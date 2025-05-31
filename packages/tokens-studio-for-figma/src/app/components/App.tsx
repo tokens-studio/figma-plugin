@@ -14,6 +14,7 @@ import { activeTabSelector } from '@/selectors';
 import PluginResizerWrapper from './PluginResizer';
 import LoadingBar from './LoadingBar';
 import { ConvertToDTCGModal } from './ConvertToDTCGModal';
+import { TokensContextProvider } from '@/context';
 
 function App() {
   const activeTab = useSelector(activeTabSelector);
@@ -28,38 +29,40 @@ function App() {
           height: '1rem',
         }}
       >
-        {activeTab !== 'loading' && <LoadingBar />}
-        <PluginResizerWrapper>
-          <Box
-            css={{
-              display: 'flex',
-              flexDirection: 'column',
-              height: '100%',
-              overflow: 'hidden',
-            }}
-          >
+        <TokensContextProvider>
+          {activeTab !== 'loading' && <LoadingBar />}
+          <PluginResizerWrapper>
             <Box
               css={{
                 display: 'flex',
                 flexDirection: 'column',
-                flexGrow: 1,
                 height: '100%',
                 overflow: 'hidden',
               }}
             >
-              {activeTab === 'loading' && <FigmaLoading />}
-              {activeTab !== 'start' && activeTab !== 'loading' && <Navbar />}
-              {activeTab === 'start' && <StartScreen />}
-              <Tokens isActive={activeTab === 'tokens'} />
-              {activeTab === 'inspector' && <Inspector />}
-              {activeTab === 'secondscreen' && <SecondSceen />}
-              {activeTab === 'settings' && <Settings />}
+              <Box
+                css={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  flexGrow: 1,
+                  height: '100%',
+                  overflow: 'hidden',
+                }}
+              >
+                {activeTab === 'loading' && <FigmaLoading />}
+                {activeTab !== 'start' && activeTab !== 'loading' && <Navbar />}
+                {activeTab === 'start' && <StartScreen />}
+                <Tokens isActive={activeTab === 'tokens'} />
+                {activeTab === 'inspector' && <Inspector />}
+                {activeTab === 'secondscreen' && <SecondSceen />}
+                {activeTab === 'settings' && <Settings />}
+              </Box>
+              {activeTab !== 'loading' && activeTab !== 'start' && <Footer />}
             </Box>
-            {activeTab !== 'loading' && activeTab !== 'start' && <Footer />}
-          </Box>
 
-        </PluginResizerWrapper>
-        <ConvertToDTCGModal />
+          </PluginResizerWrapper>
+          <ConvertToDTCGModal />
+        </TokensContextProvider>
       </IconoirProvider>
     </Box>
   );

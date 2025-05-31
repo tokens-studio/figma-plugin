@@ -62,11 +62,7 @@ export default function InspectorTokenSingle({
   React.useEffect(() => {
     setChecked(inspectState.selectedTokens.includes(`${token.category}-${token.value}`));
     if (!resolvedTokens.find((resolvedToken) => resolvedToken.name === token.value) && !token.resolvedValue) setIsBrokenLink(true);
-  }, [inspectState.selectedTokens, token]);
-
-  React.useEffect(() => {
-    tokensContext.resolvedTokens = resolvedTokens;
-  }, [resolvedTokens]);
+  }, [inspectState.selectedTokens, token, resolvedTokens]);
 
   const handleDownShiftInputChange = React.useCallback((newInputValue: string) => {
     setNewTokenName(newInputValue.replace(/[{}$]/g, ''));

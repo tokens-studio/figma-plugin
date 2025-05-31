@@ -3,7 +3,6 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ToggleGroup, IconButton } from '@tokens-studio/ui';
-import { mergeTokenGroups } from '@/utils/tokenHelpers';
 import TokenListing from './TokenListing';
 import TokensBottomBar from './TokensBottomBar';
 import ToggleEmptyButton from './ToggleEmptyButton';
@@ -19,7 +18,7 @@ import useTokens from '../store/useTokens';
 import AttentionIcon from '@/icons/attention.svg';
 import { TokensContext } from '@/context';
 import {
-  activeTokenSetSelector, aliasBaseFontSizeSelector, manageThemesModalOpenSelector, scrollPositionSetSelector, showEditFormSelector, tokenFilterSelector, tokensSelector, tokenTypeSelector, usedTokenSetSelector,
+  activeTokenSetSelector, aliasBaseFontSizeSelector, manageThemesModalOpenSelector, scrollPositionSetSelector, showEditFormSelector, tokenFilterSelector, tokensSelector, tokenTypeSelector,
 } from '@/selectors';
 import { ThemeSelector } from './ThemeSelector';
 import { ManageThemesModal } from './ManageThemesModal';
@@ -27,7 +26,6 @@ import { activeTokensTabSelector } from '@/selectors/activeTokensTabSelector';
 import { stringTokensSelector } from '@/selectors/stringTokensSelector';
 import { getAliasValue } from '@/utils/alias';
 import SidebarIcon from '@/icons/sidebar.svg';
-import { defaultTokenResolver } from '@/utils/TokenResolver';
 import { tokenFormatSelector } from '@/selectors/tokenFormatSelector';
 import { IconJson } from '@/icons';
 
@@ -86,7 +84,6 @@ function Tokens({ isActive }: { isActive: boolean }) {
   const tokenFormat = useSelector(tokenFormatSelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const activeTokensTab = useSelector(activeTokensTabSelector);
-  const usedTokenSet = useSelector(usedTokenSetSelector);
   const stringTokens = useSelector(stringTokensSelector);
   const showEditForm = useSelector(showEditFormSelector);
   const manageThemesModalOpen = useSelector(manageThemesModalOpenSelector);
@@ -97,6 +94,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
   const [tokenSetsVisible, setTokenSetsVisible] = React.useState(true);
   const { getStringTokens } = useTokens();
   const tokenDiv = React.useRef<HTMLDivElement>(null);
+  const tokensContext = React.useContext(TokensContext);
 
   React.useEffect(() => {
     if (tokenDiv.current) {
@@ -110,10 +108,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
     }
   }, [activeTokenSet]);
 
-  const resolvedTokens = React.useMemo(
-    () => defaultTokenResolver.setTokens(mergeTokenGroups(tokens, usedTokenSet, {}, activeTokenSet)),
-    [tokens, usedTokenSet, activeTokenSet],
-  );
+  const resolvedTokens = tokensContext.resolvedTokens;
 
   const tokenType = useSelector(tokenTypeSelector);
 
@@ -158,10 +153,6 @@ function Tokens({ isActive }: { isActive: boolean }) {
     }
   }, [dispatch.uiState]);
 
-  const tokensContextValue = React.useMemo(() => ({
-    resolvedTokens,
-  }), [resolvedTokens]);
-
   React.useEffect(() => {
     // @README these dependencies aren't exhaustive
     // because of specific logic requirements
@@ -193,116 +184,114 @@ function Tokens({ isActive }: { isActive: boolean }) {
   if (!isActive) return null;
 
   return (
-    <TokensContext.Provider value={tokensContextValue}>
+    <Box
+      css={{
+        flexGrow: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        overflow: 'hidden',
+      }}
+    >
       <Box
         css={{
-          flexGrow: 1,
           display: 'flex',
-          flexDirection: 'column',
+          flexDirection: 'row',
+          alignItems: 'center',
+          padding: '$2',
+          gap: '$2',
+          borderBottom: '1px solid',
+          borderColor: '$borderMuted',
+        }}
+      >
+        <IconButton
+          onClick={handleToggleTokenSetsVisibility}
+          icon={<SidebarIcon />}
+          tooltipSide="bottom"
+          size="small"
+          variant="invisible"
+          tooltip={tokenSetsVisible ? 'Collapse sidebar' : 'Expand sidebar'}
+        />
+        <TokenFilter />
+        <ThemeSelector />
+        <Box
+          css={{
+            display: 'flex',
+            gap: '$2',
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}
+        >
+          <ToggleGroup
+            size="small"
+            type="single"
+            value={activeTokensTabToggleState}
+            onValueChange={handleSetTokensTab}
+          >
+            <ToggleGroup.Item value="list">
+              <IconListing />
+            </ToggleGroup.Item>
+            <ToggleGroup.Item value="json">
+              <IconJson />
+            </ToggleGroup.Item>
+          </ToggleGroup>
+        </Box>
+      </Box>
+      <Box
+        css={{
+          display: 'flex',
+          flexDirection: 'row',
+          flexGrow: 1,
+          borderBottom: '1px solid',
+          borderColor: '$borderMuted',
           height: '100%',
           overflow: 'hidden',
         }}
       >
+        {tokenSetsVisible && (
+          <TokenSetSelector saveScrollPositionSet={saveScrollPositionSet} />
+        )}
         <Box
           css={{
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-            padding: '$2',
-            gap: '$2',
-            borderBottom: '1px solid',
-            borderColor: '$borderMuted',
-          }}
-        >
-          <IconButton
-            onClick={handleToggleTokenSetsVisibility}
-            icon={<SidebarIcon />}
-            tooltipSide="bottom"
-            size="small"
-            variant="invisible"
-            tooltip={tokenSetsVisible ? 'Collapse sidebar' : 'Expand sidebar'}
-          />
-          <TokenFilter />
-          <ThemeSelector />
-          <Box
-            css={{
-              display: 'flex',
-              gap: '$2',
-              flexDirection: 'row',
-              alignItems: 'center',
-            }}
-          >
-            <ToggleGroup
-              size="small"
-              type="single"
-              value={activeTokensTabToggleState}
-              onValueChange={handleSetTokensTab}
-            >
-              <ToggleGroup.Item value="list">
-                <IconListing />
-              </ToggleGroup.Item>
-              <ToggleGroup.Item value="json">
-                <IconJson />
-              </ToggleGroup.Item>
-            </ToggleGroup>
-          </Box>
-        </Box>
-        <Box
-          css={{
-            display: 'flex',
-            flexDirection: 'row',
             flexGrow: 1,
-            borderBottom: '1px solid',
-            borderColor: '$borderMuted',
+            display: 'flex',
+            flexDirection: 'column',
             height: '100%',
             overflow: 'hidden',
           }}
         >
-          {tokenSetsVisible && (
-            <TokenSetSelector saveScrollPositionSet={saveScrollPositionSet} />
+          {activeTokensTab === 'json' ? (
+            <Box css={{ position: 'relative', height: '100%' }}>
+              <JSONEditor stringTokens={stringTokens} handleChange={handleChangeJSON} />
+              <StatusToast
+                open={Boolean(error)}
+                error={error}
+              />
+            </Box>
+          ) : (
+            <Box ref={tokenDiv} css={{ width: '100%', paddingBottom: '$6' }} className="content scroll-container">
+              {memoizedTokens.map(({
+                key, values, isPro, schema,
+              }) => (
+                <div key={key}>
+                  <TokenListing
+                    tokenKey={key}
+                    label={schema.label || key}
+                    schema={schema}
+                    values={values}
+                    isPro={isPro}
+                  />
+                </div>
+              ))}
+              <ToggleEmptyButton />
+              {showEditForm && <EditTokenFormModal resolvedTokens={resolvedTokens} />}
+            </Box>
           )}
-          <Box
-            css={{
-              flexGrow: 1,
-              display: 'flex',
-              flexDirection: 'column',
-              height: '100%',
-              overflow: 'hidden',
-            }}
-          >
-            {activeTokensTab === 'json' ? (
-              <Box css={{ position: 'relative', height: '100%' }}>
-                <JSONEditor stringTokens={stringTokens} handleChange={handleChangeJSON} />
-                <StatusToast
-                  open={Boolean(error)}
-                  error={error}
-                />
-              </Box>
-            ) : (
-              <Box ref={tokenDiv} css={{ width: '100%', paddingBottom: '$6' }} className="content scroll-container">
-                {memoizedTokens.map(({
-                  key, values, isPro, schema,
-                }) => (
-                  <div key={key}>
-                    <TokenListing
-                      tokenKey={key}
-                      label={schema.label || key}
-                      schema={schema}
-                      values={values}
-                      isPro={isPro}
-                    />
-                  </div>
-                ))}
-                <ToggleEmptyButton />
-                {showEditForm && <EditTokenFormModal resolvedTokens={resolvedTokens} />}
-              </Box>
-            )}
-          </Box>
-          {manageThemesModalOpen && <ManageThemesModal />}
         </Box>
-        <TokensBottomBar handleError={setError} />
+        {manageThemesModalOpen && <ManageThemesModal />}
       </Box>
-    </TokensContext.Provider>
+      <TokensBottomBar handleError={setError} />
+    </Box>
   );
 }
 

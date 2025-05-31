@@ -8,35 +8,28 @@ import {
 import remConfigurationImage from '@/app/assets/hints/remConfiguration.png';
 import IconBrokenLink from '@/icons/brokenlink.svg';
 import { TokenTypes } from '@/constants/TokenTypes';
-import { mergeTokenGroups } from '@/utils/tokenHelpers';
 import { Dispatch } from '../store';
 import {
-  tokensSelector, usedTokenSetSelector, activeTokenSetSelector, aliasBaseFontSizeSelector,
+  aliasBaseFontSizeSelector,
 } from '@/selectors';
 import DownshiftInput from './DownshiftInput';
 import { getAliasValue } from '@/utils/alias';
-import { defaultTokenResolver } from '@/utils/TokenResolver';
 import Modal from './Modal';
 import { ExplainerModal } from './ExplainerModal';
+import { TokensContext } from '@/context';
 
 const RemConfiguration = () => {
   const aliasBaseFontSize = useSelector(aliasBaseFontSizeSelector);
-  const tokens = useSelector(tokensSelector);
-  const usedTokenSet = useSelector(usedTokenSetSelector);
-  const activeTokenSet = useSelector(activeTokenSetSelector);
   const dispatch = useDispatch<Dispatch>();
   const { t } = useTranslation(['settings']);
   const [modalVisible, setModalVisible] = React.useState(false);
   const [isBrokenLink, setIsBrokenLink] = React.useState<boolean>(false);
+  const tokensContext = React.useContext(TokensContext);
 
   const toggleModalVisible = React.useCallback(() => setModalVisible((prev) => !prev), []);
 
-  const resolvedTokens = React.useMemo(
-    () => defaultTokenResolver.setTokens(
-      mergeTokenGroups(tokens, usedTokenSet, {}, activeTokenSet),
-    ),
-    [tokens, usedTokenSet, activeTokenSet],
-  );
+  // Use resolved tokens from context instead of calculating locally
+  const resolvedTokens = tokensContext.resolvedTokens;
 
   const displayBaseFontValue = React.useMemo(() => {
     const resolvedAliasBaseFontSize = getAliasValue(aliasBaseFontSize, resolvedTokens);

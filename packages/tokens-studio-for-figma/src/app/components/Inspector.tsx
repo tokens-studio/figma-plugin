@@ -12,29 +12,24 @@ import IconDebug from '@/icons/debug.svg';
 import IconInspect from '@/icons/multiinspect.svg';
 import { Dispatch } from '../store';
 import Label from './Label';
-import { mergeTokenGroups } from '@/utils/tokenHelpers';
 import { track } from '@/utils/analytics';
 import {
   inspectDeepSelector,
-  tokensSelector,
-  usedTokenSetSelector,
 } from '@/selectors';
 import InspectSearchOptionDropdown from './InspectSearchOptionDropdown';
 import Stack from './Stack';
-import { defaultTokenResolver } from '@/utils/TokenResolver';
+import { TokensContext } from '@/context';
 
 function Inspector() {
   const [inspectView, setInspectView] = React.useState('multi');
   const { t } = useTranslation(['inspect']);
   const [searchInputValue, setSearchInputValue] = React.useState<string>('');
   const dispatch = useDispatch<Dispatch>();
-  const tokens = useSelector(tokensSelector);
-  const usedTokenSet = useSelector(usedTokenSetSelector);
   const inspectDeep = useSelector(inspectDeepSelector);
-  // TODO: Put this into state in a performant way
-  const resolvedTokens = React.useMemo(() => (
-    defaultTokenResolver.setTokens(mergeTokenGroups(tokens, usedTokenSet))
-  ), [tokens, usedTokenSet]);
+  const tokensContext = React.useContext(TokensContext);
+  
+  // Use resolved tokens from context instead of calculating locally
+  const resolvedTokens = tokensContext.resolvedTokens;
 
   const handleSetInspectView = React.useCallback((view: 'multi' | 'debug') => {
     if (view) {
