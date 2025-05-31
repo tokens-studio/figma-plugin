@@ -15,7 +15,9 @@ export type GitStorageSaveOptions = {
 
 export type GitStorageSaveOption = {
   commitMessage?: string,
-  storeTokenIdInJsonEditor: boolean
+  storeTokenIdInJsonEditor: boolean,
+  useDeltaDiff?: boolean,
+  lastSyncedState?: string
 };
 
 export type GitSingleFileObject = Record<string, (
@@ -95,8 +97,14 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageSaveO
     const branches = await this.fetchBranches();
     if (!branches.length) return false;
 
+    console.log('📦 GitTokenStorage: Starting write operation...');
+    console.log(`    Multi-file enabled: ${this.flags.multiFileEnabled}`);
+    console.log(`   📄 Path: ${this.path}`);
+    console.log(`   🌿 Branch: ${this.branch}`);
+
     const filesChangeset: Record<string, string> = {};
     if (this.path.endsWith('.json')) {
+      console.log('📄 GitTokenStorage: Single file mode');
       filesChangeset[this.path] = JSON.stringify({
         ...files.reduce<GitSingleFileObject>((acc, file) => {
           if (file.type === 'tokenSet') {
@@ -110,6 +118,7 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageSaveO
         }, {}),
       }, null, 2);
     } else if (this.flags.multiFileEnabled) {
+      console.log('📁 GitTokenStorage: Multi-file mode');
       files.forEach((file) => {
         if (file.type === 'tokenSet') {
           filesChangeset[joinPath(this.path, `${file.name}.json`)] = JSON.stringify(file.data, null, 2);
@@ -120,9 +129,13 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageSaveO
         }
       });
     } else {
-      // When path is a directory and multiFile is disabled return
+      console.log('❌ GitTokenStorage: Multi-file disabled but path is directory - this will fail');
       throw new Error(ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR);
     }
+
+    console.log(`📤 GitTokenStorage: Pushing ${Object.keys(filesChangeset).length} files`);
+    console.log(`   📋 Files: ${Object.keys(filesChangeset).join(', ')}`);
+
     return this.writeChangeset(
       filesChangeset,
       saveOptions.commitMessage ?? 'Commit from Figma',
