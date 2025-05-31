@@ -6,6 +6,59 @@ import { transformValue } from './helpers';
 import { isAutoLayout } from '@/utils/isAutoLayout';
 import { isPartOfInstance } from '@/utils/is/isPartOfInstance';
 
+// Helper function to check if a node is a SceneNode
+function isSceneNode(node: BaseNode): node is SceneNode {
+  return node.type !== 'DOCUMENT' && node.type !== 'PAGE';
+}
+
+// Helper function to handle full size (100%) values
+function handleFullSizeValue(
+  node: BaseNode,
+  dimension: 'width' | 'height' | 'both',
+  value: string,
+  baseFontSize: string,
+): boolean {
+  if (String(value).trim() !== '100%') {
+    return false; // Not a 100% value, let caller handle normally
+  }
+
+  // Handle full size property
+  if ('layoutAlign' in node && node.parent && isSceneNode(node.parent) && isAutoLayout(node.parent)) {
+    // If node is a child of an auto layout parent, set layoutAlign to STRETCH
+    node.layoutAlign = 'STRETCH';
+    return true;
+  }
+
+  // For regular layers, calculate size based on parent's dimensions
+  if (node.parent && 'resize' in node) {
+    if (dimension === 'both' && 'width' in node.parent && 'height' in node.parent) {
+      node.resize(node.parent.width, node.parent.height);
+      return true;
+    } else if (dimension === 'width' && 'width' in node.parent) {
+      node.resize(node.parent.width, node.height);
+      return true;
+    } else if (dimension === 'height' && 'height' in node.parent) {
+      node.resize(node.width, node.parent.height);
+      return true;
+    }
+  }
+
+  // Fallback for nodes without applicable parent
+  if ('resize' in node) {
+    if (dimension === 'both') {
+      const size = transformValue(value, 'sizing', baseFontSize);
+      node.resize(size, size);
+    } else if (dimension === 'width') {
+      node.resize(transformValue(value, 'sizing', baseFontSize), node.height);
+    } else if (dimension === 'height') {
+      node.resize(node.width, transformValue(value, 'sizing', baseFontSize));
+    }
+    return true;
+  }
+
+  return false;
+}
+
 export async function applySizingValuesOnNode(
   node: BaseNode,
   data: NodeTokenRefMap,
@@ -24,21 +77,8 @@ export async function applySizingValuesOnNode(
       && (await tryApplyVariableId(node, 'height', data.sizing))
     )
   ) {
-    // Check if sizing is set to 100% for full width and height behavior
-    if (String(values.sizing).trim() === '100%') {
-      // Handle full width and height property
-      if ('layoutAlign' in node && node.parent && isAutoLayout(node.parent)) {
-        // If node is a child of an auto layout parent, set layoutAlign to STRETCH for both dimensions
-        node.layoutAlign = 'STRETCH';
-      } else if (node.parent && 'width' in node.parent && 'height' in node.parent) {
-        // For regular layers, calculate size based on parent's dimensions
-        node.resize(node.parent.width, node.parent.height);
-      } else {
-        // Fallback for nodes without applicable parent
-        const size = transformValue(String(values.sizing), 'sizing', baseFontSize);
-        node.resize(size, size);
-      }
-    } else {
+    // Try to handle as 100% value first
+    if (!handleFullSizeValue(node, 'both', String(values.sizing), baseFontSize)) {
       // Regular sizing handling for non-100% values
       const size = transformValue(String(values.sizing), 'sizing', baseFontSize);
       node.resize(size, size);
@@ -53,20 +93,8 @@ export async function applySizingValuesOnNode(
     && isPrimitiveValue(values.width)
     && !(await tryApplyVariableId(node, 'width', data.width))
   ) {
-    // Check if width is set to 100% for full width behavior
-    if (String(values.width).trim() === '100%') {
-      // Handle full width property
-      if ('layoutAlign' in node && node.parent && isAutoLayout(node.parent)) {
-        // If node is a child of an auto layout parent, set layoutAlign to STRETCH
-        node.layoutAlign = 'STRETCH';
-      } else if (node.parent && 'width' in node.parent) {
-        // For regular layers, calculate width based on parent's width
-        node.resize(node.parent.width, node.height);
-      } else {
-        // Fallback for nodes without applicable parent
-        node.resize(transformValue(String(values.width), 'sizing', baseFontSize), node.height);
-      }
-    } else {
+    // Try to handle as 100% value first
+    if (!handleFullSizeValue(node, 'width', String(values.width), baseFontSize)) {
       // Regular width handling for non-100% values
       node.resize(transformValue(String(values.width), 'sizing', baseFontSize), node.height);
     }
@@ -80,20 +108,8 @@ export async function applySizingValuesOnNode(
     && isPrimitiveValue(values.height)
     && !(await tryApplyVariableId(node, 'height', data.height))
   ) {
-    // Check if height is set to 100% for full height behavior
-    if (String(values.height).trim() === '100%') {
-      // Handle full height property
-      if ('layoutAlign' in node && node.parent && isAutoLayout(node.parent)) {
-        // If node is a child of an auto layout parent, set layoutAlign to STRETCH
-        node.layoutAlign = 'STRETCH';
-      } else if (node.parent && 'height' in node.parent) {
-        // For regular layers, calculate height based on parent's height
-        node.resize(node.width, node.parent.height);
-      } else {
-        // Fallback for nodes without applicable parent
-        node.resize(node.width, transformValue(String(values.height), 'sizing', baseFontSize));
-      }
-    } else {
+    // Try to handle as 100% value first
+    if (!handleFullSizeValue(node, 'height', String(values.height), baseFontSize)) {
       // Regular height handling for non-100% values
       node.resize(node.width, transformValue(String(values.height), 'sizing', baseFontSize));
     }
@@ -104,8 +120,8 @@ export async function applySizingValuesOnNode(
     node.type !== 'DOCUMENT'
     && node.type !== 'PAGE'
     && !isPartOfInstance(node.id)
-    && (isAutoLayout(node)
-      || (node.parent && node.parent.type !== 'DOCUMENT' && node.parent.type !== 'PAGE' && isAutoLayout(node.parent)))
+    && (isSceneNode(node) && isAutoLayout(node)
+      || (node.parent && isSceneNode(node.parent) && isAutoLayout(node.parent)))
   ) {
     // SIZING: MIN WIDTH
     if (
