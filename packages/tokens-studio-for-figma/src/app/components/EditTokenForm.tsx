@@ -24,6 +24,7 @@ import { checkIfAlias, checkIfContainsAlias, getAliasValue } from '@/utils/alias
 import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
 import {
   activeTokenSetSelector, editTokenSelector, themesListSelector, tokensSelector,
+  showEditFormSelector,
 } from '@/selectors';
 import { TokenTypes } from '@/constants/TokenTypes';
 import TypographyInput from './TypographyInput';
@@ -42,7 +43,6 @@ import { ColorModifier } from '@/types/Modifier';
 import { MultiSelectDropdown } from './MultiSelectDropdown';
 import { tokenTypesToCreateVariable } from '@/constants/VariableTypes';
 import { ModalOptions } from '@/constants/ModalOptions';
-import { showEditFormSelector } from '@/selectors';
 
 let lastUsedRenameOption: UpdateMode = UpdateMode.SELECTION;
 let lastUsedRenameStyles = false;
@@ -533,7 +533,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
 
   // Only register the shortcut when this form is actually being used
   const showEditForm = useSelector(showEditFormSelector);
-  
+
   // Conditionally register the shortcut only when the form is active
   React.useEffect(() => {
     if (showEditForm) {
@@ -543,12 +543,13 @@ function EditTokenForm({ resolvedTokens }: Props) {
           checkAndSubmitTokenValue();
         }
       };
-      
+
       document.addEventListener('keydown', handleKeyDown);
       return () => {
         document.removeEventListener('keydown', handleKeyDown);
       };
     }
+    return undefined; // return undefined to avoid eslint error
   }, [showEditForm, checkAndSubmitTokenValue]);
 
   const handleReset = React.useCallback(() => {

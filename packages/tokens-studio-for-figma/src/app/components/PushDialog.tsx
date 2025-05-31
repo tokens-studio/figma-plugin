@@ -113,12 +113,13 @@ function PushDialog() {
           handlePushChanges();
         }
       };
-      
+
       document.addEventListener('keydown', handleKeyDown);
       return () => {
         document.removeEventListener('keydown', handleKeyDown);
       };
     }
+    return undefined; // return undefined to avoid eslint error
   }, [showPushDialog?.state, handlePushChanges]);
 
   switch (showPushDialog?.state) {
