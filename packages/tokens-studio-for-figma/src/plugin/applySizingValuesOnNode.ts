@@ -22,36 +22,41 @@ function handleFullSizeValue(
     return false; // Not a 100% value, let caller handle normally
   }
 
-  // Handle full size property
+  // Handle auto layout case: set layoutAlign to STRETCH
   if ('layoutAlign' in node && node.parent && isSceneNode(node.parent) && isAutoLayout(node.parent)) {
-    // If node is a child of an auto layout parent, set layoutAlign to STRETCH
     node.layoutAlign = 'STRETCH';
     return true;
   }
 
-  // For regular layers, calculate size based on parent's dimensions
+  // Handle regular layers: resize based on parent dimensions
   if (node.parent && 'resize' in node) {
-    if (dimension === 'both' && 'width' in node.parent && 'height' in node.parent) {
-      node.resize(node.parent.width, node.parent.height);
+    const parent = node.parent;
+    
+    if (dimension === 'both' && 'width' in parent && 'height' in parent) {
+      node.resize(parent.width, parent.height);
       return true;
-    } else if (dimension === 'width' && 'width' in node.parent) {
-      node.resize(node.parent.width, node.height);
+    } 
+    
+    if (dimension === 'width' && 'width' in parent) {
+      node.resize(parent.width, node.height);
       return true;
-    } else if (dimension === 'height' && 'height' in node.parent) {
-      node.resize(node.width, node.parent.height);
+    } 
+    
+    if (dimension === 'height' && 'height' in parent) {
+      node.resize(node.width, parent.height);
       return true;
     }
   }
 
-  // Fallback for nodes without applicable parent
+  // Fallback: treat as regular sizing token
   if ('resize' in node) {
+    const transformedValue = transformValue(value, 'sizing', baseFontSize);
     if (dimension === 'both') {
-      const size = transformValue(value, 'sizing', baseFontSize);
-      node.resize(size, size);
+      node.resize(transformedValue, transformedValue);
     } else if (dimension === 'width') {
-      node.resize(transformValue(value, 'sizing', baseFontSize), node.height);
+      node.resize(transformedValue, node.height);
     } else if (dimension === 'height') {
-      node.resize(node.width, transformValue(value, 'sizing', baseFontSize));
+      node.resize(node.width, transformedValue);
     }
     return true;
   }
@@ -77,11 +82,12 @@ export async function applySizingValuesOnNode(
       && (await tryApplyVariableId(node, 'height', data.sizing))
     )
   ) {
+    const sizingValue = String(values.sizing);
     // Try to handle as 100% value first
-    if (!handleFullSizeValue(node, 'both', String(values.sizing), baseFontSize)) {
+    if (!handleFullSizeValue(node, 'both', sizingValue, baseFontSize)) {
       // Regular sizing handling for non-100% values
-      const size = transformValue(String(values.sizing), 'sizing', baseFontSize);
-      node.resize(size, size);
+      const transformedSize = transformValue(sizingValue, 'sizing', baseFontSize);
+      node.resize(transformedSize, transformedSize);
     }
   }
 
@@ -93,10 +99,12 @@ export async function applySizingValuesOnNode(
     && isPrimitiveValue(values.width)
     && !(await tryApplyVariableId(node, 'width', data.width))
   ) {
+    const widthValue = String(values.width);
     // Try to handle as 100% value first
-    if (!handleFullSizeValue(node, 'width', String(values.width), baseFontSize)) {
+    if (!handleFullSizeValue(node, 'width', widthValue, baseFontSize)) {
       // Regular width handling for non-100% values
-      node.resize(transformValue(String(values.width), 'sizing', baseFontSize), node.height);
+      const transformedWidth = transformValue(widthValue, 'sizing', baseFontSize);
+      node.resize(transformedWidth, node.height);
     }
   }
 
@@ -108,10 +116,12 @@ export async function applySizingValuesOnNode(
     && isPrimitiveValue(values.height)
     && !(await tryApplyVariableId(node, 'height', data.height))
   ) {
+    const heightValue = String(values.height);
     // Try to handle as 100% value first
-    if (!handleFullSizeValue(node, 'height', String(values.height), baseFontSize)) {
+    if (!handleFullSizeValue(node, 'height', heightValue, baseFontSize)) {
       // Regular height handling for non-100% values
-      node.resize(node.width, transformValue(String(values.height), 'sizing', baseFontSize));
+      const transformedHeight = transformValue(heightValue, 'sizing', baseFontSize);
+      node.resize(node.width, transformedHeight);
     }
   }
 
