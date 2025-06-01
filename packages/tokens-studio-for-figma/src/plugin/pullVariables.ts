@@ -1,11 +1,13 @@
 import { figmaRGBToHex } from '@figma-plugin/helpers';
-import { notifyVariableValues } from './notifiers';
+import { notifyVariableValues, notifyRenamedCollections } from './notifiers';
 import { PullVariablesOptions, ThemeObjectsList } from '@/types';
 import { VariableToCreateToken } from '@/types/payloads';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { getVariablesWithoutZombies } from './getVariablesWithoutZombies';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { normalizeVariableName } from '@/utils/normalizeVariableName';
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { AsyncMessageTypes } from '@/types/AsyncMessages';
 
 export default async function pullVariables(options: PullVariablesOptions, themes: ThemeObjectsList, proUser: boolean): Promise<void> {
   // @TODO should be specifically typed according to their type
@@ -180,9 +182,24 @@ export default async function pullVariables(options: PullVariablesOptions, theme
 
   type ResultObject = Record<string, VariableToCreateToken[]>;
 
+  const renamedCollections = new Map<string, string>();
+
   const themesToCreate: ThemeObjectsList = [];
   // Process themes if pro user
   if (proUser) {
+    // Get existing token sets using GET_THEME_INFO which includes token set information
+    const themeInfo = await AsyncMessageChannel.PluginInstance.message({
+      type: AsyncMessageTypes.GET_THEME_INFO,
+    });
+
+    // Extract token sets from themes
+    const existingTokenSets = new Set<string>();
+    themeInfo.themes?.forEach((theme) => {
+      Object.keys(theme.selectedTokenSets || {}).forEach((tokenSet) => {
+        existingTokenSets.add(tokenSet);
+      });
+    });
+
     await Promise.all(Array.from(collections.values()).map(async (collection) => {
       await Promise.all(collection.modes.map(async (mode) => {
         const collectionVariables = localVariables.filter((v) => v.variableCollectionId === collection.id);
@@ -192,12 +209,29 @@ export default async function pullVariables(options: PullVariablesOptions, theme
           [normalizeVariableName(variable.name)]: variable.key,
         }), {});
 
+        const tokenSetName = `${collection.name}/${mode.name}`;
+        const themeId = `${collection.name.toLowerCase()}-${mode.name.toLowerCase()}`;
+
+        // Find if there's an existing token set that matches this theme but with a different name
+        // This could happen if the collection or mode was renamed in Figma
+        for (const existingSet of existingTokenSets) {
+          // Check if this is a renamed version of an existing set
+          // We can't know for sure, but we can make an educated guess based on the theme ID
+          const existingThemeId = existingSet.replace('/', '-').toLowerCase();
+          if (existingThemeId !== themeId && existingSet.includes('/') && (existingSet.split('/')[1] === mode.name || existingThemeId.endsWith(`-${mode.name.toLowerCase()}`))) {
+            // This is likely a renamed collection with the same mode
+            renamedCollections.set(existingSet, tokenSetName);
+            break;
+          }
+        }
+
+        // Track this collection/mode combination
         themesToCreate.push({
-          id: `${collection.name.toLowerCase()}-${mode.name.toLowerCase()}`,
+          id: themeId,
           name: mode.name,
           group: collection.name,
           selectedTokenSets: {
-            [`${collection.name}/${mode.name}`]: TokenSetStatus.ENABLED,
+            [tokenSetName]: TokenSetStatus.ENABLED,
           },
           $figmaStyleReferences: {},
           $figmaVariableReferences: variableReferences,
@@ -215,7 +249,15 @@ export default async function pullVariables(options: PullVariablesOptions, theme
       }
       return acc;
     }, {});
-    notifyVariableValues(processedTokens, themesToCreate);
+    notifyVariableValues(
+      processedTokens,
+      themesToCreate,
+    );
+
+    // Add notification for renamed collections
+    if (proUser && renamedCollections.size > 0) {
+      notifyRenamedCollections(Array.from(renamedCollections.entries()));
+    }
   } catch (error) {
     console.error('Error processing results:', error);
     notifyVariableValues({});

@@ -692,6 +692,78 @@ export const tokenState = createModel<RootModel>()({
       compressedTokens: payload.compressedTokens,
       compressedThemes: payload.compressedThemes,
     }),
+    handleRenamedCollections: (state, renamedCollections: [string, string][]) => {
+      let newState = { ...state };
+
+      for (const [oldName, newName] of renamedCollections) {
+        // Only check if old name exists - we'll create the new one
+        if (oldName in newState.tokens) {
+          // Create a new tokens object with the renamed token set
+          const updatedTokens = { ...newState.tokens };
+
+          // Copy the old token set to the new name if it doesn't exist yet
+          if (!(newName in updatedTokens)) {
+            updatedTokens[newName] = [...updatedTokens[oldName]];
+          }
+
+          // Delete the old token set
+          delete updatedTokens[oldName];
+
+          // Update the tokens in the state
+          newState = {
+            ...newState,
+            tokens: updatedTokens,
+          };
+
+          // Update usedTokenSet if needed
+          if (oldName in newState.usedTokenSet) {
+            const updatedUsedTokenSet = { ...newState.usedTokenSet };
+            // If the status wasn't already copied, copy it
+            if (!(newName in updatedUsedTokenSet)) {
+              updatedUsedTokenSet[newName] = updatedUsedTokenSet[oldName];
+            }
+            delete updatedUsedTokenSet[oldName];
+
+            newState = {
+              ...newState,
+              usedTokenSet: updatedUsedTokenSet,
+            };
+          }
+
+          // Update activeTokenSet if needed
+          if (newState.activeTokenSet === oldName) {
+            newState = {
+              ...newState,
+              activeTokenSet: newName,
+            };
+          }
+
+          // Update themes if needed
+          const updatedThemes = newState.themes.map((theme) => {
+            if (theme.selectedTokenSets && oldName in theme.selectedTokenSets) {
+              const status = theme.selectedTokenSets[oldName];
+              const updatedSelectedTokenSets = { ...theme.selectedTokenSets };
+              updatedSelectedTokenSets[newName] = status;
+              delete updatedSelectedTokenSets[oldName];
+
+              return {
+                ...theme,
+                selectedTokenSets: updatedSelectedTokenSets,
+              };
+            }
+            return theme;
+          });
+
+          newState = {
+            ...newState,
+            themes: updatedThemes,
+          };
+        }
+      }
+
+      console.log('Token sets after:', Object.keys(newState.tokens));
+      return newState;
+    },
     ...tokenStateReducers,
   },
   effects: (dispatch) => ({
