@@ -6,6 +6,7 @@ import useRemoteTokens from '../../store/remoteTokens';
 import Stack from '../Stack';
 import { StorageTypeFormValues } from '@/types/StorageType';
 import { Eventlike } from '../StorageItemForm/types';
+import { useSyncProviderProgressDialog } from '../../hooks/useSyncProviderProgressDialog';
 
 type Props = {
   isOpen: boolean;
@@ -22,20 +23,38 @@ export default function EditStorageItemModal({
   const [hasErrored, setHasErrored] = React.useState(false);
   const { addNewProviderItem } = useRemoteTokens();
   const [errorMessage, setErrorMessage] = React.useState<string>();
+  const { showDialog, hideDialog } = useSyncProviderProgressDialog();
 
   const handleChange = React.useCallback((e: Eventlike) => {
     setFormFields({ ...formFields, [e.target.name]: e.target.value });
   }, [formFields]);
 
   const handleSubmit = React.useCallback(async (values: StorageTypeFormValues<false>) => {
+    const providerName = {
+      url: 'URL',
+      jsonbin: 'JSONBIN',
+      github: 'GitHub',
+      gitlab: 'GitLab',
+      ado: 'Azure DevOps',
+      bitbucket: 'Bitbucket',
+      supernova: 'Supernova',
+      genericVersionedStorage: 'Generic Versioned Storage',
+      tokensstudio: 'Tokens Studio',
+    }[values.provider] || values.provider;
+    
+    showDialog(providerName);
+    
     const response = await addNewProviderItem(values);
     if (response.status === 'success') {
+      // The progress dialog will automatically transition to success state
+      // and the user can close it when ready
       onSuccess();
     } else {
+      hideDialog();
       setHasErrored(true);
       setErrorMessage(response?.errorMessage);
     }
-  }, [addNewProviderItem, onSuccess]);
+  }, [addNewProviderItem, onSuccess, showDialog, hideDialog]);
 
   return (
     <Modal title={t('editCredentials') as string} id="modal-edit-storage-item" isOpen={isOpen} close={onClose}>

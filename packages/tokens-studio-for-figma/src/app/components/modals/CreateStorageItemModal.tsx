@@ -6,6 +6,7 @@ import { StorageTypeFormValues } from '@/types/StorageType';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { getProviderIcon } from '@/utils/getProviderIcon';
 import { Eventlike } from '../StorageItemForm/types';
+import { useSyncProviderProgressDialog } from '../../hooks/useSyncProviderProgressDialog';
 
 type Props = {
   isOpen: boolean;
@@ -20,6 +21,7 @@ export default function CreateStorageItemModal({
   const { addNewProviderItem } = useRemoteTokens();
   const [hasErrored, setHasErrored] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState<string>();
+  const { showDialog, hideDialog } = useSyncProviderProgressDialog();
 
   const getHeaderText = (storageProvider: StorageProviderType) => {
     const icon = getProviderIcon(storageProvider);
@@ -51,15 +53,32 @@ export default function CreateStorageItemModal({
   const handleCreateNewClick = React.useCallback(
     async (values: StorageTypeFormValues<false>) => {
       setHasErrored(false);
+      const providerName = {
+        url: 'URL',
+        jsonbin: 'JSONBIN',
+        github: 'GitHub',
+        gitlab: 'GitLab',
+        ado: 'Azure DevOps',
+        bitbucket: 'Bitbucket',
+        supernova: 'Supernova',
+        genericVersionedStorage: 'Generic Versioned Storage',
+        tokensstudio: 'Tokens Studio',
+      }[values.provider] || values.provider;
+      
+      showDialog(providerName);
+      
       const response = await addNewProviderItem(values);
       if (response.status === 'success') {
+        // The progress dialog will automatically transition to success state
+        // and the user can close it when ready
         onSuccess();
       } else {
+        hideDialog();
         setHasErrored(true);
         setErrorMessage(response?.errorMessage);
       }
     },
-    [addNewProviderItem, onSuccess],
+    [addNewProviderItem, onSuccess, showDialog, hideDialog],
   );
 
   const handleChange = React.useCallback(

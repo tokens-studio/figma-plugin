@@ -81,6 +81,8 @@ export interface UIState {
   showPushDialog: { state: string | false, overrides?: PushOverrides };
   showPullDialog: string | false;
   showApplyDialog: string | false;
+  showSyncProviderDialog: string | false;
+  syncProviderName: string;
   showEmptyGroups: boolean;
   collapsed: boolean;
   selectedLayers: number;
@@ -142,6 +144,8 @@ export const uiState = createModel<RootModel>()({
     showPushDialog: { state: false },
     showPullDialog: false,
     showApplyDialog: false,
+    showSyncProviderDialog: false,
+    syncProviderName: '',
     showEmptyGroups: true,
     collapsed: false,
     selectedLayers: 0,
@@ -170,6 +174,14 @@ export const uiState = createModel<RootModel>()({
     setShowApplyDialog: (state, data: string | false) => ({
       ...state,
       showApplyDialog: data,
+    }),
+    setShowSyncProviderDialog: (state, data: string | false) => ({
+      ...state,
+      showSyncProviderDialog: data,
+    }),
+    setSyncProviderName: (state, data: string) => ({
+      ...state,
+      syncProviderName: data,
     }),
     setHasRemoteChange: (state, data: boolean) => ({
       ...state,

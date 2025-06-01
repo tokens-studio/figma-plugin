@@ -109,5 +109,12 @@
   "converttow3c": "Convert to W3C DTCG format",
   "converttolegacy": "Convert to legacy format",
   "pushfirsterror": "Push your unsaved changes before converting",
-  "readmoreformat": "Read more"
+  "readmoreformat": "Read more",
+  "settingUpProvider": "Setting up sync provider",
+  "providerSetupComplete": "Sync provider setup complete",
+  "connectingToProvider": "Connecting to {{provider}}",
+  "validatingCredentials": "Validating credentials and checking connection...",
+  "allDone": "All done!",
+  "providerConnectedSuccessfully": "{{provider}} connected successfully",
+  "close": "Close"
 }

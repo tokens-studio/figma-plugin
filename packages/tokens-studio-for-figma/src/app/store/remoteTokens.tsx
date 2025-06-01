@@ -497,6 +497,8 @@ export default function useRemoteTokens() {
           throw new Error('Not implemented');
       }
       if (content?.status === 'failure') {
+        // Complete sync provider setup job if it exists (failure case)
+        dispatch.uiState.completeJob(BackgroundJobs.UI_SYNC_PROVIDER_SETUP);
         return {
           status: 'failure',
           errorMessage: content?.errorMessage,
@@ -506,10 +508,14 @@ export default function useRemoteTokens() {
         dispatch.uiState.setLocalApiState(credentials as StorageTypeCredentials); // in JSONBIN the ID can technically be omitted, but this function handles this by creating a new JSONBin and assigning the ID
         dispatch.uiState.setApiData(credentials as StorageTypeCredentials);
         setStorageType({ provider: credentials as StorageTypeCredentials, shouldSetInDocument: true });
+        // Complete sync provider setup job if it exists
+        dispatch.uiState.completeJob(BackgroundJobs.UI_SYNC_PROVIDER_SETUP);
         return {
           status: 'success',
         };
       }
+      // Complete sync provider setup job if it exists (failure case)
+      dispatch.uiState.completeJob(BackgroundJobs.UI_SYNC_PROVIDER_SETUP);
       return {
         status: 'failure',
         errorMessage: ErrorMessages.GENERAL_CONNECTION_ERROR,

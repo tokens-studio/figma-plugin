@@ -22,4 +22,5 @@ export enum BackgroundJobs {
   UI_CREATEVARIABLES = 'ui_create_variables',
   UI_CREATE_STYLES = 'ui_create_styles',
   UI_APPLY_TOKENS = 'ui_apply_tokens',
+  UI_SYNC_PROVIDER_SETUP = 'ui_sync_provider_setup',
 }
