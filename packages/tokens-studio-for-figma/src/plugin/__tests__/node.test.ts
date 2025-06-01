@@ -1,13 +1,13 @@
-import { mockGetNodeById, mockScrollAndZoomIntoView } from '../../../tests/__mocks__/figmaMock';
+import { mockGetNodeById, mockGetNodeByIdAsync, mockScrollAndZoomIntoView } from '../../../tests/__mocks__/figmaMock';
 import { goToNode } from '../node';
 
 describe('goToNode', () => {
-  it('should work', () => {
-    mockGetNodeById.mockImplementation(() => ({
+  it('should work', async () => {
+    mockGetNodeByIdAsync.mockImplementation(() => Promise.resolve({
       type: 'RECTANGLE',
     }));
 
-    goToNode('id');
+    await goToNode('id');
 
     expect(figma.currentPage.selection).toEqual([{
       type: 'RECTANGLE',

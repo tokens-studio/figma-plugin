@@ -31,7 +31,7 @@ export class NodeManager {
 
   public async getNode(id: string): Promise<NodeManagerNode | null> {
     await this.waitForUpdating();
-    const node = figma.getNodeById(id);
+    const node = await figma.getNodeByIdAsync(id);
     if (!node) return null;
     return {
       node,

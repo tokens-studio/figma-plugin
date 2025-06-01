@@ -193,8 +193,8 @@ export async function saveOnboardingExplainerInspect(onboardingExplainerInspect:
   await OnboardingExplainerInspectProperty.write(onboardingExplainerInspect);
 }
 
-export function goToNode(id: string) {
-  const node = figma.getNodeById(id);
+export async function goToNode(id: string) {
+  const node = await figma.getNodeByIdAsync(id);
   if (
     node
     && node.type !== 'PAGE'
@@ -205,8 +205,9 @@ export function goToNode(id: string) {
   }
 }
 
-export function selectNodes(ids: string[]) {
-  const nodes = compact(ids.map(figma.getNodeById)).filter((node) => (
+export async function selectNodes(ids: string[]) {
+  const nodePromises = ids.map(id => figma.getNodeByIdAsync(id));
+  const nodes = compact(await Promise.all(nodePromises)).filter((node) => (
     node.type !== 'PAGE' && node.type !== 'DOCUMENT'
   )) as (Exclude<BaseNode, PageNode | DocumentNode>)[];
   figma.currentPage.selection = nodes;
