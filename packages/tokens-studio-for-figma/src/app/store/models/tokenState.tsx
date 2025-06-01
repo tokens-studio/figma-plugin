@@ -169,7 +169,7 @@ export const tokenState = createModel<RootModel>()({
       usedTokenSet: data,
     }),
     setThemes: (state, data: ThemeObjectsList) => {
-      const { newThemes, updatedThemes } = state.importedThemes;
+      const { newThemes = [], updatedThemes = [] } = state.importedThemes || { newThemes: [], updatedThemes: [] };
 
       return {
         ...state,

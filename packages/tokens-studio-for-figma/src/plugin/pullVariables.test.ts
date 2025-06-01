@@ -86,6 +86,16 @@ jest.mock('./getVariablesWithoutZombies', () => ({
   ]),
 }));
 
+jest.mock('@/AsyncMessageChannel', () => ({
+  AsyncMessageChannel: {
+    PluginInstance: {
+      message: jest.fn().mockResolvedValue({
+        themes: [],
+      }),
+    },
+  },
+}));
+
 // Update the figma global mocks to include the new async function
 global.figma = {
   ui: {
@@ -119,6 +129,18 @@ global.figma = {
 
 describe('pullStyles', () => {
   const notifyStyleValuesSpy = jest.spyOn(notifiers, 'notifyVariableValues');
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    
+    // Ensure figma.ui has the necessary methods
+    if (!global.figma.ui.on) {
+      global.figma.ui.on = jest.fn();
+    }
+    if (!global.figma.ui.off) {
+      global.figma.ui.off = jest.fn();
+    }
+  });
 
   it('pulls variables without no dimension options', async () => {
     await pullVariables({ useDimensions: false, useRem: false }, [], false);
