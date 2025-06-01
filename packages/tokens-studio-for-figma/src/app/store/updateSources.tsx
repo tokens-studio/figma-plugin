@@ -14,6 +14,7 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageType, StorageTypeCredentials } from '@/types/StorageType';
 import { defaultTokenResolver } from '@/utils/TokenResolver';
 import { getFormat, TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
+import { BackgroundJobs } from '@/constants/BackgroundJobs';
 
 type UpdateRemoteTokensPayload = {
   provider: StorageProviderType;
@@ -213,6 +214,14 @@ export default async function updateTokensOnSources({
     if (transaction) {
       transaction.setMeasurement('nodes', result.nodes, '');
       transaction.finish();
+    }
+    
+    // Check if there's an active apply job running and complete it
+    const currentState = dispatch.getState();
+    const applyJob = currentState.uiState.backgroundJobs.find(job => job.name === BackgroundJobs.UI_APPLY_TOKENS);
+    if (applyJob && currentState.uiState.showApplyDialog === 'loading') {
+      dispatch.uiState.completeJob(BackgroundJobs.UI_APPLY_TOKENS);
+      dispatch.uiState.setShowApplyDialog('success');
     }
   });
 }

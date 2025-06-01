@@ -5,6 +5,7 @@ import {
   createMockStore, render, waitFor,
 } from '../../../tests/config/setupTest';
 import ApplySelector from './ApplySelector';
+import { BackgroundJobs } from '@/constants/BackgroundJobs';
 
 const mockHandleUpdate = jest.fn();
 jest.mock('../store/useTokens', () => ({
@@ -47,5 +48,30 @@ describe('ApplySelector', () => {
       updateButton.click();
       expect(mockHandleUpdate).toBeCalledTimes(1);
     });
+  });
+
+  it('should start apply job and show dialog when handleUpdate is called', async () => {
+    const startJobSpy = jest.spyOn(mockStore.dispatch.uiState, 'startJob');
+    const setShowApplyDialogSpy = jest.spyOn(mockStore.dispatch.uiState, 'setShowApplyDialog');
+    
+    // Mock handleUpdate to actually call the UI actions
+    mockHandleUpdate.mockImplementation(() => {
+      mockStore.dispatch.uiState.startJob({
+        name: BackgroundJobs.UI_APPLY_TOKENS,
+        isInfinite: true,
+      });
+      mockStore.dispatch.uiState.setShowApplyDialog('loading');
+    });
+
+    const result = renderStore();
+    const updateButton = await result.findByTestId('update-button');
+    
+    await userEvent.click(updateButton);
+    
+    expect(startJobSpy).toHaveBeenCalledWith({
+      name: BackgroundJobs.UI_APPLY_TOKENS,
+      isInfinite: true,
+    });
+    expect(setShowApplyDialogSpy).toHaveBeenCalledWith('loading');
   });
 });

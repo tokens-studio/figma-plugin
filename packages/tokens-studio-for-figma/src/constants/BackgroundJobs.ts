@@ -21,4 +21,5 @@ export enum BackgroundJobs {
   UI_RENAME_TOKEN_ACROSS_SETS = 'ui_rename_token_across_sets',
   UI_CREATEVARIABLES = 'ui_create_variables',
   UI_CREATE_STYLES = 'ui_create_styles',
+  UI_APPLY_TOKENS = 'ui_apply_tokens',
 }

@@ -80,6 +80,7 @@ export interface UIState {
   confirmState: ConfirmProps;
   showPushDialog: { state: string | false, overrides?: PushOverrides };
   showPullDialog: string | false;
+  showApplyDialog: string | false;
   showEmptyGroups: boolean;
   collapsed: boolean;
   selectedLayers: number;
@@ -140,6 +141,7 @@ export const uiState = createModel<RootModel>()({
     confirmState: defaultConfirmState,
     showPushDialog: { state: false },
     showPullDialog: false,
+    showApplyDialog: false,
     showEmptyGroups: true,
     collapsed: false,
     selectedLayers: 0,
@@ -164,6 +166,10 @@ export const uiState = createModel<RootModel>()({
     setShowPullDialog: (state, data: string | false) => ({
       ...state,
       showPullDialog: data,
+    }),
+    setShowApplyDialog: (state, data: string | false) => ({
+      ...state,
+      showApplyDialog: data,
     }),
     setHasRemoteChange: (state, data: boolean) => ({
       ...state,

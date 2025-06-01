@@ -22,6 +22,7 @@ import { AuthContextProvider } from '@/context/AuthContext';
 import SecondScreenSync from '../SecondScreenSync';
 import AuthModal from '../AuthModal';
 import PullDialog from '../PullDialog';
+import ApplyProgressDialog from '../ApplyProgressDialog';
 import { useFigmaTheme } from '@/hooks/useFigmaTheme';
 import Box from '../Box';
 import { darkThemeMode, lightThemeMode } from '@/stitches.config';
@@ -102,6 +103,7 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
       {
         !showLoadingScreen && <PullDialog />
       }
+      <ApplyProgressDialog />
       <WindowResizer />
       <OnboardingFlow />
       <Changelog />

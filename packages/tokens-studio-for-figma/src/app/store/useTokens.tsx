@@ -141,6 +141,16 @@ export default function useTokens() {
   // Handles the update operation
   const handleUpdate = useCallback(() => {
     track('Update Tokens');
+    
+    // Start the apply job in the UI
+    dispatch.uiState.startJob({
+      name: BackgroundJobs.UI_APPLY_TOKENS,
+      isInfinite: true,
+    });
+    
+    // Show the apply progress dialog
+    dispatch.uiState.setShowApplyDialog('loading');
+    
     if (shouldConfirm) {
       confirm({
         text: 'Are you sure?',
@@ -150,13 +160,17 @@ export default function useTokens() {
         if (result && result.result) {
           // @ts-ignore
           dispatch.tokenState.updateDocument();
+        } else {
+          // User cancelled, hide dialog and complete job
+          dispatch.uiState.setShowApplyDialog(false);
+          dispatch.uiState.completeJob(BackgroundJobs.UI_APPLY_TOKENS);
         }
       });
     } else {
       // @ts-ignore
       dispatch.tokenState.updateDocument();
     }
-  }, [confirm, dispatch.tokenState, shouldConfirm]);
+  }, [confirm, dispatch.tokenState, dispatch.uiState, shouldConfirm]);
 
   // Calls Figma asking for all local text- and color styles
   const pullStyles = useCallback(async () => {
