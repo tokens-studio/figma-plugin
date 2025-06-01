@@ -61,6 +61,8 @@ export class NodeManager {
     } else if (updateMode === UpdateMode.SELECTION) {
       relevantNodes = findAll(figma.currentPage.selection, true, opts.nodesWithoutPluginData);
     } else {
+      // Load all pages first to ensure they're available for document-wide operations
+      await figma.loadAllPagesAsync();
       relevantNodes = findAll([figma.root], false, opts.nodesWithoutPluginData);
     }
 

@@ -1,4 +1,4 @@
-import { mockGetNodeById, mockGetNodeByIdAsync, mockScrollAndZoomIntoView } from '../../../tests/__mocks__/figmaMock';
+import { mockGetNodeByIdAsync, mockScrollAndZoomIntoView } from '../../../tests/__mocks__/figmaMock';
 import { goToNode } from '../node';
 
 describe('goToNode', () => {

@@ -206,7 +206,7 @@ export async function goToNode(id: string) {
 }
 
 export async function selectNodes(ids: string[]) {
-  const nodePromises = ids.map(id => figma.getNodeByIdAsync(id));
+  const nodePromises = ids.map((id) => figma.getNodeByIdAsync(id));
   const nodes = compact(await Promise.all(nodePromises)).filter((node) => (
     node.type !== 'PAGE' && node.type !== 'DOCUMENT'
   )) as (Exclude<BaseNode, PageNode | DocumentNode>)[];
