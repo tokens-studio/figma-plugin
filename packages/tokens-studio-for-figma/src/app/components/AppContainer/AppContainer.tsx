@@ -22,7 +22,6 @@ import { AuthContextProvider } from '@/context/AuthContext';
 import SecondScreenSync from '../SecondScreenSync';
 import AuthModal from '../AuthModal';
 import PullDialog from '../PullDialog';
-import ApplyProgressDialog from '../ApplyProgressDialog';
 import { SyncProviderProgressDialog } from '../SyncProviderProgressDialog';
 import { useFigmaTheme } from '@/hooks/useFigmaTheme';
 import Box from '../Box';
@@ -104,7 +103,6 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
       {
         !showLoadingScreen && <PullDialog />
       }
-      <ApplyProgressDialog />
       <SyncProviderProgressDialog />
       <WindowResizer />
       <OnboardingFlow />

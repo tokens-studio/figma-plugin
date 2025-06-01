@@ -27,7 +27,6 @@ export const backgroundJobTitles = {
   [BackgroundJobs.UI_CREATEVARIABLES]: 'Creating variables...',
   [BackgroundJobs.UI_CREATE_STYLES]: 'Creating styles...',
   [BackgroundJobs.UI_SYNC_PROVIDER_SETUP]: 'Setting up sync provider...',
-  [BackgroundJobs.UI_APPLY_TOKENS]: 'Applying tokens...',
 };
 
 export default function LoadingBar() {

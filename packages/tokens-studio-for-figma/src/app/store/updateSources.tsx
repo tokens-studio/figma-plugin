@@ -215,13 +215,5 @@ export default async function updateTokensOnSources({
       transaction.setMeasurement('nodes', result.nodes, '');
       transaction.finish();
     }
-    
-    // Check if there's an active apply job running and complete it
-    const currentState = dispatch.getState();
-    const applyJob = currentState.uiState.backgroundJobs.find(job => job.name === BackgroundJobs.UI_APPLY_TOKENS);
-    if (applyJob && currentState.uiState.showApplyDialog === 'loading') {
-      dispatch.uiState.completeJob(BackgroundJobs.UI_APPLY_TOKENS);
-      dispatch.uiState.setShowApplyDialog('success');
-    }
   });
 }

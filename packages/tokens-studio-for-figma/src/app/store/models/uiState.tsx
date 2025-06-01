@@ -80,7 +80,6 @@ export interface UIState {
   confirmState: ConfirmProps;
   showPushDialog: { state: string | false, overrides?: PushOverrides };
   showPullDialog: string | false;
-  showApplyDialog: string | false;
   showSyncProviderDialog: string | false;
   syncProviderName: string;
   showEmptyGroups: boolean;
@@ -143,7 +142,6 @@ export const uiState = createModel<RootModel>()({
     confirmState: defaultConfirmState,
     showPushDialog: { state: false },
     showPullDialog: false,
-    showApplyDialog: false,
     showSyncProviderDialog: false,
     syncProviderName: '',
     showEmptyGroups: true,
@@ -170,10 +168,6 @@ export const uiState = createModel<RootModel>()({
     setShowPullDialog: (state, data: string | false) => ({
       ...state,
       showPullDialog: data,
-    }),
-    setShowApplyDialog: (state, data: string | false) => ({
-      ...state,
-      showApplyDialog: data,
     }),
     setShowSyncProviderDialog: (state, data: string | false) => ({
       ...state,
