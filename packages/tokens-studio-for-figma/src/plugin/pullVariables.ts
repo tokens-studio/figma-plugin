@@ -1,3 +1,4 @@
+/* eslint-disable no-continue */
 import { figmaRGBToHex } from '@figma-plugin/helpers';
 import { notifyVariableValues, notifyRenamedCollections } from './notifiers';
 import { PullVariablesOptions, ThemeObjectsList } from '@/types';
@@ -215,13 +216,34 @@ export default async function pullVariables(options: PullVariablesOptions, theme
         // Find if there's an existing token set that matches this theme but with a different name
         // This could happen if the collection or mode was renamed in Figma
         for (const existingSet of existingTokenSets) {
-          // Check if this is a renamed version of an existing set
-          // We can't know for sure, but we can make an educated guess based on the theme ID
-          const existingThemeId = existingSet.replace('/', '-').toLowerCase();
-          if (existingThemeId !== themeId && existingSet.includes('/') && (existingSet.split('/')[1] === mode.name || existingThemeId.endsWith(`-${mode.name.toLowerCase()}`))) {
-            // This is likely a renamed collection with the same mode
+          if (!existingSet.includes('/')) continue; // Skip non-collection/mode sets
+
+          const [existingCollection, existingMode] = existingSet.split('/');
+
+          // Case 1: Collection renamed, same mode (e.g., "oldColl/light" -> "newColl/light")
+          if (existingMode === mode.name && existingCollection !== collection.name) {
             renamedCollections.set(existingSet, tokenSetName);
             break;
+          }
+
+          // Case 2: Same collection, mode renamed (e.g., "abc/light" -> "abc/lit")
+          if (existingCollection === collection.name && existingMode !== mode.name) {
+            renamedCollections.set(existingSet, tokenSetName);
+            break;
+          }
+
+          // Case 3: Both collection and mode renamed
+          // This is harder to detect, but we can use collection ID and mode ID to help
+          const matchingTheme = themeInfo.themes?.find((t) => t.$figmaCollectionId === collection.id && t.$figmaModeId === mode.modeId);
+
+          if (matchingTheme) {
+            // If we found a theme with matching collection ID and mode ID,
+            // check if its token set is different from the current one
+            Object.keys(matchingTheme.selectedTokenSets || {}).forEach((tokenSet) => {
+              if (tokenSet !== tokenSetName && tokenSet.includes('/')) {
+                renamedCollections.set(tokenSet, tokenSetName);
+              }
+            });
           }
         }
 
@@ -240,6 +262,29 @@ export default async function pullVariables(options: PullVariablesOptions, theme
         });
       }));
     }));
+
+    // After processing all collections and modes, check for orphaned token sets
+    // These are token sets that exist but don't correspond to any current collection/mode
+    const currentTokenSets = new Set(themesToCreate.map((theme) => `${theme.group}/${theme.name}`));
+
+    // Find token sets that look like collection/mode but don't match any current ones
+    for (const existingSet of existingTokenSets) {
+      if (existingSet.includes('/') && !currentTokenSets.has(existingSet)) {
+        // This is an orphaned token set, try to find a matching new one
+
+        for (const newSet of currentTokenSets) {
+          // Check if this might be a renamed version (similar pattern)
+          const [newColl, newMode] = newSet.split('/');
+          const [oldColl, oldMode] = existingSet.split('/');
+
+          // If either collection or mode matches, this might be a rename
+          if (newColl === oldColl || newMode === oldMode) {
+            renamedCollections.set(existingSet, newSet);
+            break;
+          }
+        }
+      }
+    }
   }
 
   try {
