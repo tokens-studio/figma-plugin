@@ -1,5 +1,6 @@
 import pullVariables from './pullVariables';
 import * as notifiers from './notifiers';
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 
 jest.mock('./getVariablesWithoutZombies', () => ({
   getVariablesWithoutZombies: jest.fn().mockResolvedValue([
@@ -129,10 +130,16 @@ global.figma = {
 
 describe('pullStyles', () => {
   const notifyStyleValuesSpy = jest.spyOn(notifiers, 'notifyVariableValues');
+  const notifyRenamedCollectionsSpy = jest.spyOn(notifiers, 'notifyRenamedCollections');
 
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
+    // Reset the AsyncMessageChannel mock for each test
+    (AsyncMessageChannel.PluginInstance.message as jest.Mock).mockResolvedValue({
+      themes: [],
+    });
+
     // Ensure figma.ui has the necessary methods
     if (!global.figma.ui.on) {
       global.figma.ui.on = jest.fn();
@@ -795,6 +802,117 @@ describe('pullStyles', () => {
           $figmaModeId: '1:0',
           $figmaCollectionId: 'VariableID:1:0',
         }),
+      ]),
+    );
+  });
+
+  it('updates existing themes when collection names change', async () => {
+    // Mock AsyncMessageChannel to return existing themes with old collection name
+    (AsyncMessageChannel.PluginInstance.message as jest.Mock).mockResolvedValueOnce({
+      themes: [
+        {
+          id: 'old-collection-default',
+          name: 'Default',
+          group: 'Old Collection',
+          selectedTokenSets: {
+            'Old Collection/Default': 'enabled',
+          },
+          $figmaStyleReferences: {},
+          $figmaModeId: '1:0',
+          $figmaCollectionId: 'VariableID:1:0',
+        },
+      ],
+    });
+
+    // Mock the collection with a new name but same ID
+    global.figma.variables.getVariableCollectionByIdAsync = jest.fn().mockResolvedValueOnce({
+      id: 'VariableID:1:0',
+      name: 'Collection 1', // New name
+      modes: [
+        { name: 'Default', modeId: '1:0' },
+      ],
+    });
+
+    await pullVariables({ useDimensions: false, useRem: false }, [], true);
+
+    // Check if notifyRenamedCollections was called with the old and new collection names
+    expect(notifyRenamedCollectionsSpy).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        ['Old Collection/Default', 'Collection 1/Default'],
+      ]),
+    );
+  });
+
+  it('updates existing themes when mode names change', async () => {
+    // Mock AsyncMessageChannel to return existing themes with old mode name
+    (AsyncMessageChannel.PluginInstance.message as jest.Mock).mockResolvedValueOnce({
+      themes: [
+        {
+          id: 'collection-1-old-mode',
+          name: 'Old Mode',
+          group: 'Collection 1',
+          selectedTokenSets: {
+            'Collection 1/Old Mode': 'enabled',
+          },
+          $figmaStyleReferences: {},
+          $figmaModeId: '1:0',
+          $figmaCollectionId: 'VariableID:1:0',
+        },
+      ],
+    });
+
+    // Mock the collection with a mode that has a new name but same ID
+    global.figma.variables.getVariableCollectionByIdAsync = jest.fn().mockResolvedValueOnce({
+      id: 'VariableID:1:0',
+      name: 'Collection 1',
+      modes: [
+        { name: 'Default', modeId: '1:0' }, // New mode name, same ID
+      ],
+    });
+
+    await pullVariables({ useDimensions: false, useRem: false }, [], true);
+
+    // Check if notifyRenamedCollections was called with the old and new mode names
+    expect(notifyRenamedCollectionsSpy).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        ['Collection 1/Old Mode', 'Collection 1/Default'],
+      ]),
+    );
+  });
+
+  it('updates existing themes when both collection and mode names change', async () => {
+    // Mock AsyncMessageChannel to return existing themes with old collection and mode names
+    (AsyncMessageChannel.PluginInstance.message as jest.Mock).mockResolvedValueOnce({
+      themes: [
+        {
+          id: 'old-collection-old-mode',
+          name: 'Old Mode',
+          group: 'Old Collection',
+          selectedTokenSets: {
+            'Old Collection/Old Mode': 'enabled',
+          },
+          $figmaStyleReferences: {},
+          $figmaModeId: '1:0',
+          $figmaCollectionId: 'VariableID:1:0',
+        },
+      ],
+    });
+
+    // Mock the collection with new name and mode with new name but same IDs
+    global.figma.variables.getVariableCollectionByIdAsync = jest.fn().mockResolvedValueOnce({
+      id: 'VariableID:1:0',
+      name: 'Collection 1', // New collection name
+      modes: [
+        { name: 'Default', modeId: '1:0' }, // New mode name, same ID
+      ],
+    });
+
+    await pullVariables({ useDimensions: false, useRem: false }, [], true);
+
+    // Check if notifyRenamedCollections was called with the old and new names
+    expect(notifyRenamedCollectionsSpy).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        ['Old Collection/Old Mode', 'Collection 1/Default'],
       ]),
     );
   });
