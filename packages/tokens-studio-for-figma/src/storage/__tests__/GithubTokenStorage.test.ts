@@ -1481,4 +1481,179 @@ describe('GithubTokenStorage', () => {
 
     expect(await storageProvider.getCommitSha()).toEqual('abc123');
   });
+
+  describe('Optimized sync functionality', () => {
+    beforeEach(() => {
+      storageProvider.enableMultiFile();
+      storageProvider.changePath('data');
+      mockGetContent.mockClear();
+      mockCreateOrUpdateFiles.mockClear();
+    });
+
+    it('should skip commit when no files have changed in multi-file mode', async () => {
+      // Mock remote content that matches local content
+      const remoteContent = JSON.stringify({ red: { type: 'color', value: '#ff0000' } }, null, 2);
+
+      mockGetContent.mockImplementation((opts: { path: string }) => {
+        if (opts.path === 'data') {
+          return Promise.resolve({
+            data: [
+              { path: 'data/global.json', sha: 'sha(data/global.json)', type: 'file' },
+            ],
+          });
+        }
+        if (opts.path === 'data/global.json') {
+          return Promise.resolve({
+            data: remoteContent,
+          });
+        }
+        return Promise.reject();
+      });
+
+      mockCreateTree.mockImplementationOnce(() => (
+        Promise.resolve({
+          data: {
+            tree: [{ sha: 'tree-sha' }],
+          },
+        })
+      ));
+
+      mockGetTree.mockImplementationOnce(() => (
+        Promise.resolve({
+          data: {
+            tree: [
+              { path: 'data/global.json', type: 'blob', sha: 'sha(global.json)' },
+            ],
+          },
+        })
+      ));
+
+      const changeset = {
+        'data/global.json': remoteContent, // Same content as remote
+      };
+
+      const result = await storageProvider.writeChangeset(changeset, 'Test commit', 'main');
+
+      expect(result).toBe(true);
+      expect(mockCreateOrUpdateFiles).not.toBeCalledWith();
+    });
+
+    it('should only push changed files in multi-file mode', async () => {
+      // Mock remote content
+      const remoteGlobalContent = JSON.stringify({ red: { type: 'color', value: '#ff0000' } }, null, 2);
+      const remoteThemesContent = JSON.stringify([{ id: 'light', name: 'Light' }], null, 2);
+
+      mockGetContent.mockImplementation((opts: { path: string }) => {
+        if (opts.path === 'data') {
+          return Promise.resolve({
+            data: [
+              { path: 'data/global.json', sha: 'sha(data/global.json)', type: 'file' },
+              { path: 'data/$themes.json', sha: 'sha(data/$themes.json)', type: 'file' },
+            ],
+          });
+        }
+        if (opts.path === 'data/global.json') {
+          return Promise.resolve({
+            data: remoteGlobalContent,
+          });
+        }
+        if (opts.path === 'data/$themes.json') {
+          return Promise.resolve({
+            data: remoteThemesContent,
+          });
+        }
+        return Promise.reject();
+      });
+
+      mockCreateTree.mockImplementationOnce(() => (
+        Promise.resolve({
+          data: {
+            tree: [{ sha: 'tree-sha' }],
+          },
+        })
+      ));
+
+      mockGetTree.mockImplementationOnce(() => (
+        Promise.resolve({
+          data: {
+            tree: [
+              { path: 'global.json', type: 'blob', sha: 'sha(global.json)' },
+              { path: '$themes.json', type: 'blob', sha: 'sha($themes.json)' },
+            ],
+          },
+        })
+      ));
+
+      mockCreateOrUpdateFiles.mockImplementationOnce(() => (
+        Promise.resolve({
+          data: {
+            content: {},
+          },
+        })
+      ));
+
+      const newGlobalContent = JSON.stringify({ red: { type: 'color', value: '#00ff00' } }, null, 2); // Changed
+      const changeset = {
+        'data/global.json': newGlobalContent, // Changed content
+        'data/$themes.json': remoteThemesContent, // Same content as remote
+      };
+
+      const result = await storageProvider.writeChangeset(changeset, 'Test commit', 'main', false);
+
+      expect(result).toBe(true);
+      expect(mockCreateOrUpdateFiles).toHaveBeenCalledWith({
+        branch: 'main',
+        owner: 'six7',
+        repo: 'figma-tokens',
+        createBranch: false,
+        changes: [{
+          message: 'Test commit',
+          files: {
+            'data/global.json': newGlobalContent, // Only the changed file
+          },
+          filesToDelete: [],
+          ignoreDeletionFailures: true,
+        }],
+      });
+    });
+
+    it('should push all files in single-file mode (no optimization)', async () => {
+      storageProvider.disableMultiFile();
+      storageProvider.changePath('tokens.json');
+
+      mockGetContent.mockImplementationOnce(() => (
+        Promise.resolve({
+          data: 'existing content',
+        })
+      ));
+
+      mockCreateOrUpdateFiles.mockImplementationOnce(() => (
+        Promise.resolve({
+          data: {
+            content: {},
+          },
+        })
+      ));
+
+      const changeset = {
+        'tokens.json': JSON.stringify({ global: { red: { type: 'color', value: '#ff0000' } } }),
+      };
+
+      const result = await storageProvider.writeChangeset(changeset, 'Test commit', 'main', false);
+
+      expect(result).toBe(true);
+      expect(mockCreateOrUpdateFiles).toHaveBeenCalledWith({
+        branch: 'main',
+        owner: 'six7',
+        repo: 'figma-tokens',
+        createBranch: false,
+        changes: [{
+          message: 'Test commit',
+          files: changeset, // All files pushed in single-file mode
+          filesToDelete: undefined,
+          ignoreDeletionFailures: undefined,
+        }],
+      });
+    });
+  });
 });

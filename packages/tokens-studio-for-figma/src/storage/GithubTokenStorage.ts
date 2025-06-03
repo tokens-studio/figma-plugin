@@ -292,6 +292,95 @@ export class GithubTokenStorage extends GitTokenStorage {
     return !!response;
   }
 
+  /**
+   * Get the current content of JSON files from the remote repository
+   * @param jsonFiles Array of JSON file objects from the tree
+   * @returns Map of file paths to their content
+   */
+  private async getRemoteFileContents(jsonFiles: Array<{ path?: string }>): Promise<Record<string, string>> {
+    const remoteContents: Record<string, string> = {};
+
+    try {
+      // Fetch content for each JSON file
+      const fileContents = await Promise.all(jsonFiles.map(async (file) => {
+        if (!file.path) return null;
+
+        try {
+          const fileResponse = await this.octokitClient.rest.repos.getContent({
+            owner: this.owner,
+            repo: this.repository,
+            path: joinPath(this.path, file.path),
+            ref: this.branch,
+            headers: {
+              ...octokitClientDefaultHeaders,
+              Accept: 'application/vnd.github.raw',
+            },
+          });
+
+          const fullPath = joinPath(this.path, file.path);
+          return {
+            path: fullPath,
+            content: fileResponse.data as unknown as string,
+          };
+        } catch (e) {
+          console.warn(`Failed to fetch content for ${file.path}:`, e);
+          return null;
+        }
+      }));
+
+      fileContents.forEach((fileContent) => {
+        if (fileContent) {
+          remoteContents[fileContent.path] = fileContent.content;
+        }
+      });
+    } catch (e) {
+      console.warn('Failed to fetch remote file contents:', e);
+    }
+
+    return remoteContents;
+  }
+
+  /**
+   * Filter changeset to only include files that have actually changed
+   * @param changeset Local file changes
+   * @param remoteContents Current remote file contents
+   * @returns Filtered changeset with only changed files
+   */
+  private filterChangedFiles(changeset: Record<string, string>, remoteContents: Record<string, string>): Record<string, string> {
+    const filteredChangeset: Record<string, string> = {};
+
+    console.log('🔍 Detailed file comparison:');
+    Object.entries(changeset).forEach(([filePath, localContent]) => {
+      const remoteContent = remoteContents[filePath];
+
+      if (!remoteContent) {
+        // New file
+        filteredChangeset[filePath] = localContent;
+        console.log(`  ✨ NEW: ${filePath} (${localContent.length} chars)`);
+      } else {
+        // Compare content
+        const localTrimmed = localContent.trim();
+        const remoteTrimmed = remoteContent.trim();
+
+        if (localTrimmed !== remoteTrimmed) {
+          filteredChangeset[filePath] = localContent;
+          console.log(`  🔄 MODIFIED: ${filePath}`);
+          console.log(`    📏 Local: ${localContent.length} chars, Remote: ${remoteContent.length} chars`);
+
+          // Show a small diff preview for debugging
+          if (localTrimmed.length < 200 && remoteTrimmed.length < 200) {
+            console.log(`    📝 Local preview: ${localTrimmed.substring(0, 100)}${localTrimmed.length > 100 ? '...' : ''}`);
+            console.log(`    🌐 Remote preview: ${remoteTrimmed.substring(0, 100)}${remoteTrimmed.length > 100 ? '...' : ''}`);
+          }
+        } else {
+          console.log(`  ✅ UNCHANGED: ${filePath}`);
+        }
+      }
+    });
+
+    return filteredChangeset;
+  }
+
   public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch?: boolean): Promise<boolean> {
     try {
       const response = await this.octokitClient.rest.repos.getContent({
@@ -312,7 +401,7 @@ export class GithubTokenStorage extends GitTokenStorage {
           })),
         });
 
-        if (directoryTreeResponse.data.tree[0].sha) {
+        if (directoryTreeResponse.data.tree[0]?.sha) {
           const treeResponse = await this.octokitClient.rest.git.getTree({
             owner: this.owner,
             repo: this.repository,
@@ -327,9 +416,65 @@ export class GithubTokenStorage extends GitTokenStorage {
               (a.path && b.path) ? a.path.localeCompare(b.path) : 0
             ));
 
-            const filesToDelete = jsonFiles.filter((jsonFile) => !Object.keys(changeset).some((item) => jsonFile.path && item === joinPath(this.path, jsonFile?.path)))
-              .map((fileToDelete) => (`${this.path.split('/')[0]}/${fileToDelete.path}` ?? ''));
-            return await this.createOrUpdate(changeset, message, branch, shouldCreateBranch, filesToDelete, true);
+            // Apply optimization only in multi-file mode
+            let filteredChangeset = changeset;
+            if (this.flags.multiFileEnabled && !this.path.endsWith('.json')) {
+              console.log('🔍 GitHub Sync Optimization: Fetching remote content for comparison...');
+              const remoteContents = await this.getRemoteFileContents(jsonFiles);
+              console.log(`📁 Found ${Object.keys(remoteContents).length} remote files:`, Object.keys(remoteContents));
+
+              console.log('🔄 Comparing local changeset with remote content...');
+              console.log('📝 Local changeset files:', Object.keys(changeset));
+
+              filteredChangeset = this.filterChangedFiles(changeset, remoteContents);
+
+              // Log detailed comparison results
+              const unchangedFiles = Object.keys(changeset).filter((file) => !Object.keys(filteredChangeset).includes(file));
+              const newFiles = Object.keys(filteredChangeset).filter((file) => !remoteContents[file]);
+              const modifiedFiles = Object.keys(filteredChangeset).filter((file) => remoteContents[file]);
+
+              console.log('📊 Sync Analysis:');
+              console.log(`  • Total files in changeset: ${Object.keys(changeset).length}`);
+              console.log(`  • Files with changes: ${Object.keys(filteredChangeset).length}`);
+              console.log(`  • Files unchanged: ${unchangedFiles.length}`);
+
+              if (newFiles.length > 0) {
+                console.log(`  • New files (${newFiles.length}):`, newFiles);
+              }
+              if (modifiedFiles.length > 0) {
+                console.log(`  • Modified files (${modifiedFiles.length}):`, modifiedFiles);
+              }
+              if (unchangedFiles.length > 0) {
+                console.log(`  • Unchanged files (${unchangedFiles.length}):`, unchangedFiles);
+              }
+
+              // If no files have changed, skip the commit
+              if (Object.keys(filteredChangeset).length === 0) {
+                console.log('✅ No files have changed, skipping commit');
+                return true;
+              }
+
+              console.log('🚀 Filtered changeset to push:');
+              Object.entries(filteredChangeset).forEach(([filePath, content]) => {
+                const contentPreview = content.length > 100 ? `${content.substring(0, 100)}...` : content;
+                console.log(`  📄 ${filePath} (${content.length} chars): ${contentPreview}`);
+              });
+            }
+
+            const filesToDelete = jsonFiles.filter((jsonFile) => !Object.keys(changeset).some((item) => jsonFile.path && item === joinPath(this.path, jsonFile.path)))
+              .map((fileToDelete) => `${this.path.split('/')[0]}/${fileToDelete.path}`);
+
+            if (filesToDelete.length > 0) {
+              console.log(`🗑️ Files to delete (${filesToDelete.length}):`, filesToDelete);
+            }
+
+            console.log('📤 Final GitHub API call:');
+            console.log(`  • Files to create/update: ${Object.keys(filteredChangeset).length}`);
+            console.log(`  • Files to delete: ${filesToDelete.length}`);
+            console.log(`  • Commit message: "${message}"`);
+            console.log(`  • Branch: ${branch}`);
+
+            return await this.createOrUpdate(filteredChangeset, message, branch, shouldCreateBranch, filesToDelete, true);
           }
         }
       }
