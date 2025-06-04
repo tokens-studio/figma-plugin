@@ -761,7 +761,6 @@ export const tokenState = createModel<RootModel>()({
         }
       }
 
-      console.log('Token sets after:', Object.keys(newState.tokens));
       return newState;
     },
     ...tokenStateReducers,
