@@ -300,7 +300,7 @@ export default async function pullVariables(options: PullVariablesOptions, theme
     );
 
     // Add notification for renamed collections
-    if (proUser && renamedCollections.size > 0) {
+    if (renamedCollections.size > 0) {
       notifyRenamedCollections(Array.from(renamedCollections.entries()));
     }
   } catch (error) {
