@@ -23,6 +23,7 @@ import { RenameVariableToken } from '@/app/store/models/reducers/tokenState';
 import { UpdateTokenVariablePayload } from './payloads/UpdateTokenVariablePayload';
 import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 import { ExportTokenSet } from './ExportTokenSet';
+import type { VariableCollectionInfo } from './VariableCollectionSelection';
 
 export enum AsyncMessageTypes {
   // the below messages are going from UI to plugin
@@ -73,6 +74,7 @@ export enum AsyncMessageTypes {
   UPDATE_VARIABLES = 'async/update-variables',
   SET_INITIAL_LOAD = 'async/set-initial-load',
   PREVIEW_REQUEST_STARTUP = 'async/preview-request-startup',
+  GET_AVAILABLE_VARIABLE_COLLECTIONS = 'async/get-available-variable-collections',
 }
 
 export type AsyncMessage<T extends AsyncMessageTypes, P = unknown> = P & { type: T };
@@ -278,6 +280,12 @@ export type GetFigmaFontsMessage = AsyncMessage<AsyncMessageTypes.GET_FIGMA_FONT
 export type GetFigmaFontsMessageResult = AsyncMessage<AsyncMessageTypes.GET_FIGMA_FONTS, {
   fonts: Array<Font>
 }>;
+
+export type GetAvailableVariableCollectionsMessage = AsyncMessage<AsyncMessageTypes.GET_AVAILABLE_VARIABLE_COLLECTIONS>;
+export type GetAvailableVariableCollectionsMessageResult = AsyncMessage<AsyncMessageTypes.GET_AVAILABLE_VARIABLE_COLLECTIONS, {
+  collections: VariableCollectionInfo[]
+}>;
+
 export type RemoveStylesWithoutConnectionMessage = AsyncMessage<AsyncMessageTypes.REMOVE_STYLES_WITHOUT_CONNECTION, {
   usedStyleIds: string[]
 }>;
@@ -398,6 +406,7 @@ export type AsyncMessages =
   | ResolveStyleInfo
   | SetNoneValuesOnNodeAsyncMessage
   | GetFigmaFontsMessage
+  | GetAvailableVariableCollectionsMessage
   | SetAuthDataMessage
   | SetUsedEmailMessage
   | CreateLocalVariablesAsyncMessage
@@ -446,6 +455,7 @@ export type AsyncMessageResults =
   | ResolveStyleInfoResult
   | SetNoneValuesOnNodeAsyncMessageResult
   | GetFigmaFontsMessageResult
+  | GetAvailableVariableCollectionsMessageResult
   | SetAuthDataMessageResult
   | SetUsedEmailMessageResult
   | CreateLocalVariablesAsyncMessageResult

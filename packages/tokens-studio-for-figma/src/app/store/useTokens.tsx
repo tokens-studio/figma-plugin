@@ -189,30 +189,6 @@ export default function useTokens() {
     }
   }, [confirm]);
 
-  const pullVariables = useCallback(async () => {
-    const userDecision = await confirm({
-      text: 'Import variables',
-      description: 'Sets will be created for each variable mode.',
-      choices: [
-        { key: 'useDimensions', label: 'Convert numbers to dimensions', enabled: false },
-        { key: 'useRem', label: 'Use rem for dimension values', enabled: false },
-      ],
-      confirmAction: 'Import',
-    });
-
-    if (userDecision) {
-      AsyncMessageChannel.ReactInstance.message({
-        type: AsyncMessageTypes.PULL_VARIABLES,
-        options: {
-          useDimensions: userDecision.data.includes('useDimensions'),
-          useRem: userDecision.data.includes('useRem'),
-        },
-        themes,
-        proUser,
-      });
-    }
-  }, [confirm, themes, proUser]);
-
   const removeTokensByValue = useCallback((data: RemoveTokensByValueData) => {
     track('removeTokensByValue', { count: data.length });
 
@@ -779,7 +755,6 @@ export default function useTokens() {
       createStylesFromSelectedTokenSets,
       createStylesFromSelectedThemes,
       pullStyles,
-      pullVariables,
       remapToken,
       remapTokensInGroup,
       removeTokensByValue,
@@ -805,7 +780,6 @@ export default function useTokens() {
       createStylesFromSelectedTokenSets,
       createStylesFromSelectedThemes,
       pullStyles,
-      pullVariables,
       remapToken,
       remapTokensInGroup,
       removeTokensByValue,
