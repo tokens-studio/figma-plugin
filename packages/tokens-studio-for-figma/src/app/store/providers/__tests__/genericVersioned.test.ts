@@ -1,7 +1,7 @@
 import { ThemeObjectsList } from '@/types';
 import { SingleToken } from '@/types/tokens';
 import { updateGenericVersionedTokens } from '../generic/versionedStorage';
-import * as pjs from '@/../package.json';
+import pjs from '@/../package.json';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { createMockStore } from '@/../tests/config/setupTest';
 import { notifyToUI } from '@/plugin/notifiers';
