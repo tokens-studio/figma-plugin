@@ -5,7 +5,6 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { sendSelectionChange } from './sendSelectionChange';
 import { init } from '@/utils/plugin';
-import { sendDocumentChange } from './sendDocumentChange';
 import { performCodeGen } from './performCodeGen';
 
 AsyncMessageChannel.PluginInstance.connect();
@@ -82,8 +81,8 @@ figma.on('selectionchange', () => {
   sendSelectionChange();
 });
 
-figma.on('documentchange', (event: DocumentChangeEvent) => {
-  sendDocumentChange(event);
+figma.on('currentpagechange', () => {
+  sendSelectionChange();
 });
 
 figma.codegen.on('generate', (event: any): CodegenResult[] => performCodeGen(event));
