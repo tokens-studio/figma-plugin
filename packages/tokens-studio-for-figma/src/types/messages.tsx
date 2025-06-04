@@ -133,7 +133,7 @@ export type TrackFromPluginMessage = {
 
 export type RenameCollectionsAndModesMessage = {
   type: MessageFromPluginTypes.RENAME_COLLECTIONS_AND_MODES;
-  renamedCollections: any;
+  renamedCollections: [string, string][];
 };
 
 export type PostToUIMessage =
