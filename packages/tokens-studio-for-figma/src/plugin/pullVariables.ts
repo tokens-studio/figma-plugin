@@ -1,11 +1,14 @@
+/* eslint-disable no-continue */
 import { figmaRGBToHex } from '@figma-plugin/helpers';
-import { notifyVariableValues } from './notifiers';
+import { notifyVariableValues, notifyRenamedCollections } from './notifiers';
 import { PullVariablesOptions, ThemeObjectsList } from '@/types';
 import { VariableToCreateToken } from '@/types/payloads';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { getVariablesWithoutZombies } from './getVariablesWithoutZombies';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { normalizeVariableName } from '@/utils/normalizeVariableName';
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { AsyncMessageTypes } from '@/types/AsyncMessages';
 
 export default async function pullVariables(options: PullVariablesOptions, themes: ThemeObjectsList, proUser: boolean): Promise<void> {
   // @TODO should be specifically typed according to their type
@@ -180,9 +183,24 @@ export default async function pullVariables(options: PullVariablesOptions, theme
 
   type ResultObject = Record<string, VariableToCreateToken[]>;
 
+  const renamedCollections = new Map<string, string>();
+
   const themesToCreate: ThemeObjectsList = [];
   // Process themes if pro user
   if (proUser) {
+    // Get existing token sets using GET_THEME_INFO which includes token set information
+    const themeInfo = await AsyncMessageChannel.PluginInstance.message({
+      type: AsyncMessageTypes.GET_THEME_INFO,
+    });
+
+    // Extract token sets from themes
+    const existingTokenSets = new Set<string>();
+    themeInfo.themes?.forEach((theme) => {
+      Object.keys(theme.selectedTokenSets || {}).forEach((tokenSet) => {
+        existingTokenSets.add(tokenSet);
+      });
+    });
+
     await Promise.all(Array.from(collections.values()).map(async (collection) => {
       await Promise.all(collection.modes.map(async (mode) => {
         const collectionVariables = localVariables.filter((v) => v.variableCollectionId === collection.id);
@@ -192,12 +210,50 @@ export default async function pullVariables(options: PullVariablesOptions, theme
           [normalizeVariableName(variable.name)]: variable.key,
         }), {});
 
+        const tokenSetName = `${collection.name}/${mode.name}`;
+        const themeId = `${collection.name.toLowerCase()}-${mode.name.toLowerCase()}`;
+
+        // Find if there's an existing token set that matches this theme but with a different name
+        // This could happen if the collection or mode was renamed in Figma
+        for (const existingSet of existingTokenSets) {
+          if (!existingSet.includes('/')) continue; // Skip non-collection/mode sets
+
+          const [existingCollection, existingMode] = existingSet.split('/');
+
+          // Case 1: Collection renamed, same mode (e.g., "oldColl/light" -> "newColl/light")
+          if (existingMode === mode.name && existingCollection !== collection.name) {
+            renamedCollections.set(existingSet, tokenSetName);
+            break;
+          }
+
+          // Case 2: Same collection, mode renamed (e.g., "abc/light" -> "abc/lit")
+          if (existingCollection === collection.name && existingMode !== mode.name) {
+            renamedCollections.set(existingSet, tokenSetName);
+            break;
+          }
+
+          // Case 3: Both collection and mode renamed
+          // This is harder to detect, but we can use collection ID and mode ID to help
+          const matchingTheme = themeInfo.themes?.find((t) => t.$figmaCollectionId === collection.id && t.$figmaModeId === mode.modeId);
+
+          if (matchingTheme) {
+            // If we found a theme with matching collection ID and mode ID,
+            // check if its token set is different from the current one
+            Object.keys(matchingTheme.selectedTokenSets || {}).forEach((tokenSet) => {
+              if (tokenSet !== tokenSetName && tokenSet.includes('/')) {
+                renamedCollections.set(tokenSet, tokenSetName);
+              }
+            });
+          }
+        }
+
+        // Track this collection/mode combination
         themesToCreate.push({
-          id: `${collection.name.toLowerCase()}-${mode.name.toLowerCase()}`,
+          id: themeId,
           name: mode.name,
           group: collection.name,
           selectedTokenSets: {
-            [`${collection.name}/${mode.name}`]: TokenSetStatus.ENABLED,
+            [tokenSetName]: TokenSetStatus.ENABLED,
           },
           $figmaStyleReferences: {},
           $figmaVariableReferences: variableReferences,
@@ -206,6 +262,29 @@ export default async function pullVariables(options: PullVariablesOptions, theme
         });
       }));
     }));
+
+    // After processing all collections and modes, check for orphaned token sets
+    // These are token sets that exist but don't correspond to any current collection/mode
+    const currentTokenSets = new Set(themesToCreate.map((theme) => `${theme.group}/${theme.name}`));
+
+    // Find token sets that look like collection/mode but don't match any current ones
+    for (const existingSet of existingTokenSets) {
+      if (existingSet.includes('/') && !currentTokenSets.has(existingSet)) {
+        // This is an orphaned token set, try to find a matching new one
+
+        for (const newSet of currentTokenSets) {
+          // Check if this might be a renamed version (similar pattern)
+          const [newColl, newMode] = newSet.split('/');
+          const [oldColl, oldMode] = existingSet.split('/');
+
+          // If either collection or mode matches, this might be a rename
+          if (newColl === oldColl || newMode === oldMode) {
+            renamedCollections.set(existingSet, newSet);
+            break;
+          }
+        }
+      }
+    }
   }
 
   try {
@@ -215,7 +294,15 @@ export default async function pullVariables(options: PullVariablesOptions, theme
       }
       return acc;
     }, {});
-    notifyVariableValues(processedTokens, themesToCreate);
+    notifyVariableValues(
+      processedTokens,
+      themesToCreate,
+    );
+
+    // Add notification for renamed collections
+    if (renamedCollections.size > 0) {
+      notifyRenamedCollections(Array.from(renamedCollections.entries()));
+    }
   } catch (error) {
     console.error('Error processing results:', error);
     notifyVariableValues({});

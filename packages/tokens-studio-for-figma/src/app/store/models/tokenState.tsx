@@ -168,10 +168,21 @@ export const tokenState = createModel<RootModel>()({
       ...state,
       usedTokenSet: data,
     }),
-    setThemes: (state, data: ThemeObjectsList) => ({
-      ...state,
-      themes: [...data],
-    }),
+    setThemes: (state, data: ThemeObjectsList) => {
+      const { newThemes = [], updatedThemes = [] } = state.importedThemes || { newThemes: [], updatedThemes: [] };
+
+      return {
+        ...state,
+        themes: [
+          ...(newThemes.length === 0 && updatedThemes.length === 0 ? data : []),
+          ...state.themes.map((existingTheme) => {
+            const updateTheme = updatedThemes.find((importedTheme) => importedTheme.$figmaCollectionId === existingTheme.$figmaCollectionId && importedTheme.$figmaModeId === existingTheme.$figmaModeId);
+            return updateTheme ? { ...existingTheme, ...updateTheme } : existingTheme;
+          }),
+          ...newThemes,
+        ],
+      };
+    },
     setNewTokenData: (state, data: TokenData['synced_data']) => ({
       ...state,
       usedTokenSet: data.usedTokenSets || state.usedTokenSet,
@@ -651,7 +662,7 @@ export const tokenState = createModel<RootModel>()({
       const updatedThemes: ThemeObjectsList = [];
 
       themes.forEach((theme) => {
-        const existingTheme = state.themes.find((t) => t.group === theme.group && t.name === theme.name);
+        const existingTheme = state.themes.find((t) => t.$figmaCollectionId === theme.$figmaCollectionId);
 
         if (existingTheme) {
           if (!isEqual(existingTheme.selectedTokenSets, theme.selectedTokenSets)) {
@@ -681,6 +692,89 @@ export const tokenState = createModel<RootModel>()({
       compressedTokens: payload.compressedTokens,
       compressedThemes: payload.compressedThemes,
     }),
+    handleRenamedCollections: (state, renamedCollections: [string, string][]) => {
+      let newState = { ...state };
+
+      for (const [oldName, newName] of renamedCollections) {
+        // Only check if old name exists - we'll create the new one
+        if (oldName in newState.tokens) {
+          // Create a new tokens object with the renamed token set
+          const updatedTokens = { ...newState.tokens };
+
+          // Copy the old token set to the new name if it doesn't exist yet
+          if (!(newName in updatedTokens)) {
+            updatedTokens[newName] = [...updatedTokens[oldName]];
+          }
+
+          // Delete the old token set using updateTokenSetsInState
+          const stateWithUpdatedTokens = updateTokenSetsInState({ ...newState, tokens: updatedTokens }, (setName) => (setName === oldName ? null : [setName, updatedTokens[setName]]));
+
+          // Update the tokens in the state
+          newState = {
+            ...newState,
+            tokens: stateWithUpdatedTokens.tokens,
+          };
+
+          // Update usedTokenSet if needed
+          if (oldName in newState.usedTokenSet) {
+            const updatedUsedTokenSet = { ...newState.usedTokenSet };
+            // If the status wasn't already copied, copy it
+            if (!(newName in updatedUsedTokenSet)) {
+              updatedUsedTokenSet[newName] = updatedUsedTokenSet[oldName];
+            }
+            // Create a new object without the old name
+            const filteredUsedTokenSet = Object.entries(updatedUsedTokenSet)
+              .filter(([key]) => key !== oldName)
+              .reduce((acc, [key, value]) => {
+                acc[key] = value;
+                return acc;
+              }, {} as Record<string, TokenSetStatus>);
+
+            newState = {
+              ...newState,
+              usedTokenSet: filteredUsedTokenSet,
+            };
+          }
+
+          // Update activeTokenSet if needed
+          if (newState.activeTokenSet === oldName) {
+            newState = {
+              ...newState,
+              activeTokenSet: newName,
+            };
+          }
+
+          // Update themes if needed
+          const updatedThemes = newState.themes.map((theme) => {
+            if (theme.selectedTokenSets && oldName in theme.selectedTokenSets) {
+              const status = theme.selectedTokenSets[oldName];
+              const updatedSelectedTokenSets = { ...theme.selectedTokenSets };
+              updatedSelectedTokenSets[newName] = status;
+              // Create a new object without the old name
+              const filteredSelectedTokenSets = Object.entries(updatedSelectedTokenSets)
+                .filter(([key]) => key !== oldName)
+                .reduce((acc, [key, value]) => {
+                  acc[key] = value;
+                  return acc;
+                }, {} as Record<string, TokenSetStatus>);
+
+              return {
+                ...theme,
+                selectedTokenSets: filteredSelectedTokenSets,
+              };
+            }
+            return theme;
+          });
+
+          newState = {
+            ...newState,
+            themes: updatedThemes,
+          };
+        }
+      }
+
+      return newState;
+    },
     ...tokenStateReducers,
   },
   effects: (dispatch) => ({
