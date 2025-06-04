@@ -3,12 +3,17 @@ import { Selector } from 'reselect';
 import useRemoteTokens from './remoteTokens';
 import { StorageTypeCredentials } from '@/types/StorageType';
 import {
+  lastSyncedStateSelector,
+  remoteDataSelector,
+  storageTypeSelector,
   themesListSelector,
   tokensSelector,
 } from '@/selectors';
+import { tokenFormatSelector } from '@/selectors/tokenFormatSelector';
 import { notifyToUI } from '@/plugin/notifiers';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { JSONBinTokenStorage } from '@/storage';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 
 const mockStartJob = jest.fn();
 const mockRetrieve = jest.fn();
@@ -69,6 +74,38 @@ const mockSelector = (selector: Selector) => {
           },
         },
       ];
+    case remoteDataSelector:
+      return {
+        tokens: {
+          global: [
+            {
+              value: '#ffffff',
+              type: 'color',
+              name: 'white',
+            },
+          ],
+        },
+        themes: [
+          {
+            id: 'light',
+            name: 'Light',
+            selectedTokenSets: {
+              global: 'enabled',
+            },
+          },
+        ],
+        metadata: {
+          tokenSetOrder: ['global'],
+        },
+      };
+    case storageTypeSelector:
+      return {
+        provider: StorageProviderType.LOCAL,
+      };
+    case lastSyncedStateSelector:
+      return '{}';
+    case tokenFormatSelector:
+      return 'object';
     default:
       return {};
   }
@@ -95,6 +132,7 @@ jest.mock('react-redux', () => ({
       resetChangedState: mockResetChangedState,
       setRemoteData: mockSetRemoteData,
       setTokenFormat: mockSetTokenFormat,
+      updateCheckForChanges: jest.fn(),
     },
     branchState: {
       setBranches: mockSetBranches,
