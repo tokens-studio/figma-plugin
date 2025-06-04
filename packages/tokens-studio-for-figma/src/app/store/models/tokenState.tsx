@@ -706,13 +706,13 @@ export const tokenState = createModel<RootModel>()({
             updatedTokens[newName] = [...updatedTokens[oldName]];
           }
 
-          // Delete the old token set
-          delete updatedTokens[oldName];
+          // Delete the old token set using updateTokenSetsInState
+          const stateWithUpdatedTokens = updateTokenSetsInState({ ...newState, tokens: updatedTokens }, (setName) => (setName === oldName ? null : [setName, updatedTokens[setName]]));
 
           // Update the tokens in the state
           newState = {
             ...newState,
-            tokens: updatedTokens,
+            tokens: stateWithUpdatedTokens.tokens,
           };
 
           // Update usedTokenSet if needed
@@ -722,11 +722,17 @@ export const tokenState = createModel<RootModel>()({
             if (!(newName in updatedUsedTokenSet)) {
               updatedUsedTokenSet[newName] = updatedUsedTokenSet[oldName];
             }
-            delete updatedUsedTokenSet[oldName];
+            // Create a new object without the old name
+            const filteredUsedTokenSet = Object.entries(updatedUsedTokenSet)
+              .filter(([key]) => key !== oldName)
+              .reduce((acc, [key, value]) => {
+                acc[key] = value;
+                return acc;
+              }, {} as Record<string, TokenSetStatus>);
 
             newState = {
               ...newState,
-              usedTokenSet: updatedUsedTokenSet,
+              usedTokenSet: filteredUsedTokenSet,
             };
           }
 
@@ -744,11 +750,17 @@ export const tokenState = createModel<RootModel>()({
               const status = theme.selectedTokenSets[oldName];
               const updatedSelectedTokenSets = { ...theme.selectedTokenSets };
               updatedSelectedTokenSets[newName] = status;
-              delete updatedSelectedTokenSets[oldName];
+              // Create a new object without the old name
+              const filteredSelectedTokenSets = Object.entries(updatedSelectedTokenSets)
+                .filter(([key]) => key !== oldName)
+                .reduce((acc, [key, value]) => {
+                  acc[key] = value;
+                  return acc;
+                }, {} as Record<string, TokenSetStatus>);
 
               return {
                 ...theme,
-                selectedTokenSets: updatedSelectedTokenSets,
+                selectedTokenSets: filteredSelectedTokenSets,
               };
             }
             return theme;
