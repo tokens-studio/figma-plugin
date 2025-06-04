@@ -64,13 +64,13 @@ describe('renameTokenGroup cross-set issue', () => {
 
     // The token in theme1 should ALSO be renamed (this might be the issue)
     expect(updatedTokens.theme1[0].name).toBe('colors.brand.500');
-    
+
     // The reference in theme1 should be updated
     expect(updatedTokens.theme1[1].value).toBe('{colors.brand.500}');
 
     // The token in theme2 should also be renamed
     expect(updatedTokens.theme2[0].name).toBe('colors.brand.600');
-    
+
     // The reference in theme2 should be updated
     expect(updatedTokens.theme2[1].value).toBe('{colors.brand.600}');
   });
