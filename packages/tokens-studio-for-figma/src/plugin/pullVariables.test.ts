@@ -139,14 +139,6 @@ describe('pullStyles', () => {
     (AsyncMessageChannel.PluginInstance.message as jest.Mock).mockResolvedValue({
       themes: [],
     });
-
-    // Ensure figma.ui has the necessary methods
-    if (!global.figma.ui.on) {
-      global.figma.ui.on = jest.fn();
-    }
-    if (!global.figma.ui.off) {
-      global.figma.ui.off = jest.fn();
-    }
   });
 
   it('pulls variables without no dimension options', async () => {
