@@ -31,6 +31,71 @@ describe('convertStringtoFigmaGradient', () => {
     },
   };
 
+  const testOklch = {
+    input: 'linear-gradient(45deg, oklch(1 0 0) 0%, oklch(0.627955 0.257704 29.2338) 100%)',
+    output: {
+      gradientStops: [
+        {
+          color: {
+            a: 1,
+            b: 1,
+            g: 1,
+            r: 1,
+          },
+          position: 0,
+        },
+        {
+          color: {
+            a: 1,
+            b: 0,
+            g: 0,
+            r: 1,
+          },
+          position: 1,
+        },
+      ],
+      gradientTransform: [
+        [0.5, -0.5, 0.5],
+        [0.5, 0.5, 0],
+      ],
+    },
+  };
+
+  const testOklchWithAlpha = {
+    input: 'linear-gradient(90deg, oklch(0.5 0.1 180 / 0.5) 0%, oklch(0.8 0.15 240) 50%, rgba(255,0,0,0.8) 100%)',
+    output: {
+      gradientStops: [
+        {
+          color: {
+            a: 0.5,
+            // Color values will be tested with approximation
+          },
+          position: 0,
+        },
+        {
+          color: {
+            a: 1,
+            // Color values will be tested with approximation
+          },
+          position: 0.5,
+        },
+        {
+          color: {
+            a: 0.8,
+            b: 0,
+            g: 0,
+            r: 1,
+          },
+          position: 1,
+        },
+      ],
+      gradientTransform: [
+        [1, 0, 0],
+        [0, 1, 0],
+      ],
+    },
+  };
+
   const test2 = {
     input: 'linear-gradient(45deg, #ffffff 0%, rgba(255,0,0,0.5) 50%, #000000 100%)',
     output: {
@@ -233,6 +298,49 @@ describe('convertStringtoFigmaGradient', () => {
   expect(convertStringToFigmaGradient(test5.input)).toEqual(test5.output);
   expect(convertStringToFigmaGradient(test6.input)).toEqual(test6.output);
   expect(convertStringToFigmaGradient(test7.input)).toEqual(test7.output);
+});
+
+describe('convertStringtoFigmaGradient with OKLCH colors', () => {
+  it('should convert OKLCH colors in gradients', () => {
+    // Test basic OKLCH gradient: white to red
+    const oklchGradient = 'linear-gradient(45deg, oklch(1 0 0) 0%, oklch(0.627955 0.257704 29.2338) 100%)';
+    const oklchResult = convertStringToFigmaGradient(oklchGradient);
+    
+    expect(oklchResult.gradientStops).toHaveLength(2);
+    // First stop: OKLCH white
+    expect(oklchResult.gradientStops[0].color.r).toBeCloseTo(1, 1);
+    expect(oklchResult.gradientStops[0].color.g).toBeCloseTo(1, 1);
+    expect(oklchResult.gradientStops[0].color.b).toBeCloseTo(1, 1);
+    expect(oklchResult.gradientStops[0].color.a).toBe(1);
+    expect(oklchResult.gradientStops[0].position).toBe(0);
+    
+    // Second stop: OKLCH red
+    expect(oklchResult.gradientStops[1].color.r).toBeCloseTo(1, 1);
+    expect(oklchResult.gradientStops[1].color.g).toBeCloseTo(0, 1);
+    expect(oklchResult.gradientStops[1].color.b).toBeCloseTo(0, 1);
+    expect(oklchResult.gradientStops[1].color.a).toBe(1);
+    expect(oklchResult.gradientStops[1].position).toBe(1);
+    
+    expect(oklchResult.gradientTransform).toEqual([
+      [0.5, -0.5, 0.5],
+      [0.5, 0.5, 0],
+    ]);
+  });
+
+  it('should convert OKLCH colors with alpha in gradients', () => {
+    // Test gradient with OKLCH colors with alpha and mixed color formats
+    const oklchAlphaGradient = 'linear-gradient(90deg, oklch(0.5 0.1 180 / 0.5) 0%, oklch(0.8 0.15 240) 50%, rgba(255,0,0,0.8) 100%)';
+    const oklchAlphaResult = convertStringToFigmaGradient(oklchAlphaGradient);
+    
+    expect(oklchAlphaResult.gradientStops).toHaveLength(3);
+    expect(oklchAlphaResult.gradientStops[0].color.a).toBe(0.5); // First OKLCH with alpha
+    expect(oklchAlphaResult.gradientStops[1].color.a).toBe(1); // Second OKLCH without alpha
+    expect(oklchAlphaResult.gradientStops[2].color.a).toBe(0.8); // RGBA color
+    expect(oklchAlphaResult.gradientTransform).toEqual([
+      [1, 0, 0],
+      [0, 1, 0],
+    ]);
+  });
 });
 
 describe('convertFigmaGradientToString', () => {
