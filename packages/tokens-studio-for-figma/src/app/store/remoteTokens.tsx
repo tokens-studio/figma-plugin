@@ -361,12 +361,12 @@ export default function useRemoteTokens() {
   );
 
   const pushTokens = useCallback(
-    async ({ context = api, overrides }: { context?: StorageTypeCredentials; overrides?: PushOverrides } = {}) => {
+    async ({ context = api, overrides, featureFlags }: { context?: StorageTypeCredentials; overrides?: PushOverrides; featureFlags?: LDProps['flags'] } = {}) => {
       const isFolder = 'filePath' in context && !context.filePath?.endsWith('.json');
       let pushResult;
       switch (context.provider) {
         case StorageProviderType.GITHUB: {
-          pushResult = await pushTokensToGitHub(context, overrides);
+          pushResult = await pushTokensToGitHub(context, overrides, featureFlags);
           break;
         }
         case StorageProviderType.GITLAB: {

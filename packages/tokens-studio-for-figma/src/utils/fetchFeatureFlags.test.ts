@@ -67,10 +67,11 @@ describe('fetchFeatureFlags', (() => {
   }));
 
   it('should return mock flags when provided', async () => {
-    process.env.LAUNCHDARKLY_FLAGS = 'multiFileSync';
+    process.env.LAUNCHDARKLY_FLAGS = 'multiFileSync,selectiveSync';
     const flags = await fetchFeatureFlags({});
     expect(flags).toEqual({
       multiFileSync: true,
+      selectiveSync: true,
     });
   });
 }));
