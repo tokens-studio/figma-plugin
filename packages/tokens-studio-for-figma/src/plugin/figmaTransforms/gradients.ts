@@ -22,11 +22,8 @@ const roundToPrecision = (value, precision = 10) => {
   return Math.round((value + Number.EPSILON) * roundToPrecisionVal) / roundToPrecisionVal;
 };
 
-// if node type check is needed due to bugs caused by obscure node types, use (value: string/*, node?: BaseNode | PaintStyle) and convertStringToFigmaGradient(value, target)
-export function convertStringToFigmaGradient(value: string) {
-  const innerContent = value.substring(value.indexOf('(') + 1, value.lastIndexOf(')'));
-  
-  // More sophisticated parsing to handle colors with spaces (like OKLCH)
+// Helper function to parse gradient parts while respecting parentheses
+function parseGradientParts(innerContent: string): string[] {
   const parts: string[] = [];
   let current = '';
   let parenDepth = 0;
@@ -55,6 +52,14 @@ export function convertStringToFigmaGradient(value: string) {
   if (current.trim()) {
     parts.push(current.trim());
   }
+  
+  return parts;
+}
+
+// if node type check is needed due to bugs caused by obscure node types, use (value: string/*, node?: BaseNode | PaintStyle) and convertStringToFigmaGradient(value, target)
+export function convertStringToFigmaGradient(value: string) {
+  const innerContent = value.substring(value.indexOf('(') + 1, value.lastIndexOf(')'));
+  const parts = parseGradientParts(innerContent);
 
   // Default angle is to top (180 degrees)
   let angle = 180;
@@ -136,12 +141,7 @@ export function convertStringToFigmaGradient(value: string) {
   const gradientTransformMatrix = transformationMatrix.to2DArray();
 
   const gradientStops = parts.map((stop, i, arr) => {
-    // Parse each gradient stop which may have format like:
-    // "oklch(0.5 0.1 180)" (no position - use index)
-    // "oklch(0.5 0.1 180) 50%" (with position)
-    // "#ff0000 50%" (simple color with position)
-    
-    // Find the last space that's not inside parentheses to separate color from position
+    // Separate color from position by finding the last space outside parentheses
     let colorPart = stop;
     let positionPart = '';
     let parenDepth = 0;
@@ -160,7 +160,7 @@ export function convertStringToFigmaGradient(value: string) {
     
     if (lastSpaceIndex > -1) {
       const potentialPosition = stop.substring(lastSpaceIndex + 1);
-      // Check if this looks like a percentage or position
+      // Check if this looks like a percentage or numeric position
       if (potentialPosition.includes('%') || /^\d+(\.\d+)?$/.test(potentialPosition)) {
         colorPart = stop.substring(0, lastSpaceIndex);
         positionPart = potentialPosition;
