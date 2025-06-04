@@ -71,17 +71,63 @@ export function useBitbucket() {
 
     const pushSettings = await pushDialog({ state: 'initial', overrides });
     if (pushSettings) {
-      const { commitMessage, customBranch } = pushSettings;
+      const { commitMessage, customBranch, changedFiles } = pushSettings;
       try {
         if (customBranch) storage.selectBranch(customBranch);
         const metadata = {
           tokenSetOrder: Object.keys(tokens),
         };
-        await storage.save({
-          themes,
-          tokens,
-          metadata,
-        }, { commitMessage, storeTokenIdInJsonEditor });
+
+        // Use changed files information if available and multiFile is enabled
+        if (changedFiles && storage.flags?.multiFileEnabled) {
+          const filesToSave: any[] = [];
+          
+          // Add only changed token sets
+          changedFiles.tokenSets.forEach(tokenSetName => {
+            if (tokens[tokenSetName]) {
+              filesToSave.push({
+                type: 'tokenSet',
+                name: tokenSetName,
+                path: `${tokenSetName}.json`,
+                data: tokens[tokenSetName],
+              });
+            }
+          });
+
+          // Add themes file if it changed
+          if (changedFiles.themes) {
+            filesToSave.push({
+              type: 'themes',
+              path: '$themes.json',
+              data: themes,
+            });
+          }
+
+          // Add metadata file if it changed
+          if (changedFiles.metadata) {
+            filesToSave.push({
+              type: 'metadata',
+              path: '$metadata.json',
+              data: metadata,
+            });
+          }
+
+          await storage.write(filesToSave, {
+            commitMessage,
+            storeTokenIdInJsonEditor,
+          });
+        } else {
+          // Fallback to saving all files (original behavior)
+          await storage.save({
+            themes,
+            tokens,
+            metadata,
+          }, {
+            commitMessage,
+            storeTokenIdInJsonEditor,
+          });
+        }
+
         dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as BitbucketCredentials);
         dispatch.uiState.setApiData({ ...context, branch: customBranch });
         dispatch.tokenState.setTokenData({

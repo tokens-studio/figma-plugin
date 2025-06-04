@@ -19,6 +19,8 @@ import PushJSON from './PushJSON';
 import PushSettingForm from './PushSettingForm';
 import { getSupernovaOpenCloud } from '../store/providers/supernova/getSupernovaOpenCloud';
 import Modal from './Modal';
+import { useChangedFiles } from '@/hooks/useChangedFiles';
+import { useFlags } from './LaunchDarkly';
 
 export enum PushDialogTabs {
   COMMIT = 'commit',
@@ -34,6 +36,8 @@ function PushDialog() {
   const [commitMessage, setCommitMessage] = React.useState('');
   const [branch, setBranch] = React.useState((isGitProvider(localApiState) ? localApiState.branch : '') || '');
   const [activeTab, setActiveTab] = React.useState(PushDialogTabs.COMMIT);
+  const changedFiles = useChangedFiles();
+  const flags = useFlags();
 
   const handleToggleValueChange = React.useCallback((value: PushDialogTabs) => {
     if (value) setActiveTab(value);
@@ -101,9 +105,16 @@ function PushDialog() {
 
   const handlePushChanges = React.useCallback(() => {
     if (localApiState.provider === StorageProviderType.SUPERNOVA || (commitMessage && branch)) {
-      onConfirm(commitMessage, branch);
+      // Only include changed files information for Git providers when selectiveFileSync feature flag is enabled
+      const shouldUseChangedFiles = flags?.selectiveFileSync && 
+        (localApiState.provider === StorageProviderType.GITHUB ||
+         localApiState.provider === StorageProviderType.GITLAB ||
+         localApiState.provider === StorageProviderType.BITBUCKET ||
+         localApiState.provider === StorageProviderType.ADO);
+
+      onConfirm(commitMessage, branch, shouldUseChangedFiles ? changedFiles : undefined);
     }
-  }, [branch, commitMessage, onConfirm, localApiState]);
+  }, [branch, commitMessage, onConfirm, localApiState, changedFiles, flags]);
 
   const handleSaveShortcut = React.useCallback(
     (event: KeyboardEvent) => {

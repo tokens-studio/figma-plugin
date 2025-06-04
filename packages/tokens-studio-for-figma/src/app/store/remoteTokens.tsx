@@ -33,7 +33,15 @@ import { Tabs } from '@/constants/Tabs';
 import { useTokensStudio } from './providers/tokens-studio';
 import { notifyToUI } from '@/plugin/notifiers';
 
-export type PushOverrides = { branch: string; commitMessage: string };
+export type PushOverrides = { 
+  branch: string; 
+  commitMessage: string;
+  changedFiles?: {
+    tokenSets: string[];
+    themes: boolean;
+    metadata: boolean;
+  };
+};
 
 type PullTokensOptions = {
   context?: StorageTypeCredentials;

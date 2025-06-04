@@ -3,19 +3,21 @@ import { useCallback, useMemo } from 'react';
 import { showPushDialogSelector } from '@/selectors';
 import { Dispatch } from '../store';
 import { PushOverrides } from '../store/remoteTokens';
+import { ChangedFiles } from '@/hooks/useChangedFiles';
 
 // @TODO fix using useCallback and other memoization
 
 export type PushDialogPromiseResult = {
   commitMessage: string;
   customBranch: string;
+  changedFiles?: ChangedFiles;
 };
 
 export type UseDialogResult = {
   showPushDialog?: { state: string | boolean, overrides?: PushOverrides };
   closePushDialog: () => void
   pushDialog: ({ state, overrides }: { state?: string, overrides?: PushOverrides }) => Promise<PushDialogPromiseResult | null>
-  onConfirm: (commitMessage: string, customBranch: string) => void
+  onConfirm: (commitMessage: string, customBranch: string, changedFiles?: ChangedFiles) => void
   onCancel: () => void
 };
 
@@ -44,9 +46,9 @@ function usePushDialog(): UseDialogResult {
     resolveCallback(null);
   }, [closePushDialog]);
 
-  const onConfirm = useCallback((commitMessage: string, customBranch: string) => {
+  const onConfirm = useCallback((commitMessage: string, customBranch: string, changedFiles?: ChangedFiles) => {
     dispatch.uiState.setShowPushDialog({ state: 'loading' });
-    resolveCallback({ commitMessage, customBranch });
+    resolveCallback({ commitMessage, customBranch, changedFiles });
   }, [dispatch]);
 
   return useMemo(() => ({
