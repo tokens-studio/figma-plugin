@@ -91,6 +91,7 @@ export interface UIState {
   showConvertTokenFormatModal: boolean;
   sidebarWidth: number;
   hasRemoteChange: boolean;
+  selectedExportThemes?: string[];
 }
 
 const defaultConfirmState: ConfirmProps = {
@@ -151,6 +152,7 @@ export const uiState = createModel<RootModel>()({
     showConvertTokenFormatModal: false,
     sidebarWidth: 150,
     hasRemoteChange: false,
+    selectedExportThemes: [],
   } as unknown as UIState,
   reducers: {
     setShowConvertTokenFormatModal: (state, data: boolean) => ({
@@ -421,6 +423,10 @@ export const uiState = createModel<RootModel>()({
       ...state,
       sidebarWidth: data,
     }),
+    setSelectedExportThemes: (state, data: string[]) => ({
+      ...state,
+      selectedExportThemes: data,
+    }),
   },
   effects: (dispatch) => ({
     setLastOpened: (payload) => {
@@ -464,6 +470,12 @@ export const uiState = createModel<RootModel>()({
       AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.SET_SHOW_EMPTY_GROUPS,
         showEmptyGroups: payload == null ? rootState.uiState.showEmptyGroups : payload,
+      });
+    },
+    setSelectedExportThemes: (payload: string[]) => {
+      AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.SET_SELECTED_EXPORT_THEMES,
+        themes: JSON.stringify(payload),
       });
     },
   }),
