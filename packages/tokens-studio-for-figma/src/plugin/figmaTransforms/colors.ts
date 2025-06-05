@@ -117,7 +117,7 @@ export function convertToFigmaColor(input: string) {
       const rgbColor = oklchColor.to('srgb');
       const [r, g, b] = rgbColor.coords;
       const a = rgbColor.alpha ?? 1;
-      
+
       color = {
         r: Math.max(0, Math.min(1, r)), // Clamp to [0,1] range
         g: Math.max(0, Math.min(1, g)),

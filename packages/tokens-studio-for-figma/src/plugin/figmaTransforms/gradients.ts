@@ -28,15 +28,15 @@ function parseGradientParts(innerContent: string): string[] {
   let current = '';
   let parenDepth = 0;
   let i = 0;
-  
+
   while (i < innerContent.length) {
     const char = innerContent[i];
-    
+
     if (char === '(') {
-      parenDepth++;
+      parenDepth += 1;
       current += char;
     } else if (char === ')') {
-      parenDepth--;
+      parenDepth -= 1;
       current += char;
     } else if (char === ',' && parenDepth === 0) {
       // We're at a top-level comma, so this is a separator
@@ -45,14 +45,13 @@ function parseGradientParts(innerContent: string): string[] {
     } else {
       current += char;
     }
-    i++;
+    i += 1;
   }
-  
+
   // Don't forget the last part
   if (current.trim()) {
     parts.push(current.trim());
   }
-  
   return parts;
 }
 
@@ -146,18 +145,18 @@ export function convertStringToFigmaGradient(value: string) {
     let positionPart = '';
     let parenDepth = 0;
     let lastSpaceIndex = -1;
-    
-    for (let j = 0; j < stop.length; j++) {
+
+    for (let j = 0; j < stop.length; j += 1) {
       const char = stop[j];
       if (char === '(') {
-        parenDepth++;
+        parenDepth += 1;
       } else if (char === ')') {
-        parenDepth--;
+        parenDepth -= 1;
       } else if (char === ' ' && parenDepth === 0) {
         lastSpaceIndex = j;
       }
     }
-    
+
     if (lastSpaceIndex > -1) {
       const potentialPosition = stop.substring(lastSpaceIndex + 1);
       // Check if this looks like a percentage or numeric position
@@ -166,7 +165,7 @@ export function convertStringToFigmaGradient(value: string) {
         positionPart = potentialPosition;
       }
     }
-    
+
     const { color, opacity } = convertToFigmaColor(colorPart);
     const gradientColor = color;
     gradientColor.a = opacity;
