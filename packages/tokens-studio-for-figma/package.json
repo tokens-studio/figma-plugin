@@ -248,7 +248,7 @@
     "webpack": "5",
     "webpack-bundle-analyzer": "^4.10.2",
     "webpack-cli": "^3.3.6",
-    "webpack-dev-server": "3.x",
+    "webpack-dev-server": "5.x",
     "whatwg-fetch": "^3.6.2"
   },
   "husky": {
