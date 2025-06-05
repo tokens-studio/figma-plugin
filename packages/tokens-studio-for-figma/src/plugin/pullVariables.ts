@@ -185,6 +185,9 @@ export default async function pullVariables(options: PullVariablesOptions, theme
 
   const renamedCollections = new Map<string, string>();
 
+  // Track which themes have been processed to avoid duplicate renames
+  const processedThemes = new Set<string>();
+
   const themesToCreate: ThemeObjectsList = [];
   // Process themes if pro user
   if (proUser) {
@@ -195,9 +198,15 @@ export default async function pullVariables(options: PullVariablesOptions, theme
 
     // Extract token sets from themes
     const existingTokenSets = new Set<string>();
+    const activeTokenSets = new Set<string>();
+
     themeInfo.themes?.forEach((theme) => {
-      Object.keys(theme.selectedTokenSets || {}).forEach((tokenSet) => {
+      Object.entries(theme.selectedTokenSets || {}).forEach(([tokenSet, status]) => {
         existingTokenSets.add(tokenSet);
+        // Track which token sets are active
+        if (status === TokenSetStatus.ENABLED) {
+          activeTokenSets.add(tokenSet);
+        }
       });
     });
 
@@ -213,34 +222,66 @@ export default async function pullVariables(options: PullVariablesOptions, theme
         const tokenSetName = `${collection.name}/${mode.name}`;
         const themeId = `${collection.name.toLowerCase()}-${mode.name.toLowerCase()}`;
 
-        // Find if there's an existing token set that matches this theme but with a different name
-        // This could happen if the collection or mode was renamed in Figma
+        // Mark this theme as processed
+        processedThemes.add(`${collection.id}:${mode.modeId}`);
+
+        // Find if there's an existing token set that matches this theme but with a different name This could happen if the collection or mode was renamed in Figma
         for (const existingSet of existingTokenSets) {
-          if (!existingSet.includes('/')) continue; // Skip non-collection/mode sets
+          if (!existingSet.includes('/')) {
+            continue; // Skip non-collection/mode sets
+          }
 
           const [existingCollection, existingMode] = existingSet.split('/');
 
+          // Skip if this existing set is already mapped to something
+          if (Array.from(renamedCollections.values()).includes(existingSet)) {
+            continue;
+          }
+
+          // Skip if this existing set is already a source in renamedCollections
+          if (renamedCollections.has(existingSet)) {
+            continue;
+          }
+
           // Case 1: Collection renamed, same mode (e.g., "oldColl/light" -> "newColl/light")
           if (existingMode === mode.name && existingCollection !== collection.name) {
-            renamedCollections.set(existingSet, tokenSetName);
-            break;
+            // Only add to renamedCollections if we haven't already mapped this set
+            if (!renamedCollections.has(existingSet) && !Array.from(renamedCollections.values()).includes(tokenSetName)) {
+              renamedCollections.set(existingSet, tokenSetName);
+            }
+            continue;
           }
 
           // Case 2: Same collection, mode renamed (e.g., "abc/light" -> "abc/lit")
           if (existingCollection === collection.name && existingMode !== mode.name) {
-            renamedCollections.set(existingSet, tokenSetName);
-            break;
+            // Check if this is an active set - if so, be more cautious about renaming
+            if (activeTokenSets.has(existingSet)) {
+              // For active sets, only rename if we have strong evidence (like matching IDs)
+              const matchingTheme = themeInfo.themes?.find((t) => t.$figmaCollectionId === collection.id
+                && t.$figmaModeId === mode.modeId
+                && Object.keys(t.selectedTokenSets || {}).includes(existingSet));
+
+              if (matchingTheme) {
+                renamedCollections.set(existingSet, tokenSetName);
+              }
+            } else if (!renamedCollections.has(existingSet) && !Array.from(renamedCollections.values()).includes(tokenSetName)) {
+              // For non-active sets, we can be less strict
+              renamedCollections.set(existingSet, tokenSetName);
+            }
+            continue;
           }
 
           // Case 3: Both collection and mode renamed
           // This is harder to detect, but we can use collection ID and mode ID to help
-          const matchingTheme = themeInfo.themes?.find((t) => t.$figmaCollectionId === collection.id && t.$figmaModeId === mode.modeId);
+          const matchingTheme = themeInfo.themes?.find((t) => t.$figmaCollectionId === collection.id
+            && t.$figmaModeId === mode.modeId);
 
           if (matchingTheme) {
-            // If we found a theme with matching collection ID and mode ID,
-            // check if its token set is different from the current one
+            // If we found a theme with matching collection ID and mode ID, check if its token set is different from the current one
             Object.keys(matchingTheme.selectedTokenSets || {}).forEach((tokenSet) => {
-              if (tokenSet !== tokenSetName && tokenSet.includes('/')) {
+              if (tokenSet !== tokenSetName && tokenSet.includes('/')
+                  && !renamedCollections.has(tokenSet)
+                  && !Array.from(renamedCollections.values()).includes(tokenSetName)) {
                 renamedCollections.set(tokenSet, tokenSetName);
               }
             });
@@ -266,21 +307,44 @@ export default async function pullVariables(options: PullVariablesOptions, theme
     // After processing all collections and modes, check for orphaned token sets
     // These are token sets that exist but don't correspond to any current collection/mode
     const currentTokenSets = new Set(themesToCreate.map((theme) => `${theme.group}/${theme.name}`));
-
     // Find token sets that look like collection/mode but don't match any current ones
     for (const existingSet of existingTokenSets) {
+      // Skip if this set is already mapped as a source in renamedCollections
+      if (renamedCollections.has(existingSet)) {
+        continue;
+      }
+
       if (existingSet.includes('/') && !currentTokenSets.has(existingSet)) {
-        // This is an orphaned token set, try to find a matching new one
+        // First try to find a matching theme by collection ID and mode ID
+        const [oldColl] = existingSet.split('/');
+        const matchingTheme = themeInfo.themes?.find((t) => Object.keys(t.selectedTokenSets || {}).includes(existingSet)
+          && t.group === oldColl);
 
-        for (const newSet of currentTokenSets) {
-          // Check if this might be a renamed version (similar pattern)
-          const [newColl, newMode] = newSet.split('/');
-          const [oldColl, oldMode] = existingSet.split('/');
-
-          // If either collection or mode matches, this might be a rename
-          if (newColl === oldColl || newMode === oldMode) {
+        if (matchingTheme) {
+          // If we found a matching theme, use its current name for the mapping
+          const newSet = `${matchingTheme.group}/${matchingTheme.name}`;
+          if (currentTokenSets.has(newSet)) {
             renamedCollections.set(existingSet, newSet);
-            break;
+            continue;
+          }
+        }
+
+        // If no direct match by theme, check if there's a similar set with same collection
+        const sameCollectionSets = Array.from(currentTokenSets)
+          .filter((set) => set.startsWith(`${oldColl}/`));
+
+        if (sameCollectionSets.length === 1) {
+          // If there's only one set with the same collection, it's likely the renamed one
+          renamedCollections.set(existingSet, sameCollectionSets[0]);
+        } else if (sameCollectionSets.length > 1) {
+          // If multiple matches, try to find the best one
+          // Prioritize sets that aren't already targets in renamedCollections
+          const availableSets = sameCollectionSets.filter(
+            (set) => !Array.from(renamedCollections.values()).includes(set),
+          );
+
+          if (availableSets.length > 0) {
+            renamedCollections.set(existingSet, availableSets[0]);
           }
         }
       }
