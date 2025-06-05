@@ -63,6 +63,56 @@ describe('convertToFigmaColor', () => {
     });
   });
 
+  it('converts oklch colors to figma readable', () => {
+    // Test basic OKLCH red (equivalent to red)
+    const oklchRed = 'oklch(0.627955 0.257704 29.2338)';
+    const result = convertToFigmaColor(oklchRed);
+    expect(result.color.r).toBeCloseTo(1, 1); // Close to 1 (red)
+    expect(result.color.g).toBeCloseTo(0, 1); // Close to 0
+    expect(result.color.b).toBeCloseTo(0, 1); // Close to 0
+    expect(result.opacity).toBe(1);
+
+    // Test OKLCH with alpha
+    const oklchWithAlpha = 'oklch(0.5 0.1 180 / 0.5)';
+    const resultWithAlpha = convertToFigmaColor(oklchWithAlpha);
+    expect(resultWithAlpha.opacity).toBe(0.5);
+    expect(resultWithAlpha.color.r).toBeGreaterThanOrEqual(0);
+    expect(resultWithAlpha.color.r).toBeLessThanOrEqual(1);
+    expect(resultWithAlpha.color.g).toBeGreaterThanOrEqual(0);
+    expect(resultWithAlpha.color.g).toBeLessThanOrEqual(1);
+    expect(resultWithAlpha.color.b).toBeGreaterThanOrEqual(0);
+    expect(resultWithAlpha.color.b).toBeLessThanOrEqual(1);
+
+    // Test OKLCH white
+    const oklchWhite = 'oklch(1 0 0)';
+    const resultWhite = convertToFigmaColor(oklchWhite);
+    expect(resultWhite.color.r).toBeCloseTo(1, 1);
+    expect(resultWhite.color.g).toBeCloseTo(1, 1);
+    expect(resultWhite.color.b).toBeCloseTo(1, 1);
+    expect(resultWhite.opacity).toBe(1);
+
+    // Test OKLCH black
+    const oklchBlack = 'oklch(0 0 0)';
+    const resultBlack = convertToFigmaColor(oklchBlack);
+    expect(resultBlack.color.r).toBeCloseTo(0, 1);
+    expect(resultBlack.color.g).toBeCloseTo(0, 1);
+    expect(resultBlack.color.b).toBeCloseTo(0, 1);
+    expect(resultBlack.opacity).toBe(1);
+  });
+
+  it('handles invalid oklch colors gracefully', () => {
+    // Test invalid OKLCH that should fall back to hex conversion
+    const invalidOklch = 'oklch(invalid values)';
+    const result = convertToFigmaColor(invalidOklch);
+    // Should still return valid values (fallback behavior)
+    expect(result.color).toBeDefined();
+    expect(result.opacity).toBeDefined();
+    expect(typeof result.color.r).toBe('number');
+    expect(typeof result.color.g).toBe('number');
+    expect(typeof result.color.b).toBe('number');
+    expect(typeof result.opacity).toBe('number');
+  });
+
   it('converts named colors to figma readable', () => {
     const color = 'red';
 
