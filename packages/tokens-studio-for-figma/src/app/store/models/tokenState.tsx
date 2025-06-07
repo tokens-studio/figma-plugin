@@ -692,89 +692,7 @@ export const tokenState = createModel<RootModel>()({
       compressedTokens: payload.compressedTokens,
       compressedThemes: payload.compressedThemes,
     }),
-    handleRenamedCollections: (state, renamedCollections: [string, string][]) => {
-      let newState = { ...state };
-
-      for (const [oldName, newName] of renamedCollections) {
-        // Only check if old name exists - we'll create the new one
-        if (oldName in newState.tokens) {
-          // Create a new tokens object with the renamed token set
-          const updatedTokens = { ...newState.tokens };
-
-          // Copy the old token set to the new name if it doesn't exist yet
-          if (!(newName in updatedTokens)) {
-            updatedTokens[newName] = [...updatedTokens[oldName]];
-          }
-
-          // Delete the old token set using updateTokenSetsInState
-          const stateWithUpdatedTokens = updateTokenSetsInState({ ...newState, tokens: updatedTokens }, (setName) => (setName === oldName ? null : [setName, updatedTokens[setName]]));
-
-          // Update the tokens in the state
-          newState = {
-            ...newState,
-            tokens: stateWithUpdatedTokens.tokens,
-          };
-
-          // Update usedTokenSet if needed
-          if (oldName in newState.usedTokenSet) {
-            const updatedUsedTokenSet = { ...newState.usedTokenSet };
-            // If the status wasn't already copied, copy it
-            if (!(newName in updatedUsedTokenSet)) {
-              updatedUsedTokenSet[newName] = updatedUsedTokenSet[oldName];
-            }
-            // Create a new object without the old name
-            const filteredUsedTokenSet = Object.entries(updatedUsedTokenSet)
-              .filter(([key]) => key !== oldName)
-              .reduce((acc, [key, value]) => {
-                acc[key] = value;
-                return acc;
-              }, {} as Record<string, TokenSetStatus>);
-
-            newState = {
-              ...newState,
-              usedTokenSet: filteredUsedTokenSet,
-            };
-          }
-
-          // Update activeTokenSet if needed
-          if (newState.activeTokenSet === oldName) {
-            newState = {
-              ...newState,
-              activeTokenSet: newName,
-            };
-          }
-
-          // Update themes if needed
-          const updatedThemes = newState.themes.map((theme) => {
-            if (theme.selectedTokenSets && oldName in theme.selectedTokenSets) {
-              const status = theme.selectedTokenSets[oldName];
-              const updatedSelectedTokenSets = { ...theme.selectedTokenSets };
-              updatedSelectedTokenSets[newName] = status;
-              // Create a new object without the old name
-              const filteredSelectedTokenSets = Object.entries(updatedSelectedTokenSets)
-                .filter(([key]) => key !== oldName)
-                .reduce((acc, [key, value]) => {
-                  acc[key] = value;
-                  return acc;
-                }, {} as Record<string, TokenSetStatus>);
-
-              return {
-                ...theme,
-                selectedTokenSets: filteredSelectedTokenSets,
-              };
-            }
-            return theme;
-          });
-
-          newState = {
-            ...newState,
-            themes: updatedThemes,
-          };
-        }
-      }
-
-      return newState;
-    },
+    handleRenamedCollections: (state, _renamedCollections: [string, string][]) => state,
     ...tokenStateReducers,
   },
   effects: (dispatch) => ({
@@ -1071,6 +989,112 @@ export const tokenState = createModel<RootModel>()({
           });
         }
       }
+    },
+    handleRenamedCollections(renamedCollections: [string, string][], rootState) {
+      console.log('Effect: handleRenamedCollections started', renamedCollections);
+
+      // Create a copy of the current state to accumulate all changes
+      const updatedUsedTokenSet = { ...rootState.tokenState.usedTokenSet };
+      let updatedActiveTokenSet = rootState.tokenState.activeTokenSet;
+      let updatedThemes = [...rootState.tokenState.themes];
+      const updatedTokens = { ...rootState.tokenState.tokens };
+
+      // Process all renames at once
+      for (const [oldName, newName] of renamedCollections) {
+        console.log(`Processing rename: ${oldName} -> ${newName}`);
+
+        // First, check if the old token set exists
+        if (oldName in rootState.tokenState.tokens) {
+          console.log(`Old token set ${oldName} exists, copying to ${newName}`);
+
+          // Create the new token set with the content from the old one if it doesn't exist yet
+          if (!(newName in updatedTokens)) {
+            console.log(`Creating new token set ${newName}`);
+            updatedTokens[newName] = [...rootState.tokenState.tokens[oldName]];
+          }
+
+          // Now mark the old token set for deletion
+          console.log(`Deleting old token set ${oldName}`);
+          delete updatedTokens[oldName];
+        } else {
+          console.log(`Old token set ${oldName} not found in tokens`);
+        }
+
+        // Update usedTokenSet if needed
+        if (oldName in updatedUsedTokenSet) {
+          console.log(`Updating usedTokenSet for ${oldName}`);
+
+          // If the status wasn't already copied, copy it
+          if (!(newName in updatedUsedTokenSet)) {
+            console.log(`Copying status from ${oldName} to ${newName} in usedTokenSet`);
+            updatedUsedTokenSet[newName] = updatedUsedTokenSet[oldName];
+          }
+
+          // Remove the old name
+          delete updatedUsedTokenSet[oldName];
+        }
+
+        // Update activeTokenSet if needed
+        if (updatedActiveTokenSet === oldName) {
+          console.log(`Updating activeTokenSet from ${oldName} to ${newName}`);
+          updatedActiveTokenSet = newName;
+        }
+
+        // Update themes if needed
+        updatedThemes = updatedThemes.map((theme, index) => {
+          if (theme.selectedTokenSets && oldName in theme.selectedTokenSets) {
+            console.log(`Updating theme ${index} selectedTokenSets for ${oldName}`);
+            const status = theme.selectedTokenSets[oldName];
+            const updatedSelectedTokenSets = { ...theme.selectedTokenSets };
+            updatedSelectedTokenSets[newName] = status;
+
+            // Remove the old name
+            delete updatedSelectedTokenSets[oldName];
+
+            return {
+              ...theme,
+              selectedTokenSets: updatedSelectedTokenSets,
+            };
+          }
+          return theme;
+        });
+      }
+
+      // Apply all accumulated changes at once
+      dispatch.tokenState.setTokens(updatedTokens);
+      dispatch.tokenState.setUsedTokenSet(updatedUsedTokenSet);
+      if (updatedActiveTokenSet !== rootState.tokenState.activeTokenSet) {
+        dispatch.tokenState.setActiveTokenSet(updatedActiveTokenSet);
+      }
+      if (updatedThemes.some((theme, i) => theme !== rootState.tokenState.themes[i])) {
+        console.log('Themes were updated, setting new themes');
+        dispatch.tokenState.setThemes(updatedThemes);
+      }
+
+      // Update the document to reflect the changes
+      console.log('Updating document');
+      dispatch.tokenState.updateDocument({
+        shouldUpdateNodes: false,
+        updateRemote: true,
+      });
+
+      // If using Tokens Studio storage, update remote data
+      if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO) {
+        console.log('Updating Tokens Studio remote data');
+        for (const [oldName, newName] of renamedCollections) {
+          if (oldName in rootState.tokenState.tokens
+              || Object.keys(updatedTokens).some((key) => key === newName)) {
+            console.log(`Updating token set in Tokens Studio: ${oldName} -> ${newName}`);
+            updateTokenSetInTokensStudio({
+              rootState,
+              data: { oldName, newName },
+              onTokenSetUpdated: dispatch.tokenState.setTokenSetMetadata,
+            });
+          }
+        }
+      }
+
+      console.log('Effect: handleRenamedCollections completed');
     },
     ...Object.fromEntries(Object.entries(tokenStateEffects).map(([key, factory]) => [key, factory(dispatch)])),
   }),
