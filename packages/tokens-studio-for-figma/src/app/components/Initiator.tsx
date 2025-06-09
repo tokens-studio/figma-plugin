@@ -133,7 +133,7 @@ export function Initiator() {
           case MessageFromPluginTypes.RENAME_COLLECTIONS_AND_MODES: {
             const { renamedCollections } = pluginMessage;
             if (renamedCollections && renamedCollections.length > 0) {
-              dispatch.tokenState.handleRenamedCollections(renamedCollections);
+              dispatch.tokenState.setRenamedCollections(renamedCollections);
             }
             break;
           }

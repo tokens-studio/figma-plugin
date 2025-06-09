@@ -88,6 +88,7 @@ export interface TokenState {
   compressedThemes: string;
   tokensSize: number;
   themesSize: number;
+  renamedCollections: [string, string][] | null;
 }
 
 export const tokenState = createModel<RootModel>()({
@@ -132,6 +133,7 @@ export const tokenState = createModel<RootModel>()({
     compressedThemes: '',
     tokensSize: 0,
     themesSize: 0,
+    renamedCollections: null,
   } as unknown as TokenState,
   reducers: {
     setTokensSize: (state, size: number) => ({
@@ -228,6 +230,18 @@ export const tokenState = createModel<RootModel>()({
     setTokenSetMetadata: (state, data: TokenState['tokenSetMetadata']) => ({
       ...state,
       tokenSetMetadata: data,
+    }),
+    replaceThemes: (state, themes: ThemeObjectsList) => ({
+      ...state,
+      themes,
+    }),
+    setImportedThemes: (state, importedThemes: { newThemes: ThemeObjectsList; updatedThemes: ThemeObjectsList }) => ({
+      ...state,
+      importedThemes,
+    }),
+    setRenamedCollections: (state, renamedCollections: [string, string][] | null) => ({
+      ...state,
+      renamedCollections,
     }),
     resetImportedTokens: (state) => ({
       ...state,
@@ -1004,6 +1018,7 @@ export const tokenState = createModel<RootModel>()({
       const updatedUsedTokenSet = { ...rootState.tokenState.usedTokenSet };
       let updatedActiveTokenSet = rootState.tokenState.activeTokenSet;
       const updatedTokens = { ...rootState.tokenState.tokens };
+      const updatedThemes = [...rootState.tokenState.themes];
 
       // Process all renames at once
       for (const [oldName, newName] of renamedCollections) {
@@ -1033,11 +1048,27 @@ export const tokenState = createModel<RootModel>()({
         if (updatedActiveTokenSet === oldName) {
           updatedActiveTokenSet = newName;
         }
+
+        // Remove old token set references from themes when token sets are deleted
+        for (let i = 0; i < updatedThemes.length; i += 1) {
+          const theme = updatedThemes[i];
+          if (theme.selectedTokenSets && oldName in theme.selectedTokenSets) {
+            updatedThemes[i] = {
+              ...theme,
+              selectedTokenSets: {
+                ...theme.selectedTokenSets,
+              },
+            };
+            // Remove the old token set reference since the token set is being deleted
+            delete updatedThemes[i].selectedTokenSets[oldName];
+          }
+        }
       }
 
       // Apply all accumulated changes at once
       dispatch.tokenState.setTokens(updatedTokens);
       dispatch.tokenState.setUsedTokenSet(updatedUsedTokenSet);
+      dispatch.tokenState.replaceThemes(updatedThemes);
       if (updatedActiveTokenSet !== rootState.tokenState.activeTokenSet) {
         dispatch.tokenState.setActiveTokenSet(updatedActiveTokenSet);
       }
