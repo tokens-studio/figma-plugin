@@ -235,10 +235,6 @@ export const tokenState = createModel<RootModel>()({
       ...state,
       themes,
     }),
-    setImportedThemes: (state, importedThemes: { newThemes: ThemeObjectsList; updatedThemes: ThemeObjectsList }) => ({
-      ...state,
-      importedThemes,
-    }),
     setRenamedCollections: (state, renamedCollections: [string, string][] | null) => ({
       ...state,
       renamedCollections,
@@ -1020,6 +1016,9 @@ export const tokenState = createModel<RootModel>()({
       const updatedTokens = { ...rootState.tokenState.tokens };
       const updatedThemes = [...rootState.tokenState.themes];
 
+      // Get the original token set order to preserve it
+      const originalTokenSetOrder = Object.keys(rootState.tokenState.tokens);
+
       // Process all renames at once
       for (const [oldName, newName] of renamedCollections) {
         // First, check if the old token set exists
@@ -1032,7 +1031,37 @@ export const tokenState = createModel<RootModel>()({
           // Now mark the old token set for deletion
           delete updatedTokens[oldName];
         }
+      }
 
+      // Rebuild the tokens object with preserved order
+      const orderedTokens: typeof updatedTokens = {};
+      for (const tokenSetName of originalTokenSetOrder) {
+        // Check if this token set was renamed
+        const renamedTo = renamedCollections.find(([oldName]) => oldName === tokenSetName)?.[1];
+
+        if (renamedTo && renamedTo in updatedTokens) {
+          // Use the new name but preserve the position
+          orderedTokens[renamedTo] = updatedTokens[renamedTo];
+        } else if (tokenSetName in updatedTokens) {
+          // Keep the original token set
+          orderedTokens[tokenSetName] = updatedTokens[tokenSetName];
+        }
+        // If token set was deleted (not in updatedTokens), skip it
+      }
+
+      // Add any new token sets that weren't in the original order (shouldn't happen in rename scenario, but safety check)
+      for (const [tokenSetName, tokens] of Object.entries(updatedTokens)) {
+        if (!(tokenSetName in orderedTokens)) {
+          orderedTokens[tokenSetName] = tokens;
+        }
+      }
+
+      // Replace updatedTokens with the ordered version
+      Object.keys(updatedTokens).forEach((key) => delete updatedTokens[key]);
+      Object.assign(updatedTokens, orderedTokens);
+
+      // Process other updates for each renamed collection
+      for (const [oldName, newName] of renamedCollections) {
         // Update usedTokenSet if needed
         if (oldName in updatedUsedTokenSet) {
           // If the status wasn't already copied, copy it
