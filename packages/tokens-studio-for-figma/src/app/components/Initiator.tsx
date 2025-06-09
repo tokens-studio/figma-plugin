@@ -130,6 +130,14 @@ export function Initiator() {
             break;
           }
 
+          case MessageFromPluginTypes.RENAME_COLLECTIONS_AND_MODES: {
+            const { renamedCollections } = pluginMessage;
+            if (renamedCollections && renamedCollections.length > 0) {
+              dispatch.tokenState.setRenamedCollections(renamedCollections);
+            }
+            break;
+          }
+
           case MessageFromPluginTypes.SHOW_EMPTY_GROUPS: {
             dispatch.uiState.toggleShowEmptyGroups(pluginMessage.showEmptyGroups);
             break;
