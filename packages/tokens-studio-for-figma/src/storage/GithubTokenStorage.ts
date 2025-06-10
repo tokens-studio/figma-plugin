@@ -1,4 +1,5 @@
 import compact from 'just-compact';
+import set from 'set-value';
 import { Octokit } from '@octokit/rest';
 import { RemoteTokenstorageErrorMessage, RemoteTokenStorageFile, RemoteTokenStorageMetadata } from './RemoteTokenStorage';
 import IsJSONString from '@/utils/isJSONString';
@@ -341,6 +342,164 @@ export class GithubTokenStorage extends GitTokenStorage {
   }
 
   /**
+   * Convert flat array tokens to nested object format for comparison
+   * @param flatTokens Array of tokens in flat format (name, value, type)
+   * @returns Nested object format matching file structure
+   */
+  private convertFlatArrayToNestedObject(flatTokens: any[]): any {
+    const nestedObj = {};
+
+    flatTokens.forEach((token) => {
+      if (token && token.name && typeof token.value !== 'undefined') {
+        // Use set-value to create nested structure from dot notation
+        const {
+          name, value, type, description,
+        } = token;
+
+        // Create token object in current format (DTCG or Legacy)
+        const tokenObj: any = {};
+
+        // Add properties in the correct format
+        if (type) {
+          tokenObj.$type = type;
+        }
+        if (typeof value !== 'undefined') {
+          tokenObj.$value = value;
+        }
+        if (description) {
+          tokenObj.$description = description;
+        }
+
+        // Use set-value to create nested structure
+        set(nestedObj, name, tokenObj);
+      }
+    });
+
+    return nestedObj;
+  }
+
+  /**
+   * Filter changeset using lastSyncedState comparison
+   * @param changeset Local file changes
+   * @param lastSyncedState JSON string of the last synced state
+   * @returns Filtered changeset with only changed files, or null if comparison fails
+   */
+  private filterChangesetWithLastSyncedState(changeset: Record<string, string>, lastSyncedState: string): Record<string, string> | null {
+    try {
+      const parsedLastSyncedState = JSON.parse(lastSyncedState);
+      if (!Array.isArray(parsedLastSyncedState) || parsedLastSyncedState.length < 1) {
+        console.log('🔍 Invalid lastSyncedState format, falling back to full changeset');
+        return null;
+      }
+
+      const [lastTokens, lastThemes] = parsedLastSyncedState;
+      const filteredChangeset: Record<string, string> = {};
+
+      console.log('🔍 LastSyncedState contains:');
+      console.log(`  • Token sets: ${Object.keys(lastTokens || {}).join(', ')}`);
+      console.log(`  • Themes: ${(lastThemes || []).length} themes`);
+
+      Object.entries(changeset).forEach(([filePath, localContent]) => {
+        let hasChanged = false;
+        const fileName = filePath.split('/').pop()?.replace('.json', '') || '';
+
+        console.log(`🔍 Checking file: ${filePath} (fileName: ${fileName})`);
+
+        if (fileName === '$themes') {
+          // Compare themes
+          const lastThemesContent = JSON.stringify(lastThemes || [], null, 2);
+          if (localContent.trim() !== lastThemesContent.trim()) {
+            hasChanged = true;
+            console.log(`  🔄 THEMES CHANGED: Content differs`);
+            console.log(`    📏 Local: ${localContent.length} chars, Last: ${lastThemesContent.length} chars`);
+          } else {
+            console.log(`  ✅ THEMES UNCHANGED`);
+          }
+        } else if (fileName === '$metadata') {
+          // Compare metadata - it should contain tokenSetOrder based on current token sets
+          try {
+            const localMetadata = JSON.parse(localContent);
+            const expectedMetadata = {
+              tokenSetOrder: Object.keys(lastTokens || {}),
+            };
+
+            if (JSON.stringify(localMetadata, null, 2) !== JSON.stringify(expectedMetadata, null, 2)) {
+              hasChanged = true;
+              console.log(`  🔄 METADATA CHANGED: Content differs from expected`);
+              console.log(`    📏 Local: ${localContent.length} chars, Expected: ${JSON.stringify(expectedMetadata, null, 2).length} chars`);
+            } else {
+              console.log(`  ✅ METADATA UNCHANGED`);
+            }
+          } catch (e) {
+            // If we can't parse metadata, update it to be safe
+            hasChanged = true;
+            console.log(`  🔄 METADATA: Failed to parse, updating (conservative approach)`);
+          }
+        } else {
+          // Compare token sets
+          const lastTokenSet = lastTokens[fileName];
+          if (!lastTokenSet) {
+            // New token set
+            hasChanged = true;
+            console.log(`  ✨ NEW TOKEN SET: ${fileName} (not in lastSyncedState)`);
+          } else {
+            // The lastSyncedState stores tokens in flat array format, but files are in nested object format
+            // We need to convert the lastSyncedState format to match the file format for comparison
+            let lastContentForComparison: string;
+
+            try {
+              const localJson = JSON.parse(localContent);
+
+              // Check if local content is in nested object format (file format)
+              if (typeof localJson === 'object' && !Array.isArray(localJson)) {
+                // Local is in nested format, convert lastTokenSet (flat array) to nested format
+                const convertedLastTokenSet = this.convertFlatArrayToNestedObject(lastTokenSet);
+                lastContentForComparison = JSON.stringify(convertedLastTokenSet, null, 2);
+                console.log(`    🔄 Converted lastSyncedState from flat array to nested object format for comparison`);
+              } else if (Array.isArray(localJson)) {
+                // Local is in flat array format, use lastTokenSet as-is
+                lastContentForComparison = JSON.stringify(lastTokenSet, null, 2);
+                console.log(`    � Using lastSyncedState in flat array format for comparison`);
+              } else {
+                // Fallback to direct comparison
+                lastContentForComparison = JSON.stringify(lastTokenSet, null, 2);
+                console.log(`    ⚠️ Unknown local format, using direct comparison`);
+              }
+            } catch (e) {
+              // Fallback to direct comparison if parsing fails
+              lastContentForComparison = JSON.stringify(lastTokenSet, null, 2);
+              console.log(`    ⚠️ Failed to parse local content, using direct comparison`);
+            }
+
+            if (localContent.trim() !== lastContentForComparison.trim()) {
+              hasChanged = true;
+              console.log(`  🔄 TOKEN SET CHANGED: ${fileName}`);
+              console.log(`    📏 Local: ${localContent.length} chars, Last: ${lastContentForComparison.length} chars`);
+
+              // Show a detailed comparison for debugging
+              if (localContent.length < 2000 && lastContentForComparison.length < 2000) {
+                console.log(`    � Local preview: ${localContent.substring(0, 200)}${localContent.length > 200 ? '...' : ''}`);
+                console.log(`    🌐 Last preview: ${lastContentForComparison.substring(0, 200)}${lastContentForComparison.length > 200 ? '...' : ''}`);
+              }
+            } else {
+              console.log(`  ✅ TOKEN SET UNCHANGED: ${fileName}`);
+            }
+          }
+        }
+
+        if (hasChanged) {
+          filteredChangeset[filePath] = localContent;
+        }
+      });
+
+      return filteredChangeset;
+    } catch (error) {
+      console.warn('Failed to parse lastSyncedState for comparison:', error);
+      return null;
+    }
+  }
+
+  /**
    * Filter changeset to only include files that have actually changed
    * @param changeset Local file changes
    * @param remoteContents Current remote file contents
@@ -381,8 +540,105 @@ export class GithubTokenStorage extends GitTokenStorage {
     return filteredChangeset;
   }
 
-  public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch?: boolean): Promise<boolean> {
+  public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch?: boolean, lastSyncedState?: string): Promise<boolean> {
     try {
+      // Try to use lastSyncedState optimization first
+      if (lastSyncedState && this.flags.multiFileEnabled && !this.path.endsWith('.json')) {
+        console.log('🚀 GitHub Sync Optimization: Using lastSyncedState comparison instead of fetching from GitHub');
+
+        // We still need to get the list of existing files for deletion detection
+        const response = await this.octokitClient.rest.repos.getContent({
+          owner: this.owner,
+          repo: this.repository,
+          path: this.path,
+          ref: this.branch,
+        });
+
+        if (Array.isArray(response.data)) {
+          const directoryTreeResponse = await this.octokitClient.rest.git.createTree({
+            owner: this.owner,
+            repo: this.repository,
+            tree: response.data.map((item) => ({
+              path: item.path,
+              sha: item.sha,
+              mode: getTreeMode(item.type),
+            })),
+          });
+
+          if (directoryTreeResponse.data.tree[0]?.sha) {
+            const treeResponse = await this.octokitClient.rest.git.getTree({
+              owner: this.owner,
+              repo: this.repository,
+              tree_sha: directoryTreeResponse.data.tree[0].sha,
+              recursive: 'true',
+            });
+
+            if (treeResponse.data.tree.length > 0) {
+              const jsonFiles = treeResponse.data.tree.filter((file) => (
+                file.path?.endsWith('.json')
+              )).sort((a, b) => (
+                (a.path && b.path) ? a.path.localeCompare(b.path) : 0
+              ));
+
+              // Use lastSyncedState to filter changeset instead of fetching remote content
+              console.log('🔄 Comparing local changeset with lastSyncedState...');
+              console.log('📝 Local changeset files:', Object.keys(changeset));
+
+              // Parse lastSyncedState and compare with current changeset
+              const filteredChangeset = this.filterChangesetWithLastSyncedState(changeset, lastSyncedState);
+
+              if (filteredChangeset === null) {
+                console.log('⚠️ Failed to use lastSyncedState optimization, falling back to remote comparison');
+                // Fall through to the original implementation below
+              } else {
+                // Calculate files to delete
+                const filesToDelete = jsonFiles.filter((jsonFile) => !Object.keys(changeset).some((item) => jsonFile.path && item === joinPath(this.path, jsonFile.path)))
+                  .map((fileToDelete) => `${this.path.split('/')[0]}/${fileToDelete.path}`);
+
+                // Log optimization results
+                const unchangedFiles = Object.keys(changeset).filter((file) => !Object.keys(filteredChangeset).includes(file));
+                const newFiles = Object.keys(filteredChangeset).filter((file) => !jsonFiles.some(jsonFile => joinPath(this.path, jsonFile.path || '') === file));
+                const modifiedFiles = Object.keys(filteredChangeset).filter((file) => jsonFiles.some(jsonFile => joinPath(this.path, jsonFile.path || '') === file));
+
+                console.log('📊 LastSyncedState Optimization Results:');
+                console.log(`  • Total files in changeset: ${Object.keys(changeset).length}`);
+                console.log(`  • Files with changes: ${Object.keys(filteredChangeset).length}`);
+                console.log(`  • Files unchanged: ${unchangedFiles.length}`);
+
+                if (newFiles.length > 0) {
+                  console.log(`  • New files (${newFiles.length}):`, newFiles);
+                }
+                if (modifiedFiles.length > 0) {
+                  console.log(`  • Modified files (${modifiedFiles.length}):`, modifiedFiles);
+                }
+                if (unchangedFiles.length > 0) {
+                  console.log(`  • Unchanged files (${unchangedFiles.length}):`, unchangedFiles);
+                }
+
+                // If no files have changed, skip the commit
+                if (Object.keys(filteredChangeset).length === 0) {
+                  console.log('✅ No files have changed based on lastSyncedState, skipping commit');
+                  return true;
+                }
+
+                if (filesToDelete.length > 0) {
+                  console.log(`🗑️ Files to delete (${filesToDelete.length}):`, filesToDelete);
+                }
+
+                console.log('📤 Optimized GitHub API call using lastSyncedState:');
+                console.log(`  • Files to create/update: ${Object.keys(filteredChangeset).length}`);
+                console.log(`  • Files to delete: ${filesToDelete.length}`);
+                console.log(`  • Commit message: "${message}"`);
+                console.log(`  • Branch: ${branch}`);
+
+                return await this.createOrUpdate(filteredChangeset, message, branch, shouldCreateBranch, filesToDelete, true);
+              }
+            }
+          }
+        }
+      }
+
+      // Original implementation (fallback or when optimization is not applicable)
       const response = await this.octokitClient.rest.repos.getContent({
         owner: this.owner,
         repo: this.repository,
