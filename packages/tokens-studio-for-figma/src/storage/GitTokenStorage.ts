@@ -110,14 +110,11 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageSaveO
     try {
       const parsedLastSyncedState = tryParseJson<LastSyncedState>(lastSyncedState);
       if (!parsedLastSyncedState) {
-        console.log('🔍 Unable to parse lastSyncedState, falling back to full changeset');
         return null;
       }
 
       const [lastTokens, lastThemes] = parsedLastSyncedState;
       const filteredChangeset: Record<string, string> = {};
-
-      console.log('🔍 GitHub Sync Optimization: Comparing with lastSyncedState...');
 
       if (this.path.endsWith('.json')) {
         // Single file mode - compare entire file content
@@ -142,9 +139,6 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageSaveO
 
         if (currentFileContent.trim() !== lastSyncedFileContent.trim()) {
           filteredChangeset[this.path] = currentFileContent;
-          console.log(`  🔄 MODIFIED: ${this.path} (single file mode)`);
-        } else {
-          console.log(`  ✅ UNCHANGED: ${this.path} (single file mode)`);
         }
       } else if (this.flags.multiFileEnabled) {
         // Multi-file mode - compare individual files
@@ -162,14 +156,10 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageSaveO
             if (!lastTokenSet) {
               // New token set
               hasChanged = true;
-              console.log(`  ✨ NEW: ${filePath} (new token set)`);
             } else {
               const lastContent = JSON.stringify(lastTokenSet, null, 2);
               if (currentContent.trim() !== lastContent.trim()) {
                 hasChanged = true;
-                console.log(`  🔄 MODIFIED: ${filePath} (token set changed)`);
-              } else {
-                console.log(`  ✅ UNCHANGED: ${filePath} (token set)`);
               }
             }
           } else if (file.type === 'themes') {
@@ -180,9 +170,6 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageSaveO
             const lastThemesContent = JSON.stringify(lastThemes || [], null, 2);
             if (currentContent.trim() !== lastThemesContent.trim()) {
               hasChanged = true;
-              console.log(`  🔄 MODIFIED: ${filePath} (themes changed)`);
-            } else {
-              console.log(`  ✅ UNCHANGED: ${filePath} (themes)`);
             }
           } else if (file.type === 'metadata') {
             filePath = joinPath(this.path, `${SystemFilenames.METADATA}.json`);
@@ -191,7 +178,6 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageSaveO
             // For metadata, we always include it if it exists since it's not part of lastSyncedState
             // This is a conservative approach to ensure metadata is always up to date
             hasChanged = true;
-            console.log(`  🔄 MODIFIED: ${filePath} (metadata - always updated)`);
           }
 
           if (hasChanged && filePath && currentContent) {
@@ -205,32 +191,13 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageSaveO
 
         Object.keys(lastTokens).forEach((tokenSetName) => {
           if (!currentTokenSetNames.includes(tokenSetName)) {
-            console.log(`  🗑️ DELETED: ${tokenSetName} (token set removed)`);
             // Note: Actual file deletion will be handled by the writeChangeset implementation
           }
         });
       }
 
-      const changedFilesCount = Object.keys(filteredChangeset).length;
-      const totalFilesCount = files.length;
-
-      console.log('📊 LastSyncedState Comparison Results:');
-      console.log(`  • Total files: ${totalFilesCount}`);
-      console.log(`  • Files with changes: ${changedFilesCount}`);
-      console.log(`  • Files unchanged: ${totalFilesCount - changedFilesCount}`);
-
-      if (changedFilesCount === 0) {
-        console.log('✅ No files have changed based on lastSyncedState comparison');
-      } else {
-        console.log('🚀 Filtered changeset based on lastSyncedState:');
-        Object.keys(filteredChangeset).forEach((filePath) => {
-          console.log(`  📄 ${filePath}`);
-        });
-      }
-
       return filteredChangeset;
     } catch (error) {
-      console.warn('🔍 Error comparing with lastSyncedState, falling back to full changeset:', error);
       return null;
     }
   }

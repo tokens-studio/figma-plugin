@@ -269,7 +269,6 @@ export class GithubTokenStorage extends GitTokenStorage {
 
       return [];
     } catch (e) {
-      // Raise error (usually this is an auth error)
       console.error('Error', e);
       return [];
     }
@@ -388,32 +387,21 @@ export class GithubTokenStorage extends GitTokenStorage {
     try {
       const parsedLastSyncedState = JSON.parse(lastSyncedState);
       if (!Array.isArray(parsedLastSyncedState) || parsedLastSyncedState.length < 1) {
-        console.log('🔍 Invalid lastSyncedState format, falling back to full changeset');
         return null;
       }
 
       const [lastTokens, lastThemes] = parsedLastSyncedState;
       const filteredChangeset: Record<string, string> = {};
 
-      console.log('🔍 LastSyncedState contains:');
-      console.log(`  • Token sets: ${Object.keys(lastTokens || {}).join(', ')}`);
-      console.log(`  • Themes: ${(lastThemes || []).length} themes`);
-
       Object.entries(changeset).forEach(([filePath, localContent]) => {
         let hasChanged = false;
         const fileName = filePath.split('/').pop()?.replace('.json', '') || '';
-
-        console.log(`🔍 Checking file: ${filePath} (fileName: ${fileName})`);
 
         if (fileName === '$themes') {
           // Compare themes
           const lastThemesContent = JSON.stringify(lastThemes || [], null, 2);
           if (localContent.trim() !== lastThemesContent.trim()) {
             hasChanged = true;
-            console.log(`  🔄 THEMES CHANGED: Content differs`);
-            console.log(`    📏 Local: ${localContent.length} chars, Last: ${lastThemesContent.length} chars`);
-          } else {
-            console.log(`  ✅ THEMES UNCHANGED`);
           }
         } else if (fileName === '$metadata') {
           // Compare metadata - it should contain tokenSetOrder based on current token sets
@@ -425,15 +413,10 @@ export class GithubTokenStorage extends GitTokenStorage {
 
             if (JSON.stringify(localMetadata, null, 2) !== JSON.stringify(expectedMetadata, null, 2)) {
               hasChanged = true;
-              console.log(`  🔄 METADATA CHANGED: Content differs from expected`);
-              console.log(`    📏 Local: ${localContent.length} chars, Expected: ${JSON.stringify(expectedMetadata, null, 2).length} chars`);
-            } else {
-              console.log(`  ✅ METADATA UNCHANGED`);
             }
           } catch (e) {
             // If we can't parse metadata, update it to be safe
             hasChanged = true;
-            console.log(`  🔄 METADATA: Failed to parse, updating (conservative approach)`);
           }
         } else {
           // Compare token sets
@@ -441,7 +424,6 @@ export class GithubTokenStorage extends GitTokenStorage {
           if (!lastTokenSet) {
             // New token set
             hasChanged = true;
-            console.log(`  ✨ NEW TOKEN SET: ${fileName} (not in lastSyncedState)`);
           } else {
             // The lastSyncedState stores tokens in flat array format, but files are in nested object format
             // We need to convert the lastSyncedState format to match the file format for comparison
@@ -455,34 +437,20 @@ export class GithubTokenStorage extends GitTokenStorage {
                 // Local is in nested format, convert lastTokenSet (flat array) to nested format
                 const convertedLastTokenSet = this.convertFlatArrayToNestedObject(lastTokenSet);
                 lastContentForComparison = JSON.stringify(convertedLastTokenSet, null, 2);
-                console.log(`    🔄 Converted lastSyncedState from flat array to nested object format for comparison`);
               } else if (Array.isArray(localJson)) {
                 // Local is in flat array format, use lastTokenSet as-is
                 lastContentForComparison = JSON.stringify(lastTokenSet, null, 2);
-                console.log(`    � Using lastSyncedState in flat array format for comparison`);
               } else {
                 // Fallback to direct comparison
                 lastContentForComparison = JSON.stringify(lastTokenSet, null, 2);
-                console.log(`    ⚠️ Unknown local format, using direct comparison`);
               }
             } catch (e) {
               // Fallback to direct comparison if parsing fails
               lastContentForComparison = JSON.stringify(lastTokenSet, null, 2);
-              console.log(`    ⚠️ Failed to parse local content, using direct comparison`);
             }
 
             if (localContent.trim() !== lastContentForComparison.trim()) {
               hasChanged = true;
-              console.log(`  🔄 TOKEN SET CHANGED: ${fileName}`);
-              console.log(`    📏 Local: ${localContent.length} chars, Last: ${lastContentForComparison.length} chars`);
-
-              // Show a detailed comparison for debugging
-              if (localContent.length < 2000 && lastContentForComparison.length < 2000) {
-                console.log(`    � Local preview: ${localContent.substring(0, 200)}${localContent.length > 200 ? '...' : ''}`);
-                console.log(`    🌐 Last preview: ${lastContentForComparison.substring(0, 200)}${lastContentForComparison.length > 200 ? '...' : ''}`);
-              }
-            } else {
-              console.log(`  ✅ TOKEN SET UNCHANGED: ${fileName}`);
             }
           }
         }
@@ -508,14 +476,12 @@ export class GithubTokenStorage extends GitTokenStorage {
   private filterChangedFiles(changeset: Record<string, string>, remoteContents: Record<string, string>): Record<string, string> {
     const filteredChangeset: Record<string, string> = {};
 
-    console.log('🔍 Detailed file comparison:');
     Object.entries(changeset).forEach(([filePath, localContent]) => {
       const remoteContent = remoteContents[filePath];
 
       if (!remoteContent) {
         // New file
         filteredChangeset[filePath] = localContent;
-        console.log(`  ✨ NEW: ${filePath} (${localContent.length} chars)`);
       } else {
         // Compare content
         const localTrimmed = localContent.trim();
@@ -523,16 +489,6 @@ export class GithubTokenStorage extends GitTokenStorage {
 
         if (localTrimmed !== remoteTrimmed) {
           filteredChangeset[filePath] = localContent;
-          console.log(`  🔄 MODIFIED: ${filePath}`);
-          console.log(`    📏 Local: ${localContent.length} chars, Remote: ${remoteContent.length} chars`);
-
-          // Show a small diff preview for debugging
-          if (localTrimmed.length < 200 && remoteTrimmed.length < 200) {
-            console.log(`    📝 Local preview: ${localTrimmed.substring(0, 100)}${localTrimmed.length > 100 ? '...' : ''}`);
-            console.log(`    🌐 Remote preview: ${remoteTrimmed.substring(0, 100)}${remoteTrimmed.length > 100 ? '...' : ''}`);
-          }
-        } else {
-          console.log(`  ✅ UNCHANGED: ${filePath}`);
         }
       }
     });
@@ -544,8 +500,6 @@ export class GithubTokenStorage extends GitTokenStorage {
     try {
       // Try to use lastSyncedState optimization first
       if (lastSyncedState && this.flags.multiFileEnabled && !this.path.endsWith('.json')) {
-        console.log('🚀 GitHub Sync Optimization: Using lastSyncedState comparison instead of fetching from GitHub');
-
         // We still need to get the list of existing files for deletion detection
         const response = await this.octokitClient.rest.repos.getContent({
           owner: this.owner,
@@ -581,55 +535,20 @@ export class GithubTokenStorage extends GitTokenStorage {
               ));
 
               // Use lastSyncedState to filter changeset instead of fetching remote content
-              console.log('🔄 Comparing local changeset with lastSyncedState...');
-              console.log('📝 Local changeset files:', Object.keys(changeset));
-
               // Parse lastSyncedState and compare with current changeset
               const filteredChangeset = this.filterChangesetWithLastSyncedState(changeset, lastSyncedState);
 
               if (filteredChangeset === null) {
-                console.log('⚠️ Failed to use lastSyncedState optimization, falling back to remote comparison');
                 // Fall through to the original implementation below
               } else {
                 // Calculate files to delete
                 const filesToDelete = jsonFiles.filter((jsonFile) => !Object.keys(changeset).some((item) => jsonFile.path && item === joinPath(this.path, jsonFile.path)))
                   .map((fileToDelete) => `${this.path.split('/')[0]}/${fileToDelete.path}`);
 
-                // Log optimization results
-                const unchangedFiles = Object.keys(changeset).filter((file) => !Object.keys(filteredChangeset).includes(file));
-                const newFiles = Object.keys(filteredChangeset).filter((file) => !jsonFiles.some(jsonFile => joinPath(this.path, jsonFile.path || '') === file));
-                const modifiedFiles = Object.keys(filteredChangeset).filter((file) => jsonFiles.some(jsonFile => joinPath(this.path, jsonFile.path || '') === file));
-
-                console.log('📊 LastSyncedState Optimization Results:');
-                console.log(`  • Total files in changeset: ${Object.keys(changeset).length}`);
-                console.log(`  • Files with changes: ${Object.keys(filteredChangeset).length}`);
-                console.log(`  • Files unchanged: ${unchangedFiles.length}`);
-
-                if (newFiles.length > 0) {
-                  console.log(`  • New files (${newFiles.length}):`, newFiles);
-                }
-                if (modifiedFiles.length > 0) {
-                  console.log(`  • Modified files (${modifiedFiles.length}):`, modifiedFiles);
-                }
-                if (unchangedFiles.length > 0) {
-                  console.log(`  • Unchanged files (${unchangedFiles.length}):`, unchangedFiles);
-                }
-
                 // If no files have changed, skip the commit
                 if (Object.keys(filteredChangeset).length === 0) {
-                  console.log('✅ No files have changed based on lastSyncedState, skipping commit');
                   return true;
                 }
-
-                if (filesToDelete.length > 0) {
-                  console.log(`🗑️ Files to delete (${filesToDelete.length}):`, filesToDelete);
-                }
-
-                console.log('📤 Optimized GitHub API call using lastSyncedState:');
-                console.log(`  • Files to create/update: ${Object.keys(filteredChangeset).length}`);
-                console.log(`  • Files to delete: ${filesToDelete.length}`);
-                console.log(`  • Commit message: "${message}"`);
-                console.log(`  • Branch: ${branch}`);
 
                 return await this.createOrUpdate(filteredChangeset, message, branch, shouldCreateBranch, filesToDelete, true);
               }
@@ -675,60 +594,17 @@ export class GithubTokenStorage extends GitTokenStorage {
             // Apply optimization only in multi-file mode
             let filteredChangeset = changeset;
             if (this.flags.multiFileEnabled && !this.path.endsWith('.json')) {
-              console.log('🔍 GitHub Sync Optimization: Fetching remote content for comparison...');
               const remoteContents = await this.getRemoteFileContents(jsonFiles);
-              console.log(`📁 Found ${Object.keys(remoteContents).length} remote files:`, Object.keys(remoteContents));
-
-              console.log('🔄 Comparing local changeset with remote content...');
-              console.log('📝 Local changeset files:', Object.keys(changeset));
-
               filteredChangeset = this.filterChangedFiles(changeset, remoteContents);
-
-              // Log detailed comparison results
-              const unchangedFiles = Object.keys(changeset).filter((file) => !Object.keys(filteredChangeset).includes(file));
-              const newFiles = Object.keys(filteredChangeset).filter((file) => !remoteContents[file]);
-              const modifiedFiles = Object.keys(filteredChangeset).filter((file) => remoteContents[file]);
-
-              console.log('📊 Sync Analysis:');
-              console.log(`  • Total files in changeset: ${Object.keys(changeset).length}`);
-              console.log(`  • Files with changes: ${Object.keys(filteredChangeset).length}`);
-              console.log(`  • Files unchanged: ${unchangedFiles.length}`);
-
-              if (newFiles.length > 0) {
-                console.log(`  • New files (${newFiles.length}):`, newFiles);
-              }
-              if (modifiedFiles.length > 0) {
-                console.log(`  • Modified files (${modifiedFiles.length}):`, modifiedFiles);
-              }
-              if (unchangedFiles.length > 0) {
-                console.log(`  • Unchanged files (${unchangedFiles.length}):`, unchangedFiles);
-              }
 
               // If no files have changed, skip the commit
               if (Object.keys(filteredChangeset).length === 0) {
-                console.log('✅ No files have changed, skipping commit');
                 return true;
               }
-
-              console.log('🚀 Filtered changeset to push:');
-              Object.entries(filteredChangeset).forEach(([filePath, content]) => {
-                const contentPreview = content.length > 100 ? `${content.substring(0, 100)}...` : content;
-                console.log(`  📄 ${filePath} (${content.length} chars): ${contentPreview}`);
-              });
             }
 
             const filesToDelete = jsonFiles.filter((jsonFile) => !Object.keys(changeset).some((item) => jsonFile.path && item === joinPath(this.path, jsonFile.path)))
               .map((fileToDelete) => `${this.path.split('/')[0]}/${fileToDelete.path}`);
-
-            if (filesToDelete.length > 0) {
-              console.log(`🗑️ Files to delete (${filesToDelete.length}):`, filesToDelete);
-            }
-
-            console.log('📤 Final GitHub API call:');
-            console.log(`  • Files to create/update: ${Object.keys(filteredChangeset).length}`);
-            console.log(`  • Files to delete: ${filesToDelete.length}`);
-            console.log(`  • Commit message: "${message}"`);
-            console.log(`  • Branch: ${branch}`);
 
             return await this.createOrUpdate(filteredChangeset, message, branch, shouldCreateBranch, filesToDelete, true);
           }
@@ -759,7 +635,6 @@ export class GithubTokenStorage extends GitTokenStorage {
       return response.data.sha;
     } catch (e) {
       // Raise error (usually this is an auth error)
-      console.error('Error', e);
       return '';
     }
   }
