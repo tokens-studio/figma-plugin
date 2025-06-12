@@ -27,7 +27,7 @@ import { ErrorMessages } from '@/constants/ErrorMessages';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { PushOverrides } from '../../remoteTokens';
 import { useIsProUser } from '@/app/hooks/useIsProUser';
-import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
+import { TokenFormat, TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 import { determineFileChanges } from '@/utils/determineFileChanges';
 
 type GithubCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITHUB; }>;
@@ -80,7 +80,7 @@ export function useGitHub() {
         const fileChanges = determineFileChanges(
           tokens,
           themes,
-          tokenFormat,
+          tokenFormat as TokenFormatOptions,
           lastSyncedState,
           context.filePath || '',
           isProUser, // Multi-file is enabled for pro users
