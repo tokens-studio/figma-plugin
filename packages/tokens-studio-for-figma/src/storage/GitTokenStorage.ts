@@ -88,11 +88,10 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageSaveO
     changeset: Record<string, string>,
     message: string,
     branch: string,
-    shouldCreateBranch?: boolean,
-    skipRemoteFetch?: boolean
+    shouldCreateBranch?: boolean
   ): Promise<boolean>;
 
-  public async write(files: RemoteTokenStorageFile[], saveOptions: GitStorageSaveOption, skipRemoteFetch?: boolean): Promise<boolean> {
+  public async write(files: RemoteTokenStorageFile[], saveOptions: GitStorageSaveOption): Promise<boolean> {
     const branches = await this.fetchBranches();
     if (!branches.length) return false;
 
@@ -129,7 +128,6 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageSaveO
       saveOptions.commitMessage ?? 'Commit from Figma',
       this.branch,
       !branches.includes(this.branch),
-      skipRemoteFetch,
     );
   }
 }

@@ -9,7 +9,6 @@ import {
 } from './GitTokenStorage';
 import { SystemFilenames } from '@/constants/SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
-import { joinPath } from '@/utils/string';
 import convertTokensToObject from '@/utils/convertTokensToObject';
 
 type ExtendedOctokitClient = Omit<Octokit, 'repos'> & {
@@ -397,69 +396,18 @@ export class GithubTokenStorage extends GitTokenStorage {
       return true;
     }
 
-    // Use the regular write method with filtered files, skipping remote fetch
-    return this.write(filteredFiles, saveOptions, true);
+    // Use the regular write method with filtered files
+    return this.write(filteredFiles, saveOptions);
   }
 
-  public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch?: boolean, skipRemoteFetch?: boolean): Promise<boolean> {
-    // If skipRemoteFetch is true, we trust that the changeset is already optimized
-    // and skip the expensive remote fetching and comparison
-    if (skipRemoteFetch) {
-      console.log('🚀 GitHub Push Optimization: Skipping remote fetch, using pre-filtered changeset');
-      console.log(`📤 Pushing ${Object.keys(changeset).length} optimized files directly to GitHub`);
-      console.log('📋 Files to push:', Object.keys(changeset));
+  public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch?: boolean): Promise<boolean> {
+    // Always use optimized approach - skip expensive remote fetching and comparison
+    console.log('🚀 GitHub Push Optimization: Using optimized changeset without remote fetch');
+    console.log(`📤 Pushing ${Object.keys(changeset).length} files directly to GitHub`);
+    console.log('📋 Files to push:', Object.keys(changeset));
 
-      // Push the changeset directly without remote comparison
-      return await this.createOrUpdate(changeset, message, branch, shouldCreateBranch, [], true);
-    }
-
-    // Original implementation with remote fetching (for backward compatibility)
-    console.log('📡 GitHub Push: Fetching remote content for comparison (legacy mode)');
-    try {
-      const response = await this.octokitClient.rest.repos.getContent({
-        owner: this.owner,
-        repo: this.repository,
-        path: this.path,
-        ref: this.branch,
-      });
-
-      if (Array.isArray(response.data)) {
-        const directoryTreeResponse = await this.octokitClient.rest.git.createTree({
-          owner: this.owner,
-          repo: this.repository,
-          tree: response.data.map((item) => ({
-            path: item.path,
-            sha: item.sha,
-            mode: getTreeMode(item.type),
-          })),
-        });
-
-        if (directoryTreeResponse.data.tree[0].sha) {
-          const treeResponse = await this.octokitClient.rest.git.getTree({
-            owner: this.owner,
-            repo: this.repository,
-            tree_sha: directoryTreeResponse.data.tree[0].sha,
-            recursive: 'true',
-          });
-
-          if (treeResponse.data.tree.length > 0) {
-            const jsonFiles = treeResponse.data.tree.filter((file) => (
-              file.path?.endsWith('.json')
-            )).sort((a, b) => (
-              (a.path && b.path) ? a.path.localeCompare(b.path) : 0
-            ));
-
-            const filesToDelete = jsonFiles.filter((jsonFile) => !Object.keys(changeset).some((item) => jsonFile.path && item === joinPath(this.path, jsonFile?.path)))
-              .map((fileToDelete) => (`${this.path.split('/')[0]}/${fileToDelete.path}` ?? ''));
-            return await this.createOrUpdate(changeset, message, branch, shouldCreateBranch, filesToDelete, true);
-          }
-        }
-      }
-
-      return await this.createOrUpdate(changeset, message, branch, shouldCreateBranch);
-    } catch {
-      return await this.createOrUpdate(changeset, message, branch, shouldCreateBranch);
-    }
+    // Push the changeset directly without remote comparison
+    return await this.createOrUpdate(changeset, message, branch, shouldCreateBranch, [], true);
   }
 
   public async getCommitSha(): Promise<string> {
