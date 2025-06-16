@@ -11,6 +11,7 @@ import {
   storeTokenIdInJsonEditorSelector,
   localApiStateSelector, themesListSelector, tokensSelector, usedTokenSetSelector,
 } from '@/selectors';
+import { useChangedState } from '@/hooks/useChangedState';
 import { GithubTokenStorage } from '@/storage/GithubTokenStorage';
 import { isEqual } from '@/utils/isEqual';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
@@ -33,6 +34,7 @@ export function useGitHub() {
   const localApiState = useSelector(localApiStateSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
+  const { changedPushState } = useChangedState();
   const isProUser = useIsProUser();
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
@@ -67,14 +69,35 @@ export function useGitHub() {
         const metadata = {
           tokenSetOrder: Object.keys(tokens),
         };
-        await storage.save({
-          themes,
-          tokens,
-          metadata,
-        }, {
-          commitMessage,
-          storeTokenIdInJsonEditor,
-        });
+
+        // Check if we should use optimized multi-file sync
+        const isMultiFileMode = isProUser && context.filePath && !context.filePath.endsWith('.json');
+        const hasChanges = Object.keys(changedPushState.tokens).length > 0 ||
+                          changedPushState.themes.length > 0 ||
+                          changedPushState.metadata;
+
+        if (isMultiFileMode && hasChanges) {
+          console.log('🚀 Using optimized GitHub multi-file sync');
+          // Use the optimized save method for multi-file mode
+          await (storage as any).saveOptimized({
+            themes,
+            tokens,
+            metadata,
+          }, {
+            commitMessage,
+            storeTokenIdInJsonEditor,
+          }, changedPushState);
+        } else {
+          console.log('📄 Using regular GitHub sync (single file or no optimization)');
+          await storage.save({
+            themes,
+            tokens,
+            metadata,
+          }, {
+            commitMessage,
+            storeTokenIdInJsonEditor,
+          });
+        }
         const commitSha = await storage.getCommitSha();
         dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as GithubCredentials);
         dispatch.uiState.setApiData({ ...context, branch: customBranch, ...(commitSha ? { commitSha } : {}) });
@@ -131,6 +154,9 @@ export function useGitHub() {
     localApiState,
     usedTokenSet,
     activeTheme,
+    changedPushState,
+    isProUser,
+    storeTokenIdInJsonEditor,
   ]);
 
   const checkAndSetAccess = useCallback(async ({

@@ -1,15 +1,16 @@
 import compact from 'just-compact';
 import { Octokit } from '@octokit/rest';
-import { RemoteTokenstorageErrorMessage, RemoteTokenStorageFile, RemoteTokenStorageMetadata } from './RemoteTokenStorage';
+import { RemoteTokenstorageErrorMessage, RemoteTokenStorageFile, RemoteTokenStorageMetadata, RemoteTokenStorageData } from './RemoteTokenStorage';
 import IsJSONString from '@/utils/isJSONString';
 import { AnyTokenSet } from '@/types/tokens';
 import { ThemeObjectsList } from '@/types';
 import {
-  GitMultiFileObject, GitSingleFileObject, GitTokenStorage,
+  GitMultiFileObject, GitSingleFileObject, GitTokenStorage, GitStorageSaveOption, GitStorageSaveOptions,
 } from './GitTokenStorage';
 import { SystemFilenames } from '@/constants/SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { joinPath } from '@/utils/string';
+import convertTokensToObject from '@/utils/convertTokensToObject';
 
 type ExtendedOctokitClient = Omit<Octokit, 'repos'> & {
   repos: Octokit['repos'] & {
@@ -292,7 +293,128 @@ export class GithubTokenStorage extends GitTokenStorage {
     return !!response;
   }
 
-  public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch?: boolean): Promise<boolean> {
+  /**
+   * Optimized save method that only pushes changed files based on changedState
+   * @param data Token data to save
+   * @param saveOptions Save options including commit message
+   * @param changedState Object containing information about what has changed
+   * @returns Promise<boolean> indicating success
+   */
+  public async saveOptimized(
+    data: RemoteTokenStorageData<GitStorageSaveOptions>,
+    saveOptions: GitStorageSaveOption,
+    changedState: {
+      tokens: Record<string, any[]>,
+      themes: any[],
+      metadata: any
+    }
+  ): Promise<boolean> {
+    console.log('🚀 GitHub Multi-File Sync Optimization: Using changedState to filter files');
+    console.log('📊 Changed state analysis:', {
+      changedTokenSets: Object.keys(changedState.tokens),
+      changedThemes: changedState.themes.length,
+      hasMetadataChanges: !!changedState.metadata
+    });
+
+    // For single file mode, fall back to regular save
+    if (this.path.endsWith('.json')) {
+      console.log('📄 Single file mode detected, using regular save method');
+      return this.save(data, saveOptions);
+    }
+
+    // For multi-file mode, filter files based on changedState
+    if (!this.flags.multiFileEnabled) {
+      console.log('📁 Multi-file not enabled, using regular save method');
+      return this.save(data, saveOptions);
+    }
+
+    // First, convert data to files using the base class logic
+    const files: RemoteTokenStorageFile<GitStorageSaveOptions>[] = [];
+
+    // Convert tokens to files
+    const tokenSetObjects = convertTokensToObject({ ...data.tokens }, saveOptions.storeTokenIdInJsonEditor);
+    Object.entries(tokenSetObjects).forEach(([name, tokenSet]) => {
+      files.push({
+        type: 'tokenSet',
+        name,
+        path: `${name}.json`,
+        data: tokenSet,
+      });
+    });
+
+    // Add themes file
+    files.push({
+      type: 'themes',
+      path: `${SystemFilenames.THEMES}.json`,
+      data: data.themes,
+    });
+
+    // Add metadata file if present
+    if ('metadata' in data && data.metadata) {
+      files.push({
+        type: 'metadata',
+        path: `${SystemFilenames.METADATA}.json`,
+        data: data.metadata,
+      });
+    }
+
+    // Now filter the files based on changedState
+    const filteredFiles: RemoteTokenStorageFile<GitStorageSaveOptions>[] = [];
+
+    files.forEach((file) => {
+      if (file.type === 'tokenSet') {
+        const hasChanges = changedState.tokens[file.name];
+        if (hasChanges && hasChanges.length > 0) {
+          filteredFiles.push(file);
+          console.log(`  ✅ Including token set: ${file.name} (${hasChanges.length} changes)`);
+        } else {
+          console.log(`  ⏭️ Skipping unchanged token set: ${file.name}`);
+        }
+      } else if (file.type === 'themes') {
+        if (changedState.themes.length > 0) {
+          filteredFiles.push(file);
+          console.log(`  ✅ Including themes file (${changedState.themes.length} changes)`);
+        } else {
+          console.log(`  ⏭️ Skipping unchanged themes file`);
+        }
+      } else if (file.type === 'metadata') {
+        if (changedState.metadata) {
+          filteredFiles.push(file);
+          console.log(`  ✅ Including metadata file (has changes)`);
+        } else {
+          console.log(`  ⏭️ Skipping unchanged metadata file`);
+        }
+      }
+    });
+
+    console.log('📋 Optimization Summary:');
+    console.log(`  • Total files available: ${files.length}`);
+    console.log(`  • Files to push: ${filteredFiles.length}`);
+    console.log(`  • Optimization: ${Math.round((1 - filteredFiles.length / files.length) * 100)}% reduction in files`);
+
+    if (filteredFiles.length === 0) {
+      console.log('✅ No changes detected, skipping GitHub push');
+      return true;
+    }
+
+    // Use the regular write method with filtered files, skipping remote fetch
+    return this.write(filteredFiles, saveOptions, true);
+  }
+
+  public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch?: boolean, skipRemoteFetch?: boolean): Promise<boolean> {
+    // If skipRemoteFetch is true, we trust that the changeset is already optimized
+    // and skip the expensive remote fetching and comparison
+    if (skipRemoteFetch) {
+      console.log('🚀 GitHub Push Optimization: Skipping remote fetch, using pre-filtered changeset');
+      console.log(`📤 Pushing ${Object.keys(changeset).length} optimized files directly to GitHub`);
+      console.log('📋 Files to push:', Object.keys(changeset));
+
+      // Push the changeset directly without remote comparison
+      return await this.createOrUpdate(changeset, message, branch, shouldCreateBranch, [], true);
+    }
+
+    // Original implementation with remote fetching (for backward compatibility)
+    console.log('📡 GitHub Push: Fetching remote content for comparison (legacy mode)');
     try {
       const response = await this.octokitClient.rest.repos.getContent({
         owner: this.owner,
