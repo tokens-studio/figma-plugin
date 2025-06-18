@@ -9,6 +9,8 @@ import {
 import { notifyToUI } from '@/plugin/notifiers';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { JSONBinTokenStorage } from '@/storage';
+import { remoteDataSelector, lastSyncedStateSelector, storageTypeSelector } from '@/selectors';
+import { tokenFormatSelector } from '@/selectors/tokenFormatSelector';
 
 const mockStartJob = jest.fn();
 const mockRetrieve = jest.fn();
@@ -43,6 +45,7 @@ const mockGetCommitSha = jest.fn();
 const mockGetLatestCommitDate = jest.fn();
 const mockSetRemoteData = jest.fn();
 const mockSetHasRemoteChange = jest.fn();
+const mockUpdateCheckForChanges = jest.fn();
 
 // Hide log calls unless they are expected
 jest.spyOn(console, 'log').mockImplementation(() => { });
@@ -69,6 +72,18 @@ const mockSelector = (selector: Selector) => {
           },
         },
       ];
+    case remoteDataSelector:
+      return {
+        tokens: {},
+        themes: [],
+        metadata: null,
+      };
+    case lastSyncedStateSelector:
+      return JSON.stringify([{ global: [] }, []], null, 2);
+    case storageTypeSelector:
+      return { provider: 'local' };
+    case tokenFormatSelector:
+      return 'legacy';
     default:
       return {};
   }
@@ -95,6 +110,7 @@ jest.mock('react-redux', () => ({
       resetChangedState: mockResetChangedState,
       setRemoteData: mockSetRemoteData,
       setTokenFormat: mockSetTokenFormat,
+      updateCheckForChanges: mockUpdateCheckForChanges,
     },
     branchState: {
       setBranches: mockSetBranches,
