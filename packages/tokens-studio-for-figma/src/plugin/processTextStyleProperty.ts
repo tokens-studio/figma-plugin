@@ -18,7 +18,29 @@ export function processTextStyleProperty(
     if (variable) {
       const normalizedName = variable.name.replace(/\//g, '.');
 
-      // Get the variable's actual value and transform it if needed
+      // First, check if there's already an existing token that matches this variable name
+      if (_tokens && typeof _tokens === 'object' && 'values' in _tokens) {
+        const tokenStore = _tokens as any;
+        // Search through all token sets for a matching token
+        for (const setName of Object.keys(tokenStore.values || {})) {
+          const tokenSet = tokenStore.values[setName];
+          if (Array.isArray(tokenSet)) {
+            const existingToken = tokenSet.find((token: any) => (
+              token.name === normalizedName && token.type === tokenType
+            ));
+            if (existingToken) {
+              // Return the existing token
+              return {
+                name: existingToken.name,
+                value: existingToken.value,
+                type: existingToken.type,
+              };
+            }
+          }
+        }
+      }
+
+      // If no existing token found, get the variable's actual value and transform it if needed
       // Get the first available mode value
       const modeKeys = Object.keys(variable.valuesByMode || {});
       let variableValue = modeKeys.length > 0 ? variable.valuesByMode[modeKeys[0]] : undefined;
