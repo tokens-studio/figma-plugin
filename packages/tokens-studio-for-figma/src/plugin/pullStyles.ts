@@ -40,7 +40,7 @@ async function processStylesWithVariablesInBlocks<T>(
   styles: T[],
   allVariables: Variable[],
   processor: (style: T, relevantVariables: Variable[], index: number) => any,
-  blockSize: number = 5, // Very small blocks for variable processing
+  blockSize: number = 10, // Increased batch size for better performance
 ): Promise<any[]> {
   const results: any[] = [];
   const totalBlocks = Math.ceil(styles.length / blockSize);
@@ -89,7 +89,7 @@ async function processTypographyInBlocks(
   styles: TextStyle[],
   _allVariables: Variable[],
   processor: (style: TextStyle) => any,
-  blockSize: number = 2, // Very small blocks for typography
+  blockSize: number = 10, // Increased batch size for better performance
 ): Promise<any[]> {
   const results: any[] = [];
   const totalBlocks = Math.ceil(styles.length / blockSize);
