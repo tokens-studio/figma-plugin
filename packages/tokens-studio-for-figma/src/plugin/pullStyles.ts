@@ -8,7 +8,7 @@ import { convertFigmaToLetterSpacing } from './figmaTransforms/letterSpacing';
 import { convertFigmaToLineHeight } from './figmaTransforms/lineHeight';
 import { convertFigmaToTextCase } from './figmaTransforms/textCase';
 import { convertFigmaToTextDecoration } from './figmaTransforms/textDecoration';
-import { notifyStyleValues } from './notifiers';
+import { notifyStyleValues, postToUI } from './notifiers';
 import { PullStyleOptions } from '@/types';
 import { slugify } from '@/utils/string';
 import { TokenTypes } from '@/constants/TokenTypes';
@@ -17,6 +17,8 @@ import { StyleToCreateToken } from '@/types/payloads';
 import { getVariablesWithoutZombies } from './getVariablesWithoutZombies';
 import { getTokenData } from './node';
 import { processTextStyleProperty } from './processTextStyleProperty';
+import { MessageFromPluginTypes } from '@/types/messages';
+import { BackgroundJobs } from '@/constants/BackgroundJobs';
 
 // Helper function to get only the variables needed for a specific style
 function getRelevantVariablesForStyle(style: TextStyle, allVariables: Variable[]): Variable[] {
@@ -120,6 +122,21 @@ async function processTypographyInBlocks(
 }
 
 export default async function pullStyles(styleTypes: PullStyleOptions): Promise<void> {
+  // Calculate total steps for progress tracking
+  const totalSteps = Object.values(styleTypes).filter(Boolean).length;
+  let currentStepCount = 0;
+
+  // Start the import job
+  postToUI({
+    type: MessageFromPluginTypes.START_JOB,
+    job: {
+      name: BackgroundJobs.UI_IMPORT_STYLES,
+      timePerTask: 1000, // Estimated time per step in ms
+      completedTasks: 0,
+      totalTasks: totalSteps,
+    },
+  });
+
   const tokens = await getTokenData();
   // @TODO should be specifically typed according to their type
   let colors: StyleToCreateToken[] = [];
@@ -173,6 +190,14 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
             : null;
         }),
     );
+
+    // Update progress
+    currentStepCount += 1;
+    postToUI({
+      type: MessageFromPluginTypes.COMPLETE_JOB_TASKS,
+      name: BackgroundJobs.UI_IMPORT_STYLES,
+      count: 1,
+    });
   }
 
   if (styleTypes.textStyles) {
@@ -455,6 +480,14 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
         return styleObject;
       },
     );
+
+    // Update progress
+    currentStepCount += 1;
+    postToUI({
+      type: MessageFromPluginTypes.COMPLETE_JOB_TASKS,
+      name: BackgroundJobs.UI_IMPORT_STYLES,
+      count: 1,
+    });
   }
 
   if (styleTypes.effectStyles) {
@@ -498,6 +531,14 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
           return styleObject;
         }),
     );
+
+    // Update progress
+    currentStepCount += 1;
+    postToUI({
+      type: MessageFromPluginTypes.COMPLETE_JOB_TASKS,
+      name: BackgroundJobs.UI_IMPORT_STYLES,
+      count: 1,
+    });
   }
 
   const stylesObject = {
@@ -525,4 +566,10 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
  }, {});
 
  notifyStyleValues(returnedObject);
+
+ // Complete the import job
+ postToUI({
+   type: MessageFromPluginTypes.COMPLETE_JOB,
+   name: BackgroundJobs.UI_IMPORT_STYLES,
+ });
 }
