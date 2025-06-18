@@ -32,7 +32,7 @@ function getRelevantVariablesForStyle(style: TextStyle, allVariables: Variable[]
   }
 
   // Return only the variables needed for this style
-  return allVariables.filter(v => relevantVariableIds.has(v.id));
+  return allVariables.filter((v) => relevantVariableIds.has(v.id));
 }
 
 // Helper function to process styles with variable references in small blocks
@@ -43,19 +43,13 @@ async function processStylesWithVariablesInBlocks<T>(
   blockSize: number = 10, // Increased batch size for better performance
 ): Promise<any[]> {
   const results: any[] = [];
-  const totalBlocks = Math.ceil(styles.length / blockSize);
-
-  console.log(`Processing ${styles.length} styles with variables in ${totalBlocks} blocks of ${blockSize}`);
 
   for (let i = 0; i < styles.length; i += blockSize) {
     const block = styles.slice(i, i + blockSize);
-    const blockIndex = Math.floor(i / blockSize);
-
-    console.log(`Processing variable block ${blockIndex + 1}/${totalBlocks}`);
 
     try {
       // Process each style in the block with only the variables it needs
-      for (let j = 0; j < block.length; j++) {
+      for (let j = 0; j < block.length; j += 1) {
         const style = block[j];
         const styleIndex = i + j;
 
@@ -67,16 +61,18 @@ async function processStylesWithVariablesInBlocks<T>(
 
         // Give Figma time between each style when processing variables
         if (relevantVariables.length > 0) {
-          await new Promise((resolve) => setTimeout(resolve, 5));
+          await new Promise((resolve) => {
+            setTimeout(resolve, 5);
+          });
         }
       }
 
       // Clear block and give Figma more time between blocks
       block.length = 0;
-      await new Promise((resolve) => setTimeout(resolve, 20));
-
+      await new Promise((resolve) => {
+        setTimeout(resolve, 20);
+      });
     } catch (error) {
-      console.error(`Error processing variable block ${blockIndex + 1}/${totalBlocks}:`, error);
       // Continue with next block instead of failing completely
     }
   }
@@ -92,34 +88,30 @@ async function processTypographyInBlocks(
   blockSize: number = 10, // Increased batch size for better performance
 ): Promise<any[]> {
   const results: any[] = [];
-  const totalBlocks = Math.ceil(styles.length / blockSize);
-
-  console.log(`Processing ${styles.length} typography styles in ${totalBlocks} blocks of ${blockSize}`);
 
   for (let i = 0; i < styles.length; i += blockSize) {
     const block = styles.slice(i, i + blockSize);
-    const blockIndex = Math.floor(i / blockSize);
-
-    console.log(`Processing typography block ${blockIndex + 1}/${totalBlocks}`);
 
     try {
       // Process each style in the block
-      for (let j = 0; j < block.length; j++) {
+      for (let j = 0; j < block.length; j += 1) {
         const style = block[j];
 
         const result = processor(style);
         results.push(result);
 
         // Give Figma time between each typography style (they're complex)
-        await new Promise((resolve) => setTimeout(resolve, 10));
+        await new Promise((resolve) => {
+          setTimeout(resolve, 10);
+        });
       }
 
       // Clear block and give Figma more time between blocks
       block.length = 0;
-      await new Promise((resolve) => setTimeout(resolve, 30));
-
+      await new Promise((resolve) => {
+        setTimeout(resolve, 30);
+      });
     } catch (error) {
-      console.error(`Error processing typography block ${blockIndex + 1}/${totalBlocks}:`, error);
       // Continue with next block instead of failing completely
     }
   }
