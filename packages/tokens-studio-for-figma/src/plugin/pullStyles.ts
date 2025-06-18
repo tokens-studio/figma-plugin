@@ -537,7 +537,7 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
     postToUI({
       type: MessageFromPluginTypes.COMPLETE_JOB_TASKS,
       name: BackgroundJobs.UI_IMPORT_STYLES,
-      count: 1,
+      count: currentStepCount,
     });
   }
 
