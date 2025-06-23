@@ -30,12 +30,12 @@ async function processBatch(
   referenceVariableCandidates: ReferenceVariableType[],
   renamedVariableKeys: string[],
 ) {
-  await Promise.all(batch.map(async (token) => {
+  return Promise.all(batch.map(async (token) => {
     const variableType = convertTokenTypeToVariableType(token.type, token.value);
     // If id matches the variableId, or name patches the token path, we can use it to update the variable instead of re-creating.
     // This has the nasty side-effect that if font weight changes from string to number, it will not update the variable given we cannot change type.
     // In that case, we should delete the variable and re-create it.
-    const variable = variablesInFigma.find((v) => (v.key === token.variableId && !v.remote) || v.name === token.path) || figma.variables.createVariable(token.path, collection, variableType);
+    const variable = variablesInFigma.find((v) => (v.key === token.variableId && !v.remote) || v.name === token.path) ?? figma.variables.createVariable(token.path, collection, variableType);
 
     if (variable) {
       // First, rename all variables that should be renamed (if the user choose to do so)
@@ -116,12 +116,11 @@ export default async function setValuesOnVariable(
   // Process tokens in batches to prevent memory leaks with large token sets
   // Use smaller batch sizes for very large token sets to prevent memory issues
   const totalTokens = tokens.length;
-  let BATCH_SIZE = 100;
-  if (totalTokens > 10000) {
-    BATCH_SIZE = 50;
-  } else if (totalTokens > 5000) {
-    BATCH_SIZE = 75;
-  }
+  // clamp batch size between 100 and 50, for tiny sets -> 100, for sets>10000 -> 50
+  const BATCH_SIZE = Math.round(Math.min(Math.max(100 - totalTokens / 200, 50), 100));
+
+  // Calculate delay based on total tokens: totalTokens / 200, clamped between 10 and 50ms
+  const DELAY = Math.max(10, Math.min(50, Math.round(totalTokens / 200)));
 
   const tracker = new ProgressTracker(BackgroundJobs.PLUGIN_UPDATEPLUGINDATA);
 
@@ -158,16 +157,10 @@ export default async function setValuesOnVariable(
       }
       tracker.reportIfNecessary();
 
-      // For very large token sets, add longer delays to prevent memory issues
+      // Add delay between batches to prevent memory issues
       if (i + BATCH_SIZE < totalTokens) {
-        let delay = 10;
-        if (totalTokens > 10000) {
-          delay = 50;
-        } else if (totalTokens > 5000) {
-          delay = 25;
-        }
         await new Promise<void>((resolve) => {
-          setTimeout(resolve, delay);
+          setTimeout(resolve, DELAY);
         });
       }
     }
@@ -177,9 +170,7 @@ export default async function setValuesOnVariable(
       name: BackgroundJobs.PLUGIN_UPDATEPLUGINDATA,
     });
 
-    if (totalTokens > 1000) {
-      notifyUI(`Successfully processed ${totalTokens} tokens!`, { timeout: 2000 });
-    }
+    notifyUI(`Successfully processed ${totalTokens} tokens!`, { timeout: 2000 });
   } catch (e) {
     console.error('Setting values on variable failed', e);
 
