@@ -136,6 +136,7 @@ export default async function setValuesOnVariable(
   });
 
   try {
+    // Process batches sequentially (not parallelized) to avoid memory issues in Figma, as it causes crashes
     for (let i = 0; i < totalTokens; i += BATCH_SIZE) {
       const batch = tokens.slice(i, i + BATCH_SIZE);
 
