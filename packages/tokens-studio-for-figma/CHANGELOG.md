@@ -1,5 +1,16 @@
 # @tokens-studio/figma-plugin
 
+## 2.5.2
+
+### Patch Changes
+
+- 12c166e2: Add Alt+click functionality to collapse/expand all token set folders at once. Users can now Alt+click (Option+click on Mac) on any folder in the token set tree to toggle all folders, similar to the existing behavior in token listings.
+- 208baa07: Change default export mode from single file to multiple files
+- 246c2f0b: Fix issue where the “Recover local changes” prompt wouldn’t appear after closing the plugin with unsaved changes while using remote sync providers, unless the user clicked on 'Apply to Selection'
+- d3765b56: Add retry button to token loading error callout. Users can now retry loading tokens when encountering connection errors, in addition to entering new credentials. The error messaging has also been improved to better distinguish between credential and access issues.
+- 0760abcc: Fix display of empty braces message to user when studio sync or pull fails.
+- f6312a0f: Fix an issue of loading tokens upon the start of the plugin, even when credentials are correct.
+
 ## 2.5.1
 
 ### Patch Changes

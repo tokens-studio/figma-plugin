@@ -12,5 +12,8 @@
   "cancel": "रद्द करना",
   "loadingWait": "लोड हो रहा है कृपया प्रतीक्षा करें",
   "enterCredentials": "क्रेडेंशियल दर्ज करें",
-  "unableToFetchRemote": "रिमोट स्टोरेज से टोकन लाने में असमर्थ, यदि आपने अभी तक क्रेडेंशियल नहीं जोड़े हैं तो उन्हें अगले चरण में जोड़ें। अन्यथा सुनिश्चित करें कि फ़ाइल मौजूद है और आपके पास उस तक पहुंच है।"
+  "unableToFetchRemote": "रिमोट स्टोरेज से टोकन लाने में असमर्थ, यदि आपने अभी तक क्रेडेंशियल नहीं जोड़े हैं तो उन्हें अगले चरण में जोड़ें। अन्यथा सुनिश्चित करें कि फ़ाइल मौजूद है और आपके पास उस तक पहुंच है।",
+  "unableToFetchRemoteNoCredentials": "Unable to fetch tokens from remote storage. You need to add credentials to access this storage provider.",
+  "unableToFetchRemoteWithCredentials": "Unable to fetch tokens from remote storage. This may be due to incorrect credentials, or the file might not exist or you don't have access to it.",
+  "retry": "Retry"
 }

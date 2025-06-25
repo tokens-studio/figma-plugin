@@ -1,7 +1,7 @@
 import type { Dispatch } from '@/app/store';
 import type { StartupMessage } from '@/types/AsyncMessages';
 import { identify, track } from '@/utils/analytics';
-import * as pjs from '../../../../../package.json';
+import pjs from '../../../../../package.json';
 
 export function savePluginDataFactory(dispatch: Dispatch, params: StartupMessage) {
   return async () => {

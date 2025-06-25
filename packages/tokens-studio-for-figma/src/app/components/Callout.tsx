@@ -12,10 +12,14 @@ type Props = {
     text: React.ReactNode
     onClick: React.ComponentProps<typeof Button>['onClick']
   }
+  secondaryAction?: {
+    text: React.ReactNode
+    onClick: React.ComponentProps<typeof Button>['onClick']
+  }
 };
 
 export default function Callout({
-  heading, description, action, id,
+  heading, description, action, secondaryAction, id,
 }: Props) {
   return (
     <Box css={{
@@ -31,11 +35,21 @@ export default function Callout({
             <Heading>{heading}</Heading>
             <Text muted size="xsmall">{description}</Text>
           </Stack>
-          <Box>
+          <Stack direction="row" gap={2}>
             <Button data-testid={id} size="small" variant="primary" onClick={action.onClick}>
               {action.text}
             </Button>
-          </Box>
+            {secondaryAction && (
+              <Button
+                data-testid={`${id}-secondary`}
+                size="small"
+                variant="secondary"
+                onClick={secondaryAction.onClick}
+              >
+                {secondaryAction.text}
+              </Button>
+            )}
+          </Stack>
         </Stack>
       </Stack>
     </Box>
