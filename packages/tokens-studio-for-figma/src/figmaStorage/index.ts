@@ -22,3 +22,5 @@ export * from './TokenFormatProperty';
 export * from './FileKeyProperty';
 export * from './CheckForChangesProperty';
 export * from './IsCompressedProperty';
+export * from './VariableExportSettingsProperty';
+export * from './SelectedExportThemesProperty';
