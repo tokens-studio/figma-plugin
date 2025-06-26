@@ -845,6 +845,78 @@ describe('Can set values on node', () => {
     expect(solidNodeMock).toEqual({ ...solidNodeMock, strokes: [], cornerRadius: 0 });
   });
 
+  it('should apply border width to ELLIPSE node correctly', async () => {
+    // Mock an ELLIPSE node that only has strokeWeight, not individual stroke weight properties
+    const ellipseNodeMock = ({
+      id: '123:459',
+      type: 'ELLIPSE',
+      strokeWeight: 0,
+      opacity: 1,
+      effects: [],
+      fills: [],
+      strokes: [],
+      effectStyleId: '',
+      fillStyleId: '',
+      strokeStyleId: '',
+      dashPattern: [],
+      visible: true,
+      getSharedPluginData: () => '',
+      setSharedPluginData: () => undefined,
+      // Note: ELLIPSE nodes don't have strokeTopWeight, strokeRightWeight, etc.
+    } as unknown) as EllipseNode;
+
+    const values = {
+      borderWidth: '3',
+    };
+
+    const data = {
+      borderWidth: 'border-width-3',
+    };
+
+    await setValuesOnNode({ node: ellipseNodeMock, values, data });
+
+    // The border width should be applied to strokeWeight
+    expect(ellipseNodeMock.strokeWeight).toEqual(3);
+  });
+
+  it('should apply border width to RECTANGLE node with individual stroke weights', async () => {
+    // Mock a RECTANGLE node that has individual stroke weight properties
+    const rectangleNodeMock = ({
+      id: '123:460',
+      type: 'RECTANGLE',
+      strokeWeight: 0,
+      strokeTopWeight: 0,
+      strokeRightWeight: 0,
+      strokeBottomWeight: 0,
+      strokeLeftWeight: 0,
+      opacity: 1,
+      effects: [],
+      fills: [],
+      strokes: [],
+      effectStyleId: '',
+      fillStyleId: '',
+      strokeStyleId: '',
+      dashPattern: [],
+      visible: true,
+      getSharedPluginData: () => '',
+      setSharedPluginData: () => undefined,
+    } as unknown) as RectangleNode;
+
+    const values = {
+      borderWidth: '3',
+    };
+
+    const data = {
+      borderWidth: 'border-width-3',
+    };
+
+    await setValuesOnNode({ node: rectangleNodeMock, values, data });
+
+    // For RECTANGLE nodes, the border width should be applied to strokeWeight
+    // (since we're not applying variables in this test, it falls back to raw value)
+    expect(rectangleNodeMock.strokeWeight).toEqual(3);
+  });
+
   it('can set boolean token for visibility', async () => {
     const values = {
       visibility: 'false',
