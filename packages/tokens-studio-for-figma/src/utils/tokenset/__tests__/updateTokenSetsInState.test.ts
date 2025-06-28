@@ -159,7 +159,6 @@ describe('updateTokenSetsInState', () => {
           name: 'Dark',
           selectedTokenSets: {
             global: TokenSetStatus.ENABLED,
-            global_Copy: TokenSetStatus.DISABLED,
           },
         },
       ],
@@ -211,7 +210,6 @@ describe('updateTokenSetsInState', () => {
           name: 'Dark',
           selectedTokenSets: {
             global: TokenSetStatus.ENABLED,
-            'global/light': TokenSetStatus.DISABLED,
             dark: TokenSetStatus.DISABLED,
           },
         },
