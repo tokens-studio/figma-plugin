@@ -517,25 +517,29 @@ export const tokenState = createModel<RootModel>()({
       const {
         oldName, newName, type, parent,
       } = data;
-      const tokensInParent = state.tokens[parent] ?? [];
-      const renamedTokensInParent = tokensInParent.map((token) => {
-        if (token.name.startsWith(`${oldName}.`) && token.type === type) {
-          const { name, ...rest } = token;
-          const newTokenName = name.replace(`${oldName}`, `${newName}`);
-          return {
-            ...rest,
-            name: newTokenName,
-          };
-        }
-        return token;
-      }) as AnyTokenList;
+
+      // Rename tokens across ALL sets, not just the parent set
+      const updatedTokens = Object.keys(state.tokens).reduce<Record<string, AnyTokenList>>((acc, setName) => {
+        const tokensInSet = state.tokens[setName] ?? [];
+        const renamedTokensInSet = tokensInSet.map((token) => {
+          if (token.name.startsWith(`${oldName}.`) && token.type === type) {
+            const { name, ...rest } = token;
+            const newTokenName = name.replace(`${oldName}`, `${newName}`);
+            return {
+              ...rest,
+              name: newTokenName,
+            };
+          }
+          return token;
+        }) as AnyTokenList;
+
+        acc[setName] = renamedTokensInSet;
+        return acc;
+      }, {});
 
       const newState = {
         ...state,
-        tokens: {
-          ...state.tokens,
-          [parent]: renamedTokensInParent,
-        },
+        tokens: updatedTokens,
       };
       return newState as TokenState;
     },
@@ -846,15 +850,24 @@ export const tokenState = createModel<RootModel>()({
         oldName, newName, type, parent,
       } = data;
 
-      const tokensInParent = rootState.tokenState.tokens[parent] ?? [];
-      tokensInParent
-        .filter((token) => token.name.startsWith(`${newName}.`) && token.type === type)
-        .forEach((updatedToken) => {
-          dispatch.tokenState.updateAliases({
-            oldName: updatedToken.name.replace(`${newName}`, `${oldName}`),
-            newName: updatedToken.name,
+      // Collect all renamed tokens from ALL sets for alias updates
+      const allRenamedTokens: Array<{ oldName: string; newName: string }> = [];
+
+      Object.entries(rootState.tokenState.tokens).forEach(([setName, tokens]) => {
+        tokens
+          .filter((token) => token.name.startsWith(`${newName}.`) && token.type === type)
+          .forEach((updatedToken) => {
+            allRenamedTokens.push({
+              oldName: updatedToken.name.replace(`${newName}`, `${oldName}`),
+              newName: updatedToken.name,
+            });
           });
-        });
+      });
+
+      // Update aliases for all renamed tokens
+      allRenamedTokens.forEach((tokenPair) => {
+        dispatch.tokenState.updateAliases(tokenPair);
+      });
     },
     updateCheckForChanges(checkForChanges: boolean, rootState) {
       if (rootState.uiState.storageType.provider !== StorageProviderType.LOCAL) {
