@@ -598,18 +598,21 @@ export default function useRemoteTokens() {
       track('fetchTokensFromFileOrDirectory');
       dispatch.uiState.startJob({ name: BackgroundJobs.UI_FETCHTOKENSFROMFILE });
 
-      if (files) {
+      if (files && files.length > 0) {
         const remoteData = await readTokensFromFileOrDirectory(files);
+
         if (remoteData?.status === 'success') {
           const sortedTokens = applyTokenSetOrder(
             remoteData.tokens,
             remoteData.metadata?.tokenSetOrder ?? Object.keys(remoteData.tokens),
           );
+
           dispatch.tokenState.setTokenData({
             values: sortedTokens,
             themes: remoteData.themes,
             activeTheme: activeTheme ?? {},
             usedTokenSet: usedTokenSet ?? {},
+            shouldUpdate: true,
           });
           track('Launched with token sets', {
             count: Object.keys(remoteData.tokens).length,
