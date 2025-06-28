@@ -15,7 +15,8 @@ export type GitStorageSaveOptions = {
 
 export type GitStorageSaveOption = {
   commitMessage?: string,
-  storeTokenIdInJsonEditor: boolean
+  storeTokenIdInJsonEditor: boolean,
+  changedFiles?: Set<string>
 };
 
 export type GitSingleFileObject = Record<string, (
@@ -110,7 +111,21 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageSaveO
         }, {}),
       }, null, 2);
     } else if (this.flags.multiFileEnabled) {
-      files.forEach((file) => {
+      // Filter files based on changed files if provided
+      const filesToProcess = saveOptions.changedFiles 
+        ? files.filter((file) => {
+            if (file.type === 'tokenSet') {
+              return saveOptions.changedFiles!.has(file.name);
+            } else if (file.type === 'themes') {
+              return saveOptions.changedFiles!.has('$themes');
+            } else if (file.type === 'metadata') {
+              return saveOptions.changedFiles!.has('$metadata');
+            }
+            return false;
+          })
+        : files;
+
+      filesToProcess.forEach((file) => {
         if (file.type === 'tokenSet') {
           filesChangeset[joinPath(this.path, `${file.name}.json`)] = JSON.stringify(file.data, null, 2);
         } else if (file.type === 'themes') {
