@@ -6,7 +6,7 @@ import Modal from './Modal';
 import { Dispatch } from '../store';
 import useManageTokens from '../store/useManageTokens';
 import {
-  activeTokenSetSelector, importedTokensSelector, importedThemesSelector, themesListSelector,
+  activeTokenSetSelector, importedTokensSelector, importedThemesSelector, themesListSelector, renamedCollectionsSelector,
 } from '@/selectors';
 import Stack from './Stack';
 import AddIcon from '@/icons/add.svg';
@@ -103,6 +103,7 @@ export default function ImportedTokensDialog() {
   const themes = useSelector(themesListSelector);
   const importedTokens = useSelector(importedTokensSelector);
   const importedThemes = useSelector(importedThemesSelector);
+  const renamedCollections = useSelector(renamedCollectionsSelector);
   const [newThemes, setNewThemes] = React.useState(importedThemes.newThemes);
   const [updatedThemes, setUpdatedThemes] = React.useState(importedThemes.updatedThemes);
   const [newTokens, setNewTokens] = React.useState(importedTokens.newTokens);
@@ -176,6 +177,13 @@ export default function ImportedTokensDialog() {
       ]);
     }
 
+    // Apply renamed collections cleanup if there were any renames
+    if (renamedCollections && renamedCollections.length > 0) {
+      dispatch.tokenState.handleRenamedCollections(renamedCollections);
+      // Clear the renamed collections after applying them
+      dispatch.tokenState.setRenamedCollections(null);
+    }
+
     // Update all existing tokens, and create new ones
     importMultipleTokens({ multipleUpdatedTokens, multipleNewTokens });
 
@@ -204,7 +212,7 @@ export default function ImportedTokensDialog() {
     setNewTokens([]);
     setNewThemes([]);
     setUpdatedThemes([]);
-  }, [activeTokenSet, importMultipleTokens, newTokens, updatedTokens, themes, newThemes, updatedThemes, dispatch]);
+  }, [activeTokenSet, importMultipleTokens, newTokens, updatedTokens, themes, newThemes, updatedThemes, renamedCollections, dispatch]);
 
   const handleCreateSingleClick = React.useCallback((token: any) => {
     // Create new tokens according to styles
