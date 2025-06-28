@@ -109,7 +109,7 @@ export function pullTokensFactory(
       }
     } else if (params.localTokenData) {
       if (params.localTokenData.tokenFormat) dispatch.tokenState.setTokenFormat(params.localTokenData.tokenFormat);
-      dispatch.tokenState.setTokenData({ ...params.localTokenData, activeTheme });
+      dispatch.tokenState.setTokenData({ ...params.localTokenData, activeTheme, shouldUpdate: true });
       const existTokens = hasTokenValues(params.localTokenData.values);
       if (existTokens) dispatch.uiState.setActiveTab(Tabs.TOKENS);
       else dispatch.uiState.setActiveTab(Tabs.START);
@@ -153,7 +153,7 @@ export function pullTokensFactory(
       } else {
         if (params.localTokenData.tokenFormat) dispatch.tokenState.setTokenFormat(params.localTokenData.tokenFormat);
         // User confirmed to recover local changes
-        dispatch.tokenState.setTokenData({ ...params.localTokenData, activeTheme });
+        dispatch.tokenState.setTokenData({ ...params.localTokenData, activeTheme, shouldUpdate: true });
 
         if (hasLocalData) {
           // local tokens found
