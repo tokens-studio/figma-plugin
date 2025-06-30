@@ -1,15 +1,15 @@
 import compact from 'just-compact';
 import { Octokit } from '@octokit/rest';
-import { RemoteTokenstorageErrorMessage, RemoteTokenStorageFile, RemoteTokenStorageMetadata } from './RemoteTokenStorage';
+import { RemoteTokenstorageErrorMessage, RemoteTokenStorageFile, RemoteTokenStorageMetadata, RemoteTokenStorageData } from './RemoteTokenStorage';
 import IsJSONString from '@/utils/isJSONString';
 import { AnyTokenSet } from '@/types/tokens';
 import { ThemeObjectsList } from '@/types';
 import {
-  GitMultiFileObject, GitSingleFileObject, GitTokenStorage,
+  GitMultiFileObject, GitSingleFileObject, GitTokenStorage, GitStorageSaveOption, GitStorageSaveOptions,
 } from './GitTokenStorage';
 import { SystemFilenames } from '@/constants/SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
-import { joinPath } from '@/utils/string';
+import convertTokensToObject from '@/utils/convertTokensToObject';
 
 type ExtendedOctokitClient = Omit<Octokit, 'repos'> & {
   repos: Octokit['repos'] & {
@@ -292,52 +292,216 @@ export class GithubTokenStorage extends GitTokenStorage {
     return !!response;
   }
 
-  public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch?: boolean): Promise<boolean> {
-    try {
-      const response = await this.octokitClient.rest.repos.getContent({
-        owner: this.owner,
-        repo: this.repository,
-        path: this.path,
-        ref: this.branch,
+  /**
+   * Optimized save method that only pushes changed files based on changedState
+   * @param data Token data to save
+   * @param saveOptions Save options including commit message
+   * @param changedState Object containing information about what has changed
+   * @returns Promise<boolean> indicating success
+   */
+  public async saveOptimized(
+    data: RemoteTokenStorageData<GitStorageSaveOptions>,
+    saveOptions: GitStorageSaveOption,
+    changedState: {
+      tokens: Record<string, any[]>,
+      themes: any[],
+      metadata: any
+    }
+  ): Promise<boolean> {
+    console.log('🚀 GitHub Multi-File Sync Optimization: Using changedState to filter files');
+    console.log('📊 Changed state analysis:', {
+      changedTokenSets: Object.keys(changedState.tokens),
+      changedThemes: changedState.themes.length,
+      hasMetadataChanges: !!changedState.metadata
+    });
+
+    // For single file mode, fall back to regular save
+    if (this.path.endsWith('.json')) {
+      console.log('📄 Single file mode detected, using regular save method');
+      return this.save(data, saveOptions);
+    }
+
+    // For multi-file mode, filter files based on changedState
+    if (!this.flags.multiFileEnabled) {
+      console.log('📁 Multi-file not enabled, using regular save method');
+      return this.save(data, saveOptions);
+    }
+
+    // First, convert data to files using the base class logic
+    const files: RemoteTokenStorageFile<GitStorageSaveOptions>[] = [];
+
+    // Convert tokens to files
+    const tokenSetObjects = convertTokensToObject({ ...data.tokens }, saveOptions.storeTokenIdInJsonEditor);
+    Object.entries(tokenSetObjects).forEach(([name, tokenSet]) => {
+      files.push({
+        type: 'tokenSet',
+        name,
+        path: `${name}.json`,
+        data: tokenSet,
       });
+    });
 
-      if (Array.isArray(response.data)) {
-        const directoryTreeResponse = await this.octokitClient.rest.git.createTree({
-          owner: this.owner,
-          repo: this.repository,
-          tree: response.data.map((item) => ({
-            path: item.path,
-            sha: item.sha,
-            mode: getTreeMode(item.type),
-          })),
-        });
+    // Add themes file
+    files.push({
+      type: 'themes',
+      path: `${SystemFilenames.THEMES}.json`,
+      data: data.themes,
+    });
 
-        if (directoryTreeResponse.data.tree[0].sha) {
-          const treeResponse = await this.octokitClient.rest.git.getTree({
-            owner: this.owner,
-            repo: this.repository,
-            tree_sha: directoryTreeResponse.data.tree[0].sha,
-            recursive: 'true',
-          });
+    // Add metadata file if present
+    if ('metadata' in data && data.metadata) {
+      files.push({
+        type: 'metadata',
+        path: `${SystemFilenames.METADATA}.json`,
+        data: data.metadata,
+      });
+    }
 
-          if (treeResponse.data.tree.length > 0) {
-            const jsonFiles = treeResponse.data.tree.filter((file) => (
-              file.path?.endsWith('.json')
-            )).sort((a, b) => (
-              (a.path && b.path) ? a.path.localeCompare(b.path) : 0
-            ));
+    // Now filter the files based on changedState and detect deletions
+    const filteredFiles: RemoteTokenStorageFile<GitStorageSaveOptions>[] = [];
+    const filesToDelete: string[] = [];
 
-            const filesToDelete = jsonFiles.filter((jsonFile) => !Object.keys(changeset).some((item) => jsonFile.path && item === joinPath(this.path, jsonFile?.path)))
-              .map((fileToDelete) => (`${this.path.split('/')[0]}/${fileToDelete.path}` ?? ''));
-            return await this.createOrUpdate(changeset, message, branch, shouldCreateBranch, filesToDelete, true);
-          }
+    files.forEach((file) => {
+      if (file.type === 'tokenSet') {
+        const hasChanges = changedState.tokens[file.name];
+        if (hasChanges && hasChanges.length > 0) {
+          filteredFiles.push(file);
+          console.log(`  ✅ Including token set: ${file.name} (${hasChanges.length} changes)`);
+        } else {
+          console.log(`  ⏭️ Skipping unchanged token set: ${file.name}`);
+        }
+      } else if (file.type === 'themes') {
+        if (changedState.themes.length > 0) {
+          filteredFiles.push(file);
+          console.log(`  ✅ Including themes file (${changedState.themes.length} changes)`);
+        } else {
+          console.log(`  ⏭️ Skipping unchanged themes file`);
+        }
+      } else if (file.type === 'metadata') {
+        if (changedState.metadata) {
+          filteredFiles.push(file);
+          console.log(`  ✅ Including metadata file (has changes)`);
+        } else {
+          console.log(`  ⏭️ Skipping unchanged metadata file`);
         }
       }
+    });
 
-      return await this.createOrUpdate(changeset, message, branch, shouldCreateBranch);
-    } catch {
-      return await this.createOrUpdate(changeset, message, branch, shouldCreateBranch);
+    // Check for deleted token sets by looking for REMOVE importType in changedState
+    Object.entries(changedState.tokens).forEach(([tokenSetName, changes]) => {
+      const hasRemovedTokens = changes.some((change: any) => change.importType === 'REMOVE');
+      if (hasRemovedTokens) {
+        // Check if the entire token set was removed (no corresponding file in current data)
+        const currentFile = files.find(f => f.type === 'tokenSet' && f.name === tokenSetName);
+        if (!currentFile) {
+          const filePath = `${tokenSetName}.json`;
+          filesToDelete.push(filePath);
+          console.log(`  🗑️ Marking token set for deletion: ${tokenSetName}`);
+        }
+      }
+    });
+
+    // Check for renamed token sets by detecting token sets that have REMOVE entries
+    // but DON'T exist in current files (indicating they were the old names that got renamed)
+    Object.entries(changedState.tokens).forEach(([tokenSetName, changes]) => {
+      const hasRemovedTokens = changes.some((change: any) => change.importType === 'REMOVE');
+      if (hasRemovedTokens) {
+        // Check if this token set name does NOT exist in current files
+        const currentFile = files.find((f) => f.type === 'tokenSet' && f.name === tokenSetName);
+        if (!currentFile) {
+          // This token set has REMOVE entries but doesn't exist in current files
+          // This indicates it was the old name that got renamed to something else
+          const oldFilePath = `${tokenSetName}.json`;
+          filesToDelete.push(oldFilePath);
+          console.log(`  🔄 Detected old name from rename: ${tokenSetName}, marking file for deletion`);
+        }
+      }
+    });
+
+    // Check for removed themes
+    const hasRemovedThemes = changedState.themes.some((theme: any) => theme.importType === 'REMOVE');
+    if (hasRemovedThemes) {
+      console.log(`  🗑️ Themes have removals, including themes file for update`);
+      // Themes file should already be included above if there are changes
     }
+
+    console.log('📋 Optimization Summary:');
+    console.log(`  • Total files available: ${files.length}`);
+    console.log(`  • Files to push: ${filteredFiles.length}`);
+    console.log(`  • Files to delete: ${filesToDelete.length}`);
+    console.log(`  • Optimization: ${Math.round((1 - filteredFiles.length / files.length) * 100)}% reduction in files`);
+
+    if (filteredFiles.length === 0 && filesToDelete.length === 0) {
+      console.log('✅ No changes detected, skipping GitHub push');
+      return true;
+    }
+
+    // Use a custom write method that handles both files and deletions
+    return this.writeOptimized(filteredFiles, saveOptions, filesToDelete);
+  }
+
+  /**
+   * Optimized write method that handles both file updates and deletions
+   */
+  private async writeOptimized(files: RemoteTokenStorageFile<GitStorageSaveOptions>[], saveOptions: GitStorageSaveOption, filesToDelete: string[]): Promise<boolean> {
+    const branches = await this.fetchBranches();
+    if (!branches.length) return false;
+
+    const filesChangeset: Record<string, string> = {};
+
+    // Process files to update/create
+    if (this.path.endsWith('.json')) {
+      // Single file mode
+      filesChangeset[this.path] = JSON.stringify({
+        ...files.reduce<GitSingleFileObject>((acc, file) => {
+          if (file.type === 'tokenSet') {
+            acc[file.name] = file.data;
+          } else if (file.type === 'themes') {
+            acc.$themes = [...acc.$themes ?? [], ...file.data];
+          } else if (file.type === 'metadata') {
+            acc.$metadata = { ...acc.$metadata ?? {}, ...file.data };
+          }
+          return acc;
+        }, {}),
+      }, null, 2);
+    } else if (this.flags.multiFileEnabled) {
+      // Multi-file mode
+      files.forEach((file) => {
+        if (file.type === 'tokenSet') {
+          filesChangeset[`${this.path}/${file.name}.json`] = JSON.stringify(file.data, null, 2);
+        } else if (file.type === 'themes') {
+          filesChangeset[`${this.path}/${SystemFilenames.THEMES}.json`] = JSON.stringify(file.data, null, 2);
+        } else if (file.type === 'metadata') {
+          filesChangeset[`${this.path}/${SystemFilenames.METADATA}.json`] = JSON.stringify(file.data, null, 2);
+        }
+      });
+    } else {
+      throw new Error(ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR);
+    }
+
+    // Prepare files to delete for multi-file mode
+    const filesToDeleteWithPath = this.flags.multiFileEnabled
+      ? filesToDelete.map((fileName) => `${this.path}/${fileName}`)
+      : [];
+
+    return this.createOrUpdate(
+      filesChangeset,
+      saveOptions.commitMessage ?? 'Commit from Figma',
+      this.branch,
+      !branches.includes(this.branch),
+      filesToDeleteWithPath,
+      true,
+    );
+  }
+
+  public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch?: boolean): Promise<boolean> {
+    // Always use optimized approach - skip expensive remote fetching and comparison
+    console.log('🚀 GitHub Push Optimization: Using optimized changeset without remote fetch');
+    console.log(`📤 Pushing ${Object.keys(changeset).length} files directly to GitHub`);
+    console.log('📋 Files to push:', Object.keys(changeset));
+
+    // Push the changeset directly without remote comparison
+    return await this.createOrUpdate(changeset, message, branch, shouldCreateBranch, [], true);
   }
 
   public async getCommitSha(): Promise<string> {
