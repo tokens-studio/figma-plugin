@@ -1,0 +1,269 @@
+/**
+ * Studio Configuration Service
+ * 
+ * This service handles discovery and management of Studio instance configurations
+ * by fetching configuration from /.well-known/plugin-config.json endpoints.
+ */
+
+export interface StudioOAuthConfiguration {
+  authorization_endpoint: string;
+  token_endpoint: string;
+  client_id: string | null;
+  generate_keypair: string;
+  read_code: string;
+  callback: string;
+}
+
+export interface StudioInstanceConfiguration {
+  frontend_base_url: string;
+  auth_domain: string;
+  legacy_graphql_endpoint: string;
+  auth_graphql_endpoint: string;
+  oauth: StudioOAuthConfiguration;
+  features: Record<string, any>;
+}
+
+export interface StudioConfigurationCache {
+  [baseUrl: string]: {
+    config: StudioInstanceConfiguration;
+    timestamp: number;
+    ttl: number;
+  };
+}
+
+export class StudioConfigurationService {
+  private static instance: StudioConfigurationService;
+  private cache: StudioConfigurationCache = {};
+  private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+  private readonly DEFAULT_CONFIG_PATH = '/.well-known/plugin-config.json';
+
+  private constructor() {}
+
+  public static getInstance(): StudioConfigurationService {
+    if (!StudioConfigurationService.instance) {
+      StudioConfigurationService.instance = new StudioConfigurationService();
+    }
+    return StudioConfigurationService.instance;
+  }
+
+  /**
+   * Discovers and returns the configuration for a Studio instance
+   */
+  public async discoverConfiguration(baseUrl: string): Promise<StudioInstanceConfiguration> {
+    // Normalize base URL
+    const normalizedBaseUrl = this.normalizeBaseUrl(baseUrl);
+    
+    // Check cache first
+    const cached = this.getCachedConfiguration(normalizedBaseUrl);
+    if (cached) {
+      return cached;
+    }
+
+    try {
+      const configUrl = `${normalizedBaseUrl}${this.DEFAULT_CONFIG_PATH}`;
+      const response = await fetch(configUrl, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch configuration: ${response.status} ${response.statusText}`);
+      }
+
+      const config: StudioInstanceConfiguration = await response.json();
+      
+      // Validate the configuration
+      this.validateConfiguration(config);
+      
+      // Cache the configuration
+      this.cacheConfiguration(normalizedBaseUrl, config);
+      
+      return config;
+    } catch (error) {
+      console.error(`Failed to discover configuration for ${normalizedBaseUrl}:`, error);
+      
+      // Return fallback configuration for known Studio instances
+      return this.getFallbackConfiguration(normalizedBaseUrl);
+    }
+  }
+
+  /**
+   * Gets the GraphQL host for a Studio instance
+   */
+  public async getGraphQLHost(baseUrl?: string): Promise<string> {
+    if (!baseUrl) {
+      // Return default host for backward compatibility
+      return process.env.TOKENS_STUDIO_API_HOST || 'localhost:4200';
+    }
+
+    try {
+      const config = await this.discoverConfiguration(baseUrl);
+      // Extract host from legacy_graphql_endpoint
+      const url = new URL(`https://${config.legacy_graphql_endpoint}`);
+      return url.host;
+    } catch (error) {
+      console.error('Failed to get GraphQL host, falling back to default:', error);
+      return process.env.TOKENS_STUDIO_API_HOST || 'localhost:4200';
+    }
+  }
+
+  /**
+   * Gets the full configuration for a Studio instance
+   */
+  public async getConfiguration(baseUrl?: string): Promise<StudioInstanceConfiguration | null> {
+    if (!baseUrl) {
+      return null;
+    }
+
+    try {
+      return await this.discoverConfiguration(baseUrl);
+    } catch (error) {
+      console.error('Failed to get configuration:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Validates if a base URL is accessible and has valid configuration
+   */
+  public async validateBaseUrl(baseUrl: string): Promise<{ valid: boolean; error?: string }> {
+    try {
+      const normalizedBaseUrl = this.normalizeBaseUrl(baseUrl);
+      const configUrl = `${normalizedBaseUrl}${this.DEFAULT_CONFIG_PATH}`;
+
+      const response = await fetch(configUrl, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        return {
+          valid: false,
+          error: `Configuration endpoint not accessible: ${response.status} ${response.statusText}`,
+        };
+      }
+
+      const config = await response.json();
+      this.validateConfiguration(config);
+
+      return { valid: true };
+    } catch (error) {
+      return {
+        valid: false,
+        error: error instanceof Error ? error.message : 'Unknown validation error',
+      };
+    }
+  }
+
+  /**
+   * Clears the configuration cache
+   */
+  public clearCache(): void {
+    this.cache = {};
+  }
+
+  /**
+   * Clears expired cache entries
+   */
+  public clearExpiredCache(): void {
+    const now = Date.now();
+    Object.keys(this.cache).forEach(key => {
+      const entry = this.cache[key];
+      if (now - entry.timestamp > entry.ttl) {
+        delete this.cache[key];
+      }
+    });
+  }
+
+  private normalizeBaseUrl(baseUrl: string): string {
+    // Remove trailing slash and ensure https protocol
+    let normalized = baseUrl.replace(/\/$/, '');
+    if (!normalized.startsWith('http://') && !normalized.startsWith('https://')) {
+      normalized = `https://${normalized}`;
+    }
+    return normalized;
+  }
+
+  private getCachedConfiguration(baseUrl: string): StudioInstanceConfiguration | null {
+    const cached = this.cache[baseUrl];
+    if (!cached) {
+      return null;
+    }
+
+    const now = Date.now();
+    if (now - cached.timestamp > cached.ttl) {
+      delete this.cache[baseUrl];
+      return null;
+    }
+
+    return cached.config;
+  }
+
+  private cacheConfiguration(baseUrl: string, config: StudioInstanceConfiguration): void {
+    this.cache[baseUrl] = {
+      config,
+      timestamp: Date.now(),
+      ttl: this.CACHE_TTL,
+    };
+  }
+
+  private validateConfiguration(config: any): void {
+    const requiredFields = [
+      'frontend_base_url',
+      'auth_domain',
+      'legacy_graphql_endpoint',
+      'auth_graphql_endpoint',
+      'oauth'
+    ];
+
+    for (const field of requiredFields) {
+      if (!config[field]) {
+        throw new Error(`Missing required configuration field: ${field}`);
+      }
+    }
+
+    // Validate OAuth configuration
+    const requiredOAuthFields = [
+      'authorization_endpoint',
+      'token_endpoint',
+      'generate_keypair',
+      'read_code',
+      'callback'
+    ];
+
+    for (const field of requiredOAuthFields) {
+      if (!config.oauth[field]) {
+        throw new Error(`Missing required OAuth configuration field: ${field}`);
+      }
+    }
+  }
+
+  private getFallbackConfiguration(baseUrl: string): StudioInstanceConfiguration {
+    // Provide fallback configuration for known Studio instances
+    const url = new URL(baseUrl);
+    const domain = url.hostname;
+
+    // Default fallback configuration
+    return {
+      frontend_base_url: baseUrl,
+      auth_domain: `https://auth.${domain}`,
+      legacy_graphql_endpoint: `graphql.${domain}`,
+      auth_graphql_endpoint: `https://auth.${domain}/graphql/`,
+      oauth: {
+        authorization_endpoint: `https://auth.${domain}/accounts/oauth/authorize/`,
+        token_endpoint: `https://auth.${domain}/accounts/oauth/token/`,
+        client_id: null,
+        generate_keypair: `https://auth.${domain}/oauth-native/keypair/`,
+        read_code: `https://auth.${domain}/oauth-native/code/CODE_PLACEHOLDER/`,
+        callback: `https://auth.${domain}/oauth-native/callback/`,
+      },
+      features: {},
+    };
+  }
+}

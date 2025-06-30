@@ -25,14 +25,20 @@ import {
 import { track } from '@/utils/analytics';
 import { ThemeObjectsList } from '@/types';
 import { TokensStudioAction } from '@/app/store/providers/tokens-studio';
+import { StudioConfigurationService } from './tokensStudio/StudioConfigurationService';
 
 const DEFAULT_BRANCH = 'main';
 
-const makeClient = (secret: string) => create({
-  host: process.env.TOKENS_STUDIO_API_HOST || 'localhost:4200',
-  secure: process.env.NODE_ENV !== 'development',
-  auth: `Bearer ${secret}`,
-});
+const makeClient = async (secret: string, baseUrl?: string) => {
+  const configService = StudioConfigurationService.getInstance();
+  const host = await configService.getGraphQLHost(baseUrl);
+
+  return create({
+    host,
+    secure: process.env.NODE_ENV !== 'development',
+    auth: `Bearer ${secret}`,
+  });
+};
 
 export type TokensStudioSaveOptions = {
   commitMessage?: string;
@@ -150,27 +156,35 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
 
   private orgId: string;
 
+  private baseUrl?: string;
+
   private client: any;
 
   public actionsQueue: any[];
 
   public processQueueTimeout: NodeJS.Timeout | null;
 
-  constructor(id: string, orgId: string, secret: string) {
+  constructor(id: string, orgId: string, secret: string, baseUrl?: string) {
     super();
     this.id = id;
     this.orgId = orgId;
     this.secret = secret;
-    this.client = makeClient(secret);
+    this.baseUrl = baseUrl;
     this.actionsQueue = [];
     this.processQueueTimeout = null;
+    this.initializeClient();
   }
 
-  public setContext(id: string, orgId: string, secret: string) {
+  public setContext(id: string, orgId: string, secret: string, baseUrl?: string) {
     this.id = id;
     this.orgId = orgId;
     this.secret = secret;
-    this.client = makeClient(secret);
+    this.baseUrl = baseUrl;
+    this.initializeClient();
+  }
+
+  private async initializeClient() {
+    this.client = await makeClient(this.secret, this.baseUrl);
   }
 
   public async read(): Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage> {
