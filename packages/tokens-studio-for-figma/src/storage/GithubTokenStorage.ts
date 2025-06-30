@@ -1,4 +1,5 @@
 import compact from 'just-compact';
+import set from 'set-value';
 import { Octokit } from '@octokit/rest';
 import { RemoteTokenstorageErrorMessage, RemoteTokenStorageFile, RemoteTokenStorageMetadata } from './RemoteTokenStorage';
 import IsJSONString from '@/utils/isJSONString';
@@ -268,7 +269,6 @@ export class GithubTokenStorage extends GitTokenStorage {
 
       return [];
     } catch (e) {
-      // Raise error (usually this is an auth error)
       console.error('Error', e);
       return [];
     }
@@ -292,8 +292,272 @@ export class GithubTokenStorage extends GitTokenStorage {
     return !!response;
   }
 
-  public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch?: boolean): Promise<boolean> {
+  /**
+   * Get the current content of JSON files from the remote repository
+   * @param jsonFiles Array of JSON file objects from the tree
+   * @returns Map of file paths to their content
+   */
+  private async getRemoteFileContents(jsonFiles: Array<{ path?: string }>): Promise<Record<string, string>> {
+    const remoteContents: Record<string, string> = {};
+
     try {
+      // Fetch content for each JSON file
+      const fileContents = await Promise.all(jsonFiles.map(async (file) => {
+        if (!file.path) return null;
+
+        try {
+          const fileResponse = await this.octokitClient.rest.repos.getContent({
+            owner: this.owner,
+            repo: this.repository,
+            path: joinPath(this.path, file.path),
+            ref: this.branch,
+            headers: {
+              ...octokitClientDefaultHeaders,
+              Accept: 'application/vnd.github.raw',
+            },
+          });
+
+          const fullPath = joinPath(this.path, file.path);
+          return {
+            path: fullPath,
+            content: fileResponse.data as unknown as string,
+          };
+        } catch (e) {
+          console.warn(`Failed to fetch content for ${file.path}:`, e);
+          return null;
+        }
+      }));
+
+      fileContents.forEach((fileContent) => {
+        if (fileContent) {
+          remoteContents[fileContent.path] = fileContent.content;
+        }
+      });
+    } catch (e) {
+      console.warn('Failed to fetch remote file contents:', e);
+    }
+
+    return remoteContents;
+  }
+
+  /**
+   * Convert flat array tokens to nested object format for comparison
+   * @param flatTokens Array of tokens in flat format (name, value, type)
+   * @returns Nested object format matching file structure
+   */
+  private convertFlatArrayToNestedObject(flatTokens: any[]): any {
+    const nestedObj = {};
+
+    flatTokens.forEach((token) => {
+      if (token && token.name && typeof token.value !== 'undefined') {
+        // Use set-value to create nested structure from dot notation
+        const {
+          name, value, type, description,
+        } = token;
+
+        // Create token object in current format (DTCG or Legacy)
+        const tokenObj: any = {};
+
+        // Add properties in the correct format
+        if (type) {
+          tokenObj.$type = type;
+        }
+        if (typeof value !== 'undefined') {
+          tokenObj.$value = value;
+        }
+        if (description) {
+          tokenObj.$description = description;
+        }
+
+        // Use set-value to create nested structure
+        set(nestedObj, name, tokenObj);
+      }
+    });
+
+    return nestedObj;
+  }
+
+  /**
+   * Filter changeset using lastSyncedState comparison
+   * @param changeset Local file changes
+   * @param lastSyncedState JSON string of the last synced state
+   * @returns Filtered changeset with only changed files, or null if comparison fails
+   */
+  private filterChangesetWithLastSyncedState(changeset: Record<string, string>, lastSyncedState: string): Record<string, string> | null {
+    try {
+      const parsedLastSyncedState = JSON.parse(lastSyncedState);
+      if (!Array.isArray(parsedLastSyncedState) || parsedLastSyncedState.length < 1) {
+        return null;
+      }
+
+      const [lastTokens, lastThemes] = parsedLastSyncedState;
+      const filteredChangeset: Record<string, string> = {};
+
+      Object.entries(changeset).forEach(([filePath, localContent]) => {
+        let hasChanged = false;
+        const fileName = filePath.split('/').pop()?.replace('.json', '') || '';
+
+        if (fileName === '$themes') {
+          // Compare themes
+          const lastThemesContent = JSON.stringify(lastThemes || [], null, 2);
+          if (localContent.trim() !== lastThemesContent.trim()) {
+            hasChanged = true;
+          }
+        } else if (fileName === '$metadata') {
+          // Compare metadata - it should contain tokenSetOrder based on current token sets
+          try {
+            const localMetadata = JSON.parse(localContent);
+            const expectedMetadata = {
+              tokenSetOrder: Object.keys(lastTokens || {}),
+            };
+
+            if (JSON.stringify(localMetadata, null, 2) !== JSON.stringify(expectedMetadata, null, 2)) {
+              hasChanged = true;
+            }
+          } catch (e) {
+            // If we can't parse metadata, update it to be safe
+            hasChanged = true;
+          }
+        } else {
+          // Compare token sets
+          const lastTokenSet = lastTokens[fileName];
+          if (!lastTokenSet) {
+            // New token set
+            hasChanged = true;
+          } else {
+            // The lastSyncedState stores tokens in flat array format, but files are in nested object format
+            // We need to convert the lastSyncedState format to match the file format for comparison
+            let lastContentForComparison: string;
+
+            try {
+              const localJson = JSON.parse(localContent);
+
+              // Check if local content is in nested object format (file format)
+              if (typeof localJson === 'object' && !Array.isArray(localJson)) {
+                // Local is in nested format, convert lastTokenSet (flat array) to nested format
+                const convertedLastTokenSet = this.convertFlatArrayToNestedObject(lastTokenSet);
+                lastContentForComparison = JSON.stringify(convertedLastTokenSet, null, 2);
+              } else if (Array.isArray(localJson)) {
+                // Local is in flat array format, use lastTokenSet as-is
+                lastContentForComparison = JSON.stringify(lastTokenSet, null, 2);
+              } else {
+                // Fallback to direct comparison
+                lastContentForComparison = JSON.stringify(lastTokenSet, null, 2);
+              }
+            } catch (e) {
+              // Fallback to direct comparison if parsing fails
+              lastContentForComparison = JSON.stringify(lastTokenSet, null, 2);
+            }
+
+            if (localContent.trim() !== lastContentForComparison.trim()) {
+              hasChanged = true;
+            }
+          }
+        }
+
+        if (hasChanged) {
+          filteredChangeset[filePath] = localContent;
+        }
+      });
+
+      return filteredChangeset;
+    } catch (error) {
+      console.warn('Failed to parse lastSyncedState for comparison:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Filter changeset to only include files that have actually changed
+   * @param changeset Local file changes
+   * @param remoteContents Current remote file contents
+   * @returns Filtered changeset with only changed files
+   */
+  private filterChangedFiles(changeset: Record<string, string>, remoteContents: Record<string, string>): Record<string, string> {
+    const filteredChangeset: Record<string, string> = {};
+
+    Object.entries(changeset).forEach(([filePath, localContent]) => {
+      const remoteContent = remoteContents[filePath];
+
+      if (!remoteContent) {
+        // New file
+        filteredChangeset[filePath] = localContent;
+      } else {
+        // Compare content
+        const localTrimmed = localContent.trim();
+        const remoteTrimmed = remoteContent.trim();
+
+        if (localTrimmed !== remoteTrimmed) {
+          filteredChangeset[filePath] = localContent;
+        }
+      }
+    });
+
+    return filteredChangeset;
+  }
+
+  public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch?: boolean, lastSyncedState?: string): Promise<boolean> {
+    try {
+      // Try to use lastSyncedState optimization first
+      if (lastSyncedState && this.flags.multiFileEnabled && !this.path.endsWith('.json')) {
+        // We still need to get the list of existing files for deletion detection
+        const response = await this.octokitClient.rest.repos.getContent({
+          owner: this.owner,
+          repo: this.repository,
+          path: this.path,
+          ref: this.branch,
+        });
+
+        if (Array.isArray(response.data)) {
+          const directoryTreeResponse = await this.octokitClient.rest.git.createTree({
+            owner: this.owner,
+            repo: this.repository,
+            tree: response.data.map((item) => ({
+              path: item.path,
+              sha: item.sha,
+              mode: getTreeMode(item.type),
+            })),
+          });
+
+          if (directoryTreeResponse.data.tree[0]?.sha) {
+            const treeResponse = await this.octokitClient.rest.git.getTree({
+              owner: this.owner,
+              repo: this.repository,
+              tree_sha: directoryTreeResponse.data.tree[0].sha,
+              recursive: 'true',
+            });
+
+            if (treeResponse.data.tree.length > 0) {
+              const jsonFiles = treeResponse.data.tree.filter((file) => (
+                file.path?.endsWith('.json')
+              )).sort((a, b) => (
+                (a.path && b.path) ? a.path.localeCompare(b.path) : 0
+              ));
+
+              // Use lastSyncedState to filter changeset instead of fetching remote content
+              // Parse lastSyncedState and compare with current changeset
+              const filteredChangeset = this.filterChangesetWithLastSyncedState(changeset, lastSyncedState);
+
+              if (filteredChangeset === null) {
+                // Fall through to the original implementation below
+              } else {
+                // Calculate files to delete
+                const filesToDelete = jsonFiles.filter((jsonFile) => !Object.keys(changeset).some((item) => jsonFile.path && item === joinPath(this.path, jsonFile.path)))
+                  .map((fileToDelete) => `${this.path.split('/')[0]}/${fileToDelete.path}`);
+
+                // If no files have changed, skip the commit
+                if (Object.keys(filteredChangeset).length === 0) {
+                  return true;
+                }
+
+                return await this.createOrUpdate(filteredChangeset, message, branch, shouldCreateBranch, filesToDelete, true);
+              }
+            }
+          }
+        }
+      }
+
+      // Original implementation (fallback or when optimization is not applicable)
       const response = await this.octokitClient.rest.repos.getContent({
         owner: this.owner,
         repo: this.repository,
@@ -312,7 +576,7 @@ export class GithubTokenStorage extends GitTokenStorage {
           })),
         });
 
-        if (directoryTreeResponse.data.tree[0].sha) {
+        if (directoryTreeResponse.data.tree[0]?.sha) {
           const treeResponse = await this.octokitClient.rest.git.getTree({
             owner: this.owner,
             repo: this.repository,
@@ -327,9 +591,22 @@ export class GithubTokenStorage extends GitTokenStorage {
               (a.path && b.path) ? a.path.localeCompare(b.path) : 0
             ));
 
-            const filesToDelete = jsonFiles.filter((jsonFile) => !Object.keys(changeset).some((item) => jsonFile.path && item === joinPath(this.path, jsonFile?.path)))
-              .map((fileToDelete) => (`${this.path.split('/')[0]}/${fileToDelete.path}` ?? ''));
-            return await this.createOrUpdate(changeset, message, branch, shouldCreateBranch, filesToDelete, true);
+            // Apply optimization only in multi-file mode
+            let filteredChangeset = changeset;
+            if (this.flags.multiFileEnabled && !this.path.endsWith('.json')) {
+              const remoteContents = await this.getRemoteFileContents(jsonFiles);
+              filteredChangeset = this.filterChangedFiles(changeset, remoteContents);
+
+              // If no files have changed, skip the commit
+              if (Object.keys(filteredChangeset).length === 0) {
+                return true;
+              }
+            }
+
+            const filesToDelete = jsonFiles.filter((jsonFile) => !Object.keys(changeset).some((item) => jsonFile.path && item === joinPath(this.path, jsonFile.path)))
+              .map((fileToDelete) => `${this.path.split('/')[0]}/${fileToDelete.path}`);
+
+            return await this.createOrUpdate(filteredChangeset, message, branch, shouldCreateBranch, filesToDelete, true);
           }
         }
       }
@@ -358,7 +635,6 @@ export class GithubTokenStorage extends GitTokenStorage {
       return response.data.sha;
     } catch (e) {
       // Raise error (usually this is an auth error)
-      console.error('Error', e);
       return '';
     }
   }
