@@ -13,5 +13,10 @@ export function setDefaultTokens(dispatch: RematchDispatch<RootModel>) {
       activeTheme: {},
       usedTokenSet: { core: TokenSetStatus.SOURCE, light: TokenSetStatus.ENABLED, theme: TokenSetStatus.ENABLED },
     });
+
+    dispatch.tokenState.updateDocument({
+      shouldUpdateNodes: false,
+      updateRemote: false,
+    });
   };
 }
