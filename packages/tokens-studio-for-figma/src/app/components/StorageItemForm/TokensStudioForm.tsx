@@ -67,6 +67,7 @@ export default function TokensStudioForm({
         secret: zod.string(),
         internalId: zod.string().optional(),
         orgId: zod.string(),
+        baseUrl: zod.string().optional(),
       });
       const validationResult = zodSchema.safeParse(values);
       if (validationResult.success) {
@@ -93,7 +94,7 @@ export default function TokensStudioForm({
   const fetchOrgData = React.useCallback(async () => {
     try {
       const client = create({
-        host: process.env.TOKENS_STUDIO_API_HOST || 'localhost:4200',
+        host: values.baseUrl || process.env.TOKENS_STUDIO_API_HOST || 'localhost:4200',
         secure: process.env.NODE_ENV !== 'development',
         auth: `Bearer ${values.secret}`,
       });
@@ -107,7 +108,7 @@ export default function TokensStudioForm({
     } catch (error) {
       setFetchOrgsError('Error fetching organization data. Please check your Studio API key.');
     }
-  }, [values.secret, dispatch]);
+  }, [values.secret, values.baseUrl, dispatch]);
 
   useEffect(() => {
     if (values.secret) {
@@ -216,6 +217,18 @@ export default function TokensStudioForm({
             )}
           />
           {fetchOrgsError && <Text muted>{fetchOrgsError}</Text>}
+        </FormField>
+        <FormField>
+          <Label htmlFor="baseUrl">{t('baseUrl')}</Label>
+          <TextInput
+            name="baseUrl"
+            id="baseUrl"
+            value={values.baseUrl || ''}
+            placeholder="https://api.tokens.studio"
+            onChange={onChange}
+            type="text"
+          />
+          <Text muted>{t('baseUrlHelpText')}</Text>
         </FormField>
         {orgOptions?.length > 0 && (
           <Stack direction="column" gap={2}>

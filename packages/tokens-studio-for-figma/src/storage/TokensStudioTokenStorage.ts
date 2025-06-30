@@ -28,8 +28,8 @@ import { TokensStudioAction } from '@/app/store/providers/tokens-studio';
 
 const DEFAULT_BRANCH = 'main';
 
-const makeClient = (secret: string) => create({
-  host: process.env.TOKENS_STUDIO_API_HOST || 'localhost:4200',
+const makeClient = (secret: string, baseUrl?: string) => create({
+  host: baseUrl || process.env.TOKENS_STUDIO_API_HOST || 'localhost:4200',
   secure: process.env.NODE_ENV !== 'development',
   auth: `Bearer ${secret}`,
 });
@@ -150,27 +150,31 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
 
   private orgId: string;
 
+  private baseUrl?: string;
+
   private client: any;
 
   public actionsQueue: any[];
 
   public processQueueTimeout: NodeJS.Timeout | null;
 
-  constructor(id: string, orgId: string, secret: string) {
+  constructor(id: string, orgId: string, secret: string, baseUrl?: string) {
     super();
     this.id = id;
     this.orgId = orgId;
     this.secret = secret;
-    this.client = makeClient(secret);
+    this.baseUrl = baseUrl;
+    this.client = makeClient(secret, baseUrl);
     this.actionsQueue = [];
     this.processQueueTimeout = null;
   }
 
-  public setContext(id: string, orgId: string, secret: string) {
+  public setContext(id: string, orgId: string, secret: string, baseUrl?: string) {
     this.id = id;
     this.orgId = orgId;
     this.secret = secret;
-    this.client = makeClient(secret);
+    this.baseUrl = baseUrl;
+    this.client = makeClient(secret, baseUrl);
   }
 
   public async read(): Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage> {
