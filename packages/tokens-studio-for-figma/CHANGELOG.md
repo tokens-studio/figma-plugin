@@ -1,5 +1,11 @@
 # @tokens-studio/figma-plugin
 
+## 2.6.1
+
+### Patch Changes
+
+- 866068b9: Fix to roll back a patch for large token sets' export to variables in Figma.
+
 ## 2.6.0
 
 ### Minor Changes
