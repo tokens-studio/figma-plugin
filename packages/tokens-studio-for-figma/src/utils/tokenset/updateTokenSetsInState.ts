@@ -84,13 +84,10 @@ export function updateTokenSetsInState(
   if (newTokenSets.length) {
     newTokenSets.forEach(([name]) => {
       nextUsedTokenSet[name] = TokenSetStatus.DISABLED;
-      nextThemes = nextThemes.map((theme) => ({
-        ...theme,
-        selectedTokenSets: {
-          ...theme.selectedTokenSets,
-          [name]: TokenSetStatus.DISABLED,
-        },
-      }));
+      // NOTE: Do not automatically add new token sets to existing themes
+      // This prevents the GitLab duplicate push issue where the first push
+      // contains incorrect DISABLED status for token sets that should be enabled.
+      // Users should explicitly configure which themes use the new token set.
     });
   }
 

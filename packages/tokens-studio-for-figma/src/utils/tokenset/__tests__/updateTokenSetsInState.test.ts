@@ -159,7 +159,7 @@ describe('updateTokenSetsInState', () => {
           name: 'Dark',
           selectedTokenSets: {
             global: TokenSetStatus.ENABLED,
-            global_Copy: TokenSetStatus.DISABLED,
+            // global_Copy should NOT be automatically added
           },
         },
       ],
@@ -211,11 +211,67 @@ describe('updateTokenSetsInState', () => {
           name: 'Dark',
           selectedTokenSets: {
             global: TokenSetStatus.ENABLED,
-            'global/light': TokenSetStatus.DISABLED,
             dark: TokenSetStatus.DISABLED,
+            // 'global/light' should NOT be automatically added
           },
         },
       ],
     });
+  });
+
+  it('should not automatically add new token sets to existing themes to prevent duplicate GitLab pushes', () => {
+    // This test validates the fix for the GitLab duplicate push issue
+    // When a new token set is created, it should NOT be automatically added to existing themes
+    // The user should explicitly configure which themes use the new token set
+    const nextState = updateTokenSetsInState(
+      {
+        tokens: {
+          global: [],
+          colors: [],
+        },
+        activeTokenSet: 'global',
+        usedTokenSet: {
+          global: TokenSetStatus.ENABLED,
+          colors: TokenSetStatus.SOURCE,
+        },
+        themes: [
+          {
+            id: 'lightTheme',
+            name: 'Light Theme',
+            selectedTokenSets: {
+              global: TokenSetStatus.ENABLED,
+              colors: TokenSetStatus.SOURCE,
+            },
+          },
+          {
+            id: 'darkTheme',
+            name: 'Dark Theme',
+            selectedTokenSets: {
+              global: TokenSetStatus.ENABLED,
+            },
+          },
+        ],
+      } as unknown as TokenState,
+      null,
+      ['newTokenSet', []], // Adding a new token set
+    );
+
+    // The new token set should be added to the tokens
+    expect(nextState.tokens).toHaveProperty('newTokenSet');
+    expect(nextState.tokens.newTokenSet).toEqual([]);
+
+    // The new token set should be DISABLED in the global usedTokenSet for backward compatibility
+    expect(nextState.usedTokenSet.newTokenSet).toBe(TokenSetStatus.DISABLED);
+
+    // The new token set should NOT be automatically added to existing themes
+    // This prevents the duplicate GitLab push issue where first push has wrong DISABLED status
+    expect(nextState.themes[0].selectedTokenSets).not.toHaveProperty('newTokenSet');
+    expect(nextState.themes[1].selectedTokenSets).not.toHaveProperty('newTokenSet');
+
+    // Existing theme configurations should remain unchanged
+    expect(nextState.themes[0].selectedTokenSets.global).toBe(TokenSetStatus.ENABLED);
+    expect(nextState.themes[0].selectedTokenSets.colors).toBe(TokenSetStatus.SOURCE);
+    expect(nextState.themes[1].selectedTokenSets.global).toBe(TokenSetStatus.ENABLED);
+    expect(nextState.themes[1].selectedTokenSets.colors).toBeUndefined();
   });
 });
