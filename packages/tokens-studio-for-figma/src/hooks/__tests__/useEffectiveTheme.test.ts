@@ -1,7 +1,7 @@
-import { useEffectiveTheme } from '../useEffectiveTheme';
-import { useFigmaTheme } from '../useFigmaTheme';
 import { renderHook } from '@testing-library/react';
 import { useSelector } from 'react-redux';
+import { useEffectiveTheme } from '../useEffectiveTheme';
+import { useFigmaTheme } from '../useFigmaTheme';
 
 // Mock the dependencies
 jest.mock('../useFigmaTheme');
