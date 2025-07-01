@@ -126,7 +126,7 @@ export default function TokensStudioForm({
 
       // Determine if we should use HTTPS
       // Use HTTPS for production builds OR when connecting to external Studio instances
-      const shouldUseSecure = process.env.NODE_ENV !== 'development' || (values.baseUrl?.trim() && !host.includes('localhost'));
+      const shouldUseSecure = process.env.NODE_ENV !== 'development' || Boolean(values.baseUrl?.trim() && !host.includes('localhost'));
 
       const client = create({
         host,
@@ -187,6 +187,13 @@ export default function TokensStudioForm({
     [onChange],
   );
 
+  const handleBaseUrlBlur = React.useCallback(
+    (e: React.FocusEvent<HTMLInputElement>) => {
+      validateBaseUrl(e.target.value);
+    },
+    [validateBaseUrl],
+  );
+
   return showTeaser ? (
     <Stack direction="column" align="start" gap={5}>
       <StyledTokensStudioWord />
@@ -239,7 +246,7 @@ export default function TokensStudioForm({
             id="baseUrl"
             value={values.baseUrl || ''}
             onChange={onChange}
-            onBlur={(e) => validateBaseUrl(e.target.value)}
+            onBlur={handleBaseUrlBlur}
             type="text"
             placeholder="https://app.your-studio-instance.com"
           />

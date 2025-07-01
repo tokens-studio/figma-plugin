@@ -1,6 +1,6 @@
 /**
  * Studio Configuration Service
- * 
+ *
  * This service handles discovery and management of Studio instance configurations
  * by fetching configuration from /.well-known/plugin-config.json endpoints.
  */
@@ -33,10 +33,14 @@ export interface StudioConfigurationCache {
 
 export class StudioConfigurationService {
   private static instance: StudioConfigurationService;
+
   private cache: StudioConfigurationCache = {};
+
   private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
   private readonly DEFAULT_CONFIG_PATH = '/.well-known/plugin-config.json';
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   private constructor() {}
 
   public static getInstance(): StudioConfigurationService {
@@ -52,7 +56,7 @@ export class StudioConfigurationService {
   public async discoverConfiguration(baseUrl: string): Promise<StudioInstanceConfiguration> {
     // Normalize base URL
     const normalizedBaseUrl = this.normalizeBaseUrl(baseUrl);
-    
+
     // Check cache first
     const cached = this.getCachedConfiguration(normalizedBaseUrl);
     if (cached) {
@@ -65,7 +69,7 @@ export class StudioConfigurationService {
         method: 'GET',
         mode: 'cors',
         headers: {
-          'Accept': 'application/json',
+          Accept: 'application/json',
         },
       });
 
@@ -75,23 +79,25 @@ export class StudioConfigurationService {
       }
 
       const config: StudioInstanceConfiguration = await response.json();
-      
+
       // Validate the configuration
       this.validateConfiguration(config);
-      
+
       // Cache the configuration
       this.cacheConfiguration(normalizedBaseUrl, config);
-      
+
       return config;
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error(`Failed to discover configuration for ${normalizedBaseUrl}:`, error);
 
       // Log more details about the error for debugging
       if (error instanceof Error) {
+        // eslint-disable-next-line no-console
         console.error('Error details:', {
           message: error.message,
           name: error.name,
-          stack: error.stack
+          stack: error.stack,
         });
       }
 
@@ -115,6 +121,7 @@ export class StudioConfigurationService {
       const url = new URL(`https://${config.legacy_graphql_endpoint}`);
       return url.host;
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Failed to get GraphQL host, falling back to default:', error);
       return process.env.TOKENS_STUDIO_API_HOST || 'localhost:4200';
     }
@@ -131,6 +138,7 @@ export class StudioConfigurationService {
     try {
       return await this.discoverConfiguration(baseUrl);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Failed to get configuration:', error);
       return null;
     }
@@ -148,7 +156,7 @@ export class StudioConfigurationService {
         method: 'GET',
         mode: 'cors',
         headers: {
-          'Accept': 'application/json',
+          Accept: 'application/json',
         },
       });
 
@@ -192,7 +200,7 @@ export class StudioConfigurationService {
    */
   public clearExpiredCache(): void {
     const now = Date.now();
-    Object.keys(this.cache).forEach(key => {
+    Object.keys(this.cache).forEach((key) => {
       const entry = this.cache[key];
       if (now - entry.timestamp > entry.ttl) {
         delete this.cache[key];
@@ -238,7 +246,7 @@ export class StudioConfigurationService {
       'auth_domain',
       'legacy_graphql_endpoint',
       'auth_graphql_endpoint',
-      'oauth'
+      'oauth',
     ];
 
     for (const field of requiredFields) {
@@ -253,7 +261,7 @@ export class StudioConfigurationService {
       'token_endpoint',
       'generate_keypair',
       'read_code',
-      'callback'
+      'callback',
     ];
 
     for (const field of requiredOAuthFields) {

@@ -35,7 +35,7 @@ const makeClient = async (secret: string, baseUrl?: string) => {
 
   // Determine if we should use HTTPS
   // Use HTTPS for production builds OR when connecting to external Studio instances
-  const shouldUseSecure = process.env.NODE_ENV !== 'development' || (baseUrl?.trim() && !host.includes('localhost'));
+  const shouldUseSecure = process.env.NODE_ENV !== 'development' || Boolean(baseUrl?.trim() && !host.includes('localhost'));
 
   return create({
     host,
