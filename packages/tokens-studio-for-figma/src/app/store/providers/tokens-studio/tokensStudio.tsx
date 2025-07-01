@@ -51,11 +51,11 @@ let storageClientObject;
 
 const getStorageClient = (context: TokensStudioCredentials) => {
   if (!storageClientObject) {
-    storageClientObject = new TokensStudioTokenStorage(context.id, context.orgId, context.secret);
+    storageClientObject = new TokensStudioTokenStorage(context.id, context.orgId, context.secret, context.baseUrl);
     return storageClientObject;
   }
 
-  storageClientObject.setContext(context.id, context.orgId, context.secret);
+  storageClientObject.setContext(context.id, context.orgId, context.secret, context.baseUrl);
   return storageClientObject;
 };
 
