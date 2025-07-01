@@ -52,10 +52,17 @@ describe('StudioConfigurationService', () => {
       expect(host).toBe('graphql.test.tokens.studio');
     });
 
-    it('should fallback to default host when discovery fails', async () => {
+    it('should fallback to constructed host when discovery fails for non-tokens.studio domains', async () => {
       (fetch as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
 
       const host = await service.getGraphQLHost('https://invalid.url');
+      expect(host).toBe('graphql.invalid.url');
+    });
+
+    it('should fallback to default host when discovery fails for tokens.studio domains', async () => {
+      (fetch as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
+
+      const host = await service.getGraphQLHost('https://app.test.tokens.studio');
       expect(host).toBe('localhost:4200');
     });
   });
@@ -131,6 +138,7 @@ describe('StudioConfigurationService', () => {
         ok: false,
         status: 404,
         statusText: 'Not Found',
+        text: () => Promise.resolve('Not Found'),
       });
 
       const result = await service.validateBaseUrl('https://invalid.tokens.studio');
