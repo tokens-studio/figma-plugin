@@ -22,7 +22,7 @@ import { AuthContextProvider } from '@/context/AuthContext';
 import SecondScreenSync from '../SecondScreenSync';
 import AuthModal from '../AuthModal';
 import PullDialog from '../PullDialog';
-import { useFigmaTheme } from '@/hooks/useFigmaTheme';
+import { useEffectiveTheme } from '@/hooks/useEffectiveTheme';
 import Box from '../Box';
 import { darkThemeMode, lightThemeMode } from '@/stitches.config';
 
@@ -40,7 +40,7 @@ const applicationInitStepLabels = {
 };
 
 export const AppContainer = withLDProviderWrapper((params: Props) => {
-  const { isDarkTheme } = useFigmaTheme();
+  const { isDarkTheme } = useEffectiveTheme();
   const dispatch = useDispatch<Dispatch>();
   const startupProcess = useStartupProcess(params);
 

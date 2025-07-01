@@ -38,6 +38,10 @@ export interface SettingsState {
   */
   sessionRecording: boolean;
   storeTokenIdInJsonEditor: boolean;
+  /**
+   * User preference for theme: 'auto' follows Figma, 'light' forces light, 'dark' forces dark
+   */
+  themePreference: 'auto' | 'light' | 'dark';
   /*
    * Export styles and variables options
   */
@@ -87,6 +91,7 @@ export const settings = createModel<RootModel>()({
     baseFontSize: defaultBaseFontSize,
     aliasBaseFontSize: defaultBaseFontSize,
     storeTokenIdInJsonEditor: false,
+    themePreference: 'auto',
     variablesColor: true,
     variablesString: true,
     variablesNumber: true,
@@ -219,6 +224,12 @@ export const settings = createModel<RootModel>()({
         storeTokenIdInJsonEditor: payload,
       };
     },
+    setThemePreference(state, payload: 'auto' | 'light' | 'dark') {
+      return {
+        ...state,
+        themePreference: payload,
+      };
+    },
   },
   effects: () => ({
     setLanguage: (payload: string, rootState) => {
@@ -273,6 +284,9 @@ export const settings = createModel<RootModel>()({
       setUI(rootState.settings);
     },
     setStoreTokenIdInJsonEditorSelector: (payload, rootState) => {
+      setUI(rootState.settings);
+    },
+    setThemePreference: (payload, rootState) => {
       setUI(rootState.settings);
     },
     ...Object.fromEntries(

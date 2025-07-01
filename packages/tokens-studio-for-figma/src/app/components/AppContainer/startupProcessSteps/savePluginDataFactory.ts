@@ -25,6 +25,7 @@ export function savePluginDataFactory(dispatch: Dispatch, params: StartupMessage
           height,
           isMinimized: false,
         },
+        themePreference: 'auto' as const,
         ...rest,
       };
       dispatch.userState.setUserId(user.figmaId);

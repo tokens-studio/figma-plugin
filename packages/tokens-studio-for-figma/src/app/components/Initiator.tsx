@@ -104,7 +104,10 @@ export function Initiator() {
             break;
           }
           case MessageFromPluginTypes.UI_SETTINGS: {
-            dispatch.settings.setUISettings(pluginMessage.settings);
+            dispatch.settings.setUISettings({
+              themePreference: 'auto' as const,
+              ...pluginMessage.settings,
+            });
             dispatch.settings.triggerWindowChange();
             break;
           }

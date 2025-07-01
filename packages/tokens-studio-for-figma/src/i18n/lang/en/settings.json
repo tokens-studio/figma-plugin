@@ -32,5 +32,10 @@
   "liveSyncActive": "Live sync active",
   "liveSyncInactive": "Live sync inactive",
   "language": "Language",
-  "languageExplainer": "Tokens Studio has been machine translated, therefore translations may appear inaccurate. \n Don't see your language? Submit a feature request"
+  "languageExplainer": "Tokens Studio has been machine translated, therefore translations may appear inaccurate. \n Don't see your language? Submit a feature request",
+  "theme": "Theme",
+  "themeAuto": "Auto (Follow Figma)",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "selectTheme": "Select theme"
 }

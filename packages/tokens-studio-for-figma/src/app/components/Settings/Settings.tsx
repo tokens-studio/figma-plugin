@@ -8,6 +8,7 @@ import {
 import { track } from '@/utils/analytics';
 import SyncSettings from '../SyncSettings';
 import { LanguageSelector } from '../LanguageSelector';
+import { ThemePreferenceSelector } from '../ThemeSelector';
 import { Dispatch } from '../../store';
 import {
   storeTokenIdInJsonEditorSelector,
@@ -126,6 +127,7 @@ function Settings() {
             }}
           >
             <LanguageSelector />
+            <ThemePreferenceSelector />
           </Stack>
           <Stack
             direction="column"
