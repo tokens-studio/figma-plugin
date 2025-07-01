@@ -73,11 +73,11 @@ function StartScreen() {
     dispatch.uiState.setLocalApiState(credentialsToSet);
   }, [apiProviders, dispatch.tokenState, dispatch.uiState, storageType]);
 
-  const matchingProvider = React.useMemo(() => 
-    storageType && 'internalId' in storageType 
+  const matchingProvider = React.useMemo(
+    () => (storageType && 'internalId' in storageType
       ? apiProviders.find((i) => i.internalId === storageType.internalId)
-      : undefined, 
-    [apiProviders, storageType]
+      : undefined),
+    [apiProviders, storageType],
   );
 
   return (

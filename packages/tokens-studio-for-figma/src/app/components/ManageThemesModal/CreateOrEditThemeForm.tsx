@@ -22,6 +22,7 @@ import { TabButton } from '../TabButton';
 import { ThemeStyleManagementForm } from './ThemeStyleManagementForm';
 import { TokenSetTreeContent } from '../TokenSetTree/TokenSetTreeContent';
 import { ThemeGroupDropDownMenu } from './ThemeGroupDropDownMenu';
+import fuzzySearch from '@/utils/fuzzySearch';
 
 export type FormValues = {
   name: string
@@ -47,6 +48,7 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
   const store = useStore<RootState>();
   const [activeTab, setActiveTab] = useState(ThemeFormTabs.SETS);
   const [showGroupInput, setShowGroupInput] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const githubMfsEnabled = useIsGitMultiFileEnabled();
   const selectedTokenSets = useMemo(() => (
     usedTokenSetSelector(store.getState())
@@ -61,6 +63,55 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
       ? tokenSetListToTree(availableTokenSets)
       : tokenSetListToList(availableTokenSets)
   ), [githubMfsEnabled, availableTokenSets]);
+
+  // Filter items based on search query
+  const filteredTreeOrListItems = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return treeOrListItems;
+    }
+
+    const searchTerm = searchQuery.toLowerCase();
+
+    // Filter function to check if item or any of its children match the search
+    const matchesSearch = (item: TreeItem): boolean => fuzzySearch(searchTerm, item.label.toLowerCase()) || fuzzySearch(searchTerm, item.path.toLowerCase());
+
+    // For tree structure, we need to include parent folders if any children match
+    if (githubMfsEnabled) {
+      const matchingItems = new Set<string>();
+
+      // First pass: find all matching leaf items
+      treeOrListItems.forEach((item) => {
+        if (item.isLeaf && matchesSearch(item)) {
+          matchingItems.add(item.path);
+          // Add all parent paths
+          let currentParentPath = item.parent;
+          while (currentParentPath) {
+            matchingItems.add(currentParentPath);
+            const currentPath = currentParentPath;
+            const parentItem = treeOrListItems.find((p) => p.path === currentPath);
+            currentParentPath = parentItem?.parent || null;
+          }
+        }
+      });
+
+      // Second pass: include folders that match directly
+      treeOrListItems.forEach((item) => {
+        if (!item.isLeaf && matchesSearch(item)) {
+          matchingItems.add(item.path);
+          // Add all children
+          treeOrListItems.forEach((child) => {
+            if (child.path.startsWith(`${item.path}/`) || child.parent === item.path) {
+              matchingItems.add(child.path);
+            }
+          });
+        }
+      });
+
+      return treeOrListItems.filter((item) => matchingItems.has(item.path));
+    }
+    // For list structure, just filter by matching items
+    return treeOrListItems.filter(matchesSearch);
+  }, [treeOrListItems, searchQuery, githubMfsEnabled]);
 
   const {
     register, handleSubmit, control, resetField,
@@ -94,6 +145,10 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
       )}
     />
   ), [control]);
+
+  const handleSearchQueryChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  }, []);
 
   const handleAddGroup = React.useCallback(() => [
     setShowGroupInput(true),
@@ -194,8 +249,17 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
       <Stack direction="column" gap={1}>
         {activeTab === ThemeFormTabs.SETS && (
         <Stack direction="column" gap={1} css={{ padding: '$3 $4 $3' }}>
+          <Input
+            data-testid="token-sets-search-input"
+            type="text"
+            value={searchQuery}
+            onChange={handleSearchQueryChange}
+            placeholder={t('sets.search')}
+            prefix="🔍"
+            css={{ marginBottom: '$2' }}
+          />
           <TokenSetTreeContent
-            items={treeOrListItems}
+            items={filteredTreeOrListItems}
             renderItemContent={TokenSetThemeItemInput}
             keyPosition="end"
           />
