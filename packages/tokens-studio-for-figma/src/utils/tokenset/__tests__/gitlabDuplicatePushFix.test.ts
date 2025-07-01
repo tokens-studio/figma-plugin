@@ -64,12 +64,12 @@ describe('GitLab duplicate push fix', () => {
     const stateAfterCreation = updateTokenSetsInState(
       mockInitialState,
       null,
-      ['newSpacingSet', [{ name: 'spacing.small', value: '8px' }]]
+      ['newSpacingSet', [{ name: 'spacing.small', value: '8px' }]],
     );
 
     // Verify the new token set is created
     expect(stateAfterCreation.tokens.newSpacingSet).toEqual([
-      { name: 'spacing.small', value: '8px' }
+      { name: 'spacing.small', value: '8px' },
     ]);
 
     // Verify the new token set is DISABLED in global usedTokenSet (for backward compatibility)
@@ -109,7 +109,7 @@ describe('GitLab duplicate push fix', () => {
 
     // Step 3: Activate a theme to update usedTokenSet properly
     const finalState = setActiveTheme(stateAfterThemeConfiguration, {
-      newActiveTheme: { group: 'lightTheme' }
+      newActiveTheme: { group: 'lightTheme' },
     });
 
     // Verify the active theme configuration is correct
@@ -132,7 +132,7 @@ describe('GitLab duplicate push fix', () => {
     const stateAfterCreation = updateTokenSetsInState(
       mockInitialState,
       null,
-      ['typography', [{ name: 'font.size', value: '16px' }]]
+      ['typography', [{ name: 'font.size', value: '16px' }]],
     );
 
     // Existing configurations should be preserved
