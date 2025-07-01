@@ -63,14 +63,15 @@ export class StudioConfigurationService {
       const configUrl = `${normalizedBaseUrl}${this.DEFAULT_CONFIG_PATH}`;
       const response = await fetch(configUrl, {
         method: 'GET',
+        mode: 'cors',
         headers: {
           'Accept': 'application/json',
-          'Content-Type': 'application/json',
         },
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to fetch configuration: ${response.status} ${response.statusText}`);
+        const errorText = await response.text().catch(() => 'Unable to read response');
+        throw new Error(`Failed to fetch configuration: ${response.status} ${response.statusText}. Response: ${errorText}`);
       }
 
       const config: StudioInstanceConfiguration = await response.json();
@@ -84,7 +85,16 @@ export class StudioConfigurationService {
       return config;
     } catch (error) {
       console.error(`Failed to discover configuration for ${normalizedBaseUrl}:`, error);
-      
+
+      // Log more details about the error for debugging
+      if (error instanceof Error) {
+        console.error('Error details:', {
+          message: error.message,
+          name: error.name,
+          stack: error.stack
+        });
+      }
+
       // Return fallback configuration for known Studio instances
       return this.getFallbackConfiguration(normalizedBaseUrl);
     }
@@ -136,16 +146,17 @@ export class StudioConfigurationService {
 
       const response = await fetch(configUrl, {
         method: 'GET',
+        mode: 'cors',
         headers: {
           'Accept': 'application/json',
-          'Content-Type': 'application/json',
         },
       });
 
       if (!response.ok) {
+        const errorText = await response.text().catch(() => 'Unable to read response');
         return {
           valid: false,
-          error: `Configuration endpoint not accessible: ${response.status} ${response.statusText}`,
+          error: `Configuration endpoint not accessible: ${response.status} ${response.statusText}. Response: ${errorText}`,
         };
       }
 
@@ -154,9 +165,17 @@ export class StudioConfigurationService {
 
       return { valid: true };
     } catch (error) {
+      let errorMessage = 'Unknown validation error';
+      if (error instanceof Error) {
+        errorMessage = error.message;
+        // Provide helpful message for CORS errors
+        if (errorMessage.includes('CORS') || errorMessage.includes('cross-origin')) {
+          errorMessage = 'Configuration endpoint exists but CORS headers are not configured. The Studio backend team needs to add CORS headers to allow plugin access.';
+        }
+      }
       return {
         valid: false,
-        error: error instanceof Error ? error.message : 'Unknown validation error',
+        error: errorMessage,
       };
     }
   }
@@ -248,6 +267,27 @@ export class StudioConfigurationService {
     // Provide fallback configuration for known Studio instances
     const url = new URL(baseUrl);
     const domain = url.hostname;
+
+    // Special handling for known tokens.studio domains
+    if (domain.includes('tokens.studio')) {
+      // Use the current environment's default configuration
+      // This ensures compatibility with the existing Studio setup
+      return {
+        frontend_base_url: baseUrl,
+        auth_domain: `https://auth.${domain}`,
+        legacy_graphql_endpoint: process.env.TOKENS_STUDIO_API_HOST || 'localhost:4200',
+        auth_graphql_endpoint: `https://auth.${domain}/graphql/`,
+        oauth: {
+          authorization_endpoint: `https://auth.${domain}/accounts/oauth/authorize/`,
+          token_endpoint: `https://auth.${domain}/accounts/oauth/token/`,
+          client_id: null,
+          generate_keypair: `https://auth.${domain}/oauth-native/keypair/`,
+          read_code: `https://auth.${domain}/oauth-native/code/CODE_PLACEHOLDER/`,
+          callback: `https://auth.${domain}/oauth-native/callback/`,
+        },
+        features: {},
+      };
+    }
 
     // Default fallback configuration
     return {

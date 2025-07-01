@@ -124,9 +124,13 @@ export default function TokensStudioForm({
       const configService = StudioConfigurationService.getInstance();
       const host = await configService.getGraphQLHost(values.baseUrl);
 
+      // Determine if we should use HTTPS
+      // Use HTTPS for production builds OR when connecting to external Studio instances
+      const shouldUseSecure = process.env.NODE_ENV !== 'development' || (values.baseUrl?.trim() && !host.includes('localhost'));
+
       const client = create({
         host,
-        secure: process.env.NODE_ENV !== 'development',
+        secure: shouldUseSecure,
         auth: `Bearer ${values.secret}`,
       });
       const result = await client.query({
