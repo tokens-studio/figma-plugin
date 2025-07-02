@@ -13,7 +13,6 @@ import useTokens from './useTokens';
 import { StyleOptions } from '@/constants/StyleOptions';
 import { ColorModifier } from '@/types/Modifier';
 import { wrapTransaction } from '@/profiling/transaction';
-import { FigmaVariableExtensions } from '@/types/FigmaVariableTypes';
 
 // @TODO this typing could be more strict in the future
 
@@ -33,7 +32,6 @@ export type EditSingleTokenData = {
       modify?: ColorModifier
     }
   };
-  figmaVariableProperties?: FigmaVariableExtensions;
 };
 
 export type CreateSingleTokenData = {
@@ -50,7 +48,6 @@ export type CreateSingleTokenData = {
       modify?: ColorModifier
     }
   };
-  figmaVariableProperties?: FigmaVariableExtensions;
 };
 
 type Choice = { key: string; label: string; enabled?: boolean, unique?: boolean };
@@ -66,7 +63,7 @@ export default function useManageTokens() {
 
   const editSingleToken = useCallback(async (data: EditSingleTokenData) => {
     const {
-      parent, type, name, value, description, oldName, shouldUpdateDocument = true, $extensions, figmaVariableProperties,
+      parent, type, name, value, description, oldName, shouldUpdateDocument = true, $extensions,
     } = data;
     dispatch.uiState.startJob({
       name: BackgroundJobs.UI_EDITSINGLETOKEN,
@@ -85,7 +82,6 @@ export default function useManageTokens() {
         oldName,
         shouldUpdate: shouldUpdateDocument,
         $extensions,
-        figmaVariableProperties,
       } as UpdateTokenPayload);
       if (oldName) {
         dispatch.tokenState.renameStyleNamesToCurrentTheme([{ oldName, newName: name }]);
@@ -97,7 +93,7 @@ export default function useManageTokens() {
 
   const createSingleToken = useCallback(async (data: CreateSingleTokenData) => {
     const {
-      parent, type, name, value, description, shouldUpdateDocument = true, $extensions, figmaVariableProperties,
+      parent, type, name, value, description, shouldUpdateDocument = true, $extensions,
     } = data;
     dispatch.uiState.startJob({
       name: BackgroundJobs.UI_CREATESINGLETOKEN,
@@ -120,7 +116,6 @@ export default function useManageTokens() {
         description,
         shouldUpdate: shouldUpdateDocument,
         $extensions,
-        figmaVariableProperties,
       } as UpdateTokenPayload);
     }
     dispatch.uiState.completeJob(BackgroundJobs.UI_CREATESINGLETOKEN);

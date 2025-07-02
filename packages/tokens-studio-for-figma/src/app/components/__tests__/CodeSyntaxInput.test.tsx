@@ -12,8 +12,8 @@ describe('CodeSyntaxInput', () => {
 
   it('should render with code syntax values', () => {
     const codeSyntax = {
-      WEB: '$web-token',
-      ANDROID: '@android-token',
+      Web: '$web-token',
+      Android: '@android-token',
       iOS: 'ios_token'
     };
     
@@ -45,7 +45,7 @@ describe('CodeSyntaxInput', () => {
     const webInput = result.getByLabelText('Web');
     fireEvent.change(webInput, { target: { value: '$new-web-token' } });
 
-    expect(mockOnCodeSyntaxChange).toHaveBeenCalledWith('WEB', '$new-web-token');
+    expect(mockOnCodeSyntaxChange).toHaveBeenCalledWith('Web', '$new-web-token');
   });
 
   it('should render all platform inputs', () => {

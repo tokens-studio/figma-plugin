@@ -17,10 +17,11 @@ export type VariableScope =
   | 'PARAGRAPH_INDENT';
 
 // Figma Code Syntax Platforms - mirrors Figma Plugin API types
-export type CodeSyntaxPlatform = 'WEB' | 'ANDROID' | 'iOS';
+export type CodeSyntaxPlatform = 'Web' | 'Android' | 'iOS';
 
 // Token extension for Figma variable properties
 export interface FigmaVariableExtensions {
+  hiddenFromPublishing?: boolean;
   scopes?: VariableScope[];
   codeSyntax?: {
     [K in CodeSyntaxPlatform]?: string;
@@ -48,7 +49,29 @@ export const VARIABLE_SCOPE_OPTIONS: Array<{ value: VariableScope; label: string
 
 // Code syntax platform options for UI
 export const CODE_SYNTAX_PLATFORM_OPTIONS: Array<{ value: CodeSyntaxPlatform; label: string }> = [
-  { value: 'WEB', label: 'Web' },
-  { value: 'ANDROID', label: 'Android' },
+  { value: 'Web', label: 'Web' },
+  { value: 'Android', label: 'Android' },
   { value: 'iOS', label: 'iOS' },
 ];
+
+// Helper functions to access Figma extensions from tokens
+export const getFigmaExtensions = (token: any): FigmaVariableExtensions | undefined => {
+  return token?.$extensions?.['com.figma'];
+};
+
+export const setFigmaExtensions = (token: any, extensions: FigmaVariableExtensions): void => {
+  if (!token.$extensions) {
+    token.$extensions = {};
+  }
+  token.$extensions['com.figma'] = extensions;
+};
+
+// Map our platform names to Figma's expected platform names
+export const mapCodeSyntaxPlatformToFigma = (platform: CodeSyntaxPlatform): 'WEB' | 'ANDROID' | 'iOS' => {
+  const mapping: Record<CodeSyntaxPlatform, 'WEB' | 'ANDROID' | 'iOS'> = {
+    'Web': 'WEB',
+    'Android': 'ANDROID',
+    'iOS': 'iOS',
+  };
+  return mapping[platform];
+};

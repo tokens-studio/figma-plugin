@@ -1,6 +1,5 @@
 import { TokenTypes } from '@/constants/TokenTypes';
 import { ColorModifier } from '../Modifier';
-import { FigmaVariableExtensions } from '../FigmaVariableTypes';
 import {
   SingleColorToken,
   SingleBorderRadiusToken,
@@ -38,7 +37,6 @@ type GenericTokenInput<T extends TokenTypes, V = string> = {
   shouldUpdate?: boolean
   shouldUpdateDocument?: boolean;
   $extensions?: { 'studio.tokens'?: { modify?: ColorModifier, urn?: string; } };
-  figmaVariableProperties?: FigmaVariableExtensions;
 };
 
 export type UpdateTokenPayload =

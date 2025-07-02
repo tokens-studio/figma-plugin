@@ -7,7 +7,7 @@ import { convertTokenTypeToVariableType } from '@/utils/convertTokenTypeToVariab
 import { checkCanReferenceVariable } from '@/utils/alias/checkCanReferenceVariable';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { transformValue } from './helpers';
-import { CodeSyntaxPlatform } from '@/types/FigmaVariableTypes';
+import { CodeSyntaxPlatform, getFigmaExtensions, mapCodeSyntaxPlatformToFigma } from '@/types/FigmaVariableTypes';
 
 export type ReferenceVariableType = {
   variable: Variable;
@@ -50,17 +50,24 @@ export default async function setValuesOnVariable(
         variable.description = token.description ?? '';
         
         // Apply Figma variable properties if available
-        if (token.figmaVariableProperties) {
+        const figmaExtensions = getFigmaExtensions(token);
+        if (figmaExtensions) {
           // Set variable scopes
-          if (token.figmaVariableProperties.scopes && token.figmaVariableProperties.scopes.length > 0) {
-            variable.scopes = token.figmaVariableProperties.scopes;
+          if (figmaExtensions.scopes && figmaExtensions.scopes.length > 0) {
+            variable.scopes = figmaExtensions.scopes;
+          }
+          
+          // Set hidden from publishing
+          if (figmaExtensions.hiddenFromPublishing !== undefined) {
+            variable.hiddenFromPublishing = figmaExtensions.hiddenFromPublishing;
           }
           
           // Set code syntax for different platforms
-          if (token.figmaVariableProperties.codeSyntax) {
-            Object.entries(token.figmaVariableProperties.codeSyntax).forEach(([platform, syntax]) => {
+          if (figmaExtensions.codeSyntax) {
+            Object.entries(figmaExtensions.codeSyntax).forEach(([platform, syntax]) => {
               if (syntax) {
-                variable.setVariableCodeSyntax(platform as CodeSyntaxPlatform, syntax);
+                const figmaPlatform = mapCodeSyntaxPlatformToFigma(platform as CodeSyntaxPlatform);
+                variable.setVariableCodeSyntax(figmaPlatform, syntax);
               }
             });
           }

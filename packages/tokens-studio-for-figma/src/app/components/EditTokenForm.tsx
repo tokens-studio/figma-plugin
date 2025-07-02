@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import {
-  Button, Heading, Textarea, Label, Stack,
+  Button, Heading, Textarea, Label, Stack, Checkbox,
 } from '@tokens-studio/ui';
 import { track } from '@/utils/analytics';
 import { Dispatch } from '../store';
@@ -45,7 +45,7 @@ import { tokenTypesToCreateVariable } from '@/constants/VariableTypes';
 import { ModalOptions } from '@/constants/ModalOptions';
 import VariableScopesInput from './VariableScopesInput';
 import CodeSyntaxInput from './CodeSyntaxInput';
-import { VariableScope, CodeSyntaxPlatform } from '@/types/FigmaVariableTypes';
+import { VariableScope, CodeSyntaxPlatform, getFigmaExtensions, setFigmaExtensions } from '@/types/FigmaVariableTypes';
 
 let lastUsedRenameOption: UpdateMode = UpdateMode.SELECTION;
 let lastUsedRenameStyles = false;
@@ -376,13 +376,13 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const handleScopesChange = React.useCallback(
     (scopes: VariableScope[]) => {
       if (internalEditToken) {
-        setInternalEditToken({
-          ...internalEditToken,
-          figmaVariableProperties: {
-            ...internalEditToken.figmaVariableProperties,
-            scopes,
-          },
+        const figmaExtensions = getFigmaExtensions(internalEditToken) || {};
+        const updated = { ...internalEditToken };
+        setFigmaExtensions(updated, {
+          ...figmaExtensions,
+          scopes,
         });
+        setInternalEditToken(updated);
       }
     },
     [internalEditToken],
@@ -391,7 +391,8 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const handleCodeSyntaxChange = React.useCallback(
     (platform: CodeSyntaxPlatform, value: string) => {
       if (internalEditToken) {
-        const currentCodeSyntax = internalEditToken.figmaVariableProperties?.codeSyntax || {};
+        const figmaExtensions = getFigmaExtensions(internalEditToken) || {};
+        const currentCodeSyntax = figmaExtensions.codeSyntax || {};
         const newCodeSyntax = { ...currentCodeSyntax };
         
         if (value.trim()) {
@@ -400,13 +401,28 @@ function EditTokenForm({ resolvedTokens }: Props) {
           delete newCodeSyntax[platform];
         }
 
-        setInternalEditToken({
-          ...internalEditToken,
-          figmaVariableProperties: {
-            ...internalEditToken.figmaVariableProperties,
-            codeSyntax: newCodeSyntax,
-          },
+        const updated = { ...internalEditToken };
+        setFigmaExtensions(updated, {
+          ...figmaExtensions,
+          codeSyntax: newCodeSyntax,
         });
+        setInternalEditToken(updated);
+      }
+    },
+    [internalEditToken],
+  );
+
+  const handleHiddenFromPublishingChange = React.useCallback(
+    (checked: boolean | string) => {
+      if (internalEditToken) {
+        const hiddenFromPublishing = checked === true;
+        const figmaExtensions = getFigmaExtensions(internalEditToken) || {};
+        const updated = { ...internalEditToken };
+        setFigmaExtensions(updated, {
+          ...figmaExtensions,
+          hiddenFromPublishing,
+        });
+        setInternalEditToken(updated);
       }
     },
     [internalEditToken],
@@ -423,7 +439,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
 
   // @TODO update to useCallback
   const submitTokenValue = async ({
-    type, value, name, $extensions, figmaVariableProperties,
+    type, value, name, $extensions,
   }: EditTokenObject) => {
     if (internalEditToken && value && name) {
       let oldName: string | undefined;
@@ -444,7 +460,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
           type,
           value: trimmedValue as SingleToken['value'],
           ...($extensions ? { $extensions } : {}),
-          ...(figmaVariableProperties ? { figmaVariableProperties } : {}),
         });
       } else if (internalEditToken.status === EditTokenFormStatus.EDIT) {
         editSingleToken({
@@ -455,7 +470,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
           type,
           value: trimmedValue as SingleToken['value'],
           ...($extensions ? { $extensions } : {}),
-          ...(figmaVariableProperties ? { figmaVariableProperties } : {}),
         });
         if (themes.length > 0 && tokenTypesToCreateVariable.includes(internalEditToken.type)) {
           updateVariablesFromToken({
@@ -465,7 +479,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
             value: resolvedValue,
             rawValue: internalEditToken.value,
             ...($extensions ? { $extensions } : {}),
-            ...(figmaVariableProperties ? { figmaVariableProperties } : {}),
           });
         }
         // When users change token names the applied tokens on layers are still pointing to the old name, ask user to remap
@@ -556,7 +569,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
           value: trimmedValue as SingleToken['value'],
           tokenSets: selectedTokenSets,
           ...($extensions ? { $extensions } : {}),
-          ...(figmaVariableProperties ? { figmaVariableProperties } : {}),
         });
       }
     }
@@ -764,12 +776,22 @@ function EditTokenForm({ resolvedTokens }: Props) {
         {/* Figma Variable Properties - only show for tokens that can become variables */}
         {tokenTypesToCreateVariable.includes(internalEditToken.type) && (
           <>
+            <Stack direction="column" gap={3}>
+              <Heading size="small">Figma Variable Properties</Heading>
+              <Checkbox
+                checked={getFigmaExtensions(internalEditToken)?.hiddenFromPublishing || false}
+                onCheckedChange={handleHiddenFromPublishingChange}
+                id="hiddenFromPublishing"
+              >
+                Hidden from publishing
+              </Checkbox>
+            </Stack>
             <VariableScopesInput
-              selectedScopes={internalEditToken.figmaVariableProperties?.scopes || []}
+              selectedScopes={getFigmaExtensions(internalEditToken)?.scopes || []}
               onScopesChange={handleScopesChange}
             />
             <CodeSyntaxInput
-              codeSyntax={internalEditToken.figmaVariableProperties?.codeSyntax || {}}
+              codeSyntax={getFigmaExtensions(internalEditToken)?.codeSyntax || {}}
               onCodeSyntaxChange={handleCodeSyntaxChange}
             />
           </>
