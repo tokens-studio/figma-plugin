@@ -7,6 +7,7 @@ import { convertTokenTypeToVariableType } from '@/utils/convertTokenTypeToVariab
 import { checkCanReferenceVariable } from '@/utils/alias/checkCanReferenceVariable';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { transformValue } from './helpers';
+import { CodeSyntaxPlatform } from '@/types/FigmaVariableTypes';
 
 export type ReferenceVariableType = {
   variable: Variable;
@@ -47,6 +48,23 @@ export default async function setValuesOnVariable(
           // variable = figma.variables.createVariable(t.path, collection.id, variableType);
         }
         variable.description = token.description ?? '';
+        
+        // Apply Figma variable properties if available
+        if (token.figmaVariableProperties) {
+          // Set variable scopes
+          if (token.figmaVariableProperties.scopes && token.figmaVariableProperties.scopes.length > 0) {
+            variable.scopes = token.figmaVariableProperties.scopes;
+          }
+          
+          // Set code syntax for different platforms
+          if (token.figmaVariableProperties.codeSyntax) {
+            Object.entries(token.figmaVariableProperties.codeSyntax).forEach(([platform, syntax]) => {
+              if (syntax) {
+                variable.setVariableCodeSyntax(platform as CodeSyntaxPlatform, syntax);
+              }
+            });
+          }
+        }
 
         switch (variableType) {
           case 'BOOLEAN':

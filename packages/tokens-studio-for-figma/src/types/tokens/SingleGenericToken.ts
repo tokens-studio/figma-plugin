@@ -1,5 +1,6 @@
 import { TokenTypes } from '@/constants/TokenTypes';
 import { ColorModifier } from '../Modifier';
+import { FigmaVariableExtensions } from '../FigmaVariableTypes';
 
 export type SingleGenericToken<T extends TokenTypes, V = string, Named extends boolean = true, P = unknown> = {
   type: T;
@@ -20,7 +21,9 @@ export type SingleGenericToken<T extends TokenTypes, V = string, Named extends b
       urn?: string;
     },
     id?: string;
-  }
+  };
+  // Figma variable-specific properties
+  figmaVariableProperties?: FigmaVariableExtensions;
 } & (Named extends true ? {
   name: string;
 } : {

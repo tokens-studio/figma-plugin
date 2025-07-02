@@ -1,6 +1,7 @@
 import { TokenTypes } from '@/constants/TokenTypes';
 import { ColorModifier } from '../Modifier';
 import { SingleToken } from '../tokens';
+import { FigmaVariableExtensions } from '../FigmaVariableTypes';
 
 export type DuplicateTokenPayload = {
   parent: string;
@@ -18,5 +19,6 @@ export type DuplicateTokenPayload = {
       id?: string;
       modify?: ColorModifier
     }
-  }
+  };
+  figmaVariableProperties?: FigmaVariableExtensions;
 };
