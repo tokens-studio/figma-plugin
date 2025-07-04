@@ -73,5 +73,6 @@ export * from './stylesTypographySelector';
 export * from './stylesEffectSelector';
 export * from './createStylesWithVariableReferencesSelector';
 export * from './importedThemesSelector';
+export * from './renamedCollectionsSelector';
 export * from './tokensSizeSelector';
 export * from './themesSizeSelector';
