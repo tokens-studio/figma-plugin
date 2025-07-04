@@ -11,6 +11,7 @@ import {
 } from '@/selectors';
 import useRemoteTokens from '../../store/remoteTokens';
 import { track } from '@/utils/analytics';
+import { useIsProUser } from '@/app/hooks/useIsProUser';
 
 declare module 'react' {
   interface InputHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -33,6 +34,7 @@ type Props = {
 export default function FilePreset({ onCancel }: Props) {
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const activeTheme = useSelector(activeThemeSelector);
+  const isProUser = useIsProUser();
   const hiddenFileInput = React.useRef<HTMLInputElement>(null);
   const hiddenDirectoryInput = React.useRef<HTMLInputElement>(null);
   const { fetchTokensFromFileOrDirectory } = useRemoteTokens();
@@ -78,7 +80,11 @@ export default function FilePreset({ onCancel }: Props) {
           onChange={handleFileOrDirectoryChange}
           accept=".json"
         />
-        <Button variant="primary" onClick={handleDirectoryButtonClick}>
+        <Button
+          variant="primary"
+          onClick={handleDirectoryButtonClick}
+          disabled={!isProUser}
+        >
           Choose folder
         </Button>
         <input

@@ -90,6 +90,7 @@ export default function DuplicateTokenGroupModal({
           type="text"
           name="tokengroupname"
           value={newName}
+          readOnly={!handleNewTokenGroupNameChange}
           autoFocus
           required
           css={{ width: '100%' }}
