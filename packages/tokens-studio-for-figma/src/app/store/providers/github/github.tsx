@@ -9,7 +9,12 @@ import { notifyToUI } from '@/plugin/notifiers';
 import {
   activeThemeSelector,
   storeTokenIdInJsonEditorSelector,
-  localApiStateSelector, themesListSelector, tokensSelector, usedTokenSetSelector,
+  localApiStateSelector,
+  themesListSelector,
+  tokensSelector,
+  usedTokenSetSelector,
+  lastSyncedStateSelector,
+  tokenFormatSelector,
 } from '@/selectors';
 import { GithubTokenStorage } from '@/storage/GithubTokenStorage';
 import { isEqual } from '@/utils/isEqual';
@@ -22,7 +27,8 @@ import { ErrorMessages } from '@/constants/ErrorMessages';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { PushOverrides } from '../../remoteTokens';
 import { useIsProUser } from '@/app/hooks/useIsProUser';
-import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
+import { TokenFormat, TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
+import { determineFileChanges } from '@/utils/determineFileChanges';
 
 type GithubCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITHUB; }>;
 type GithubFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITHUB }>;
@@ -33,6 +39,8 @@ export function useGitHub() {
   const localApiState = useSelector(localApiStateSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
+  const lastSyncedState = useSelector(lastSyncedStateSelector);
+  const tokenFormat = useSelector(tokenFormatSelector);
   const isProUser = useIsProUser();
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
@@ -67,14 +75,72 @@ export function useGitHub() {
         const metadata = {
           tokenSetOrder: Object.keys(tokens),
         };
-        await storage.save({
-          themes,
+
+        // Determine file changes based on lastSyncedState for optimization
+        const fileChanges = determineFileChanges(
           tokens,
-          metadata,
-        }, {
-          commitMessage,
-          storeTokenIdInJsonEditor,
-        });
+          themes,
+          tokenFormat as TokenFormatOptions,
+          lastSyncedState,
+          context.filePath || '',
+          isProUser, // Multi-file is enabled for pro users
+          (context.filePath || '').endsWith('.json'),
+        );
+
+        // Use optimized push approach if we have file change information
+        if (fileChanges.hasChanges && storage.writeChangesetOptimized) {
+          // Create the changeset directly based on what files need to be updated/created
+          const filesChangeset: Record<string, string> = {};
+          const isMultiFile = isProUser && !context.filePath?.endsWith('.json');
+
+          if (context.filePath?.endsWith('.json')) {
+            // Single file mode
+            filesChangeset[context.filePath] = JSON.stringify({
+              ...Object.fromEntries(Object.entries(tokens).map(([name, tokenSet]) => [name, tokenSet])),
+              ...(themes.length > 0 ? { $themes: themes } : {}),
+              $metadata: metadata,
+            }, null, 2);
+          } else if (isMultiFile) {
+            // Multi-file mode - only include files that have changes
+            Object.keys(tokens).forEach((tokenSetName) => {
+              const filePath = `${context.filePath || ''}/${tokenSetName}.json`;
+              if (fileChanges.filesToCreate.includes(filePath) || fileChanges.filesToUpdate.includes(filePath)) {
+                filesChangeset[filePath] = JSON.stringify(tokens[tokenSetName], null, 2);
+              }
+            });
+
+            // Add themes file if it has changes
+            const themesPath = `${context.filePath || ''}/$themes.json`;
+            if (fileChanges.filesToCreate.includes(themesPath) || fileChanges.filesToUpdate.includes(themesPath)) {
+              filesChangeset[themesPath] = JSON.stringify(themes, null, 2);
+            }
+
+            // Add metadata file if it has changes
+            const metadataPath = `${context.filePath || ''}/$metadata.json`;
+            if (fileChanges.filesToCreate.includes(metadataPath) || fileChanges.filesToUpdate.includes(metadataPath)) {
+              filesChangeset[metadataPath] = JSON.stringify(metadata, null, 2);
+            }
+          }
+
+          await storage.writeChangesetOptimized(
+            filesChangeset,
+            commitMessage,
+            customBranch,
+            !(await storage.fetchBranches()).includes(customBranch),
+            fileChanges.filesToDelete,
+          );
+        } else {
+          // Fallback to regular save method
+          await storage.save({
+            themes,
+            tokens,
+            metadata,
+          }, {
+            commitMessage,
+            storeTokenIdInJsonEditor,
+          });
+        }
+
         const commitSha = await storage.getCommitSha();
         dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as GithubCredentials);
         dispatch.uiState.setApiData({ ...context, branch: customBranch, ...(commitSha ? { commitSha } : {}) });
@@ -131,6 +197,10 @@ export function useGitHub() {
     localApiState,
     usedTokenSet,
     activeTheme,
+    tokenFormat,
+    lastSyncedState,
+    isProUser,
+    storeTokenIdInJsonEditor,
   ]);
 
   const checkAndSetAccess = useCallback(async ({
