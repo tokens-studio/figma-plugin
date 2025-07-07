@@ -257,19 +257,24 @@ export default async function pullVariables(options: PullVariablesOptions, theme
 
     const currentTokenSets = new Set(themesToCreate.map((theme) => `${theme.group}/${theme.name}`));
     for (const existingSet of existingTokenSets) {
-      // Skip if this set is already mapped as a source in renamedCollections
       if (renamedCollections.has(existingSet)) {
         continue;
       }
 
       if (existingSet.includes('/') && !currentTokenSets.has(existingSet)) {
         // Find matching theme by collection ID and mode ID only
-        const matchingTheme = themeInfo.themes?.find((t) => Object.keys(t.selectedTokenSets || {}).includes(existingSet)
-          && t.$figmaCollectionId
-          && t.$figmaModeId);
+        const matchingTheme = themeInfo.themes?.find((t) => {
+          if (!t.$figmaCollectionId || !t.$figmaModeId) {
+            return false;
+          }
+
+          const hasMatchingCurrentTheme = themesToCreate.some((currentTheme) => currentTheme.$figmaCollectionId === t.$figmaCollectionId
+            && currentTheme.$figmaModeId === t.$figmaModeId);
+
+          return hasMatchingCurrentTheme && Object.keys(t.selectedTokenSets || {}).includes(existingSet);
+        });
 
         if (matchingTheme) {
-          // Find the corresponding current theme using only IDs
           const currentTheme = themesToCreate.find((t) => t.$figmaCollectionId === matchingTheme.$figmaCollectionId
             && t.$figmaModeId === matchingTheme.$figmaModeId);
 
