@@ -191,7 +191,6 @@ export default async function pullVariables(options: PullVariablesOptions, theme
   const themesToCreate: ThemeObjectsList = [];
   // Process themes if pro user
   if (proUser) {
-    // Get existing token sets using GET_THEME_INFO which includes token set information
     const themeInfo = await AsyncMessageChannel.PluginInstance.message({
       type: AsyncMessageTypes.GET_THEME_INFO,
     });
@@ -222,70 +221,22 @@ export default async function pullVariables(options: PullVariablesOptions, theme
         const tokenSetName = `${collection.name}/${mode.name}`;
         const themeId = `${collection.name.toLowerCase()}-${mode.name.toLowerCase()}`;
 
-        // Mark this theme as processed
         processedThemes.add(`${collection.id}:${mode.modeId}`);
 
-        // Find if there's an existing token set that matches this theme but with a different name This could happen if the collection or mode was renamed in Figma
-        for (const existingSet of existingTokenSets) {
-          if (!existingSet.includes('/')) {
-            continue; // Skip non-collection/mode sets
-          }
+        // Check if there's an existing theme with the same collection ID and mode ID but different token set name
+        const matchingTheme = themeInfo.themes?.find((t) => t.$figmaCollectionId === collection.id
+          && t.$figmaModeId === mode.modeId);
 
-          const [existingCollection, existingMode] = existingSet.split('/');
-
-          // Skip if this existing set is already mapped to something
-          if (Array.from(renamedCollections.values()).includes(existingSet)) {
-            continue;
-          }
-
-          // Skip if this existing set is already a source in renamedCollections
-          if (renamedCollections.has(existingSet)) {
-            continue;
-          }
-
-          // Case 1: Collection renamed, same mode (e.g., "oldColl/light" -> "newColl/light")
-          if (existingMode === mode.name && existingCollection !== collection.name) {
-            // Only add to renamedCollections if we haven't already mapped this set
-            if (!renamedCollections.has(existingSet) && !Array.from(renamedCollections.values()).includes(tokenSetName)) {
-              renamedCollections.set(existingSet, tokenSetName);
+        if (matchingTheme) {
+          // Find token sets in this theme that are different from the current token set name
+          Object.keys(matchingTheme.selectedTokenSets || {}).forEach((existingTokenSet) => {
+            if (existingTokenSet !== tokenSetName
+                && existingTokenSet.includes('/')
+                && !renamedCollections.has(existingTokenSet)
+                && !Array.from(renamedCollections.values()).includes(tokenSetName)) {
+              renamedCollections.set(existingTokenSet, tokenSetName);
             }
-            continue;
-          }
-
-          // Case 2: Same collection, mode renamed (e.g., "abc/light" -> "abc/lit")
-          if (existingCollection === collection.name && existingMode !== mode.name) {
-            // Check if this is an active set - if so, be more cautious about renaming
-            if (activeTokenSets.has(existingSet)) {
-              // For active sets, only rename if we have strong evidence (like matching IDs)
-              const matchingTheme = themeInfo.themes?.find((t) => t.$figmaCollectionId === collection.id
-                && t.$figmaModeId === mode.modeId
-                && Object.keys(t.selectedTokenSets || {}).includes(existingSet));
-
-              if (matchingTheme) {
-                renamedCollections.set(existingSet, tokenSetName);
-              }
-            } else if (!renamedCollections.has(existingSet) && !Array.from(renamedCollections.values()).includes(tokenSetName)) {
-              // For non-active sets, we can be less strict
-              renamedCollections.set(existingSet, tokenSetName);
-            }
-            continue;
-          }
-
-          // Case 3: Both collection and mode renamed
-          // This is harder to detect, but we can use collection ID and mode ID to help
-          const matchingTheme = themeInfo.themes?.find((t) => t.$figmaCollectionId === collection.id
-            && t.$figmaModeId === mode.modeId);
-
-          if (matchingTheme) {
-            // If we found a theme with matching collection ID and mode ID, check if its token set is different from the current one
-            Object.keys(matchingTheme.selectedTokenSets || {}).forEach((tokenSet) => {
-              if (tokenSet !== tokenSetName && tokenSet.includes('/')
-                  && !renamedCollections.has(tokenSet)
-                  && !Array.from(renamedCollections.values()).includes(tokenSetName)) {
-                renamedCollections.set(tokenSet, tokenSetName);
-              }
-            });
-          }
+          });
         }
 
         // Track this collection/mode combination
@@ -304,10 +255,7 @@ export default async function pullVariables(options: PullVariablesOptions, theme
       }));
     }));
 
-    // After processing all collections and modes, check for orphaned token sets
-    // These are token sets that exist but don't correspond to any current collection/mode
     const currentTokenSets = new Set(themesToCreate.map((theme) => `${theme.group}/${theme.name}`));
-    // Find token sets that look like collection/mode but don't match any current ones
     for (const existingSet of existingTokenSets) {
       // Skip if this set is already mapped as a source in renamedCollections
       if (renamedCollections.has(existingSet)) {
@@ -315,17 +263,22 @@ export default async function pullVariables(options: PullVariablesOptions, theme
       }
 
       if (existingSet.includes('/') && !currentTokenSets.has(existingSet)) {
-        // First try to find a matching theme by collection ID and mode ID
-        const [oldColl] = existingSet.split('/');
+        // Find matching theme by collection ID and mode ID only
         const matchingTheme = themeInfo.themes?.find((t) => Object.keys(t.selectedTokenSets || {}).includes(existingSet)
-          && t.group === oldColl);
+          && t.$figmaCollectionId
+          && t.$figmaModeId);
 
         if (matchingTheme) {
-          // If we found a matching theme, use its current name for the mapping
-          const newSet = `${matchingTheme.group}/${matchingTheme.name}`;
-          if (currentTokenSets.has(newSet)) {
-            renamedCollections.set(existingSet, newSet);
-            continue;
+          // Find the corresponding current theme using only IDs
+          const currentTheme = themesToCreate.find((t) => t.$figmaCollectionId === matchingTheme.$figmaCollectionId
+            && t.$figmaModeId === matchingTheme.$figmaModeId);
+
+          if (currentTheme) {
+            const newSet = `${currentTheme.group}/${currentTheme.name}`;
+            if (currentTokenSets.has(newSet)) {
+              renamedCollections.set(existingSet, newSet);
+              continue;
+            }
           }
         }
       }
@@ -344,7 +297,6 @@ export default async function pullVariables(options: PullVariablesOptions, theme
       themesToCreate,
     );
 
-    // Add notification for renamed collections
     if (renamedCollections.size > 0) {
       notifyRenamedCollections(Array.from(renamedCollections.entries()));
     }
