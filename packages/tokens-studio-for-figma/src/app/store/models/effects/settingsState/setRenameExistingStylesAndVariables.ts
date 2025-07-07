@@ -1,6 +1,7 @@
 import type { RootState } from '@/app/store';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
+import { saveVariableExportSettings } from './saveVariableExportSettings';
 
 export function setRenameExistingStylesAndVariables() {
   return (payload: boolean, rootState: RootState): void => {
@@ -8,5 +9,7 @@ export function setRenameExistingStylesAndVariables() {
       type: AsyncMessageTypes.SET_UI,
       ...rootState.settings,
     });
+
+    saveVariableExportSettings()(payload, rootState);
   };
 }
