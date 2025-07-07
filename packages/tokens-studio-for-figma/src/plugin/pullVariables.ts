@@ -328,25 +328,6 @@ export default async function pullVariables(options: PullVariablesOptions, theme
             continue;
           }
         }
-
-        // If no direct match by theme, check if there's a similar set with same collection
-        const sameCollectionSets = Array.from(currentTokenSets)
-          .filter((set) => set.startsWith(`${oldColl}/`));
-
-        if (sameCollectionSets.length === 1) {
-          // If there's only one set with the same collection, it's likely the renamed one
-          renamedCollections.set(existingSet, sameCollectionSets[0]);
-        } else if (sameCollectionSets.length > 1) {
-          // If multiple matches, try to find the best one
-          // Prioritize sets that aren't already targets in renamedCollections
-          const availableSets = sameCollectionSets.filter(
-            (set) => !Array.from(renamedCollections.values()).includes(set),
-          );
-
-          if (availableSets.length > 0) {
-            renamedCollections.set(existingSet, availableSets[0]);
-          }
-        }
       }
     }
   }
