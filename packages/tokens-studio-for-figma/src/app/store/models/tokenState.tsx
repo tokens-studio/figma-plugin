@@ -1104,7 +1104,7 @@ export const tokenState = createModel<RootModel>()({
 
       // Update the document to reflect the changes
       dispatch.tokenState.updateDocument({
-        shouldUpdateNodes: true,
+        shouldUpdateNodes: false,
         updateRemote: true,
       });
 
