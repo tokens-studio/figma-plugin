@@ -22,9 +22,43 @@ const roundToPrecision = (value, precision = 10) => {
   return Math.round((value + Number.EPSILON) * roundToPrecisionVal) / roundToPrecisionVal;
 };
 
+// Helper function to parse gradient parts while respecting parentheses
+function parseGradientParts(innerContent: string): string[] {
+  const parts: string[] = [];
+  let current = '';
+  let parenDepth = 0;
+  let i = 0;
+
+  while (i < innerContent.length) {
+    const char = innerContent[i];
+
+    if (char === '(') {
+      parenDepth += 1;
+      current += char;
+    } else if (char === ')') {
+      parenDepth -= 1;
+      current += char;
+    } else if (char === ',' && parenDepth === 0) {
+      // We're at a top-level comma, so this is a separator
+      parts.push(current.trim());
+      current = '';
+    } else {
+      current += char;
+    }
+    i += 1;
+  }
+
+  // Don't forget the last part
+  if (current.trim()) {
+    parts.push(current.trim());
+  }
+  return parts;
+}
+
 // if node type check is needed due to bugs caused by obscure node types, use (value: string/*, node?: BaseNode | PaintStyle) and convertStringToFigmaGradient(value, target)
 export function convertStringToFigmaGradient(value: string) {
-  const parts = value.substring(value.indexOf('(') + 1, value.lastIndexOf(')')).split(', ').map((s) => s.trim());
+  const innerContent = value.substring(value.indexOf('(') + 1, value.lastIndexOf(')'));
+  const parts = parseGradientParts(innerContent);
 
   // Default angle is to top (180 degrees)
   let angle = 180;
@@ -106,13 +140,38 @@ export function convertStringToFigmaGradient(value: string) {
   const gradientTransformMatrix = transformationMatrix.to2DArray();
 
   const gradientStops = parts.map((stop, i, arr) => {
-    const seperatedStop = stop.split(' ');
-    const { color, opacity } = convertToFigmaColor(seperatedStop[0]);
+    // Separate color from position by finding the last space outside parentheses
+    let colorPart = stop;
+    let positionPart = '';
+    let parenDepth = 0;
+    let lastSpaceIndex = -1;
+
+    for (let j = 0; j < stop.length; j += 1) {
+      const char = stop[j];
+      if (char === '(') {
+        parenDepth += 1;
+      } else if (char === ')') {
+        parenDepth -= 1;
+      } else if (char === ' ' && parenDepth === 0) {
+        lastSpaceIndex = j;
+      }
+    }
+
+    if (lastSpaceIndex > -1) {
+      const potentialPosition = stop.substring(lastSpaceIndex + 1);
+      // Check if this looks like a percentage or numeric position
+      if (potentialPosition.includes('%') || /^\d+(\.\d+)?$/.test(potentialPosition)) {
+        colorPart = stop.substring(0, lastSpaceIndex);
+        positionPart = potentialPosition;
+      }
+    }
+
+    const { color, opacity } = convertToFigmaColor(colorPart);
     const gradientColor = color;
     gradientColor.a = opacity;
     return {
       color: gradientColor,
-      position: seperatedStop[1] ? parseFloat(seperatedStop[1]) / 100 : i / (arr.length - 1),
+      position: positionPart ? parseFloat(positionPart) / 100 : i / (arr.length - 1),
     };
   }) as ColorStop[];
 

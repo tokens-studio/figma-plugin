@@ -1,5 +1,22 @@
 # @tokens-studio/figma-plugin
 
+## 2.6.1
+
+### Patch Changes
+
+- 866068b9: Fix to roll back a patch for large token sets' export to variables in Figma.
+
+## 2.6.0
+
+### Minor Changes
+
+- da152555: Add OKLCH color support in linear gradients. OKLCH colors are now supported in linear-gradient color strings, extending the existing support for RGB, HSL, and hex colors.
+
+### Patch Changes
+
+- f7c6a7d5: Fix issue of the plugin crashing when exporting large token sets(1000+ tokens) to variables in Figma.
+- ef2d7774: When you create Variables we now remember the choice of theme you made on that file on subsequent runs
+
 ## 2.5.2
 
 ### Patch Changes
