@@ -176,7 +176,6 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
     this.baseUrl = baseUrl;
     this.actionsQueue = [];
     this.processQueueTimeout = null;
-    this.initializeClient();
   }
 
   public setContext(id: string, orgId: string, secret: string, baseUrl?: string) {
@@ -184,17 +183,43 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
     this.orgId = orgId;
     this.secret = secret;
     this.baseUrl = baseUrl;
-    this.initializeClient();
+    // Reset client initialization so it will be re-initialized with new context
+    this.clientInitialization = null;
+    this.client = null;
   }
 
+  private clientInitialization: Promise<void> | null = null;
+
   private async initializeClient() {
-    this.client = await makeClient(this.secret, this.baseUrl);
+    if (!this.clientInitialization) {
+      this.clientInitialization = this.doInitializeClient();
+    }
+    return this.clientInitialization;
+  }
+
+  private async doInitializeClient() {
+    try {
+      this.client = await makeClient(this.secret, this.baseUrl);
+    } catch (error) {
+      console.error('Failed to initialize Tokens Studio client:', error);
+      this.client = null;
+      throw error;
+    }
   }
 
   public async read(): Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage> {
     let tokens: AnyTokenSet | null | undefined = {};
     let themes: ThemeObjectsList = [];
     const metadata: RemoteTokenStorageMetadata = {};
+
+    await this.initializeClient();
+
+    // Check if client was properly initialized
+    if (!this.client) {
+      return {
+        errorMessage: 'Failed to initialize Tokens Studio client. Please check your configuration and credentials.',
+      };
+    }
 
     try {
       const projectData = await getProjectData(this.id, this.orgId, this.client);
@@ -289,6 +314,13 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
       if (!data.name) {
         throw new Error('Invalid data');
       }
+
+      // Ensure client is initialized before proceeding
+      await this.initializeClient();
+      if (!this.client) {
+        throw new Error('Failed to initialize Tokens Studio client');
+      }
+
       // TODO: export the type for the mutation from sdk
       const responseData = await this.client.mutate({
         mutation: CREATE_TOKEN_SET_MUTATION,
@@ -318,6 +350,11 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
 
   private async handleUpdateTokenSet(data: any, successCallback: () => void) {
     try {
+      await this.initializeClient();
+      if (!this.client) {
+        throw new Error('Failed to initialize Tokens Studio client');
+      }
+
       const responseData = await this.client.mutate({
         mutation: UPDATE_TOKEN_SET_MUTATION,
         variables: {
@@ -354,6 +391,12 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
         throw new Error('Invalid data');
       }
 
+      // Ensure client is initialized before proceeding
+      await this.initializeClient();
+      if (!this.client) {
+        throw new Error('Failed to initialize Tokens Studio client');
+      }
+
       const responseData = await this.client.mutate({
         mutation: DELETE_TOKEN_SET_MUTATION,
         variables: {
@@ -380,6 +423,11 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
 
   private async handleUpdateTokenSetOrder(data: any, successCallback: () => void) {
     try {
+      await this.initializeClient();
+      if (!this.client) {
+        throw new Error('Failed to initialize Tokens Studio client');
+      }
+
       const responseData = await this.client.mutate({
         mutation: UPDATE_TOKEN_SET_ORDER_MUTATION,
         variables: {
@@ -405,6 +453,12 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
 
   private async handleCreateThemeGroup(data: any, successCallback: () => void) {
     try {
+      // Ensure client is initialized before proceeding
+      await this.initializeClient();
+      if (!this.client) {
+        throw new Error('Failed to initialize Tokens Studio client');
+      }
+
       const responseData = await this.client.mutate({
         mutation: CREATE_THEME_GROUP_MUTATION,
         variables: {
@@ -434,6 +488,11 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
 
   private async handleUpdateThemeGroup(data: any, successCallback: () => void) {
     try {
+      await this.initializeClient();
+      if (!this.client) {
+        throw new Error('Failed to initialize Tokens Studio client');
+      }
+
       const responseData = await this.client.mutate({
         mutation: UPDATE_THEME_GROUP_MUTATION,
         variables: {
@@ -463,6 +522,12 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
 
   private async handleDeleteThemeGroup(data: any, successCallback: () => void) {
     try {
+      // Ensure client is initialized before proceeding
+      await this.initializeClient();
+      if (!this.client) {
+        throw new Error('Failed to initialize Tokens Studio client');
+      }
+
       const responseData = await this.client.mutate({
         mutation: DELETE_THEME_GROUP_MUTATION,
         variables: {

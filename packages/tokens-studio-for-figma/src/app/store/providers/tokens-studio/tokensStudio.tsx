@@ -242,6 +242,7 @@ export function useTokensStudio() {
         type: AsyncMessageTypes.CREDENTIALS,
         credential: context,
       });
+
       return {
         status: 'success',
         tokens: data.tokens ?? tokens,
