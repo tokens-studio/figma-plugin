@@ -111,8 +111,10 @@ export class StudioConfigurationService {
    */
   public async getGraphQLHost(baseUrl?: string): Promise<string> {
     if (!baseUrl) {
-      // Return default host for backward compatibility
-      return process.env.TOKENS_STUDIO_API_HOST || 'localhost:4200';
+      // When no baseUrl is provided, use environment-specific default
+      return process.env.ENVIRONMENT === 'development'
+        ? 'localhost:4200'
+        : 'graphql.app.tokens.studio';
     }
 
     try {
@@ -122,8 +124,23 @@ export class StudioConfigurationService {
       return url.host;
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.error('Failed to get GraphQL host, falling back to default:', error);
-      return process.env.TOKENS_STUDIO_API_HOST || 'localhost:4200';
+      console.error('Failed to get GraphQL host for baseUrl:', baseUrl, error);
+
+      // For custom Studio instances, try to construct a reasonable fallback based on the baseUrl
+      const normalizedBaseUrl = this.normalizeBaseUrl(baseUrl);
+      const url = new URL(normalizedBaseUrl);
+      const domain = url.hostname;
+
+      // Special handling for known tokens.studio domains
+      if (domain.includes('tokens.studio')) {
+        // Use environment-specific default for tokens.studio domains
+        return process.env.ENVIRONMENT === 'development'
+          ? 'localhost:4200'
+          : 'graphql.app.tokens.studio';
+      }
+
+      // For custom Studio instances, construct a GraphQL endpoint based on the domain
+      return `graphql.${domain}`;
     }
   }
 

@@ -126,7 +126,7 @@ export default function TokensStudioForm({
 
       // Determine if we should use HTTPS
       // Use HTTPS for production builds OR when connecting to external Studio instances
-      const shouldUseSecure = process.env.NODE_ENV !== 'development' || Boolean(values.baseUrl?.trim() && !host.includes('localhost'));
+      const shouldUseSecure = process.env.ENVIRONMENT !== 'development' || Boolean(values.baseUrl?.trim() && !host.includes('localhost'));
 
       const client = create({
         host,
