@@ -26,7 +26,10 @@ export function useChangedState() {
     return findDifferentState(remoteData, {
       tokens,
       themes,
-      metadata: storageType.provider !== StorageProviderType.LOCAL ? { tokenSetOrder } : {},
+      metadata: storageType.provider !== StorageProviderType.LOCAL ? {
+        tokenSetsData: remoteData.metadata?.tokenSetsData || {},
+        tokenSetOrder,
+      } : {},
     });
   }, [remoteData, tokens, themes, storageType]);
 
@@ -36,7 +39,10 @@ export function useChangedState() {
       {
         tokens,
         themes,
-        metadata: storageType.provider !== StorageProviderType.LOCAL ? { tokenSetOrder } : {},
+        metadata: storageType.provider !== StorageProviderType.LOCAL ? {
+          tokenSetsData: remoteData.metadata?.tokenSetsData || {},
+          tokenSetOrder,
+        } : {},
       },
       remoteData,
     );
