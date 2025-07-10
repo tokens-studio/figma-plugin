@@ -26,6 +26,7 @@ import TokensStudioWord from '@/icons/tokensstudio-word.svg';
 import { styled } from '@/stitches.config';
 import { GET_ORGS_QUERY } from '@/storage/tokensStudio/graphql';
 import { Dispatch } from '@/app/store';
+import { StudioConfigurationService } from '@/storage/tokensStudio/StudioConfigurationService';
 
 const StyledTokensStudioWord = styled(TokensStudioWord, {
   width: '200px',
@@ -47,9 +48,11 @@ export default function TokensStudioForm({
 }: Props) {
   const { t } = useTranslation(['storage']);
   const [fetchOrgsError, setFetchOrgsError] = React.useState<string | null>(null);
+  const [baseUrlError, setBaseUrlError] = React.useState<string | null>(null);
   const [orgData, setOrgData] = React.useState<Organization[]>([]);
   const [isMasked, setIsMasked] = React.useState(true);
   const [showTeaser, setShowTeaser] = React.useState(true);
+  const [isValidatingBaseUrl, setIsValidatingBaseUrl] = React.useState(false);
   const dispatch = useDispatch<Dispatch>();
 
   const toggleMask = React.useCallback(() => {
@@ -67,6 +70,7 @@ export default function TokensStudioForm({
         secret: zod.string(),
         internalId: zod.string().optional(),
         orgId: zod.string(),
+        baseUrl: zod.string().optional(),
       });
       const validationResult = zodSchema.safeParse(values);
       if (validationResult.success) {
@@ -90,11 +94,43 @@ export default function TokensStudioForm({
     setShowTeaser(false);
   }, []);
 
+  const validateBaseUrl = React.useCallback(async (baseUrl: string) => {
+    if (!baseUrl.trim()) {
+      setBaseUrlError(null);
+      return;
+    }
+
+    setIsValidatingBaseUrl(true);
+    setBaseUrlError(null);
+
+    try {
+      const configService = StudioConfigurationService.getInstance();
+      const validation = await configService.validateBaseUrl(baseUrl);
+
+      if (!validation.valid) {
+        setBaseUrlError(validation.error || 'Invalid base URL');
+      }
+    } catch (error) {
+      setBaseUrlError('Failed to validate base URL');
+    } finally {
+      setIsValidatingBaseUrl(false);
+    }
+  }, []);
+
   const fetchOrgData = React.useCallback(async () => {
     try {
+      setFetchOrgsError(null);
+
+      const configService = StudioConfigurationService.getInstance();
+      const host = await configService.getGraphQLHost(values.baseUrl);
+
+      // Determine if we should use HTTPS
+      // Use HTTPS for production builds OR when connecting to external Studio instances
+      const shouldUseSecure = process.env.ENVIRONMENT !== 'development' || Boolean(values.baseUrl?.trim() && !host.includes('localhost'));
+
       const client = create({
-        host: process.env.TOKENS_STUDIO_API_HOST || 'localhost:4200',
-        secure: process.env.NODE_ENV !== 'development',
+        host,
+        secure: shouldUseSecure,
         auth: `Bearer ${values.secret}`,
       });
       const result = await client.query({
@@ -105,9 +141,9 @@ export default function TokensStudioForm({
         dispatch.userState.setTokensStudioPAT(values.secret);
       }
     } catch (error) {
-      setFetchOrgsError('Error fetching organization data. Please check your Studio API key.');
+      setFetchOrgsError('Error fetching organization data. Please check your Studio API key and base URL.');
     }
-  }, [values.secret, dispatch]);
+  }, [values.secret, values.baseUrl, dispatch]);
 
   useEffect(() => {
     if (values.secret) {
@@ -149,6 +185,13 @@ export default function TokensStudioForm({
       onChange({ target: { name: 'id', value } });
     },
     [onChange],
+  );
+
+  const handleBaseUrlBlur = React.useCallback(
+    (e: React.FocusEvent<HTMLInputElement>) => {
+      validateBaseUrl(e.target.value);
+    },
+    [validateBaseUrl],
   );
 
   return showTeaser ? (
@@ -195,6 +238,24 @@ export default function TokensStudioForm({
           <Label htmlFor="name">{t('providers.tokensstudio.name')}</Label>
           <TextInput name="name" id="name" value={values.name || ''} onChange={onChange} type="text" required />
           <Text muted>{t('nameHelpText')}</Text>
+        </FormField>
+        <FormField>
+          <Label htmlFor="baseUrl">Studio Base URL (optional)</Label>
+          <TextInput
+            name="baseUrl"
+            id="baseUrl"
+            value={values.baseUrl || ''}
+            onChange={onChange}
+            onBlur={handleBaseUrlBlur}
+            type="text"
+            placeholder="https://app.your-studio-instance.com"
+          />
+          {baseUrlError && <Text css={{ color: '$dangerFg' }}>{baseUrlError}</Text>}
+          {isValidatingBaseUrl && <Text muted>Validating base URL...</Text>}
+          <Text muted>
+            Leave empty to use the default Studio instance. For custom Studio instances, enter the base URL
+            (e.g., https://app.acme-corp.enterprise.tokens.studio)
+          </Text>
         </FormField>
         <FormField>
           <Label htmlFor="secret">{t('providers.tokensstudio.pat')}</Label>

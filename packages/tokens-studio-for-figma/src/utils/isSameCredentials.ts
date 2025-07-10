@@ -38,6 +38,8 @@ function isSameCredentials(
       return (
         credential.id === stored.id
         && credential.provider === stored.provider
+        && credential.orgId === stored.orgId
+        && credential.baseUrl === stored.baseUrl
       );
     default:
       return false;
