@@ -7,6 +7,7 @@ const actionsToTriggerUpdateInTokensStudio = [
   'tokenState/assignStyleIdsToCurrentTheme',
   'tokenState/assignStyleIdsToTheme',
   'tokenState/saveTheme',
+  'tokenState/setThemes',
   'tokenState/deleteTheme',
   'tokenState/updateThemeGroupName',
   'tokenState/disconnectVariableFromTheme',

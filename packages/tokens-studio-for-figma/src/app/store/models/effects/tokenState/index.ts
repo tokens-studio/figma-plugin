@@ -1,5 +1,6 @@
 export * from './saveTheme';
 export * from './setActiveTheme';
+export * from './setThemes';
 export * from './setDefaultTokens';
 export * from './setEmptyTokens';
 export * from './assignStyleIdsToCurrentTheme';
