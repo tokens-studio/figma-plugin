@@ -350,16 +350,46 @@ export class GithubTokenStorage extends GitTokenStorage {
         ref: this.branch,
         headers: octokitClientDefaultHeaders,
       });
-      // read entire directory
+
       if (Array.isArray(response.data)) {
         const directorySha = await this.getTreeShaForDirectory(normalizedPath);
-        return directorySha;
+        const treeResponse = await this.octokitClient.rest.git.getTree({
+          owner: this.owner,
+          repo: this.repository,
+          tree_sha: directorySha,
+          recursive: 'true',
+          headers: octokitClientDefaultHeaders,
+        });
+        if (treeResponse && treeResponse.data.tree.length > 0) {
+          const jsonFiles = treeResponse.data.tree.filter((file) => (
+            file.path?.endsWith('.json')
+          )).sort((a, b) => (
+            (a.path && b.path) ? a.path.localeCompare(b.path) : 0
+          ));
+          if (jsonFiles.length > 0) {
+            const firstFile = jsonFiles[0];
+            if (firstFile.path) {
+              const fileResponse = await this.octokitClient.rest.repos.getContent({
+                owner: this.owner,
+                repo: this.repository,
+                path: firstFile.path.startsWith(normalizedPath) ? firstFile.path : `${normalizedPath}/${firstFile.path}`,
+                ref: this.branch,
+                headers: octokitClientDefaultHeaders,
+              });
+              if (!Array.isArray(fileResponse.data) && 'sha' in fileResponse.data) {
+                return fileResponse.data.sha;
+              }
+            }
+          }
+        }
+      } else if (response.data && 'sha' in response.data) {
+        return response.data.sha;
       }
-      return response.data.sha;
+
+      throw new Error('Could not find commit SHA');
     } catch (e) {
-      // Raise error (usually this is an auth error)
-      console.error('Error', e);
-      return '';
+      console.error('Error getting commit SHA', e);
+      throw e;
     }
   }
 }
