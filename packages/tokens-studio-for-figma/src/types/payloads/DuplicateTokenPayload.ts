@@ -18,5 +18,5 @@ export type DuplicateTokenPayload = {
       id?: string;
       modify?: ColorModifier
     }
-  }
+  };
 };
