@@ -9,6 +9,7 @@ export type UseDialogResult = {
   pullDialogMode?: string | boolean
   closePullDialog: () => void
   showPullDialog: (givenState?: string) => Promise<PullDialogPromiseResult | null>
+  showPullDialogError: (errorMessage: string) => void
   onConfirm: () => void
   onCancel: () => void
 };
@@ -33,6 +34,10 @@ function usePullDialog(): UseDialogResult {
     dispatch.uiState.setShowPullDialog(false);
   }, [dispatch]);
 
+  const showPullDialogError: UseDialogResult['showPullDialogError'] = useCallback((errorMessage) => {
+    dispatch.uiState.setShowPullDialog(`error:${errorMessage}`);
+  }, [dispatch]);
+
   const onCancel = useCallback(() => {
     closePullDialog();
     resolveCallback(false);
@@ -44,8 +49,8 @@ function usePullDialog(): UseDialogResult {
   }, [closePullDialog]);
 
   return useMemo(() => ({
-    showPullDialog, onConfirm, onCancel, pullDialogMode, closePullDialog,
-  }), [showPullDialog, onConfirm, onCancel, closePullDialog, pullDialogMode]);
+    showPullDialog, onConfirm, onCancel, pullDialogMode, closePullDialog, showPullDialogError,
+  }), [showPullDialog, onConfirm, onCancel, closePullDialog, pullDialogMode, showPullDialogError]);
 }
 
 export default usePullDialog;
