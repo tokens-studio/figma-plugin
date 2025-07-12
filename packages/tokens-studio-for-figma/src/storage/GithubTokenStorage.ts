@@ -292,6 +292,10 @@ export class GithubTokenStorage extends GitTokenStorage {
     return !!response;
   }
 
+  public async writeChangesetOptimized(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch?: boolean, filesToDelete?: string[]): Promise<boolean> {
+    return await this.createOrUpdate(changeset, message, branch, shouldCreateBranch, filesToDelete, true);
+  }
+
   public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch?: boolean): Promise<boolean> {
     try {
       const response = await this.octokitClient.rest.repos.getContent({
