@@ -1,6 +1,8 @@
 import compact from 'just-compact';
 import { Octokit } from '@octokit/rest';
-import { RemoteTokenstorageErrorMessage, RemoteTokenStorageFile, RemoteTokenStorageMetadata, RemoteTokenStorageData } from './RemoteTokenStorage';
+import {
+  RemoteTokenstorageErrorMessage, RemoteTokenStorageFile, RemoteTokenStorageMetadata, RemoteTokenStorageData,
+} from './RemoteTokenStorage';
 import IsJSONString from '@/utils/isJSONString';
 import { AnyTokenSet } from '@/types/tokens';
 import { ThemeObjectsList } from '@/types';
@@ -9,7 +11,7 @@ import {
 } from './GitTokenStorage';
 import { SystemFilenames } from '@/constants/SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
-import convertTokensToObject from '@/utils/convertTokensToObject';
+import { GitSyncOptimizer, ChangedState } from './GitSyncOptimizer';
 
 type ExtendedOctokitClient = Omit<Octokit, 'repos'> & {
   repos: Octokit['repos'] & {
@@ -302,99 +304,16 @@ export class GithubTokenStorage extends GitTokenStorage {
   public async saveOptimized(
     data: RemoteTokenStorageData<GitStorageSaveOptions>,
     saveOptions: GitStorageSaveOption,
-    changedState: {
-      tokens: Record<string, any[]>,
-      themes: any[],
-      metadata: any
-    },
+    changedState: ChangedState,
   ): Promise<boolean> {
-    // First, convert data to files using the base class logic
-    const files: RemoteTokenStorageFile<GitStorageSaveOptions>[] = [];
+    // Use the shared Git sync optimizer
+    const { filteredFiles, filesToDelete, hasChanges } = GitSyncOptimizer.optimizeSync(
+      data,
+      saveOptions,
+      changedState,
+    );
 
-    // Convert tokens to files
-    const tokenSetObjects = convertTokensToObject({ ...data.tokens }, saveOptions.storeTokenIdInJsonEditor);
-    Object.entries(tokenSetObjects).forEach(([name, tokenSet]) => {
-      files.push({
-        type: 'tokenSet',
-        name,
-        path: `${name}.json`,
-        data: tokenSet,
-      });
-    });
-
-    // Add themes file
-    files.push({
-      type: 'themes',
-      path: `${SystemFilenames.THEMES}.json`,
-      data: data.themes,
-    });
-
-    // Add metadata file if present
-    if ('metadata' in data && data.metadata) {
-      files.push({
-        type: 'metadata',
-        path: `${SystemFilenames.METADATA}.json`,
-        data: data.metadata,
-      });
-    }
-
-    // Now filter the files based on changedState and detect deletions
-    const filteredFiles: RemoteTokenStorageFile<GitStorageSaveOptions>[] = [];
-    const filesToDelete: string[] = [];
-
-    files.forEach((file) => {
-      if (file.type === 'tokenSet') {
-        const hasChanges = changedState.tokens[file.name];
-        if (hasChanges && hasChanges.length > 0) {
-          filteredFiles.push(file);
-        }
-      } else if (file.type === 'themes') {
-        if (changedState.themes.length > 0) {
-          filteredFiles.push(file);
-        }
-      } else if (file.type === 'metadata') {
-        if (changedState.metadata) {
-          filteredFiles.push(file);
-        }
-      }
-    });
-
-    // Check for deleted token sets by looking for REMOVE importType in changedState
-    Object.entries(changedState.tokens).forEach(([tokenSetName, changes]) => {
-      const hasRemovedTokens = changes.some((change: any) => change.importType === 'REMOVE');
-      if (hasRemovedTokens) {
-        // Check if the entire token set was removed (no corresponding file in current data)
-        const currentFile = files.find(f => f.type === 'tokenSet' && f.name === tokenSetName);
-        if (!currentFile) {
-          const filePath = `${tokenSetName}.json`;
-          filesToDelete.push(filePath);
-        }
-      }
-    });
-
-    // Check for renamed token sets by detecting token sets that have REMOVE entries
-    // but DON'T exist in current files (indicating they were the old names that got renamed)
-    Object.entries(changedState.tokens).forEach(([tokenSetName, changes]) => {
-      const hasRemovedTokens = changes.some((change: any) => change.importType === 'REMOVE');
-      if (hasRemovedTokens) {
-        // Check if this token set name does NOT exist in current files
-        const currentFile = files.find((f) => f.type === 'tokenSet' && f.name === tokenSetName);
-        if (!currentFile) {
-          // This token set has REMOVE entries but doesn't exist in current files
-          // This indicates it was the old name that got renamed to something else
-          const oldFilePath = `${tokenSetName}.json`;
-          filesToDelete.push(oldFilePath);
-        }
-      }
-    });
-
-    // Check for removed themes
-    const hasRemovedThemes = changedState.themes.some((theme: any) => theme.importType === 'REMOVE');
-    if (hasRemovedThemes) {
-      // Themes file should already be included above if there are changes
-    }
-
-    if (filteredFiles.length === 0 && filesToDelete.length === 0) {
+    if (!hasChanges) {
       return true;
     }
 
@@ -409,21 +328,9 @@ export class GithubTokenStorage extends GitTokenStorage {
     const branches = await this.fetchBranches();
     if (!branches.length) return false;
 
-    const filesChangeset: Record<string, string> = {};
-
-    // Process files to update/create (multi-file mode only)
-    files.forEach((file) => {
-      if (file.type === 'tokenSet') {
-        filesChangeset[`${this.path}/${file.name}.json`] = JSON.stringify(file.data, null, 2);
-      } else if (file.type === 'themes') {
-        filesChangeset[`${this.path}/${SystemFilenames.THEMES}.json`] = JSON.stringify(file.data, null, 2);
-      } else if (file.type === 'metadata') {
-        filesChangeset[`${this.path}/${SystemFilenames.METADATA}.json`] = JSON.stringify(file.data, null, 2);
-      }
-    });
-
-    // Prepare files to delete (add path prefix)
-    const filesToDeleteWithPath = filesToDelete.map((fileName) => `${this.path}/${fileName}`);
+    // Use shared utilities to create changeset and prepare file deletions
+    const filesChangeset = GitSyncOptimizer.createMultiFileChangeset(files, this.path);
+    const filesToDeleteWithPath = GitSyncOptimizer.prepareFileDeletions(filesToDelete, this.path);
 
     return this.createOrUpdate(
       filesChangeset,

@@ -72,9 +72,7 @@ export function useGitHub() {
 
         // Check if we should use optimized multi-file sync
         const isMultiFileMode = isProUser && context.filePath && !context.filePath.endsWith('.json');
-        const hasChanges = Object.keys(changedPushState.tokens).length > 0 ||
-                          changedPushState.themes.length > 0 ||
-                          changedPushState.metadata;
+        const hasChanges = Object.keys(changedPushState.tokens).length > 0 || changedPushState.themes.length > 0 || changedPushState.metadata;
 
         if (isMultiFileMode && hasChanges) {
           // Use the optimized save method for multi-file mode
