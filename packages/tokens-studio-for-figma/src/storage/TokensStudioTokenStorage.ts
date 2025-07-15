@@ -207,15 +207,21 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
     }
   }
 
+  private async ensureClient(): Promise<void> {
+    await this.initializeClient();
+    if (!this.client) {
+      throw new Error('Failed to initialize Tokens Studio client. Please check your configuration and credentials.');
+    }
+  }
+
   public async read(): Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage> {
     let tokens: AnyTokenSet | null | undefined = {};
     let themes: ThemeObjectsList = [];
     const metadata: RemoteTokenStorageMetadata = {};
 
-    await this.initializeClient();
-
-    // Check if client was properly initialized
-    if (!this.client) {
+    try {
+      await this.ensureClient();
+    } catch (error) {
       return {
         errorMessage: 'Failed to initialize Tokens Studio client. Please check your configuration and credentials.',
       };
@@ -315,11 +321,7 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
         throw new Error('Invalid data');
       }
 
-      // Ensure client is initialized before proceeding
-      await this.initializeClient();
-      if (!this.client) {
-        throw new Error('Failed to initialize Tokens Studio client');
-      }
+      await this.ensureClient();
 
       // TODO: export the type for the mutation from sdk
       const responseData = await this.client.mutate({
@@ -350,10 +352,7 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
 
   private async handleUpdateTokenSet(data: any, successCallback: () => void) {
     try {
-      await this.initializeClient();
-      if (!this.client) {
-        throw new Error('Failed to initialize Tokens Studio client');
-      }
+      await this.ensureClient();
 
       const responseData = await this.client.mutate({
         mutation: UPDATE_TOKEN_SET_MUTATION,
@@ -391,11 +390,7 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
         throw new Error('Invalid data');
       }
 
-      // Ensure client is initialized before proceeding
-      await this.initializeClient();
-      if (!this.client) {
-        throw new Error('Failed to initialize Tokens Studio client');
-      }
+      await this.ensureClient();
 
       const responseData = await this.client.mutate({
         mutation: DELETE_TOKEN_SET_MUTATION,
@@ -423,10 +418,7 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
 
   private async handleUpdateTokenSetOrder(data: any, successCallback: () => void) {
     try {
-      await this.initializeClient();
-      if (!this.client) {
-        throw new Error('Failed to initialize Tokens Studio client');
-      }
+      await this.ensureClient();
 
       const responseData = await this.client.mutate({
         mutation: UPDATE_TOKEN_SET_ORDER_MUTATION,
@@ -453,11 +445,7 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
 
   private async handleCreateThemeGroup(data: any, successCallback: () => void) {
     try {
-      // Ensure client is initialized before proceeding
-      await this.initializeClient();
-      if (!this.client) {
-        throw new Error('Failed to initialize Tokens Studio client');
-      }
+      await this.ensureClient();
 
       const responseData = await this.client.mutate({
         mutation: CREATE_THEME_GROUP_MUTATION,
@@ -488,10 +476,7 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
 
   private async handleUpdateThemeGroup(data: any, successCallback: () => void) {
     try {
-      await this.initializeClient();
-      if (!this.client) {
-        throw new Error('Failed to initialize Tokens Studio client');
-      }
+      await this.ensureClient();
 
       const responseData = await this.client.mutate({
         mutation: UPDATE_THEME_GROUP_MUTATION,
@@ -522,11 +507,7 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
 
   private async handleDeleteThemeGroup(data: any, successCallback: () => void) {
     try {
-      // Ensure client is initialized before proceeding
-      await this.initializeClient();
-      if (!this.client) {
-        throw new Error('Failed to initialize Tokens Studio client');
-      }
+      await this.ensureClient();
 
       const responseData = await this.client.mutate({
         mutation: DELETE_THEME_GROUP_MUTATION,
