@@ -7,6 +7,7 @@ import { FileZipIcon } from '@primer/octicons-react';
 import { editProhibitedSelector } from '@/selectors';
 import PresetModal from './modals/PresetModal';
 import ExportModal from './modals/ExportModal';
+import LivingDocumentationModal from './modals/LivingDocumentationModal';
 
 export default function ToolsDropdown() {
   const editProhibited = useSelector(editProhibitedSelector);
@@ -15,6 +16,7 @@ export default function ToolsDropdown() {
 
   const [presetModalVisible, showPresetModal] = React.useState(false);
   const [exportModalVisible, showExportModal] = React.useState(false);
+  const [docModalVisible, showDocModal] = React.useState(false);
 
   const handleCloseExportModal = useCallback(() => {
     showExportModal(false);
@@ -24,11 +26,18 @@ export default function ToolsDropdown() {
     showPresetModal(false);
   }, []);
 
+  const handleCloseDocModal = useCallback(() => {
+    showDocModal(false);
+  }, []);
+
   const handleShowPresetModal = useCallback(() => {
     showPresetModal(true);
   }, []);
   const handleShowExportModal = useCallback(() => {
     showExportModal(true);
+  }, []);
+  const handleShowDocModal = useCallback(() => {
+    showDocModal(true);
   }, []);
 
   return (
@@ -39,14 +48,16 @@ export default function ToolsDropdown() {
         </DropdownMenu.Trigger>
 
         <DropdownMenu.Portal>
-          <DropdownMenu.Content side="top">
-            <DropdownMenu.Item disabled={editProhibited} onSelect={handleShowPresetModal}>{t('loadFromFileOrPreset')}</DropdownMenu.Item>
-            <DropdownMenu.Item disabled={editProhibited} onSelect={handleShowExportModal}>{t('exportToFile')}</DropdownMenu.Item>
-          </DropdownMenu.Content>
-        </DropdownMenu.Portal>
+        <DropdownMenu.Content side="top">
+          <DropdownMenu.Item disabled={editProhibited} onSelect={handleShowPresetModal}>{t('loadFromFileOrPreset')}</DropdownMenu.Item>
+          <DropdownMenu.Item disabled={editProhibited} onSelect={handleShowExportModal}>{t('exportToFile')}</DropdownMenu.Item>
+          <DropdownMenu.Item disabled={editProhibited} onSelect={handleShowDocModal}>Generate documentation</DropdownMenu.Item>
+        </DropdownMenu.Content>
+      </DropdownMenu.Portal>
       </DropdownMenu>
       {exportModalVisible && <ExportModal onClose={handleCloseExportModal} />}
       {presetModalVisible && <PresetModal onClose={handleClosePresetModal} />}
+      {docModalVisible && <LivingDocumentationModal isOpen onClose={handleCloseDocModal} />}
     </>
   );
 }
