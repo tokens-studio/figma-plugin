@@ -411,40 +411,19 @@ export class GithubTokenStorage extends GitTokenStorage {
 
     const filesChangeset: Record<string, string> = {};
 
-    // Process files to update/create
-    if (this.path.endsWith('.json')) {
-      // Single file mode
-      filesChangeset[this.path] = JSON.stringify({
-        ...files.reduce<GitSingleFileObject>((acc, file) => {
-          if (file.type === 'tokenSet') {
-            acc[file.name] = file.data;
-          } else if (file.type === 'themes') {
-            acc.$themes = [...acc.$themes ?? [], ...file.data];
-          } else if (file.type === 'metadata') {
-            acc.$metadata = { ...acc.$metadata ?? {}, ...file.data };
-          }
-          return acc;
-        }, {}),
-      }, null, 2);
-    } else if (this.flags.multiFileEnabled) {
-      // Multi-file mode
-      files.forEach((file) => {
-        if (file.type === 'tokenSet') {
-          filesChangeset[`${this.path}/${file.name}.json`] = JSON.stringify(file.data, null, 2);
-        } else if (file.type === 'themes') {
-          filesChangeset[`${this.path}/${SystemFilenames.THEMES}.json`] = JSON.stringify(file.data, null, 2);
-        } else if (file.type === 'metadata') {
-          filesChangeset[`${this.path}/${SystemFilenames.METADATA}.json`] = JSON.stringify(file.data, null, 2);
-        }
-      });
-    } else {
-      throw new Error(ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR);
-    }
+    // Process files to update/create (multi-file mode only)
+    files.forEach((file) => {
+      if (file.type === 'tokenSet') {
+        filesChangeset[`${this.path}/${file.name}.json`] = JSON.stringify(file.data, null, 2);
+      } else if (file.type === 'themes') {
+        filesChangeset[`${this.path}/${SystemFilenames.THEMES}.json`] = JSON.stringify(file.data, null, 2);
+      } else if (file.type === 'metadata') {
+        filesChangeset[`${this.path}/${SystemFilenames.METADATA}.json`] = JSON.stringify(file.data, null, 2);
+      }
+    });
 
-    // Prepare files to delete for multi-file mode
-    const filesToDeleteWithPath = this.flags.multiFileEnabled
-      ? filesToDelete.map((fileName) => `${this.path}/${fileName}`)
-      : [];
+    // Prepare files to delete (add path prefix)
+    const filesToDeleteWithPath = filesToDelete.map((fileName) => `${this.path}/${fileName}`);
 
     return this.createOrUpdate(
       filesChangeset,
