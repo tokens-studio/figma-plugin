@@ -78,14 +78,18 @@ export function useGitHub() {
 
         if (isMultiFileMode && hasChanges) {
           // Use the optimized save method for multi-file mode
-          await (storage as any).saveOptimized({
+          await (storage as GithubTokenStorage).saveOptimized({
             themes,
             tokens,
             metadata,
           }, {
             commitMessage,
             storeTokenIdInJsonEditor,
-          }, changedPushState);
+          }, {
+            tokens: changedPushState.tokens,
+            themes: changedPushState.themes,
+            metadata: changedPushState.metadata || null,
+          });
         } else {
           await storage.save({
             themes,
