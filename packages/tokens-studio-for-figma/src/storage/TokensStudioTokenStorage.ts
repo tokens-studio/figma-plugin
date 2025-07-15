@@ -27,8 +27,20 @@ import { ThemeObjectsList } from '@/types';
 import { TokensStudioAction } from '@/app/store/providers/tokens-studio';
 import { StudioConfigurationService } from './tokensStudio/StudioConfigurationService';
 import { shouldUseSecureConnection } from '@/utils/shouldUseSecureConnection';
+import { store } from '@/app/store';
+import { isJWTError, getErrorMessage } from '@/utils/jwtErrorUtils';
 
 const DEFAULT_BRANCH = 'main';
+
+// Checks if an error is related to invalid JWT token and clears the stored token if so
+function handleJWTError(error: any): void {
+  const errorMessage = getErrorMessage(error);
+
+  if (isJWTError(errorMessage)) {
+    store.dispatch.userState.setTokensStudioPAT(null);
+    notifyToUI('Authentication token expired. Please re-enter your Tokens Studio API key.', { error: true });
+  }
+}
 
 const makeClient = async (secret: string, baseUrl?: string) => {
   const configService = StudioConfigurationService.getInstance();
@@ -127,6 +139,9 @@ async function getProjectData(id: string, orgId: string, client: any): Promise<P
   } catch (e) {
     Sentry.captureException(e);
     console.error('Error fetching tokens from Tokens Studio', e);
+
+    // Check for JWT/authentication errors and clear token if needed
+    handleJWTError(e);
 
     let errorMessage = 'Error connecting to Tokens Studio';
 
@@ -238,6 +253,8 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
         metadata.tokenSetOrder = projectData.tokenSetOrder;
       }
     } catch (error) {
+      handleJWTError(error);
+
       // We get errors in a slightly changed format from the backend
       if (tokens?.errors) console.log('Error is', tokens.errors[0].message);
       return {
@@ -342,6 +359,8 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
 
       successCallback?.();
     } catch (e) {
+      handleJWTError(e);
+
       Sentry.captureException(e);
       console.error('Error creating token set in Tokens Studio', e);
     }

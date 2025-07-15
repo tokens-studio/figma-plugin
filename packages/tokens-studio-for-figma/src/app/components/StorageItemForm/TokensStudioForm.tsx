@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
+import { useDebounce } from 'use-debounce';
 import zod from 'zod';
 import {
   Box,
@@ -28,6 +29,7 @@ import { GET_ORGS_QUERY } from '@/storage/tokensStudio/graphql';
 import { Dispatch } from '@/app/store';
 import { StudioConfigurationService } from '@/storage/tokensStudio/StudioConfigurationService';
 import { shouldUseSecureConnection } from '@/utils/shouldUseSecureConnection';
+import { isJWTError, getErrorMessage } from '@/utils/jwtErrorUtils';
 
 const StyledTokensStudioWord = styled(TokensStudioWord, {
   width: '200px',
@@ -55,6 +57,8 @@ export default function TokensStudioForm({
   const [showTeaser, setShowTeaser] = React.useState(true);
   const [isValidatingBaseUrl, setIsValidatingBaseUrl] = React.useState(false);
   const dispatch = useDispatch<Dispatch>();
+
+  const [debouncedSecret] = useDebounce(values.secret, 500);
 
   const toggleMask = React.useCallback(() => {
     setIsMasked((prev) => !prev);
@@ -138,15 +142,23 @@ export default function TokensStudioForm({
         dispatch.userState.setTokensStudioPAT(values.secret);
       }
     } catch (error) {
-      setFetchOrgsError('Error fetching organization data. Please check your Studio API key and base URL.');
+      // Check if it's a JWT/authentication error
+      const errorMsg = getErrorMessage(error);
+
+      if (isJWTError(errorMsg)) {
+        dispatch.userState.setTokensStudioPAT(null);
+        setFetchOrgsError('Authentication token expired. Please re-enter your Tokens Studio API key.');
+      } else {
+        setFetchOrgsError('Error fetching organization data. Please check your Studio API key and base URL.');
+      }
     }
   }, [values.secret, values.baseUrl, dispatch]);
 
   useEffect(() => {
-    if (values.secret) {
+    if (debouncedSecret) {
       fetchOrgData();
     }
-  }, [values.secret, fetchOrgData]);
+  }, [debouncedSecret, fetchOrgData]);
 
   const orgOptions = React.useMemo(
     () => orgData?.map((org) => ({
