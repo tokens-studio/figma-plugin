@@ -40,8 +40,26 @@ export class StudioConfigurationService {
 
   private readonly DEFAULT_CONFIG_PATH = '/.well-known/plugin-config.json';
 
+  private readonly DEVELOPMENT_GRAPHQL_HOST = 'localhost:4200';
+
+  private readonly PRODUCTION_GRAPHQL_HOST = 'graphql.app.tokens.studio';
+
+  private normalizedBaseUrl?: string;
+
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   private constructor() {}
+
+  // Sets and normalizes the base URL for subsequent operations
+  public setBaseUrl(baseUrl: string): void {
+    this.normalizedBaseUrl = this.normalizeBaseUrl(baseUrl);
+  }
+
+  // Gets the appropriate GraphQL host based on environment
+  private getDefaultGraphQLHost(): string {
+    return process.env.ENVIRONMENT === 'development'
+      ? this.DEVELOPMENT_GRAPHQL_HOST
+      : this.PRODUCTION_GRAPHQL_HOST;
+  }
 
   public static getInstance(): StudioConfigurationService {
     if (!StudioConfigurationService.instance) {
@@ -54,17 +72,19 @@ export class StudioConfigurationService {
    * Discovers and returns the configuration for a Studio instance
    */
   public async discoverConfiguration(baseUrl: string): Promise<StudioInstanceConfiguration> {
-    // Normalize base URL
-    const normalizedBaseUrl = this.normalizeBaseUrl(baseUrl);
+    // Set and normalize base URL if not already set or different
+    if (!this.normalizedBaseUrl || this.normalizedBaseUrl !== this.normalizeBaseUrl(baseUrl)) {
+      this.setBaseUrl(baseUrl);
+    }
 
     // Check cache first
-    const cached = this.getCachedConfiguration(normalizedBaseUrl);
+    const cached = this.getCachedConfiguration(this.normalizedBaseUrl!);
     if (cached) {
       return cached;
     }
 
     try {
-      const configUrl = `${normalizedBaseUrl}${this.DEFAULT_CONFIG_PATH}`;
+      const configUrl = `${this.normalizedBaseUrl}${this.DEFAULT_CONFIG_PATH}`;
       const response = await fetch(configUrl, {
         method: 'GET',
         mode: 'cors',
@@ -84,12 +104,12 @@ export class StudioConfigurationService {
       this.validateConfiguration(config);
 
       // Cache the configuration
-      this.cacheConfiguration(normalizedBaseUrl, config);
+      this.cacheConfiguration(this.normalizedBaseUrl!, config);
 
       return config;
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.error(`Failed to discover configuration for ${normalizedBaseUrl}:`, error);
+      console.error(`Failed to discover configuration for ${this.normalizedBaseUrl}:`, error);
 
       // Log more details about the error for debugging
       if (error instanceof Error) {
@@ -102,7 +122,7 @@ export class StudioConfigurationService {
       }
 
       // Return fallback configuration for known Studio instances
-      return this.getFallbackConfiguration(normalizedBaseUrl);
+      return this.getFallbackConfiguration(this.normalizedBaseUrl!);
     }
   }
 
@@ -112,9 +132,7 @@ export class StudioConfigurationService {
   public async getGraphQLHost(baseUrl?: string): Promise<string> {
     if (!baseUrl) {
       // When no baseUrl is provided, use environment-specific default
-      return process.env.ENVIRONMENT === 'development'
-        ? 'localhost:4200'
-        : 'graphql.app.tokens.studio';
+      return this.getDefaultGraphQLHost();
     }
 
     try {
@@ -127,16 +145,17 @@ export class StudioConfigurationService {
       console.error('Failed to get GraphQL host for baseUrl:', baseUrl, error);
 
       // For custom Studio instances, try to construct a reasonable fallback based on the baseUrl
-      const normalizedBaseUrl = this.normalizeBaseUrl(baseUrl);
-      const url = new URL(normalizedBaseUrl);
+      // Use cached normalized URL if available, otherwise normalize it
+      if (!this.normalizedBaseUrl || this.normalizedBaseUrl !== this.normalizeBaseUrl(baseUrl)) {
+        this.setBaseUrl(baseUrl);
+      }
+      const url = new URL(this.normalizedBaseUrl!);
       const domain = url.hostname;
 
       // Special handling for known tokens.studio domains
       if (domain.includes('tokens.studio')) {
         // Use environment-specific default for tokens.studio domains
-        return process.env.ENVIRONMENT === 'development'
-          ? 'localhost:4200'
-          : 'graphql.app.tokens.studio';
+        return this.getDefaultGraphQLHost();
       }
 
       // For custom Studio instances, construct a GraphQL endpoint based on the domain
@@ -166,8 +185,10 @@ export class StudioConfigurationService {
    */
   public async validateBaseUrl(baseUrl: string): Promise<{ valid: boolean; error?: string }> {
     try {
-      const normalizedBaseUrl = this.normalizeBaseUrl(baseUrl);
-      const configUrl = `${normalizedBaseUrl}${this.DEFAULT_CONFIG_PATH}`;
+      if (!this.normalizedBaseUrl || this.normalizedBaseUrl !== this.normalizeBaseUrl(baseUrl)) {
+        this.setBaseUrl(baseUrl);
+      }
+      const configUrl = `${this.normalizedBaseUrl}${this.DEFAULT_CONFIG_PATH}`;
 
       const response = await fetch(configUrl, {
         method: 'GET',
@@ -300,7 +321,7 @@ export class StudioConfigurationService {
       return {
         frontend_base_url: baseUrl,
         auth_domain: `https://auth.${domain}`,
-        legacy_graphql_endpoint: process.env.TOKENS_STUDIO_API_HOST || 'localhost:4200',
+        legacy_graphql_endpoint: process.env.TOKENS_STUDIO_API_HOST || this.DEVELOPMENT_GRAPHQL_HOST,
         auth_graphql_endpoint: `https://auth.${domain}/graphql/`,
         oauth: {
           authorization_endpoint: `https://auth.${domain}/accounts/oauth/authorize/`,
