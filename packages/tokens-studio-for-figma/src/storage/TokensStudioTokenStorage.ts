@@ -26,6 +26,7 @@ import { track } from '@/utils/analytics';
 import { ThemeObjectsList } from '@/types';
 import { TokensStudioAction } from '@/app/store/providers/tokens-studio';
 import { StudioConfigurationService } from './tokensStudio/StudioConfigurationService';
+import { shouldUseSecureConnection } from '@/utils/shouldUseSecureConnection';
 
 const DEFAULT_BRANCH = 'main';
 
@@ -33,13 +34,9 @@ const makeClient = async (secret: string, baseUrl?: string) => {
   const configService = StudioConfigurationService.getInstance();
   const host = await configService.getGraphQLHost(baseUrl);
 
-  // Determine if we should use HTTPS
-  // Use HTTPS for production builds OR when connecting to external Studio instances
-  const shouldUseSecure = process.env.ENVIRONMENT !== 'development' || Boolean(baseUrl?.trim() && !host.includes('localhost'));
-
   return create({
     host,
-    secure: shouldUseSecure,
+    secure: shouldUseSecureConnection(baseUrl, host),
     auth: `Bearer ${secret}`,
   });
 };

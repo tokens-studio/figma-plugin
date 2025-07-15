@@ -27,6 +27,7 @@ import { styled } from '@/stitches.config';
 import { GET_ORGS_QUERY } from '@/storage/tokensStudio/graphql';
 import { Dispatch } from '@/app/store';
 import { StudioConfigurationService } from '@/storage/tokensStudio/StudioConfigurationService';
+import { shouldUseSecureConnection } from '@/utils/shouldUseSecureConnection';
 
 const StyledTokensStudioWord = styled(TokensStudioWord, {
   width: '200px',
@@ -124,13 +125,9 @@ export default function TokensStudioForm({
       const configService = StudioConfigurationService.getInstance();
       const host = await configService.getGraphQLHost(values.baseUrl);
 
-      // Determine if we should use HTTPS
-      // Use HTTPS for production builds OR when connecting to external Studio instances
-      const shouldUseSecure = process.env.ENVIRONMENT !== 'development' || Boolean(values.baseUrl?.trim() && !host.includes('localhost'));
-
       const client = create({
         host,
-        secure: shouldUseSecure,
+        secure: shouldUseSecureConnection(values.baseUrl, host),
         auth: `Bearer ${values.secret}`,
       });
       const result = await client.query({
