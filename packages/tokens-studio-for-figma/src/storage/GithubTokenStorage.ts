@@ -306,18 +306,8 @@ export class GithubTokenStorage extends GitTokenStorage {
       tokens: Record<string, any[]>,
       themes: any[],
       metadata: any
-    }
+    },
   ): Promise<boolean> {
-    // For single file mode, fall back to regular save
-    if (this.path.endsWith('.json')) {
-      return this.save(data, saveOptions);
-    }
-
-    // For multi-file mode, filter files based on changedState
-    if (!this.flags.multiFileEnabled) {
-      return this.save(data, saveOptions);
-    }
-
     // First, convert data to files using the base class logic
     const files: RemoteTokenStorageFile<GitStorageSaveOptions>[] = [];
 
