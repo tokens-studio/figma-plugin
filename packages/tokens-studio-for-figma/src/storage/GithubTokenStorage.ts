@@ -308,22 +308,13 @@ export class GithubTokenStorage extends GitTokenStorage {
       metadata: any
     }
   ): Promise<boolean> {
-    console.log('🚀 GitHub Multi-File Sync Optimization: Using changedState to filter files');
-    console.log('📊 Changed state analysis:', {
-      changedTokenSets: Object.keys(changedState.tokens),
-      changedThemes: changedState.themes.length,
-      hasMetadataChanges: !!changedState.metadata
-    });
-
     // For single file mode, fall back to regular save
     if (this.path.endsWith('.json')) {
-      console.log('📄 Single file mode detected, using regular save method');
       return this.save(data, saveOptions);
     }
 
     // For multi-file mode, filter files based on changedState
     if (!this.flags.multiFileEnabled) {
-      console.log('📁 Multi-file not enabled, using regular save method');
       return this.save(data, saveOptions);
     }
 
@@ -366,23 +357,14 @@ export class GithubTokenStorage extends GitTokenStorage {
         const hasChanges = changedState.tokens[file.name];
         if (hasChanges && hasChanges.length > 0) {
           filteredFiles.push(file);
-          console.log(`  ✅ Including token set: ${file.name} (${hasChanges.length} changes)`);
-        } else {
-          console.log(`  ⏭️ Skipping unchanged token set: ${file.name}`);
         }
       } else if (file.type === 'themes') {
         if (changedState.themes.length > 0) {
           filteredFiles.push(file);
-          console.log(`  ✅ Including themes file (${changedState.themes.length} changes)`);
-        } else {
-          console.log(`  ⏭️ Skipping unchanged themes file`);
         }
       } else if (file.type === 'metadata') {
         if (changedState.metadata) {
           filteredFiles.push(file);
-          console.log(`  ✅ Including metadata file (has changes)`);
-        } else {
-          console.log(`  ⏭️ Skipping unchanged metadata file`);
         }
       }
     });
@@ -396,7 +378,6 @@ export class GithubTokenStorage extends GitTokenStorage {
         if (!currentFile) {
           const filePath = `${tokenSetName}.json`;
           filesToDelete.push(filePath);
-          console.log(`  🗑️ Marking token set for deletion: ${tokenSetName}`);
         }
       }
     });
@@ -413,7 +394,6 @@ export class GithubTokenStorage extends GitTokenStorage {
           // This indicates it was the old name that got renamed to something else
           const oldFilePath = `${tokenSetName}.json`;
           filesToDelete.push(oldFilePath);
-          console.log(`  🔄 Detected old name from rename: ${tokenSetName}, marking file for deletion`);
         }
       }
     });
@@ -421,18 +401,10 @@ export class GithubTokenStorage extends GitTokenStorage {
     // Check for removed themes
     const hasRemovedThemes = changedState.themes.some((theme: any) => theme.importType === 'REMOVE');
     if (hasRemovedThemes) {
-      console.log(`  🗑️ Themes have removals, including themes file for update`);
       // Themes file should already be included above if there are changes
     }
 
-    console.log('📋 Optimization Summary:');
-    console.log(`  • Total files available: ${files.length}`);
-    console.log(`  • Files to push: ${filteredFiles.length}`);
-    console.log(`  • Files to delete: ${filesToDelete.length}`);
-    console.log(`  • Optimization: ${Math.round((1 - filteredFiles.length / files.length) * 100)}% reduction in files`);
-
     if (filteredFiles.length === 0 && filesToDelete.length === 0) {
-      console.log('✅ No changes detected, skipping GitHub push');
       return true;
     }
 
@@ -496,10 +468,6 @@ export class GithubTokenStorage extends GitTokenStorage {
 
   public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch?: boolean): Promise<boolean> {
     // Always use optimized approach - skip expensive remote fetching and comparison
-    console.log('🚀 GitHub Push Optimization: Using optimized changeset without remote fetch');
-    console.log(`📤 Pushing ${Object.keys(changeset).length} files directly to GitHub`);
-    console.log('📋 Files to push:', Object.keys(changeset));
-
     // Push the changeset directly without remote comparison
     return await this.createOrUpdate(changeset, message, branch, shouldCreateBranch, [], true);
   }

@@ -77,7 +77,6 @@ export function useGitHub() {
                           changedPushState.metadata;
 
         if (isMultiFileMode && hasChanges) {
-          console.log('🚀 Using optimized GitHub multi-file sync');
           // Use the optimized save method for multi-file mode
           await (storage as any).saveOptimized({
             themes,
@@ -88,7 +87,6 @@ export function useGitHub() {
             storeTokenIdInJsonEditor,
           }, changedPushState);
         } else {
-          console.log('📄 Using regular GitHub sync (single file or no optimization)');
           await storage.save({
             themes,
             tokens,
@@ -123,7 +121,6 @@ export function useGitHub() {
         };
       } catch (e) {
         closePushDialog();
-        console.log('Error pushing to GitHub', e);
         if (e instanceof Error && e.message === ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR) {
           return {
             status: 'failure',
@@ -265,7 +262,6 @@ export function useGitHub() {
       return await pushTokensToGitHub(context);
     } catch (e) {
       notifyToUI(ErrorMessages.GITHUB_CREDENTIAL_ERROR, { error: true });
-      console.log('Error', e);
       return {
         status: 'failure',
         errorMessage: ErrorMessages.GITHUB_CREDENTIAL_ERROR,
