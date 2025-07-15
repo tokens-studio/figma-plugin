@@ -11,7 +11,7 @@ export const createLivingDocumentation: AsyncMessageChannelHandlers[AsyncMessage
   const tokens = values[tokenSet]?.filter((t) => t.name.startsWith(startsWith));
   if (!tokens) return;
   const [template] = figma.currentPage.selection;
-  if (!template) {
+  if (!template || !('clone' in template)) {
     figma.notify('Select a template node first');
     return;
   }
@@ -28,14 +28,21 @@ export const createLivingDocumentation: AsyncMessageChannelHandlers[AsyncMessage
 
   for (const token of tokens) {
     const clone = template.clone();
-    clone.name = token.name;
-    const placeholders = clone.findAll((n) => n.type === 'TEXT' && n.name.startsWith('__')) as TextNode[];
-    placeholders.forEach((node) => {
-      const prop = node.name.replace(/^__/, '');
-      node.characters = node.name;
-      node.setSharedPluginData(SharedPluginDataNamespaces.TOKENS, prop, JSON.stringify(token.name));
-    });
-    container.appendChild(clone);
+    if ('name' in clone && 'appendChild' in clone) {
+      console.log('cloning', token.name);
+
+      const allNodes = clone.findAll((_n) => true);
+
+      const placeholders = allNodes.filter((n) => n.name.startsWith('__'));
+      // Now apply changes to all placeholders
+      placeholders.forEach((node) => {
+        const prop = node.name.replace(/^__/, '');
+        console.log('applying', prop, token.name, 'to node:', node.name);
+
+        node.setSharedPluginData(SharedPluginDataNamespaces.TOKENS, prop, JSON.stringify(token.name));
+      });
+      container.appendChild(clone as SceneNode);
+    }
   }
 
   figma.currentPage.appendChild(container);
