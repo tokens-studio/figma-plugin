@@ -23,7 +23,16 @@ export async function applyBorderRadiusValuesOnNode(
       switch (individualBorderRadius.length) {
         case 1:
           if ('cornerRadius' in node) {
-            node.cornerRadius = transformValue(String(values.borderRadius), 'borderRadius', baseFontSize);
+            if (
+              !(
+                (await tryApplyVariableId(node, 'topLeftRadius', data.borderRadius))
+                && (await tryApplyVariableId(node, 'topRightRadius', data.borderRadius))
+                && (await tryApplyVariableId(node, 'bottomRightRadius', data.borderRadius))
+                && (await tryApplyVariableId(node, 'bottomLeftRadius', data.borderRadius))
+              )
+            ) {
+              node.cornerRadius = transformValue(String(values.borderRadius), 'borderRadius', baseFontSize);
+            }
           }
           break;
         case 2:
