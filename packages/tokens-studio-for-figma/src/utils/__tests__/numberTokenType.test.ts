@@ -1,6 +1,7 @@
 import { updateAliasesInState } from '@/app/store/utils/updateAliasesInState';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { SingleToken } from '@/types/tokens';
+import { defaultTokenResolver } from '@/utils/TokenResolver';
 
 describe('Number Token Type Preservation', () => {
   it('should preserve number type when updating aliases', () => {
@@ -150,5 +151,36 @@ describe('Number Token Type Preservation', () => {
     const referenceToken = updatedTokens.core.find((token) => token.name === 'spacing.reference');
     expect(referenceToken?.value).toBe('{spacing.newBase}');
     expect(typeof referenceToken?.value).toBe('string');
+  });
+
+  it('should work correctly with TokenResolver after alias updates', () => {
+    // This test ensures our fix works with the token resolution system
+    const tokens = [
+      {
+        name: 'spacing.base',
+        type: TokenTypes.SPACING,
+        value: 16, // Number token
+      } as SingleToken,
+      {
+        name: 'spacing.large',
+        type: TokenTypes.SPACING,
+        value: '{spacing.base}', // Reference to number token
+      } as SingleToken,
+    ];
+
+    // Create resolver and resolve tokens
+    const resolver = defaultTokenResolver;
+    resolver.setTokens(tokens);
+    const resolvedTokens = resolver.resolveTokenValues();
+    
+    // Base token should maintain number type
+    const baseToken = resolvedTokens.find(token => token.name === 'spacing.base');
+    expect(baseToken?.value).toBe(16);
+    expect(typeof baseToken?.value).toBe('number');
+    
+    // Referenced token should resolve to the number value, not a string
+    const largeToken = resolvedTokens.find(token => token.name === 'spacing.large');
+    expect(largeToken?.value).toBe(16);
+    expect(typeof largeToken?.value).toBe('number');
   });
 });
