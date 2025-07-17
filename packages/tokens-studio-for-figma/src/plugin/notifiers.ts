@@ -176,6 +176,13 @@ export function notifyVariableValues(
   });
 }
 
+export function notifyRenamedCollections(renamedCollections: [string, string][]) {
+  postToUI({
+    type: MessageFromPluginTypes.RENAME_COLLECTIONS_AND_MODES,
+    renamedCollections,
+  });
+}
+
 export function notifySetTokens(values: TokenStore) {
   postToUI({ type: MessageFromPluginTypes.SET_TOKENS, values });
 }
