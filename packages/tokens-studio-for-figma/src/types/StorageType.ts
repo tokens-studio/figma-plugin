@@ -79,6 +79,7 @@ StorageProviderType.TOKENS_STUDIO,
   name: string; // this is only for reference
   orgId: string; // this is the organization id
   id: string; // this is the project id
+  baseUrl?: string; // this is the base URL for the Studio instance (optional for backward compatibility)
 }
 >;
 
