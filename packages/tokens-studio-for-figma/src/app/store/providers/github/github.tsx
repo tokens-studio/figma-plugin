@@ -23,6 +23,8 @@ import { applyTokenSetOrder } from '@/utils/tokenset';
 import { PushOverrides } from '../../remoteTokens';
 import { useIsProUser } from '@/app/hooks/useIsProUser';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
+import { useChangedState } from '@/hooks/useChangedState';
+import { getChangedFiles } from '@/utils/getChangedFiles';
 
 type GithubCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITHUB; }>;
 type GithubFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITHUB }>;
@@ -33,6 +35,7 @@ export function useGitHub() {
   const localApiState = useSelector(localApiStateSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
+  const { changedPushState } = useChangedState();
   const isProUser = useIsProUser();
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
@@ -56,7 +59,7 @@ export function useGitHub() {
     return confirmResult;
   }, [confirm]);
 
-  const pushTokensToGitHub = useCallback(async (context: GithubCredentials, overrides?: PushOverrides): Promise<RemoteResponseData> => {
+  const pushTokensToGitHub = useCallback(async (context: GithubCredentials, overrides?: PushOverrides, receivedFeatureFlags?: LDProps['flags']): Promise<RemoteResponseData> => {
     const storage = storageClientFactory(context);
     dispatch.uiState.setLocalApiState({ ...context });
     const pushSettings = await pushDialog({ state: 'initial', overrides });
@@ -67,6 +70,13 @@ export function useGitHub() {
         const metadata = {
           tokenSetOrder: Object.keys(tokens),
         };
+
+        // Determine which files to push based on feature flag and changed state
+        let changedFiles: Set<string> | undefined;
+        if (receivedFeatureFlags?.selectiveSync && receivedFeatureFlags?.multiFileSync) {
+          changedFiles = getChangedFiles(changedPushState, []);
+        }
+
         await storage.save({
           themes,
           tokens,
@@ -74,6 +84,7 @@ export function useGitHub() {
         }, {
           commitMessage,
           storeTokenIdInJsonEditor,
+          changedFiles,
         });
         const commitSha = await storage.getCommitSha();
         dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as GithubCredentials);
@@ -131,6 +142,7 @@ export function useGitHub() {
     localApiState,
     usedTokenSet,
     activeTheme,
+    changedPushState,
   ]);
 
   const checkAndSetAccess = useCallback(async ({
