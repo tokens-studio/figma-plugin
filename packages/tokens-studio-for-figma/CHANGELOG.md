@@ -1,5 +1,19 @@
 # @tokens-studio/figma-plugin
 
+## 2.6.2
+
+### Patch Changes
+
+- 3f834212: Add ability for users to set custom base URL while setting up their sync with the Studio App.
+- dcb46c7f: Fixed duplicate commits when creating a new set, adding it to theme and then syncing with Gitlab
+- 3486fe77: Fixes an issue where tokens aren't saved when the Preset file is loaded, until the 'Apply To' button is clicked.
+
+## 2.6.1
+
+### Patch Changes
+
+- 866068b9: Fix to roll back a patch for large token sets' export to variables in Figma.
+
 ## 2.6.0
 
 ### Minor Changes
