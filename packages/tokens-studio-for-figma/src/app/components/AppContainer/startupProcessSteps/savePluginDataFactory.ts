@@ -1,7 +1,7 @@
 import type { Dispatch } from '@/app/store';
 import type { StartupMessage } from '@/types/AsyncMessages';
 import { identify, track } from '@/utils/analytics';
-import * as pjs from '../../../../../package.json';
+import pjs from '../../../../../package.json';
 
 export function savePluginDataFactory(dispatch: Dispatch, params: StartupMessage) {
   return async () => {
@@ -36,6 +36,11 @@ export function savePluginDataFactory(dispatch: Dispatch, params: StartupMessage
       dispatch.uiState.setOnboardingExplainerSyncProviders(params.onboardingExplainer.syncProviders);
       dispatch.uiState.setOnboardingExplainerInspect(params.onboardingExplainer.inspect);
       dispatch.settings.setUISettings(settings);
+
+      // Store the selected export themes in the UI state
+      if (params.selectedExportThemes) {
+        dispatch.uiState.setSelectedExportThemes(params.selectedExportThemes);
+      }
     } else {
       throw new Error('User not found');
     }

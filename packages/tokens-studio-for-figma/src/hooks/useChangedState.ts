@@ -1,5 +1,5 @@
+import { useMemo, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useMemo } from 'react';
 import {
   lastSyncedStateSelector,
   remoteDataSelector,
@@ -51,10 +51,13 @@ export function useChangedState() {
   const hasChanges = useMemo(() => {
     const hasChanged = !compareLastSyncedState(tokens, themes, lastSyncedState, tokenFormat);
 
-    dispatch.tokenState.updateCheckForChanges(hasChanged);
-
     return hasChanged;
-  }, [tokens, themes, lastSyncedState, tokenFormat, dispatch.tokenState]);
+  }, [tokens, themes, lastSyncedState, tokenFormat]);
+
+  // Move the dispatch call to useEffect to avoid setState during render
+  useEffect(() => {
+    dispatch.tokenState.updateCheckForChanges(hasChanges);
+  }, [hasChanges, dispatch.tokenState]);
 
   return { changedPushState, changedPullState, hasChanges };
 }

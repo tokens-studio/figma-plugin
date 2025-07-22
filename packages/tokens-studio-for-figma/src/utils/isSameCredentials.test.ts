@@ -25,6 +25,8 @@ describe('isSameCredentials', () => {
     const storedTokensStudio = {
       id: '789',
       provider: StorageProviderType.TOKENS_STUDIO,
+      orgId: 'org123',
+      baseUrl: 'https://app.tokens.studio',
     };
     const correctCredentials = {
       id: '123',
@@ -62,6 +64,8 @@ describe('isSameCredentials', () => {
       provider: StorageProviderType.TOKENS_STUDIO,
       secret: 'ghi',
       name: 'tokensstudio',
+      orgId: 'org123',
+      baseUrl: 'https://app.tokens.studio',
     };
 
     expect(isSameCredentials(correctCredentials, storedJSONBin)).toBe(true);
@@ -75,6 +79,14 @@ describe('isSameCredentials', () => {
     expect(isSameCredentials({ ...correctSupernovaCredentials, mapping: { baz: 'qux' } }, storedSupernova)).toBe(false);
     expect(isSameCredentials(correctTokensStudioCredentials, storedTokensStudio)).toBe(true);
     expect(isSameCredentials({ ...correctTokensStudioCredentials, id: '987' }, storedTokensStudio)).toBe(false);
+    expect(isSameCredentials({ ...correctTokensStudioCredentials, orgId: 'different-org' }, storedTokensStudio)).toBe(false);
+    expect(isSameCredentials({ ...correctTokensStudioCredentials, baseUrl: 'https://different.tokens.studio' }, storedTokensStudio)).toBe(false);
+
+    // Test with undefined baseUrl
+    const storedTokensStudioNoBaseUrl = { ...storedTokensStudio, baseUrl: undefined };
+    const correctTokensStudioNoBaseUrl = { ...correctTokensStudioCredentials, baseUrl: undefined };
+    expect(isSameCredentials(correctTokensStudioNoBaseUrl, storedTokensStudioNoBaseUrl)).toBe(true);
+    expect(isSameCredentials(correctTokensStudioCredentials, storedTokensStudioNoBaseUrl)).toBe(false);
   });
 
   it('should use internalId for comparison when available', () => {

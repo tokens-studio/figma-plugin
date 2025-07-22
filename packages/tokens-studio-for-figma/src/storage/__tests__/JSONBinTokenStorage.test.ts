@@ -1,6 +1,6 @@
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { TokenTypes } from '@/constants/TokenTypes';
-import * as pjs from '../../../package.json';
+import pjs from '../../../package.json';
 import { mockFetch } from '../../../tests/__mocks__/fetchMock';
 import { JSONBinTokenStorage } from '../JSONBinTokenStorage';
 
