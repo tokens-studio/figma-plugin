@@ -51,11 +51,11 @@ let storageClientObject;
 
 const getStorageClient = (context: TokensStudioCredentials) => {
   if (!storageClientObject) {
-    storageClientObject = new TokensStudioTokenStorage(context.id, context.orgId, context.secret);
+    storageClientObject = new TokensStudioTokenStorage(context.id, context.orgId, context.secret, context.baseUrl);
     return storageClientObject;
   }
 
-  storageClientObject.setContext(context.id, context.orgId, context.secret);
+  storageClientObject.setContext(context.id, context.orgId, context.secret, context.baseUrl);
   return storageClientObject;
 };
 
@@ -221,7 +221,7 @@ export function useTokensStudio() {
         notifyToUI('Error syncing with Tokens Studio, check credentials', { error: true });
         return {
           status: 'failure',
-          errorMessage: JSON.stringify(e),
+          errorMessage: String(e),
         };
       }
     },
@@ -242,6 +242,7 @@ export function useTokensStudio() {
         type: AsyncMessageTypes.CREDENTIALS,
         credential: context,
       });
+
       return {
         status: 'success',
         tokens: data.tokens ?? tokens,

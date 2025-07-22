@@ -84,13 +84,6 @@ export function updateTokenSetsInState(
   if (newTokenSets.length) {
     newTokenSets.forEach(([name]) => {
       nextUsedTokenSet[name] = TokenSetStatus.DISABLED;
-      nextThemes = nextThemes.map((theme) => ({
-        ...theme,
-        selectedTokenSets: {
-          ...theme.selectedTokenSets,
-          [name]: TokenSetStatus.DISABLED,
-        },
-      }));
     });
   }
 

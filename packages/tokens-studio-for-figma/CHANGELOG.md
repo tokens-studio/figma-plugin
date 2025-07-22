@@ -1,5 +1,41 @@
 # @tokens-studio/figma-plugin
 
+## 2.6.2
+
+### Patch Changes
+
+- 3f834212: Add ability for users to set custom base URL while setting up their sync with the Studio App.
+- dcb46c7f: Fixed duplicate commits when creating a new set, adding it to theme and then syncing with Gitlab
+- 3486fe77: Fixes an issue where tokens aren't saved when the Preset file is loaded, until the 'Apply To' button is clicked.
+
+## 2.6.1
+
+### Patch Changes
+
+- 866068b9: Fix to roll back a patch for large token sets' export to variables in Figma.
+
+## 2.6.0
+
+### Minor Changes
+
+- da152555: Add OKLCH color support in linear gradients. OKLCH colors are now supported in linear-gradient color strings, extending the existing support for RGB, HSL, and hex colors.
+
+### Patch Changes
+
+- f7c6a7d5: Fix issue of the plugin crashing when exporting large token sets(1000+ tokens) to variables in Figma.
+- ef2d7774: When you create Variables we now remember the choice of theme you made on that file on subsequent runs
+
+## 2.5.2
+
+### Patch Changes
+
+- 12c166e2: Add Alt+click functionality to collapse/expand all token set folders at once. Users can now Alt+click (Option+click on Mac) on any folder in the token set tree to toggle all folders, similar to the existing behavior in token listings.
+- 208baa07: Change default export mode from single file to multiple files
+- 246c2f0b: Fix issue where the “Recover local changes” prompt wouldn’t appear after closing the plugin with unsaved changes while using remote sync providers, unless the user clicked on 'Apply to Selection'
+- d3765b56: Add retry button to token loading error callout. Users can now retry loading tokens when encountering connection errors, in addition to entering new credentials. The error messaging has also been improved to better distinguish between credential and access issues.
+- 0760abcc: Fix display of empty braces message to user when studio sync or pull fails.
+- f6312a0f: Fix an issue of loading tokens upon the start of the plugin, even when credentials are correct.
+
 ## 2.5.1
 
 ### Patch Changes

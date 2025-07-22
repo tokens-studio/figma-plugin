@@ -1,5 +1,6 @@
 import { figmaRGBToHex, hexToFigmaRGB, webRGBToFigmaRGB } from '@figma-plugin/helpers';
 import { toHex } from 'color2k';
+import Color from 'colorjs.io';
 
 type WebRGBA = [number, number, number, number];
 interface RGBA {
@@ -110,6 +111,35 @@ export function convertToFigmaColor(input: string) {
       r, g, b,
     };
     opacity = Number(a);
+  } else if (input.startsWith('oklch')) {
+    try {
+      const oklchColor = new Color(input);
+      const rgbColor = oklchColor.to('srgb');
+      const [r, g, b] = rgbColor.coords;
+      const a = rgbColor.alpha ?? 1;
+
+      color = {
+        r: Math.max(0, Math.min(1, r)), // Clamp to [0,1] range
+        g: Math.max(0, Math.min(1, g)),
+        b: Math.max(0, Math.min(1, b)),
+      };
+      opacity = roundToTwo(a);
+    } catch (e) {
+      // Fallback to toHex if OKLCH parsing fails
+      try {
+        const {
+          r, g, b, a = 1,
+        }: RGBA = hexToFigmaRGB(toHex(input));
+        color = {
+          r, g, b,
+        };
+        opacity = roundToTwo(a);
+      } catch (e2) {
+        // If all parsing fails, return black as fallback
+        color = { r: 0, g: 0, b: 0 };
+        opacity = 1;
+      }
+    }
   } else {
     const {
       r, g, b, a = 1,
