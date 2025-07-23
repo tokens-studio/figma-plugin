@@ -12,6 +12,7 @@ import { LocalVariableInfo } from './createLocalVariablesInPlugin';
 import { findCollectionAndModeIdForTheme } from './findCollectionAndModeIdForTheme';
 import { createNecessaryVariableCollections } from './createNecessaryVariableCollections';
 import { getVariablesWithoutZombies } from './getVariablesWithoutZombies';
+import { defaultTokenValueRetriever } from './TokenValueRetriever';
 
 /**
 * This function is used to create variables based on token sets, without the use of themes
@@ -23,11 +24,15 @@ import { getVariablesWithoutZombies } from './getVariablesWithoutZombies';
 * - TODO: Likely a good idea to merge this with createLocalVariablesInPlugin to reduce duplication
 * */
 export default async function createLocalVariablesWithoutModesInPlugin(tokens: Record<string, AnyTokenList>, settings: SettingsState, selectedSets: ExportTokenSet[]) {
+  // Clear cache at start to ensure clean state and prevent memory leaks
+  defaultTokenValueRetriever.clearCache();
+
   // Big O (n * m * x): (n: amount of themes, m: amount of variableCollections, x: amount of modes)
   const allVariableCollectionIds: Record<string, LocalVariableInfo> = {};
   let referenceVariableCandidates: ReferenceVariableType[] = [];
   const updatedVariableCollections: VariableCollection[] = [];
   let updatedVariables: Variable[] = [];
+  const allNewlyCreatedVariables = new Map<string, string>(); // Track newly created variables for reference resolution
   const figmaVariablesBeforeCreate = (await getVariablesWithoutZombies()).length;
   const figmaVariableCollectionsBeforeCreate = figma.variables.getLocalVariableCollections().length;
 
@@ -74,11 +79,22 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
             variableIds: allVariableObj.variableIds,
           };
           referenceVariableCandidates = referenceVariableCandidates.concat(allVariableObj.referenceVariableCandidate);
+
+          // Collect newly created variables for reference resolution
+          Object.entries(allVariableObj.variableIds).forEach(([tokenName, variableKey]) => {
+            allNewlyCreatedVariables.set(tokenName, variableKey);
+          });
         }
         updatedVariableCollections.push(collection);
       }
     }));
     const existingVariables = await mergeVariableReferencesWithLocalVariables();
+
+    // Merge newly created variables with existing variables for proper reference resolution
+    allNewlyCreatedVariables.forEach((variableKey, tokenName) => {
+      existingVariables.set(tokenName, variableKey);
+    });
+
     updatedVariables = await updateVariablesToReference(existingVariables, referenceVariableCandidates);
   }
 
@@ -90,6 +106,10 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
   } else {
     notifyUI(`${figmaVariableCollectionsAfterCreate - figmaVariableCollectionsBeforeCreate} collections and ${figmaVariablesAfterCreate - figmaVariablesBeforeCreate} variables created`);
   }
+
+  // Clear cache at end to free memory and prevent leaks
+  defaultTokenValueRetriever.clearCache();
+
   return {
     allVariableCollectionIds,
     totalVariables: updatedVariables.length,

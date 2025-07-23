@@ -25,19 +25,42 @@ export default async function setValuesOnVariable(
   const variableKeyMap: Record<string, string> = {};
   const referenceVariableCandidates: ReferenceVariableType[] = [];
   const renamedVariableKeys: string[] = [];
+
+  // Pre-build lookup maps to avoid O(n×m) complexity and prevent memory leaks
+  const variablesByKey = new Map<string, Variable>();
+  const variablesByName = new Map<string, Variable>();
+
+  variablesInFigma.forEach((variable) => {
+    if (!variable.remote) {
+      variablesByKey.set(variable.key, variable);
+      variablesByName.set(variable.name, variable);
+    }
+  });
+
   try {
     await Promise.all(tokens.map(async (token) => {
       const variableType = convertTokenTypeToVariableType(token.type, token.value);
-      // If id matches the variableId, or name patches the token path, we can use it to update the variable instead of re-creating.
+      // Use efficient map lookups instead of O(n) array.find() to prevent memory leaks
+      // If id matches the variableId, or name matches the token path, we can use it to update the variable instead of re-creating.
       // This has the nasty side-effect that if font weight changes from string to number, it will not update the variable given we cannot change type.
       // In that case, we should delete the variable and re-create it.
-      const variable = variablesInFigma.find((v) => (v.key === token.variableId && !v.remote) || v.name === token.path) || figma.variables.createVariable(token.path, collection, variableType);
+      let variable = variablesByKey.get(token.variableId) || variablesByName.get(token.path);
+
+      if (!variable) {
+        // Create new variable and add it to lookup maps for future reference resolution
+        variable = figma.variables.createVariable(token.path, collection, variableType);
+        variablesByKey.set(variable.key, variable);
+        variablesByName.set(variable.name, variable);
+      }
 
       if (variable) {
         // First, rename all variables that should be renamed (if the user choose to do so)
         if (variable.name !== token.path && shouldRename) {
           renamedVariableKeys.push(variable.key);
+          // Remove old name from lookup map and add new name
+          variablesByName.delete(variable.name);
           variable.name = token.path;
+          variablesByName.set(variable.name, variable);
         }
         if (variableType !== variable?.resolvedType) {
           // TODO: There's an edge case where the user had created a variable based on a numerical weight leading to a float variable,
