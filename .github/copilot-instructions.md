@@ -10,6 +10,7 @@ Tokens Studio for Figma is a plugin for Figma allowing you to define and use des
 ### Figma Plugin Architecture
 
 As a Figma plugin, our codebase is split into two main environments:
+
 - **UI (iframe)**: The React-based user interface that runs in a browser-like environment
 - **Figma Sandbox**: The code that interacts directly with the Figma document and API
 
@@ -43,6 +44,7 @@ For anything related to the Figma sandbox environment or using the global `figma
 ### Webpack Configuration
 
 The project uses Webpack with the following key configurations:
+
 - SWC for fast transpilation
 - Different entry points for UI and plugin code
 - Source maps in development mode
@@ -151,6 +153,19 @@ SENTRY_REPLAY_SAMPLING=0
 - Build failures - Check your Node version and dependencies
 - Test failures - Check for environment variables and mocks
 
+## Changeset Requirements
+
+**IMPORTANT: Every PR must include a changeset to describe the changes made.**
+
+Before making any code changes or when completing a PR:
+
+1. **Always run `yarn changeset` to create a changeset file**
+2. Choose the appropriate version bump (patch, minor, major) based on the changes
+3. Write a clear, user-facing description of what changed
+4. Commit the generated changeset file along with your changes
+
+This is mandatory for all code changes and helps maintain proper version management and release notes.
+
 ## Code Patterns to Follow
 
 1. Use functional React components with hooks
@@ -159,6 +174,6 @@ SENTRY_REPLAY_SAMPLING=0
 4. Keep components small and focused
 5. Use appropriate error handling
 6. Document complex logic with comments
-7. Always use `yarn changeset` on every PR to describe your changes
+7. **Always create a changeset (see Changeset Requirements section above)**
 8. For UI components, use @tokens-studio/ui components that we use across the codebase instead of creating from scratch
 9. For UI work, use tokens from @tokens-studio/tokens, found in node_modules/@tokens-studio/tokens/dist/css/dark.css and node_modules/@tokens-studio/tokens/dist/css/core.css instead of using raw hex values.
