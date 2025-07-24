@@ -1,5 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import compact from 'just-compact';
 import { Dispatch } from '@/app/store';
 import useConfirm from '@/app/hooks/useConfirm';
@@ -84,6 +85,7 @@ export function useTokensStudio() {
   const localApiState = useSelector(localApiStateSelector);
   const { pushDialog, closePushDialog } = usePushDialog();
   const { confirm } = useConfirm();
+  const { t } = useTranslation(['sync']);
 
   const storageClientFactory = useCallback((context: TokensStudioCredentials) => {
     const storageClient = getStorageClient(context);
@@ -92,11 +94,11 @@ export function useTokensStudio() {
 
   const askUserIfPull = useCallback(async () => {
     const confirmResult = await confirm({
-      text: 'Pull from Tokens Studio?',
-      description: 'Your tokens might be different from the ones stored in Tokens Studio, do you want to pull these now?',
+      text: t('pullFrom', { provider: 'Tokens Studio' }),
+      description: t('pullConfirmDescription', { provider: 'Tokens Studio' }),
     });
     return confirmResult;
-  }, [confirm]);
+  }, [confirm, t]);
 
   const pushTokensToTokensStudio = useCallback(
     async (context: TokensStudioCredentials, overrides?: PushOverrides): Promise<RemoteResponseData> => {

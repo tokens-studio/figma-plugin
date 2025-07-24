@@ -3,6 +3,7 @@
   "cancel": "Cancel",
   "pullTokens": "Pull Tokens",
   "pullFrom": "Pull from {{provider}}",
+  "pullConfirmDescription": "Your tokens might be different from the ones stored in {{provider}}, do you want to pull these now?",
   "pushTo": "Push to {{provider}}",
   "goTo": "Go to {{provider}}",
   "thisWillPushYourLocalChangesToTheBranch": "This will push your local changes to the branch:",
