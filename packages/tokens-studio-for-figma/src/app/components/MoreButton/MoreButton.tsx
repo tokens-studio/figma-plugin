@@ -8,7 +8,7 @@ import copy from 'copy-to-clipboard';
 
 import { ContextMenu } from '@tokens-studio/ui';
 import { styled } from '@/stitches.config';
-import { activeTokenSetReadOnlySelector, activeTokenSetSelector, editProhibitedSelector } from '@/selectors';
+import { activeTokenSetReadOnlySelector, activeTokenSetSelector, editProhibitedSelector, storageTypeSelector } from '@/selectors';
 import { PropertyObject } from '@/types/properties';
 import { MoreButtonProperty } from './MoreButtonProperty';
 import { DocumentationProperties } from '@/constants/DocumentationProperties';
@@ -26,6 +26,8 @@ import TokenButtonContent from '../TokenButton/TokenButtonContent';
 import { useGetActiveState } from '@/hooks';
 import { usePropertiesForTokenType } from '../../hooks/usePropertiesForType';
 import { getAliasValue } from '@/utils/alias';
+import { buildStudioUrl, isTokensStudioStorage } from '@/utils/studioUrlBuilder';
+import { TokensStudioStorageType } from '@/types/StorageType';
 
 const RightSlot = styled('div', {
   marginLeft: 'auto',
@@ -54,9 +56,11 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
   const editProhibited = useSelector(editProhibitedSelector);
   const activeTokenSetReadOnly = useSelector(activeTokenSetReadOnlySelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
+  const storageType = useSelector(storageTypeSelector);
   const { deleteSingleToken } = useManageTokens();
 
   const canEdit = !editProhibited && !activeTokenSetReadOnly;
+  const canOpenInStudio = isTokensStudioStorage(storageType);
 
   const resolvedValue = useMemo(
     () => getAliasValue(token, tokensContext.resolvedTokens),
@@ -88,6 +92,17 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
   const handleDuplicateClick = React.useCallback(() => {
     showForm({ name: `${token.name}-copy`, token, status: EditTokenFormStatus.DUPLICATE });
   }, [showForm, token]);
+
+  const handleOpenInStudioClick = React.useCallback(() => {
+    if (canOpenInStudio) {
+      const studioUrl = buildStudioUrl(storageType as TokensStudioStorageType, {
+        tokenSetName: activeTokenSet,
+        tokenName: token.name,
+      });
+      window.open(studioUrl, '_blank');
+      track('Open Token in Studio', { tokenName: token.name, tokenSet: activeTokenSet });
+    }
+  }, [canOpenInStudio, storageType, activeTokenSet, token.name]);
 
   // TODO: This should probably move to state or a hook
   const setPluginValue = React.useCallback(
@@ -199,6 +214,11 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
           <ContextMenu.Item onSelect={handleEditClick} disabled={!canEdit}>
             Edit Token
           </ContextMenu.Item>
+          {canOpenInStudio && (
+            <ContextMenu.Item onSelect={handleOpenInStudioClick}>
+              Edit in Studio
+            </ContextMenu.Item>
+          )}
           <ContextMenu.Item onSelect={handleDuplicateClick} disabled={!canEdit}>
             Duplicate Token
           </ContextMenu.Item>
