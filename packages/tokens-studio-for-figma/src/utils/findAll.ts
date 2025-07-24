@@ -5,10 +5,10 @@ export function findAll(nodes: readonly BaseNode[], includeSelf = false, nodesWi
   const pluginDataOptions = nodesWithoutPluginData
     ? {}
     : {
-      sharedPluginData: {
-        namespace: 'tokens',
-      },
-    };
+        sharedPluginData: {
+          namespace: 'tokens',
+        },
+      };
   nodes.forEach((node) => {
     if ('children' in node) {
       allNodes = allNodes.concat(

@@ -1,10 +1,7 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import { TreeItem } from '@/utils/tokenset';
-import {
-  createMockStore,
-  fireEvent, render,
-} from '../../../../tests/config/setupTest';
+import { createMockStore, fireEvent, render } from '../../../../tests/config/setupTest';
 import { TokenSetItem } from './TokenSetItem';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 
@@ -23,21 +20,23 @@ describe('TokenSetItem', () => {
       path: 'light',
       isLeaf: true,
     } as unknown as TreeItem;
-    const { getByText } = render(<TokenSetItem
-      isActive
-      onClick={mockOnClick}
-      isChecked
-      item={mockItem}
-      onCheck={mockOnCheck}
-      canReorder
-      canEdit
-      canDelete
-      onDelete={mockOnDelete}
-      onDuplicate={mockOnDuplicate}
-      onDragStart={mockOnDragStart}
-      onRename={mockOnRename}
-      onTreatAsSource={mockOnTreatAsSource}
-    />);
+    const { getByText } = render(
+      <TokenSetItem
+        isActive
+        onClick={mockOnClick}
+        isChecked
+        item={mockItem}
+        onCheck={mockOnCheck}
+        canReorder
+        canEdit
+        canDelete
+        onDelete={mockOnDelete}
+        onDuplicate={mockOnDuplicate}
+        onDragStart={mockOnDragStart}
+        onRename={mockOnRename}
+        onTreatAsSource={mockOnTreatAsSource}
+      />,
+    );
 
     await fireEvent.contextMenu(getByText('light'));
     await fireEvent.click(getByText('rename'));
@@ -50,21 +49,23 @@ describe('TokenSetItem', () => {
       path: 'light',
       isLeaf: true,
     } as unknown as TreeItem;
-    const { getByText } = render(<TokenSetItem
-      isActive
-      onClick={mockOnClick}
-      isChecked
-      item={mockItem}
-      onCheck={mockOnCheck}
-      canReorder
-      canEdit
-      canDelete
-      onDelete={mockOnDelete}
-      onDuplicate={mockOnDuplicate}
-      onDragStart={mockOnDragStart}
-      onRename={mockOnRename}
-      onTreatAsSource={mockOnTreatAsSource}
-    />);
+    const { getByText } = render(
+      <TokenSetItem
+        isActive
+        onClick={mockOnClick}
+        isChecked
+        item={mockItem}
+        onCheck={mockOnCheck}
+        canReorder
+        canEdit
+        canDelete
+        onDelete={mockOnDelete}
+        onDuplicate={mockOnDuplicate}
+        onDragStart={mockOnDragStart}
+        onRename={mockOnRename}
+        onTreatAsSource={mockOnTreatAsSource}
+      />,
+    );
 
     await fireEvent.contextMenu(getByText('light'));
     await fireEvent.click(getByText('delete'));

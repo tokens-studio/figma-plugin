@@ -99,11 +99,7 @@ export default function OnboardingFlow() {
             <Heading size="medium">{t(item.title)}</Heading>
             <Text size="small">{t(item.excerpt)}</Text>
             {item.read_more_link && (
-              <StyledLink
-                target="_blank"
-                rel="noreferrer"
-                href={item.read_more_link}
-              >
+              <StyledLink target="_blank" rel="noreferrer" href={item.read_more_link}>
                 {t('readMore')}
               </StyledLink>
             )}

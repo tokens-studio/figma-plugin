@@ -24,11 +24,13 @@ describe('figmaStyleUtils', () => {
         blendMode: 'NORMAL',
       },
     ],
-    strokes: [{
-      type: 'SOLID',
-      opacity: 1,
-      color: { r: 1, g: 0, b: 0 },
-    }],
+    strokes: [
+      {
+        type: 'SOLID',
+        opacity: 1,
+        color: { r: 1, g: 0, b: 0 },
+      },
+    ],
     typography: {
       fontFamily: 'Inter',
       fontWeight: 'Bold',

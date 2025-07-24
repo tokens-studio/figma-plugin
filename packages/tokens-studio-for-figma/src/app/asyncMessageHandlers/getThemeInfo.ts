@@ -9,13 +9,14 @@ interface ThemeInfo {
   themes: ThemeObjectsList;
 }
 
-export const getThemeInfo: AsyncMessageChannelHandlers[AsyncMessageTypes.GET_THEME_INFO] = async (): Promise<ThemeInfo> => {
-  const state = store.getState();
-  const activeTheme = activeThemeSelector(state);
-  const themesList = themesListSelector(state);
+export const getThemeInfo: AsyncMessageChannelHandlers[AsyncMessageTypes.GET_THEME_INFO] =
+  async (): Promise<ThemeInfo> => {
+    const state = store.getState();
+    const activeTheme = activeThemeSelector(state);
+    const themesList = themesListSelector(state);
 
-  return {
-    activeTheme,
-    themes: themesList,
+    return {
+      activeTheme,
+      themes: themesList,
+    };
   };
-};

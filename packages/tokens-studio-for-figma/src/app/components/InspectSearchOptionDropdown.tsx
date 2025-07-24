@@ -12,13 +12,19 @@ export default function InspectSearchOptionDropdown() {
   const inspectState = useSelector(inspectStateSelector, isEqual);
   const dispatch = useDispatch<Dispatch>();
 
-  const handleIsShowBrokenReferences = React.useCallback((checked: boolean) => {
-    dispatch.inspectState.toggleShowBrokenReferences(checked);
-  }, [dispatch.inspectState]);
+  const handleIsShowBrokenReferences = React.useCallback(
+    (checked: boolean) => {
+      dispatch.inspectState.toggleShowBrokenReferences(checked);
+    },
+    [dispatch.inspectState],
+  );
 
-  const handleIsShowResolvedReferences = React.useCallback((checked: boolean) => {
-    dispatch.inspectState.toggleShowResolvedReferences(checked);
-  }, [dispatch.inspectState]);
+  const handleIsShowResolvedReferences = React.useCallback(
+    (checked: boolean) => {
+      dispatch.inspectState.toggleShowResolvedReferences(checked);
+    },
+    [dispatch.inspectState],
+  );
 
   const { t } = useTranslation(['inspect']);
 

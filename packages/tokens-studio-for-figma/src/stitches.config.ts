@@ -41,9 +41,7 @@ export const stitchesInstance = createStitches({
   },
 });
 
-const {
-  createTheme, styled, css, keyframes, theme, globalCss,
-} = stitchesInstance;
+const { createTheme, styled, css, keyframes, theme, globalCss } = stitchesInstance;
 
 const lightThemeMode = createTheme('figma-light', {
   colors: {
@@ -67,6 +65,4 @@ const darkThemeMode = createTheme('figma-dark', {
   shadows: darkTheme.shadows,
 });
 
-export {
-  lightThemeMode, darkThemeMode, styled, css, keyframes, theme, globalCss,
-};
+export { lightThemeMode, darkThemeMode, styled, css, keyframes, theme, globalCss };

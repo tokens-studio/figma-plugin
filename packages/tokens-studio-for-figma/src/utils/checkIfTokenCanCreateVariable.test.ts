@@ -13,7 +13,7 @@ const settings: SettingsState = {
 };
 
 describe('checkIfTokenCanCreateVariable', () => {
-  it('multi value border radius and spacing tokens can\'t create variable', () => {
+  it("multi value border radius and spacing tokens can't create variable", () => {
     const multiValueBorderRadiusToken = {
       name: 'border-radius-multi-value',
       value: '1 2',
@@ -28,7 +28,7 @@ describe('checkIfTokenCanCreateVariable', () => {
     expect(checkIfTokenCanCreateVariable(multiValueSpacingToken, settings)).toBe(false);
   });
 
-  it('gradient colors can\'t create variable', () => {
+  it("gradient colors can't create variable", () => {
     const gradientColor = {
       name: 'border-radius-multi-value',
       value: 'linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(9,9,121,1) 35%, rgba(0,212,255,1) 100%)',
@@ -62,10 +62,12 @@ describe('checkIfTokenCanCreateVariable', () => {
       type: TokenTypes.STRING,
     } as ResolveTokenValuesResult;
 
-    expect(checkIfTokenCanCreateVariable(stringToken, {
-      ...settings,
-      variablesString: false,
-    })).toBe(false);
+    expect(
+      checkIfTokenCanCreateVariable(stringToken, {
+        ...settings,
+        variablesString: false,
+      }),
+    ).toBe(false);
   });
 
   it('should return false for boolean token when variablesBoolean setting is false', () => {
@@ -74,10 +76,12 @@ describe('checkIfTokenCanCreateVariable', () => {
       value: 'true',
       type: TokenTypes.BOOLEAN,
     } as ResolveTokenValuesResult;
-    expect(checkIfTokenCanCreateVariable(booleanToken, {
-      ...settings,
-      variablesBoolean: false,
-    })).toBe(false);
+    expect(
+      checkIfTokenCanCreateVariable(booleanToken, {
+        ...settings,
+        variablesBoolean: false,
+      }),
+    ).toBe(false);
   });
 
   it('should return false for font weights token when variablesNumber setting is false and value is numeric', () => {
@@ -86,10 +90,12 @@ describe('checkIfTokenCanCreateVariable', () => {
       value: '400',
       type: TokenTypes.FONT_WEIGHTS,
     } as ResolveTokenValuesResult;
-    expect(checkIfTokenCanCreateVariable(fontWeightsToken, {
-      ...settings,
-      variablesNumber: false,
-    })).toBe(false);
+    expect(
+      checkIfTokenCanCreateVariable(fontWeightsToken, {
+        ...settings,
+        variablesNumber: false,
+      }),
+    ).toBe(false);
   });
 
   it('should return false for font weights token when variablesString setting is false and value is not numeric', () => {
@@ -98,10 +104,12 @@ describe('checkIfTokenCanCreateVariable', () => {
       value: 'bold',
       type: TokenTypes.FONT_WEIGHTS,
     } as ResolveTokenValuesResult;
-    expect(checkIfTokenCanCreateVariable(fontWeightsToken, {
-      ...settings,
-      variablesString: false,
-    })).toBe(false);
+    expect(
+      checkIfTokenCanCreateVariable(fontWeightsToken, {
+        ...settings,
+        variablesString: false,
+      }),
+    ).toBe(false);
   });
 
   it('should return false for line heights token when value is "AUTO"', () => {

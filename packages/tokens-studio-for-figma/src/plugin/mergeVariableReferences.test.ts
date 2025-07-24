@@ -7,9 +7,7 @@ describe('mergeVariableReferencesWithLocalVariables', () => {
       { name: 'fg/local', key: 'V:123', variableCollectionId: 'coll1' },
       { name: 'fg/muted', key: 'V:999', variableCollectionId: 'coll1' },
     ]);
-    figma.variables.getLocalVariableCollectionsAsync = jest.fn().mockResolvedValue([
-      { id: 'coll1' },
-    ]);
+    figma.variables.getLocalVariableCollectionsAsync = jest.fn().mockResolvedValue([{ id: 'coll1' }]);
   });
 
   it('should merge variable references with local variables', async () => {

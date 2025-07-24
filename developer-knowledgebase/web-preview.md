@@ -4,8 +4,8 @@
 
 1. Open Terminal and run:
 
-    > Terminal
+   > Terminal
 
-    ```sh
-    npm run preview
-    ```
+   ```sh
+   npm run preview
+   ```

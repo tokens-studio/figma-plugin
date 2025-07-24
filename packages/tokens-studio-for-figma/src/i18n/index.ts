@@ -10,7 +10,21 @@ import zhTranslations from './lang/zh';
 
 const isSBX = process.env.NODE_ENV === 'sbx';
 
-export const namespaces = ['branch', 'error', 'footer', 'general', 'inspect', 'licence', 'navbar', 'onBoarding', 'settings', 'storage', 'sync', 'tokens', 'variables'];
+export const namespaces = [
+  'branch',
+  'error',
+  'footer',
+  'general',
+  'inspect',
+  'licence',
+  'navbar',
+  'onBoarding',
+  'settings',
+  'storage',
+  'sync',
+  'tokens',
+  'variables',
+];
 
 export const resources = {
   en: enTranslations,
@@ -24,30 +38,32 @@ export const resources = {
 /**
  * Add languages here
  */
-export const languages = [{
-  title: 'English',
-  code: 'en',
-},
-{
-  title: 'French',
-  code: 'fr',
-},
-{
-  title: 'Dutch',
-  code: 'nl',
-},
-{
-  title: 'Chinese',
-  code: 'zh',
-},
-{
-  title: 'Hindi',
-  code: 'hi',
-},
-{
-  title: 'Spanish',
-  code: 'es',
-}];
+export const languages = [
+  {
+    title: 'English',
+    code: 'en',
+  },
+  {
+    title: 'French',
+    code: 'fr',
+  },
+  {
+    title: 'Dutch',
+    code: 'nl',
+  },
+  {
+    title: 'Chinese',
+    code: 'zh',
+  },
+  {
+    title: 'Hindi',
+    code: 'hi',
+  },
+  {
+    title: 'Spanish',
+    code: 'es',
+  },
+];
 
 export const i18nInstance = i18n
   // pass the i18n instance to react-i18next.
@@ -58,7 +74,11 @@ export const i18nInstance = i18n
     defaultNS: 'general',
     ns: namespaces,
     // Only throw error in SBX
-    parseMissingKeyHandler: isSBX ? (key) => { throw new Error(`Missing translation for ${key}`); } : undefined,
+    parseMissingKeyHandler: isSBX
+      ? (key) => {
+          throw new Error(`Missing translation for ${key}`);
+        }
+      : undefined,
     lng: 'en',
     interpolation: {
       escapeValue: false, // react already safes from xss

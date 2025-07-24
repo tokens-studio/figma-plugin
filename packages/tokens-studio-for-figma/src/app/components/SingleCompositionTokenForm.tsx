@@ -1,9 +1,7 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useUIDSeed } from 'react-uid';
-import {
-  Select, Box, IconButton, Stack,
-} from '@tokens-studio/ui';
+import { Select, Box, IconButton, Stack } from '@tokens-studio/ui';
 import IconMinus from '@/icons/minus.svg';
 import { Properties } from '@/constants/Properties';
 import { CompositionTokenProperty } from '@/types/CompositionTokenProperty';
@@ -35,28 +33,31 @@ export default function SingleCompositionTokenForm({
   onRemove: (property: string) => void;
   setOrderObj: (newOrderObj: NodeTokenRefMap) => void;
   setError: (newError: boolean) => void;
-  onSubmit: () => void
+  onSubmit: () => void;
 }) {
   const propertyType = useTypeForProperty(property);
   const seed = useUIDSeed();
   const { t } = useTranslation(['tokens']);
 
-  const onPropertySelected = useCallback((newProperty: string) => {
-    // keep the order of the properties when select new property
-    const newOrderObj: NodeTokenRefMap = {};
-    const keysInTokenValue = Object.keys(tokenValue);
-    keysInTokenValue.splice(index, 1, newProperty);
-    keysInTokenValue.forEach((key, idx) => {
-      newOrderObj[key as keyof typeof Properties] = String(idx);
-    });
-    setOrderObj(newOrderObj);
+  const onPropertySelected = useCallback(
+    (newProperty: string) => {
+      // keep the order of the properties when select new property
+      const newOrderObj: NodeTokenRefMap = {};
+      const keysInTokenValue = Object.keys(tokenValue);
+      keysInTokenValue.splice(index, 1, newProperty);
+      keysInTokenValue.forEach((key, idx) => {
+        newOrderObj[key as keyof typeof Properties] = String(idx);
+      });
+      setOrderObj(newOrderObj);
 
-    // set newTokenValue
-    delete tokenValue[property as keyof typeof Properties];
-    tokenValue[newProperty as keyof typeof Properties] = propertyValue;
-    setTokenValue(tokenValue);
-    setError(false);
-  }, [index, property, propertyValue, setError, setOrderObj, setTokenValue, tokenValue]);
+      // set newTokenValue
+      delete tokenValue[property as keyof typeof Properties];
+      tokenValue[newProperty as keyof typeof Properties] = propertyValue;
+      setTokenValue(tokenValue);
+      setError(false);
+    },
+    [index, property, propertyValue, setError, setOrderObj, setTokenValue, tokenValue],
+  );
 
   const onPropertyValueChanged = React.useCallback(
     (type: string, value: string) => {
@@ -66,10 +67,13 @@ export default function SingleCompositionTokenForm({
     [property, setTokenValue, tokenValue],
   );
 
-  const handleDownShiftInputChange = React.useCallback((newInputValue: string) => {
-    tokenValue[property as CompositionTokenProperty] = newInputValue;
-    setTokenValue(tokenValue);
-  }, [property, setTokenValue, tokenValue]);
+  const handleDownShiftInputChange = React.useCallback(
+    (newInputValue: string) => {
+      tokenValue[property as CompositionTokenProperty] = newInputValue;
+      setTokenValue(tokenValue);
+    },
+    [property, setTokenValue, tokenValue],
+  );
 
   const handleRemove = useCallback(() => {
     onRemove(property);
@@ -89,30 +93,38 @@ export default function SingleCompositionTokenForm({
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           border: 'none', // We're using a wrapper that controls the border
-          '& * svg': property ? { // Hides the arrow for properties
-            display: 'none',
-          } : {},
+          '& * svg': property
+            ? {
+                // Hides the arrow for properties
+                display: 'none',
+              }
+            : {},
         }}
         data-testid="composition-token-dropdown"
       />
       <Select.Content>
-        {properties.length > 0
-              && properties.map((prop, idx) => <Select.Item data-testid={`item-dropdown-menu-element-${prop}`} key={`property-${seed(idx)}`} value={prop}>{prop}</Select.Item>)}
+        {properties.length > 0 &&
+          properties.map((prop, idx) => (
+            <Select.Item data-testid={`item-dropdown-menu-element-${prop}`} key={`property-${seed(idx)}`} value={prop}>
+              {prop}
+            </Select.Item>
+          ))}
       </Select.Content>
     </Select>
   );
 
   return (
-    <Box css={{
-      width: '100%',
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      gap: '$3',
-      '& > .relative ': {
-        flex: '2',
-      },
-    }}
+    <Box
+      css={{
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        gap: '$3',
+        '& > .relative ': {
+          flex: '2',
+        },
+      }}
     >
       <Stack direction="row" css={{ flex: 1, alignItems: 'center' }}>
         <Box css={{ flexGrow: 1 }}>
@@ -124,9 +136,7 @@ export default function SingleCompositionTokenForm({
             setInputValue={handleDownShiftInputChange}
             prefix={renderSelect()}
             isComposition
-            placeholder={
-              propertyType === 'color' ? t('colorOrAlias') : t('valueOrAlias')
-            }
+            placeholder={propertyType === 'color' ? t('colorOrAlias') : t('valueOrAlias')}
             suffix
             onSubmit={onSubmit}
           />

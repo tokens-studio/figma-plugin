@@ -9,7 +9,7 @@ import Label from '../Label';
 import { UpdateMode } from '@/constants/UpdateMode';
 
 type Props = {
-  isOpen: boolean
+  isOpen: boolean;
   onClose: () => void;
 };
 
@@ -43,9 +43,7 @@ export default function BulkRemapModal({ isOpen, onClose }: Props) {
 
   return (
     <Modal size="large" showClose isOpen={isOpen} close={handleClose} title="Bulk remap">
-      <form
-        onSubmit={onConfirm}
-      >
+      <form onSubmit={onConfirm}>
         <Stack direction="column" gap={4}>
           <Input
             full
@@ -68,15 +66,15 @@ export default function BulkRemapModal({ isOpen, onClose }: Props) {
             onChange={handleNewNameChange}
             name="newName"
           />
-          <Box css={{
-            display: 'flex', alignItems: 'center', gap: '$3', fontSize: '$small',
-          }}
+          <Box
+            css={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '$3',
+              fontSize: '$small',
+            }}
           >
-            <Checkbox
-              checked={shouldRemapDocument}
-              id="remapDocument"
-              onCheckedChange={updateShouldRemapDocument}
-            />
+            <Checkbox checked={shouldRemapDocument} id="remapDocument" onCheckedChange={updateShouldRemapDocument} />
             <Label htmlFor="remapDocument" css={{ fontSize: '$small', fontWeight: '$sansBold' }}>
               Remap across document (slow)
             </Label>

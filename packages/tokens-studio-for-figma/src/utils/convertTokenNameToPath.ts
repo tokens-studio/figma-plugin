@@ -1,5 +1,8 @@
 export function convertTokenNameToPath(name: string, prefix: string | null = null, skip = 0) {
-  const splitKey = name.split('.').slice(skip).map((part) => part.trim());
+  const splitKey = name
+    .split('.')
+    .slice(skip)
+    .map((part) => part.trim());
   if (splitKey[splitKey.length - 1] === 'value') {
     splitKey.pop();
   }

@@ -1,7 +1,4 @@
 import { createSelector } from 'reselect';
 import { settingsStateSelector } from './settingsStateSelector';
 
-export const languageSelector = createSelector(
-  settingsStateSelector,
-  (state) => state.language,
-);
+export const languageSelector = createSelector(settingsStateSelector, (state) => state.language);

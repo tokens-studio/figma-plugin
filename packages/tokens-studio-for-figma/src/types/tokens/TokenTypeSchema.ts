@@ -1,9 +1,11 @@
 import { TokenTypes } from '@/constants/TokenTypes';
 
-interface StringSchemaType { type: 'string' }
+interface StringSchemaType {
+  type: 'string';
+}
 interface ObjectSchemaType {
-  type: 'object'
-  properties: Record<string, StringSchemaType | ObjectSchemaType>
+  type: 'object';
+  properties: Record<string, StringSchemaType | ObjectSchemaType>;
 }
 
 export type TokenTypeSchema = {
@@ -15,5 +17,5 @@ export type TokenTypeSchema = {
   isPro?: boolean;
   schemas: {
     value: ObjectSchemaType;
-  }
+  };
 };

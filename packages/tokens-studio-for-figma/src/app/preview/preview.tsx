@@ -1,13 +1,5 @@
-import React, {
-  FormEvent,
-  ReactNode,
-  useCallback,
-  useEffect,
-  useState,
-} from 'react';
-import {
-  Box, Button, DropdownMenu, IconButton, Stack, Text,
-} from '@tokens-studio/ui';
+import React, { FormEvent, ReactNode, useCallback, useEffect, useState } from 'react';
+import { Box, Button, DropdownMenu, IconButton, Stack, Text } from '@tokens-studio/ui';
 import { useDispatch, useSelector } from 'react-redux';
 import hash from 'object-hash';
 import { Code, Expand, Collapse } from 'iconoir-react';
@@ -104,34 +96,42 @@ const dispatchMockMessage = (message) => {
   window.postMessage({ pluginMessage: msg });
 };
 
-const MockMessageForm = ({ type, handleClose }: { type?: string, handleClose: () => void }) => {
-  const [value, setValue] = useState({
-    STARTUP: JSON.stringify(mockStartupParams, null, 2),
-    DEFAULT: '',
-  }[type || 'DEFAULT'] || '');
+const MockMessageForm = ({ type, handleClose }: { type?: string; handleClose: () => void }) => {
+  const [value, setValue] = useState(
+    {
+      STARTUP: JSON.stringify(mockStartupParams, null, 2),
+      DEFAULT: '',
+    }[type || 'DEFAULT'] || '',
+  );
   const [error, setError] = useState('');
-  const handleJsonEditChange = useCallback((val) => {
-    try {
-      JSON.parse(val);
-      if (error) {
-        setError('');
+  const handleJsonEditChange = useCallback(
+    (val) => {
+      try {
+        JSON.parse(val);
+        if (error) {
+          setError('');
+        }
+        setValue(val);
+      } catch (err) {
+        setError('Not valid JSON');
       }
-      setValue(val);
-    } catch (err) {
-      setError('Not valid JSON');
-    }
-  }, [setValue, error]);
+    },
+    [setValue, error],
+  );
   const { isDarkTheme } = useFigmaTheme();
 
   const isValid = true;
 
-  const checkAndSubmitMessage = useCallback((e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const message = JSON.parse(value);
-    dispatchMockMessage(message);
+  const checkAndSubmitMessage = useCallback(
+    (e: FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      const message = JSON.parse(value);
+      dispatchMockMessage(message);
 
-    handleClose();
-  }, [value, handleClose]);
+      handleClose();
+    },
+    [value, handleClose],
+  );
 
   return (
     <form onSubmit={checkAndSubmitMessage} style={{ display: 'flex', flexGrow: 1, height: '100%' }}>
@@ -140,7 +140,10 @@ const MockMessageForm = ({ type, handleClose }: { type?: string, handleClose: ()
         direction="column"
         justify="start"
         css={{
-          minHeight: '$8', position: 'relative', flexGrow: 1, height: '100%',
+          minHeight: '$8',
+          position: 'relative',
+          flexGrow: 1,
+          height: '100%',
         }}
       >
         <Text>WIP</Text>
@@ -186,22 +189,27 @@ const MockMessageForm = ({ type, handleClose }: { type?: string, handleClose: ()
   );
 };
 
-const PreviewMockMessageModal = ({ type, handleClose }: { type: string | undefined, handleClose: () => void }) => (
-  <Modal
-    size="large"
-    isOpen
-    modal
-    close={handleClose}
-    title="Create Mock Action"
-    full
-  >
+const PreviewMockMessageModal = ({ type, handleClose }: { type: string | undefined; handleClose: () => void }) => (
+  <Modal size="large" isOpen modal close={handleClose} title="Create Mock Action" full>
     <MockMessageForm type={type} handleClose={handleClose} />
   </Modal>
 );
 
 const PreviewPluginWindow = ({
-  height = 600, width = '100%', children, css = {}, fullscreen, updateHash,
-}: { children: ReactNode, height?: number | string, width?: number | string, css: CSS | undefined, fullscreen?: boolean, updateHash: any }) => {
+  height = 600,
+  width = '100%',
+  children,
+  css = {},
+  fullscreen,
+  updateHash,
+}: {
+  children: ReactNode;
+  height?: number | string;
+  width?: number | string;
+  css: CSS | undefined;
+  fullscreen?: boolean;
+  updateHash: any;
+}) => {
   useEffect(() => {
     AsyncMessageChannelPreview.ReactInstance.message({
       type: AsyncMessageTypes.PREVIEW_REQUEST_STARTUP,
@@ -217,7 +225,11 @@ const PreviewPluginWindow = ({
       <Stack
         direction="row"
         css={{
-          padding: '$2', paddingLeft: '$3', minHeight: '40px', background: '$bgSurface', borderBottom: '1px solid $bgSubtle',
+          padding: '$2',
+          paddingLeft: '$3',
+          minHeight: '40px',
+          background: '$bgSurface',
+          borderBottom: '1px solid $bgSubtle',
         }}
         align="center"
       >
@@ -225,28 +237,43 @@ const PreviewPluginWindow = ({
           align="center"
           justify="center"
           css={{
-            height: '$7', width: '$7', marginRight: '-$3', marginLeft: '-$2',
+            height: '$7',
+            width: '$7',
+            marginRight: '-$3',
+            marginLeft: '-$2',
           }}
         >
-          <Code style={{
-            background: 'black', color: 'white', borderRadius: 2, height: 20, width: 20, padding: 2,
-          }}
+          <Code
+            style={{
+              background: 'black',
+              color: 'white',
+              borderRadius: 2,
+              height: 20,
+              width: 20,
+              padding: 2,
+            }}
           />
         </Stack>
         <Stack css={{ flex: 1 }}>
-          <Text css={{ paddingLeft: '$3', fontSize: '$small', fontWeight: '$sansSemibold' }}>Tokens Studio for Figma</Text>
+          <Text css={{ paddingLeft: '$3', fontSize: '$small', fontWeight: '$sansSemibold' }}>
+            Tokens Studio for Figma
+          </Text>
         </Stack>
         <Stack align="center" justify="center" css={{ height: '$7', width: '$7' }}>
           {fullscreen ? (
             <IconButton
               tooltip=""
               data-testid="123"
-              icon={(
-                <Collapse style={{
-                  color: isDarkTheme ? 'white' : 'black', borderRadius: 2, height: 20, width: 20,
-                }}
+              icon={
+                <Collapse
+                  style={{
+                    color: isDarkTheme ? 'white' : 'black',
+                    borderRadius: 2,
+                    height: 20,
+                    width: 20,
+                  }}
                 />
-              )}
+              }
               size="small"
               variant="invisible"
               onClick={toggleFullscreen}
@@ -255,12 +282,16 @@ const PreviewPluginWindow = ({
             <IconButton
               tooltip=""
               data-testid="123"
-              icon={(
-                <Expand style={{
-                  color: isDarkTheme ? 'white' : 'black', borderRadius: 2, height: 20, width: 20,
-                }}
+              icon={
+                <Expand
+                  style={{
+                    color: isDarkTheme ? 'white' : 'black',
+                    borderRadius: 2,
+                    height: 20,
+                    width: 20,
+                  }}
                 />
-              )}
+              }
               size="small"
               variant="invisible"
               onClick={toggleFullscreen}
@@ -268,10 +299,11 @@ const PreviewPluginWindow = ({
           )}
         </Stack>
       </Stack>
-      <Box css={{
-        width,
-        height,
-      }}
+      <Box
+        css={{
+          width,
+          height,
+        }}
       >
         {children}
       </Box>
@@ -292,9 +324,8 @@ function PreviewApp({ children }: { children: ReactNode }) {
   const settings = useSelector(settingsStateSelector);
   const uiState = useSelector(uiStateSelector);
   const {
-    data: {
-      tab, action, subAction, theme, fullscreen,
-    }, updateHash,
+    data: { tab, action, subAction, theme, fullscreen },
+    updateHash,
   } = usePreviewState();
 
   useEffect(() => {
@@ -321,9 +352,12 @@ function PreviewApp({ children }: { children: ReactNode }) {
     }
   }, [uiState.activeTab, tab, updateHash]);
 
-  const onThemeSelected = useCallback((type) => () => {
-    setFigmaBrowserTheme(type, updateHash);
-  }, [updateHash]);
+  const onThemeSelected = useCallback(
+    (type) => () => {
+      setFigmaBrowserTheme(type, updateHash);
+    },
+    [updateHash],
+  );
   const onActionSelected = React.useCallback(
     (type: string) => () => {
       if (type === 'CUSTOM') {
@@ -363,49 +397,36 @@ function PreviewApp({ children }: { children: ReactNode }) {
       }}
     >
       <Text css={{ fontSize: '$large' }}>Web Preview</Text>
-      <Stack css={{ flex: 1 }}><span /></Stack>
-      {mockMessageModalOpen && <PreviewMockMessageModal type={mockMessageModalOpen} handleClose={handleCloseCustomModal} />}
+      <Stack css={{ flex: 1 }}>
+        <span />
+      </Stack>
+      {mockMessageModalOpen && (
+        <PreviewMockMessageModal type={mockMessageModalOpen} handleClose={handleCloseCustomModal} />
+      )}
       {/* <Button onClick={resetApp}>
         RESET
       </Button> */}
       <DropdownMenu>
         <DropdownMenu.Trigger asChild data-testid="add-storage-item-dropdown">
-          <Button asDropdown>
-            Theme
-          </Button>
+          <Button asDropdown>Theme</Button>
         </DropdownMenu.Trigger>
         <DropdownMenu.Portal>
-          <DropdownMenu.Content
-            side="bottom"
-            className="content scroll-container"
-          >
-            {
-            Object.keys(themes).map((type) => (
-              <DropdownMenu.Item
-                key={type}
-                onSelect={onThemeSelected(type)}
-                css={{ display: 'flex', gap: '$3' }}
-              >
+          <DropdownMenu.Content side="bottom" className="content scroll-container">
+            {Object.keys(themes).map((type) => (
+              <DropdownMenu.Item key={type} onSelect={onThemeSelected(type)} css={{ display: 'flex', gap: '$3' }}>
                 {themes[type]}
               </DropdownMenu.Item>
-            ))
-          }
+            ))}
           </DropdownMenu.Content>
         </DropdownMenu.Portal>
       </DropdownMenu>
       <DropdownMenu>
         <DropdownMenu.Trigger asChild data-testid="add-storage-item-dropdown">
-          <Button asDropdown>
-            Mock Actions
-          </Button>
+          <Button asDropdown>Mock Actions</Button>
         </DropdownMenu.Trigger>
         <DropdownMenu.Portal>
-          <DropdownMenu.Content
-            side="bottom"
-            className="content scroll-container"
-          >
-            {
-            [{ type: 'STARTUP' }, { type: 'CUSTOM' }].map((mockAction) => (
+          <DropdownMenu.Content side="bottom" className="content scroll-container">
+            {[{ type: 'STARTUP' }, { type: 'CUSTOM' }].map((mockAction) => (
               <DropdownMenu.Item
                 key={mockAction.type}
                 onSelect={onActionSelected(mockAction.type)}
@@ -413,8 +434,7 @@ function PreviewApp({ children }: { children: ReactNode }) {
               >
                 {mockAction.type}
               </DropdownMenu.Item>
-            ))
-          }
+            ))}
           </DropdownMenu.Content>
         </DropdownMenu.Portal>
       </DropdownMenu>
@@ -440,9 +460,14 @@ function PreviewApp({ children }: { children: ReactNode }) {
   );
 
   return (
-    <Box css={{
-      justifyContent: 'center', alignItems: 'center', padding: '$7', backgroundColor: '$bgSubtle', height: '100vh',
-    }}
+    <Box
+      css={{
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: '$7',
+        backgroundColor: '$bgSubtle',
+        height: '100vh',
+      }}
     >
       {PREVIEW_ENV === 'browser' ? (
         <>
@@ -450,13 +475,17 @@ function PreviewApp({ children }: { children: ReactNode }) {
           <PreviewPluginWindow
             height={fullscreen ? '100%' : settings.uiWindow?.height}
             width={fullscreen ? '100%' : settings.uiWindow?.width}
-            css={fullscreen ? {
-              height: '100%',
-              width: '100%',
-              position: 'fixed',
-              top: 0,
-              left: 0,
-            } : undefined}
+            css={
+              fullscreen
+                ? {
+                    height: '100%',
+                    width: '100%',
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                  }
+                : undefined
+            }
             fullscreen={fullscreen}
             updateHash={updateHash}
           >

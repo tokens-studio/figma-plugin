@@ -7,7 +7,11 @@ import { MessageFromPluginTypes } from '@/types/messages';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { ProgressTracker } from './ProgressTracker';
 
-export async function removePluginDataByMap({ nodeKeyMap }: { nodeKeyMap: readonly ({ node: BaseNode | SceneNode; key: Properties; })[]; }) {
+export async function removePluginDataByMap({
+  nodeKeyMap,
+}: {
+  nodeKeyMap: readonly { node: BaseNode | SceneNode; key: Properties }[];
+}) {
   postToUI({
     type: MessageFromPluginTypes.START_JOB,
     job: {
@@ -21,14 +25,16 @@ export async function removePluginDataByMap({ nodeKeyMap }: { nodeKeyMap: readon
   const tracker = new ProgressTracker(BackgroundJobs.PLUGIN_UPDATEPLUGINDATA);
   const promises: Set<Promise<void>> = new Set();
   nodeKeyMap.forEach(async ({ node, key }) => {
-    promises.add(defaultWorker.schedule(async () => {
-      node.setPluginData(key, '');
-      tokensSharedDataHandler.set(node, key, '');
-      removeValuesFromNode(node, key);
+    promises.add(
+      defaultWorker.schedule(async () => {
+        node.setPluginData(key, '');
+        tokensSharedDataHandler.set(node, key, '');
+        removeValuesFromNode(node, key);
 
-      tracker.next();
-      tracker.reportIfNecessary();
-    }));
+        tracker.next();
+        tracker.reportIfNecessary();
+      }),
+    );
   });
   await Promise.all(promises);
   postToUI({

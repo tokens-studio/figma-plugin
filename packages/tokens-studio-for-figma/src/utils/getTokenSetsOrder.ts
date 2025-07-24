@@ -8,9 +8,11 @@ export function getTokenSetsOrder(
   usedSets: UsedTokenSetsMap,
   overallConfig: UsedTokenSetsMap,
   activeTokenSet?: string,
-): { tokenSetsOrder: string[]; usedSetsList: string[]; overallSets: string[]; } {
+): { tokenSetsOrder: string[]; usedSetsList: string[]; overallSets: string[] } {
   const originalTokenSetOrder = Object.keys(tokens);
-  const usedSetsList = originalTokenSetOrder.filter((key) => usedSets[key] === TokenSetStatus.ENABLED || usedSets[key] === TokenSetStatus.SOURCE);
+  const usedSetsList = originalTokenSetOrder.filter(
+    (key) => usedSets[key] === TokenSetStatus.ENABLED || usedSets[key] === TokenSetStatus.SOURCE,
+  );
   const overallSets = originalTokenSetOrder
     .filter((set) => !usedSetsList.includes(set))
     .sort((a, b) => sortSets(a, b, overallConfig));

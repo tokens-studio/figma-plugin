@@ -5,9 +5,9 @@ import pjs from '../../package.json';
 const DSN = process.env.SENTRY_DSN;
 
 // Bitwise operators are used to force conversion of  the string to a number
-const SAMPLING = ~~(process.env.SENTRY_SAMPLING!) || 0.1;
-const PROFILE_RATE = ~~(process.env.SENTRY_PROFILE_SAMPLING!) || 0.1;
-const REPLAY_RATE = ~~(process.env.SENTRY_REPLAY_SAMPLING!) || 0;
+const SAMPLING = ~~process.env.SENTRY_SAMPLING! || 0.1;
+const PROFILE_RATE = ~~process.env.SENTRY_PROFILE_SAMPLING! || 0.1;
+const REPLAY_RATE = ~~process.env.SENTRY_REPLAY_SAMPLING! || 0;
 
 export const replay = new Sentry.Replay({
   // Make sure we never leak any sensitive data

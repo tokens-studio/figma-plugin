@@ -8,7 +8,11 @@ describe('generateTokensToCreate', () => {
   const theme: ThemeObject = {
     id: 'ThemeId:1:2',
     name: 'Light',
-    selectedTokenSets: { core: TokenSetStatus.ENABLED, source: TokenSetStatus.SOURCE, disabled: TokenSetStatus.DISABLED },
+    selectedTokenSets: {
+      core: TokenSetStatus.ENABLED,
+      source: TokenSetStatus.SOURCE,
+      disabled: TokenSetStatus.DISABLED,
+    },
   };
   const tokens: Record<string, AnyTokenList> = {
     core: [
@@ -18,16 +22,20 @@ describe('generateTokensToCreate', () => {
         type: TokenTypes.COLOR,
       },
     ],
-    source: [{
-      name: 'primary.green',
-      value: '#00ff00',
-      type: TokenTypes.COLOR,
-    }],
-    disabled: [{
-      name: 'primary.blue',
-      value: '#0000ff',
-      type: TokenTypes.COLOR,
-    }],
+    source: [
+      {
+        name: 'primary.green',
+        value: '#00ff00',
+        type: TokenTypes.COLOR,
+      },
+    ],
+    disabled: [
+      {
+        name: 'primary.blue',
+        value: '#0000ff',
+        type: TokenTypes.COLOR,
+      },
+    ],
   };
 
   it('returns the correct tokens for enabled sets', () => {

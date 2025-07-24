@@ -2,9 +2,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { IconButton, Heading } from '@tokens-studio/ui';
-import {
-  IconCollapseArrow, IconExpandArrow, IconList, IconGrid, IconAdd,
-} from '@/icons';
+import { IconCollapseArrow, IconExpandArrow, IconList, IconGrid, IconAdd } from '@/icons';
 import { activeTokenSetReadOnlySelector, displayTypeSelector, editProhibitedSelector } from '@/selectors';
 import ProBadge from './ProBadge';
 

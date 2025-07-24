@@ -104,21 +104,23 @@ describe('setEffectValuesOnTarget', () => {
     rectangleNodeMock = {
       type: 'RECTANGLE',
       fills: [],
-      effects: [{
-        type: 'DROP_SHADOW',
-        blendMode: 'NORMAL',
-        visible: true,
-        color: {
-          a: 0.5,
-          r: 0,
-          g: 0,
-          b: 0,
+      effects: [
+        {
+          type: 'DROP_SHADOW',
+          blendMode: 'NORMAL',
+          visible: true,
+          color: {
+            a: 0.5,
+            r: 0,
+            g: 0,
+            b: 0,
+          },
+          offset: { x: 0, y: 0 },
+          radius: 2,
+          spread: 4,
+          showShadowBehindNode: true,
         },
-        offset: { x: 0, y: 0 },
-        radius: 2,
-        spread: 4,
-        showShadowBehindNode: true,
-      }],
+      ],
     } as unknown as RectangleNode;
   });
 

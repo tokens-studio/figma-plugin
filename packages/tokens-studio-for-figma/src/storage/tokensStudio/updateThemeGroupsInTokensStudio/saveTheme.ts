@@ -9,9 +9,7 @@ type Props = {
 
 export const saveTheme = ({ action, themes: newThemes, prevThemes }: Props) => {
   const {
-    payload: {
-      name, group, meta, id,
-    },
+    payload: { name, group, meta, id },
   } = action;
 
   const prevGroupsThemes = prevThemes.reduce((acc, theme) => {

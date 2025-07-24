@@ -7,7 +7,11 @@ import { getVariablesWithoutZombies } from './getVariablesWithoutZombies';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { normalizeVariableName } from '@/utils/normalizeVariableName';
 
-export default async function pullVariables(options: PullVariablesOptions, themes: ThemeObjectsList, proUser: boolean): Promise<void> {
+export default async function pullVariables(
+  options: PullVariablesOptions,
+  themes: ThemeObjectsList,
+  proUser: boolean,
+): Promise<void> {
   // @TODO should be specifically typed according to their type
   const colors: VariableToCreateToken[] = [];
   const booleans: VariableToCreateToken[] = [];
@@ -20,9 +24,8 @@ export default async function pullVariables(options: PullVariablesOptions, theme
     const uiSettings = await figma.clientStorage.getAsync('uiSettings');
     const settings = JSON.parse(await uiSettings);
     if (settings?.baseFontSize) {
-      const baseFontSizeValue = typeof settings.baseFontSize === 'number'
-        ? settings.baseFontSize
-        : parseFloat(settings.baseFontSize);
+      const baseFontSizeValue =
+        typeof settings.baseFontSize === 'number' ? settings.baseFontSize : parseFloat(settings.baseFontSize);
 
       baseRem = !isNaN(baseFontSizeValue) ? Number(baseFontSizeValue) : 16;
     }
@@ -30,18 +33,24 @@ export default async function pullVariables(options: PullVariablesOptions, theme
 
   const localVariables = await getVariablesWithoutZombies();
 
-  const collections = new Map<string, {
-    id: string,
-    name: string,
-    modes: { name: string, modeId: string }[]
-  }>();
+  const collections = new Map<
+    string,
+    {
+      id: string;
+      name: string;
+      modes: { name: string; modeId: string }[];
+    }
+  >();
 
   // Cache for collection lookups
-  const collectionsCache = new Map<string, {
-    id: string,
-    name: string,
-    modes: { name: string, modeId: string }[]
-  }>();
+  const collectionsCache = new Map<
+    string,
+    {
+      id: string;
+      name: string;
+      modes: { name: string; modeId: string }[];
+    }
+  >();
 
   for (const variable of localVariables) {
     let collection = collectionsCache.get(variable.variableCollectionId);
@@ -183,29 +192,36 @@ export default async function pullVariables(options: PullVariablesOptions, theme
   const themesToCreate: ThemeObjectsList = [];
   // Process themes if pro user
   if (proUser) {
-    await Promise.all(Array.from(collections.values()).map(async (collection) => {
-      await Promise.all(collection.modes.map(async (mode) => {
-        const collectionVariables = localVariables.filter((v) => v.variableCollectionId === collection.id);
+    await Promise.all(
+      Array.from(collections.values()).map(async (collection) => {
+        await Promise.all(
+          collection.modes.map(async (mode) => {
+            const collectionVariables = localVariables.filter((v) => v.variableCollectionId === collection.id);
 
-        const variableReferences = collectionVariables.reduce((acc, variable) => ({
-          ...acc,
-          [normalizeVariableName(variable.name)]: variable.key,
-        }), {});
+            const variableReferences = collectionVariables.reduce(
+              (acc, variable) => ({
+                ...acc,
+                [normalizeVariableName(variable.name)]: variable.key,
+              }),
+              {},
+            );
 
-        themesToCreate.push({
-          id: `${collection.name.toLowerCase()}-${mode.name.toLowerCase()}`,
-          name: mode.name,
-          group: collection.name,
-          selectedTokenSets: {
-            [`${collection.name}/${mode.name}`]: TokenSetStatus.ENABLED,
-          },
-          $figmaStyleReferences: {},
-          $figmaVariableReferences: variableReferences,
-          $figmaModeId: mode.modeId,
-          $figmaCollectionId: collection.id,
-        });
-      }));
-    }));
+            themesToCreate.push({
+              id: `${collection.name.toLowerCase()}-${mode.name.toLowerCase()}`,
+              name: mode.name,
+              group: collection.name,
+              selectedTokenSets: {
+                [`${collection.name}/${mode.name}`]: TokenSetStatus.ENABLED,
+              },
+              $figmaStyleReferences: {},
+              $figmaVariableReferences: variableReferences,
+              $figmaModeId: mode.modeId,
+              $figmaCollectionId: collection.id,
+            });
+          }),
+        );
+      }),
+    );
   }
 
   try {

@@ -4,10 +4,11 @@ import { writeSharedPluginData } from '@/utils/figmaStorage/writeSharedPluginDat
 import { SharedPluginDataNamespaces } from '@/constants/SharedPluginDataNamespaces';
 import { SharedPluginDataKeys } from '@/constants/SharedPluginDataKeys';
 
-export const setSelectedExportThemes: AsyncMessageChannelHandlers[AsyncMessageTypes.SET_SELECTED_EXPORT_THEMES] = async (msg) => {
-  await writeSharedPluginData(
-    SharedPluginDataNamespaces.TOKENS,
-    SharedPluginDataKeys[SharedPluginDataNamespaces.TOKENS].selectedExportThemes,
-    msg.themes,
-  );
-};
+export const setSelectedExportThemes: AsyncMessageChannelHandlers[AsyncMessageTypes.SET_SELECTED_EXPORT_THEMES] =
+  async (msg) => {
+    await writeSharedPluginData(
+      SharedPluginDataNamespaces.TOKENS,
+      SharedPluginDataKeys[SharedPluginDataNamespaces.TOKENS].selectedExportThemes,
+      msg.themes,
+    );
+  };

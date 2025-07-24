@@ -2,8 +2,8 @@ import EventEmitter from 'eventemitter3';
 import { CanceledError } from './CanceledError';
 
 type PoolFn = {
-  id: number
-  fn: () => Promise<any>
+  id: number;
+  fn: () => Promise<any>;
 };
 
 export class Worker {
@@ -23,12 +23,14 @@ export class Worker {
     // eslint-disable-next-line
     for (const item of this.pool) {
       this.pool.delete(item);
-      promises.add(new Promise((resolve) => {
-        item.fn().then((result) => {
-          this.emitter.emit(`completed/${item.id}`, result);
-          resolve();
-        });
-      }));
+      promises.add(
+        new Promise((resolve) => {
+          item.fn().then((result) => {
+            this.emitter.emit(`completed/${item.id}`, result);
+            resolve();
+          });
+        }),
+      );
 
       numberOfJobs += 1;
       if (numberOfJobs >= 30) {

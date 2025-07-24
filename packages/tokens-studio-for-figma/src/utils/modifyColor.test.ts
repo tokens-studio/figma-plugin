@@ -26,7 +26,9 @@ describe('modifyColor', () => {
       },
     ];
     spaceValues.forEach((spaceValue) => {
-      expect(modifyColor(baseColor, { ...lightenModifiers, space: spaceValue.space } as ColorModifier)).toEqual(spaceValue.output);
+      expect(modifyColor(baseColor, { ...lightenModifiers, space: spaceValue.space } as ColorModifier)).toEqual(
+        spaceValue.output,
+      );
     });
   });
 
@@ -52,7 +54,9 @@ describe('modifyColor', () => {
       },
     ];
     spaceValues.forEach((spaceValue) => {
-      expect(modifyColor(baseColor, { ...darkenModifiers, space: spaceValue.space } as ColorModifier)).toEqual(spaceValue.output);
+      expect(modifyColor(baseColor, { ...darkenModifiers, space: spaceValue.space } as ColorModifier)).toEqual(
+        spaceValue.output,
+      );
     });
   });
 
@@ -79,7 +83,9 @@ describe('modifyColor', () => {
       },
     ];
     spaceValues.forEach((spaceValue) => {
-      expect(modifyColor(baseColor, { ...mixModifiers, space: spaceValue.space } as ColorModifier)).toEqual(spaceValue.output);
+      expect(modifyColor(baseColor, { ...mixModifiers, space: spaceValue.space } as ColorModifier)).toEqual(
+        spaceValue.output,
+      );
     });
   });
 
@@ -105,7 +111,9 @@ describe('modifyColor', () => {
       },
     ];
     spaceValues.forEach((spaceValue) => {
-      expect(modifyColor(baseColor, { ...alphaModifiers, space: spaceValue.space } as ColorModifier)).toEqual(spaceValue.output);
+      expect(modifyColor(baseColor, { ...alphaModifiers, space: spaceValue.space } as ColorModifier)).toEqual(
+        spaceValue.output,
+      );
     });
   });
 });

@@ -35,13 +35,23 @@ export default function ToolsDropdown() {
     <>
       <DropdownMenu>
         <DropdownMenu.Trigger asChild>
-          <IconButton tooltip={t('tools')} aria-label={t('tools')} size="small" variant="invisible" icon={<FileZipIcon />} />
+          <IconButton
+            tooltip={t('tools')}
+            aria-label={t('tools')}
+            size="small"
+            variant="invisible"
+            icon={<FileZipIcon />}
+          />
         </DropdownMenu.Trigger>
 
         <DropdownMenu.Portal>
           <DropdownMenu.Content side="top">
-            <DropdownMenu.Item disabled={editProhibited} onSelect={handleShowPresetModal}>{t('loadFromFileOrPreset')}</DropdownMenu.Item>
-            <DropdownMenu.Item disabled={editProhibited} onSelect={handleShowExportModal}>{t('exportToFile')}</DropdownMenu.Item>
+            <DropdownMenu.Item disabled={editProhibited} onSelect={handleShowPresetModal}>
+              {t('loadFromFileOrPreset')}
+            </DropdownMenu.Item>
+            <DropdownMenu.Item disabled={editProhibited} onSelect={handleShowExportModal}>
+              {t('exportToFile')}
+            </DropdownMenu.Item>
           </DropdownMenu.Content>
         </DropdownMenu.Portal>
       </DropdownMenu>

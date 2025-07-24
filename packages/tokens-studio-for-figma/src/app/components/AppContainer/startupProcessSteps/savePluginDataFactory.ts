@@ -16,9 +16,7 @@ export function savePluginDataFactory(dispatch: Dispatch, params: StartupMessage
         });
       }
       track('Launched', { version: pjs.version });
-      const {
-        width, height, showEmptyGroups, ...rest
-      } = params.settings;
+      const { width, height, showEmptyGroups, ...rest } = params.settings;
       const settings = {
         uiWindow: {
           width,

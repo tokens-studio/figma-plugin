@@ -1,9 +1,9 @@
 import type { TokenState } from '../../tokenState';
 
 export type RenameVariableToken = {
-  oldName: string,
-  newName: string,
-  variableIds: string[]
+  oldName: string;
+  newName: string;
+  variableIds: string[];
 };
 export function renameVariableIdsToTheme(state: TokenState, variableTokens: RenameVariableToken[]): TokenState {
   const updatedThemes = [...state.themes];

@@ -49,9 +49,7 @@ export async function removeSingleCredential(context: StorageTypeCredentials) {
     const data = await ApiProvidersProperty.read();
     let existingProviders: NonNullable<typeof data> = [];
     if (data) {
-      existingProviders = compact(
-        data.map((i) => (isSameCredentials(i, context) ? null : i)).filter((i) => i),
-      );
+      existingProviders = compact(data.map((i) => (isSameCredentials(i, context) ? null : i)).filter((i) => i));
     }
     await ApiProvidersProperty.write(existingProviders);
     const newProviders = await ApiProvidersProperty.read();

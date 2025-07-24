@@ -46,9 +46,7 @@ type Props = {
   errorMessage?: string;
 };
 
-export default function TokensStudioForm({
-  onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
-}: Props) {
+export default function TokensStudioForm({ onChange, onSubmit, onCancel, values, hasErrored, errorMessage }: Props) {
   const { t } = useTranslation(['storage']);
   const [fetchOrgsError, setFetchOrgsError] = React.useState<string | null>(null);
   const [baseUrlError, setBaseUrlError] = React.useState<string | null>(null);
@@ -161,10 +159,11 @@ export default function TokensStudioForm({
   }, [debouncedSecret, fetchOrgData]);
 
   const orgOptions = React.useMemo(
-    () => orgData?.map((org) => ({
-      label: org.name,
-      value: org.id,
-    })),
+    () =>
+      orgData?.map((org) => ({
+        label: org.name,
+        value: org.id,
+      })),
     [orgData],
   );
 
@@ -223,8 +222,7 @@ export default function TokensStudioForm({
     <form onSubmit={handleSubmit}>
       <Stack direction="column" gap={5}>
         <Text muted>
-          {t('providers.tokensstudio.descriptionFirstPart')}
-          {' '}
+          {t('providers.tokensstudio.descriptionFirstPart')}{' '}
           <Link
             href="https://q2gsw2tok1e.typeform.com/to/pJCwLVh2?typeform-source=tokens.studio"
             target="_blank"
@@ -262,8 +260,8 @@ export default function TokensStudioForm({
           {baseUrlError && <Text css={{ color: '$dangerFg' }}>{baseUrlError}</Text>}
           {isValidatingBaseUrl && <Text muted>Validating base URL...</Text>}
           <Text muted>
-            Leave empty to use the default Studio instance. For custom Studio instances, enter the base URL
-            (e.g., https://app.acme-corp.enterprise.tokens.studio)
+            Leave empty to use the default Studio instance. For custom Studio instances, enter the base URL (e.g.,
+            https://app.acme-corp.enterprise.tokens.studio)
           </Text>
         </FormField>
         <FormField>
@@ -276,14 +274,14 @@ export default function TokensStudioForm({
             onBlur={fetchOrgData}
             required
             type={isMasked ? 'password' : 'text'}
-            trailingAction={(
+            trailingAction={
               <IconButton
                 variant="invisible"
                 size="small"
                 onClick={toggleMask}
                 icon={isMasked ? <EyeClosedIcon /> : <EyeOpenIcon />}
               />
-            )}
+            }
           />
           {fetchOrgsError && <Text muted>{fetchOrgsError}</Text>}
         </FormField>

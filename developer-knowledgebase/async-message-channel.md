@@ -32,19 +32,22 @@ Static instances of `AsyncMessageChannel` are initialised when the class is load
 
 ```ts
 class AsyncMessageChannel {
-  public static PluginInstance: AsyncMessageChannel = new AsyncMessageChannel(true);
-  public static ReactInstance: AsyncMessageChannel = new AsyncMessageChannel(false);
+  public static PluginInstance: AsyncMessageChannel = new AsyncMessageChannel(
+    true,
+  );
+  public static ReactInstance: AsyncMessageChannel = new AsyncMessageChannel(
+    false,
+  );
 
   protected inFigmaSandbox = false;
 
   constructor(inFigmaSandbox: boolean) {
-    this.inFigmaSandbox = inFigmaSandbox
+    this.inFigmaSandbox = inFigmaSandbox;
   }
 }
-
 ```
 
-- 
+-
 
 ## Environments
 
@@ -81,9 +84,9 @@ Conditionally registers message event handlers depending on the environment:
   - `figma.ui.on('message', listener)`
 - `Environment.UI`
   - `window.addEventListener('message', listener)` – listens to messages controller
-    - *IF process.env.PREVIEW_MODE IS SET*
+    - _IF process.env.PREVIEW_MODE IS SET_
       - `this.ws?.addEventListener('message', listener)`
-      - Where if this condition is true, `UI` has two message listeners, one to listen 
+      - Where if this condition is true, `UI` has two message listeners, one to listen
 - `Environment.CONTROLLER`
   - `this.ws?.addEventListener('message', listener)`
 
@@ -113,7 +116,6 @@ Example: `AsyncMessageChannel.ReactInstance.handle(AsyncMessageTypes.STARTUP, as
 AsyncMessageChannel.PluginInstance.connect();
 ```
 
-
 **`init.ts`**
 
 ```ts
@@ -124,7 +126,7 @@ figma.showUI(__html__, {
   height: params.settings.height ?? DefaultWindowSize.height,
 });
 
-// 
+//
 await AsyncMessageChannel.PluginInstance.message({
   type: AsyncMessageTypes.STARTUP,
   ...params,
@@ -134,14 +136,19 @@ await AsyncMessageChannel.PluginInstance.message({
 **`asyncMessageHandlers/startup.tsx` / `StartupApp`**
 
 ```tsx
-  useEffect(() => {
-    AsyncMessageChannel.ReactInstance.handle(AsyncMessageTypes.STARTUP, async (startupParams) => {
+useEffect(() => {
+  AsyncMessageChannel.ReactInstance.handle(
+    AsyncMessageTypes.STARTUP,
+    async (startupParams) => {
       setParams(startupParams);
-    });
+    },
+  );
 
-    return () => {
-      AsyncMessageChannel.ReactInstance.handle(AsyncMessageTypes.STARTUP, (() => {}) as any);
-    };
-  }, []);
+  return () => {
+    AsyncMessageChannel.ReactInstance.handle(
+      AsyncMessageTypes.STARTUP,
+      (() => {}) as any,
+    );
+  };
+}, []);
 ```
-

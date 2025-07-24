@@ -14,11 +14,12 @@ const mockStoreJSONBin = createMockStore({
   },
 });
 
-const renderStore = (store = mockStore) => render(
-  <Provider store={store}>
-    <SettingsDropdown />
-  </Provider>,
-);
+const renderStore = (store = mockStore) =>
+  render(
+    <Provider store={store}>
+      <SettingsDropdown />
+    </Provider>,
+  );
 
 describe('SettingsDropdown', () => {
   it('should work', async () => {

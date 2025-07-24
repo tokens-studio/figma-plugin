@@ -30,7 +30,10 @@ function transformShadowKeyToFigmaVariable(key: string): VariableBindableEffectF
 }
 
 async function tryApplyCompositeVariable({
-  target, value, baseFontSize, resolvedValue,
+  target,
+  value,
+  baseFontSize,
+  resolvedValue,
 }: {
   target: BaseNode | EffectStyle;
   value: TokenBoxshadowValue;
@@ -39,7 +42,8 @@ async function tryApplyCompositeVariable({
 }) {
   // If we're creating styles we need to check the user's setting. If we're applying on a layer, always try to apply variables.
   // 'consumers' only exists in styles, so we can use that to determine if we're creating a style or applying to a layer
-  const shouldCreateStylesWithVariables = defaultTokenValueRetriever.createStylesWithVariableReferences || !('consumers' in target);
+  const shouldCreateStylesWithVariables =
+    defaultTokenValueRetriever.createStylesWithVariableReferences || !('consumers' in target);
 
   const { color, opacity: a } = convertToFigmaColor(value.color);
   const { r, g, b } = color;
@@ -54,17 +58,26 @@ async function tryApplyCompositeVariable({
     type: convertBoxShadowTypeToFigma(value.type),
     spread: convertTypographyNumberToFigma(value.spread.toString(), baseFontSize),
     radius: convertTypographyNumberToFigma(value.blur.toString(), baseFontSize),
-    offset: convertOffsetToFigma(convertTypographyNumberToFigma(value.x.toString(), baseFontSize), convertTypographyNumberToFigma(value.y.toString(), baseFontSize)),
+    offset: convertOffsetToFigma(
+      convertTypographyNumberToFigma(value.x.toString(), baseFontSize),
+      convertTypographyNumberToFigma(value.y.toString(), baseFontSize),
+    ),
     blendMode: (value.blendMode || 'NORMAL') as BlendMode,
     visible: true,
-    ...value.type === 'dropShadow' && 'effects' in target ? { showShadowBehindNode: getShadowBehindNodeFromEffect(target.effects[0]) } : {},
+    ...(value.type === 'dropShadow' && 'effects' in target
+      ? { showShadowBehindNode: getShadowBehindNodeFromEffect(target.effects[0]) }
+      : {}),
   };
   try {
     for (const [key, val] of Object.entries(resolvedValue)) {
       if (val.toString().startsWith('{') && val.toString().endsWith('}') && shouldCreateStylesWithVariables) {
         const variableToApply = await defaultTokenValueRetriever.getVariableReference(val.slice(1, -1));
         if (variableToApply) {
-          const updatedEffect = figma.variables.setBoundVariableForEffect(effect, transformShadowKeyToFigmaVariable(key), variableToApply);
+          const updatedEffect = figma.variables.setBoundVariableForEffect(
+            effect,
+            transformShadowKeyToFigmaVariable(key),
+            variableToApply,
+          );
           effect = {
             ...effect,
             boundVariables: updatedEffect.boundVariables,
@@ -92,22 +105,28 @@ export default async function setEffectValuesOnTarget(
     if (typeof resolvedValue === 'undefined') return;
 
     if (Array.isArray(value)) {
-      const effectsArray = await Promise.all(value.map(async (v, i) => {
-        const newEffect = await tryApplyCompositeVariable({
-          target, value: v, baseFontSize, resolvedValue: resolvedValue[i],
-        });
-        return newEffect;
-      }));
+      const effectsArray = await Promise.all(
+        value.map(async (v, i) => {
+          const newEffect = await tryApplyCompositeVariable({
+            target,
+            value: v,
+            baseFontSize,
+            resolvedValue: resolvedValue[i],
+          });
+          return newEffect;
+        }),
+      );
 
       if ('effects' in target && key === 'effects') target.effects = effectsArray.reverse();
     } else if (typeof value !== 'string') {
       if ('effects' in target && key === 'effects') {
         const newEffect = await tryApplyCompositeVariable({
-          target, value, baseFontSize, resolvedValue,
+          target,
+          value,
+          baseFontSize,
+          resolvedValue,
         });
-        target.effects = [
-          newEffect,
-        ];
+        target.effects = [newEffect];
         Promise.resolve();
       }
     }

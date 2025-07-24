@@ -1,9 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import {
-  Button, Heading, Spinner, Stack, Text, ToggleGroup,
-} from '@tokens-studio/ui';
+import { Button, Heading, Spinner, Stack, Text, ToggleGroup } from '@tokens-studio/ui';
 import { localApiStateSelector, storageTypeSelector } from '@/selectors';
 import usePushDialog from '../hooks/usePushDialog';
 import { getBitbucketCreatePullRequestUrl } from '../store/providers/bitbucket';
@@ -133,7 +131,7 @@ function PushDialog() {
           isOpen
           close={onCancel}
           stickyFooter
-          footer={(
+          footer={
             <Stack direction="row" justify="end" gap={4}>
               <Button variant="secondary" data-testid="push-dialog-button-close" onClick={onCancel}>
                 {t('cancel')}
@@ -147,10 +145,15 @@ function PushDialog() {
                 {t('pushChanges')}
               </Button>
             </Stack>
-          )}
+          }
         >
           <Stack direction="column" align="start">
-            <ToggleGroup type="single" value={activeTab} onValueChange={handleToggleValueChange} css={{ marginLeft: '$3', marginTop: '$3' }}>
+            <ToggleGroup
+              type="single"
+              value={activeTab}
+              onValueChange={handleToggleValueChange}
+              css={{ marginLeft: '$3', marginTop: '$3' }}
+            >
               <ToggleGroup.Item iconOnly={false} value={PushDialogTabs.COMMIT}>
                 {t('commit')}
               </ToggleGroup.Item>
@@ -163,8 +166,7 @@ function PushDialog() {
             </ToggleGroup>
             {activeTab !== 'commit' && localApiState.provider === StorageProviderType.SUPERNOVA && (
               <Stack direction="row" gap={2} align="center" css={{ display: 'inline', padding: '$4' }}>
-                {t('thisWillPushYourLocalChangesToTheBranch')}
-                {' '}
+                {t('thisWillPushYourLocalChangesToTheBranch')}{' '}
                 <Text
                   bold
                   css={{

@@ -57,20 +57,20 @@ This library can also be used programmatically to resolve tokens without giving 
 const { transformTokens } = require('token-transformer');
 
 const rawTokens = {
-    setA:{
-        "sizing": {
-            "base": {
-            "value": "4",
-            "description": "Alias value",
-            "type": "sizing"
-            },
-            "large": {
-            "value": "$sizing.base * 2",
-            "description": "Math value",
-            "type": "sizing"
-            }
-        }
-    }
+  setA: {
+    sizing: {
+      base: {
+        value: '4',
+        description: 'Alias value',
+        type: 'sizing',
+      },
+      large: {
+        value: '$sizing.base * 2',
+        description: 'Math value',
+        type: 'sizing',
+      },
+    },
+  },
 };
 
 const setsToUse = ['setA'];
@@ -82,11 +82,11 @@ const transformerOptions = {
   expandComposition: true,
   expandBorder: true,
   preserveRawValue: false,
-  throwErrorWhenNotResolved:  true,
-  resolveReferences:true
-}
+  throwErrorWhenNotResolved: true,
+  resolveReferences: true,
+};
 
-const resolved = transformTokens(rawTokens,setsToUse, excludes,transformerOptions);
+const resolved = transformTokens(rawTokens, setsToUse, excludes, transformerOptions);
 
 /*{
   sizing: {
@@ -94,5 +94,4 @@ const resolved = transformTokens(rawTokens,setsToUse, excludes,transformerOption
     large: { value: 8, description: 'Math value', type: 'sizing' } 
   }
 }*/
-
 ```

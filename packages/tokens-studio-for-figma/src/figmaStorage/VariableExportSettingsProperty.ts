@@ -7,7 +7,5 @@ export const VariableExportSettingsProperty = new FigmaStorageProperty<Record<st
   FigmaStorageType.SHARED_PLUGIN_DATA,
   `${SharedPluginDataNamespaces.TOKENS}/${SharedPluginDataKeys.tokens.variableExportSettings}`,
   (value) => JSON.stringify(value),
-  (value) => attemptOrFallback<Record<string, boolean>>(() => (
-    value ? JSON.parse(value) : {}
-  ), {}),
+  (value) => attemptOrFallback<Record<string, boolean>>(() => (value ? JSON.parse(value) : {}), {}),
 );

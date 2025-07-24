@@ -16,7 +16,9 @@ export async function getThemeReferences(prefixStylesWithThemeName?: boolean) {
   const figmaStyleReferences: Map<string, string> = new Map();
   const figmaVariableReferences: RawVariableReferenceMap = new Map();
 
-  const activeThemes = themeInfo.themes?.filter((theme) => Object.values(themeInfo.activeTheme).some((v) => v === theme.id));
+  const activeThemes = themeInfo.themes?.filter((theme) =>
+    Object.values(themeInfo.activeTheme).some((v) => v === theme.id),
+  );
 
   const stylePathPrefix = prefixStylesWithThemeName && activeThemes.length > 0 ? activeThemes[0].name : undefined;
 
@@ -34,13 +36,17 @@ export async function getThemeReferences(prefixStylesWithThemeName?: boolean) {
   });
 
   // We'll also add variables of source token sets to the references to properly resolve variables when used in styles
-  const allSourceTokenSetsOfActiveThemes = activeThemes.map((theme) => Object.entries(theme.selectedTokenSets)
-    .filter(([_, status]) => status === TokenSetStatus.SOURCE)) // filter only for source sets
-    .map((theme) => Object.keys(theme).filter((key) => theme[key] === TokenSetStatus.SOURCE)).flat(); // just return name
+  const allSourceTokenSetsOfActiveThemes = activeThemes
+    .map((theme) => Object.entries(theme.selectedTokenSets).filter(([_, status]) => status === TokenSetStatus.SOURCE)) // filter only for source sets
+    .map((theme) => Object.keys(theme).filter((key) => theme[key] === TokenSetStatus.SOURCE))
+    .flat(); // just return name
 
   // Get all themes containing the source token sets
-  const allThemesContainingSourceTokenSets = themeInfo.themes.filter((theme) => allSourceTokenSetsOfActiveThemes
-    .some((sourceTokenSet) => theme.selectedTokenSets[sourceTokenSet] === TokenSetStatus.ENABLED)); // Just get those where its enabled
+  const allThemesContainingSourceTokenSets = themeInfo.themes.filter((theme) =>
+    allSourceTokenSetsOfActiveThemes.some(
+      (sourceTokenSet) => theme.selectedTokenSets[sourceTokenSet] === TokenSetStatus.ENABLED,
+    ),
+  ); // Just get those where its enabled
 
   allThemesContainingSourceTokenSets?.forEach((theme) => {
     Object.entries(theme.$figmaVariableReferences ?? {}).forEach(([token, variableId]) => {
@@ -74,6 +80,8 @@ export async function getThemeReferences(prefixStylesWithThemeName?: boolean) {
   });
 
   return {
-    figmaStyleReferences, figmaVariableReferences, stylePathPrefix,
+    figmaStyleReferences,
+    figmaVariableReferences,
+    stylePathPrefix,
   };
 }

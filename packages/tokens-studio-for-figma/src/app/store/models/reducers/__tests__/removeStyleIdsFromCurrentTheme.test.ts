@@ -12,24 +12,27 @@ describe('removeStyleIdsFromThemes', () => {
       redux: {
         initialState: {
           tokenState: {
-            themes: [{
-              id: 'light',
-              name: 'Light',
-              selectedTokenSets: {},
-              $figmaStyleReferences: {
-                'colors.brand.primary': 'S:1234',
-                'colors.red': 'S:1235',
-                'colors.blue': 'S:1236',
+            themes: [
+              {
+                id: 'light',
+                name: 'Light',
+                selectedTokenSets: {},
+                $figmaStyleReferences: {
+                  'colors.brand.primary': 'S:1234',
+                  'colors.red': 'S:1235',
+                  'colors.blue': 'S:1236',
+                },
               },
-            }, {
-              id: 'dark',
-              name: 'Dark',
-              selectedTokenSets: {},
-              $figmaStyleReferences: {
-                'colors.brand.primary': 'S:2345',
-                'colors.red': 'S:2346',
+              {
+                id: 'dark',
+                name: 'Dark',
+                selectedTokenSets: {},
+                $figmaStyleReferences: {
+                  'colors.brand.primary': 'S:2345',
+                  'colors.red': 'S:2346',
+                },
               },
-            }],
+            ],
           },
         },
       },
@@ -37,21 +40,24 @@ describe('removeStyleIdsFromThemes', () => {
     });
     await store.dispatch.tokenState.removeStyleIdsFromThemes(['S:1234', 'S:2345']);
     const { themes } = store.getState().tokenState;
-    expect(themes).toEqual([{
-      id: 'light',
-      name: 'Light',
-      selectedTokenSets: {},
-      $figmaStyleReferences: {
-        'colors.red': 'S:1235',
-        'colors.blue': 'S:1236',
+    expect(themes).toEqual([
+      {
+        id: 'light',
+        name: 'Light',
+        selectedTokenSets: {},
+        $figmaStyleReferences: {
+          'colors.red': 'S:1235',
+          'colors.blue': 'S:1236',
+        },
       },
-    }, {
-      id: 'dark',
-      name: 'Dark',
-      selectedTokenSets: {},
-      $figmaStyleReferences: {
-        'colors.red': 'S:2346',
+      {
+        id: 'dark',
+        name: 'Dark',
+        selectedTokenSets: {},
+        $figmaStyleReferences: {
+          'colors.red': 'S:2346',
+        },
       },
-    }]);
+    ]);
   });
 });

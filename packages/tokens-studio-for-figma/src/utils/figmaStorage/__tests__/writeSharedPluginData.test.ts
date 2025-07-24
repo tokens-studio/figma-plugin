@@ -26,10 +26,12 @@ describe('writeSharedPluginData', () => {
 
   it('should clear chunks when value is null and chunks exist', async () => {
     // Mock metadata indicating chunked storage
-    mockNode.getSharedPluginData.mockReturnValueOnce(JSON.stringify({
-      type: 'chunked',
-      count: 2,
-    }));
+    mockNode.getSharedPluginData.mockReturnValueOnce(
+      JSON.stringify({
+        type: 'chunked',
+        count: 2,
+      }),
+    );
 
     await writeSharedPluginData('namespace', 'values', null, mockNode as unknown as BaseNode);
 
@@ -94,10 +96,12 @@ describe('writeSharedPluginData', () => {
     (splitIntoChunks as jest.Mock).mockReturnValueOnce(chunks);
 
     // Mock metadata indicating there were previously 2 chunks
-    mockNode.getSharedPluginData.mockReturnValueOnce(JSON.stringify({
-      type: 'chunked',
-      count: 2,
-    }));
+    mockNode.getSharedPluginData.mockReturnValueOnce(
+      JSON.stringify({
+        type: 'chunked',
+        count: 2,
+      }),
+    );
 
     await writeSharedPluginData('namespace', 'values', testValue, mockNode as unknown as BaseNode);
 

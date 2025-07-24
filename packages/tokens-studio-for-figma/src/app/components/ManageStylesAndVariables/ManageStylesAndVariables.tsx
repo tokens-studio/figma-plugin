@@ -1,11 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Button, Stack, Tabs,
-} from '@tokens-studio/ui';
-import {
-  ChevronLeftIcon, SlidersIcon,
-} from '@primer/octicons-react';
+import { Button, Stack, Tabs } from '@tokens-studio/ui';
+import { ChevronLeftIcon, SlidersIcon } from '@primer/octicons-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { StyledProBadge } from '../ProBadge';
 import Modal from '../Modal';
@@ -20,7 +16,13 @@ import { ExportTokenSet } from '@/types/ExportTokenSet';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { Dispatch } from '@/app/store';
 
-export default function ManageStylesAndVariables({ showModal, setShowModal }: { showModal: boolean, setShowModal: (show: boolean) => void }) {
+export default function ManageStylesAndVariables({
+  showModal,
+  setShowModal,
+}: {
+  showModal: boolean;
+  setShowModal: (show: boolean) => void;
+}) {
   const { t } = useTranslation(['manageStylesAndVariables']);
 
   const isProUser = useIsProUser();
@@ -37,22 +39,26 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
   const validatedSelectedThemes = savedSelectedThemes.filter((themeId) => themes.some((theme) => theme.id === themeId));
 
   // Default to using all themes if no valid saved themes are found
-  const initialSelectedThemes = validatedSelectedThemes.length > 0
-    ? validatedSelectedThemes
-    : themes.map((theme) => theme.id);
+  const initialSelectedThemes =
+    validatedSelectedThemes.length > 0 ? validatedSelectedThemes : themes.map((theme) => theme.id);
 
   const [selectedThemes, setSelectedThemes] = React.useState<string[]>(initialSelectedThemes);
 
-  const [selectedSets, setSelectedSets] = React.useState<ExportTokenSet[]>(allSets.map((set) => {
-    const tokenSet = {
-      set,
-      status: TokenSetStatus.ENABLED,
-    };
-    return tokenSet;
-  }));
+  const [selectedSets, setSelectedSets] = React.useState<ExportTokenSet[]>(
+    allSets.map((set) => {
+      const tokenSet = {
+        set,
+        status: TokenSetStatus.ENABLED,
+      };
+      return tokenSet;
+    }),
+  );
 
   const {
-    createVariablesFromSets, createVariablesFromThemes, createStylesFromSelectedTokenSets, createStylesFromSelectedThemes,
+    createVariablesFromSets,
+    createVariablesFromThemes,
+    createStylesFromSelectedTokenSets,
+    createStylesFromSelectedThemes,
   } = useTokens();
 
   // Save selected themes when they change and update redux state
@@ -81,7 +87,16 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
       await createVariablesFromThemes(selectedThemes);
       await createStylesFromSelectedThemes(selectedThemes);
     }
-  }, [setShowModal, activeTab, selectedThemes, selectedSets, createVariablesFromSets, createStylesFromSelectedTokenSets, createVariablesFromThemes, createStylesFromSelectedThemes]);
+  }, [
+    setShowModal,
+    activeTab,
+    selectedThemes,
+    selectedSets,
+    createVariablesFromSets,
+    createStylesFromSelectedTokenSets,
+    createVariablesFromThemes,
+    createStylesFromSelectedThemes,
+  ]);
   const canExportToFigma = activeTab === 'useSets' ? selectedSets.length > 0 : selectedThemes.length > 0;
 
   const handleTabChange = React.useCallback((tab: 'useThemes' | 'useSets') => {
@@ -109,21 +124,31 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
         isOpen={showModal}
         close={handleClose}
         onInteractOutside={onInteractOutside}
-        footer={(
+        footer={
           <Stack direction="row" gap={4} justify="between">
             <Button variant="invisible" id="manageStyles-button-close" onClick={handleClose} icon={<ChevronLeftIcon />}>
               {t('actions.cancel')}
             </Button>
             <Stack direction="row" gap={4}>
-              <Button variant="secondary" icon={<SlidersIcon />} id="manageStyles-button-options" onClick={handleShowOptions}>
+              <Button
+                variant="secondary"
+                icon={<SlidersIcon />}
+                id="manageStyles-button-options"
+                onClick={handleShowOptions}
+              >
                 {t('actions.options')}
               </Button>
-              <Button variant="primary" id="pullDialog-button-override" onClick={handleExportToFigma} disabled={!canExportToFigma}>
+              <Button
+                variant="primary"
+                id="pullDialog-button-override"
+                onClick={handleExportToFigma}
+                disabled={!canExportToFigma}
+              >
                 {t('actions.export')}
               </Button>
             </Stack>
           </Stack>
-  )}
+        }
         stickyFooter
       >
         <Tabs defaultValue={activeTab}>
@@ -134,13 +159,19 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
               <StyledProBadge css={{ marginInlineStart: '$2' }}>{isProUser ? 'PRO' : 'Get PRO'}</StyledProBadge>
             </Tabs.Trigger>
             {/* eslint-disable-next-line react/jsx-no-bind */}
-            <Tabs.Trigger value="useSets" onClick={() => handleTabChange('useSets')}>{t('tabs.exportSets')}</Tabs.Trigger>
+            <Tabs.Trigger value="useSets" onClick={() => handleTabChange('useSets')}>
+              {t('tabs.exportSets')}
+            </Tabs.Trigger>
           </Tabs.List>
           <ExportThemesTab selectedThemes={selectedThemes} setSelectedThemes={setSelectedThemes} />
           <ExportSetsTab selectedSets={selectedSets} setSelectedSets={setSelectedSets} />
         </Tabs>
       </Modal>
-      <OptionsModal isOpen={showModal && showOptions} title={t('optionsModalTitle')} closeAction={handleCancelOptions} />
+      <OptionsModal
+        isOpen={showModal && showOptions}
+        title={t('optionsModalTitle')}
+        closeAction={handleCancelOptions}
+      />
     </>
   );
 }

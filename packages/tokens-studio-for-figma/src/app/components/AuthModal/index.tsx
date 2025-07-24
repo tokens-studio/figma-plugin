@@ -1,8 +1,6 @@
 import React, { ChangeEvent, useCallback, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  Box, Button, Label, Stack, TextInput, Link, Text,
-} from '@tokens-studio/ui';
+import { Box, Button, Label, Stack, TextInput, Link, Text } from '@tokens-studio/ui';
 import { ChevronLeftIcon } from '@radix-ui/react-icons';
 import { useAuth } from '@/context/AuthContext';
 import { secondScreenSelector } from '@/selectors/secondScreenSelector';
@@ -16,9 +14,7 @@ enum AuthModes {
 }
 
 export default function AuthModal() {
-  const {
-    user, authInProgress, logIn, signUp, authError, setAuthError,
-  } = useAuth();
+  const { user, authInProgress, logIn, signUp, authError, setAuthError } = useAuth();
   const dispatch = useDispatch<Dispatch>();
   const [mode, setMode] = useState<AuthModes>(AuthModes.LOGIN);
   const secondScreenEnabled = useSelector(secondScreenSelector);
@@ -80,17 +76,18 @@ export default function AuthModal() {
               <Button size="small" onClick={onCtaClick}>
                 Sign up here
               </Button>
-
             </Box>
             <Box css={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              <Link target="_blank" href={`${process.env.SECOND_SCREEN_APP_URL}/password-recovery`} rel="noreferrer">Forgot password ?</Link>
+              <Link target="_blank" href={`${process.env.SECOND_SCREEN_APP_URL}/password-recovery`} rel="noreferrer">
+                Forgot password ?
+              </Link>
             </Box>
           </>
         )}
         {mode === AuthModes.SIGNUP && (
-        <Button icon={<ChevronLeftIcon />} size="small" variant="invisible" onClick={onCtaClick}>
-          Back to login
-        </Button>
+          <Button icon={<ChevronLeftIcon />} size="small" variant="invisible" onClick={onCtaClick}>
+            Back to login
+          </Button>
         )}
 
         <Box

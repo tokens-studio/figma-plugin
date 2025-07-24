@@ -1,6 +1,4 @@
-import React, {
-  useCallback, useMemo, useState, useRef, useEffect,
-} from 'react';
+import React, { useCallback, useMemo, useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import omit from 'just-omit';
 import debounce from 'lodash.debounce';
@@ -67,19 +65,22 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
     dispatch.uiState.setManageThemesModalOpen(false);
   }, [dispatch]);
 
-  const handleToggleThemeEditor = useCallback((theme?: ThemeObject) => {
-    if (theme && typeof theme !== 'boolean') {
-      const nextState = theme.id === themeEditorOpen ? false : theme.id;
-      if (nextState) {
-        if (themeListRef.current) {
-          setThemeListScrollPosition(themeListRef.current.scrollTop);
+  const handleToggleThemeEditor = useCallback(
+    (theme?: ThemeObject) => {
+      if (theme && typeof theme !== 'boolean') {
+        const nextState = theme.id === themeEditorOpen ? false : theme.id;
+        if (nextState) {
+          if (themeListRef.current) {
+            setThemeListScrollPosition(themeListRef.current.scrollTop);
+          }
         }
+        setThemeEditorOpen(nextState);
+      } else {
+        setThemeEditorOpen(!themeEditorOpen);
       }
-      setThemeEditorOpen(nextState);
-    } else {
-      setThemeEditorOpen(!themeEditorOpen);
-    }
-  }, [themeEditorOpen]);
+    },
+    [themeEditorOpen],
+  );
 
   const handleToggleOpenThemeEditor = useCallback(() => {
     setThemeEditorOpen(!themeEditorOpen);
@@ -87,7 +88,11 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
 
   const handleDeleteTheme = useCallback(async () => {
     if (typeof themeEditorOpen === 'string') {
-      const confirmDelete = await confirm({ text: t('confirmDeleteTheme'), confirmAction: t('delete'), variant: 'danger' });
+      const confirmDelete = await confirm({
+        text: t('confirmDeleteTheme'),
+        confirmAction: t('delete'),
+        variant: 'danger',
+      });
       if (confirmDelete) {
         track('Delete theme', { id: themeEditorOpen });
         dispatch.tokenState.deleteTheme(themeEditorOpen);
@@ -100,68 +105,73 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
     setThemeEditorOpen(false);
   }, []);
 
-  const handleSubmit = useCallback((values: FormValues) => {
-    const id = typeof themeEditorOpen === 'string' ? themeEditorOpen : undefined;
-    if (id) {
-      track('Edit theme', { id, values });
-    } else {
-      track('Create theme', { values });
-    }
-    dispatch.tokenState.saveTheme({
-      id,
-      name: values.name,
-      selectedTokenSets: values.tokenSets,
-      ...(values?.group ? { group: values.group } : {}),
-      meta: {
-        oldName: themeEditorDefaultValues?.name,
-        oldGroup: themeEditorDefaultValues?.group,
-      },
-    });
-    setThemeEditorOpen(false);
-  }, [themeEditorOpen, dispatch.tokenState, themeEditorDefaultValues]);
+  const handleSubmit = useCallback(
+    (values: FormValues) => {
+      const id = typeof themeEditorOpen === 'string' ? themeEditorOpen : undefined;
+      if (id) {
+        track('Edit theme', { id, values });
+      } else {
+        track('Create theme', { values });
+      }
+      dispatch.tokenState.saveTheme({
+        id,
+        name: values.name,
+        selectedTokenSets: values.tokenSets,
+        ...(values?.group ? { group: values.group } : {}),
+        meta: {
+          oldName: themeEditorDefaultValues?.name,
+          oldGroup: themeEditorDefaultValues?.group,
+        },
+      });
+      setThemeEditorOpen(false);
+    },
+    [themeEditorOpen, dispatch.tokenState, themeEditorDefaultValues],
+  );
 
-  const handleReorder = React.useCallback((reorderedItems: TreeItem[]) => {
-    let currentGroup = '';
-    const updatedThemes = reorderedItems.reduce<ThemeObjectsList>((acc, curr) => {
-      if (!curr.isLeaf && typeof curr.value === 'string') {
-        currentGroup = curr.value;
-      }
-      if (curr.isLeaf && typeof curr.value === 'object') {
-        acc.push({
-          ...omit(curr.value, 'group'),
-          ...(currentGroup === INTERNAL_THEMES_NO_GROUP ? {} : { group: currentGroup }),
-        });
-      }
-      return acc;
-    }, []);
-    const newActiveTheme = activeTheme;
-    Object.keys(newActiveTheme).forEach((group) => {
-      // check whether the activeTheme is still belong to the group
-      if (updatedThemes.findIndex((theme) => theme.id === activeTheme?.[group] && theme.group === group) < 0) {
-        delete newActiveTheme[group];
-      }
-    });
-    dispatch.tokenState.setThemes(updatedThemes);
-  }, [dispatch.tokenState, activeTheme]);
+  const handleReorder = React.useCallback(
+    (reorderedItems: TreeItem[]) => {
+      let currentGroup = '';
+      const updatedThemes = reorderedItems.reduce<ThemeObjectsList>((acc, curr) => {
+        if (!curr.isLeaf && typeof curr.value === 'string') {
+          currentGroup = curr.value;
+        }
+        if (curr.isLeaf && typeof curr.value === 'object') {
+          acc.push({
+            ...omit(curr.value, 'group'),
+            ...(currentGroup === INTERNAL_THEMES_NO_GROUP ? {} : { group: currentGroup }),
+          });
+        }
+        return acc;
+      }, []);
+      const newActiveTheme = activeTheme;
+      Object.keys(newActiveTheme).forEach((group) => {
+        // check whether the activeTheme is still belong to the group
+        if (updatedThemes.findIndex((theme) => theme.id === activeTheme?.[group] && theme.group === group) < 0) {
+          delete newActiveTheme[group];
+        }
+      });
+      dispatch.tokenState.setThemes(updatedThemes);
+    },
+    [dispatch.tokenState, activeTheme],
+  );
 
-  const handleCheckReorder = React.useCallback((
-    order: ItemData<typeof treeItems[number]>[],
-    value: typeof treeItems[number],
-    offset: number,
-    velocity: number,
-  ) => {
-    const availableIndexes = findOrderableTargetIndexesInThemeList(
-      velocity,
-      value,
-      order,
-    );
-    let nextOrder = checkReorder(order, value, offset, velocity, availableIndexes);
-    // ensure folders stay together
-    if (!value.isLeaf) {
-      nextOrder = ensureFolderIsTogether<TreeItem>(value, order, nextOrder);
-    }
-    return nextOrder;
-  }, []);
+  const handleCheckReorder = React.useCallback(
+    (
+      order: ItemData<(typeof treeItems)[number]>[],
+      value: (typeof treeItems)[number],
+      offset: number,
+      velocity: number,
+    ) => {
+      const availableIndexes = findOrderableTargetIndexesInThemeList(velocity, value, order);
+      let nextOrder = checkReorder(order, value, offset, velocity, availableIndexes);
+      // ensure folders stay together
+      if (!value.isLeaf) {
+        nextOrder = ensureFolderIsTogether<TreeItem>(value, order, nextOrder);
+      }
+      return nextOrder;
+    },
+    [],
+  );
 
   useEffect(() => {
     if (themeListRef.current) {
@@ -184,7 +194,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
       title={t('themes')}
       stickyFooter
       showClose
-      footer={(
+      footer={
         <Stack gap={2} direction="row" justify="end">
           {!themeEditorOpen && (
             <Button
@@ -200,14 +210,14 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
             <>
               <Box css={{ marginRight: 'auto' }}>
                 {typeof themeEditorOpen === 'string' && (
-                <Button
-                  data-testid="button-manage-themes-modal-delete-theme"
-                  variant="danger"
-                  type="submit"
-                  onClick={handleDeleteTheme}
-                >
-                  {t('delete')}
-                </Button>
+                  <Button
+                    data-testid="button-manage-themes-modal-delete-theme"
+                    variant="danger"
+                    type="submit"
+                    onClick={handleDeleteTheme}
+                  >
+                    {t('delete')}
+                  </Button>
                 )}
               </Box>
               <Stack direction="row" gap={4}>
@@ -230,7 +240,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
             </>
           )}
         </Stack>
-      )}
+      }
       close={handleClose}
       scrollContainerRef={themeListRef}
     >
@@ -242,42 +252,49 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
         />
       )}
       {!!themes.length && !themeEditorOpen && (
-        <Box
-          css={{ padding: '$3 $2 $3 0' }}
-          onScroll={debouncedHandleThemeListScroll}
-        >
+        <Box css={{ padding: '$3 $2 $3 0' }} onScroll={debouncedHandleThemeListScroll}>
           <StyledReorderGroup
             layoutScroll
             values={treeItems}
             onReorder={handleReorder}
-            checkReorder={handleCheckReorder as (order: ItemData<unknown>[], value: unknown, offset: number, velocity: number) => ItemData<unknown>[]}
+            checkReorder={
+              handleCheckReorder as (
+                order: ItemData<unknown>[],
+                value: unknown,
+                offset: number,
+                velocity: number,
+              ) => ItemData<unknown>[]
+            }
           >
-            {
-            treeItems.map((item) => (
+            {treeItems.map((item) => (
               <DragItem<TreeItem> key={item.key} item={item}>
-                {
-                  item.isLeaf && typeof item.value === 'object' ? (
-                    <ThemeListItemContent item={item.value} isActive={activeTheme?.[item.parent as string] === item.value.id} onOpen={handleToggleThemeEditor} groupName={item.parent as string} />
-                  ) : (
-                    <ThemeListGroupHeader
-                      label={item.value === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : item.value as string}
-                      groupName={item.value as string}
-                    />
-                  )
-                }
+                {item.isLeaf && typeof item.value === 'object' ? (
+                  <ThemeListItemContent
+                    item={item.value}
+                    isActive={activeTheme?.[item.parent as string] === item.value.id}
+                    onOpen={handleToggleThemeEditor}
+                    groupName={item.parent as string}
+                  />
+                ) : (
+                  <ThemeListGroupHeader
+                    label={
+                      item.value === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : (item.value as string)
+                    }
+                    groupName={item.value as string}
+                  />
+                )}
               </DragItem>
-            ))
-          }
+            ))}
           </StyledReorderGroup>
         </Box>
       )}
       {themeEditorOpen && (
-      <CreateOrEditThemeForm
-        id={typeof themeEditorOpen === 'string' ? themeEditorOpen : undefined}
-        defaultValues={themeEditorDefaultValues}
-        onSubmit={handleSubmit}
-        onCancel={handleCancelEdit}
-      />
+        <CreateOrEditThemeForm
+          id={typeof themeEditorOpen === 'string' ? themeEditorOpen : undefined}
+          defaultValues={themeEditorDefaultValues}
+          onSubmit={handleSubmit}
+          onCancel={handleCancelEdit}
+        />
       )}
     </Modal>
   );

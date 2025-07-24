@@ -11,9 +11,9 @@ export async function applyDimensionTokenValuesOnNode(
   baseFontSize: string,
 ) {
   if (
-    typeof values.dimension !== 'undefined'
-    && typeof data.dimension !== 'undefined'
-    && isPrimitiveValue(values.dimension)
+    typeof values.dimension !== 'undefined' &&
+    typeof data.dimension !== 'undefined' &&
+    isPrimitiveValue(values.dimension)
   ) {
     if ('itemSpacing' in node) {
       if (node.primaryAxisAlignItems === 'SPACE_BETWEEN') {
@@ -26,8 +26,8 @@ export async function applyDimensionTokenValuesOnNode(
     } else if ('resize' in node) {
       if (
         !(
-          (await tryApplyVariableId(node, 'width', data.dimension))
-          && (await tryApplyVariableId(node, 'height', data.dimension))
+          (await tryApplyVariableId(node, 'width', data.dimension)) &&
+          (await tryApplyVariableId(node, 'height', data.dimension))
         )
       ) {
         const size = transformValue(String(values.dimension), 'sizing', baseFontSize);

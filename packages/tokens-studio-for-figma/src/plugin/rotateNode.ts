@@ -2,9 +2,7 @@ export const getCenterOfNode = (node: SceneNode) => {
   if (!node.absoluteBoundingBox) {
     return undefined;
   }
-  const {
-    x, y, width, height,
-  } = node.absoluteBoundingBox;
+  const { x, y, width, height } = node.absoluteBoundingBox;
 
   // Get x,y of parent
   let px = 0;
@@ -46,9 +44,19 @@ export const rotateNode = (node: SceneNode, angle: number) => {
     node.rotation = angle;
 
     if (center) {
-      const newx = Math.cos(theta) * node.x + node.y * Math.sin(theta) - center.y * Math.sin(theta) - center.x * Math.cos(theta) + center.x;
+      const newx =
+        Math.cos(theta) * node.x +
+        node.y * Math.sin(theta) -
+        center.y * Math.sin(theta) -
+        center.x * Math.cos(theta) +
+        center.x;
 
-      const newy = -Math.sin(theta) * node.x + center.x * Math.sin(theta) + node.y * Math.cos(theta) - center.y * Math.cos(theta) + center.y;
+      const newy =
+        -Math.sin(theta) * node.x +
+        center.x * Math.sin(theta) +
+        node.y * Math.cos(theta) -
+        center.y * Math.cos(theta) +
+        center.y;
 
       node.x = newx;
       node.y = newy;

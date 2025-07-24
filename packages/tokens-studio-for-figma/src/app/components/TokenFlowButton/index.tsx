@@ -53,18 +53,15 @@ export default function TokenFlowButton() {
     setLoading(false);
   }, [activeTheme, availableThemes, themeObjects, tokens, usedTokenSet]);
 
-  return (
-    (existingKey && !licenseKeyError)
-      ? (
-        <IconButton
-          size="small"
-          variant="invisible"
-          tooltip="Open visualization flow"
-          data-testid="token-flow-button"
-          loading={loading}
-          onClick={handleOpenTokenFlowApp}
-          icon={<FlowIcon />}
-        />
-      ) : null
-  );
+  return existingKey && !licenseKeyError ? (
+    <IconButton
+      size="small"
+      variant="invisible"
+      tooltip="Open visualization flow"
+      data-testid="token-flow-button"
+      loading={loading}
+      onClick={handleOpenTokenFlowApp}
+      icon={<FlowIcon />}
+    />
+  ) : null;
 }

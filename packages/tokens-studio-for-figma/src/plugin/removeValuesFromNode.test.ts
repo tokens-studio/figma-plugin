@@ -4,7 +4,7 @@ import removeValuesFromNode from './removeValuesFromNode';
 describe('removeTokensByValue', () => {
   let mockNode: BaseNode;
   beforeEach(() => {
-    mockNode = ({
+    mockNode = {
       cornerRadius: 10,
       topLeftRadius: 10,
       topRightRadius: 10,
@@ -45,11 +45,13 @@ describe('removeTokensByValue', () => {
           ],
         },
       ],
-      strokes: [{
-        type: 'SOLID',
-        opacity: 1,
-        color: { r: 1, g: 0, b: 0 },
-      }],
+      strokes: [
+        {
+          type: 'SOLID',
+          opacity: 1,
+          color: { r: 1, g: 0, b: 0 },
+        },
+      ],
       paddingTop: 10,
       paddingRight: 10,
       paddingBottom: 10,
@@ -57,7 +59,7 @@ describe('removeTokensByValue', () => {
       itemSpacing: 10,
       textDecoration: 'underline',
       visible: false,
-    } as unknown) as BaseNode;
+    } as unknown as BaseNode;
   });
 
   it('should set cornerRadius as 0', () => {

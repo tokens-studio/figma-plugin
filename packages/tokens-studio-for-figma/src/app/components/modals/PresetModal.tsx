@@ -6,7 +6,7 @@ import DefaultPreset from '../PresetProvider/DefaultPreset';
 import FilePreset from '../PresetProvider/FilePreset';
 
 type Props = {
-  onClose: () => void
+  onClose: () => void;
 };
 
 export default function PresetModal({ onClose }: Props) {
@@ -24,15 +24,19 @@ export default function PresetModal({ onClose }: Props) {
         <Stack direction="column" gap={4}>
           <Box>
             <ToggleGroup type="single" value={importMode} onValueChange={handleValueChange}>
-              <ToggleGroup.Item iconOnly={false} value={LoadProviderType.FILE}>File or Folder</ToggleGroup.Item>
-              <ToggleGroup.Item iconOnly={false} value={LoadProviderType.PRESET}>Preset</ToggleGroup.Item>
+              <ToggleGroup.Item iconOnly={false} value={LoadProviderType.FILE}>
+                File or Folder
+              </ToggleGroup.Item>
+              <ToggleGroup.Item iconOnly={false} value={LoadProviderType.PRESET}>
+                Preset
+              </ToggleGroup.Item>
             </ToggleGroup>
           </Box>
-          {
-            importMode === LoadProviderType.PRESET
-              ? <DefaultPreset onCancel={onClose} />
-              : <FilePreset onCancel={onClose} />
-          }
+          {importMode === LoadProviderType.PRESET ? (
+            <DefaultPreset onCancel={onClose} />
+          ) : (
+            <FilePreset onCancel={onClose} />
+          )}
         </Stack>
       </Stack>
     </Modal>

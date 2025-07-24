@@ -1,8 +1,6 @@
 import React from 'react';
 import { Provider } from 'react-redux';
-import {
-  createMockStore, render, waitFor,
-} from '../../../../../tests/config/setupTest';
+import { createMockStore, render, waitFor } from '../../../../../tests/config/setupTest';
 import { ManageThemesModal } from '../ManageThemesModal';
 
 const mockConfirm = jest.fn();
@@ -62,9 +60,7 @@ describe('ManageThemesModal', () => {
   });
 
   it('should render edit theme form', async () => {
-    mockConfirm.mockImplementationOnce(() => (
-      Promise.resolve(false)
-    ));
+    mockConfirm.mockImplementationOnce(() => Promise.resolve(false));
     const mockStore = createMockStore({
       tokenState: {
         themes: [
