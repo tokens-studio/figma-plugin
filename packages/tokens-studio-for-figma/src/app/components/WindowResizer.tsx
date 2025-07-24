@@ -11,43 +11,37 @@ export default function WindowResizer() {
   const cornerRef = React.useRef<HTMLDivElement>(null);
 
   const debouncedSizeChange = React.useRef(
-    debounce((width, height) => track('Set Window Size', { width, height }), 300),
+    debounce(
+      (width, height) => track('Set Window Size', { width, height }),
+      300,
+    ),
   ).current;
 
-  const handleSizeChange = React.useCallback(
-    (e: PointerEvent) => {
-      const size = {
-        width: Math.max(300, Math.floor(e.clientX + 5)),
-        height: Math.max(200, Math.floor(e.clientY + 5)),
-      };
-      dispatch.settings.setWindowSize({
-        ...size,
-      });
-      debouncedSizeChange(size.width, size.height);
-    },
-    [debouncedSizeChange, dispatch.settings],
-  );
+  const handleSizeChange = React.useCallback((e: PointerEvent) => {
+    const size = {
+      width: Math.max(300, Math.floor(e.clientX + 5)),
+      height: Math.max(200, Math.floor(e.clientY + 5)),
+    };
+    dispatch.settings.setWindowSize({
+      ...size,
+    });
+    debouncedSizeChange(size.width, size.height);
+  }, [debouncedSizeChange, dispatch.settings]);
 
-  const onDown = React.useCallback(
-    (e: any) => {
-      if (cornerRef.current) {
-        cornerRef.current.onpointermove = handleSizeChange;
-        cornerRef.current.setPointerCapture(e.pointerId);
-      }
-    },
-    [handleSizeChange],
-  );
+  const onDown = React.useCallback((e: any) => {
+    if (cornerRef.current) {
+      cornerRef.current.onpointermove = handleSizeChange;
+      cornerRef.current.setPointerCapture(e.pointerId);
+    }
+  }, [handleSizeChange]);
 
-  const onUp = React.useCallback(
-    (e: any) => {
-      if (cornerRef.current) {
-        cornerRef.current.onpointermove = null;
-        cornerRef.current.releasePointerCapture(e.pointerId);
-        dispatch.settings.triggerWindowChange();
-      }
-    },
-    [dispatch.settings],
-  );
+  const onUp = React.useCallback((e: any) => {
+    if (cornerRef.current) {
+      cornerRef.current.onpointermove = null;
+      cornerRef.current.releasePointerCapture(e.pointerId);
+      dispatch.settings.triggerWindowChange();
+    }
+  }, [dispatch.settings]);
 
   // @TODO: Fix this when modals are open
   return (

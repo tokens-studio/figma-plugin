@@ -11,9 +11,7 @@ global.figma = createFigma({
   simulateErrors: true,
 });
 
-documentChildren.forEach((child) => {
-  child.parent = figma.currentPage;
-});
+documentChildren.forEach((child) => { child.parent = figma.currentPage; });
 
 global.figma._currentPage.children = documentChildren; // eslint-disable-line no-underscore-dangle
 

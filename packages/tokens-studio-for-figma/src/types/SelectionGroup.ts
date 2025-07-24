@@ -8,6 +8,6 @@ export interface SelectionGroup {
   type: string;
   value: string;
   nodes: NodeInfo[];
-  resolvedValue?: SingleToken['value']; // We save the value of the style
-  appliedType: 'token' | 'variable' | 'style';
+  resolvedValue?: SingleToken['value'] // We save the value of the style
+  appliedType: 'token' | 'variable' | 'style'
 }

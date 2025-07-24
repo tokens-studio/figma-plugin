@@ -12,7 +12,8 @@ jest.mock('@/storage/GitlabTokenStorage', () => ({
     enableMultiFile: mockEnableMultiFile,
     selectBranch: mockSelectBranch,
     assignProjectId: mockAssignProjectId,
-  })),
+  }
+  )),
 }));
 
 describe('gitlab client factory', () => {
@@ -32,14 +33,7 @@ describe('gitlab client factory', () => {
     } as unknown as GitlabCredentials;
     await clientFactory(context, false);
 
-    expect(GitlabTokenStorage).toHaveBeenCalledWith(
-      secret,
-      repositoryId,
-      fullPath,
-      baseUrl,
-      branch,
-      previousSourceBranch,
-    );
+    expect(GitlabTokenStorage).toHaveBeenCalledWith(secret, repositoryId, fullPath, baseUrl, branch, previousSourceBranch);
   });
 
   it('should call change path if there is a filepath', async () => {

@@ -13,7 +13,7 @@ export function processTextStyleProperty(
   valueTransformer?: (value: any) => string,
 ): StyleToCreateToken {
   // Check if the style has a bound variable for this property
-  const boundVariables = style.boundVariables as Record<string, { id: string } | undefined>;
+  const boundVariables = style.boundVariables as Record<string, { id: string; } | undefined>;
   if (boundVariables?.[propertyKey]?.id) {
     const variable = localVariables.find((v) => v.id === boundVariables[propertyKey]?.id);
     if (variable && tokens) {
@@ -22,12 +22,10 @@ export function processTextStyleProperty(
       // Look for an existing token with this name
       const existingToken = Object.entries(tokens.values).reduce<SingleToken | null>((found, [_, tokenSet]) => {
         if (found) return found;
-        const foundToken = Array.isArray(tokenSet)
-          ? tokenSet.find(
-              (token) =>
-                typeof token === 'object' && token !== null && 'name' in token && token.name === normalizedName,
-            )
-          : null;
+        const foundToken = Array.isArray(tokenSet) ? tokenSet.find((token) => typeof token === 'object'
+          && token !== null
+          && 'name' in token
+          && token.name === normalizedName) : null;
         return foundToken || null;
       }, null);
 

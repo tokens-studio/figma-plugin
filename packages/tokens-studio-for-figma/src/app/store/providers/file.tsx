@@ -7,40 +7,35 @@ import { useIsProUser } from '@/app/hooks/useIsProUser';
 export default function useFile() {
   const isProUser = useIsProUser();
 
-  const storageClientFactory = useCallback(
-    (files: FileList) => {
-      const storageClient = new FileTokenStorage(files);
+  const storageClientFactory = useCallback((files: FileList) => {
+    const storageClient = new FileTokenStorage(files);
 
-      if (isProUser) storageClient.enableMultiFile();
-      return storageClient;
-    },
-    [isProUser],
-  );
+    if (isProUser) storageClient.enableMultiFile();
+    return storageClient;
+  }, [isProUser]);
 
-  const readTokensFromFileOrDirectory = useCallback(
-    async (files: FileList): Promise<RemoteResponseData | null> => {
-      const storage = storageClientFactory(files);
-      try {
-        const content = await storage.retrieve();
-        if (content) {
-          return content;
-        }
-      } catch (e) {
-        console.log('Error', e);
-        return {
-          status: 'failure',
-          errorMessage: ErrorMessages.FILE_CREDENTIAL_ERROR,
-        };
+  const readTokensFromFileOrDirectory = useCallback(async (files: FileList): Promise<RemoteResponseData | null> => {
+    const storage = storageClientFactory(files);
+    try {
+      const content = await storage.retrieve();
+      if (content) {
+        return content;
       }
-      return null;
-    },
-    [storageClientFactory],
-  );
+    } catch (e) {
+      console.log('Error', e);
+      return {
+        status: 'failure',
+        errorMessage: ErrorMessages.FILE_CREDENTIAL_ERROR,
+      };
+    }
+    return null;
+  }, [
+    storageClientFactory,
+  ]);
 
-  return useMemo(
-    () => ({
-      readTokensFromFileOrDirectory,
-    }),
-    [readTokensFromFileOrDirectory],
-  );
+  return useMemo(() => ({
+    readTokensFromFileOrDirectory,
+  }), [
+    readTokensFromFileOrDirectory,
+  ]);
 }

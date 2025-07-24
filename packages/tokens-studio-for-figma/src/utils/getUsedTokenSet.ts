@@ -13,7 +13,13 @@ export async function getUsedTokenSet(): Promise<UsedTokenSetsMap | null> {
     migratedUsedTokenSet = migrate<typeof usedTokenSets, UsedTokenSetsMap>(
       usedTokenSets,
       (input): input is string[] => Array.isArray(input),
-      (input) => Object.fromEntries<TokenSetStatus>(input.map((tokenSet) => [tokenSet, TokenSetStatus.ENABLED])),
+      (input) => (
+        Object.fromEntries<TokenSetStatus>(
+          input.map((tokenSet) => (
+            [tokenSet, TokenSetStatus.ENABLED]
+          )),
+        )
+      ),
     );
 
     return migratedUsedTokenSet;

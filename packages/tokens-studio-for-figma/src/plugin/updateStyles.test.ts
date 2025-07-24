@@ -11,7 +11,7 @@ import { createStyles } from './asyncMessageHandlers';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
 
-type ExtendedSingleToken = SingleToken<true, { path: string; styleId: string }>;
+type ExtendedSingleToken = SingleToken<true, { path: string, styleId: string }>;
 const mockRemove = jest.fn();
 
 describe('updateStyles', () => {
@@ -20,13 +20,11 @@ describe('updateStyles', () => {
   const effectSpy = jest.spyOn(updateEffectStyles, 'default');
 
   let disconnectAsyncMessageChannel = () => {};
-  const mockGetThemeInfo = jest.fn(
-    async (): Promise<GetThemeInfoMessageResult> => ({
-      type: AsyncMessageTypes.GET_THEME_INFO,
-      activeTheme: {},
-      themes: [],
-    }),
-  );
+  const mockGetThemeInfo = jest.fn(async (): Promise<GetThemeInfoMessageResult> => ({
+    type: AsyncMessageTypes.GET_THEME_INFO,
+    activeTheme: {},
+    themes: [],
+  }));
 
   beforeAll(() => {
     const disconnectPluginInstance = AsyncMessageChannel.PluginInstance.connect();
@@ -37,24 +35,20 @@ describe('updateStyles', () => {
       disconnectPluginInstance();
       disconnectReactInstance();
     };
-    figma.getLocalPaintStylesAsync = jest.fn(() =>
-      Promise.resolve([
-        {
-          name: 'other',
-          key: 'removekey',
-          id: 'removeid',
-          paints: [{ type: 'SOLID', color: { r: 1, g: 0, b: 0 } }],
-          remove: mockRemove,
-        },
-        {
-          name: 'primary/500',
-          key: '1234',
-          id: '1234',
-          paints: [{ type: 'SOLID', color: { r: 1, g: 0, b: 0 } }],
-          remove: mockRemove,
-        },
-      ]),
-    );
+    figma.getLocalPaintStylesAsync = jest.fn(() => Promise.resolve([{
+      name: 'other',
+      key: 'removekey',
+      id: 'removeid',
+      paints: [{ type: 'SOLID', color: { r: 1, g: 0, b: 0 } }],
+      remove: mockRemove,
+    },
+    {
+      name: 'primary/500',
+      key: '1234',
+      id: '1234',
+      paints: [{ type: 'SOLID', color: { r: 1, g: 0, b: 0 } }],
+      remove: mockRemove,
+    }]));
   });
 
   afterAll(() => {
@@ -76,16 +70,14 @@ describe('updateStyles', () => {
   it('returns if no text values are given', async () => {
     await AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.CREATE_STYLES,
-      tokens: [
-        {
-          name: 'primary.500',
-          path: 'light/primary/500',
-          value: '#ff0000',
-          type: TokenTypes.COLOR,
-          styleId: '1234',
-          internal__Parent: 'global',
-        },
-      ],
+      tokens: [{
+        name: 'primary.500',
+        path: 'light/primary/500',
+        value: '#ff0000',
+        type: TokenTypes.COLOR,
+        styleId: '1234',
+        internal__Parent: 'global',
+      }],
       sourceTokens: [],
       settings: {} as SettingsState,
     });
@@ -138,36 +130,34 @@ describe('updateStyles', () => {
       },
     ] as ExtendedSingleToken[];
 
-    mockGetThemeInfo.mockImplementationOnce(() =>
+    mockGetThemeInfo.mockImplementationOnce(() => (
       Promise.resolve({
         type: AsyncMessageTypes.GET_THEME_INFO,
         activeTheme: {
           [INTERNAL_THEMES_NO_GROUP]: 'light',
         },
-        themes: [
-          {
-            id: 'light',
-            name: 'light',
-            selectedTokenSets: {
-              global: TokenSetStatus.ENABLED,
-            },
-            $figmaStyleReferences: {
-              'primary.500': '1234',
-            },
+        themes: [{
+          id: 'light',
+          name: 'light',
+          selectedTokenSets: {
+            global: TokenSetStatus.ENABLED,
           },
-        ],
-      }),
-    );
+          $figmaStyleReferences: {
+            'primary.500': '1234',
+          },
+        }],
+      })
+    ));
 
-    await updateStyles(
-      [...colorTokens],
-      {
-        prefixStylesWithThemeName: true,
-        stylesColor: true,
-      } as SettingsState,
+    await updateStyles([...colorTokens], {
+      prefixStylesWithThemeName: true,
+      stylesColor: true,
+    } as SettingsState, false);
+    expect(colorSpy).toHaveBeenCalledWith(
+      colorTokens,
       false,
+      undefined,
     );
-    expect(colorSpy).toHaveBeenCalledWith(colorTokens, false, undefined);
   });
 
   it('calls update functions with correct tokens when all tokens are given', async () => {
@@ -218,39 +208,35 @@ describe('updateStyles', () => {
       stylesTypography: true,
     } as SettingsState);
     expect(colorSpy).toHaveBeenCalledWith(
-      [
-        {
-          name: 'primary.500',
-          path: '500',
-          value: '#ff0000',
-          type: 'color',
-          styleId: '',
-        },
-      ],
+      [{
+        name: 'primary.500',
+        path: '500',
+        value: '#ff0000',
+        type: 'color',
+        styleId: '',
+      }],
       false,
       undefined,
     );
     expect(textSpy).toHaveBeenCalledWith(
-      [
-        {
-          name: 'heading.h1',
-          path: 'h1',
-          value: {
-            fontFamily: 'Inter',
-            fontWeight: 'Regular',
-            fontSize: '24',
-          },
-          type: 'typography',
-          styleId: '',
+      [{
+        name: 'heading.h1',
+        path: 'h1',
+        value: {
+          fontFamily: 'Inter',
+          fontWeight: 'Regular',
+          fontSize: '24',
         },
-      ],
+        type: 'typography',
+        styleId: '',
+      }],
       undefined,
       false,
       undefined,
     );
-    expect(effectSpy).toHaveBeenCalledWith({
-      effectTokens: [
-        {
+    expect(effectSpy).toHaveBeenCalledWith(
+      {
+        effectTokens: [{
           name: 'shadow.large',
           path: 'large',
           type: 'boxShadow',
@@ -264,10 +250,10 @@ describe('updateStyles', () => {
             spread: 0,
           },
           styleId: '',
-        },
-      ],
-      shouldCreate: false,
-    });
+        }],
+        shouldCreate: false,
+      },
+    );
   });
 
   it('calls update functions with correct tokens for color tokens', async () => {
@@ -285,7 +271,11 @@ describe('updateStyles', () => {
       prefixStylesWithThemeName: true,
       stylesColor: true,
     } as SettingsState);
-    expect(colorSpy).toHaveBeenCalledWith(colorTokens, false, undefined);
+    expect(colorSpy).toHaveBeenCalledWith(
+      colorTokens,
+      false,
+      undefined,
+    );
     expect(textSpy).not.toHaveBeenCalled();
     expect(effectSpy).not.toHaveBeenCalled();
   });
@@ -309,7 +299,12 @@ describe('updateStyles', () => {
       prefixStylesWithThemeName: true,
       stylesTypography: true,
     } as SettingsState);
-    expect(textSpy).toHaveBeenCalledWith(typographyTokens, undefined, false, undefined);
+    expect(textSpy).toHaveBeenCalledWith(
+      typographyTokens,
+      undefined,
+      false,
+      undefined,
+    );
     expect(colorSpy).not.toHaveBeenCalled();
     expect(effectSpy).not.toHaveBeenCalled();
   });
@@ -339,10 +334,12 @@ describe('updateStyles', () => {
       stylesEffect: true,
       stylesTypography: false,
     } as SettingsState);
-    expect(effectSpy).toHaveBeenCalledWith({
-      effectTokens,
-      shouldCreate: false,
-    });
+    expect(effectSpy).toHaveBeenCalledWith(
+      {
+        effectTokens,
+        shouldCreate: false,
+      },
+    );
     expect(colorSpy).not.toHaveBeenCalled();
     expect(textSpy).not.toHaveBeenCalled();
   });

@@ -7,10 +7,7 @@ import { SingleTypographyToken } from '@/types/tokens';
 import { ApplyVariablesStylesOrRawValues } from '@/constants/ApplyVariablesStyleOrder';
 
 export async function tryApplyTypographyCompositeVariable({
-  target,
-  value,
-  baseFontSize,
-  resolvedValue,
+  target, value, baseFontSize, resolvedValue,
 }: {
   target: TextNode | TextStyle;
   value: SingleTypographyToken['value'];
@@ -22,9 +19,7 @@ export async function tryApplyTypographyCompositeVariable({
   const { applyVariablesStylesOrRawValue } = defaultTokenValueRetriever;
   const shouldApplyStylesAndVariables = applyVariablesStylesOrRawValue !== ApplyVariablesStylesOrRawValues.RAW_VALUES;
   const isStyle = 'consumers' in target;
-  const shouldCreateStylesWithVariables =
-    (isStyle && defaultTokenValueRetriever.createStylesWithVariableReferences) ||
-    (!isStyle && shouldApplyStylesAndVariables);
+  const shouldCreateStylesWithVariables = (isStyle && defaultTokenValueRetriever.createStylesWithVariableReferences) || (!isStyle && shouldApplyStylesAndVariables);
 
   if (typeof value === 'string') return;
 
@@ -33,14 +28,8 @@ export async function tryApplyTypographyCompositeVariable({
     for (const [originalKey, val] of Object.entries(value).filter(([_, keyValue]) => typeof keyValue !== 'undefined')) {
       if (typeof val === 'undefined') return;
       let successfullyAppliedVariable = false;
-      if (
-        resolvedValue[originalKey]?.toString().startsWith('{') &&
-        resolvedValue[originalKey].toString().endsWith('}') &&
-        shouldCreateStylesWithVariables
-      ) {
-        const variableToApply = await defaultTokenValueRetriever.getVariableReference(
-          resolvedValue[originalKey].toString().slice(1, -1),
-        );
+      if (resolvedValue[originalKey]?.toString().startsWith('{') && resolvedValue[originalKey].toString().endsWith('}') && shouldCreateStylesWithVariables) {
+        const variableToApply = await defaultTokenValueRetriever.getVariableReference(resolvedValue[originalKey].toString().slice(1, -1));
         const key = transformTypographyKeyToFigmaVariable(originalKey, variableToApply);
         // If we're dealing with a variable, we fetch all available font weights for the current font and load them.
         // This is needed because we have numerical weights, but we need to apply the string ones. We dont know them from Figma, so we need to load all.
@@ -48,9 +37,7 @@ export async function tryApplyTypographyCompositeVariable({
         if (key === 'fontFamily' && variableToApply) {
           const firstVariableValue = Object.values(variableToApply.valuesByMode)[0];
           if (firstVariableValue) {
-            const fontsMatching = ((await figma.listAvailableFontsAsync()) || []).filter(
-              (font) => font.fontName.family === firstVariableValue,
-            );
+            const fontsMatching = (await figma.listAvailableFontsAsync() || []).filter((font) => font.fontName.family === firstVariableValue);
             for (const font of fontsMatching) {
               await figma.loadFontAsync(font.fontName);
             }
@@ -72,11 +59,7 @@ export async function tryApplyTypographyCompositeVariable({
         // First we set font family and weight without variables, we do this because to apply those values we need their combination
         if (originalKey === 'fontFamily' || originalKey === 'fontWeight') {
           if ('fontName' in target && ('fontWeight' in value || 'fontFamily' in value)) {
-            setFontStyleOnTarget({
-              target,
-              value: { fontFamily: value.fontFamily, fontWeight: value.fontWeight },
-              baseFontSize,
-            });
+            setFontStyleOnTarget({ target, value: { fontFamily: value.fontFamily, fontWeight: value.fontWeight }, baseFontSize });
           }
         } else {
           if (target.fontName !== figma.mixed) await figma.loadFontAsync(target.fontName);

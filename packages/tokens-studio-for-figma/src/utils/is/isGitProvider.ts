@@ -10,9 +10,9 @@ export function isGitProvider<
   | Extract<T, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB }>
   | Extract<T, { provider: StorageProviderType.BITBUCKET }> {
   return (
-    provider.provider === StorageProviderType.ADO ||
-    provider.provider === StorageProviderType.GITHUB ||
-    provider.provider === StorageProviderType.GITLAB ||
-    provider.provider === StorageProviderType.BITBUCKET
+    provider.provider === StorageProviderType.ADO
+    || provider.provider === StorageProviderType.GITHUB
+    || provider.provider === StorageProviderType.GITLAB
+    || provider.provider === StorageProviderType.BITBUCKET
   );
 }

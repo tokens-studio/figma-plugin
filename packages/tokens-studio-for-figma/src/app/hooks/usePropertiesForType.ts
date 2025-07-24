@@ -25,13 +25,19 @@ const spacingProperties = (value?: SingleToken['value']) => {
     {
       label: 'Horizontal padding',
       name: Properties.horizontalPadding,
-      clear: [Properties.paddingLeft, Properties.paddingRight],
+      clear: [
+        Properties.paddingLeft,
+        Properties.paddingRight,
+      ],
       disabled: isMultiValue,
     },
     {
       label: 'Vertical padding',
       name: Properties.verticalPadding,
-      clear: [Properties.paddingTop, Properties.paddingBottom],
+      clear: [
+        Properties.paddingTop,
+        Properties.paddingBottom,
+      ],
       disabled: isMultiValue,
     },
     { label: 'Row gap', name: Properties.counterAxisSpacing, disabled: isMultiValue },
@@ -45,19 +51,17 @@ const spacingProperties = (value?: SingleToken['value']) => {
   return properties;
 };
 
-const sizingProperties = [
-  {
-    label: 'All',
-    name: Properties.sizing,
-    clear: [Properties.width, Properties.height],
-  },
-  { label: 'Width', name: Properties.width },
-  { label: 'Height', name: Properties.height },
-  { label: 'Min width', name: Properties.minWidth },
-  { label: 'Max width', name: Properties.maxWidth },
-  { label: 'Min height', name: Properties.minHeight },
-  { label: 'Max height', name: Properties.maxHeight },
-];
+const sizingProperties = [{
+  label: 'All',
+  name: Properties.sizing,
+  clear: [Properties.width, Properties.height],
+},
+{ label: 'Width', name: Properties.width },
+{ label: 'Height', name: Properties.height },
+{ label: 'Min width', name: Properties.minWidth },
+{ label: 'Max width', name: Properties.maxWidth },
+{ label: 'Min height', name: Properties.minHeight },
+{ label: 'Max height', name: Properties.maxHeight }];
 
 export function usePropertiesForTokenType(type: TokenTypes, value?: SingleToken['value']): PropertyObject[] {
   let disabled = false;
@@ -90,7 +94,12 @@ export function usePropertiesForTokenType(type: TokenTypes, value?: SingleToken[
           {
             label: 'All',
             name: Properties.border,
-            clear: [Properties.borderTop, Properties.borderRight, Properties.borderBottom, Properties.borderLeft],
+            clear: [
+              Properties.borderTop,
+              Properties.borderRight,
+              Properties.borderBottom,
+              Properties.borderLeft,
+            ],
           },
           { label: 'Top', name: Properties.borderTop, disabled },
           { label: 'Right', name: Properties.borderRight, disabled },
@@ -151,12 +160,16 @@ export function usePropertiesForTokenType(type: TokenTypes, value?: SingleToken[
           {
             label: 'Spacing',
             name: Properties.spacing,
-            childProperties: [...spacingProperties(value)],
+            childProperties: [
+              ...spacingProperties(value),
+            ],
           },
           {
             label: 'Sizing',
             name: Properties.sizing,
-            childProperties: [...sizingProperties],
+            childProperties: [
+              ...sizingProperties,
+            ],
           },
           {
             label: 'Border radius',
@@ -214,7 +227,9 @@ export function usePropertiesForTokenType(type: TokenTypes, value?: SingleToken[
         }
         break;
       case TokenTypes.BOOLEAN:
-        properties.push({ label: 'Visibility', name: Properties.visibility });
+        properties.push(
+          { label: 'Visibility', name: Properties.visibility },
+        );
         break;
       default:
         if (isPropertyType(type)) {

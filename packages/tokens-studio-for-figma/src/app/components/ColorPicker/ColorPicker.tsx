@@ -30,16 +30,10 @@ type Props = {
 };
 
 const DEFAULT_RGBA = Object.freeze({
-  r: 0,
-  g: 0,
-  b: 0,
-  a: 1,
+  r: 0, g: 0, b: 0, a: 1,
 });
 const DEFAULT_HSLA = Object.freeze({
-  h: 0,
-  s: 0,
-  l: 0,
-  a: 1,
+  h: 0, s: 0, l: 0, a: 1,
 });
 const PROPS: Omit<React.ComponentProps<typeof Input>, 'name'> = {
   full: true,
@@ -81,10 +75,7 @@ const hexToHslaColor = (value: string) => {
   }
 };
 
-const ColorPicker: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
-  value = '#000000',
-  onChange,
-}) => {
+const ColorPicker: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({ value = '#000000', onChange }) => {
   const [inputMode, setInputMode] = React.useState(InputMode.RGBA);
   const [internalValue, setInternalValue] = React.useState(value);
   const [rgba, setRgba] = React.useState<Rgba>(hexToRgbaColor(value));
@@ -189,20 +180,36 @@ const ColorPicker: React.FC<React.PropsWithChildren<React.PropsWithChildren<Prop
       </div>
       <Stack direction="row" gap={1}>
         {inputMode === InputMode.RGBA && (
-          <Stack direction="row" gap={1}>
-            <Input {...PROPS} min={0} max={255} name="r" value={rgba.r} onChange={handleRedChange} />
-            <Input {...PROPS} min={0} max={255} name="g" value={rgba.g} onChange={handleGreenChange} />
-            <Input {...PROPS} min={0} max={255} name="b" value={rgba.b} onChange={handleBlueChange} />
-            <Input {...PROPS} min={0} max={1} step="0.01" name="a" value={rgba.a} onChange={handleAlphaChange} />
-          </Stack>
+        <Stack direction="row" gap={1}>
+          <Input {...PROPS} min={0} max={255} name="r" value={rgba.r} onChange={handleRedChange} />
+          <Input {...PROPS} min={0} max={255} name="g" value={rgba.g} onChange={handleGreenChange} />
+          <Input {...PROPS} min={0} max={255} name="b" value={rgba.b} onChange={handleBlueChange} />
+          <Input
+            {...PROPS}
+            min={0}
+            max={1}
+            step="0.01"
+            name="a"
+            value={rgba.a}
+            onChange={handleAlphaChange}
+          />
+        </Stack>
         )}
         {inputMode === InputMode.HSLA && (
-          <Stack direction="row" gap={1}>
-            <Input {...PROPS} min={0} max={360} name="h" value={hsla.h} onChange={handleHueChange} />
-            <Input {...PROPS} min={0} max={100} name="s" value={hsla.s} onChange={handleSaturationChange} />
-            <Input {...PROPS} min={0} max={100} name="l" value={hsla.l} onChange={handleLightnessChange} />
-            <Input {...PROPS} step="0.01" min={0} max={1} name="a" value={hsla.a} onChange={handleAlphaChange} />
-          </Stack>
+        <Stack direction="row" gap={1}>
+          <Input {...PROPS} min={0} max={360} name="h" value={hsla.h} onChange={handleHueChange} />
+          <Input {...PROPS} min={0} max={100} name="s" value={hsla.s} onChange={handleSaturationChange} />
+          <Input {...PROPS} min={0} max={100} name="l" value={hsla.l} onChange={handleLightnessChange} />
+          <Input
+            {...PROPS}
+            step="0.01"
+            min={0}
+            max={1}
+            name="a"
+            value={hsla.a}
+            onChange={handleAlphaChange}
+          />
+        </Stack>
         )}
         <Button variant="secondary" size="small" onClick={handleInputModeToggle}>
           {inputMode === InputMode.RGBA ? 'RGB(A)' : 'HSL(A)'}

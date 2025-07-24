@@ -182,9 +182,7 @@ describe('convertTokensToObject', () => {
 
     it('should convert array-like tokens with inherited types to a nested object', () => {
       TokenFormat.setFormat(TokenFormatOptions.Legacy);
-      expect(convertTokensToObject(INPUT_TOKENS_WITH_INHERITED_TYPES, true)).toEqual(
-        OUTPUT_LEGACY_FORMAT_OBJECT_WITH_INHERITED_TYPES,
-      );
+      expect(convertTokensToObject(INPUT_TOKENS_WITH_INHERITED_TYPES, true)).toEqual(OUTPUT_LEGACY_FORMAT_OBJECT_WITH_INHERITED_TYPES);
     });
   });
 
@@ -196,9 +194,7 @@ describe('convertTokensToObject', () => {
 
     it('should convert array-like tokens with inherited types to a nested object', () => {
       TokenFormat.setFormat(TokenFormatOptions.DTCG);
-      expect(convertTokensToObject(INPUT_TOKENS_WITH_INHERITED_TYPES, true)).toEqual(
-        OUTPUT_DTCG_FORMAT_OBJECT_WITH_INHERITED_TYPES,
-      );
+      expect(convertTokensToObject(INPUT_TOKENS_WITH_INHERITED_TYPES, true)).toEqual(OUTPUT_DTCG_FORMAT_OBJECT_WITH_INHERITED_TYPES);
     });
   });
 

@@ -22,8 +22,6 @@ export function generateTokensToCreate({
     .map(([tokenSet]) => tokenSet);
   const resolved = defaultTokenResolver.setTokens(mergeTokenGroups(tokens, theme.selectedTokenSets, overallConfig));
   return resolved.filter(
-    (token) =>
-      (!token.internal__Parent || enabledTokenSets.includes(token.internal__Parent)) &&
-      tokenTypesToCreateVariable.includes(token.type), // filter out SOURCE tokens
+    (token) => ((!token.internal__Parent || enabledTokenSets.includes(token.internal__Parent)) && tokenTypesToCreateVariable.includes(token.type)), // filter out SOURCE tokens
   );
 }

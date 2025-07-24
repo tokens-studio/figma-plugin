@@ -115,15 +115,9 @@ describe('convertTokensObjectToResolved', () => {
       ],
     };
 
-    expect(
-      convertTokensObjectToResolved(tokens, [], [], {
-        expandTypography: false,
-        expandShadow: false,
-        expandComposition: false,
-        expandBorder: false,
-        preserveRawValue: false,
-      }),
-    ).toMatchSnapshot();
+    expect(convertTokensObjectToResolved(tokens, [], [], {
+      expandTypography: false, expandShadow: false, expandComposition: false, expandBorder: false, preserveRawValue: false,
+    })).toMatchSnapshot();
   });
 
   it('does not expand shadows when not needed', () => {
@@ -166,15 +160,9 @@ describe('convertTokensObjectToResolved', () => {
       ],
     };
 
-    expect(
-      convertTokensObjectToResolved(tokens, [], [], {
-        expandTypography: false,
-        expandShadow: false,
-        expandComposition: false,
-        expandBorder: false,
-        preserveRawValue: true,
-      }),
-    ).toMatchSnapshot();
+    expect(convertTokensObjectToResolved(tokens, [], [], {
+      expandTypography: false, expandShadow: false, expandComposition: false, expandBorder: false, preserveRawValue: true,
+    })).toMatchSnapshot();
   });
 
   it('does not expand composition when not needed', () => {
@@ -216,15 +204,9 @@ describe('convertTokensObjectToResolved', () => {
       },
     };
 
-    expect(
-      convertTokensObjectToResolved(tokens, [], [], {
-        expandTypography: false,
-        expandShadow: false,
-        expandComposition: false,
-        expandBorder: false,
-        preserveRawValue: true,
-      }),
-    ).toMatchSnapshot();
+    expect(convertTokensObjectToResolved(tokens, [], [], {
+      expandTypography: false, expandShadow: false, expandComposition: false, expandBorder: false, preserveRawValue: true,
+    })).toMatchSnapshot();
   });
 
   it('should expand composition when needed', () => {
@@ -266,15 +248,9 @@ describe('convertTokensObjectToResolved', () => {
       },
     };
 
-    expect(
-      convertTokensObjectToResolved(tokens, [], [], {
-        expandTypography: false,
-        expandShadow: false,
-        expandComposition: true,
-        expandBorder: true,
-        preserveRawValue: true,
-      }),
-    ).toMatchSnapshot();
+    expect(convertTokensObjectToResolved(tokens, [], [], {
+      expandTypography: false, expandShadow: false, expandComposition: true, expandBorder: true, preserveRawValue: true,
+    })).toMatchSnapshot();
   });
 
   it('preserves rawValue when requested', () => {
@@ -309,15 +285,9 @@ describe('convertTokensObjectToResolved', () => {
       },
     };
 
-    expect(
-      convertTokensObjectToResolved(tokens, [], [], {
-        expandTypography: false,
-        expandShadow: false,
-        expandComposition: false,
-        expandBorder: true,
-        preserveRawValue: true,
-      }),
-    ).toMatchSnapshot();
+    expect(convertTokensObjectToResolved(tokens, [], [], {
+      expandTypography: false, expandShadow: false, expandComposition: false, expandBorder: true, preserveRawValue: true,
+    })).toMatchSnapshot();
   });
 
   it('resolves all references when requested', () => {
@@ -464,16 +434,9 @@ describe('convertTokensObjectToResolved', () => {
       },
     };
 
-    expect(
-      convertTokensObjectToResolved(tokens, [], [], {
-        expandTypography: false,
-        expandShadow: false,
-        expandComposition: false,
-        expandBorder: false,
-        preserveRawValue: false,
-        resolveReferences: true,
-      }),
-    ).toMatchSnapshot();
+    expect(convertTokensObjectToResolved(tokens, [], [], {
+      expandTypography: false, expandShadow: false, expandComposition: false, expandBorder: false, preserveRawValue: false, resolveReferences: true,
+    })).toMatchSnapshot();
   });
 
   it('preserves all references when requested', () => {
@@ -619,16 +582,9 @@ describe('convertTokensObjectToResolved', () => {
       },
     };
 
-    expect(
-      convertTokensObjectToResolved(tokens, [], [], {
-        expandTypography: false,
-        expandShadow: false,
-        expandComposition: false,
-        expandBorder: false,
-        preserveRawValue: false,
-        resolveReferences: false,
-      }),
-    ).toMatchSnapshot();
+    expect(convertTokensObjectToResolved(tokens, [], [], {
+      expandTypography: false, expandShadow: false, expandComposition: false, expandBorder: false, preserveRawValue: false, resolveReferences: false,
+    })).toMatchSnapshot();
   });
 
   it('resolves only math expressions when requested', () => {
@@ -774,15 +730,8 @@ describe('convertTokensObjectToResolved', () => {
       },
     };
 
-    expect(
-      convertTokensObjectToResolved(tokens, [], [], {
-        expandTypography: false,
-        expandShadow: false,
-        expandComposition: false,
-        expandBorder: false,
-        preserveRawValue: false,
-        resolveReferences: 'math',
-      }),
-    ).toMatchSnapshot();
+    expect(convertTokensObjectToResolved(tokens, [], [], {
+      expandTypography: false, expandShadow: false, expandComposition: false, expandBorder: false, preserveRawValue: false, resolveReferences: 'math',
+    })).toMatchSnapshot();
   });
 });

@@ -1,23 +1,25 @@
 import React, { useCallback } from 'react';
 import { ArrowRightIcon, LinkBreak1Icon, LinkBreak2Icon } from '@radix-ui/react-icons';
-import { Box, IconButton, Tooltip, Checkbox } from '@tokens-studio/ui';
+import {
+  Box, IconButton, Tooltip, Checkbox,
+} from '@tokens-studio/ui';
 import { Flex } from '../Flex';
 import Text from '../Text';
 import ResolvingLoader from '../ResolvingLoader';
 import Stack from '../Stack';
 
 export type VariableInfo = {
-  id: string;
-  name?: string;
-  isResolved?: boolean;
+  id: string
+  name?: string
+  isResolved?: boolean
 };
 
 type Props = {
-  token: string;
-  variableInfo: VariableInfo;
-  isChecked: boolean;
-  onDisconnectVariable: (token: string) => void;
-  handleToggleSelectedVariable: (token: string) => void;
+  token: string
+  variableInfo: VariableInfo
+  isChecked: boolean
+  onDisconnectVariable: (token: string) => void
+  handleToggleSelectedVariable: (token: string) => void
 };
 
 export const ThemeVariableManagementEntry: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
@@ -44,7 +46,11 @@ export const ThemeVariableManagementEntry: React.FC<React.PropsWithChildren<Reac
         alignItems: 'center',
       }}
     >
-      <Checkbox checked={isChecked} id={token} onCheckedChange={onCheckedChanged} />
+      <Checkbox
+        checked={isChecked}
+        id={token}
+        onCheckedChange={onCheckedChanged}
+      />
 
       <Flex
         css={{
@@ -57,49 +63,40 @@ export const ThemeVariableManagementEntry: React.FC<React.PropsWithChildren<Reac
       >
         <Tooltip
           side="bottom"
-          label={
+          label={(
             <Stack direction="column" align="start" gap={1} css={{ wordBreak: 'break-word' }}>
-              <Text css={{ color: '$tooltipFg' }}>{token}</Text>
-              <Text css={{ color: '$tooltipFgMuted' }}>{variableInfo.name}</Text>
+              <Text css={{ color: '$tooltipFg' }}>
+                {token}
+              </Text>
+              <Text css={{ color: '$tooltipFgMuted' }}>
+                {variableInfo.name}
+              </Text>
             </Stack>
-          }
+          )}
         >
-          <Box
-            css={{
-              flexGrow: 0,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '$3',
-              overflow: 'hidden',
-            }}
+          <Box css={{
+            flexGrow: 0, display: 'flex', alignItems: 'center', gap: '$3', overflow: 'hidden',
+          }}
           >
-            <Text css={{ overflow: 'hidden', textOverflow: 'ellipsis' }} size="small">
-              {token}
-            </Text>
+            <Text css={{ overflow: 'hidden', textOverflow: 'ellipsis' }} size="small">{token}</Text>
             <Box css={{ flexShrink: 0 }}>
               <ArrowRightIcon />
             </Box>
-            {!variableInfo.name && !variableInfo.isResolved && <ResolvingLoader />}
-            {!variableInfo.name && variableInfo.isResolved && (
-              <Stack direction="row" gap={1} css={{ color: '$dangerFg' }}>
-                <LinkBreak1Icon />
-                Reference not found
-              </Stack>
+            {(!variableInfo.name && !variableInfo.isResolved) && (
+            <ResolvingLoader />
+            )}
+            {(!variableInfo.name && variableInfo.isResolved) && (
+            <Stack direction="row" gap={1} css={{ color: '$dangerFg' }}>
+              <LinkBreak1Icon />
+              Reference not found
+            </Stack>
             )}
             {variableInfo.name && (
-              <Text bold size="small" title={variableInfo.name} css={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {variableInfo.name}
-              </Text>
+            <Text bold size="small" title={variableInfo.name} css={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{variableInfo.name}</Text>
             )}
           </Box>
         </Tooltip>
-        <IconButton
-          tooltip="Detach variable"
-          icon={<LinkBreak2Icon />}
-          variant="invisible"
-          data-testid="ThemeVariableManagementEntry-unlink"
-          onClick={handleDisconnectVariable}
-        />
+        <IconButton tooltip="Detach variable" icon={<LinkBreak2Icon />} variant="invisible" data-testid="ThemeVariableManagementEntry-unlink" onClick={handleDisconnectVariable} />
       </Flex>
     </Flex>
   );

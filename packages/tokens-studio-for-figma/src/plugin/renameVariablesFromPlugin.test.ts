@@ -1,8 +1,5 @@
 import {
-  mockGetLocalVariableCollectionsAsync,
-  mockGetLocalVariablesAsync,
-  mockGetVariableById,
-  mockSetValueForMode,
+  mockGetLocalVariableCollectionsAsync, mockGetLocalVariablesAsync, mockGetVariableById, mockSetValueForMode,
 } from '../../tests/__mocks__/figmaMock';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
@@ -17,20 +14,18 @@ describe('renameVariablesFromPlugin', () => {
     activeTheme: {
       [INTERNAL_THEMES_NO_GROUP]: 'light',
     },
-    themes: [
-      {
-        id: 'light',
-        name: 'light',
-        selectedTokenSets: {
-          global: TokenSetStatus.ENABLED,
-        },
-        $figmaVariableReferences: {
-          'fg.default-rename': '12345',
-          'fg.muted': '23456',
-          'fg.alias': '34567',
-        },
+    themes: [{
+      id: 'light',
+      name: 'light',
+      selectedTokenSets: {
+        global: TokenSetStatus.ENABLED,
       },
-    ],
+      $figmaVariableReferences: {
+        'fg.default-rename': '12345',
+        'fg.muted': '23456',
+        'fg.alias': '34567',
+      },
+    }],
   });
   runAfter.push(AsyncMessageChannel.ReactInstance.connect());
   AsyncMessageChannel.ReactInstance.handle(AsyncMessageTypes.GET_THEME_INFO, mockGetThemeInfoHandler);
@@ -76,26 +71,24 @@ describe('renameVariablesFromPlugin', () => {
         id: 'VariableCollectionId:12:12345',
         name: 'Collection 1',
         remote: false,
-        modes: [{ name: 'Default', modeId: '123' }],
+        modes: [
+          { name: 'Default', modeId: '123' },
+        ],
       },
     ];
     mockGetLocalVariablesAsync.mockImplementation(() => mockLocalVariablesAsync);
     mockGetLocalVariableCollectionsAsync.mockImplementation(() => Promise.resolve(mockLocalVariableCollectionsAsync));
     mockGetVariableById.mockImplementation(() => mockLocalVariablesAsync[2]);
-    expect(
-      await renameVariablesFromPlugin([
-        {
-          oldName: 'fg.default',
-          newName: 'fg.default-rename',
-        },
-      ]),
-    ).toEqual([
+    expect(await renameVariablesFromPlugin([
       {
         oldName: 'fg.default',
         newName: 'fg.default-rename',
-        variableIds: ['12345'],
       },
-    ]);
+    ])).toEqual([{
+      oldName: 'fg.default',
+      newName: 'fg.default-rename',
+      variableIds: ['12345'],
+    }]);
     expect(mockLocalVariablesAsync[0].name).toBe('fg/default-rename');
   });
 });

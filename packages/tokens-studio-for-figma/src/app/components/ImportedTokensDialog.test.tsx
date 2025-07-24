@@ -1,10 +1,12 @@
 import React from 'react';
 import { Provider } from 'react-redux';
-import { act, render, createMockStore, waitFor } from '../../../tests/config/setupTest';
+import {
+  act, render, createMockStore, waitFor,
+} from '../../../tests/config/setupTest';
 import ImportedTokensDialog from './ImportedTokensDialog';
 
 // Hide log calls unless they are expected. This is mainly related to react-modal
-jest.spyOn(console, 'error').mockImplementation(() => {});
+jest.spyOn(console, 'error').mockImplementation(() => { });
 
 jest.mock('uuid', () => ({
   v4: jest.fn(() => 'mock-uuid'),
@@ -94,18 +96,14 @@ describe('ImportedTokensDialog', () => {
       expect(result.queryByText('updateAll')).toBeInTheDocument();
       expect(result.queryByText('#ffffff')).toBeInTheDocument();
       expect(result.queryByText('regular color token')).toBeInTheDocument();
-      expect(
-        result.queryByText(
-          JSON.stringify({
-            blur: 1,
-            color: '#00000040',
-            spread: 1,
-            type: 'dropShadow',
-            x: 1,
-            y: 1,
-          }),
-        ),
-      ).toBeInTheDocument();
+      expect(result.queryByText(JSON.stringify({
+        blur: 1,
+        color: '#00000040',
+        spread: 1,
+        type: 'dropShadow',
+        x: 1,
+        y: 1,
+      }))).toBeInTheDocument();
       expect(result.queryByText('cancel')).toBeInTheDocument();
       expect(result.queryByText('importAll')).toBeInTheDocument();
     });
@@ -123,31 +121,33 @@ describe('ImportedTokensDialog', () => {
       updateButton.click();
     });
     waitFor(async () => {
-      expect(mockStore.getState().tokenState.tokens.global).toEqual([
-        {
-          name: 'light',
-          type: 'typography',
-          value: {
-            fontFamily: 'aria',
-            fontSize: '12',
-            fontWeight: 'bold',
+      expect(mockStore.getState().tokenState.tokens.global).toEqual(
+        [
+          {
+            name: 'light',
+            type: 'typography',
+            value: {
+              fontFamily: 'aria',
+              fontSize: '12',
+              fontWeight: 'bold',
+            },
           },
-        },
-        {
-          name: 'opacity.50',
-          type: 'opacity',
-          value: '50%',
-        },
-        {
-          $extensions: {
-            'studio.tokens': { id: 'mock-uuid' },
+          {
+            name: 'opacity.50',
+            type: 'opacity',
+            value: '50%',
           },
-          name: 'small',
-          type: 'sizing',
-          value: '12',
-          description: 'regular sizing token',
-        },
-      ]);
+          {
+            $extensions: {
+              'studio.tokens': { id: 'mock-uuid' },
+            },
+            name: 'small',
+            type: 'sizing',
+            value: '12',
+            description: 'regular sizing token',
+          },
+        ],
+      );
     });
   });
 
@@ -163,52 +163,54 @@ describe('ImportedTokensDialog', () => {
       createButton.click();
     });
     waitFor(async () => {
-      expect(mockStore.getState().tokenState.tokens.global).toEqual([
-        {
-          name: 'light',
-          type: 'typography',
-          value: {
-            fontFamily: 'aria',
-            fontSize: '12',
-            fontWeight: 'bold',
+      expect(mockStore.getState().tokenState.tokens.global).toEqual(
+        [
+          {
+            name: 'light',
+            type: 'typography',
+            value: {
+              fontFamily: 'aria',
+              fontSize: '12',
+              fontWeight: 'bold',
+            },
           },
-        },
-        {
-          name: 'opacity.50',
-          type: 'opacity',
-          value: '50%',
-        },
-        {
-          $extensions: {
-            'studio.tokens': { id: 'mock-uuid' },
+          {
+            name: 'opacity.50',
+            type: 'opacity',
+            value: '50%',
           },
-          name: 'small',
-          type: 'sizing',
-          value: '12',
-          description: 'regular sizing token',
-        },
-        {
-          $extensions: {
-            'studio.tokens': { id: 'mock-uuid' },
+          {
+            $extensions: {
+              'studio.tokens': { id: 'mock-uuid' },
+            },
+            name: 'small',
+            type: 'sizing',
+            value: '12',
+            description: 'regular sizing token',
           },
-          name: 'black',
-          type: 'color',
-          value: '#ffffff',
-          description: 'regular color token',
-        },
-        {
-          name: 'headline',
-          type: 'boxShadow',
-          value: {
-            blur: 1,
-            color: '#00000040',
-            spread: 1,
-            type: 'dropShadow',
-            x: 1,
-            y: 1,
+          {
+            $extensions: {
+              'studio.tokens': { id: 'mock-uuid' },
+            },
+            name: 'black',
+            type: 'color',
+            value: '#ffffff',
+            description: 'regular color token',
           },
-        },
-      ]);
+          {
+            name: 'headline',
+            type: 'boxShadow',
+            value: {
+              blur: 1,
+              color: '#00000040',
+              spread: 1,
+              type: 'dropShadow',
+              x: 1,
+              y: 1,
+            },
+          },
+        ],
+      );
     });
   });
 
@@ -229,46 +231,48 @@ describe('ImportedTokensDialog', () => {
       createButton.click();
     });
     waitFor(async () => {
-      expect(mockStore.getState().tokenState.tokens.global).toEqual([
-        {
-          name: 'light',
-          type: 'typography',
-          value: {
-            fontFamily: 'aria',
-            fontSize: '12',
-            fontWeight: 'bold',
+      expect(mockStore.getState().tokenState.tokens.global).toEqual(
+        [
+          {
+            name: 'light',
+            type: 'typography',
+            value: {
+              fontFamily: 'aria',
+              fontSize: '12',
+              fontWeight: 'bold',
+            },
           },
-        },
-        {
-          name: 'opacity.50',
-          type: 'opacity',
-          value: '50%',
-        },
-        {
-          $extensions: {
-            'studio.tokens': { id: 'mock-uuid' },
+          {
+            name: 'opacity.50',
+            type: 'opacity',
+            value: '50%',
           },
-          name: 'black',
-          type: 'color',
-          value: '#ffffff',
-          description: 'regular color token',
-        },
-        {
-          $extensions: {
-            'studio.tokens': { id: 'mock-uuid' },
+          {
+            $extensions: {
+              'studio.tokens': { id: 'mock-uuid' },
+            },
+            name: 'black',
+            type: 'color',
+            value: '#ffffff',
+            description: 'regular color token',
           },
-          name: 'headline',
-          type: 'boxShadow',
-          value: {
-            blur: 1,
-            color: '#00000040',
-            spread: 1,
-            type: 'dropShadow',
-            x: 1,
-            y: 1,
+          {
+            $extensions: {
+              'studio.tokens': { id: 'mock-uuid' },
+            },
+            name: 'headline',
+            type: 'boxShadow',
+            value: {
+              blur: 1,
+              color: '#00000040',
+              spread: 1,
+              type: 'dropShadow',
+              x: 1,
+              y: 1,
+            },
           },
-        },
-      ]);
+        ],
+      );
     });
   });
 
@@ -286,22 +290,24 @@ describe('ImportedTokensDialog', () => {
     });
 
     waitFor(async () => {
-      expect(mockStore.getState().tokenState.tokens.global).toEqual([
-        {
-          name: 'light',
-          type: 'typography',
-          value: {
-            fontFamily: 'aria',
-            fontSize: '24',
-            fontWeight: 'light',
+      expect(mockStore.getState().tokenState.tokens.global).toEqual(
+        [
+          {
+            name: 'light',
+            type: 'typography',
+            value: {
+              fontFamily: 'aria',
+              fontSize: '24',
+              fontWeight: 'light',
+            },
           },
-        },
-        {
-          name: 'opacity.50',
-          type: 'opacity',
-          value: '50%',
-        },
-      ]);
+          {
+            name: 'opacity.50',
+            type: 'opacity',
+            value: '50%',
+          },
+        ],
+      );
     });
   });
 
@@ -319,22 +325,24 @@ describe('ImportedTokensDialog', () => {
     });
 
     waitFor(async () => {
-      expect(mockStore.getState().tokenState.tokens.global).toEqual([
-        {
-          name: 'light',
-          type: 'typography',
-          value: {
-            fontFamily: 'aria',
-            fontSize: '24',
-            fontWeight: 'light',
+      expect(mockStore.getState().tokenState.tokens.global).toEqual(
+        [
+          {
+            name: 'light',
+            type: 'typography',
+            value: {
+              fontFamily: 'aria',
+              fontSize: '24',
+              fontWeight: 'light',
+            },
           },
-        },
-        {
-          name: 'opacity.50',
-          type: 'opacity',
-          value: '30%',
-        },
-      ]);
+          {
+            name: 'opacity.50',
+            type: 'opacity',
+            value: '30%',
+          },
+        ],
+      );
     });
   });
 
@@ -356,23 +364,25 @@ describe('ImportedTokensDialog', () => {
     });
 
     await waitFor(() => {
-      expect(mockStore.getState().tokenState.tokens.global).toEqual([
-        {
-          name: 'light',
-          type: 'typography',
-          value: {
-            fontFamily: 'aria',
-            fontSize: '12',
-            fontWeight: 'bold',
+      expect(mockStore.getState().tokenState.tokens.global).toEqual(
+        [
+          {
+            name: 'light',
+            type: 'typography',
+            value: {
+              fontFamily: 'aria',
+              fontSize: '12',
+              fontWeight: 'bold',
+            },
           },
-        },
-        {
-          $extensions: { 'studio.tokens': { id: 'mock-uuid' } },
-          name: 'opacity.50',
-          type: 'opacity',
-          value: '30%',
-        },
-      ]);
+          {
+            $extensions: { 'studio.tokens': { id: 'mock-uuid' } },
+            name: 'opacity.50',
+            type: 'opacity',
+            value: '30%',
+          },
+        ],
+      );
     });
   });
 
@@ -385,54 +395,56 @@ describe('ImportedTokensDialog', () => {
     );
 
     await waitFor(async () => {
-      const updateButton = (await result.findByText('importAll')) as HTMLButtonElement;
+      const updateButton = await result.findByText('importAll') as HTMLButtonElement;
       updateButton.click();
 
-      expect(mockStore.getState().tokenState.tokens.global).toEqual([
-        {
-          $extensions: { 'studio.tokens': { id: 'mock-uuid' } },
-          name: 'light',
-          type: 'typography',
-          value: {
-            fontFamily: 'aria',
-            fontSize: '24',
-            fontWeight: 'light',
+      expect(mockStore.getState().tokenState.tokens.global).toEqual(
+        [
+          {
+            $extensions: { 'studio.tokens': { id: 'mock-uuid' } },
+            name: 'light',
+            type: 'typography',
+            value: {
+              fontFamily: 'aria',
+              fontSize: '24',
+              fontWeight: 'light',
+            },
           },
-        },
-        {
-          $extensions: { 'studio.tokens': { id: 'mock-uuid' } },
-          name: 'opacity.50',
-          type: 'opacity',
-          value: '30%',
-        },
-        {
-          $extensions: { 'studio.tokens': { id: 'mock-uuid' } },
-          name: 'small',
-          type: 'sizing',
-          value: '12',
-          description: 'regular sizing token',
-        },
-        {
-          $extensions: { 'studio.tokens': { id: 'mock-uuid' } },
-          name: 'black',
-          type: 'color',
-          value: '#ffffff',
-          description: 'regular color token',
-        },
-        {
-          $extensions: { 'studio.tokens': { id: 'mock-uuid' } },
-          name: 'headline',
-          type: 'boxShadow',
-          value: {
-            blur: 1,
-            color: '#00000040',
-            spread: 1,
-            type: 'dropShadow',
-            x: 1,
-            y: 1,
+          {
+            $extensions: { 'studio.tokens': { id: 'mock-uuid' } },
+            name: 'opacity.50',
+            type: 'opacity',
+            value: '30%',
           },
-        },
-      ]);
+          {
+            $extensions: { 'studio.tokens': { id: 'mock-uuid' } },
+            name: 'small',
+            type: 'sizing',
+            value: '12',
+            description: 'regular sizing token',
+          },
+          {
+            $extensions: { 'studio.tokens': { id: 'mock-uuid' } },
+            name: 'black',
+            type: 'color',
+            value: '#ffffff',
+            description: 'regular color token',
+          },
+          {
+            $extensions: { 'studio.tokens': { id: 'mock-uuid' } },
+            name: 'headline',
+            type: 'boxShadow',
+            value: {
+              blur: 1,
+              color: '#00000040',
+              spread: 1,
+              type: 'dropShadow',
+              x: 1,
+              y: 1,
+            },
+          },
+        ],
+      );
     });
   });
 

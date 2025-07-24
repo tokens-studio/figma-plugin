@@ -1,4 +1,4 @@
 export type ToggleManyTokenSetsPayload = {
-  shouldCheck: boolean;
-  sets: string[];
+  shouldCheck: boolean
+  sets: string[]
 };

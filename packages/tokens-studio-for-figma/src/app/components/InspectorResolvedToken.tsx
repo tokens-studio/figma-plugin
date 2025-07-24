@@ -13,13 +13,8 @@ import { TokenTypographyValue, TokenBoxshadowValue, TokenBorderValue } from '@/t
 
 type Props = {
   name: string;
-  value: SingleToken['value'];
-  rawValue?: Partial<
-    Record<
-      TokenTypes,
-      string | number | TokenTypographyValue | TokenBoxshadowValue | TokenBorderValue | TokenBoxshadowValue[]
-    >
-  >;
+  value: SingleToken['value']
+  rawValue?: Partial<Record<TokenTypes, string | number | TokenTypographyValue | TokenBoxshadowValue | TokenBorderValue | TokenBoxshadowValue[]>>
   type: string;
 };
 

@@ -1,7 +1,9 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { Box, Checkbox, Label, Stack, Button, EmptyState } from '@tokens-studio/ui';
+import {
+  Box, Checkbox, Label, Stack, Button, EmptyState,
+} from '@tokens-studio/ui';
 import { Dispatch } from '../store';
 import useTokens from '../store/useTokens';
 import InspectorTokenGroup from './InspectorTokenGroup';
@@ -16,13 +18,7 @@ import { StyleIdBackupKeys } from '@/constants/StyleIdBackupKeys';
 import OnboardingExplainer from './OnboardingExplainer';
 import BulkRemapModal from './modals/BulkRemapModal';
 
-export default function InspectorMultiView({
-  resolvedTokens,
-  tokenToSearch,
-}: {
-  resolvedTokens: SingleToken[];
-  tokenToSearch: string;
-}) {
+export default function InspectorMultiView({ resolvedTokens, tokenToSearch }: { resolvedTokens: SingleToken[], tokenToSearch: string }) {
   const { t } = useTranslation(['inspect']);
 
   const onboardingData = {
@@ -44,54 +40,43 @@ export default function InspectorMultiView({
   const filteredSelectionValues = React.useMemo(() => {
     let result = uiState.selectionValues;
     if (!inspectState.isShowBrokenReferences) {
-      result = result.filter(
-        (token) => resolvedTokens.find((resolvedToken) => resolvedToken.name === token.value) || token.resolvedValue,
-      );
+      result = result.filter((token) => resolvedTokens.find((resolvedToken) => resolvedToken.name === token.value) || token.resolvedValue);
     }
     if (!inspectState.isShowResolvedReferences) {
-      result = result.filter(
-        (token) => !resolvedTokens.find((resolvedToken) => resolvedToken.name === token.value) && !token.resolvedValue,
-      );
+      result = result.filter((token) => (!resolvedTokens.find((resolvedToken) => resolvedToken.name === token.value) && !token.resolvedValue));
     }
     return tokenToSearch ? result.filter((token) => token.value.includes(tokenToSearch)) : result;
-  }, [
-    uiState.selectionValues,
-    inspectState.isShowBrokenReferences,
-    inspectState.isShowResolvedReferences,
-    resolvedTokens,
-    tokenToSearch,
-  ]);
+  }, [uiState.selectionValues, inspectState.isShowBrokenReferences, inspectState.isShowResolvedReferences, resolvedTokens, tokenToSearch]);
 
-  const groupedSelectionValues = React.useMemo(
-    () =>
-      filteredSelectionValues.reduce<
-        Partial<Record<TokenTypes, SelectionGroup[]> & Record<Properties, SelectionGroup[]>>
-      >((acc, curr) => {
-        if (StyleIdBackupKeys.includes(curr.type)) return acc;
-        if (acc[curr.category]) {
-          const sameValueIndex = acc[curr.category]!.findIndex((v) => v.value === curr.value);
+  const groupedSelectionValues = React.useMemo(() => (
+    filteredSelectionValues.reduce<Partial<
+    Record<TokenTypes, SelectionGroup[]>
+    & Record<Properties, SelectionGroup[]>
+    >>((acc, curr) => {
+      if (StyleIdBackupKeys.includes(curr.type)) return acc;
+      if (acc[curr.category]) {
+        const sameValueIndex = acc[curr.category]!.findIndex((v) => v.value === curr.value);
 
-          if (sameValueIndex > -1) {
-            acc[curr.category]![sameValueIndex].nodes.push(...curr.nodes);
-          } else {
-            acc[curr.category] = [...acc[curr.category]!, curr];
-          }
+        if (sameValueIndex > -1) {
+          acc[curr.category]![sameValueIndex].nodes.push(...curr.nodes);
         } else {
-          acc[curr.category] = [curr];
+          acc[curr.category] = [...acc[curr.category]!, curr];
         }
+      } else {
+        acc[curr.category] = [curr];
+      }
 
-        return acc;
-      }, {}),
-    [filteredSelectionValues],
-  );
+      return acc;
+    }, {})
+  ), [filteredSelectionValues]);
 
   const removeTokens = React.useCallback(() => {
     const valuesToRemove = uiState.selectionValues
       .filter((v) => inspectState.selectedTokens.includes(`${v.category}-${v.value}`))
-      .map((v) => ({ nodes: v.nodes, property: v.type })) as {
+      .map((v) => ({ nodes: v.nodes, property: v.type })) as ({
       property: Properties;
       nodes: NodeInfo[];
-    }[];
+    }[]);
 
     removeTokensByValue(valuesToRemove);
   }, [inspectState.selectedTokens, removeTokensByValue, uiState.selectionValues]);
@@ -123,23 +108,13 @@ export default function InspectorMultiView({
   return (
     <>
       {uiState.selectionValues.length > 0 && (
-        <Box
-          css={{
-            display: 'inline-flex',
-            paddingInline: '$4',
-            rowGap: '$3',
-            justifyContent: 'space-between',
-          }}
+        <Box css={{
+          display: 'inline-flex', paddingInline: '$4', rowGap: '$3', justifyContent: 'space-between',
+        }}
         >
-          <Box
-            css={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '$3',
-              fontSize: '$small',
-              flexBasis: '80px',
-              flexShrink: 0,
-            }}
+          <Box css={{
+            display: 'flex', alignItems: 'center', gap: '$3', fontSize: '$small', flexBasis: '80px', flexShrink: 0,
+          }}
           >
             <Checkbox
               checked={inspectState.selectedTokens.length === uiState.selectionValues.length}
@@ -150,32 +125,17 @@ export default function InspectorMultiView({
               {t('selectAll')}
             </Label>
           </Box>
-          <Box
-            css={{
-              display: 'flex',
-              flexDirection: 'row',
-              flexWrap: 'wrap',
-              justifyContent: 'flex-end',
-              gap: '$3',
-            }}
+          <Box css={{
+            display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-end', gap: '$3',
+          }}
           >
             <Button size="small" onClick={handleShowBulkRemap} variant="secondary">
               {t('bulkRemap')}
             </Button>
-            <Button
-              size="small"
-              onClick={setNoneValues}
-              disabled={inspectState.selectedTokens.length === 0}
-              variant="secondary"
-            >
+            <Button size="small" onClick={setNoneValues} disabled={inspectState.selectedTokens.length === 0} variant="secondary">
               {t('setToNone')}
             </Button>
-            <Button
-              size="small"
-              onClick={removeTokens}
-              disabled={inspectState.selectedTokens.length === 0}
-              variant="danger"
-            >
+            <Button size="small" onClick={removeTokens} disabled={inspectState.selectedTokens.length === 0} variant="danger">
               {t('removeSelected')}
             </Button>
           </Box>
@@ -183,29 +143,17 @@ export default function InspectorMultiView({
       )}
       <Box
         css={{
-          display: 'flex',
-          flexDirection: 'column',
-          flexGrow: 1,
-          padding: '$4',
+          display: 'flex', flexDirection: 'column', flexGrow: 1, padding: '$4',
         }}
         className="content scroll-container"
       >
         {uiState.selectionValues.length > 0 ? (
           <Box css={{ display: 'flex', flexDirection: 'column', gap: '$1' }}>
-            {Object.entries(groupedSelectionValues).map((group) => (
-              <InspectorTokenGroup
-                key={`inspect-group-${group[0]}`}
-                group={group as [Properties, SelectionGroup[]]}
-                resolvedTokens={resolvedTokens}
-              />
-            ))}
+            {Object.entries(groupedSelectionValues).map((group) => <InspectorTokenGroup key={`inspect-group-${group[0]}`} group={group as [Properties, SelectionGroup[]]} resolvedTokens={resolvedTokens} />)}
           </Box>
         ) : (
           <Stack direction="column" gap={4} css={{ padding: '$5', margin: 'auto' }}>
-            <EmptyState
-              title={uiState.selectedLayers > 0 ? t('noTokensFound') : t('noLayersSelected')}
-              description={uiState.selectedLayers > 0 ? t('noLayersWithTokens') : t('selectLayer')}
-            />
+            <EmptyState title={uiState.selectedLayers > 0 ? t('noTokensFound') : t('noLayersSelected')} description={uiState.selectedLayers > 0 ? t('noLayersWithTokens') : t('selectLayer')} />
             {/* FIXME: Use selectors - this rerenders */}
             {uiState.onboardingExplainerInspect && (
               <OnboardingExplainer data={onboardingData} closeOnboarding={closeOnboarding} />
@@ -213,7 +161,12 @@ export default function InspectorMultiView({
           </Stack>
         )}
       </Box>
-      {bulkRemapModalVisible && <BulkRemapModal isOpen={bulkRemapModalVisible} onClose={handleHideBulkRemap} />}
+      {bulkRemapModalVisible && (
+        <BulkRemapModal
+          isOpen={bulkRemapModalVisible}
+          onClose={handleHideBulkRemap}
+        />
+      )}
     </>
   );
 }

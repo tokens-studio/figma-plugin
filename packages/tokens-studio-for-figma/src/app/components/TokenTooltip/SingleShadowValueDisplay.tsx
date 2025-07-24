@@ -9,10 +9,7 @@ type Props = {
   resolvedValue?: TokenBoxshadowValue | null;
 };
 
-export const SingleShadowValueDisplay: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
-  value,
-  resolvedValue,
-}) => (
+export const SingleShadowValueDisplay: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({ value, resolvedValue }) => (
   <Box>
     <Box css={{ display: 'flex', color: '$tooltipFg' }}>{resolvedValue?.type}</Box>
     <Stack direction="row" align="start" gap={2} wrap>

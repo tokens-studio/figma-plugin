@@ -11,17 +11,15 @@ export function checkIfAlias(token: SingleToken | string, allTokens: SingleToken
     if (typeof token === 'string') {
       aliasToken = Boolean(token.match(AliasRegex));
     } else if (
-      token.type === TokenTypes.TYPOGRAPHY ||
-      token.type === TokenTypes.BOX_SHADOW ||
-      token.type === TokenTypes.BORDER
+      token.type === TokenTypes.TYPOGRAPHY
+      || token.type === TokenTypes.BOX_SHADOW
+      || token.type === TokenTypes.BORDER
     ) {
       if (typeof token.value === 'string') {
         aliasToken = Boolean(String(token.value).match(AliasRegex));
       } else {
         const arrayValue = Array.isArray(token.value) ? token.value : [token.value];
-        aliasToken = arrayValue.some((value) =>
-          Object.values(value).some((singleValue) => Boolean(singleValue?.toString().match(AliasRegex))),
-        );
+        aliasToken = arrayValue.some((value) => Object.values(value).some((singleValue) => Boolean(singleValue?.toString().match(AliasRegex))));
       }
     } else if (token.type === TokenTypes.COMPOSITION) {
       return true;

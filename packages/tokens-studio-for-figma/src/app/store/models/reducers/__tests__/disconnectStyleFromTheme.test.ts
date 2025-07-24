@@ -16,12 +16,10 @@ describe('disconnectStyleFromTheme', () => {
       ],
     } as unknown as TokenState;
 
-    expect(
-      disconnectStyleFromTheme(mockState, {
-        id: 'light',
-        key: 'colors.brand.primary',
-      }).themes,
-    ).toEqual([
+    expect(disconnectStyleFromTheme(mockState, {
+      id: 'light',
+      key: 'colors.brand.primary',
+    }).themes).toEqual([
       {
         id: 'light',
         name: 'Light',
@@ -45,12 +43,10 @@ describe('disconnectStyleFromTheme', () => {
       ],
     } as unknown as TokenState;
 
-    expect(
-      disconnectStyleFromTheme(mockState, {
-        id: 'light',
-        key: 'colors.brand.secondary',
-      }).themes,
-    ).toEqual([
+    expect(disconnectStyleFromTheme(mockState, {
+      id: 'light',
+      key: 'colors.brand.secondary',
+    }).themes).toEqual([
       {
         id: 'light',
         name: 'Light',

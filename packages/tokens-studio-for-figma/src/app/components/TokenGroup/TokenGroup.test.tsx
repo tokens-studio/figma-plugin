@@ -68,14 +68,12 @@ describe('TokenGroup', () => {
   });
 
   it('should be able to collapse a token group', async () => {
-    const { getByTestId } = render(
-      <TokenGroup
-        tokenValues={tokenValues as DeepKeyTokenMap}
-        showNewForm={showNewForm}
-        showForm={showForm}
-        schema={schema as TokenTypeSchema}
-      />,
-    );
+    const { getByTestId } = render(<TokenGroup
+      tokenValues={tokenValues as DeepKeyTokenMap}
+      showNewForm={showNewForm}
+      showForm={showForm}
+      schema={schema as TokenTypeSchema}
+    />);
 
     await fireEvent.click(getByTestId('group-heading-size.font-font-listing'));
     await fireEvent.click(getByTestId('group-heading-color-color-listing'));
@@ -85,14 +83,12 @@ describe('TokenGroup', () => {
   });
 
   it('should be able to expand a token group', async () => {
-    const { getByTestId } = render(
-      <TokenGroup
-        tokenValues={tokenValues as DeepKeyTokenMap}
-        showNewForm={showNewForm}
-        showForm={showForm}
-        schema={schema as TokenTypeSchema}
-      />,
-    );
+    const { getByTestId } = render(<TokenGroup
+      tokenValues={tokenValues as DeepKeyTokenMap}
+      showNewForm={showNewForm}
+      showForm={showForm}
+      schema={schema as TokenTypeSchema}
+    />);
 
     await fireEvent.click(getByTestId('group-heading-size.font-font-listing'));
     await fireEvent.click(getByTestId('group-heading-size.font-font-listing'));
@@ -103,14 +99,12 @@ describe('TokenGroup', () => {
   });
 
   it('should be able to add a new token', async () => {
-    const result = render(
-      <TokenGroup
-        tokenValues={tokenValues as DeepKeyTokenMap}
-        showNewForm={showNewForm}
-        showForm={showForm}
-        schema={schema as TokenTypeSchema}
-      />,
-    );
+    const result = render(<TokenGroup
+      tokenValues={tokenValues as DeepKeyTokenMap}
+      showNewForm={showNewForm}
+      showForm={showForm}
+      schema={schema as TokenTypeSchema}
+    />);
 
     await fireEvent.click(result.getAllByTestId('button-add-new-token-in-group')[0]);
     expect(showNewForm).toBeCalledTimes(1);

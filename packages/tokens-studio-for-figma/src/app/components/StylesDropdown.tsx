@@ -32,15 +32,9 @@ export default function StylesDropdown() {
 
         <DropdownMenu.Portal>
           <DropdownMenu.Content side="top">
-            <DropdownMenu.Item textValue="Export styles & variables" onSelect={handleOpenModal}>
-              {t('exportStylesAndVariables')}
-            </DropdownMenu.Item>
-            <DropdownMenu.Item textValue="Import variables" disabled={importDisabled} onSelect={pullVariables}>
-              {t('importVariables')}
-            </DropdownMenu.Item>
-            <DropdownMenu.Item textValue="Import styles" disabled={importDisabled} onSelect={pullStyles}>
-              {t('importStyles')}
-            </DropdownMenu.Item>
+            <DropdownMenu.Item textValue="Export styles & variables" onSelect={handleOpenModal}>{t('exportStylesAndVariables')}</DropdownMenu.Item>
+            <DropdownMenu.Item textValue="Import variables" disabled={importDisabled} onSelect={pullVariables}>{t('importVariables')}</DropdownMenu.Item>
+            <DropdownMenu.Item textValue="Import styles" disabled={importDisabled} onSelect={pullStyles}>{t('importStyles')}</DropdownMenu.Item>
           </DropdownMenu.Content>
         </DropdownMenu.Portal>
       </DropdownMenu>

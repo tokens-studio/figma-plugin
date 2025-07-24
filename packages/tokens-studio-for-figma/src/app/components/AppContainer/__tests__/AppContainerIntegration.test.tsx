@@ -12,7 +12,9 @@ import {
   LicenseKeyProperty,
 } from '@/figmaStorage';
 import * as validateLicenseModule from '@/utils/validateLicense';
-import { screen, createMockStore, render, waitFor, fireEvent } from '../../../../../tests/config/setupTest';
+import {
+  screen, createMockStore, render, waitFor, fireEvent,
+} from '../../../../../tests/config/setupTest';
 import { mockGetContent } from '../../../../../tests/__mocks__/octokitRestMock';
 import { AppContainer } from '../AppContainer';
 import { AsyncMessageTypes, StartupMessage } from '@/types/AsyncMessages';
@@ -30,9 +32,9 @@ const licenseKeyPropertyReadSpy = jest.spyOn(LicenseKeyProperty, 'read');
 const validateLicenseSpy = jest.spyOn(validateLicenseModule, 'default');
 
 // Hide error calls unless they are expected. This is mainly related to react-modal
-jest.spyOn(console, 'error').mockImplementation(() => {});
+jest.spyOn(console, 'error').mockImplementation(() => { });
 // Hide warn calls from shortcut hooks
-jest.spyOn(console, 'warn').mockImplementation(() => {});
+jest.spyOn(console, 'warn').mockImplementation(() => { });
 
 const mockUser = {
   figmaId: 'figma:1234',
@@ -149,7 +151,7 @@ const resetSuite = () => {
 };
 
 const mockGithubGetContent = () => {
-  mockGetContent.mockImplementation(() =>
+  mockGetContent.mockImplementation(() => (
     Promise.resolve({
       data: JSON.stringify({
         global: {
@@ -174,8 +176,8 @@ const mockGithubGetContent = () => {
           },
         ],
       }),
-    }),
-  );
+    })
+  ));
 };
 
 const withLicense = () => {
@@ -187,20 +189,22 @@ const withLicense = () => {
   }));
 };
 
-const withOrWithoutLicense =
-  (params: Omit<StartupMessage, 'licenseKey'>, fn: (parmas: StartupMessage) => Promise<void>) => async () => {
-    await fn({
-      ...params,
-      licenseKey: null,
-    });
+const withOrWithoutLicense = (
+  params: Omit<StartupMessage, 'licenseKey'>,
+  fn: (parmas: StartupMessage) => Promise<void>,
+) => async () => {
+  await fn({
+    ...params,
+    licenseKey: null,
+  });
 
-    resetSuite();
-    withLicense();
-    await fn({
-      ...params,
-      licenseKey: 'license-key',
-    });
-  };
+  resetSuite();
+  withLicense();
+  await fn({
+    ...params,
+    licenseKey: 'license-key',
+  });
+};
 // #endregion
 
 jest.mock('launchdarkly-react-client-sdk', () => ({
@@ -219,135 +223,57 @@ describe('AppContainer (integration)', () => {
   });
 
   it(
-    'shows the start screen in a blank file',
-    withOrWithoutLicense(
-      {
+    'shows the start screen in a blank file', (
+      withOrWithoutLicense({
         ...mockStartupParams,
         localTokenData: null,
         lastOpened: 1,
-      },
-      async (params) => {
+      }, async (params) => {
         const mockStore = createMockStore({});
         const result = render(
           <Provider store={mockStore}>
             <AppContainer {...params} />
           </Provider>,
         );
-        waitFor(
-          async () => {
-            expect(await result.findByText('Getting started')).not.toBeUndefined();
-            result.unmount();
-          },
-          { timeout: 10000 },
-        );
-      },
+        waitFor(async () => {
+          expect(await result.findByText('Getting started')).not.toBeUndefined();
+          result.unmount();
+        }, { timeout: 10000 });
+      })
     ),
   );
 
   it(
-    'shows the onboarding flow modal',
-    withOrWithoutLicense(
-      {
+    'shows the onboarding flow modal', (
+      withOrWithoutLicense({
         ...mockStartupParams,
         localTokenData: null,
         lastOpened: 0,
-      },
-      async (params) => {
+      }, async (params) => {
         const mockStore = createMockStore({});
         const result = render(
           <Provider store={mockStore}>
             <AppContainer {...params} />
           </Provider>,
         );
-        waitFor(
-          async () => {
-            expect(await result.findByText('Getting started')).not.toBeUndefined();
-            result.unmount();
-          },
-          { timeout: 10000 },
-        );
-      },
-    ),
-  );
-
-  it(
-    'shows the tokens screen if local tokens are found',
-    withOrWithoutLicense(
-      {
-        ...mockStartupParams,
-        localTokenData: {
-          ...mockStartupParams.localTokenData,
-          checkForChanges: false,
-          values: mockValues,
-        } as StartupMessage['localTokenData'],
-      },
-      async (params) => {
-        const mockStore = createMockStore({});
-
-        const result = render(
-          <Provider store={mockStore}>
-            <AppContainer {...params} />
-          </Provider>,
-        );
-        waitFor(
-          async () => {
-            expect(await result.findAllByText('global')).toHaveLength(1);
-            result.unmount();
-          },
-          { timeout: 10000 },
-        );
-      },
-    ),
-  );
-
-  it(
-    'shows pull dialog if there are local changes with a remote storage provider',
-    withOrWithoutLicense(
-      {
-        ...mockStartupParams,
-        localApiProviders: mockGithubApiProviders,
-        storageType: mockGithubStoragetype,
-        user: mockUser,
-        localTokenData: {
-          ...mockStartupParams.localTokenData,
-          values: mockValues,
-        } as StartupMessage['localTokenData'],
-      },
-      async (params) => {
-        const mockStore = createMockStore({});
-
-        const result = render(
-          <Provider store={mockStore}>
-            <AppContainer {...params} />
-          </Provider>,
-        );
-
         waitFor(async () => {
-          expect(screen.queryByText(/Recover local changes\?/i)).not.toBeNull();
+          expect(await result.findByText('Getting started')).not.toBeUndefined();
           result.unmount();
-        });
-      },
+        }, { timeout: 10000 });
+      })
     ),
   );
 
   it(
-    'skips start page if there are no local changes and the Github provider can sync',
-    withOrWithoutLicense(
-      {
+    'shows the tokens screen if local tokens are found', (
+      withOrWithoutLicense({
         ...mockStartupParams,
-        localApiProviders: mockGithubApiProviders,
-        storageType: mockGithubStoragetype,
-        user: mockUser,
         localTokenData: {
           ...mockStartupParams.localTokenData,
           checkForChanges: false,
-          themes: mockThemes,
           values: mockValues,
         } as StartupMessage['localTokenData'],
-      },
-      async (params) => {
-        mockGithubGetContent();
-
+      }, async (params) => {
         const mockStore = createMockStore({});
 
         const result = render(
@@ -355,115 +281,145 @@ describe('AppContainer (integration)', () => {
             <AppContainer {...params} />
           </Provider>,
         );
-
-        waitFor(
-          async () => {
-            expect(await result.findAllByText('global')).toHaveLength(1);
-            result.unmount();
-          },
-          { timeout: 10000 },
-        );
-      },
-    ),
-  );
-
-  it(
-    'can switch to a different tokenset',
-    withOrWithoutLicense(
-      {
-        ...mockStartupParams,
-        localTokenData: {
-          ...mockStartupParams.localTokenData,
-          checkForChanges: false,
-          themes: mockThemes,
-          values: mockValues,
-        } as StartupMessage['localTokenData'],
-      },
-      async (params) => {
-        const mockStore = createMockStore({});
-
-        const result = render(
-          <Provider store={mockStore}>
-            <AppContainer {...params} />
-          </Provider>,
-        );
-
         waitFor(async () => {
-          const set = await result.findByTestId('tokensetitem-playground');
-          set.click();
-          expect(mockStore.getState().tokenState.activeTokenSet).toEqual('playground');
+          expect(await result.findAllByText('global')).toHaveLength(1);
           result.unmount();
-        });
-      },
+        }, { timeout: 10000 });
+      })
     ),
   );
 
-  it(
-    'can toggle a tokenset',
-    withOrWithoutLicense(
-      {
-        ...mockStartupParams,
-        localTokenData: {
-          ...mockStartupParams.localTokenData,
-          checkForChanges: false,
-          values: mockValues,
-        } as StartupMessage['localTokenData'],
-      },
-      async (params) => {
-        const mockStore = createMockStore({});
+  it('shows pull dialog if there are local changes with a remote storage provider', withOrWithoutLicense({
+    ...mockStartupParams,
+    localApiProviders: mockGithubApiProviders,
+    storageType: mockGithubStoragetype,
+    user: mockUser,
+    localTokenData: {
+      ...mockStartupParams.localTokenData,
+      values: mockValues,
+    } as StartupMessage['localTokenData'],
+  }, async (params) => {
+    const mockStore = createMockStore({});
 
-        const result = render(
-          <Provider store={mockStore}>
-            <AppContainer {...params} />
-          </Provider>,
-        );
+    const result = render(
+      <Provider store={mockStore}>
+        <AppContainer {...params} />
+      </Provider>,
+    );
 
-        waitFor(async () => {
-          const checkbox = await result.findByTestId('tokensetitem-playground-checkbox');
-          fireEvent.click(checkbox);
+    waitFor(async () => {
+      expect(screen.queryByText(/Recover local changes\?/i)).not.toBeNull();
+      result.unmount();
+    });
+  }));
 
-          expect(mockStore.getState().tokenState.usedTokenSet).toEqual({
-            global: TokenSetStatus.DISABLED,
-            playground: TokenSetStatus.ENABLED,
-          });
-        });
+  it('skips start page if there are no local changes and the Github provider can sync', withOrWithoutLicense({
+    ...mockStartupParams,
+    localApiProviders: mockGithubApiProviders,
+    storageType: mockGithubStoragetype,
+    user: mockUser,
+    localTokenData: {
+      ...mockStartupParams.localTokenData,
+      checkForChanges: false,
+      themes: mockThemes,
+      values: mockValues,
+    } as StartupMessage['localTokenData'],
+  }, async (params) => {
+    mockGithubGetContent();
 
-        result.unmount();
-      },
-    ),
-  );
+    const mockStore = createMockStore({});
 
-  it(
-    'shows the remote storage callout',
-    withOrWithoutLicense(
-      {
-        ...mockStartupParams,
-        localTokenData: {
-          ...mockStartupParams.localTokenData!,
-          checkForChanges: false,
-        },
-        storageType: {
-          provider: StorageProviderType.GITHUB,
-          branch: 'main',
-          filePath: 'data/tokens.json',
-          id: 'github',
-          internalId: 'github',
-          name: 'Github',
-        },
-      },
-      async (params) => {
-        const mockStore = createMockStore({});
+    const result = render(
+      <Provider store={mockStore}>
+        <AppContainer {...params} />
+      </Provider>,
+    );
 
-        const result = render(
-          <Provider store={mockStore}>
-            <AppContainer {...params} />
-          </Provider>,
-        );
-        waitFor(async () => {
-          await result.findByText("Couldn't load tokens stored on GitHub");
-          expect(result.queryByText("Couldn't load tokens stored on GitHub")).toBeInTheDocument();
-        });
-      },
-    ),
-  );
+    waitFor(async () => {
+      expect(await result.findAllByText('global')).toHaveLength(1);
+      result.unmount();
+    }, { timeout: 10000 });
+  }));
+
+  it('can switch to a different tokenset', withOrWithoutLicense({
+    ...mockStartupParams,
+    localTokenData: {
+      ...mockStartupParams.localTokenData,
+      checkForChanges: false,
+      themes: mockThemes,
+      values: mockValues,
+    } as StartupMessage['localTokenData'],
+  }, async (params) => {
+    const mockStore = createMockStore({});
+
+    const result = render(
+      <Provider store={mockStore}>
+        <AppContainer {...params} />
+      </Provider>,
+    );
+
+    waitFor(async () => {
+      const set = await result.findByTestId('tokensetitem-playground');
+      set.click();
+      expect(mockStore.getState().tokenState.activeTokenSet).toEqual('playground');
+      result.unmount();
+    });
+  }));
+
+  it('can toggle a tokenset', withOrWithoutLicense({
+    ...mockStartupParams,
+    localTokenData: {
+      ...mockStartupParams.localTokenData,
+      checkForChanges: false,
+      values: mockValues,
+    } as StartupMessage['localTokenData'],
+  }, async (params) => {
+    const mockStore = createMockStore({});
+
+    const result = render(
+      <Provider store={mockStore}>
+        <AppContainer {...params} />
+      </Provider>,
+    );
+
+    waitFor(async () => {
+      const checkbox = await result.findByTestId('tokensetitem-playground-checkbox');
+      fireEvent.click(checkbox);
+
+      expect(mockStore.getState().tokenState.usedTokenSet).toEqual({
+        global: TokenSetStatus.DISABLED,
+        playground: TokenSetStatus.ENABLED,
+      });
+    });
+
+    result.unmount();
+  }));
+
+  it('shows the remote storage callout', withOrWithoutLicense({
+    ...mockStartupParams,
+    localTokenData: {
+      ...mockStartupParams.localTokenData!,
+      checkForChanges: false,
+    },
+    storageType: {
+      provider: StorageProviderType.GITHUB,
+      branch: 'main',
+      filePath: 'data/tokens.json',
+      id: 'github',
+      internalId: 'github',
+      name: 'Github',
+    },
+  }, async (params) => {
+    const mockStore = createMockStore({});
+
+    const result = render(
+      <Provider store={mockStore}>
+        <AppContainer {...params} />
+      </Provider>,
+    );
+    waitFor(async () => {
+      await result.findByText("Couldn't load tokens stored on GitHub");
+      expect(result.queryByText("Couldn't load tokens stored on GitHub")).toBeInTheDocument();
+    });
+  }));
 });

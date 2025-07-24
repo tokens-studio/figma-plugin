@@ -1,6 +1,8 @@
 import React from 'react';
 import { Stack, Label } from '@tokens-studio/ui';
-import { DiffAddedIcon, DiffRemovedIcon, PencilIcon, AlertFillIcon } from '@primer/octicons-react';
+import {
+  DiffAddedIcon, DiffRemovedIcon, PencilIcon, AlertFillIcon,
+} from '@primer/octicons-react';
 /*
 
 This component is not needed at the moment,

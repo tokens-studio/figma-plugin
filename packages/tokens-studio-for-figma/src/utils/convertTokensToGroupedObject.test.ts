@@ -16,14 +16,13 @@ describe('convertTokensToGroupedObject', () => {
         $extensions: {
           'studio.tokens': {
             modify: {
-              type: 'darken',
-              value: '0.4',
-              space: 'lch',
+              type: 'darken', value: '0.4', space: 'lch',
             },
           },
         },
         type: TokenTypes.COLOR,
       },
+
     ] as ResolveTokenValuesResult[];
     const options = {
       expandTypography: true,
@@ -70,14 +69,13 @@ describe('convertTokensToGroupedObject', () => {
         $extensions: {
           'studio.tokens': {
             modify: {
-              type: 'darken',
-              value: '0.4',
-              space: 'lch',
+              type: 'darken', value: '0.4', space: 'lch',
             },
           },
         },
         type: TokenTypes.COLOR,
       },
+
     ] as ResolveTokenValuesResult[];
     const options = {
       expandTypography: true,

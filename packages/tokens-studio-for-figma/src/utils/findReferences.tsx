@@ -48,7 +48,7 @@ export const replaceReferences = (tokenValue: string, oldName: string, newName: 
 };
 
 export const getRootReferences = (tokenValue: string) => {
-  const array: string[] = [];
+  const array:string[] = [];
   let depth = 0;
   let startIndex = 0;
   for (let i = 0; i < tokenValue.length; i += 1) {

@@ -9,9 +9,10 @@ export function useCanUndo() {
     // so we don't trigger the useSelector hooks whilst the previous reducer
     // is still running
     setTimeout(() => {
-      const nextCanUndo =
-        UndoableEnhancerState.actionsHistory.length > 0 &&
-        UndoableEnhancerState.actionsHistoryPointer < UndoableEnhancerState.actionsHistory.length;
+      const nextCanUndo = (
+        UndoableEnhancerState.actionsHistory.length > 0
+        && UndoableEnhancerState.actionsHistoryPointer < UndoableEnhancerState.actionsHistory.length
+      );
       setCanUndo(nextCanUndo);
     }, 0);
   }, []);

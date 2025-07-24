@@ -1,17 +1,17 @@
 import React from 'react';
 import { Provider } from 'react-redux';
-import { createMockStore, fireEvent, render, resetStore } from '../../../tests/config/setupTest';
+import {
+  createMockStore, fireEvent, render, resetStore,
+} from '../../../tests/config/setupTest';
 import { EditTokenObject, TokenTypeSchema } from '@/types/tokens';
 import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
 import { TokenTypes } from '@/constants/TokenTypes';
 import EditTokenForm from './EditTokenForm';
 
 const mockCreateSingleToken = jest.fn();
-jest.mock('../store/useManageTokens', () =>
-  jest.fn(() => ({
-    createSingleToken: mockCreateSingleToken,
-  })),
-);
+jest.mock('../store/useManageTokens', () => jest.fn(() => ({
+  createSingleToken: mockCreateSingleToken,
+})));
 
 describe('EditTokenForm', () => {
   beforeEach(() => {

@@ -26,9 +26,7 @@ describe('localApiStateBranchSelector', () => {
 
   it('return currentBranch', () => {
     localApiStates.forEach((localApiState, index) => {
-      expect(localApiStateBranchSelector.resultFunc(localApiState as StorageTypeFormValues)).toEqual(
-        expectedResult[index],
-      );
+      expect(localApiStateBranchSelector.resultFunc(localApiState as StorageTypeFormValues)).toEqual(expectedResult[index]);
     });
   });
 });

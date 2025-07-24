@@ -2,11 +2,7 @@ import { convertTypographyNumberToFigma } from './generic';
 import { numberMatchesPercentage } from './numberMatchesPercentage';
 import { numberRegex } from '../../constants/numberRegex';
 
-export function convertLetterSpacingToFigma(
-  inputValue: string,
-  baseFontSize: string,
-  shouldOutputForVariables = false,
-): number | LetterSpacing | null {
+export function convertLetterSpacingToFigma(inputValue: string, baseFontSize: string, shouldOutputForVariables = false): number | LetterSpacing | null {
   let letterSpacing: LetterSpacing | null = null;
   const value = inputValue.toString();
   if (numberMatchesPercentage(value)) {

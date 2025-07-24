@@ -4,7 +4,7 @@ import updateTextStyles from './updateTextStyles';
 import type { SingleTypographyToken } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
 
-type ExtendedSingleToken = SingleTypographyToken<true, { path: string; styleId: string }>;
+type ExtendedSingleToken = SingleTypographyToken<true, { path: string, styleId: string }>;
 
 const setTextValuesOnTargetSpy = jest.spyOn(setTextValuesOnTargetModule, 'setTextValuesOnTarget');
 
@@ -70,7 +70,11 @@ describe('updateTextStyles', () => {
     const baseFontSize = '16';
     figma.getLocalTextStyles.mockReturnValue([matchingFigmaStyle]);
     updateTextStyles(typographyTokens, baseFontSize);
-    expect(setTextValuesOnTargetSpy).toHaveBeenCalledWith(matchingFigmaStyle, 'H1.withValue', baseFontSize);
+    expect(setTextValuesOnTargetSpy).toHaveBeenCalledWith(
+      matchingFigmaStyle,
+      'H1.withValue',
+      baseFontSize,
+    );
   });
 
   it('renames if option is true and style is found', async () => {
@@ -87,15 +91,13 @@ describe('updateTextStyles', () => {
     mockGetLocalTextStyles.mockImplementation(() => existingStyles);
 
     await updateTextStyles(
-      [
-        {
-          name: 'type.h1',
-          value: typographyTokens[0].value,
-          type: TokenTypes.TYPOGRAPHY,
-          path: 'type/h1-RENAMED',
-          styleId: '1234',
-        },
-      ],
+      [{
+        name: 'type.h1',
+        value: typographyTokens[0].value,
+        type: TokenTypes.TYPOGRAPHY,
+        path: 'type/h1-RENAMED',
+        styleId: '1234',
+      }],
       '16',
       true,
       true,

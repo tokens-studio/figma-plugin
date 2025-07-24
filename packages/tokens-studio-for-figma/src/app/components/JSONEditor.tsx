@@ -13,7 +13,10 @@ type Props = {
   handleChange: (tokens: string) => void;
 };
 
-function JSONEditor({ stringTokens, handleChange }: Props) {
+function JSONEditor({
+  stringTokens,
+  handleChange,
+}: Props) {
   const editProhibited = useSelector(editProhibitedSelector);
   const activeTokenSetReadOnly = useSelector(activeTokenSetReadOnlySelector);
   const activeApiProvider = useSelector(activeApiProviderSelector);
@@ -24,30 +27,22 @@ function JSONEditor({ stringTokens, handleChange }: Props) {
   const monaco = useMonaco();
 
   monaco?.languages.json.jsonDefaults.setDiagnosticsOptions({
-    schemas: [
-      {
-        fileMatch: ['*'],
-        uri: 'https://schemas.tokens.studio/latest/tokens-schema.json',
-      },
-    ],
+    schemas: [{
+      fileMatch: ['*'],
+      uri: 'https://schemas.tokens.studio/latest/tokens-schema.json',
+    }],
     enableSchemaRequest: true,
   });
 
-  const handleJsonEditChange = React.useCallback(
-    (value: string | undefined) => {
-      handleChange(value ?? '');
-    },
-    [handleChange],
-  );
+  const handleJsonEditChange = React.useCallback((value: string | undefined) => {
+    handleChange(value ?? '');
+  }, [handleChange]);
 
-  const handleSaveShortcut = React.useCallback(
-    (event: KeyboardEvent) => {
-      if (event.metaKey || event.ctrlKey) {
-        handleJSONUpdate(stringTokens);
-      }
-    },
-    [handleJSONUpdate, stringTokens],
-  );
+  const handleSaveShortcut = React.useCallback((event: KeyboardEvent) => {
+    if (event.metaKey || event.ctrlKey) {
+      handleJSONUpdate(stringTokens);
+    }
+  }, [handleJSONUpdate, stringTokens]);
 
   useShortcut(['KeyS'], handleSaveShortcut);
 

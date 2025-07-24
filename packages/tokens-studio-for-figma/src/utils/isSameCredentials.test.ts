@@ -75,21 +75,12 @@ describe('isSameCredentials', () => {
     expect(isSameCredentials({ ...correctGitHubCredentials, branch: 'next' }, storedGitHub)).toBe(false);
     expect(isSameCredentials(gitHubCredentialsWithDifferentBranch, storedGitHub)).toBe(true);
     expect(isSameCredentials(correctSupernovaCredentials, storedSupernova)).toBe(true);
-    expect(
-      isSameCredentials({ ...correctSupernovaCredentials, designSystemUrl: 'https://different.com' }, storedSupernova),
-    ).toBe(false);
+    expect(isSameCredentials({ ...correctSupernovaCredentials, designSystemUrl: 'https://different.com' }, storedSupernova)).toBe(false);
     expect(isSameCredentials({ ...correctSupernovaCredentials, mapping: { baz: 'qux' } }, storedSupernova)).toBe(false);
     expect(isSameCredentials(correctTokensStudioCredentials, storedTokensStudio)).toBe(true);
     expect(isSameCredentials({ ...correctTokensStudioCredentials, id: '987' }, storedTokensStudio)).toBe(false);
-    expect(isSameCredentials({ ...correctTokensStudioCredentials, orgId: 'different-org' }, storedTokensStudio)).toBe(
-      false,
-    );
-    expect(
-      isSameCredentials(
-        { ...correctTokensStudioCredentials, baseUrl: 'https://different.tokens.studio' },
-        storedTokensStudio,
-      ),
-    ).toBe(false);
+    expect(isSameCredentials({ ...correctTokensStudioCredentials, orgId: 'different-org' }, storedTokensStudio)).toBe(false);
+    expect(isSameCredentials({ ...correctTokensStudioCredentials, baseUrl: 'https://different.tokens.studio' }, storedTokensStudio)).toBe(false);
 
     // Test with undefined baseUrl
     const storedTokensStudioNoBaseUrl = { ...storedTokensStudio, baseUrl: undefined };

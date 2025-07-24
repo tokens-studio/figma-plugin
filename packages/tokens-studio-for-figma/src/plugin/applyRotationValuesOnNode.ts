@@ -13,11 +13,11 @@ export async function applyRotationValuesOnNode(
 ) {
   // Applies tokens to control layer rotation
   if (
-    node.type !== 'DOCUMENT' &&
-    node.type !== 'PAGE' &&
-    typeof values.rotation !== 'undefined' &&
-    !isPartOfInstance(node.id) &&
-    isPrimitiveValue(values.rotation)
+    node.type !== 'DOCUMENT'
+    && node.type !== 'PAGE'
+    && typeof values.rotation !== 'undefined'
+    && !isPartOfInstance(node.id)
+    && isPrimitiveValue(values.rotation)
   ) {
     const rotation = transformValue(String(values.rotation), 'rotation', baseFontSize);
     rotateNode(node, rotation);

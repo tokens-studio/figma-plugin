@@ -2,7 +2,9 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { AnyTokenList } from '@/types/tokens';
-import { createMockStore, render, waitFor } from '../../../../tests/config/setupTest';
+import {
+  createMockStore, render, waitFor,
+} from '../../../../tests/config/setupTest';
 import RenameTokenGroupModal from './RenameTokenGroupModal';
 
 const tokens: Record<string, AnyTokenList> = {
@@ -26,7 +28,12 @@ describe('RenameTokenGroupModal', () => {
   it('render without crashing', async () => {
     render(
       <Provider store={store}>
-        <RenameTokenGroupModal isOpen newName="newName" oldName="oldName" type={TokenTypes.COLOR} />
+        <RenameTokenGroupModal
+          isOpen
+          newName="newName"
+          oldName="oldName"
+          type={TokenTypes.COLOR}
+        />
       </Provider>,
     );
   });
@@ -37,7 +44,12 @@ describe('RenameTokenGroupModal', () => {
 
     const { getByText } = render(
       <Provider store={store}>
-        <RenameTokenGroupModal isOpen newName={newName} oldName={oldName} type={TokenTypes.COLOR} />
+        <RenameTokenGroupModal
+          isOpen
+          newName={newName}
+          oldName={oldName}
+          type={TokenTypes.COLOR}
+        />
       </Provider>,
     );
 
@@ -52,7 +64,12 @@ describe('RenameTokenGroupModal', () => {
 
     const { getByText } = render(
       <Provider store={store}>
-        <RenameTokenGroupModal isOpen newName={newName} oldName={oldName} type={TokenTypes.COLOR} />
+        <RenameTokenGroupModal
+          isOpen
+          newName={newName}
+          oldName={oldName}
+          type={TokenTypes.COLOR}
+        />
       </Provider>,
     );
 

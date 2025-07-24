@@ -35,10 +35,10 @@ export default async function setValuesOnNode({
 }) {
   try {
     if (
-      node.type !== 'CONNECTOR' &&
-      node.type !== 'SHAPE_WITH_TEXT' &&
-      node.type !== 'STICKY' &&
-      node.type !== 'CODE_BLOCK'
+      node.type !== 'CONNECTOR'
+      && node.type !== 'SHAPE_WITH_TEXT'
+      && node.type !== 'STICKY'
+      && node.type !== 'CODE_BLOCK'
     ) {
       Object.entries(values).forEach(([key, value]) => {
         if (value === 'none') {

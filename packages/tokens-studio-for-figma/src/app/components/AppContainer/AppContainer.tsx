@@ -58,9 +58,9 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
 
   const handlePerformStartup = useCallback(async () => {
     if (
-      !startupProcess.isComplete &&
-      startupProcess.currentStatus !== ProcessStepStatus.FAILED &&
-      startupProcess.currentStatus !== ProcessStepStatus.CANCELED
+      !startupProcess.isComplete
+      && startupProcess.currentStatus !== ProcessStepStatus.FAILED
+      && startupProcess.currentStatus !== ProcessStepStatus.CANCELED
     ) {
       if (startupProcess.currentStep === null) {
         await startupProcess.start();
@@ -99,7 +99,9 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
       <ConfirmDialog />
       <ImportedTokensDialog />
       <PushDialog />
-      {!showLoadingScreen && <PullDialog />}
+      {
+        !showLoadingScreen && <PullDialog />
+      }
       <WindowResizer />
       <OnboardingFlow />
       <Changelog />

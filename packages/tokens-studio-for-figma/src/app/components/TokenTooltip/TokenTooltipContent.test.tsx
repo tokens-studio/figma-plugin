@@ -366,20 +366,8 @@ describe('TokenTooltip alias', () => {
       );
 
       expect(getByText(String(token.description))).toBeInTheDocument();
-      expect(
-        getByText((content) =>
-          typeof token.value === 'object'
-            ? content.includes('test-value-object-value')
-            : content.includes(String(token.value)),
-        ),
-      ).toBeInTheDocument();
-      expect(
-        getByText((content) =>
-          typeof token.rawValue === 'object'
-            ? content.includes('test-value-object-value')
-            : content.includes(String(token.rawValue)),
-        ),
-      ).toBeInTheDocument();
+      expect(getByText((content) => (typeof token.value === 'object' ? content.includes('test-value-object-value') : content.includes(String(token.value))))).toBeInTheDocument();
+      expect(getByText((content) => (typeof token.rawValue === 'object' ? content.includes('test-value-object-value') : content.includes(String(token.rawValue))))).toBeInTheDocument();
       expect(getByText(String(token.name.split('.').pop()))).toBeInTheDocument();
     });
   });

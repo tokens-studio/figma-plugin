@@ -1,4 +1,6 @@
-import { useCallback, useEffect, useState } from 'react';
+import {
+  useCallback, useEffect, useState,
+} from 'react';
 
 export const getHashParams = () => {
   const params = new URLSearchParams(window.location.hash.slice(1));
@@ -17,11 +19,11 @@ export const getHashParams = () => {
 };
 
 type State = {
-  tab: string;
-  action: string;
-  subAction: string;
-  theme: string;
-  fullscreen: boolean;
+  tab: string,
+  action: string,
+  subAction: string,
+  theme: string,
+  fullscreen: boolean,
 };
 
 export function usePreviewState() {

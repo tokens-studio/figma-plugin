@@ -4,7 +4,9 @@ import { Button, Stack } from '@tokens-studio/ui';
 import Modal from '../Modal';
 import Input from '../Input';
 import useRemoteTokens from '../../store/remoteTokens';
-import { activeThemeSelector, apiSelector, localApiStateSelector, usedTokenSetSelector } from '@/selectors';
+import {
+  activeThemeSelector, apiSelector, localApiStateSelector, usedTokenSetSelector,
+} from '@/selectors';
 import { isGitProvider } from '@/utils/is';
 import type { StorageTypeCredentials } from '@/types/StorageType';
 import { ErrorMessage } from '../ErrorMessage';
@@ -18,11 +20,15 @@ type Props = {
 };
 
 type FormData = {
-  branch: string;
+  branch: string
 };
 
-export default function CreateBranchModal({ isOpen, onClose, onSuccess, startBranch, isCurrentChanges }: Props) {
-  const { addNewBranch, pushTokens, fetchBranches, pullTokens } = useRemoteTokens();
+export default function CreateBranchModal({
+  isOpen, onClose, onSuccess, startBranch, isCurrentChanges,
+}: Props) {
+  const {
+    addNewBranch, pushTokens, fetchBranches, pullTokens,
+  } = useRemoteTokens();
 
   const localApiState = useSelector(localApiStateSelector);
   const apiData = useSelector(apiSelector);
@@ -34,8 +40,8 @@ export default function CreateBranchModal({ isOpen, onClose, onSuccess, startBra
   const branchInputRef = React.useRef<HTMLInputElement | null>(null);
 
   /* @lifecycle
-   ** set focus on input
-   */
+  ** set focus on input
+  */
   React.useEffect(() => {
     setTimeout(() => {
       branchInputRef.current?.focus();
@@ -44,69 +50,58 @@ export default function CreateBranchModal({ isOpen, onClose, onSuccess, startBra
 
   const isBranchNameValid = React.useMemo(() => !/\s/.test(formFields.branch), [formFields]);
 
-  const handleChange = React.useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setFormFields({ ...formFields, [e.target.name]: e.target.value });
-    },
-    [formFields],
-  );
+  const handleChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormFields({ ...formFields, [e.target.name]: e.target.value });
+  }, [formFields]);
 
-  const handleSubmit = React.useCallback(
-    async (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
+  const handleSubmit = React.useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-      const { branch } = formFields;
+    const { branch } = formFields;
 
-      setHasErrored(false);
+    setHasErrored(false);
 
-      if (isGitProvider(localApiState) && isGitProvider(apiData)) {
-        // type casting because of "name" error - ignoring because not important
-        const response = await addNewBranch(localApiState as StorageTypeCredentials, branch, startBranch ?? undefined);
-        const branches = await fetchBranches(localApiState as StorageTypeCredentials);
-        if (response) {
-          onSuccess(branch, branches ?? []);
-          if (!isCurrentChanges) {
-            await pullTokens({
-              context: { ...apiData, branch },
-              usedTokenSet,
-              activeTheme,
-              updateLocalTokens: true,
-            });
-          }
-        } else {
-          setHasErrored(true);
+    if (
+      isGitProvider(localApiState)
+      && isGitProvider(apiData)
+    ) {
+      // type casting because of "name" error - ignoring because not important
+      const response = await addNewBranch(localApiState as StorageTypeCredentials, branch, startBranch ?? undefined);
+      const branches = await fetchBranches(localApiState as StorageTypeCredentials);
+      if (response) {
+        onSuccess(branch, branches ?? []);
+        if (!isCurrentChanges) {
+          await pullTokens({
+            context: { ...apiData, branch }, usedTokenSet, activeTheme, updateLocalTokens: true,
+          });
         }
-
-        if (isCurrentChanges) {
-          await pushTokens({ context: { ...apiData, branch } });
-        }
+      } else {
+        setHasErrored(true);
       }
-    },
-    [
-      formFields,
-      localApiState,
-      apiData,
-      addNewBranch,
-      isCurrentChanges,
-      fetchBranches,
-      pushTokens,
-      onSuccess,
-      startBranch,
-      activeTheme,
-      pullTokens,
-      usedTokenSet,
-    ],
-  );
+
+      if (isCurrentChanges) {
+        await pushTokens({ context: { ...apiData, branch } });
+      }
+    }
+  }, [
+    formFields,
+    localApiState,
+    apiData,
+    addNewBranch,
+    isCurrentChanges,
+    fetchBranches,
+    pushTokens,
+    onSuccess,
+    startBranch,
+    activeTheme,
+    pullTokens,
+    usedTokenSet,
+  ]);
 
   const handleModalClose = React.useCallback(() => onClose(false), [onClose]);
 
   return (
-    <Modal
-      title={`Create a new branch from ${isCurrentChanges ? 'current changes' : startBranch}`}
-      size="large"
-      isOpen={isOpen}
-      close={handleModalClose}
-    >
+    <Modal title={`Create a new branch from ${isCurrentChanges ? 'current changes' : startBranch}`} size="large" isOpen={isOpen} close={handleModalClose}>
       <form onSubmit={handleSubmit}>
         <Stack direction="column" gap={4}>
           <Input
@@ -121,9 +116,13 @@ export default function CreateBranchModal({ isOpen, onClose, onSuccess, startBra
             name="branch"
             inputRef={branchInputRef}
           />
-          {!isBranchNameValid && (
-            <ErrorMessage data-testid="provider-modal-error">Branch name cannot contain spaces</ErrorMessage>
-          )}
+          {
+            !isBranchNameValid && (
+              <ErrorMessage data-testid="provider-modal-error">
+                Branch name cannot contain spaces
+              </ErrorMessage>
+            )
+          }
           <Stack direction="row" justify="end" gap={4}>
             <Button variant="secondary" onClick={handleModalClose}>
               Cancel

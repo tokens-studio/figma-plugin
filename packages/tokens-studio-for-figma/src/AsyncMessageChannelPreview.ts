@@ -13,23 +13,21 @@ type IsTypeOnlyObject<Obj extends Record<PropertyKey, unknown>> = [keyof Obj] ex
 type IncomingMessageEvent<Message = unknown> = {
   data: {
     pluginMessage:
-      | {
-          id: string;
-          message: Message;
-        }
-      | {
-          id: string;
-          error: unknown;
-        };
+    | {
+      id: string;
+      message: Message;
+    }
+    | {
+      id: string;
+      error: unknown;
+    };
   };
 };
 
 export type AsyncMessageChannelHandlers = {
   [K in AsyncMessageTypes]: (
     incoming: AsyncMessagesMap[K],
-  ) => Promise<
-    IsTypeOnlyObject<AsyncMessageResultsMap[K]> extends true ? void : Omit<AsyncMessageResultsMap[K], 'type'>
-  >;
+  ) => Promise<IsTypeOnlyObject<AsyncMessageResultsMap[K]> extends true ? void : Omit<AsyncMessageResultsMap[K], 'type'>>;
 };
 
 export const WEBSOCKET_SERVER_URL = 'ws://localhost:9001/ws';

@@ -36,16 +36,14 @@ describe('renameStylesFromPlugin', () => {
     activeTheme: {
       [INTERNAL_THEMES_NO_GROUP]: 'light',
     },
-    themes: [
-      {
-        id: 'light',
-        name: 'Light',
-        selectedTokenSets: {
-          global: TokenSetStatus.ENABLED,
-        },
-        $figmaStyleReferences: {},
+    themes: [{
+      id: 'light',
+      name: 'Light',
+      selectedTokenSets: {
+        global: TokenSetStatus.ENABLED,
       },
-    ],
+      $figmaStyleReferences: {},
+    }],
   });
 
   runAfter.push(AsyncMessageChannel.ReactInstance.connect());
@@ -54,8 +52,6 @@ describe('renameStylesFromPlugin', () => {
   runAfter.push(AsyncMessageChannel.PluginInstance.connect());
 
   it('should remove styles from plugin', async () => {
-    expect(
-      await renameStylesFromPlugin([{ oldName: 'global.colors.old', newName: 'global.colors.new' }], 'global'),
-    ).toEqual(['456']);
+    expect(await renameStylesFromPlugin([{ oldName: 'global.colors.old', newName: 'global.colors.new' }], 'global')).toEqual(['456']);
   });
 });

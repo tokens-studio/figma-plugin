@@ -163,15 +163,12 @@ describe('SetValuesOnVariable', () => {
         type: TokenTypes.BOOLEAN,
         variableId: '130',
       },
-    ] as SingleToken<true, { path: string; variableId: string }>[];
+    ] as SingleToken<true, { path: string, variableId: string }>[];
     setValuesOnVariable(variablesInFigma, tokens, collection, mode, baseFontSize);
     // Check that the right values are called (only those that were changed)
     expect(mockSetValueForMode).toBeCalledWith(mode, 8);
     expect(mockSetValueForMode).toBeCalledWith(mode, {
-      r: 1,
-      g: 0,
-      b: 0,
-      a: 1,
+      r: 1, g: 0, b: 0, a: 1,
     });
     expect(mockSetValueForMode).toBeCalledWith(mode, 'foobarX');
     expect(mockSetValueForMode).toBeCalledWith(mode, true);
@@ -188,7 +185,7 @@ describe('SetValuesOnVariable', () => {
         value: '16',
         type: TokenTypes.SIZING,
       },
-    ] as SingleToken<true, { path: string; variableId: string }>[];
+    ] as SingleToken<true, { path: string, variableId: string }>[];
     setValuesOnVariable(variablesInFigma, tokens, collection, mode, baseFontSize);
     expect(mockCreateVariable).toBeCalledWith('button/primary/width', collection, 'FLOAT');
   });
@@ -211,16 +208,14 @@ describe('SetValuesOnVariable', () => {
   });
 
   it('should apply fontWeight token with numeric value', async () => {
-    const tokens = [
-      {
-        name: 'global.fontWeight',
-        path: 'global/fontWeight',
-        value: 300,
-        rawValue: 300,
-        type: TokenTypes.FONT_WEIGHTS,
-        variableId: '1234',
-      },
-    ];
+    const tokens = [{
+      name: 'global.fontWeight',
+      path: 'global/fontWeight',
+      value: 300,
+      rawValue: 300,
+      type: TokenTypes.FONT_WEIGHTS,
+      variableId: '1234',
+    }];
     await setValuesOnVariable(variablesInFigma, tokens, collection, mode, baseFontSize);
     expect(mockCreateVariable).toBeCalledWith('global/fontWeight', collection, 'FLOAT');
   });

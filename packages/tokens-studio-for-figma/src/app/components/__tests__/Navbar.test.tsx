@@ -2,7 +2,9 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import userEvent from '@testing-library/user-event';
 import { Tabs } from '@/constants/Tabs';
-import { act, createMockStore, render, waitFor } from '../../../../tests/config/setupTest';
+import {
+  act, createMockStore, render, waitFor,
+} from '../../../../tests/config/setupTest';
 import Navbar from '../Navbar';
 
 describe('Navbar', () => {

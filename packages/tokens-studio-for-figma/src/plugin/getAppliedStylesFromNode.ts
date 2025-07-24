@@ -13,7 +13,7 @@ import { convertFigmaToLineHeight } from './figmaTransforms/lineHeight';
 export type SelectionStyle = {
   name: string;
   value: SingleToken['value'];
-  type: Properties;
+  type: Properties
 };
 
 function getStyleFromNode(node: BaseNode, styleIdBackupKey: string, styleType: 'fills' | 'strokes'): SelectionStyle[] {
@@ -27,20 +27,14 @@ function getStyleFromNode(node: BaseNode, styleIdBackupKey: string, styleType: '
       const { r, g, b } = paint.color;
       const a = paint.opacity;
       styleObject.value = figmaRGBToHex({
-        r,
-        g,
-        b,
-        a,
+        r, g, b, a,
       });
     } else if (paint.type === 'GRADIENT_LINEAR') {
       styleObject.value = convertFigmaGradientToString(paint);
     } else {
       styleObject = null;
     }
-    const normalizedName = localStyle.name
-      .split('/')
-      .map((section) => section.trim())
-      .join('.');
+    const normalizedName = localStyle.name.split('/').map((section) => section.trim()).join('.');
     if (styleObject) {
       const styleTypeConstant = styleType === 'fills' ? Properties.fill : Properties.borderColor;
       localStyles.push({ ...styleObject, name: normalizedName, type: styleTypeConstant });
@@ -55,10 +49,7 @@ export default function getAppliedStylesFromNode(node: BaseNode): SelectionStyle
   if ('effects' in node) {
     const styleIdBackupKey = 'effectStyleId_original';
     const localStyle = getLocalStyle(node, styleIdBackupKey, 'effects');
-    if (
-      localStyle &&
-      localStyle.effects.every((effect) => effect.type === 'DROP_SHADOW' || effect.type === 'INNER_SHADOW')
-    ) {
+    if (localStyle && localStyle.effects.every((effect) => effect.type === 'DROP_SHADOW' || effect.type === 'INNER_SHADOW')) {
       const effects = localStyle.effects as Effect[];
       // convert paint to object containg x, y, spread, color
       const shadows: TokenBoxshadowValue[] = effects.map((effect) => {

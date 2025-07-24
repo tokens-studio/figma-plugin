@@ -8,12 +8,13 @@ type Props = {
   resolvedValue?: TokenTypographyValue;
 };
 
-export const SingleTypographyValueDisplay: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
-  value,
-  resolvedValue,
-}) => (
+export const SingleTypographyValueDisplay: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({ value, resolvedValue }) => (
   <Stack direction="column" align="start" gap={1}>
-    {typeof value === 'string' ? <TooltipProperty value={value} /> : null}
+    {typeof value === 'string' ? (
+      <TooltipProperty
+        value={value}
+      />
+    ) : null}
     <TooltipProperty label="Font" value={value.fontFamily} resolvedValue={resolvedValue?.fontFamily} />
     <TooltipProperty label="Weight" value={value.fontWeight} resolvedValue={resolvedValue?.fontWeight} />
     <TooltipProperty label="Size" value={value.fontSize} resolvedValue={resolvedValue?.fontSize} />

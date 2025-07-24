@@ -2,16 +2,25 @@ import React, { PropsWithChildren } from 'react';
 import { Provider } from 'react-redux';
 import { renderHook } from '@testing-library/react';
 import ConfirmDialog from '../ConfirmDialog';
-import { act, createMockStore, render } from '../../../../tests/config/setupTest';
+import {
+  act, createMockStore, render,
+} from '../../../../tests/config/setupTest';
 import useConfirm, { ResolveCallbackPayload } from '@/app/hooks/useConfirm';
 
 describe('ConfirmDialog', () => {
   it('should work', async () => {
     const mockStore = createMockStore({});
 
-    const { result: useConfirmResult } = renderHook(() => useConfirm(), {
-      wrapper: ({ children }: PropsWithChildren<unknown>) => <Provider store={mockStore}>{children}</Provider>,
-    });
+    const { result: useConfirmResult } = renderHook(
+      () => useConfirm(),
+      {
+        wrapper: ({ children }: PropsWithChildren<unknown>) => (
+          <Provider store={mockStore}>
+            {children}
+          </Provider>
+        ),
+      },
+    );
 
     const result = render(
       <Provider store={mockStore}>
@@ -23,19 +32,14 @@ describe('ConfirmDialog', () => {
     await act(async () => {
       confirmPromise = useConfirmResult.current.confirm({
         text: 'You have unsaved changes',
-        description:
-          'If you create or switch your branch without pushing your local changes to your repository, the changes will be lost.',
+        description: 'If you create or switch your branch without pushing your local changes to your repository, the changes will be lost.',
         confirmAction: 'Discard changes',
         cancelAction: 'Cancel',
       });
     });
 
     expect(result.queryByText('You have unsaved changes')).toBeInTheDocument();
-    expect(
-      result.queryByText(
-        'If you create or switch your branch without pushing your local changes to your repository, the changes will be lost.',
-      ),
-    ).toBeInTheDocument();
+    expect(result.queryByText('If you create or switch your branch without pushing your local changes to your repository, the changes will be lost.')).toBeInTheDocument();
     expect(result.queryByText('Discard changes')).toBeInTheDocument();
     expect(result.queryByText('Cancel')).toBeInTheDocument();
 
@@ -54,9 +58,16 @@ describe('ConfirmDialog', () => {
   it('can show options', async () => {
     const mockStore = createMockStore({});
 
-    const { result: useConfirmResult } = renderHook(() => useConfirm(), {
-      wrapper: ({ children }: PropsWithChildren<unknown>) => <Provider store={mockStore}>{children}</Provider>,
-    });
+    const { result: useConfirmResult } = renderHook(
+      () => useConfirm(),
+      {
+        wrapper: ({ children }: PropsWithChildren<unknown>) => (
+          <Provider store={mockStore}>
+            {children}
+          </Provider>
+        ),
+      },
+    );
 
     const result = render(
       <Provider store={mockStore}>

@@ -13,16 +13,8 @@ import { destructureTokenForAlias, mapValuesToTokens } from './node';
 import setValuesOnNode from './setValuesOnNode';
 
 export async function updatePluginDataAndNodes({
-  entries: nodes,
-  values: tokenValues,
-  tokensMap,
-  settings,
-}: {
-  entries: readonly BaseNode[];
-  values: NodeTokenRefMap;
-  tokensMap: Map<string, AnyTokenList[number]>;
-  settings?: SettingsState;
-}) {
+  entries: nodes, values: tokenValues, tokensMap, settings,
+}: { entries: readonly BaseNode[]; values: NodeTokenRefMap; tokensMap: Map<string, AnyTokenList[number]>; settings?: SettingsState }) {
   // Big O (n * m): (n = amount of nodes, m = amount of applied tokens to the node)
   const { baseFontSize } = settings ?? {};
 
@@ -41,42 +33,40 @@ export async function updatePluginDataAndNodes({
   const promises: Set<Promise<void>> = new Set();
 
   nodes.forEach((node) => {
-    promises.add(
-      defaultWorker.schedule(async () => {
-        try {
-          await Promise.all(
-            Object.entries(tokenValues).map(async ([key, value]) => {
-              const jsonValue = JSON.stringify(value);
-              switch (value) {
-                case 'delete':
-                  await removePluginData({ nodes: [node], key: key as Properties, shouldRemoveValues: true });
-                  break;
-                case 'none':
-                  await setNonePluginData({ nodes: [node], key: key as Properties });
-                  break;
-                default:
-                  node.setSharedPluginData(namespace, key, jsonValue);
-                  break;
-              }
-            }),
-          );
-          const rawTokenMap = destructureTokenForAlias(tokensMap, tokenValues);
-          const mappedValues = mapValuesToTokens(tokensMap, tokenValues);
+    promises.add(defaultWorker.schedule(async () => {
+      try {
+        await Promise.all(Object.entries(tokenValues).map(async ([key, value]) => {
+          const jsonValue = JSON.stringify(value);
+          switch (value) {
+            case 'delete':
+              await removePluginData({ nodes: [node], key: key as Properties, shouldRemoveValues: true });
+              break;
+            case 'none':
+              await setNonePluginData({ nodes: [node], key: key as Properties });
+              break;
+            default:
+              node.setSharedPluginData(namespace, key, jsonValue);
+              break;
+          }
+        }));
+        const rawTokenMap = destructureTokenForAlias(tokensMap, tokenValues);
+        const mappedValues = mapValuesToTokens(tokensMap, tokenValues);
 
-          setValuesOnNode({
+        setValuesOnNode(
+          {
             node,
             values: mappedValues,
             data: rawTokenMap,
             baseFontSize,
-          });
-        } catch (e) {
-          console.log('got error', e);
-        } finally {
-          tracker.next();
-          tracker.reportIfNecessary();
-        }
-      }),
-    );
+          },
+        );
+      } catch (e) {
+        console.log('got error', e);
+      } finally {
+        tracker.next();
+        tracker.reportIfNecessary();
+      }
+    }));
   });
   await Promise.all(promises);
 

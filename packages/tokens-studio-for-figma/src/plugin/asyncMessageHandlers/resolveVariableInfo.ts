@@ -4,31 +4,27 @@ import { getVariablesMap } from '@/utils/getVariablesMap';
 
 export type ResolvedVariableInfo = {
   name: string;
-  key: string;
+  key: string
 };
-export const resolveVariableInfo: AsyncMessageChannelHandlers[AsyncMessageTypes.RESOLVE_VARIABLE_INFO] = async (
-  msg,
-) => {
+export const resolveVariableInfo: AsyncMessageChannelHandlers[AsyncMessageTypes.RESOLVE_VARIABLE_INFO] = async (msg) => {
   const localVariableMap = await getVariablesMap();
   const resolvedValues: Record<string, ResolvedVariableInfo> = {};
-  await Promise.all(
-    msg.variableIds.map(async (variableId) => {
-      if (localVariableMap[variableId]) {
+  await Promise.all(msg.variableIds.map(async (variableId) => {
+    if (localVariableMap[variableId]) {
+      resolvedValues[variableId] = {
+        name: localVariableMap[variableId].name,
+        key: localVariableMap[variableId].key,
+      };
+    } else {
+      const variable = await figma.variables.importVariableByKeyAsync(variableId);
+      if (variable) {
         resolvedValues[variableId] = {
-          name: localVariableMap[variableId].name,
-          key: localVariableMap[variableId].key,
+          name: variable.name,
+          key: variable.key,
         };
-      } else {
-        const variable = await figma.variables.importVariableByKeyAsync(variableId);
-        if (variable) {
-          resolvedValues[variableId] = {
-            name: variable.name,
-            key: variable.key,
-          };
-        }
       }
-    }),
-  );
+    }
+  }));
   return {
     resolvedValues,
   };

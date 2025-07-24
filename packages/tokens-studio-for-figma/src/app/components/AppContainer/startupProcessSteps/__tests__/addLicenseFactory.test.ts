@@ -23,16 +23,12 @@ describe('addLicenseFactory', () => {
     await fn();
 
     expect(addLicenseKeySpy).toBeCalledTimes(1);
-    expect(addLicenseKeySpy).toBeCalledWith(
-      mockStore.dispatch,
-      {
-        key: 'FIGMA-TOKENS',
-        source: AddLicenseSource.INITAL_LOAD,
-      },
-      {
-        userId: 'figma:1234',
-      },
-    );
+    expect(addLicenseKeySpy).toBeCalledWith(mockStore.dispatch, {
+      key: 'FIGMA-TOKENS',
+      source: AddLicenseSource.INITAL_LOAD,
+    }, {
+      userId: 'figma:1234',
+    });
     expect(getLicenseKeySpy).not.toBeCalled();
   });
 

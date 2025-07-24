@@ -1,14 +1,16 @@
 import {
-  mockGetLocalVariableCollectionsAsync,
-  mockGetLocalVariablesAsync,
-  mockImportVariableByKeyAsync,
+  mockGetLocalVariableCollectionsAsync, mockGetLocalVariablesAsync, mockImportVariableByKeyAsync,
 } from '../../../../tests/__mocks__/figmaMock';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { resolveVariableInfo } from '../resolveVariableInfo';
 
 describe('AttachLocalVariablesToTheme', () => {
   it('first try to find matching local variables and then find remote variables and finally return all matching variables', async () => {
-    const variableIds = ['12345', '23456', '34567'];
+    const variableIds = [
+      '12345',
+      '23456',
+      '34567',
+    ];
     const mockLocalVariables = [
       {
         id: 'VariableID:1234',
@@ -48,12 +50,10 @@ describe('AttachLocalVariablesToTheme', () => {
     mockGetLocalVariablesAsync.mockImplementationOnce(() => Promise.resolve(mockLocalVariables));
     mockGetLocalVariableCollectionsAsync.mockImplementationOnce(() => Promise.resolve(mockLocalVariableCollections));
     mockImportVariableByKeyAsync.mockImplementationOnce(() => mockRemoveVariable);
-    expect(
-      await resolveVariableInfo({
-        type: AsyncMessageTypes.RESOLVE_VARIABLE_INFO,
-        variableIds,
-      }),
-    ).toEqual({
+    expect(await resolveVariableInfo({
+      type: AsyncMessageTypes.RESOLVE_VARIABLE_INFO,
+      variableIds,
+    })).toEqual({
       resolvedValues: {
         12345: {
           key: '12345',

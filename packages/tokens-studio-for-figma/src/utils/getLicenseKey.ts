@@ -1,6 +1,8 @@
 import { handleReactError } from './error/handleReactError';
 
-type GetLicenseKeyResponse = { key: string } | { error: string };
+type GetLicenseKeyResponse =
+  { key: string; }
+  | { error: string; };
 
 export default async function getLicenseKey(userId: string | null): Promise<GetLicenseKeyResponse> {
   try {

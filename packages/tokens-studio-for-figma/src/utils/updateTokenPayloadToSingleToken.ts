@@ -2,7 +2,10 @@ import { UpdateTokenPayload } from '@/types/payloads';
 import { SingleToken } from '@/types/tokens';
 import validateStudioTokensExtensions from './validateStudioTokensExtensions';
 
-export function updateTokenPayloadToSingleToken(payload: UpdateTokenPayload, id?: string): SingleToken {
+export function updateTokenPayloadToSingleToken(
+  payload: UpdateTokenPayload,
+  id?: string,
+): SingleToken {
   const studioTokensExtension = validateStudioTokensExtensions(payload);
 
   return {
@@ -16,10 +19,8 @@ export function updateTokenPayloadToSingleToken(payload: UpdateTokenPayload, id?
         ...studioTokensExtension,
       },
     },
-    ...(payload.description
-      ? {
-          description: payload.description,
-        }
-      : {}),
+    ...(payload.description ? {
+      description: payload.description,
+    } : {}),
   } as SingleToken;
 }

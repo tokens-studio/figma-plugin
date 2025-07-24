@@ -21,11 +21,7 @@ describe('Footer', () => {
 
   it('shows push button when user is able to push', () => {
     const { getByTestId } = render(<Footer />, { store });
-    store.dispatch.uiState.setLocalApiState({
-      provider: StorageProviderType.GITHUB,
-      branch: 'test-branch',
-      filePath: 'tokens.json',
-    });
+    store.dispatch.uiState.setLocalApiState({ provider: StorageProviderType.GITHUB, branch: 'test-branch', filePath: 'tokens.json' });
 
     waitFor(() => {
       const pushButton = getByTestId('footer-push-button');

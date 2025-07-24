@@ -5,7 +5,7 @@ describe('normalizeFigmaColor', () => {
     const input = {
       r: 0.12345678,
       g: 0.23456789,
-      b: 0.3456789,
+      b: 0.34567890,
       a: 0.45678901,
     };
 
@@ -33,10 +33,7 @@ describe('setColorValuesOnVariable', () => {
 
   it('should set new color value when values are different', () => {
     mockVariable.valuesByMode[mockMode] = {
-      r: 0,
-      g: 0,
-      b: 0,
-      a: 1,
+      r: 0, g: 0, b: 0, a: 1,
     };
 
     setColorValuesOnVariable(mockVariable, mockMode, '#FF0000');
@@ -44,20 +41,14 @@ describe('setColorValuesOnVariable', () => {
     expect(mockVariable.setValueForMode).toHaveBeenCalledWith(
       mockMode,
       expect.objectContaining({
-        r: 1,
-        g: 0,
-        b: 0,
-        a: 1,
+        r: 1, g: 0, b: 0, a: 1,
       }),
     );
   });
 
   it('should not set value when colors are identical', () => {
     mockVariable.valuesByMode[mockMode] = {
-      r: 1,
-      g: 0,
-      b: 0,
-      a: 1,
+      r: 1, g: 0, b: 0, a: 1,
     };
 
     setColorValuesOnVariable(mockVariable, mockMode, '#FF0000');
@@ -78,7 +69,10 @@ describe('setColorValuesOnVariable', () => {
 
     setColorValuesOnVariable(mockVariable, mockMode, 'invalid-color');
 
-    expect(consoleSpy).toHaveBeenCalledWith('Error setting colorVariable', expect.any(Error));
+    expect(consoleSpy).toHaveBeenCalledWith(
+      'Error setting colorVariable',
+      expect.any(Error),
+    );
     consoleSpy.mockRestore();
   });
 });

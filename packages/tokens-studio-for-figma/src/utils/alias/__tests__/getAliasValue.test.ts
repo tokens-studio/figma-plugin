@@ -200,6 +200,7 @@ describe('getAliasValue', () => {
         type: BoxShadowTypes.DROP_SHADOW,
       },
       type: TokenTypes.BOX_SHADOW,
+
     },
     {
       name: 'type',
@@ -339,64 +340,55 @@ describe('getAliasValue', () => {
     {
       name: 'boxshadow.regular',
       type: TokenTypes.BOX_SHADOW,
-      value: [
-        {
-          x: '2',
-          y: '2',
-          blur: '2',
-          spread: '2',
-          color: '#000000',
-          type: BoxShadowTypes.DROP_SHADOW,
-        },
-        {
-          x: '3',
-          y: '3',
-          blur: '3',
-          spread: '3',
-          color: '#0000ff',
-          type: BoxShadowTypes.INNER_SHADOW,
-        },
-      ],
-      input: [
-        {
-          x: '2',
-          y: '2',
-          blur: '2',
-          spread: '2',
-          color: '#000000',
-          type: BoxShadowTypes.DROP_SHADOW,
-        },
-        {
-          x: '3',
-          y: '3',
-          blur: '3',
-          spread: '3',
-          color: '#0000ff',
-          type: BoxShadowTypes.INNER_SHADOW,
-        },
-      ],
+      value: [{
+        x: '2',
+        y: '2',
+        blur: '2',
+        spread: '2',
+        color: '#000000',
+        type: BoxShadowTypes.DROP_SHADOW,
+      }, {
+        x: '3',
+        y: '3',
+        blur: '3',
+        spread: '3',
+        color: '#0000ff',
+        type: BoxShadowTypes.INNER_SHADOW,
+      }],
+      input: [{
+        x: '2',
+        y: '2',
+        blur: '2',
+        spread: '2',
+        color: '#000000',
+        type: BoxShadowTypes.DROP_SHADOW,
+      }, {
+        x: '3',
+        y: '3',
+        blur: '3',
+        spread: '3',
+        color: '#0000ff',
+        type: BoxShadowTypes.INNER_SHADOW,
+      }],
     },
     {
       name: 'boxshadow.alias',
       type: TokenTypes.BOX_SHADOW,
-      value: [
-        {
-          x: '2',
-          y: '2',
-          blur: '2',
-          spread: '2',
-          color: '#000000',
-          type: BoxShadowTypes.DROP_SHADOW,
-        },
-        {
-          x: '3',
-          y: '3',
-          blur: '3',
-          spread: '3',
-          color: '#0000ff',
-          type: BoxShadowTypes.INNER_SHADOW,
-        },
-      ],
+      value: [{
+        x: '2',
+        y: '2',
+        blur: '2',
+        spread: '2',
+        color: '#000000',
+        type: BoxShadowTypes.DROP_SHADOW,
+      }, {
+        x: '3',
+        y: '3',
+        blur: '3',
+        spread: '3',
+        color: '#0000ff',
+        type: BoxShadowTypes.INNER_SHADOW,
+      }],
       input: '{boxshadow.regular}',
     },
     {
@@ -520,16 +512,10 @@ describe('getAliasValue', () => {
       type: TokenTypes.COLOR,
     },
     {
-      name: 'clamped',
-      input: 'clamped($xx,2,4)',
-      value: 2,
-      type: TokenTypes.DIMENSION,
+      name: 'clamped', input: 'clamped($xx,2,4)', value: 2, type: TokenTypes.DIMENSION,
     },
     {
-      name: 'clamp',
-      input: 'clamp($xx,2,4)',
-      value: 'clamp(1,2,4)',
-      type: TokenTypes.DIMENSION,
+      name: 'clamp', input: 'clamp($xx,2,4)', value: 'clamp(1,2,4)', type: TokenTypes.DIMENSION,
     },
     {
       name: 'xx',
@@ -545,29 +531,17 @@ describe('getAliasValue', () => {
     },
     {
       // Note that we cannot do {sample(cubicBezier1D($yy,$yy),$yy)}px to inject px values, it must have a semantic intermediary as shown in the following
-      name: 'cubicSample',
-      input: 'sample(cubicBezier1D($yy,$yy),$yy)',
-      value: 0.104,
-      type: TokenTypes.DIMENSION,
+      name: 'cubicSample', input: 'sample(cubicBezier1D($yy,$yy),$yy)', value: 0.104, type: TokenTypes.DIMENSION,
     },
     {
-      name: 'cubicSamplePx',
-      input: '{cubicSample}px',
-      value: '0.104px',
-      type: TokenTypes.DIMENSION,
+      name: 'cubicSamplePx', input: '{cubicSample}px', value: '0.104px', type: TokenTypes.DIMENSION,
     },
   ];
 
   allTokens.forEach((token) => {
     it(`alias ${token.name}`, () => {
       // @TODO check this test typing,
-      expect(
-        getAliasValue(
-          { ...token, value: token.input, type: token.type } as SingleToken,
-          allTokens as unknown as SingleToken[],
-          false,
-        ),
-      ).toEqual(token.value);
+      expect(getAliasValue({ ...token, value: token.input, type: token.type } as SingleToken, allTokens as unknown as SingleToken[], false)).toEqual(token.value);
     });
   });
 });

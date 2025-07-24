@@ -1,7 +1,9 @@
 import React, { useRef } from 'react';
 import zod from 'zod';
 import { useTranslation } from 'react-i18next';
-import { Button, Textarea, TextInput, Stack, Text, Link, Label, IconButton, FormField } from '@tokens-studio/ui';
+import {
+  Button, Textarea, TextInput, Stack, Text, Link, Label, IconButton, FormField,
+} from '@tokens-studio/ui';
 import { EyeClosedIcon, EyeOpenIcon } from '@radix-ui/react-icons';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeFormValues } from '@/types/StorageType';
@@ -18,7 +20,9 @@ type Props = {
   errorMessage?: string;
 };
 
-export default function SupernovaForm({ onChange, onSubmit, onCancel, values, hasErrored, errorMessage }: Props) {
+export default function SupernovaForm({
+  onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
+}: Props) {
   const inputEl = useRef<HTMLInputElement | null>(null);
   const [isMasked, setIsMasked] = React.useState(true);
 
@@ -65,11 +69,7 @@ export default function SupernovaForm({ onChange, onSubmit, onCancel, values, ha
       <Stack direction="column" gap={5}>
         <Text muted>{t('providers.supernova.description')}</Text>
         <Text muted css={{ marginTop: '$2' }}>
-          <Link
-            href="https://docs.tokens.studio/token-storage/remote/sync-cloud-supernova?ref=addprovider"
-            target="_blank"
-            rel="noreferrer"
-          >
+          <Link href="https://docs.tokens.studio/token-storage/remote/sync-cloud-supernova?ref=addprovider" target="_blank" rel="noreferrer">
             {t('providers.supernova.readMore')}
           </Link>
         </Text>
@@ -88,14 +88,14 @@ export default function SupernovaForm({ onChange, onSubmit, onCancel, values, ha
             ref={inputEl}
             required
             type={isMasked ? 'password' : 'text'}
-            trailingAction={
+            trailingAction={(
               <IconButton
                 variant="invisible"
                 size="small"
                 onClick={toggleMask}
                 icon={isMasked ? <EyeClosedIcon /> : <EyeOpenIcon />}
               />
-            }
+            )}
           />
         </FormField>
         <FormField>

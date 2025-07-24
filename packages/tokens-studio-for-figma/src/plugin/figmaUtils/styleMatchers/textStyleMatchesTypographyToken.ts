@@ -49,22 +49,22 @@ export function textStyleMatchesTypographyToken(
   // This will default to `null` if letterSpacing token is not set:
   const tokenLetterSpacing = transformValue(String(letterSpacing), 'letterSpacing', baseFontSize);
   if (
-    tokenLetterSpacing?.unit !== textStyle.letterSpacing.unit ||
-    tokenLetterSpacing?.value !== textStyle.letterSpacing.value
+    tokenLetterSpacing?.unit !== textStyle.letterSpacing.unit
+    || tokenLetterSpacing?.value !== textStyle.letterSpacing.value
   ) {
     if ((tokenLetterSpacing?.value && tokenLetterSpacing.value > 0) || textStyle.letterSpacing.value > 0) {
       return false;
     }
   }
   if (
-    paragraphSpacing === undefined ||
-    textStyle.paragraphSpacing !== transformValue(paragraphSpacing, 'paragraphSpacing', baseFontSize)
+    paragraphSpacing === undefined
+    || textStyle.paragraphSpacing !== transformValue(paragraphSpacing, 'paragraphSpacing', baseFontSize)
   ) {
     return false;
   }
   if (
-    paragraphIndent === undefined ||
-    textStyle.paragraphIndent !== transformValue(paragraphIndent, 'paragraphIndent', baseFontSize)
+    paragraphIndent === undefined
+    || textStyle.paragraphIndent !== transformValue(paragraphIndent, 'paragraphIndent', baseFontSize)
   ) {
     return false;
   }

@@ -6,23 +6,18 @@ import type { DeepTokensMap, ThemeObjectsList } from '@/types';
 // @README this schema applies to Git type providers
 
 type ReservedFields = {
-  $themes?: ThemeObjectsList;
+  $themes?: ThemeObjectsList
   $metadata?: {
-    tokenSetOrder?: string[];
-  };
+    tokenSetOrder?: string[]
+  }
 };
 
 type ComplexSingleFileFormat = ReservedFields & {
-  [K in Exclude<string, '$metadata' | '$themes'>]: DeepTokensMap<false>;
+  [K in Exclude<string, '$metadata' | '$themes'>]: DeepTokensMap<false>
 };
 
-export const complexSingleFileSchema: z.ZodType<ComplexSingleFileFormat> = z.lazy(
-  () =>
-    z.record(
-      tokensMapSchema.or(z.array(themeObjectSchema)).or(
-        z.object({
-          tokenSetOrder: z.array(z.string()).optional(),
-        }),
-      ),
-    ) as z.ZodType<ComplexSingleFileFormat>,
-);
+export const complexSingleFileSchema: z.ZodType<ComplexSingleFileFormat> = z.lazy(() => (
+  (z.record(tokensMapSchema.or(z.array(themeObjectSchema)).or(z.object({
+    tokenSetOrder: z.array(z.string()).optional(),
+  }))) as z.ZodType<ComplexSingleFileFormat>)
+));

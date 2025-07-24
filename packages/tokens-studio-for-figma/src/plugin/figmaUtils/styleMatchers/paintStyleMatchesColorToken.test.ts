@@ -3,7 +3,7 @@ import { paintStyleMatchesColorToken } from './paintStyleMatchesColorToken';
 describe('paintStyleMatchesColorToken', () => {
   // tslint:disable-next-line: no-empty
   const noop: () => void = () => {};
-  const dummyFunc: <T>() => T = <T>() => undefined as unknown as T;
+  const dummyFunc: <T>() => T = <T>() => (undefined as unknown) as T;
   const dummyFigmaPaintStyle: PaintStyle = {
     description: '',
     type: 'PAINT',
@@ -96,10 +96,9 @@ describe('paintStyleMatchesColorToken', () => {
   });
 
   describe('when using gradient color token', () => {
-    const figmaRGBToCss = (color: RGB) =>
-      Object.entries(color)
-        .map(([key, value]) => (key === 'a' ? value : `${value * 255}`))
-        .join(',');
+    const figmaRGBToCss = (color: RGB) => Object.entries(color)
+      .map(([key, value]) => (key === 'a' ? value : `${value * 255}`))
+      .join(',');
 
     const colorStopToCss = (stop: ColorStop) => `rgba(${figmaRGBToCss(stop.color)}) ${stop.position * 100}%`;
     const colorStopsToCss = (stops: ReadonlyArray<ColorStop>) => stops.map(colorStopToCss).join(', ');

@@ -13,10 +13,9 @@ type Props = {
 export const TokenTooltipContent: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({ token }) => {
   const tokensContext = React.useContext(TokensContext);
 
-  const failedToResolve = React.useMemo(
-    () => tokensContext.resolvedTokens.find((t) => t.name === token.name)?.failedToResolve,
-    [token, tokensContext.resolvedTokens],
-  );
+  const failedToResolve = React.useMemo(() => (
+    tokensContext.resolvedTokens.find((t) => t.name === token.name)?.failedToResolve
+  ), [token, tokensContext.resolvedTokens]);
 
   return (
     <Stack direction="column" gap={1} css={{ background: '$tooltipBg', fontSize: '$xsmall' }}>

@@ -3,10 +3,7 @@ import { resetNodeRotation } from '@/plugin/rotateNode';
 
 function removeStrokeIfEmptySides(node) {
   const sides = {
-    left: node.strokeLeftWeight,
-    right: node.strokeRightWeight,
-    top: node.strokeTopWeight,
-    bottom: node.strokeBottomWeight,
+    left: node.strokeLeftWeight, right: node.strokeRightWeight, top: node.strokeTopWeight, bottom: node.strokeBottomWeight,
   };
 
   if (!Object.values(sides).some((value) => value > 0)) {
@@ -35,10 +32,10 @@ export default function removeValuesFromNode(node: BaseNode, prop: Properties) {
       break;
     case 'borderRadius':
       if (
-        'cornerRadius' in node &&
-        typeof node.cornerRadius !== 'undefined' &&
-        node.type !== 'SHAPE_WITH_TEXT' &&
-        node.type !== 'CONNECTOR'
+        'cornerRadius' in node
+        && typeof node.cornerRadius !== 'undefined'
+        && node.type !== 'SHAPE_WITH_TEXT'
+        && node.type !== 'CONNECTOR'
       ) {
         node.cornerRadius = 0;
       }
@@ -105,12 +102,12 @@ export default function removeValuesFromNode(node: BaseNode, prop: Properties) {
       break;
     case 'opacity':
       if (
-        'opacity' in node &&
-        typeof node.opacity !== 'undefined' &&
-        node.type !== 'STICKY' &&
-        node.type !== 'SHAPE_WITH_TEXT' &&
-        node.type !== 'CODE_BLOCK' &&
-        node.type !== 'CONNECTOR'
+        'opacity' in node
+        && typeof node.opacity !== 'undefined'
+        && node.type !== 'STICKY'
+        && node.type !== 'SHAPE_WITH_TEXT'
+        && node.type !== 'CODE_BLOCK'
+        && node.type !== 'CONNECTOR'
       ) {
         node.opacity = 1;
       }

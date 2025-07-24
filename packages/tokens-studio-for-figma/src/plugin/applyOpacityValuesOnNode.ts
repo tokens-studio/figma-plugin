@@ -12,11 +12,11 @@ export async function applyOpacityValuesOnNode(
 ) {
   // Applies opacity tokens to control layer opacity
   if (
-    'opacity' in node &&
-    typeof values.opacity !== 'undefined' &&
-    typeof data.opacity !== 'undefined' &&
-    isPrimitiveValue(values.opacity) &&
-    !(await tryApplyVariableId(node, 'opacity', data.opacity))
+    'opacity' in node
+    && typeof values.opacity !== 'undefined'
+    && typeof data.opacity !== 'undefined'
+    && isPrimitiveValue(values.opacity)
+    && !(await tryApplyVariableId(node, 'opacity', data.opacity))
   ) {
     node.opacity = transformValue(String(values.opacity), 'opacity', baseFontSize);
   }

@@ -7,24 +7,15 @@ describe('findDifferentState', () => {
       tokens: {
         set1: [
           {
-            name: 'token1',
-            value: 'value1',
-            description: '',
-            type: TokenTypes.COLOR,
+            name: 'token1', value: 'value1', description: '', type: TokenTypes.COLOR,
           },
           {
-            name: 'token2',
-            value: 'value2',
-            description: '',
-            type: TokenTypes.COLOR,
+            name: 'token2', value: 'value2', description: '', type: TokenTypes.COLOR,
           },
         ],
         set2: [
           {
-            name: 'token3',
-            value: 'value3',
-            description: '',
-            type: TokenTypes.COLOR,
+            name: 'token3', value: 'value3', description: '', type: TokenTypes.COLOR,
           },
         ],
       },
@@ -36,7 +27,7 @@ describe('findDifferentState', () => {
     const result = findDifferentState(baseState, compareState);
 
     expect(result).toEqual({
-      tokens: {},
+      tokens: { },
       themes: [],
       metadata: null,
     });
@@ -47,10 +38,7 @@ describe('findDifferentState', () => {
       tokens: {
         set1: [
           {
-            name: 'token1',
-            value: 'value1',
-            description: '',
-            type: TokenTypes.COLOR,
+            name: 'token1', value: 'value1', description: '', type: TokenTypes.COLOR,
           },
         ],
       },
@@ -61,16 +49,10 @@ describe('findDifferentState', () => {
       tokens: {
         set1: [
           {
-            name: 'token1',
-            value: 'value1',
-            description: '',
-            type: TokenTypes.COLOR,
+            name: 'token1', value: 'value1', description: '', type: TokenTypes.COLOR,
           },
           {
-            name: 'token2',
-            value: 'value2',
-            description: '',
-            type: TokenTypes.COLOR,
+            name: 'token2', value: 'value2', description: '', type: TokenTypes.COLOR,
           },
         ],
       },
@@ -84,11 +66,7 @@ describe('findDifferentState', () => {
       tokens: {
         set1: [
           {
-            name: 'token2',
-            value: 'value2',
-            description: '',
-            importType: 'NEW',
-            type: TokenTypes.COLOR,
+            name: 'token2', value: 'value2', description: '', importType: 'NEW', type: TokenTypes.COLOR,
           },
         ],
       },

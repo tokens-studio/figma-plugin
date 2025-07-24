@@ -12,17 +12,11 @@ export type PushDialogPromiseResult = {
 };
 
 export type UseDialogResult = {
-  showPushDialog?: { state: string | boolean; overrides?: PushOverrides };
-  closePushDialog: () => void;
-  pushDialog: ({
-    state,
-    overrides,
-  }: {
-    state?: string;
-    overrides?: PushOverrides;
-  }) => Promise<PushDialogPromiseResult | null>;
-  onConfirm: (commitMessage: string, customBranch: string) => void;
-  onCancel: () => void;
+  showPushDialog?: { state: string | boolean, overrides?: PushOverrides };
+  closePushDialog: () => void
+  pushDialog: ({ state, overrides }: { state?: string, overrides?: PushOverrides }) => Promise<PushDialogPromiseResult | null>
+  onConfirm: (commitMessage: string, customBranch: string) => void
+  onCancel: () => void
 };
 
 let resolveCallback: (result: PushDialogPromiseResult | null) => void = () => {};
@@ -30,19 +24,16 @@ function usePushDialog(): UseDialogResult {
   const showPushDialog = useSelector(showPushDialogSelector);
   const dispatch = useDispatch<Dispatch>();
 
-  const pushDialog: UseDialogResult['pushDialog'] = useCallback(
-    ({ state, overrides }) => {
-      if (state) {
-        dispatch.uiState.setShowPushDialog({ state, overrides });
-      } else {
-        dispatch.uiState.setShowPushDialog({ state: 'initial', overrides });
-      }
-      return new Promise<PushDialogPromiseResult | null>((res) => {
-        resolveCallback = res;
-      });
-    },
-    [dispatch],
-  );
+  const pushDialog: UseDialogResult['pushDialog'] = useCallback(({ state, overrides }) => {
+    if (state) {
+      dispatch.uiState.setShowPushDialog({ state, overrides });
+    } else {
+      dispatch.uiState.setShowPushDialog({ state: 'initial', overrides });
+    }
+    return new Promise<PushDialogPromiseResult | null>((res) => {
+      resolveCallback = res;
+    });
+  }, [dispatch]);
 
   const closePushDialog = useCallback(() => {
     dispatch.uiState.setShowPushDialog({ state: false });
@@ -53,24 +44,14 @@ function usePushDialog(): UseDialogResult {
     resolveCallback(null);
   }, [closePushDialog]);
 
-  const onConfirm = useCallback(
-    (commitMessage: string, customBranch: string) => {
-      dispatch.uiState.setShowPushDialog({ state: 'loading' });
-      resolveCallback({ commitMessage, customBranch });
-    },
-    [dispatch],
-  );
+  const onConfirm = useCallback((commitMessage: string, customBranch: string) => {
+    dispatch.uiState.setShowPushDialog({ state: 'loading' });
+    resolveCallback({ commitMessage, customBranch });
+  }, [dispatch]);
 
-  return useMemo(
-    () => ({
-      pushDialog,
-      onConfirm,
-      onCancel,
-      showPushDialog,
-      closePushDialog,
-    }),
-    [pushDialog, onConfirm, onCancel, closePushDialog, showPushDialog],
-  );
+  return useMemo(() => ({
+    pushDialog, onConfirm, onCancel, showPushDialog, closePushDialog,
+  }), [pushDialog, onConfirm, onCancel, closePushDialog, showPushDialog]);
 }
 
 export default usePushDialog;

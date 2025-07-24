@@ -36,7 +36,15 @@ export const TokenButton: React.FC<React.PropsWithChildren<React.PropsWithChildr
     setDraggedToken={setDraggedToken}
   >
     {/* TODO: We should restructure and rename MoreButton as it's only ever used in TokenButton */}
-    <MoreButton token={token} type={type} showForm={showForm} />
-    <DragOverItem token={token} draggedToken={draggedToken} dragOverToken={dragOverToken} />
+    <MoreButton
+      token={token}
+      type={type}
+      showForm={showForm}
+    />
+    <DragOverItem
+      token={token}
+      draggedToken={draggedToken}
+      dragOverToken={dragOverToken}
+    />
   </DraggableWrapper>
 );

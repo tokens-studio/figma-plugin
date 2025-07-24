@@ -9,11 +9,9 @@ describe('Accordion', () => {
       <MotionConfig reducedMotion="always">
         <Accordion
           label="Header"
-          extra={
-            <button type="button" data-testid="accordion-extra">
-              Click me
-            </button>
-          }
+          extra={(
+            <button type="button" data-testid="accordion-extra">Click me</button>
+          )}
         >
           Lorem ipsum
         </Accordion>

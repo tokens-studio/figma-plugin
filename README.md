@@ -23,7 +23,6 @@ There's a Slack channel where the community can exchange ideas, best practices o
 ## How should I use this plugin?
 
 There's 2 ways how you could use the plugin:
-
 - Only use it to create or update your Styles but not apply any tokens with it, which would allow you to use features such as atomic type decisions, aliases and theme sets for managing styles (this is really powerful in combination with Figma's Swap library feature).
 - Use it to apply tokens with it, which would give you style-like functionality for things like border radius or spacings.
 

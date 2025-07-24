@@ -27,7 +27,9 @@ describe('ThemeStyleManagementCategory', () => {
               failedToResolve: false,
             },
           }}
-          icon={<Box data-testid="icon" />}
+          icon={(
+            <Box data-testid="icon" />
+          )}
           onAttachLocalStyles={mockAttachLocalStyles}
           onDisconnectStyle={mockDisconnectStyle}
         />

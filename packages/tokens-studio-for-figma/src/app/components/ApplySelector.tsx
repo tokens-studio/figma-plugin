@@ -1,7 +1,9 @@
 import { useDispatch, useSelector } from 'react-redux';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, DropdownMenu, Stack } from '@tokens-studio/ui';
+import {
+  Button, DropdownMenu, Stack,
+} from '@tokens-studio/ui';
 import { Check } from 'iconoir-react';
 import { Dispatch } from '../store';
 import IconChevronDown from '@/icons/chevrondown.svg';
@@ -52,10 +54,15 @@ export default function ApplySelector() {
         }}
         onClick={handleUpdate}
       >
-        {t('applyTo.button')} {updateMode}
+        {t('applyTo.button')}
+        {' '}
+        {updateMode}
       </Button>
       <DropdownMenu>
-        <DropdownMenu.Trigger asChild data-testid="apply-selector">
+        <DropdownMenu.Trigger
+          asChild
+          data-testid="apply-selector"
+        >
           <Button
             variant="primary"
             size="small"

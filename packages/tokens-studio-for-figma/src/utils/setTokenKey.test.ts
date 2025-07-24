@@ -1,4 +1,6 @@
-import { setTokenKey, FormatSensitiveTokenKeys, SingleTokenWithoutName } from '@/utils/setTokenKey';
+import {
+  setTokenKey, FormatSensitiveTokenKeys, SingleTokenWithoutName,
+} from '@/utils/setTokenKey';
 import { TokenFormatOptions, TokenFormat } from '@/plugin/TokenFormatStoreClass';
 
 describe('setTokenKey', () => {

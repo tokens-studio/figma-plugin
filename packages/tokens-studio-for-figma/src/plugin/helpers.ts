@@ -47,54 +47,14 @@ export async function getFileKey() {
   return fileKey;
 }
 
-export function transformValue(
-  value: string,
-  type: 'fontWeights',
-  baseFontSize: string,
-  shouldOutputForVariables?: boolean,
-): ReturnType<typeof convertFontWeightToFigma>;
-export function transformValue(
-  value: string,
-  type: 'letterSpacing',
-  baseFontSize: string,
-  shouldOutputForVariables?: boolean,
-): LetterSpacing | null;
-export function transformValue(
-  value: string,
-  type: 'lineHeights',
-  baseFontSize: string,
-  shouldOutputForVariables?: boolean,
-): LineHeight | null;
-export function transformValue(
-  value: string,
-  type: 'boxShadowType',
-  baseFontSize: string,
-  shouldOutputForVariables?: boolean,
-): ReturnType<typeof convertBoxShadowTypeToFigma>;
-export function transformValue(
-  value: string,
-  type: 'textCase',
-  baseFontSize: string,
-  shouldOutputForVariables?: boolean,
-): ReturnType<typeof convertTextCaseToFigma>;
-export function transformValue(
-  value: string,
-  type: 'textDecoration',
-  baseFontSize: string,
-  shouldOutputForVariables?: boolean,
-): ReturnType<typeof convertTextDecorationToFigma>;
-export function transformValue(
-  value: string,
-  type: 'opacity',
-  baseFontSize: string,
-  shouldOutputForVariables?: boolean,
-): number;
-export function transformValue(
-  value: string,
-  type: string,
-  baseFontSize: string,
-  shouldOutputForVariables?: boolean,
-): number;
+export function transformValue(value: string, type: 'fontWeights', baseFontSize: string, shouldOutputForVariables?: boolean): ReturnType<typeof convertFontWeightToFigma>;
+export function transformValue(value: string, type: 'letterSpacing', baseFontSize: string, shouldOutputForVariables?: boolean): LetterSpacing | null;
+export function transformValue(value: string, type: 'lineHeights', baseFontSize: string, shouldOutputForVariables?: boolean): LineHeight | null;
+export function transformValue(value: string, type: 'boxShadowType', baseFontSize: string, shouldOutputForVariables?: boolean): ReturnType<typeof convertBoxShadowTypeToFigma>;
+export function transformValue(value: string, type: 'textCase', baseFontSize: string, shouldOutputForVariables?: boolean): ReturnType<typeof convertTextCaseToFigma>;
+export function transformValue(value: string, type: 'textDecoration', baseFontSize: string, shouldOutputForVariables?: boolean): ReturnType<typeof convertTextDecorationToFigma>;
+export function transformValue(value: string, type: 'opacity', baseFontSize: string, shouldOutputForVariables?: boolean): number;
+export function transformValue(value: string, type: string, baseFontSize: string, shouldOutputForVariables?: boolean): number;
 export function transformValue(value: string, type: string, baseFontSize: string, shouldOutputForVariables = false) {
   switch (type) {
     case Properties.borderWidth:

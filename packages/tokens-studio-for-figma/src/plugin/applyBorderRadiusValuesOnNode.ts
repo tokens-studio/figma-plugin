@@ -11,13 +11,13 @@ export async function applyBorderRadiusValuesOnNode(
   baseFontSize: string,
 ) {
   if (
-    node.type !== 'CONNECTOR' && // need to exclude these layers as their cornerRadius in not editable
-    node.type !== 'SHAPE_WITH_TEXT' // need to exclude these layers as their cornerRadius in not editable
+    node.type !== 'CONNECTOR' // need to exclude these layers as their cornerRadius in not editable
+    && node.type !== 'SHAPE_WITH_TEXT' // need to exclude these layers as their cornerRadius in not editable
   ) {
     if (
-      typeof values.borderRadius !== 'undefined' &&
-      typeof data.borderRadius !== 'undefined' &&
-      isPrimitiveValue(values.borderRadius)
+      typeof values.borderRadius !== 'undefined'
+      && typeof data.borderRadius !== 'undefined'
+      && isPrimitiveValue(values.borderRadius)
     ) {
       const individualBorderRadius = String(values.borderRadius).split(' ');
       switch (individualBorderRadius.length) {
@@ -25,10 +25,10 @@ export async function applyBorderRadiusValuesOnNode(
           if ('cornerRadius' in node) {
             if (
               !(
-                (await tryApplyVariableId(node, 'topLeftRadius', data.borderRadius)) &&
-                (await tryApplyVariableId(node, 'topRightRadius', data.borderRadius)) &&
-                (await tryApplyVariableId(node, 'bottomRightRadius', data.borderRadius)) &&
-                (await tryApplyVariableId(node, 'bottomLeftRadius', data.borderRadius))
+                (await tryApplyVariableId(node, 'topLeftRadius', data.borderRadius))
+                && (await tryApplyVariableId(node, 'topRightRadius', data.borderRadius))
+                && (await tryApplyVariableId(node, 'bottomRightRadius', data.borderRadius))
+                && (await tryApplyVariableId(node, 'bottomLeftRadius', data.borderRadius))
               )
             ) {
               node.cornerRadius = transformValue(String(values.borderRadius), 'borderRadius', baseFontSize);
@@ -64,40 +64,40 @@ export async function applyBorderRadiusValuesOnNode(
       }
     }
     if (
-      'topLeftRadius' in node &&
-      typeof values.borderRadiusTopLeft !== 'undefined' &&
-      typeof data.borderRadiusTopLeft !== 'undefined' &&
-      isPrimitiveValue(values.borderRadiusTopLeft)
+      'topLeftRadius' in node
+      && typeof values.borderRadiusTopLeft !== 'undefined'
+      && typeof data.borderRadiusTopLeft !== 'undefined'
+      && isPrimitiveValue(values.borderRadiusTopLeft)
     ) {
       if (!(await tryApplyVariableId(node, 'topLeftRadius', data.borderRadiusTopLeft))) {
         node.topLeftRadius = transformValue(String(values.borderRadiusTopLeft), 'borderRadius', baseFontSize);
       }
     }
     if (
-      'topRightRadius' in node &&
-      typeof values.borderRadiusTopRight !== 'undefined' &&
-      typeof data.borderRadiusTopRight !== 'undefined' &&
-      isPrimitiveValue(values.borderRadiusTopRight)
+      'topRightRadius' in node
+      && typeof values.borderRadiusTopRight !== 'undefined'
+      && typeof data.borderRadiusTopRight !== 'undefined'
+      && isPrimitiveValue(values.borderRadiusTopRight)
     ) {
       if (!(await tryApplyVariableId(node, 'topRightRadius', data.borderRadiusTopRight))) {
         node.topRightRadius = transformValue(String(values.borderRadiusTopRight), 'borderRadius', baseFontSize);
       }
     }
     if (
-      'bottomRightRadius' in node &&
-      typeof values.borderRadiusBottomRight !== 'undefined' &&
-      typeof data.borderRadiusBottomRight !== 'undefined' &&
-      isPrimitiveValue(values.borderRadiusBottomRight)
+      'bottomRightRadius' in node
+      && typeof values.borderRadiusBottomRight !== 'undefined'
+      && typeof data.borderRadiusBottomRight !== 'undefined'
+      && isPrimitiveValue(values.borderRadiusBottomRight)
     ) {
       if (!(await tryApplyVariableId(node, 'bottomRightRadius', data.borderRadiusBottomRight))) {
         node.bottomRightRadius = transformValue(String(values.borderRadiusBottomRight), 'borderRadius', baseFontSize);
       }
     }
     if (
-      'bottomLeftRadius' in node &&
-      typeof values.borderRadiusBottomLeft !== 'undefined' &&
-      typeof data.borderRadiusBottomLeft !== 'undefined' &&
-      isPrimitiveValue(values.borderRadiusBottomLeft)
+      'bottomLeftRadius' in node
+      && typeof values.borderRadiusBottomLeft !== 'undefined'
+      && typeof data.borderRadiusBottomLeft !== 'undefined'
+      && isPrimitiveValue(values.borderRadiusBottomLeft)
     ) {
       if (!(await tryApplyVariableId(node, 'bottomLeftRadius', data.borderRadiusBottomLeft))) {
         node.bottomLeftRadius = transformValue(String(values.borderRadiusBottomLeft), 'borderRadius', baseFontSize);

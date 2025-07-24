@@ -9,11 +9,10 @@ export const ValuesProperty = new FigmaStorageProperty<Record<string, AnyTokenLi
   FigmaStorageType.SHARED_PLUGIN_DATA,
   `${SharedPluginDataNamespaces.TOKENS}/${SharedPluginDataKeys.tokens.values}`,
   (value) => compressToUTF16(JSON.stringify(value)),
-  (value, isCompressed) =>
-    attemptOrFallback<Record<string, AnyTokenList>>(() => {
-      if (!value) return {};
-      if (!isCompressed) return JSON.parse(value);
-      const decompressed = decompressFromUTF16(value);
-      return JSON.parse(decompressed);
-    }, {}),
+  (value, isCompressed) => attemptOrFallback<Record<string, AnyTokenList>>(() => {
+    if (!value) return {};
+    if (!isCompressed) return JSON.parse(value);
+    const decompressed = decompressFromUTF16(value);
+    return JSON.parse(decompressed);
+  }, {}),
 );

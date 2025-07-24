@@ -1,7 +1,9 @@
 import React from 'react';
 import zod from 'zod';
 import { useTranslation } from 'react-i18next';
-import { Button, FormField, IconButton, Label, Link, Stack, Text, TextInput } from '@tokens-studio/ui';
+import {
+  Button, FormField, IconButton, Label, Link, Stack, Text, TextInput,
+} from '@tokens-studio/ui';
 import { EyeClosedIcon, EyeOpenIcon } from '@radix-ui/react-icons';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeFormValues } from '@/types/StorageType';
@@ -11,8 +13,8 @@ import { ChangeEventHandler } from './types';
 import { ErrorMessage } from '../ErrorMessage';
 
 type ValidatedFormValues = Extract<
-  StorageTypeFormValues<false>,
-  { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB }
+StorageTypeFormValues<false>,
+{ provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB }
 >;
 type Props = {
   values: Extract<StorageTypeFormValues<true>, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB }>;
@@ -23,7 +25,9 @@ type Props = {
   errorMessage?: string;
 };
 
-export default function GitForm({ onChange, onSubmit, onCancel, values, hasErrored, errorMessage }: Props) {
+export default function GitForm({
+  onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
+}: Props) {
   const [isMasked, setIsMasked] = React.useState(true);
 
   const toggleMask = React.useCallback(() => {
@@ -97,14 +101,14 @@ export default function GitForm({ onChange, onSubmit, onCancel, values, hasError
             value={values.secret || ''}
             onChange={onChange}
             type={isMasked ? 'password' : 'text'}
-            trailingAction={
+            trailingAction={(
               <IconButton
                 variant="invisible"
                 size="small"
                 onClick={toggleMask}
                 icon={isMasked ? <EyeClosedIcon /> : <EyeOpenIcon />}
               />
-            }
+            )}
             required
           />
         </FormField>

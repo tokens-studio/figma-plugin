@@ -1,6 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Box, Text } from '@tokens-studio/ui';
+import {
+  Button, Box, Text,
+} from '@tokens-studio/ui';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { IconFile } from '@/icons';
@@ -61,9 +63,7 @@ const LocalStorageItem = () => {
         </Box>
         <Box>
           <Box css={{ fontSize: '$small', fontWeight: '$sansBold' }}>{t('localDocument')}</Box>
-          <Text muted size="xsmall">
-            Tokens will be stored on this Figma file
-          </Text>
+          <Text muted size="xsmall">Tokens will be stored on this Figma file</Text>
         </Box>
       </Box>
       <Box

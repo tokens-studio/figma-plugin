@@ -2,20 +2,17 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { AnyTokenList } from '@/types/tokens';
-import { render, fireEvent, createMockStore } from '../../../../tests/config/setupTest';
+import {
+  render, fireEvent, createMockStore,
+} from '../../../../tests/config/setupTest';
 import SingleFileExport from './SingleFileExport';
 
 const mockClose = jest.fn();
 const defaultStore = {
   tokenState: {
-    themes: [
-      {
-        id: 'light',
-        name: 'Light',
-        selectedTokenSets: {},
-        $figmaStyleReferences: {},
-      },
-    ],
+    themes: [{
+      id: 'light', name: 'Light', selectedTokenSets: {}, $figmaStyleReferences: {},
+    }],
     tokens: {
       global: [
         { name: 'white', value: '#ffffff', type: TokenTypes.COLOR },
@@ -23,19 +20,16 @@ const defaultStore = {
         {
           name: 'shadow',
           value: {
-            blur: '2',
-            color: '#000000',
-            spread: '0',
-            type: 'innerShadow',
-            x: '2',
-            y: '2',
+            blur: '2', color: '#000000', spread: '0', type: 'innerShadow', x: '2', y: '2',
           },
           type: TokenTypes.BOX_SHADOW,
         },
         { name: 'composition', value: { fill: '$white' }, type: TokenTypes.COMPOSITION },
         { name: 'border', value: { color: '$white', width: '5px' }, type: TokenTypes.BORDER },
       ],
-      light: [{ name: 'bg.default', value: '#ffffff', type: TokenTypes.COLOR }],
+      light: [
+        { name: 'bg.default', value: '#ffffff', type: TokenTypes.COLOR },
+      ],
     } as Record<string, AnyTokenList>,
   },
 };
@@ -50,49 +44,45 @@ describe('SingleFileExport', () => {
     );
     const textArea = result.getByRole('textbox');
     expect(textArea).toHaveValue(
-      JSON.stringify(
-        {
-          global: {
-            white: {
-              value: '#ffffff',
-              type: 'color',
+      JSON.stringify({
+        global: {
+          white: {
+            value: '#ffffff',
+            type: 'color',
+          },
+          headline: {
+            value: {
+              fontFamily: 'Inter',
+              fontWeight: 'Bold',
             },
-            headline: {
-              value: {
-                fontFamily: 'Inter',
-                fontWeight: 'Bold',
-              },
-              type: 'typography',
+            type: 'typography',
+          },
+          shadow: {
+            value: {
+              blur: '2',
+              color: '#000000',
+              spread: '0',
+              type: 'innerShadow',
+              x: '2',
+              y: '2',
             },
-            shadow: {
-              value: {
-                blur: '2',
-                color: '#000000',
-                spread: '0',
-                type: 'innerShadow',
-                x: '2',
-                y: '2',
-              },
-              type: 'boxShadow',
+            type: 'boxShadow',
+          },
+          composition: {
+            value: {
+              fill: '$white',
             },
-            composition: {
-              value: {
-                fill: '$white',
-              },
-              type: 'composition',
+            type: 'composition',
+          },
+          border: {
+            value: {
+              color: '$white',
+              width: '5px',
             },
-            border: {
-              value: {
-                color: '$white',
-                width: '5px',
-              },
-              type: 'border',
-            },
+            type: 'border',
           },
         },
-        null,
-        2,
-      ),
+      }, null, 2),
     );
   });
 
@@ -107,68 +97,67 @@ describe('SingleFileExport', () => {
     fireEvent.click(incluedeAllTokensCheckBox);
     const textArea = result.getByRole('textbox');
     expect(textArea).toHaveValue(
-      JSON.stringify(
-        {
-          global: {
-            white: {
+      JSON.stringify({
+        global: {
+          white: {
+            value: '#ffffff',
+            type: 'color',
+          },
+          headline: {
+            value: {
+              fontFamily: 'Inter',
+              fontWeight: 'Bold',
+            },
+            type: 'typography',
+          },
+          shadow: {
+            value: {
+              blur: '2',
+              color: '#000000',
+              spread: '0',
+              type: 'innerShadow',
+              x: '2',
+              y: '2',
+            },
+            type: 'boxShadow',
+          },
+          composition: {
+            value: {
+              fill: '$white',
+            },
+            type: 'composition',
+          },
+          border: {
+            value: {
+              color: '$white',
+              width: '5px',
+            },
+            type: 'border',
+          },
+        },
+        light: {
+          bg: {
+            default: {
               value: '#ffffff',
               type: 'color',
             },
-            headline: {
-              value: {
-                fontFamily: 'Inter',
-                fontWeight: 'Bold',
-              },
-              type: 'typography',
-            },
-            shadow: {
-              value: {
-                blur: '2',
-                color: '#000000',
-                spread: '0',
-                type: 'innerShadow',
-                x: '2',
-                y: '2',
-              },
-              type: 'boxShadow',
-            },
-            composition: {
-              value: {
-                fill: '$white',
-              },
-              type: 'composition',
-            },
-            border: {
-              value: {
-                color: '$white',
-                width: '5px',
-              },
-              type: 'border',
-            },
-          },
-          light: {
-            bg: {
-              default: {
-                value: '#ffffff',
-                type: 'color',
-              },
-            },
-          },
-          $themes: [
-            {
-              id: 'light',
-              name: 'Light',
-              selectedTokenSets: {},
-              $figmaStyleReferences: {},
-            },
-          ],
-          $metadata: {
-            tokenSetOrder: ['global', 'light'],
           },
         },
-        null,
-        2,
-      ),
+        $themes: [
+          {
+            id: 'light',
+            name: 'Light',
+            selectedTokenSets: {},
+            $figmaStyleReferences: {},
+          },
+        ],
+        $metadata: {
+          tokenSetOrder: [
+            'global',
+            'light',
+          ],
+        },
+      }, null, 2),
     );
   });
 
@@ -192,28 +181,24 @@ describe('SingleFileExport', () => {
     fireEvent.click(expandTypographyCheckBox);
     const textArea = result.getByRole('textbox');
     expect(textArea).toHaveValue(
-      JSON.stringify(
-        {
-          global: {
-            headline: {
-              fontFamily: {
-                value: 'Inter',
-                type: 'fontFamilies',
-              },
-              fontWeight: {
-                value: 'Bold',
-                type: 'fontWeights',
-              },
+      JSON.stringify({
+        global: {
+          headline: {
+            fontFamily: {
+              value: 'Inter',
+              type: 'fontFamilies',
             },
-            alias: {
-              value: '$headline',
-              type: 'typography',
+            fontWeight: {
+              value: 'Bold',
+              type: 'fontWeights',
             },
           },
+          alias: {
+            value: '$headline',
+            type: 'typography',
+          },
         },
-        null,
-        2,
-      ),
+      }, null, 2),
     );
   });
 
@@ -225,35 +210,17 @@ describe('SingleFileExport', () => {
             {
               name: 'shadow',
               value: {
-                blur: '2',
-                color: '#000000',
-                spread: '0',
-                type: 'innerShadow',
-                x: '2',
-                y: '2',
+                blur: '2', color: '#000000', spread: '0', type: 'innerShadow', x: '2', y: '2',
               },
               type: TokenTypes.BOX_SHADOW,
             },
             {
               name: 'multiShadow',
-              value: [
-                {
-                  blur: '2',
-                  color: '#000000',
-                  spread: '0',
-                  type: 'innerShadow',
-                  x: '2',
-                  y: '2',
-                },
-                {
-                  blur: '4',
-                  color: '#000000',
-                  spread: '0',
-                  type: 'innerShadow',
-                  x: '4',
-                  y: '4',
-                },
-              ],
+              value: [{
+                blur: '2', color: '#000000', spread: '0', type: 'innerShadow', x: '2', y: '2',
+              }, {
+                blur: '4', color: '#000000', spread: '0', type: 'innerShadow', x: '4', y: '4',
+              }],
               type: TokenTypes.BOX_SHADOW,
             },
             { name: 'alias', value: '$shadow', type: TokenTypes.BOX_SHADOW },
@@ -270,10 +237,36 @@ describe('SingleFileExport', () => {
     fireEvent.click(expandShadowCheckBox);
     const textArea = result.getByRole('textbox');
     expect(textArea).toHaveValue(
-      JSON.stringify(
-        {
-          global: {
-            shadow: {
+      JSON.stringify({
+        global: {
+          shadow: {
+            blur: {
+              value: '2',
+              type: 'blur',
+            },
+            color: {
+              value: '#000000',
+              type: 'color',
+            },
+            spread: {
+              value: '0',
+              type: 'spread',
+            },
+            type: {
+              value: 'innerShadow',
+              type: 'type',
+            },
+            x: {
+              value: '2',
+              type: 'x',
+            },
+            y: {
+              value: '2',
+              type: 'y',
+            },
+          },
+          multiShadow: {
+            0: {
               blur: {
                 value: '2',
                 type: 'blur',
@@ -299,69 +292,39 @@ describe('SingleFileExport', () => {
                 type: 'y',
               },
             },
-            multiShadow: {
-              0: {
-                blur: {
-                  value: '2',
-                  type: 'blur',
-                },
-                color: {
-                  value: '#000000',
-                  type: 'color',
-                },
-                spread: {
-                  value: '0',
-                  type: 'spread',
-                },
-                type: {
-                  value: 'innerShadow',
-                  type: 'type',
-                },
-                x: {
-                  value: '2',
-                  type: 'x',
-                },
-                y: {
-                  value: '2',
-                  type: 'y',
-                },
+            1: {
+              blur: {
+                value: '4',
+                type: 'blur',
               },
-              1: {
-                blur: {
-                  value: '4',
-                  type: 'blur',
-                },
-                color: {
-                  value: '#000000',
-                  type: 'color',
-                },
-                spread: {
-                  value: '0',
-                  type: 'spread',
-                },
-                type: {
-                  value: 'innerShadow',
-                  type: 'type',
-                },
-                x: {
-                  value: '4',
-                  type: 'x',
-                },
-                y: {
-                  value: '4',
-                  type: 'y',
-                },
+              color: {
+                value: '#000000',
+                type: 'color',
               },
-            },
-            alias: {
-              value: '$shadow',
-              type: 'boxShadow',
+              spread: {
+                value: '0',
+                type: 'spread',
+              },
+              type: {
+                value: 'innerShadow',
+                type: 'type',
+              },
+              x: {
+                value: '4',
+                type: 'x',
+              },
+              y: {
+                value: '4',
+                type: 'y',
+              },
             },
           },
+          alias: {
+            value: '$shadow',
+            type: 'boxShadow',
+          },
         },
-        null,
-        2,
-      ),
+      }, null, 2),
     );
   });
 
@@ -376,49 +339,45 @@ describe('SingleFileExport', () => {
     fireEvent.click(expandCompositionCheckBox);
     const textArea = result.getByRole('textbox');
     expect(textArea).toHaveValue(
-      JSON.stringify(
-        {
-          global: {
-            white: {
-              value: '#ffffff',
-              type: 'color',
+      JSON.stringify({
+        global: {
+          white: {
+            value: '#ffffff',
+            type: 'color',
+          },
+          headline: {
+            value: {
+              fontFamily: 'Inter',
+              fontWeight: 'Bold',
             },
-            headline: {
-              value: {
-                fontFamily: 'Inter',
-                fontWeight: 'Bold',
-              },
-              type: 'typography',
+            type: 'typography',
+          },
+          shadow: {
+            value: {
+              blur: '2',
+              color: '#000000',
+              spread: '0',
+              type: 'innerShadow',
+              x: '2',
+              y: '2',
             },
-            shadow: {
-              value: {
-                blur: '2',
-                color: '#000000',
-                spread: '0',
-                type: 'innerShadow',
-                x: '2',
-                y: '2',
-              },
-              type: 'boxShadow',
-            },
-            composition: {
-              fill: {
-                value: '$white',
-                type: 'fill',
-              },
-            },
-            border: {
-              value: {
-                color: '$white',
-                width: '5px',
-              },
-              type: 'border',
+            type: 'boxShadow',
+          },
+          composition: {
+            fill: {
+              value: '$white',
+              type: 'fill',
             },
           },
+          border: {
+            value: {
+              color: '$white',
+              width: '5px',
+            },
+            type: 'border',
+          },
         },
-        null,
-        2,
-      ),
+      }, null, 2),
     );
   });
 
@@ -433,52 +392,48 @@ describe('SingleFileExport', () => {
     fireEvent.click(expandBorderCheckBox);
     const textArea = result.getByRole('textbox');
     expect(textArea).toHaveValue(
-      JSON.stringify(
-        {
-          global: {
-            white: {
-              value: '#ffffff',
+      JSON.stringify({
+        global: {
+          white: {
+            value: '#ffffff',
+            type: 'color',
+          },
+          headline: {
+            value: {
+              fontFamily: 'Inter',
+              fontWeight: 'Bold',
+            },
+            type: 'typography',
+          },
+          shadow: {
+            value: {
+              blur: '2',
+              color: '#000000',
+              spread: '0',
+              type: 'innerShadow',
+              x: '2',
+              y: '2',
+            },
+            type: 'boxShadow',
+          },
+          composition: {
+            value: {
+              fill: '$white',
+            },
+            type: 'composition',
+          },
+          border: {
+            color: {
+              value: '$white',
               type: 'color',
             },
-            headline: {
-              value: {
-                fontFamily: 'Inter',
-                fontWeight: 'Bold',
-              },
-              type: 'typography',
-            },
-            shadow: {
-              value: {
-                blur: '2',
-                color: '#000000',
-                spread: '0',
-                type: 'innerShadow',
-                x: '2',
-                y: '2',
-              },
-              type: 'boxShadow',
-            },
-            composition: {
-              value: {
-                fill: '$white',
-              },
-              type: 'composition',
-            },
-            border: {
-              color: {
-                value: '$white',
-                type: 'color',
-              },
-              width: {
-                value: '5px',
-                type: 'dimension',
-              },
+            width: {
+              value: '5px',
+              type: 'dimension',
             },
           },
         },
-        null,
-        2,
-      ),
+      }, null, 2),
     );
   });
 });

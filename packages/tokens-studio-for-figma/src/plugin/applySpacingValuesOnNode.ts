@@ -12,10 +12,10 @@ export async function applySpacingValuesOnNode(
 ) {
   // Applies spacing type tokens
   if (
-    'paddingLeft' in node &&
-    typeof values.spacing !== 'undefined' &&
-    typeof data.spacing !== 'undefined' &&
-    isPrimitiveValue(values.spacing)
+    'paddingLeft' in node
+    && typeof values.spacing !== 'undefined'
+    && typeof data.spacing !== 'undefined'
+    && isPrimitiveValue(values.spacing)
   ) {
     const individualSpacing = String(values.spacing).split(' ');
     const spacing = transformValue(String(values.spacing), 'spacing', baseFontSize);
@@ -23,10 +23,10 @@ export async function applySpacingValuesOnNode(
       case 1:
         if (
           !(
-            (await tryApplyVariableId(node, 'paddingLeft', data.spacing)) &&
-            (await tryApplyVariableId(node, 'paddingRight', data.spacing)) &&
-            (await tryApplyVariableId(node, 'paddingTop', data.spacing)) &&
-            (await tryApplyVariableId(node, 'paddingBottom', data.spacing))
+            (await tryApplyVariableId(node, 'paddingLeft', data.spacing))
+            && (await tryApplyVariableId(node, 'paddingRight', data.spacing))
+            && (await tryApplyVariableId(node, 'paddingTop', data.spacing))
+            && (await tryApplyVariableId(node, 'paddingBottom', data.spacing))
           )
         ) {
           node.paddingLeft = spacing;
@@ -58,15 +58,15 @@ export async function applySpacingValuesOnNode(
     }
   }
   if (
-    'paddingLeft' in node &&
-    typeof values.horizontalPadding !== 'undefined' &&
-    typeof data.horizontalPadding !== 'undefined' &&
-    isPrimitiveValue(values.horizontalPadding)
+    'paddingLeft' in node
+    && typeof values.horizontalPadding !== 'undefined'
+    && typeof data.horizontalPadding !== 'undefined'
+    && isPrimitiveValue(values.horizontalPadding)
   ) {
     if (
       !(
-        (await tryApplyVariableId(node, 'paddingLeft', data.horizontalPadding)) &&
-        (await tryApplyVariableId(node, 'paddingRight', data.horizontalPadding))
+        (await tryApplyVariableId(node, 'paddingLeft', data.horizontalPadding))
+        && (await tryApplyVariableId(node, 'paddingRight', data.horizontalPadding))
       )
     ) {
       const horizontalPadding = transformValue(String(values.horizontalPadding), 'spacing', baseFontSize);
@@ -75,15 +75,15 @@ export async function applySpacingValuesOnNode(
     }
   }
   if (
-    'paddingTop' in node &&
-    typeof values.verticalPadding !== 'undefined' &&
-    typeof data.verticalPadding !== 'undefined' &&
-    isPrimitiveValue(values.verticalPadding)
+    'paddingTop' in node
+    && typeof values.verticalPadding !== 'undefined'
+    && typeof data.verticalPadding !== 'undefined'
+    && isPrimitiveValue(values.verticalPadding)
   ) {
     if (
       !(
-        (await tryApplyVariableId(node, 'paddingTop', data.verticalPadding)) &&
-        (await tryApplyVariableId(node, 'paddingBottom', data.verticalPadding))
+        (await tryApplyVariableId(node, 'paddingTop', data.verticalPadding))
+        && (await tryApplyVariableId(node, 'paddingBottom', data.verticalPadding))
       )
     ) {
       const verticalPadding = transformValue(String(values.verticalPadding), 'spacing', baseFontSize);
@@ -93,10 +93,10 @@ export async function applySpacingValuesOnNode(
   }
 
   if (
-    'itemSpacing' in node &&
-    typeof values.itemSpacing !== 'undefined' &&
-    typeof data.itemSpacing !== 'undefined' &&
-    isPrimitiveValue(values.itemSpacing)
+    'itemSpacing' in node
+    && typeof values.itemSpacing !== 'undefined'
+    && typeof data.itemSpacing !== 'undefined'
+    && isPrimitiveValue(values.itemSpacing)
   ) {
     if (String(values.itemSpacing) === 'AUTO') {
       node.primaryAxisAlignItems = 'SPACE_BETWEEN';
@@ -109,10 +109,10 @@ export async function applySpacingValuesOnNode(
   }
 
   if (
-    'counterAxisSpacing' in node &&
-    typeof values.counterAxisSpacing !== 'undefined' &&
-    typeof data.counterAxisSpacing !== 'undefined' &&
-    isPrimitiveValue(values.counterAxisSpacing)
+    'counterAxisSpacing' in node
+    && typeof values.counterAxisSpacing !== 'undefined'
+    && typeof data.counterAxisSpacing !== 'undefined'
+    && isPrimitiveValue(values.counterAxisSpacing)
   ) {
     if (!(await tryApplyVariableId(node, 'counterAxisSpacing', data.counterAxisSpacing))) {
       node.counterAxisSpacing = transformValue(String(values.counterAxisSpacing), 'spacing', baseFontSize);
@@ -120,20 +120,20 @@ export async function applySpacingValuesOnNode(
   }
 
   if (
-    'paddingTop' in node &&
-    typeof values.paddingTop !== 'undefined' &&
-    typeof data.paddingTop !== 'undefined' &&
-    isPrimitiveValue(values.paddingTop)
+    'paddingTop' in node
+    && typeof values.paddingTop !== 'undefined'
+    && typeof data.paddingTop !== 'undefined'
+    && isPrimitiveValue(values.paddingTop)
   ) {
     if (!(await tryApplyVariableId(node, 'paddingTop', data.paddingTop))) {
       node.paddingTop = transformValue(String(values.paddingTop), 'spacing', baseFontSize);
     }
   }
   if (
-    'paddingRight' in node &&
-    typeof values.paddingRight !== 'undefined' &&
-    typeof data.paddingRight !== 'undefined' &&
-    isPrimitiveValue(values.paddingRight)
+    'paddingRight' in node
+    && typeof values.paddingRight !== 'undefined'
+    && typeof data.paddingRight !== 'undefined'
+    && isPrimitiveValue(values.paddingRight)
   ) {
     if (!(await tryApplyVariableId(node, 'paddingRight', data.paddingRight))) {
       node.paddingRight = transformValue(String(values.paddingRight), 'spacing', baseFontSize);
@@ -141,10 +141,10 @@ export async function applySpacingValuesOnNode(
   }
 
   if (
-    'paddingBottom' in node &&
-    typeof values.paddingBottom !== 'undefined' &&
-    typeof data.paddingBottom !== 'undefined' &&
-    isPrimitiveValue(values.paddingBottom)
+    'paddingBottom' in node
+    && typeof values.paddingBottom !== 'undefined'
+    && typeof data.paddingBottom !== 'undefined'
+    && isPrimitiveValue(values.paddingBottom)
   ) {
     if (!(await tryApplyVariableId(node, 'paddingBottom', data.paddingBottom))) {
       node.paddingBottom = transformValue(String(values.paddingBottom), 'spacing', baseFontSize);
@@ -152,10 +152,10 @@ export async function applySpacingValuesOnNode(
   }
 
   if (
-    'paddingLeft' in node &&
-    typeof values.paddingLeft !== 'undefined' &&
-    typeof data.paddingLeft !== 'undefined' &&
-    isPrimitiveValue(values.paddingLeft)
+    'paddingLeft' in node
+    && typeof values.paddingLeft !== 'undefined'
+    && typeof data.paddingLeft !== 'undefined'
+    && isPrimitiveValue(values.paddingLeft)
   ) {
     if (!(await tryApplyVariableId(node, 'paddingLeft', data.paddingLeft))) {
       node.paddingLeft = transformValue(String(values.paddingLeft), 'spacing', baseFontSize);

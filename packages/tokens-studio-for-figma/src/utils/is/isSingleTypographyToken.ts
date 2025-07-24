@@ -13,18 +13,18 @@ export function isSingleTypographyToken(
   const tokenTypeKey = getTokenTypeKey(ignoreTokenFormat);
   const tokenValueKey = getTokenValueKey(ignoreTokenFormat);
   return (
-    token[tokenTypeKey] === TokenTypes.TYPOGRAPHY &&
-    (typeof token[tokenValueKey] === 'string' ||
-      (typeof token[tokenValueKey] === 'object' && !(tokenValueKey in token[tokenValueKey])))
+    token[tokenTypeKey] === TokenTypes.TYPOGRAPHY
+    && (typeof token[tokenValueKey] === 'string'
+      || (typeof token[tokenValueKey] === 'object' && !(tokenValueKey in token[tokenValueKey])))
   );
 }
 
 export function isSingleTypographyTokenInJSON(token: TokenInJSON | Tokens): token is SingleTypographyTokenInJSON {
   if (typeof token !== 'object') return false;
   return (
-    token[TokenFormat.tokenTypeKey] === TokenTypes.TYPOGRAPHY &&
-    (typeof token[TokenFormat.tokenValueKey] === 'string' ||
-      (typeof token[TokenFormat.tokenValueKey] === 'object' &&
-        !(TokenFormat.tokenValueKey in token[TokenFormat.tokenValueKey])))
+    token[TokenFormat.tokenTypeKey] === TokenTypes.TYPOGRAPHY
+    && (typeof token[TokenFormat.tokenValueKey] === 'string'
+      || (typeof token[TokenFormat.tokenValueKey] === 'object'
+        && !(TokenFormat.tokenValueKey in token[TokenFormat.tokenValueKey])))
   );
 }

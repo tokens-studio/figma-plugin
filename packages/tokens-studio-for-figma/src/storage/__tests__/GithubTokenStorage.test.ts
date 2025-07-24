@@ -29,27 +29,29 @@ describe('GithubTokenStorage', () => {
   });
 
   it('should fetch branches as a simple list', async () => {
-    expect(await storageProvider.fetchBranches()).toEqual(['main', 'development']);
+    expect(
+      await storageProvider.fetchBranches(),
+    ).toEqual(['main', 'development']);
   });
 
   it('should try to create a branch', async () => {
-    mockGetRef.mockImplementationOnce(() =>
+    mockGetRef.mockImplementationOnce(() => (
       Promise.resolve({
         data: {
           object: {
             sha: 'main-sha',
           },
         },
-      }),
-    );
+      })
+    ));
 
-    mockCreateRef.mockImplementationOnce(() =>
+    mockCreateRef.mockImplementationOnce(() => (
       Promise.resolve({
         data: {
           ref: 'development',
         },
-      }),
-    );
+      })
+    ));
 
     expect(await storageProvider.createBranch('development', 'main')).toBe(true);
     expect(mockGetRef).toBeCalledWith({
@@ -69,31 +71,35 @@ describe('GithubTokenStorage', () => {
   });
 
   it('should return false when creating a branch is failed', async () => {
-    mockGetRef.mockImplementationOnce(() => Promise.reject());
+    mockGetRef.mockImplementationOnce(() => (
+      Promise.reject()
+    ));
     expect(await storageProvider.createBranch('development', 'main')).toBe(false);
   });
 
   it('canWrite should return false if unauthenticated', async () => {
-    mockGetAuthenticated.mockImplementationOnce(() =>
+    mockGetAuthenticated.mockImplementationOnce(() => (
       Promise.resolve({
         data: {
           login: '',
         },
-      }),
-    );
+      })
+    ));
 
     expect(await storageProvider.canWrite()).toBe(false);
   });
 
   it('canWrite should return false if the user is not a collaborator', async () => {
-    mockGetAuthenticated.mockImplementationOnce(() =>
+    mockGetAuthenticated.mockImplementationOnce(() => (
       Promise.resolve({
         data: {
           login: 'six7',
         },
-      }),
-    );
-    mockGetCollaboratorPermissionLevel.mockImplementationOnce(() => Promise.resolve(null));
+      })
+    ));
+    mockGetCollaboratorPermissionLevel.mockImplementationOnce(() => (
+      Promise.resolve(null)
+    ));
     expect(await storageProvider.canWrite()).toBe(false);
     expect(mockGetCollaboratorPermissionLevel).toBeCalledWith({
       owner: 'six7',
@@ -106,13 +112,13 @@ describe('GithubTokenStorage', () => {
   });
 
   it('canWrite should return false if it fails to fetch collaboration level', async () => {
-    mockGetAuthenticated.mockImplementationOnce(() =>
+    mockGetAuthenticated.mockImplementationOnce(() => (
       Promise.resolve({
         data: {
           login: 'six7',
         },
-      }),
-    );
+      })
+    ));
     mockGetCollaboratorPermissionLevel.mockImplementationOnce(() => {
       throw new Error('Could not fetch collaboration level');
     });
@@ -135,21 +141,21 @@ describe('GithubTokenStorage', () => {
   });
 
   it('canWrite should return true if a collaborator', async () => {
-    mockGetAuthenticated.mockImplementationOnce(() =>
+    mockGetAuthenticated.mockImplementationOnce(() => (
       Promise.resolve({
         data: {
           login: 'six7',
         },
-      }),
-    );
-    mockGetCollaboratorPermissionLevel.mockImplementationOnce(() =>
+      })
+    ));
+    mockGetCollaboratorPermissionLevel.mockImplementationOnce(() => (
       Promise.resolve({
         data: {
           user: { id: 'six7' },
           permission: 'collaborator',
         },
-      }),
-    );
+      })
+    ));
     expect(await storageProvider.canWrite()).toBe(true);
     expect(mockGetCollaboratorPermissionLevel).toBeCalledWith({
       owner: 'six7',
@@ -162,7 +168,7 @@ describe('GithubTokenStorage', () => {
   });
 
   it('can read from Git in single file format', async () => {
-    mockGetContent.mockImplementationOnce(() =>
+    mockGetContent.mockImplementationOnce(() => (
       Promise.resolve({
         data: JSON.stringify({
           global: {
@@ -188,8 +194,8 @@ describe('GithubTokenStorage', () => {
           ],
           $metadata: {},
         }),
-      }),
-    );
+      })
+    ));
 
     storageProvider.changePath('data/tokens.json');
     expect(await storageProvider.retrieve()).toEqual({
@@ -233,11 +239,11 @@ describe('GithubTokenStorage', () => {
 
   it('should return error message about invalid data', async () => {
     storageProvider.changePath('data/tokens.json');
-    mockGetContent.mockImplementation(() =>
+    mockGetContent.mockImplementation(() => (
       Promise.resolve({
         data: 'Empty file',
-      }),
-    );
+      })
+    ));
 
     expect(await storageProvider.retrieve()).toEqual({
       status: 'failure',
@@ -247,11 +253,11 @@ describe('GithubTokenStorage', () => {
   });
 
   it('can handle invalid file content', async () => {
-    mockGetContent.mockImplementationOnce(() =>
+    mockGetContent.mockImplementationOnce(() => (
       Promise.resolve({
         data: 'Empty file',
-      }),
-    );
+      })
+    ));
 
     storageProvider.changePath('data/tokens.json');
     expect(await storageProvider.read()).toEqual({
@@ -261,11 +267,11 @@ describe('GithubTokenStorage', () => {
   });
 
   it('should empty array when there is no content', async () => {
-    mockGetContent.mockImplementationOnce(() =>
+    mockGetContent.mockImplementationOnce(() => (
       Promise.resolve({
         data: '',
-      }),
-    );
+      })
+    ));
 
     storageProvider.changePath('data/tokens.json');
     expect(await storageProvider.read()).toEqual([]);
@@ -276,13 +282,17 @@ describe('GithubTokenStorage', () => {
     mockGetContent.mockImplementation((opts: { path: string }) => {
       if (opts.path === '') {
         return Promise.resolve({
-          data: [{ path: 'data', sha: 'sha(data)', type: 'dir' }],
+          data: [
+            { path: 'data', sha: 'sha(data)', type: 'dir' },
+          ],
         });
       }
 
       if (opts.path === 'data') {
         return Promise.resolve({
-          data: [{ path: 'data/empty.json', sha: 'sha(data/empty.json)', type: 'file' }],
+          data: [
+            { path: 'data/empty.json', sha: 'sha(data/empty.json)', type: 'file' },
+          ],
         });
       }
 
@@ -295,14 +305,16 @@ describe('GithubTokenStorage', () => {
       return Promise.reject();
     });
 
-    mockGetTree.mockImplementationOnce(() =>
+    mockGetTree.mockImplementationOnce(() => (
       Promise.resolve({
         data: {
           sha: 'sha(data)',
-          tree: [{ path: 'data/empty.json', type: 'blob', sha: 'sha(empty.json)' }],
+          tree: [
+            { path: 'data/empty.json', type: 'blob', sha: 'sha(empty.json)' },
+          ],
         },
-      }),
-    );
+      })
+    ));
 
     storageProvider.enableMultiFile();
     storageProvider.changePath('data');
@@ -315,7 +327,9 @@ describe('GithubTokenStorage', () => {
     mockGetContent.mockImplementation((opts: { path: string }) => {
       if (opts.path === '') {
         return Promise.resolve({
-          data: [{ path: 'data', sha: 'sha(data)', type: 'dir' }],
+          data: [
+            { path: 'data', sha: 'sha(data)', type: 'dir' },
+          ],
         });
       }
 
@@ -366,7 +380,7 @@ describe('GithubTokenStorage', () => {
       return Promise.reject();
     });
 
-    mockGetTree.mockImplementationOnce(() =>
+    mockGetTree.mockImplementationOnce(() => (
       Promise.resolve({
         data: {
           sha: 'sha(data)',
@@ -376,8 +390,8 @@ describe('GithubTokenStorage', () => {
             { path: 'data/global.json', type: 'blob', sha: 'sha(global.json)' },
           ],
         },
-      }),
-    );
+      })
+    ));
 
     storageProvider.enableMultiFile();
     storageProvider.changePath('data');
@@ -392,15 +406,13 @@ describe('GithubTokenStorage', () => {
       {
         path: 'data/$themes.json',
         type: 'themes',
-        data: [
-          {
-            id: 'light',
-            name: 'Light',
-            selectedTokenSets: {
-              global: TokenSetStatus.ENABLED,
-            },
+        data: [{
+          id: 'light',
+          name: 'Light',
+          selectedTokenSets: {
+            global: TokenSetStatus.ENABLED,
           },
-        ],
+        }],
       },
       {
         path: 'data/global.json',
@@ -474,9 +486,11 @@ describe('GithubTokenStorage', () => {
       return Promise.reject();
     });
 
-    mockCreateTree.mockImplementationOnce(() => Promise.reject());
+    mockCreateTree.mockImplementationOnce(() => (
+      Promise.reject()
+    ));
 
-    mockGetTree.mockImplementationOnce(() =>
+    mockGetTree.mockImplementationOnce(() => (
       Promise.resolve({
         data: {
           sha: 'sha(data)',
@@ -486,8 +500,8 @@ describe('GithubTokenStorage', () => {
             { path: 'data/global.json', type: 'blob', sha: 'sha(global.json)' },
           ],
         },
-      }),
-    );
+      })
+    ));
 
     storageProvider.enableMultiFile();
     storageProvider.changePath('data');
@@ -502,15 +516,13 @@ describe('GithubTokenStorage', () => {
       {
         path: 'data/$themes.json',
         type: 'themes',
-        data: [
-          {
-            id: 'light',
-            name: 'Light',
-            selectedTokenSets: {
-              global: TokenSetStatus.ENABLED,
-            },
+        data: [{
+          id: 'light',
+          name: 'Light',
+          selectedTokenSets: {
+            global: TokenSetStatus.ENABLED,
           },
-        ],
+        }],
       },
       {
         path: 'data/global.json',
@@ -530,12 +542,14 @@ describe('GithubTokenStorage', () => {
   });
 
   it('should return an empty array when reading results in an error', async () => {
-    mockGetContent.mockImplementationOnce(() => Promise.reject(new Error()));
+    mockGetContent.mockImplementationOnce(() => (
+      Promise.reject(new Error())
+    ));
     expect(await storageProvider.read()).toEqual([]);
   });
 
   it('should be able to write', async () => {
-    mockGetContent.mockImplementationOnce(() =>
+    mockGetContent.mockImplementationOnce(() => (
       Promise.resolve({
         data: JSON.stringify({
           global: {
@@ -560,46 +574,41 @@ describe('GithubTokenStorage', () => {
             },
           ],
         }),
-      }),
-    );
+      })
+    ));
 
-    mockCreateOrUpdateFiles.mockImplementationOnce(() =>
+    mockCreateOrUpdateFiles.mockImplementationOnce(() => (
       Promise.resolve({
         data: {
           content: {},
         },
-      }),
-    );
+      })
+    ));
 
     storageProvider.changePath('data/tokens.json');
-    await storageProvider.save(
-      {
-        themes: [
+    await storageProvider.save({
+      themes: [{
+        id: 'light',
+        name: 'Light',
+        selectedTokenSets: {
+          global: TokenSetStatus.ENABLED,
+        },
+      }],
+      tokens: {
+        global: [
           {
-            id: 'light',
-            name: 'Light',
-            selectedTokenSets: {
-              global: TokenSetStatus.ENABLED,
-            },
+            type: TokenTypes.COLOR,
+            name: 'red',
+            value: '#ff0000',
           },
         ],
-        tokens: {
-          global: [
-            {
-              type: TokenTypes.COLOR,
-              name: 'red',
-              value: '#ff0000',
-            },
-          ],
-        },
-        metadata: {
-          tokenSetOrder: ['global'],
-        },
       },
-      {
-        commitMessage: 'Initial commit',
+      metadata: {
+        tokenSetOrder: ['global'],
       },
-    );
+    }, {
+      commitMessage: 'Initial commit',
+    });
 
     expect(mockCreateOrUpdateFiles).toBeCalledWith({
       branch: 'main',
@@ -610,30 +619,26 @@ describe('GithubTokenStorage', () => {
         {
           message: 'Initial commit',
           files: {
-            'data/tokens.json': JSON.stringify(
-              {
-                global: {
-                  red: {
-                    type: TokenTypes.COLOR,
-                    value: '#ff0000',
-                  },
-                },
-                $themes: [
-                  {
-                    id: 'light',
-                    name: 'Light',
-                    selectedTokenSets: {
-                      global: TokenSetStatus.ENABLED,
-                    },
-                  },
-                ],
-                $metadata: {
-                  tokenSetOrder: ['global'],
+            'data/tokens.json': JSON.stringify({
+              global: {
+                red: {
+                  type: TokenTypes.COLOR,
+                  value: '#ff0000',
                 },
               },
-              null,
-              2,
-            ),
+              $themes: [
+                {
+                  id: 'light',
+                  name: 'Light',
+                  selectedTokenSets: {
+                    global: TokenSetStatus.ENABLED,
+                  },
+                },
+              ],
+              $metadata: {
+                tokenSetOrder: ['global'],
+              },
+            }, null, 2),
           },
           filesToDelete: undefined,
           ignoreDeletionFailures: undefined,
@@ -643,67 +648,19 @@ describe('GithubTokenStorage', () => {
   });
 
   it('should not be able to write a multi file structure when multi file flag is off', async () => {
-    mockCreateOrUpdateFiles.mockImplementationOnce(() =>
+    mockCreateOrUpdateFiles.mockImplementationOnce(() => (
       Promise.resolve({
         data: {
           content: {},
         },
-      }),
-    );
+      })
+    ));
 
     storageProvider.disableMultiFile();
     storageProvider.changePath('data');
 
     await expect(async () => {
-      await storageProvider.write(
-        [
-          {
-            type: 'tokenSet',
-            name: 'global',
-            path: 'global.json',
-            data: {
-              red: {
-                type: TokenTypes.COLOR,
-                name: 'red',
-                value: '#ff0000',
-              },
-            },
-          },
-        ],
-        {
-          commitMessage: '',
-        },
-      );
-    }).rejects.toThrow(ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR);
-    expect(mockCreateOrUpdateFiles).not.toHaveBeenCalled();
-  });
-
-  it('should be able to write a multi file structure', async () => {
-    mockCreateOrUpdateFiles.mockImplementationOnce(() =>
-      Promise.resolve({
-        data: {
-          content: {},
-        },
-      }),
-    );
-
-    storageProvider.enableMultiFile();
-    storageProvider.changePath('data');
-    await storageProvider.write(
-      [
-        {
-          type: 'themes',
-          path: '$themes.json',
-          data: [
-            {
-              id: 'light',
-              name: 'Light',
-              selectedTokenSets: {
-                global: TokenSetStatus.ENABLED,
-              },
-            },
-          ],
-        },
+      await storageProvider.write([
         {
           type: 'tokenSet',
           name: 'global',
@@ -716,9 +673,52 @@ describe('GithubTokenStorage', () => {
             },
           },
         },
-      ],
-      {},
-    );
+      ], {
+        commitMessage: '',
+      });
+    }).rejects.toThrow(ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR);
+    expect(mockCreateOrUpdateFiles).not.toHaveBeenCalled();
+  });
+
+  it('should be able to write a multi file structure', async () => {
+    mockCreateOrUpdateFiles.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: {
+          content: {},
+        },
+      })
+    ));
+
+    storageProvider.enableMultiFile();
+    storageProvider.changePath('data');
+    await storageProvider.write([
+      {
+        type: 'themes',
+        path: '$themes.json',
+        data: [
+          {
+            id: 'light',
+            name: 'Light',
+            selectedTokenSets: {
+              global: TokenSetStatus.ENABLED,
+            },
+          },
+        ],
+      },
+      {
+        type: 'tokenSet',
+        name: 'global',
+        path: 'global.json',
+        data: {
+          red: {
+            type: TokenTypes.COLOR,
+            name: 'red',
+            value: '#ff0000',
+          },
+        },
+      },
+    ], {
+    });
 
     expect(mockCreateOrUpdateFiles).toBeCalledWith({
       branch: 'main',
@@ -731,30 +731,22 @@ describe('GithubTokenStorage', () => {
           filesToDelete: undefined,
           ignoreDeletionFailures: undefined,
           files: {
-            'data/$themes.json': JSON.stringify(
-              [
-                {
-                  id: 'light',
-                  name: 'Light',
-                  selectedTokenSets: {
-                    global: TokenSetStatus.ENABLED,
-                  },
-                },
-              ],
-              null,
-              2,
-            ),
-            'data/global.json': JSON.stringify(
+            'data/$themes.json': JSON.stringify([
               {
-                red: {
-                  type: TokenTypes.COLOR,
-                  name: 'red',
-                  value: '#ff0000',
+                id: 'light',
+                name: 'Light',
+                selectedTokenSets: {
+                  global: TokenSetStatus.ENABLED,
                 },
               },
-              null,
-              2,
-            ),
+            ], null, 2),
+            'data/global.json': JSON.stringify({
+              red: {
+                type: TokenTypes.COLOR,
+                name: 'red',
+                value: '#ff0000',
+              },
+            }, null, 2),
           },
         },
       ],
@@ -762,7 +754,7 @@ describe('GithubTokenStorage', () => {
   });
 
   it('should be able to rename and delete', async () => {
-    mockGetContent.mockImplementationOnce(() =>
+    mockGetContent.mockImplementationOnce(() => (
       Promise.resolve({
         data: JSON.stringify({
           global: {
@@ -787,66 +779,63 @@ describe('GithubTokenStorage', () => {
             },
           ],
         }),
-      }),
-    );
-    mockCreateOrUpdateFiles.mockImplementationOnce(() =>
+      })
+    ));
+    mockCreateOrUpdateFiles.mockImplementationOnce(() => (
       Promise.resolve({
         data: {
           content: {},
         },
-      }),
-    );
+      })
+    ));
 
     storageProvider.changePath('data/tokens.json');
-    await storageProvider.write(
-      [
-        {
-          type: 'metadata',
-          path: '$metadata.json',
-          data: {},
-        },
-        {
-          type: 'themes',
-          path: '$themes.json',
-          data: [
-            {
-              id: 'light',
-              name: 'Light',
-              selectedTokenSets: {
-                global: TokenSetStatus.ENABLED,
-              },
-            },
-          ],
-        },
-        {
-          type: 'tokenSet',
-          name: 'global',
-          path: 'global.json',
-          data: {
-            red: {
-              type: TokenTypes.COLOR,
-              name: 'red',
-              value: '#ff0000',
-            },
-          },
-        },
-        {
-          type: 'tokenSet',
-          name: 'core-rename',
-          path: 'global.json',
-          data: {
-            red: {
-              type: TokenTypes.COLOR,
-              name: 'red',
-              value: '#ff0000',
-            },
-          },
-        },
-      ],
+    await storageProvider.write([
       {
-        commitMessage: 'Initial commit',
+        type: 'metadata',
+        path: '$metadata.json',
+        data: {},
       },
-    );
+      {
+        type: 'themes',
+        path: '$themes.json',
+        data: [
+          {
+            id: 'light',
+            name: 'Light',
+            selectedTokenSets: {
+              global: TokenSetStatus.ENABLED,
+            },
+          },
+        ],
+      },
+      {
+        type: 'tokenSet',
+        name: 'global',
+        path: 'global.json',
+        data: {
+          red: {
+            type: TokenTypes.COLOR,
+            name: 'red',
+            value: '#ff0000',
+          },
+        },
+      },
+      {
+        type: 'tokenSet',
+        name: 'core-rename',
+        path: 'global.json',
+        data: {
+          red: {
+            type: TokenTypes.COLOR,
+            name: 'red',
+            value: '#ff0000',
+          },
+        },
+      },
+    ], {
+      commitMessage: 'Initial commit',
+    });
 
     expect(mockCreateOrUpdateFiles).toBeCalledWith({
       branch: 'main',
@@ -857,36 +846,32 @@ describe('GithubTokenStorage', () => {
         {
           message: 'Initial commit',
           files: {
-            'data/tokens.json': JSON.stringify(
-              {
-                $metadata: {},
-                $themes: [
-                  {
-                    id: 'light',
-                    name: 'Light',
-                    selectedTokenSets: {
-                      global: TokenSetStatus.ENABLED,
-                    },
-                  },
-                ],
-                global: {
-                  red: {
-                    type: TokenTypes.COLOR,
-                    name: 'red',
-                    value: '#ff0000',
+            'data/tokens.json': JSON.stringify({
+              $metadata: {},
+              $themes: [
+                {
+                  id: 'light',
+                  name: 'Light',
+                  selectedTokenSets: {
+                    global: TokenSetStatus.ENABLED,
                   },
                 },
-                'core-rename': {
-                  red: {
-                    type: TokenTypes.COLOR,
-                    name: 'red',
-                    value: '#ff0000',
-                  },
+              ],
+              global: {
+                red: {
+                  type: TokenTypes.COLOR,
+                  name: 'red',
+                  value: '#ff0000',
                 },
               },
-              null,
-              2,
-            ),
+              'core-rename': {
+                red: {
+                  type: TokenTypes.COLOR,
+                  name: 'red',
+                  value: '#ff0000',
+                },
+              },
+            }, null, 2),
           },
         },
       ],
@@ -897,7 +882,9 @@ describe('GithubTokenStorage', () => {
     mockGetContent.mockImplementation((opts: { path: string }) => {
       if (opts.path === '') {
         return Promise.resolve({
-          data: [{ path: 'data', sha: 'sha(data)', type: 'dir' }],
+          data: [
+            { path: 'data', sha: 'sha(data)', type: 'dir' },
+          ],
         });
       }
 
@@ -965,7 +952,7 @@ describe('GithubTokenStorage', () => {
       return Promise.reject();
     });
 
-    mockCreateTree.mockImplementationOnce(() =>
+    mockCreateTree.mockImplementationOnce(() => (
       Promise.resolve({
         data: {
           sha: 'sha(data)',
@@ -977,10 +964,10 @@ describe('GithubTokenStorage', () => {
             },
           ],
         },
-      }),
-    );
+      })
+    ));
 
-    mockGetTree.mockImplementationOnce(() =>
+    mockGetTree.mockImplementationOnce(() => (
       Promise.resolve({
         data: {
           sha: 'sha(data)',
@@ -991,75 +978,72 @@ describe('GithubTokenStorage', () => {
             { path: 'achieve.json', type: 'blob', sha: 'sha(achieve.json)' },
           ],
         },
-      }),
-    );
+      })
+    ));
 
-    mockCreateOrUpdateFiles.mockImplementationOnce(() =>
+    mockCreateOrUpdateFiles.mockImplementationOnce(() => (
       Promise.resolve({
         data: {
           content: {},
         },
-      }),
-    );
+      })
+    ));
 
     storageProvider.enableMultiFile();
     storageProvider.changePath('data');
-    await storageProvider.write(
-      [
-        {
-          type: 'themes',
-          path: '$themes.json',
-          data: [
-            {
-              id: 'light',
-              name: 'Light',
-              selectedTokenSets: {
-                global: TokenSetStatus.ENABLED,
-              },
-            },
-          ],
-        },
-        {
-          type: 'tokenSet',
-          name: 'base/achieve',
-          path: 'base/achieve.json',
-          data: {
-            red: {
-              type: TokenTypes.COLOR,
-              name: 'red',
-              value: '#ff0000',
-            },
-          },
-        },
-        {
-          type: 'tokenSet',
-          name: 'achieve',
-          path: 'achieve.json',
-          data: {
-            red: {
-              type: TokenTypes.COLOR,
-              name: 'red',
-              value: '#ff0000',
-            },
-          },
-        },
-        {
-          type: 'tokenSet',
-          name: 'achieve-rename',
-          path: 'achieve-rename.json',
-          data: {
-            red: {
-              type: TokenTypes.COLOR,
-              name: 'red',
-              value: '#ff0000',
-            },
-          },
-        },
-      ],
+    await storageProvider.write([
       {
-        commitMessage: 'Initial commit',
+        type: 'themes',
+        path: '$themes.json',
+        data: [
+          {
+            id: 'light',
+            name: 'Light',
+            selectedTokenSets: {
+              global: TokenSetStatus.ENABLED,
+            },
+          },
+        ],
       },
-    );
+      {
+        type: 'tokenSet',
+        name: 'base/achieve',
+        path: 'base/achieve.json',
+        data: {
+          red: {
+            type: TokenTypes.COLOR,
+            name: 'red',
+            value: '#ff0000',
+          },
+        },
+      },
+      {
+        type: 'tokenSet',
+        name: 'achieve',
+        path: 'achieve.json',
+        data: {
+          red: {
+            type: TokenTypes.COLOR,
+            name: 'red',
+            value: '#ff0000',
+          },
+        },
+      },
+      {
+        type: 'tokenSet',
+        name: 'achieve-rename',
+        path: 'achieve-rename.json',
+        data: {
+          red: {
+            type: TokenTypes.COLOR,
+            name: 'red',
+            value: '#ff0000',
+          },
+        },
+      },
+    ], {
+      commitMessage: 'Initial commit',
+    });
 
     expect(mockCreateOrUpdateFiles).toBeCalledTimes(1);
     expect(mockCreateOrUpdateFiles).toBeCalledWith({
@@ -1071,66 +1055,53 @@ describe('GithubTokenStorage', () => {
         {
           message: 'Initial commit',
           files: {
-            'data/$themes.json': JSON.stringify(
-              [
-                {
-                  id: 'light',
-                  name: 'Light',
-                  selectedTokenSets: {
-                    global: TokenSetStatus.ENABLED,
-                  },
-                },
-              ],
-              null,
-              2,
-            ),
-            'data/base/achieve.json': JSON.stringify(
+            'data/$themes.json': JSON.stringify([
               {
-                red: {
-                  type: TokenTypes.COLOR,
-                  name: 'red',
-                  value: '#ff0000',
+                id: 'light',
+                name: 'Light',
+                selectedTokenSets: {
+                  global: TokenSetStatus.ENABLED,
                 },
               },
-              null,
-              2,
-            ),
-            'data/achieve.json': JSON.stringify(
-              {
-                red: {
-                  type: TokenTypes.COLOR,
-                  name: 'red',
-                  value: '#ff0000',
-                },
+            ], null, 2),
+            'data/base/achieve.json': JSON.stringify({
+              red: {
+                type: TokenTypes.COLOR,
+                name: 'red',
+                value: '#ff0000',
               },
-              null,
-              2,
-            ),
-            'data/achieve-rename.json': JSON.stringify(
-              {
-                red: {
-                  type: TokenTypes.COLOR,
-                  name: 'red',
-                  value: '#ff0000',
-                },
+            }, null, 2),
+            'data/achieve.json': JSON.stringify({
+              red: {
+                type: TokenTypes.COLOR,
+                name: 'red',
+                value: '#ff0000',
               },
-              null,
-              2,
-            ),
+            }, null, 2),
+            'data/achieve-rename.json': JSON.stringify({
+              red: {
+                type: TokenTypes.COLOR,
+                name: 'red',
+                value: '#ff0000',
+              },
+            }, null, 2),
           },
           filesToDelete: ['data/colors/achieve.json'],
           ignoreDeletionFailures: true,
+
         },
       ],
     });
     mockGetContent.mockClear();
   });
 
-  it("couldn't be able to rename and delete a multi file structure when there is no tree", async () => {
+  it('couldn\'t be able to rename and delete a multi file structure when there is no tree', async () => {
     mockGetContent.mockImplementation((opts: { path: string }) => {
       if (opts.path === '') {
         return Promise.resolve({
-          data: [{ path: 'data', sha: 'sha(data)', type: 'dir' }],
+          data: [
+            { path: 'data', sha: 'sha(data)', type: 'dir' },
+          ],
         });
       }
 
@@ -1185,20 +1156,22 @@ describe('GithubTokenStorage', () => {
 
       if (opts.path === 'data/internal.json') {
         return Promise.resolve({
-          data: JSON.stringify({
-            red: {
-              type: 'color',
-              name: 'red',
-              value: '#ff0000',
+          data: JSON.stringify(
+            {
+              red: {
+                type: 'color',
+                name: 'red',
+                value: '#ff0000',
+              },
             },
-          }),
+          ),
         });
       }
 
       return Promise.reject();
     });
 
-    mockCreateTree.mockImplementationOnce(() =>
+    mockCreateTree.mockImplementationOnce(() => (
       Promise.resolve({
         data: {
           sha: 'sha(data)',
@@ -1210,79 +1183,76 @@ describe('GithubTokenStorage', () => {
             },
           ],
         },
-      }),
-    );
+      })
+    ));
 
-    mockGetTree.mockImplementationOnce(() =>
+    mockGetTree.mockImplementationOnce(() => (
       Promise.resolve({
         data: {
           sha: 'sha(data)',
           tree: [],
         },
-      }),
-    );
+      })
+    ));
 
-    mockCreateOrUpdateFiles.mockImplementationOnce(() =>
+    mockCreateOrUpdateFiles.mockImplementationOnce(() => (
       Promise.resolve({
         data: {
           content: {},
         },
-      }),
-    );
+      })
+    ));
 
     storageProvider.enableMultiFile();
     storageProvider.changePath('data');
-    await storageProvider.write(
-      [
-        {
-          type: 'metadata',
-          path: '$metadata.json',
-          data: {
-            tokenSetOrder: ['global'],
-          },
-        },
-        {
-          type: 'themes',
-          path: '$themes.json',
-          data: [
-            {
-              id: 'light',
-              name: 'Light',
-              selectedTokenSets: {
-                global: TokenSetStatus.ENABLED,
-              },
-            },
-          ],
-        },
-        {
-          type: 'tokenSet',
-          name: 'global',
-          path: 'global.json',
-          data: {
-            red: {
-              type: TokenTypes.COLOR,
-              name: 'red',
-              value: '#ff0000',
-            },
-          },
-        },
-        {
-          type: 'tokenSet',
-          name: 'core-rename',
-          path: 'core-rename.json',
-          data: {
-            red: {
-              type: TokenTypes.COLOR,
-              name: 'red',
-              value: '#ff0000',
-            },
-          },
-        },
-      ],
+    await storageProvider.write([
       {
-        commitMessage: 'Initial commit',
+        type: 'metadata',
+        path: '$metadata.json',
+        data: {
+          tokenSetOrder: ['global'],
+        },
       },
-    );
+      {
+        type: 'themes',
+        path: '$themes.json',
+        data: [
+          {
+            id: 'light',
+            name: 'Light',
+            selectedTokenSets: {
+              global: TokenSetStatus.ENABLED,
+            },
+          },
+        ],
+      },
+      {
+        type: 'tokenSet',
+        name: 'global',
+        path: 'global.json',
+        data: {
+          red: {
+            type: TokenTypes.COLOR,
+            name: 'red',
+            value: '#ff0000',
+          },
+        },
+      },
+      {
+        type: 'tokenSet',
+        name: 'core-rename',
+        path: 'core-rename.json',
+        data: {
+          red: {
+            type: TokenTypes.COLOR,
+            name: 'red',
+            value: '#ff0000',
+          },
+        },
+      },
+    ], {
+      commitMessage: 'Initial commit',
+    });
 
     expect(mockCreateOrUpdateFiles).toBeCalledTimes(1);
     expect(mockCreateOrUpdateFiles).toBeCalledWith({
@@ -1294,49 +1264,34 @@ describe('GithubTokenStorage', () => {
         {
           message: 'Initial commit',
           files: {
-            'data/$metadata.json': JSON.stringify(
+            'data/$metadata.json': JSON.stringify({
+              tokenSetOrder: ['global'],
+            }, null, 2),
+            'data/$themes.json': JSON.stringify([
               {
-                tokenSetOrder: ['global'],
-              },
-              null,
-              2,
-            ),
-            'data/$themes.json': JSON.stringify(
-              [
-                {
-                  id: 'light',
-                  name: 'Light',
-                  selectedTokenSets: {
-                    global: TokenSetStatus.ENABLED,
-                  },
-                },
-              ],
-              null,
-              2,
-            ),
-            'data/global.json': JSON.stringify(
-              {
-                red: {
-                  type: TokenTypes.COLOR,
-                  name: 'red',
-                  value: '#ff0000',
+                id: 'light',
+                name: 'Light',
+                selectedTokenSets: {
+                  global: TokenSetStatus.ENABLED,
                 },
               },
-              null,
-              2,
-            ),
-            'data/core-rename.json': JSON.stringify(
-              {
-                red: {
-                  type: TokenTypes.COLOR,
-                  name: 'red',
-                  value: '#ff0000',
-                },
+            ], null, 2),
+            'data/global.json': JSON.stringify({
+              red: {
+                type: TokenTypes.COLOR,
+                name: 'red',
+                value: '#ff0000',
               },
-              null,
-              2,
-            ),
+            }, null, 2),
+            'data/core-rename.json': JSON.stringify({
+              red: {
+                type: TokenTypes.COLOR,
+                name: 'red',
+                value: '#ff0000',
+              },
+            }, null, 2),
           },
+
         },
       ],
     });
@@ -1344,49 +1299,48 @@ describe('GithubTokenStorage', () => {
   });
 
   it('should be able to write even though reading results in an error', async () => {
-    mockGetContent.mockImplementationOnce(() => Promise.reject(new Error()));
+    mockGetContent.mockImplementationOnce(() => (
+      Promise.reject(new Error())
+    ));
 
-    mockCreateOrUpdateFiles.mockImplementationOnce(() =>
+    mockCreateOrUpdateFiles.mockImplementationOnce(() => (
       Promise.resolve({
         data: {
           content: {},
         },
-      }),
-    );
+      })
+    ));
 
     storageProvider.changePath('data/tokens.json');
-    await storageProvider.write(
-      [
-        {
-          type: 'themes',
-          path: '$themes.json',
-          data: [
-            {
-              id: 'light',
-              name: 'Light',
-              selectedTokenSets: {
-                global: TokenSetStatus.ENABLED,
-              },
-            },
-          ],
-        },
-        {
-          type: 'tokenSet',
-          name: 'global',
-          path: 'global.json',
-          data: {
-            red: {
-              type: TokenTypes.COLOR,
-              name: 'red',
-              value: '#ff0000',
+    await storageProvider.write([
+      {
+        type: 'themes',
+        path: '$themes.json',
+        data: [
+          {
+            id: 'light',
+            name: 'Light',
+            selectedTokenSets: {
+              global: TokenSetStatus.ENABLED,
             },
           },
-        },
-      ],
-      {
-        commitMessage: 'Initial commit',
+        ],
       },
-    );
+      {
+        type: 'tokenSet',
+        name: 'global',
+        path: 'global.json',
+        data: {
+          red: {
+            type: TokenTypes.COLOR,
+            name: 'red',
+            value: '#ff0000',
+          },
+        },
+      },
+    ], {
+      commitMessage: 'Initial commit',
+    });
 
     expect(mockCreateOrUpdateFiles).toBeCalledWith({
       branch: 'main',
@@ -1397,28 +1351,24 @@ describe('GithubTokenStorage', () => {
         {
           message: 'Initial commit',
           files: {
-            'data/tokens.json': JSON.stringify(
-              {
-                $themes: [
-                  {
-                    id: 'light',
-                    name: 'Light',
-                    selectedTokenSets: {
-                      global: TokenSetStatus.ENABLED,
-                    },
-                  },
-                ],
-                global: {
-                  red: {
-                    type: TokenTypes.COLOR,
-                    name: 'red',
-                    value: '#ff0000',
+            'data/tokens.json': JSON.stringify({
+              $themes: [
+                {
+                  id: 'light',
+                  name: 'Light',
+                  selectedTokenSets: {
+                    global: TokenSetStatus.ENABLED,
                   },
                 },
+              ],
+              global: {
+                red: {
+                  type: TokenTypes.COLOR,
+                  name: 'red',
+                  value: '#ff0000',
+                },
               },
-              null,
-              2,
-            ),
+            }, null, 2),
           },
         },
       ],
@@ -1426,27 +1376,27 @@ describe('GithubTokenStorage', () => {
   });
 
   it('should return false if there are no branches', async () => {
-    mockPaginate.mockImplementationOnce(() => Promise.resolve([]));
+    mockPaginate.mockImplementationOnce(() => (
+      Promise.resolve([])
+    ));
 
-    expect(
-      await storageProvider.write([], {
-        commitMessage: '',
-      }),
-    ).toBe(false);
+    expect(await storageProvider.write([], {
+      commitMessage: '',
+    })).toBe(false);
   });
 
   it('should be able to get the tree sha for a given path', async () => {
-    mockPaginate.mockImplementationOnce(() =>
+    mockPaginate.mockImplementationOnce(() => (
       Promise.resolve([
         {
           name: 'main',
           commit: { sha: 'root-sha' },
         },
-      ]),
-    );
+      ])
+    ));
     expect(await storageProvider.getTreeShaForDirectory('')).toEqual('root-sha');
 
-    mockGetContent.mockImplementationOnce(() =>
+    mockGetContent.mockImplementationOnce(() => (
       Promise.resolve({
         data: [
           {
@@ -1454,21 +1404,21 @@ describe('GithubTokenStorage', () => {
             sha: 'directory-sha',
           },
         ],
-      }),
-    );
+      })
+    ));
     expect(await storageProvider.getTreeShaForDirectory('companyA/ds')).toEqual('directory-sha');
 
-    mockGetContent.mockImplementationOnce(() =>
+    mockGetContent.mockImplementationOnce(() => (
       Promise.resolve({
         data: {
           path: 'companyA/ds',
           sha: 'single-directory-sha',
         },
-      }),
-    );
+      })
+    ));
     expect(await storageProvider.getTreeShaForDirectory('companyA/ds')).toEqual('single-directory-sha');
 
-    mockGetContent.mockImplementationOnce(() =>
+    mockGetContent.mockImplementationOnce(() => (
       Promise.resolve({
         data: [
           {
@@ -1476,31 +1426,31 @@ describe('GithubTokenStorage', () => {
             sha: 'directory-sha',
           },
         ],
-      }),
-    );
+      })
+    ));
     await expect(storageProvider.getTreeShaForDirectory('companyA/ds')).rejects.toThrow(
       'Unable to find directory, companyA/ds',
     );
 
-    mockGetContent.mockImplementationOnce(() =>
+    mockGetContent.mockImplementationOnce(() => (
       Promise.resolve({
         data: {
           path: 'companyA',
           sha: 'single-directory-sha',
         },
-      }),
-    );
+      })
+    ));
     await expect(storageProvider.getTreeShaForDirectory('companyA/ds')).rejects.toThrow('Could not find directory SHA');
   });
 
   it('should return the sha of the file if the response is not an array', async () => {
-    mockGetContent.mockImplementationOnce(() =>
+    mockGetContent.mockImplementationOnce(() => (
       Promise.resolve({
         data: {
           sha: 'abc123',
         },
-      }),
-    );
+      })
+    ));
 
     expect(await storageProvider.getCommitSha()).toEqual('abc123');
   });
@@ -1511,10 +1461,7 @@ describe('GithubTokenStorage', () => {
         return Promise.resolve({
           data: [
             {
-              path: 'data/tokens',
-              sha: 'sha(data/tokens)',
-              type: 'file',
-              sha: 'abc123',
+              path: 'data/tokens', sha: 'sha(data/tokens)', type: 'file', sha: 'abc123',
             },
           ],
         });
@@ -1522,7 +1469,9 @@ describe('GithubTokenStorage', () => {
 
       if (opts.path === 'data/tokens') {
         return Promise.resolve({
-          data: [{ path: 'data/tokens', sha: 'sha(data/tokens)', type: 'folder' }],
+          data: [
+            { path: 'data/tokens', sha: 'sha(data/tokens)', type: 'folder' },
+          ],
         });
       }
 

@@ -99,16 +99,14 @@ export async function updateThemeGroupsInTokensStudio({
       action: 'CREATE_THEME_GROUP',
       data: {
         name: themeToCreate.group,
-        options: [
-          {
-            name: themeToCreate.name,
-            selectedTokenSets: themeToCreate.selectedTokenSets,
-            figmaStyleReferences: themeToCreate.$figmaStyleReferences,
-            figmaVariableReferences: themeToCreate.$figmaVariableReferences,
-            figmaCollectionId: themeToCreate.$figmaCollectionId,
-            figmaModeId: themeToCreate.$figmaModeId,
-          },
-        ],
+        options: [{
+          name: themeToCreate.name,
+          selectedTokenSets: themeToCreate.selectedTokenSets,
+          figmaStyleReferences: themeToCreate.$figmaStyleReferences,
+          figmaVariableReferences: themeToCreate.$figmaVariableReferences,
+          figmaCollectionId: themeToCreate.$figmaCollectionId,
+          figmaModeId: themeToCreate.$figmaModeId,
+        }],
       },
     });
   }

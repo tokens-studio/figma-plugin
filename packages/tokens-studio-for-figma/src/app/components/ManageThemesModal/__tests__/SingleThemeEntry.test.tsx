@@ -22,7 +22,12 @@ describe('SingleThemeEntry', () => {
 
     const result = render(
       <Provider store={mockStore}>
-        <SingleThemeEntry isActive={false} theme={mockThemeObject} onOpen={mockOpen} groupName="groupA" />
+        <SingleThemeEntry
+          isActive={false}
+          theme={mockThemeObject}
+          onOpen={mockOpen}
+          groupName="groupA"
+        />
       </Provider>,
     );
 

@@ -20,29 +20,27 @@ export default async function updateEffectStyles({
   const effectStylesToKeyMap = getEffectStylesKeyMap();
   const tokenToStyleMap: Record<string, string> = {};
 
-  await Promise.all(
-    effectTokens.map(async (token) => {
-      if (effectStylesToIdMap.has(token.styleId)) {
-        const effectStyle = effectStylesToIdMap.get(token.styleId)!;
-        if (shouldRename) {
-          effectStyle.name = token.path;
-        }
-        tokenToStyleMap[token.name] = effectStyle.id;
-        await setEffectValuesOnTarget(effectStyle, token.name, baseFontSize);
-      } else if (effectStylesToKeyMap.has(token.path)) {
-        const effectStyle = effectStylesToKeyMap.get(token.path)!;
-        tokenToStyleMap[token.name] = effectStyle.id;
-
-        await setEffectValuesOnTarget(effectStyle, token.name, baseFontSize);
-      } else if (shouldCreate) {
-        const style = figma.createEffectStyle();
-        style.name = token.path;
-        tokenToStyleMap[token.name] = style.id;
-
-        await setEffectValuesOnTarget(style, token.name, baseFontSize);
+  await Promise.all(effectTokens.map(async (token) => {
+    if (effectStylesToIdMap.has(token.styleId)) {
+      const effectStyle = effectStylesToIdMap.get(token.styleId)!;
+      if (shouldRename) {
+        effectStyle.name = token.path;
       }
-    }),
-  );
+      tokenToStyleMap[token.name] = effectStyle.id;
+      await setEffectValuesOnTarget(effectStyle, token.name, baseFontSize);
+    } else if (effectStylesToKeyMap.has(token.path)) {
+      const effectStyle = effectStylesToKeyMap.get(token.path)!;
+      tokenToStyleMap[token.name] = effectStyle.id;
+
+      await setEffectValuesOnTarget(effectStyle, token.name, baseFontSize);
+    } else if (shouldCreate) {
+      const style = figma.createEffectStyle();
+      style.name = token.path;
+      tokenToStyleMap[token.name] = style.id;
+
+      await setEffectValuesOnTarget(style, token.name, baseFontSize);
+    }
+  }));
 
   return tokenToStyleMap;
 }

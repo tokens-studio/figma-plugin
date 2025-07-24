@@ -17,6 +17,7 @@ Added support for expandBorder=true - this will expand the recently introduced `
 Added support for color modifiers that we introduced with plugin version 1.35
 Changed how dimension-related properties are transformed when `expandComposition` is true: Instead of `spacing` or `sizing` we now use `dimension` for these.
 
+
 ## v0.0.29 (2023-01-05)
 
 Introduced support to programmatically use token-transformer by importing the transformTokens function. Added guide to Readme.
@@ -51,7 +52,6 @@ Shadow and typography tokens now respect the resolveReferences option (thanks @j
 ## v0.0.22 (2022-05-06)
 
 Fixed a bug that got introduced in 0.0.21 affecting multiple sets
-
 ## v0.0.21 (2022-04-29)
 
 Added throwErrorWhenNotResolved (thanks @borbit)
@@ -83,9 +83,8 @@ Hotfix for v0.0.15
 This version makes the behavior that expands typography optional and actually treats expanding as an opt-in choice. Thanks @jeffreydelooff!
 
 ### CHANGES
-
-- Introduced --expandTypography: true|false to enable/disable automatic expansion of typography types (default: false)
+* Introduced --expandTypography: true|false to enable/disable automatic expansion of typography types (default: false)
 
 ### BREAKING CHANGES
 
-- If you want your typography to be expanded to single values you need to use --expandTypography=true from now on. E.g. `node token-transformer input.json output.json --expandTypography=false`
+* If you want your typography to be expanded to single values you need to use --expandTypography=true from now on. E.g. `node token-transformer input.json output.json --expandTypography=false`

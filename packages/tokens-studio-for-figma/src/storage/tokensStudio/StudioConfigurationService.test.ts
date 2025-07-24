@@ -101,6 +101,8 @@ describe('StudioConfigurationService', () => {
 
       // TODO: Add proper production environment test when test environment can be properly isolated
     });
+
+
   });
 
   describe('validateBaseUrl', () => {
@@ -133,7 +135,7 @@ describe('StudioConfigurationService', () => {
       // Verify the correct URL was called
       expect(fetch).toHaveBeenCalledWith(
         'https://app.test.tokens.studio/.well-known/plugin-config.json',
-        expect.any(Object),
+        expect.any(Object)
       );
     });
 
@@ -165,7 +167,7 @@ describe('StudioConfigurationService', () => {
       // Verify the correct URL was called with https protocol
       expect(fetch).toHaveBeenCalledWith(
         'https://app.prod.tokens.studio/.well-known/plugin-config.json',
-        expect.any(Object),
+        expect.any(Object)
       );
     });
 

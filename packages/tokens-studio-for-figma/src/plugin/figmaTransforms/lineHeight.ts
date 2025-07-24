@@ -1,10 +1,6 @@
 import { convertTypographyNumberToFigma } from './generic';
 
-export function convertLineHeightToFigma(
-  inputValue: string,
-  baseFontSize: string,
-  shouldOutputForVariables = false,
-): number | LineHeight | null {
+export function convertLineHeightToFigma(inputValue: string, baseFontSize: string, shouldOutputForVariables = false): number | LineHeight | null {
   let lineHeight: LineHeight | null = null;
   const value = inputValue.toString();
   const numbers = /^-?\d+(\.\d+)?$/; // Matches both negative and positive numbers ending with %
@@ -32,8 +28,7 @@ export function convertLineHeightToFigma(
 export function convertFigmaToLineHeight(inputValue: LineHeight): string | number {
   if (inputValue.unit === 'PIXELS') {
     return +inputValue.value.toFixed(2);
-  }
-  if (inputValue.unit === 'PERCENT') {
+  } if (inputValue.unit === 'PERCENT') {
     return `${+inputValue.value.toFixed(2)}%`;
   }
   return 'AUTO';

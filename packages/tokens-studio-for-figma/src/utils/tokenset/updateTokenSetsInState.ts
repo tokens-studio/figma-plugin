@@ -53,7 +53,11 @@ export function updateTokenSetsInState(
     nextUsedTokenSet = omit(nextUsedTokenSet, deletedTokenSetsList[0], ...deletedTokenSetsList.slice(1));
     nextThemes = nextThemes.map((theme) => ({
       ...theme,
-      selectedTokenSets: omit(theme.selectedTokenSets, deletedTokenSetsList[0], ...deletedTokenSetsList.slice(1)),
+      selectedTokenSets: omit(
+        theme.selectedTokenSets,
+        deletedTokenSetsList[0],
+        ...deletedTokenSetsList.slice(1),
+      ),
     }));
   }
 
@@ -86,12 +90,9 @@ export function updateTokenSetsInState(
   const updatedTokens = Object.fromEntries(entries);
   const tokenSetItems = tokenSetListToTree(entries.map(([tokenSet]) => tokenSet));
   const newTokens = {};
-  tokenSetItems
-    .filter(({ isLeaf }) => isLeaf)
-    .map(({ path }) => path)
-    .forEach((set) => {
-      Object.assign(newTokens, { [set]: updatedTokens[set] });
-    });
+  tokenSetItems.filter(({ isLeaf }) => isLeaf).map(({ path }) => path).forEach((set) => {
+    Object.assign(newTokens, { [set]: updatedTokens[set] });
+  });
 
   return {
     ...state,

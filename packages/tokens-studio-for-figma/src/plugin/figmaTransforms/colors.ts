@@ -10,12 +10,7 @@ interface RGBA {
   a?: number;
 }
 
-export function RGBAToHexA(
-  red: number | string,
-  green: number | string,
-  blue: number | string,
-  alpha: number | string,
-) {
+export function RGBAToHexA(red: number | string, green: number | string, blue: number | string, alpha: number | string) {
   const r = parseInt(String(red), 10);
   const g = parseInt(String(green), 10);
   const b = parseInt(String(blue), 10);
@@ -97,29 +92,23 @@ export function convertToFigmaColor(input: string) {
   let color: RGBA;
   let opacity;
   if (input.startsWith('rgb')) {
-    const rgbValues = input
-      .replace(/^rgba?\(|\s+|\)$/g, '')
-      .split(',')
-      .map(parseFloat) as WebRGBA;
+    const rgbValues = input.replace(/^rgba?\(|\s+|\)$/g, '').split(',').map(parseFloat) as WebRGBA;
 
-    const { r, g, b, a = 1 } = webRGBToFigmaRGB(rgbValues);
+    const {
+      r, g, b, a = 1,
+    } = webRGBToFigmaRGB(rgbValues);
     color = {
-      r,
-      g,
-      b,
+      r, g, b,
     };
     opacity = Number(a);
   } else if (input.startsWith('hsl')) {
-    const hslValues = input
-      .replace(/^hsla?\(|\s+|%|\)$/g, '')
-      .split(',')
-      .map(parseFloat);
+    const hslValues = input.replace(/^hsla?\(|\s+|%|\)$/g, '').split(',').map(parseFloat);
     const rgbValues: any = hslaToRgba(hslValues);
-    const { r, g, b, a = 1 } = webRGBToFigmaRGB(rgbValues);
+    const {
+      r, g, b, a = 1,
+    } = webRGBToFigmaRGB(rgbValues);
     color = {
-      r,
-      g,
-      b,
+      r, g, b,
     };
     opacity = Number(a);
   } else if (input.startsWith('oklch')) {
@@ -138,11 +127,11 @@ export function convertToFigmaColor(input: string) {
     } catch (e) {
       // Fallback to toHex if OKLCH parsing fails
       try {
-        const { r, g, b, a = 1 }: RGBA = hexToFigmaRGB(toHex(input));
+        const {
+          r, g, b, a = 1,
+        }: RGBA = hexToFigmaRGB(toHex(input));
         color = {
-          r,
-          g,
-          b,
+          r, g, b,
         };
         opacity = roundToTwo(a);
       } catch (e2) {
@@ -152,11 +141,11 @@ export function convertToFigmaColor(input: string) {
       }
     }
   } else {
-    const { r, g, b, a = 1 }: RGBA = hexToFigmaRGB(toHex(input));
+    const {
+      r, g, b, a = 1,
+    }: RGBA = hexToFigmaRGB(toHex(input));
     color = {
-      r,
-      g,
-      b,
+      r, g, b,
     };
     opacity = roundToTwo(a);
   }

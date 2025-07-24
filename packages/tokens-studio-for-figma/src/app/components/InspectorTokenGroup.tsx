@@ -6,13 +6,7 @@ import InspectorTokenSingle from './InspectorTokenSingle';
 import { Properties } from '@/constants/Properties';
 import { SelectionGroup } from '@/types';
 
-export default function InspectorTokenGroup({
-  group,
-  resolvedTokens,
-}: {
-  group: [Properties, SelectionGroup[]];
-  resolvedTokens: SingleToken[];
-}) {
+export default function InspectorTokenGroup({ group, resolvedTokens }: { group: [Properties, SelectionGroup[]], resolvedTokens: SingleToken[] }) {
   const [groupKey, groupValue] = group;
 
   return (
@@ -26,13 +20,7 @@ export default function InspectorTokenGroup({
       key={`${groupKey}`}
     >
       <Heading size="small">{groupKey}</Heading>
-      {groupValue.map((uniqueToken) => (
-        <InspectorTokenSingle
-          key={`${uniqueToken.category}-${uniqueToken.value}`}
-          token={uniqueToken}
-          resolvedTokens={resolvedTokens}
-        />
-      ))}
+      {groupValue.map((uniqueToken) => <InspectorTokenSingle key={`${uniqueToken.category}-${uniqueToken.value}`} token={uniqueToken} resolvedTokens={resolvedTokens} />)}
     </Box>
   );
 }

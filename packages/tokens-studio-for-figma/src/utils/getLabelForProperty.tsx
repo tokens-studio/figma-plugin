@@ -1,12 +1,6 @@
 import React from 'react';
 import {
-  IconFontSize,
-  IconLetterSpacing,
-  IconParagraphSpacing,
-  IconLineHeight,
-  IconTextCase,
-  IconTextDecoration,
-  IconParagraphIndent,
+  IconFontSize, IconLetterSpacing, IconParagraphSpacing, IconLineHeight, IconTextCase, IconTextDecoration, IconParagraphIndent,
 } from '@/icons';
 
 // write a function that maps a key to a react component and returns that component or the text label
