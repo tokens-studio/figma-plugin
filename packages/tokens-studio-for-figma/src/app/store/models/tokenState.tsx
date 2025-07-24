@@ -711,7 +711,6 @@ export const tokenState = createModel<RootModel>()({
       compressedTokens: payload.compressedTokens,
       compressedThemes: payload.compressedThemes,
     }),
-    handleRenamedCollections: (state, _renamedCollections: [string, string][]) => state,
     ...tokenStateReducers,
   },
   effects: (dispatch) => ({
