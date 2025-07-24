@@ -76,33 +76,46 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
   }
 
   if (styleTypes.textStyles) {
-    const rawFontSizes: number[] = [];
-    const fontCombinations: FontName[] = [];
-    const rawLineHeights: LineHeight[] = [];
-    const rawParagraphSpacing: number[] = [];
-    const rawParagraphIndent: number[] = [];
-    const rawLetterSpacing: LetterSpacing[] = [];
-    const rawTextCase: TextCase[] = [];
-    const rawTextDecoration: TextDecoration[] = [];
-
     const figmaTextStyles = figma.getLocalTextStyles();
     const localVariables = await getVariablesWithoutZombies();
 
+    const variableMap = new Map<string, Variable>();
+    localVariables.forEach((variable) => {
+      variableMap.set(variable.id, variable);
+    });
+
+    const fontSizeSet = new Set<number>();
+    const paragraphSpacingSet = new Set<number>();
+    const paragraphIndentSet = new Set<number>();
+    const textCaseSet = new Set<TextCase>();
+    const textDecorationSet = new Set<TextDecoration>();
+
+    const fontCombinations: FontName[] = [];
+    const rawLineHeights: LineHeight[] = [];
+    const rawLetterSpacing: LetterSpacing[] = [];
+
     figmaTextStyles.forEach((style) => {
-      if (!rawFontSizes.includes(style.fontSize)) rawFontSizes.push(style.fontSize);
+      fontSizeSet.add(style.fontSize);
       fontCombinations.push(style.fontName);
       rawLineHeights.push(style.lineHeight);
-      if (!rawParagraphSpacing.includes(style.paragraphSpacing)) rawParagraphSpacing.push(style.paragraphSpacing);
-      if (!rawParagraphIndent.includes(style.paragraphIndent)) rawParagraphIndent.push(style.paragraphIndent);
+      paragraphSpacingSet.add(style.paragraphSpacing);
+      paragraphIndentSet.add(style.paragraphIndent);
       rawLetterSpacing.push(style.letterSpacing);
-      if (!rawTextCase.includes(style.textCase)) rawTextCase.push(style.textCase);
-      if (!rawTextDecoration.includes(style.textDecoration)) rawTextDecoration.push(style.textDecoration);
+      textCaseSet.add(style.textCase);
+      textDecorationSet.add(style.textDecoration);
     });
+
+    // Convert sets back to arrays only when needed
+    const rawFontSizes = Array.from(fontSizeSet);
+    const rawParagraphSpacing = Array.from(paragraphSpacingSet);
+    const rawParagraphIndent = Array.from(paragraphIndentSet);
+    const rawTextCase = Array.from(textCaseSet);
+    const rawTextDecoration = Array.from(textDecorationSet);
 
     fontSizes = figmaTextStyles.map((style, idx) => processTextStyleProperty(
       style,
       'fontSize',
-      localVariables,
+      variableMap,
       tokens,
       TokenTypes.FONT_SIZES,
       'fontSize',
@@ -110,14 +123,18 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
       (value) => value.toString(),
     ));
 
-    const uniqueFontCombinations = fontCombinations.filter(
-      (v, i, a) => a.findIndex((t) => t.family === v.family && t.style === v.style) === i,
-    );
+    // Use Map for O(1) uniqueness check instead of O(n²) filter operation
+    const fontCombinationMap = new Map<string, FontName>();
+    fontCombinations.forEach((font) => {
+      const key = `${font.family}-${font.style}`;
+      fontCombinationMap.set(key, font);
+    });
+    const uniqueFontCombinations = Array.from(fontCombinationMap.values());
 
     lineHeights = figmaTextStyles.map((style, idx) => processTextStyleProperty(
       style,
       'lineHeight',
-      localVariables,
+      variableMap,
       tokens,
       TokenTypes.LINE_HEIGHTS,
       'lineHeights',
@@ -125,9 +142,16 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
       (value) => convertFigmaToLineHeight(value).toString(),
     ));
 
+    // Create style lookup map for O(1) access instead of repeated find operations
+    const styleByFontMap = new Map<string, TextStyle>();
+    figmaTextStyles.forEach((style) => {
+      const key = `${style.fontName.family}-${style.fontName.style}`;
+      styleByFontMap.set(key, style);
+    });
+
     fontWeights = uniqueFontCombinations.map((font, idx) => {
-      const matchingStyle = figmaTextStyles.find((style) => style.fontName.family === font.family
- && style.fontName.style === font.style);
+      const key = `${font.family}-${font.style}`;
+      const matchingStyle = styleByFontMap.get(key);
 
       if (!matchingStyle) {
         return {
@@ -140,7 +164,7 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
       return processTextStyleProperty(
         matchingStyle,
         'fontStyle',
-        localVariables,
+        variableMap,
         tokens,
         TokenTypes.FONT_WEIGHTS,
         `fontWeights.${slugify(font.family)}`,
@@ -149,8 +173,17 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
       );
     });
 
-    fontFamilies = [...new Set(uniqueFontCombinations.map((font) => font.family))].map((fontFamily, idx) => {
-      const matchingStyle = figmaTextStyles.find((style) => style.fontName.family === fontFamily);
+    // Create family lookup map for O(1) access
+    const styleByFamilyMap = new Map<string, TextStyle>();
+    figmaTextStyles.forEach((style) => {
+      if (!styleByFamilyMap.has(style.fontName.family)) {
+        styleByFamilyMap.set(style.fontName.family, style);
+      }
+    });
+
+    const uniqueFontFamilies = [...new Set(uniqueFontCombinations.map((font) => font.family))];
+    fontFamilies = uniqueFontFamilies.map((fontFamily, idx) => {
+      const matchingStyle = styleByFamilyMap.get(fontFamily);
 
       if (!matchingStyle) {
         return {
@@ -163,7 +196,7 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
       return processTextStyleProperty(
         matchingStyle,
         'fontFamily',
-        localVariables,
+        variableMap,
         tokens,
         TokenTypes.FONT_FAMILIES,
         `fontFamilies.${slugify(fontFamily)}`,
@@ -175,7 +208,7 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
     paragraphSpacing = figmaTextStyles.map((style, idx) => processTextStyleProperty(
       style,
       'paragraphSpacing',
-      localVariables,
+      variableMap,
       tokens,
       TokenTypes.PARAGRAPH_SPACING,
       'paragraphSpacing',
@@ -194,7 +227,7 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
     letterSpacing = figmaTextStyles.map((style, idx) => processTextStyleProperty(
       style,
       'letterSpacing',
-      localVariables,
+      variableMap,
       tokens,
       TokenTypes.LETTER_SPACING,
       'letterSpacing',
@@ -215,11 +248,12 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
     }));
 
     typography = figmaTextStyles.map((style) => {
+      // For variable references, prioritize finding by variable name, otherwise use value lookup
       const foundFamily = fontFamilies.find(
         findBoundVariable(
           style,
           'fontFamily',
-          localVariables,
+          variableMap,
           (el) => el.value === style.fontName.family,
         ),
       );
@@ -228,7 +262,7 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
         findBoundVariable(
           style,
           'fontStyle',
-          localVariables,
+          variableMap,
           (el) => el.name.includes(slugify(style.fontName.family)) && el.value === style.fontName?.style,
         ),
       );
@@ -237,29 +271,32 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
         findBoundVariable(
           style,
           'lineHeight',
-          localVariables,
+          variableMap,
           (el) => el.value === convertFigmaToLineHeight(style.lineHeight).toString(),
         ),
       );
+
       const foundFontSize = fontSizes.find(
         findBoundVariable(
           style,
           'fontSize',
-          localVariables,
+          variableMap,
           (el) => el.value === style.fontSize.toString(),
         ),
       );
+
       const foundLetterSpacing = letterSpacing.find(
         findBoundVariable(
           style,
           'letterSpacing',
-          localVariables,
+          variableMap,
           (el) => el.value === convertFigmaToLetterSpacing(style.letterSpacing).toString(),
         ),
       );
+
       const foundParagraphSpacing = paragraphSpacing.find((el: StyleToCreateToken) => {
         if (style.boundVariables?.paragraphSpacing?.id) {
-          const paragraphSpacingVar = localVariables.find((v) => v.id === style.boundVariables?.paragraphSpacing?.id);
+          const paragraphSpacingVar = variableMap.get(style.boundVariables.paragraphSpacing.id);
           if (paragraphSpacingVar) {
             const normalizedName = paragraphSpacingVar.name.replace(/\//g, '.');
             return el.name === normalizedName;
