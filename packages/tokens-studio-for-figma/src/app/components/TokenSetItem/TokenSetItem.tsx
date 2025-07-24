@@ -7,7 +7,7 @@ import {
 } from '@tokens-studio/ui';
 import { StyledCheckbox } from '../StyledDragger/StyledCheckbox';
 import { StyledWrapper } from './StyledWrapper';
-import { tokenSetStatusSelector } from '@/selectors';
+import { tokenSetStatusSelector, storageTypeSelector } from '@/selectors';
 import { RootState } from '@/app/store';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import IconIndeterminateAlt from '@/icons/indeterminate-alt.svg';
@@ -15,6 +15,9 @@ import { TreeItem } from '@/utils/tokenset';
 import { DragGrabber } from '../StyledDragger/DragGrabber';
 import { StyledDragButton } from '../StyledDragger/StyledDragButton';
 import { formatCount } from '@/utils/formatCount';
+import { buildStudioUrl, isTokensStudioStorage } from '@/utils/studioUrlBuilder';
+import { TokensStudioStorageType } from '@/types/StorageType';
+import { track } from '@/utils/analytics';
 
 export type TokenSetItemProps = {
   item: TreeItem & { tokenCount?: number };
@@ -55,6 +58,8 @@ export function TokenSetItem({
 }: TokenSetItemProps) {
   const statusSelector = useCallback((state: RootState) => tokenSetStatusSelector(state, item.path), [item]);
   const tokenSetStatus = useSelector(statusSelector);
+  const storageType = useSelector(storageTypeSelector);
+  const canOpenInStudio = isTokensStudioStorage(storageType);
   const { t } = useTranslation(['tokens']);
 
   const handleClick = useCallback(() => {
@@ -76,6 +81,16 @@ export function TokenSetItem({
   const handleTreatAsSource = useCallback(() => {
     onTreatAsSource(item.path);
   }, [item.path, onTreatAsSource]);
+
+  const handleOpenInStudioClick = useCallback(() => {
+    if (canOpenInStudio && item.isLeaf) {
+      const studioUrl = buildStudioUrl(storageType as TokensStudioStorageType, {
+        tokenSetName: item.path,
+      });
+      window.open(studioUrl, '_blank');
+      track('Open Token Set in Studio', { tokenSet: item.path });
+    }
+  }, [canOpenInStudio, item.isLeaf, item.path, storageType]);
 
   const handleCheckedChange = useCallback(() => {
     onCheck(!isChecked, item);
@@ -171,6 +186,11 @@ export function TokenSetItem({
         <ContextMenu.Portal>
           <ContextMenu.Content>
             <ContextMenu.Item onSelect={handleRename} disabled={!canEdit}>{t('rename')}</ContextMenu.Item>
+            {item.isLeaf && canOpenInStudio && (
+              <ContextMenu.Item onSelect={handleOpenInStudioClick}>
+                Edit in Studio
+              </ContextMenu.Item>
+            )}
             {item.isLeaf && (
               <>
                 <ContextMenu.Item disabled={!canEdit || !canDuplicate} onSelect={handleDuplicate}>{t('duplicate')}</ContextMenu.Item>
