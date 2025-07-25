@@ -60,7 +60,6 @@ const SyncSettings = () => {
     {
       text: 'Tokens Studio',
       type: StorageProviderType.TOKENS_STUDIO,
-      beta: true,
     },
   ], [t]);
 
