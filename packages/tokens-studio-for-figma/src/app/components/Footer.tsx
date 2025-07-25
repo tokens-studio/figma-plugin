@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
-import { DownloadIcon, UploadIcon } from '@primer/octicons-react';
+import { DownloadIcon, UploadIcon, ArrowUpRightIcon } from '@primer/octicons-react';
 import { useTranslation } from 'react-i18next';
 import { Button, IconButton } from '@tokens-studio/ui';
 import { WarningTriangleSolid } from 'iconoir-react';
@@ -35,6 +35,9 @@ import { docUrls } from '@/constants/docUrls';
 import { TokenFormatBadge } from './TokenFormatBadge';
 import { isEqual } from '@/utils/isEqual';
 import { useStorageSizeWarning } from '../hooks/useStorageSizeWarning';
+import { buildStudioUrl, isTokensStudioStorage } from '@/utils/studioUrlBuilder';
+import { TokensStudioStorageType } from '@/types/StorageType';
+import { track } from '@/utils/analytics';
 
 export default function Footer() {
   const storageType = useSelector(storageTypeSelector);
@@ -63,6 +66,14 @@ export default function Footer() {
   const handlePullTokens = useCallback(() => {
     pullTokens({ usedTokenSet, activeTheme, updateLocalTokens: true });
   }, [pullTokens, usedTokenSet, activeTheme]);
+
+  const handleOpenInStudioClick = React.useCallback(() => {
+    if (isTokensStudioStorage(storageType)) {
+      const studioUrl = buildStudioUrl(storageType as TokensStudioStorageType);
+      window.open(studioUrl, '_blank');
+      track('Open Project in Studio');
+    }
+  }, [storageType]);
 
   const handleBadgeClick = useStorageSizeWarning();
 
@@ -124,6 +135,17 @@ export default function Footer() {
               />
             </DirtyStateBadgeWrapper>
           </>
+        )}
+        {isTokensStudioStorage(storageType) && (
+          <IconButton
+            data-testid="footer-open-studio-button"
+            icon={<ArrowUpRightIcon />}
+            onClick={handleOpenInStudioClick}
+            variant="invisible"
+            size="small"
+            tooltipSide="top"
+            tooltip="Open in Studio"
+          />
         )}
         {storageType.provider !== StorageProviderType.LOCAL
           && storageType.provider !== StorageProviderType.GITHUB

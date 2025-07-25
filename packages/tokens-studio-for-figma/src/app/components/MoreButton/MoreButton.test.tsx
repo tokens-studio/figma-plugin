@@ -235,4 +235,99 @@ describe('MoreButton', () => {
     });
     expect(mockShowForm).toHaveBeenCalled();
   });
+
+  it('should show "Edit in Studio" option when using Tokens Studio storage', async () => {
+    const mockStore = createMockStore({
+      uiState: {
+        storageType: {
+          provider: 'tokensstudio',
+          orgId: 'test-org',
+          id: 'test-project',
+          name: 'Test Project',
+          baseUrl: 'https://app.tokens.studio',
+        },
+      },
+    });
+
+    const result = render(
+      <Provider store={mockStore}>
+        <MoreButton
+          type={TokenTypes.SPACING}
+          showForm={mockShowForm}
+          token={token}
+        />
+      </Provider>,
+    );
+
+    await fireEvent.contextMenu(result.getByText(token.name));
+    expect(result.getByText('Edit in Studio')).toBeInTheDocument();
+  });
+
+  it('should not show "Edit in Studio" option when not using Tokens Studio storage', async () => {
+    const mockStore = createMockStore({
+      uiState: {
+        storageType: {
+          provider: 'github',
+          id: 'test/repo',
+          name: 'Test Repo',
+        },
+      },
+    });
+
+    const result = render(
+      <Provider store={mockStore}>
+        <MoreButton
+          type={TokenTypes.SPACING}
+          showForm={mockShowForm}
+          token={token}
+        />
+      </Provider>,
+    );
+
+    await fireEvent.contextMenu(result.getByText(token.name));
+    expect(result.queryByText('Edit in Studio')).not.toBeInTheDocument();
+  });
+
+  it('should open studio URL when "Edit in Studio" is clicked', async () => {
+    const mockStore = createMockStore({
+      uiState: {
+        storageType: {
+          provider: 'tokensstudio',
+          orgId: 'test-org',
+          id: 'test-project',
+          name: 'Test Project',
+          baseUrl: 'https://app.tokens.studio',
+        },
+        activeTokenSet: 'core',
+      },
+      tokenState: {
+        activeTokenSet: 'core',
+      },
+    });
+
+    // Mock window.open
+    const mockOpen = jest.fn();
+    Object.defineProperty(window, 'open', {
+      value: mockOpen,
+      writable: true,
+    });
+
+    const result = render(
+      <Provider store={mockStore}>
+        <MoreButton
+          type={TokenTypes.SPACING}
+          showForm={mockShowForm}
+          token={token}
+        />
+      </Provider>,
+    );
+
+    await fireEvent.contextMenu(result.getByText(token.name));
+    await fireEvent.click(result.getByText('Edit in Studio'));
+
+    expect(mockOpen).toHaveBeenCalledWith(
+      'https://app.tokens.studio/org/test-org/project/test-project/data/main/tokens/set/core?token=my-large-token',
+      '_blank'
+    );
+  });
 });
