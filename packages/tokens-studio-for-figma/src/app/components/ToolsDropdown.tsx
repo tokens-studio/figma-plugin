@@ -48,12 +48,12 @@ export default function ToolsDropdown() {
         </DropdownMenu.Trigger>
 
         <DropdownMenu.Portal>
-        <DropdownMenu.Content side="top">
-          <DropdownMenu.Item disabled={editProhibited} onSelect={handleShowPresetModal}>{t('loadFromFileOrPreset')}</DropdownMenu.Item>
-          <DropdownMenu.Item disabled={editProhibited} onSelect={handleShowExportModal}>{t('exportToFile')}</DropdownMenu.Item>
-          <DropdownMenu.Item disabled={editProhibited} onSelect={handleShowDocModal}>Generate documentation</DropdownMenu.Item>
-        </DropdownMenu.Content>
-      </DropdownMenu.Portal>
+          <DropdownMenu.Content side="top">
+            <DropdownMenu.Item disabled={editProhibited} onSelect={handleShowPresetModal}>{t('loadFromFileOrPreset')}</DropdownMenu.Item>
+            <DropdownMenu.Item disabled={editProhibited} onSelect={handleShowExportModal}>{t('exportToFile')}</DropdownMenu.Item>
+            <DropdownMenu.Item disabled={editProhibited} onSelect={handleShowDocModal}>Generate documentation</DropdownMenu.Item>
+          </DropdownMenu.Content>
+        </DropdownMenu.Portal>
       </DropdownMenu>
       {exportModalVisible && <ExportModal onClose={handleCloseExportModal} />}
       {presetModalVisible && <PresetModal onClose={handleClosePresetModal} />}

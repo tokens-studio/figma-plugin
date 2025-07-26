@@ -4,17 +4,15 @@ import { MessageFromPluginTypes } from '@/types/messages';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { defaultWorker } from './Worker';
 import { ProgressTracker } from './ProgressTracker';
-import { SettingsState } from '@/app/store/models/settings';
 import { destructureTokenForAlias, mapValuesToTokens } from './node';
 import { NodeManagerNode } from './NodeManager';
 import { defaultTokenValueRetriever } from './TokenValueRetriever';
 
 export async function updateNodes(
   nodes: readonly NodeManagerNode[],
-  settings: SettingsState,
+  baseFontSize: string,
 ) {
   // Big O (n * m): (n = amount of nodes, m = amount of applied tokens to the node)
-  const { baseFontSize } = settings ?? {};
 
   postToUI({
     type: MessageFromPluginTypes.START_JOB,

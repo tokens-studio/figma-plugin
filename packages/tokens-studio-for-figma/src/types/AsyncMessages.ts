@@ -187,6 +187,8 @@ export type CreateAnnotationAsyncMessageResult = AsyncMessage<AsyncMessageTypes.
 export type CreateLivingDocumentationAsyncMessage = AsyncMessage<AsyncMessageTypes.CREATE_LIVING_DOCUMENTATION, {
   tokenSet: string;
   startsWith: string;
+  applyTokens: boolean;
+  resolvedTokens: AnyTokenList;
 }>;
 export type CreateLivingDocumentationAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_LIVING_DOCUMENTATION>;
 
