@@ -26,6 +26,7 @@ export const backgroundJobTitles = {
   [BackgroundJobs.UI_ATTACHING_LOCAL_STYLES]: 'Attaching local styles to theme...',
   [BackgroundJobs.UI_CREATEVARIABLES]: 'Creating variables...',
   [BackgroundJobs.UI_CREATE_STYLES]: 'Creating styles...',
+  [BackgroundJobs.UI_IMPORT_STYLES]: 'Importing styles...',
 };
 
 export default function LoadingBar() {
