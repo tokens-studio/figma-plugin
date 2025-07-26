@@ -11,6 +11,7 @@ import { findCollectionAndModeIdForTheme } from './findCollectionAndModeIdForThe
 import { createNecessaryVariableCollections } from './createNecessaryVariableCollections';
 import { getVariablesWithoutZombies } from './getVariablesWithoutZombies';
 import { getOverallConfig } from '@/utils/tokenHelpers';
+import { defaultTokenValueRetriever } from './TokenValueRetriever';
 
 export type LocalVariableInfo = {
   collectionId: string;
@@ -26,6 +27,9 @@ export type LocalVariableInfo = {
 * - There's another step that we perform where we check if any variables need to be using references to other variables. This is a second step, as we need to have all variables created first before we can reference them.
 * */
 export default async function createLocalVariablesInPlugin(tokens: Record<string, AnyTokenList>, settings: SettingsState, selectedThemes?: string[]) {
+  // Clear cache at start to ensure clean state and prevent memory leaks
+  defaultTokenValueRetriever.clearCache();
+
   // Big O (n * m * x): (n: amount of themes, m: amount of variableCollections, x: amount of modes)
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
     type: AsyncMessageTypes.GET_THEME_INFO,
@@ -35,6 +39,7 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
   let referenceVariableCandidates: ReferenceVariableType[] = [];
   const updatedVariableCollections: VariableCollection[] = [];
   let updatedVariables: Variable[] = [];
+  const allNewlyCreatedVariables = new Map<string, string>(); // Track newly created variables for reference resolution
   const figmaVariablesBeforeCreate = (await getVariablesWithoutZombies())?.length;
   const figmaVariableCollectionsBeforeCreate = figma.variables.getLocalVariableCollections()?.length;
 
@@ -61,11 +66,21 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
           variableIds: allVariableObj.variableIds,
         };
         referenceVariableCandidates = referenceVariableCandidates.concat(allVariableObj.referenceVariableCandidate);
+
+        // Collect newly created variables for reference resolution
+        Object.entries(allVariableObj.variableIds).forEach(([tokenName, variableKey]) => {
+          allNewlyCreatedVariables.set(tokenName, variableKey);
+        });
       }
       updatedVariableCollections.push(collection);
     }));
     // Gather references that we should use. Merge current theme references with the ones from all themes as well as local variables
     const existingVariables = await mergeVariableReferencesWithLocalVariables(selectedThemeObjects, themeInfo.themes);
+
+    // Merge newly created variables with existing variables for proper reference resolution
+    allNewlyCreatedVariables.forEach((variableKey, tokenName) => {
+      existingVariables.set(tokenName, variableKey);
+    });
 
     // Update variables to use references instead of raw values
     updatedVariables = await updateVariablesToReference(existingVariables, referenceVariableCandidates);
@@ -79,6 +94,10 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
   } else {
     notifyUI(`${figmaVariableCollectionsAfterCreate - figmaVariableCollectionsBeforeCreate} collections and ${figmaVariablesAfterCreate - figmaVariablesBeforeCreate} variables created`);
   }
+
+  // Clear cache at end to free memory and prevent leaks
+  defaultTokenValueRetriever.clearCache();
+
   return {
     allVariableCollectionIds,
     totalVariables: updatedVariables.length,
