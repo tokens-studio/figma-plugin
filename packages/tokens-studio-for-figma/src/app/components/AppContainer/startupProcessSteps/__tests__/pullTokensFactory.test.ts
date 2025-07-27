@@ -7,15 +7,24 @@ import type useConfirm from '@/app/hooks/useConfirm';
 import type useRemoteTokens from '@/app/store/remoteTokens';
 import { Tabs } from '@/constants/Tabs';
 import type { StorageType } from '@/types/StorageType';
+import updateTokensOnSources from '@/app/store/updateSources';
 
 jest.mock('uuid', () => ({
   v4: jest.fn(() => 'mock-uuid'),
 }));
 
+jest.mock('@/app/store/updateSources', () => jest.fn());
+
+const mockedUpdateTokensOnSources = updateTokensOnSources as jest.MockedFunction<typeof updateTokensOnSources>;
+
 describe('pullTokensFactory', () => {
   const mockConfirm = jest.fn();
   const mockFetchBranches = jest.fn();
   const mockPullTokens = jest.fn();
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
   const mockStorageType: StorageType = {
     id: 'github',
@@ -75,6 +84,52 @@ describe('pullTokensFactory', () => {
     await fn();
     const state = mockStore.getState();
     expect(mockUseRemoteTokens.pullTokens).not.toBeCalled();
+    expect(state.tokenState.tokens).toEqual(mockParams.localTokenData?.values);
+    expect(state.uiState.activeTab).toEqual(Tabs.TOKENS);
+  });
+
+  it('should trigger updateDocument when loading local tokens', async () => {
+    const mockStore = createMockStore({
+      uiState: {
+        storageType: {
+          provider: StorageProviderType.LOCAL,
+        },
+      },
+    });
+
+    const mockParams = {
+      localTokenData: {
+        values: {
+          global: [
+            {
+              type: TokenTypes.COLOR,
+              name: 'colors.red',
+              value: '#ff0000',
+              $extensions: {
+                'studio.tokens': {
+                  id: 'mock-uuid',
+                },
+              },
+            },
+          ],
+        },
+      },
+    } as unknown as StartupMessage;
+
+    const fn = pullTokensFactory(
+      mockStore,
+      mockStore.dispatch,
+      {},
+      mockParams,
+      mockUseConfirm,
+      mockUseRemoteTokens,
+    );
+
+    await fn();
+
+    // Verify that updateDocument was called (which triggers updateTokensOnSources)
+    expect(mockedUpdateTokensOnSources).toHaveBeenCalled();
+    const state = mockStore.getState();
     expect(state.tokenState.tokens).toEqual(mockParams.localTokenData?.values);
     expect(state.uiState.activeTab).toEqual(Tabs.TOKENS);
   });
