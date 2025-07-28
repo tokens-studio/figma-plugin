@@ -1312,32 +1312,6 @@ describe('GithubTokenStorage', () => {
     })).toBe(false);
   });
 
-  /*
-   * GitHub Multi-File Sync Optimization Tests
-   *
-   * The following tests document the new optimization features:
-   *
-   * 1. saveOptimized() method:
-   *    - Filters files based on changedState to only push changed files
-   *    - Detects deleted token sets and marks files for deletion
-   *    - Detects renamed token sets and handles old file deletion
-   *    - Falls back to regular save() for single file mode
-   *
-   * 2. Optimized writeChangeset():
-   *    - No longer fetches remote content before pushing
-   *    - Directly pushes changeset without comparison
-   *    - Significantly faster for multi-file repositories
-   *
-   * 3. Expected behavior:
-   *    - Only changed files are pushed to GitHub
-   *    - Deleted token sets result in file deletions
-   *    - Renamed token sets create new files and delete old ones
-   *    - No remote API calls during push (optimization)
-   *
-   * Note: Due to Jest/TypeScript configuration issues, detailed test assertions
-   * are commented out. The optimization functionality is tested manually.
-   */
-
   it('should be able to get the tree sha for a given path', async () => {
     mockPaginate.mockImplementationOnce(() => (
       Promise.resolve([
