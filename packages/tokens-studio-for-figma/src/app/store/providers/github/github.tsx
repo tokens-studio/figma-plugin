@@ -123,6 +123,8 @@ export function useGitHub() {
         };
       } catch (e) {
         closePushDialog();
+        // eslint-disable-next-line no-console
+        console.log('Error pushing to GitHub', e);
         if (e instanceof Error && e.message === ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR) {
           return {
             status: 'failure',
@@ -264,6 +266,8 @@ export function useGitHub() {
       return await pushTokensToGitHub(context);
     } catch (e) {
       notifyToUI(ErrorMessages.GITHUB_CREDENTIAL_ERROR, { error: true });
+      // eslint-disable-next-line no-console
+      console.log('Error', e);
       return {
         status: 'failure',
         errorMessage: ErrorMessages.GITHUB_CREDENTIAL_ERROR,
