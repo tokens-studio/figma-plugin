@@ -1362,4 +1362,165 @@ describe('GithubTokenStorage', () => {
     expect(await storageProvider.getCommitSha()).toEqual('abc123');
     mockGetContent.mockClear();
   });
+
+  it('should correctly handle file deletions with optimized approach', async () => {
+    mockCreateOrUpdateFiles.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: {
+          content: {},
+        },
+      })
+    ));
+
+    mockPaginate.mockImplementationOnce(() => (
+      Promise.resolve([
+        {
+          name: 'main',
+          commit: { sha: 'main-sha' },
+        },
+      ])
+    ));
+
+    storageProvider.enableMultiFile();
+    storageProvider.changePath('data');
+
+    const result = await storageProvider.saveOptimized(
+      {
+        tokens: {
+          global: [
+            {
+              type: TokenTypes.COLOR,
+              name: 'red',
+              value: '#ff0000',
+            },
+          ],
+        },
+        themes: [
+          {
+            id: 'light',
+            name: 'Light',
+            selectedTokenSets: {
+              global: TokenSetStatus.ENABLED,
+            },
+          },
+        ],
+        metadata: {
+          tokenSetOrder: ['global'],
+        },
+      },
+      {
+        commitMessage: 'Test commit with deletions',
+        storeTokenIdInJsonEditor: false,
+      },
+      {
+        tokens: {
+          global: [{ importType: 'UPDATE', name: 'red' }],
+          oldTokenSet: [{ importType: 'REMOVE', name: 'someToken' }],
+        },
+        themes: [{ importType: 'UPDATE', id: 'light' }],
+        metadata: true,
+      },
+    );
+
+    expect(result).toBe(true);
+
+    expect(mockCreateOrUpdateFiles).toBeCalledWith({
+      branch: 'main',
+      owner: 'six7',
+      repo: 'figma-tokens',
+      createBranch: false,
+      changes: [
+        {
+          message: 'Test commit with deletions',
+          files: {
+            'data/$themes.json': JSON.stringify([
+              {
+                id: 'light',
+                name: 'Light',
+                selectedTokenSets: {
+                  global: 'enabled',
+                },
+              },
+            ], null, 2),
+            'data/$metadata.json': JSON.stringify({
+              tokenSetOrder: ['global'],
+            }, null, 2),
+            'data/global.json': JSON.stringify({
+              red: {
+                type: 'color',
+                value: '#ff0000',
+              },
+            }, null, 2),
+          },
+          filesToDelete: ['data/oldTokenSet.json'],
+          ignoreDeletionFailures: true,
+        },
+      ],
+    });
+  });
+
+  it('should not have duplicate files in filesToDelete array', async () => {
+    mockCreateOrUpdateFiles.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: {
+          content: {},
+        },
+      })
+    ));
+
+    mockPaginate.mockImplementationOnce(() => (
+      Promise.resolve([
+        {
+          name: 'main',
+          commit: { sha: 'main-sha' },
+        },
+      ])
+    ));
+
+    storageProvider.enableMultiFile();
+    storageProvider.changePath('data');
+
+    const result = await storageProvider.saveOptimized(
+      {
+        tokens: {
+          global: [
+            {
+              type: TokenTypes.COLOR,
+              name: 'red',
+              value: '#ff0000',
+            },
+          ],
+        },
+        themes: [],
+        metadata: {},
+      },
+      {
+        commitMessage: 'Test commit with potential duplicates',
+        storeTokenIdInJsonEditor: false,
+      },
+      {
+        tokens: {
+          global: [{ importType: 'UPDATE', name: 'red' }],
+          deletedSet: [
+            { importType: 'REMOVE', name: 'token1' },
+            { importType: 'REMOVE', name: 'token2' },
+            { importType: 'REMOVE', name: 'token3' },
+          ],
+        },
+        themes: [],
+        metadata: false,
+      },
+    );
+
+    expect(result).toEqual(true);
+
+    const call = mockCreateOrUpdateFiles.mock.calls[0][0];
+    const { filesToDelete } = call.changes[0];
+
+    expect(filesToDelete).toEqual(['data/deletedSet.json']);
+    expect(filesToDelete.length).toEqual(1);
+
+    const uniqueFiles = [...new Set(filesToDelete)];
+    expect(uniqueFiles.length).toEqual(filesToDelete.length);
+  });
 });
