@@ -21,6 +21,8 @@ describe('GithubTokenStorage', () => {
   beforeEach(() => {
     storageProvider.disableMultiFile();
     storageProvider.changePath('tokens.json');
+    mockGetContent.mockClear();
+    mockGetContent.mockReset();
   });
 
   it('should be able to get the tree mode', () => {
@@ -1324,42 +1326,45 @@ describe('GithubTokenStorage', () => {
     expect(await storageProvider.getTreeShaForDirectory('')).toEqual('root-sha');
   });
 
-  // it('should return the sha of the file if the response is not an array', async () => {
-  //   mockGetContent.mockImplementationOnce(() => (
-  //     Promise.resolve({
-  //       data: {
-  //         sha: 'abc123',
-  //       },
-  //     })
-  //   ));
+  it('should return the sha of the file if the response is not an array', async () => {
+    mockGetContent.mockClear();
+    mockGetContent.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: {
+          sha: 'abc123',
+        },
+      })
+    ));
 
-  //   expect(await storageProvider.getCommitSha()).toEqual('abc123');
-  // });
+    expect(await storageProvider.getCommitSha()).toEqual('abc123');
+  });
 
-  // it('should call return directory sha if the response is an array', async () => {
-  //   mockGetContent.mockImplementation((opts: { path: string }) => {
-  //     if (opts.path === 'data') {
-  //       return Promise.resolve({
-  //         data: [
-  //           {
-  //             path: 'data/tokens', sha: 'sha(data/tokens)', type: 'file', sha: 'abc123',
-  //           },
-  //         ],
-  //       });
-  //     }
+  it('should call return directory sha if the response is an array', async () => {
+    mockGetContent.mockClear();
+    mockGetContent.mockImplementation((opts: { path: string }) => {
+      if (opts.path === 'data') {
+        return Promise.resolve({
+          data: [
+            {
+              path: 'data/tokens', sha: 'abc123', type: 'file',
+            },
+          ],
+        });
+      }
 
-  //     if (opts.path === 'data/tokens') {
-  //       return Promise.resolve({
-  //         data: [
-  //           { path: 'data/tokens', sha: 'sha(data/tokens)', type: 'folder' },
-  //         ],
-  //       });
-  //     }
+      if (opts.path === 'data/tokens') {
+        return Promise.resolve({
+          data: [
+            { path: 'data/tokens', sha: 'sha(data/tokens)', type: 'folder' },
+          ],
+        });
+      }
 
-  //     return Promise.reject();
-  //   });
-  //   storageProvider.changePath('data/tokens');
+      return Promise.reject();
+    });
+    storageProvider.changePath('data/tokens');
 
-  //   expect(await storageProvider.getCommitSha()).toEqual('abc123');
-  // });
+    expect(await storageProvider.getCommitSha()).toEqual('abc123');
+    mockGetContent.mockClear();
+  });
 });
