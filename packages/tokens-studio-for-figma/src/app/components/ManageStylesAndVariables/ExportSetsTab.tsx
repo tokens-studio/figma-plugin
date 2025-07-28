@@ -24,7 +24,13 @@ import { FormValues } from '../ManageThemesModal/CreateOrEditThemeForm';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { ExportTokenSet } from '@/types/ExportTokenSet';
 
-export default function ExportSetsTab({ selectedSets, setSelectedSets }: { selectedSets: ExportTokenSet[], setSelectedSets: (sets: ExportTokenSet[]) => void }) {
+export default function ExportSetsTab({
+  selectedSets,
+  setSelectedSets,
+}: {
+  selectedSets: ExportTokenSet[];
+  setSelectedSets: (sets: ExportTokenSet[]) => void;
+}) {
   const dispatch = useDispatch<Dispatch>();
   const closeOnboarding = React.useCallback(() => {
     dispatch.uiState.setOnboardingExplainerExportSets(false);
@@ -35,13 +41,9 @@ export default function ExportSetsTab({ selectedSets, setSelectedSets }: { selec
 
   const store = useStore<RootState>();
 
-  const selectedTokenSets = React.useMemo(() => (
-    usedTokenSetSelector(store.getState())
-  ), [store]);
+  const selectedTokenSets = React.useMemo(() => usedTokenSetSelector(store.getState()), [store]);
 
-  const {
-    control, getValues, reset,
-  } = useForm<FormValues>({
+  const { control, getValues, reset } = useForm<FormValues>({
     defaultValues: {
       tokenSets: { ...selectedTokenSets },
     },
@@ -70,37 +72,40 @@ export default function ExportSetsTab({ selectedSets, setSelectedSets }: { selec
     setPreviousSetSelection(getValues());
   }, [getValues]);
 
-  const TokenSetThemeItemInput = React.useCallback((props: React.PropsWithChildren<{ item: TreeItem }>) => (
-    <Controller
-      name="tokenSets"
-      control={control}
-      // this is the only way to do this
-      // eslint-disable-next-line
-      render={({ field }) => (
-        <TokenSetThemeItem
-          {...props}
-          value={field.value}
-          onChange={field.onChange}
-        />
-      )}
-    />
-  ), [control]);
+  const TokenSetThemeItemInput = React.useCallback(
+    (props: React.PropsWithChildren<{ item: TreeItem }>) => (
+      <Controller
+        name="tokenSets"
+        control={control}
+        // this is the only way to do this
+        // eslint-disable-next-line
+        render={({ field }) => <TokenSetThemeItem {...props} value={field.value} onChange={field.onChange} />}
+      />
+    ),
+    [control],
+  );
 
-  const selectedEnabledSets = useMemo(() => selectedSets.filter((set) => set.status === TokenSetStatus.ENABLED), [selectedSets]);
+  const selectedEnabledSets = useMemo(
+    () => selectedSets.filter((set) => set.status === TokenSetStatus.ENABLED),
+    [selectedSets],
+  );
 
   React.useEffect(() => {
     if (!showChangeSets) {
       const currentSelectedSets = getValues();
-      const internalSelectedTokenSets: ExportTokenSet[] = Object.keys(currentSelectedSets.tokenSets).reduce((acc: ExportTokenSet[], curr: string) => {
-        if (currentSelectedSets.tokenSets[curr] !== TokenSetStatus.DISABLED) {
-          const tokenSet = {
-            set: curr,
-            status: currentSelectedSets.tokenSets[curr],
-          } as ExportTokenSet;
-          acc.push(tokenSet);
-        }
-        return acc;
-      }, [] as ExportTokenSet[]);
+      const internalSelectedTokenSets: ExportTokenSet[] = Object.keys(currentSelectedSets.tokenSets).reduce(
+        (acc: ExportTokenSet[], curr: string) => {
+          if (currentSelectedSets.tokenSets[curr] !== TokenSetStatus.DISABLED) {
+            const tokenSet = {
+              set: curr,
+              status: currentSelectedSets.tokenSets[curr],
+            } as ExportTokenSet;
+            acc.push(tokenSet);
+          }
+          return acc;
+        },
+        [] as ExportTokenSet[],
+      );
       setSelectedSets([...internalSelectedTokenSets]);
     }
   }, [showChangeSets, getValues, setSelectedSets]);
@@ -139,18 +144,19 @@ export default function ExportSetsTab({ selectedSets, setSelectedSets }: { selec
               {t('exportSetsTab.setsSelectedForExport')}
             </span>
           </Stack>
-          <Button variant="secondary" size="small" onClick={handleShowChangeSets}>{t('actions.changeSets')}</Button>
+          <Button variant="secondary" size="small" onClick={handleShowChangeSets}>
+            {t('actions.changeSets')}
+          </Button>
         </Stack>
       </StyledCard>
       <Modal
         size="fullscreen"
-        full
         compact
         isOpen={showChangeSets}
         close={handleCancelChangeSets}
         backArrow
         title="Styles and Variables / Export Sets"
-        footer={(
+        footer={
           <Stack direction="row" gap={4} justify="between">
             <Button variant="secondary" onClick={handleCancelChangeSets}>
               {t('actions.cancel')}
@@ -159,11 +165,9 @@ export default function ExportSetsTab({ selectedSets, setSelectedSets }: { selec
               {t('actions.confirm')}
             </Button>
           </Stack>
-          )}
+        }
       >
-        <Heading>
-          {t('exportSetsTab.changeSetsHeading')}
-        </Heading>
+        <Heading>{t('exportSetsTab.changeSetsHeading')}</Heading>
         {/* Commenting until we have docs <Link target="_blank" href={docsLinks.sets}>{`${t('generic.learnMore')} – ${t('docs.referenceOnlyMode')}`}</Link> */}
         <Stack
           direction="column"
