@@ -32,82 +32,50 @@ export class GitSyncOptimizer {
     saveOptions: GitStorageSaveOption,
     changedState: ChangedState,
   ): OptimizedSyncResult {
-    // First, convert data to files using the base class logic
-    const files: RemoteTokenStorageFile<GitStorageSaveOptions>[] = [];
+    // Convert data to files and filter based on changedState in a single pass
+    const filteredFiles: RemoteTokenStorageFile<GitStorageSaveOptions>[] = [];
+    const filesToDelete: string[] = [];
 
-    // Convert tokens to files
+    // Convert tokens to files and filter based on changes
     const tokenSetObjects = convertTokensToObject({ ...data.tokens }, saveOptions.storeTokenIdInJsonEditor);
     Object.entries(tokenSetObjects).forEach(([name, tokenSet]) => {
-      files.push({
-        type: 'tokenSet',
-        name,
-        path: `${name}.json`,
-        data: tokenSet,
+      const hasChanges = changedState.tokens[name];
+      if (hasChanges && hasChanges.length > 0) {
+        filteredFiles.push({
+          type: 'tokenSet',
+          name,
+          path: `${name}.json`,
+          data: tokenSet,
+        });
+      }
+    });
+
+    // Add themes file if there are theme changes
+    if (changedState.themes.length > 0) {
+      filteredFiles.push({
+        type: 'themes',
+        path: `${SystemFilenames.THEMES}.json`,
+        data: data.themes,
       });
-    });
+    }
 
-    // Add themes file
-    files.push({
-      type: 'themes',
-      path: `${SystemFilenames.THEMES}.json`,
-      data: data.themes,
-    });
-
-    // Add metadata file if present
-    if ('metadata' in data && data.metadata) {
-      files.push({
+    // Add metadata file if present and has changes
+    if ('metadata' in data && data.metadata && changedState.metadata) {
+      filteredFiles.push({
         type: 'metadata',
         path: `${SystemFilenames.METADATA}.json`,
         data: data.metadata,
       });
     }
 
-    // Now filter the files based on changedState and detect deletions
-    const filteredFiles: RemoteTokenStorageFile<GitStorageSaveOptions>[] = [];
-    const filesToDelete: string[] = [];
-
-    files.forEach((file) => {
-      if (file.type === 'tokenSet') {
-        const hasChanges = changedState.tokens[file.name];
-        if (hasChanges && hasChanges.length > 0) {
-          filteredFiles.push(file);
-        }
-      } else if (file.type === 'themes') {
-        if (changedState.themes.length > 0) {
-          filteredFiles.push(file);
-        }
-      } else if (file.type === 'metadata') {
-        if (changedState.metadata) {
-          filteredFiles.push(file);
-        }
-      }
-    });
-
     // Check for deleted token sets by looking for REMOVE importType in changedState
     Object.entries(changedState.tokens).forEach(([tokenSetName, changes]) => {
       const hasRemovedTokens = changes.some((change: any) => change.importType === 'REMOVE');
       if (hasRemovedTokens) {
-        // Check if the entire token set was removed (no corresponding file in current data)
-        const currentFile = files.find((f) => f.type === 'tokenSet' && f.name === tokenSetName);
-        if (!currentFile) {
+        const existsInCurrentData = tokenSetName in data.tokens;
+        if (!existsInCurrentData) {
           const filePath = `${tokenSetName}.json`;
           filesToDelete.push(filePath);
-        }
-      }
-    });
-
-    // Check for renamed token sets by detecting token sets that have REMOVE entries
-    // but DON'T exist in current files (indicating they were the old names that got renamed)
-    Object.entries(changedState.tokens).forEach(([tokenSetName, changes]) => {
-      const hasRemovedTokens = changes.some((change: any) => change.importType === 'REMOVE');
-      if (hasRemovedTokens) {
-        // Check if this token set name does NOT exist in current files
-        const currentFile = files.find((f) => f.type === 'tokenSet' && f.name === tokenSetName);
-        if (!currentFile) {
-          // This token set has REMOVE entries but doesn't exist in current files
-          // This indicates it was the old name that got renamed to something else
-          const oldFilePath = `${tokenSetName}.json`;
-          filesToDelete.push(oldFilePath);
         }
       }
     });
