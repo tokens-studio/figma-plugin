@@ -216,9 +216,56 @@ export class ADOTokenStorage extends GitTokenStorage {
           includeContent: true,
         },
       });
-      return await response.json();
+
+      // Check response status
+      if (!response.ok) {
+        console.log(`🚨 ADO: HTTP ${response.status} for ${path}:`, response.statusText);
+        return {};
+      }
+
+      const jsonData = await response.json();
+
+      // Always log the response structure to understand what's happening
+      console.log(`🔍 ADO: Response for ${path}:`, {
+        hasContent: !!jsonData.content,
+        hasEncoding: !!jsonData.encoding,
+        encoding: jsonData.encoding,
+        isDirectJson: !jsonData.content && !jsonData.encoding && typeof jsonData === 'object',
+        keys: Object.keys(jsonData || {}),
+        responseType: jsonData.content ? 'base64-encoded' : 'direct-json'
+      });
+
+      // Check if this is the new Azure DevOps API response format with base64 content
+      if (jsonData.content && jsonData.encoding === 'base64') {
+        try {
+          const decodedContent = atob(jsonData.content);
+          const parsedContent = JSON.parse(decodedContent);
+          console.log(`🔧 ADO: Decoded base64 content for ${path}`);
+          return parsedContent;
+        } catch (decodeError) {
+          console.log(`💥 ADO: Failed to decode base64 content for ${path}:`, decodeError);
+          return {};
+        }
+      }
+
+      // Check if this is already parsed JSON content (old format)
+      if (jsonData && typeof jsonData === 'object' && !jsonData.content && !jsonData.encoding) {
+        console.log(`🔧 ADO: Using direct JSON content for ${path}`);
+        return jsonData;
+      }
+
+      // Log unexpected response format
+      console.log(`🤔 ADO: Unexpected response format for ${path}:`, {
+        hasContent: !!jsonData.content,
+        hasEncoding: !!jsonData.encoding,
+        encoding: jsonData.encoding,
+        keys: Object.keys(jsonData || {}),
+        sample: JSON.stringify(jsonData).substring(0, 200)
+      });
+
+      return jsonData;
     } catch (e) {
-      console.log(e);
+      console.log(`💥 ADO: Exception in getItem for ${path}:`, e);
       return {};
     }
   }
@@ -255,21 +302,78 @@ export class ADOTokenStorage extends GitTokenStorage {
 
         if (!jsonFiles.length) return [];
 
+        console.log(`🔄 ADO: Reading ${jsonFiles.length} files from Azure DevOps with Promise.all...`);
+
+        // First pass: Read ALL files in parallel with Promise.all
         const jsonFileContents = await Promise.all(
           jsonFiles.map(async ({ path }) => {
-            const res = await this.getItem(path);
-            const validationResult = await multiFileSchema.safeParseAsync(res);
-            if (validationResult.success) {
-              return validationResult.data;
+            try {
+              const res = await this.getItem(path);
+
+              // Check if we got valid data
+              if (!res || (typeof res === 'object' && Object.keys(res).length === 0)) {
+                console.log(`⚠️ ADO: File ${path} returned empty/null data`);
+                return null;
+              }
+
+              const validationResult = await multiFileSchema.safeParseAsync(res);
+              if (validationResult.success) {
+                return validationResult.data;
+              } else {
+                console.log(`❌ ADO: File ${path} validation failed:`, validationResult.error);
+                return null;
+              }
+            } catch (error) {
+              console.log(`💥 ADO: Error reading file ${path}:`, error);
+              return null;
             }
-            return null;
           }),
         );
-        return compact(jsonFileContents.map<RemoteTokenStorageFile | null>((fileContent, index) => {
+
+        const successCount = jsonFileContents.filter(Boolean).length;
+        const failedIndices = jsonFileContents
+          .map((content, index) => content === null ? index : -1)
+          .filter(index => index !== -1);
+
+        console.log(`🏁 ADO: Promise.all complete. Success: ${successCount}/${jsonFiles.length}, Failed: ${failedIndices.length}`);
+
+        // Second pass: Retry ONLY the failed files sequentially
+        if (failedIndices.length > 0) {
+          console.log(`🔄 ADO: Retrying ${failedIndices.length} failed files sequentially...`);
+
+          for (const failedIndex of failedIndices) {
+            const { path } = jsonFiles[failedIndex];
+            try {
+              console.log(`🔄 ADO: Retrying ${path}`);
+              const res = await this.getItem(path);
+
+              if (res && !(typeof res === 'object' && Object.keys(res).length === 0)) {
+                const validationResult = await multiFileSchema.safeParseAsync(res);
+                if (validationResult.success) {
+                  console.log(`✅ ADO: Retry successful for ${path}`);
+                  jsonFileContents[failedIndex] = validationResult.data;
+                }
+              }
+
+              // Small delay between retries
+              await new Promise(resolve => setTimeout(resolve, 100));
+            } catch (error) {
+              console.log(`💥 ADO: Retry failed for ${path}:`, error);
+            }
+          }
+        }
+
+        const finalSuccessCount = jsonFileContents.filter(Boolean).length;
+        console.log(`🎯 ADO: Final result. Success: ${finalSuccessCount}/${jsonFiles.length}, Improved: ${finalSuccessCount - successCount}`);
+
+        const processedFiles = compact(jsonFileContents.map<RemoteTokenStorageFile | null>((fileContent, index) => {
           const { path } = jsonFiles[index];
           if (fileContent) {
             const name = path?.replace(this.path, '')?.replace(/^\/+/, '')?.replace('.json', '');
+            console.log(`🔧 ADO: Processing file ${path} -> ${name}`);
+
             if (name === SystemFilenames.THEMES && Array.isArray(fileContent)) {
+              console.log(`📋 ADO: Processed as themes file with ${fileContent.length} themes`);
               return {
                 path,
                 type: 'themes',
@@ -279,6 +383,7 @@ export class ADOTokenStorage extends GitTokenStorage {
 
             if (!Array.isArray(fileContent)) {
               if (name === SystemFilenames.METADATA) {
+                console.log(`📊 ADO: Processed as metadata file`);
                 return {
                   path,
                   type: 'metadata',
@@ -286,6 +391,8 @@ export class ADOTokenStorage extends GitTokenStorage {
                 } as RemoteTokenStorageMetadataFile;
               }
 
+              const tokenCount = Object.keys(fileContent || {}).length;
+              console.log(`🎯 ADO: Processed as token set with ${tokenCount} root keys`);
               return {
                 path,
                 name,
@@ -293,10 +400,15 @@ export class ADOTokenStorage extends GitTokenStorage {
                 data: fileContent,
               } as RemoteTokenStorageSingleTokenSetFile;
             }
+          } else {
+            console.log(`⚠️ ADO: Skipping file ${path} - no content`);
           }
 
           return null;
         }));
+
+        console.log(`📦 ADO: Final result - ${processedFiles.length} files processed successfully`);
+        return processedFiles;
       }
 
       const singleItem = await this.getItem();
@@ -305,29 +417,34 @@ export class ADOTokenStorage extends GitTokenStorage {
       if (singleItemValidationResult.success) {
         const { $themes = [], $metadata, ...data } = singleItemValidationResult.data;
 
-        return [
+        const tokenSets = Object.entries(data).filter(([key]) => (
+          !Object.values<string>(SystemFilenames).includes(key)
+        )) as [string, AnyTokenSet<false>][];
+
+        const result: RemoteTokenStorageFile[] = [
           {
             type: 'themes',
             path: this.path,
             data: $themes,
-          },
+          } as RemoteTokenStorageThemesFile,
           ...($metadata ? [
             {
               type: 'metadata' as const,
               path: this.path,
               data: $metadata,
-            },
+            } as RemoteTokenStorageMetadataFile,
           ] : []),
-          ...(Object.entries(data).filter(([key]) => (
-            !Object.values<string>(SystemFilenames).includes(key)
-          )) as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile>(([name, tokenSet]) => ({
+          ...tokenSets.map<RemoteTokenStorageFile>(([name, tokenSet]) => ({
             name,
             type: 'tokenSet',
             path: this.path,
             data: !Array.isArray(tokenSet) ? tokenSet : {},
-          })),
+          } as RemoteTokenStorageSingleTokenSetFile)),
         ];
+
+        return result;
       }
+
       if (singleItem.errorCode === 0) {
         return [];
       }

@@ -96,18 +96,34 @@ export abstract class RemoteTokenStorage<
     // start by reading the files from the remote source
     // it is up to the remote storage implementation to split it up into "File" objects
     const files = await this.read();
+
     // successfully fetch data
     if (Array.isArray(files)) {
       if (files.length === 0) {
         return null;
       }
+
       files.forEach((file) => {
         if (file.type === 'themes') {
           data.themes = [...data.themes, ...file.data];
         } else if (file.type === 'tokenSet') {
+          // Debug logging for problematic token sets
+          const problematicSets = ['tce/fosse-park/components/image-text', 'tce/the-gate/components/features-accordion'];
+          if (problematicSets.includes(file.name)) {
+            console.log(`🔍 PARSING REMOTE TOKEN SET: ${file.name}`);
+            console.log(`   Raw file data:`, file.data);
+          }
+
+          const parsedTokens = parseTokenValues({ [file.name]: file.data });
+
+          if (problematicSets.includes(file.name)) {
+            console.log(`   Parsed tokens:`, parsedTokens);
+            console.log(`   Token names:`, parsedTokens[file.name]?.map(t => t.name) || []);
+          }
+
           data.tokens = {
             ...data.tokens,
-            ...parseTokenValues({ [file.name]: file.data }),
+            ...parsedTokens,
           };
         } else if (file.type === 'metadata') {
           data.metadata = {
@@ -116,6 +132,7 @@ export abstract class RemoteTokenStorage<
           };
         }
       });
+
       return {
         status: 'success',
         ...data,
