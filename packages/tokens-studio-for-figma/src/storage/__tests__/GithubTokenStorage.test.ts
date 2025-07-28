@@ -888,9 +888,6 @@ describe('GithubTokenStorage', () => {
   });
 
   it('should be able to write a multi file structure with optimized approach (no remote fetch)', async () => {
-    // With the new optimization, writeChangeset no longer fetches remote content
-    // It directly pushes the provided changeset without comparison
-
     mockCreateOrUpdateFiles.mockImplementationOnce(() => (
       Promise.resolve({
         data: {
@@ -965,7 +962,6 @@ describe('GithubTokenStorage', () => {
       storeTokenIdInJsonEditor: false,
     });
 
-    // With optimization, no remote fetching occurs, files are pushed directly
     expect(mockCreateOrUpdateFiles).toBeCalledWith({
       branch: 'main',
       owner: 'six7',
@@ -1012,7 +1008,6 @@ describe('GithubTokenStorage', () => {
       ],
     });
 
-    // Verify that remote content fetching methods are NOT called
     expect(mockGetContent).not.toHaveBeenCalled();
     expect(mockCreateTree).not.toHaveBeenCalled();
     expect(mockGetTree).not.toHaveBeenCalled();

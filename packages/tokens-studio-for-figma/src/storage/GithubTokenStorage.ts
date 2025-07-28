@@ -321,9 +321,6 @@ export class GithubTokenStorage extends GitTokenStorage {
     return this.writeOptimized(filteredFiles, saveOptions, filesToDelete);
   }
 
-  /**
-   * Optimized write method that handles both file updates and deletions
-   */
   private async writeOptimized(files: RemoteTokenStorageFile<GitStorageSaveOptions>[], saveOptions: GitStorageSaveOption, filesToDelete: string[]): Promise<boolean> {
     const branches = await this.fetchBranches();
     if (!branches.length) return false;
@@ -343,8 +340,6 @@ export class GithubTokenStorage extends GitTokenStorage {
   }
 
   public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch?: boolean): Promise<boolean> {
-    // Always use optimized approach - skip expensive remote fetching and comparison
-    // Push the changeset directly without remote comparison
     return await this.createOrUpdate(changeset, message, branch, shouldCreateBranch, [], true);
   }
 
