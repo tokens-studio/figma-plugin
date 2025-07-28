@@ -3,6 +3,7 @@
   "cancel": "Cancelar",
   "pullTokens": "Tirar fichas",
   "pullFrom": "Extraer de {{provider}}",
+  "pullConfirmDescription": "Sus tokens pueden ser diferentes de los almacenados en {{provider}}, ¿desea extraerlos ahora?",
   "pushTo": "Empuje a __LUGAR__",
   "goTo": "Ir a __MARCADOR__",
   "thisWillPushYourLocalChangesToTheBranch": "Esto impulsará sus cambios locales a la rama:",

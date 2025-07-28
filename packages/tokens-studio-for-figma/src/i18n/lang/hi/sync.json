@@ -3,6 +3,7 @@
   "cancel": "रद्द करना",
   "pullTokens": "टोकन खींचें",
   "pullFrom": "{{provider}} से खींचें",
+  "pullConfirmDescription": "आपके टोकन {{provider}} में संग्रहीत टोकन से भिन्न हो सकते हैं, क्या आप इन्हें अभी खींचना चाहते हैं?",
   "pushTo": "{{provider}} पर पुश करें",
   "goTo": "__प्लेसहोल्डर__ पर जाएँ",
   "thisWillPushYourLocalChangesToTheBranch": "यह आपके स्थानीय परिवर्तनों को शाखा में भेज देगा:",

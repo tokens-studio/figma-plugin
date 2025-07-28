@@ -88,6 +88,7 @@ export interface TokenState {
   compressedThemes: string;
   tokensSize: number;
   themesSize: number;
+  renamedCollections: [string, string][] | null;
 }
 
 export const tokenState = createModel<RootModel>()({
@@ -132,6 +133,7 @@ export const tokenState = createModel<RootModel>()({
     compressedThemes: '',
     tokensSize: 0,
     themesSize: 0,
+    renamedCollections: null,
   } as unknown as TokenState,
   reducers: {
     setTokensSize: (state, size: number) => ({
@@ -168,10 +170,21 @@ export const tokenState = createModel<RootModel>()({
       ...state,
       usedTokenSet: data,
     }),
-    setThemes: (state, data: ThemeObjectsList) => ({
-      ...state,
-      themes: [...data],
-    }),
+    setThemes: (state, data: ThemeObjectsList) => {
+      const { newThemes = [], updatedThemes = [] } = state.importedThemes || { newThemes: [], updatedThemes: [] };
+
+      return {
+        ...state,
+        themes: [
+          ...(newThemes.length === 0 && updatedThemes.length === 0 ? data : []),
+          ...state.themes.map((existingTheme) => {
+            const updateTheme = updatedThemes.find((importedTheme) => importedTheme.$figmaCollectionId === existingTheme.$figmaCollectionId && importedTheme.$figmaModeId === existingTheme.$figmaModeId);
+            return updateTheme ? { ...existingTheme, ...updateTheme } : existingTheme;
+          }),
+          ...newThemes,
+        ],
+      };
+    },
     setNewTokenData: (state, data: TokenData['synced_data']) => ({
       ...state,
       usedTokenSet: data.usedTokenSets || state.usedTokenSet,
@@ -217,6 +230,14 @@ export const tokenState = createModel<RootModel>()({
     setTokenSetMetadata: (state, data: TokenState['tokenSetMetadata']) => ({
       ...state,
       tokenSetMetadata: data,
+    }),
+    replaceThemes: (state, themes: ThemeObjectsList) => ({
+      ...state,
+      themes,
+    }),
+    setRenamedCollections: (state, renamedCollections: [string, string][] | null) => ({
+      ...state,
+      renamedCollections,
     }),
     resetImportedTokens: (state) => ({
       ...state,
@@ -651,12 +672,21 @@ export const tokenState = createModel<RootModel>()({
       const updatedThemes: ThemeObjectsList = [];
 
       themes.forEach((theme) => {
-        const existingTheme = state.themes.find((t) => t.group === theme.group && t.name === theme.name);
+        // Use figmaCollectionId and figmaModeId to identify themes, not just figmaCollectionId
+        const existingTheme = state.themes.find((t) => t.$figmaCollectionId === theme.$figmaCollectionId
+          && t.$figmaModeId === theme.$figmaModeId);
 
         if (existingTheme) {
-          if (!isEqual(existingTheme.selectedTokenSets, theme.selectedTokenSets)) {
+          // Check if anything has changed that requires an update
+          const needsUpdate = !isEqual(existingTheme.selectedTokenSets, theme.selectedTokenSets)
+                              || !isEqual(existingTheme.name, theme.name)
+                              || !isEqual(existingTheme.group, theme.group);
+
+          if (needsUpdate) {
             updatedThemes.push({
-              ...theme,
+              ...existingTheme, // Keep existing properties
+              ...theme, // Apply updates
+              // Ensure we preserve the existing selectedTokenSets and add new ones
               selectedTokenSets: {
                 ...existingTheme.selectedTokenSets,
                 ...theme.selectedTokenSets,
@@ -975,6 +1005,106 @@ export const tokenState = createModel<RootModel>()({
             action: 'UPDATE_TOKEN_SET',
             data: { raw: rawSet, name: set },
           });
+        }
+      }
+    },
+    handleRenamedCollections(renamedCollections: [string, string][], rootState) {
+      // Create a copy of the current state to accumulate all changes
+      const updatedUsedTokenSet = { ...rootState.tokenState.usedTokenSet };
+      let updatedActiveTokenSet = rootState.tokenState.activeTokenSet;
+      const updatedTokens = { ...rootState.tokenState.tokens };
+      const updatedThemes = [...rootState.tokenState.themes];
+
+      const originalTokenSetOrder = Object.keys(rootState.tokenState.tokens);
+
+      for (const [oldName, newName] of renamedCollections) {
+        if (oldName in rootState.tokenState.tokens) {
+          if (!(newName in updatedTokens)) {
+            updatedTokens[newName] = [...rootState.tokenState.tokens[oldName]];
+          }
+
+          delete updatedTokens[oldName];
+        }
+      }
+
+      const orderedTokens: typeof updatedTokens = {};
+      for (const tokenSetName of originalTokenSetOrder) {
+        // Check if this token set was renamed
+        const renamedTo = renamedCollections.find(([oldName]) => oldName === tokenSetName)?.[1];
+
+        if (renamedTo && renamedTo in updatedTokens) {
+          // Use the new name but preserve the position
+          orderedTokens[renamedTo] = updatedTokens[renamedTo];
+        } else if (tokenSetName in updatedTokens) {
+          orderedTokens[tokenSetName] = updatedTokens[tokenSetName];
+        }
+      }
+
+      // Add any new token sets that weren't in the original order (shouldn't happen in rename scenario, but safety check)
+      for (const [tokenSetName, tokens] of Object.entries(updatedTokens)) {
+        if (!(tokenSetName in orderedTokens)) {
+          orderedTokens[tokenSetName] = tokens;
+        }
+      }
+
+      Object.keys(updatedTokens).forEach((key) => delete updatedTokens[key]);
+      Object.assign(updatedTokens, orderedTokens);
+
+      for (const [oldName, newName] of renamedCollections) {
+        // Update usedTokenSet if needed
+        if (oldName in updatedUsedTokenSet) {
+          // If the status wasn't already copied, copy it
+          if (!(newName in updatedUsedTokenSet)) {
+            updatedUsedTokenSet[newName] = updatedUsedTokenSet[oldName];
+          }
+
+          delete updatedUsedTokenSet[oldName];
+        }
+
+        if (updatedActiveTokenSet === oldName) {
+          updatedActiveTokenSet = newName;
+        }
+
+        // Remove old token set references from themes when token sets are deleted
+        for (let i = 0; i < updatedThemes.length; i += 1) {
+          const theme = updatedThemes[i];
+          if (theme.selectedTokenSets && oldName in theme.selectedTokenSets) {
+            updatedThemes[i] = {
+              ...theme,
+              selectedTokenSets: {
+                ...theme.selectedTokenSets,
+              },
+            };
+            // Remove the old token set reference since the token set is being deleted
+            delete updatedThemes[i].selectedTokenSets[oldName];
+          }
+        }
+      }
+
+      dispatch.tokenState.setTokens(updatedTokens);
+      dispatch.tokenState.setUsedTokenSet(updatedUsedTokenSet);
+      dispatch.tokenState.replaceThemes(updatedThemes);
+      if (updatedActiveTokenSet !== rootState.tokenState.activeTokenSet) {
+        dispatch.tokenState.setActiveTokenSet(updatedActiveTokenSet);
+      }
+
+      // Update the document to reflect the changes
+      dispatch.tokenState.updateDocument({
+        shouldUpdateNodes: false,
+        updateRemote: true,
+      });
+
+      // If using Tokens Studio storage, update remote data
+      if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO) {
+        for (const [oldName, newName] of renamedCollections) {
+          if (oldName in rootState.tokenState.tokens
+              || Object.keys(updatedTokens).some((key) => key === newName)) {
+            updateTokenSetInTokensStudio({
+              rootState,
+              data: { oldName, newName },
+              onTokenSetUpdated: dispatch.tokenState.setTokenSetMetadata,
+            });
+          }
         }
       }
     },
