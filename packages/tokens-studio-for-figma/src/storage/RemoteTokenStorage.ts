@@ -107,23 +107,9 @@ export abstract class RemoteTokenStorage<
         if (file.type === 'themes') {
           data.themes = [...data.themes, ...file.data];
         } else if (file.type === 'tokenSet') {
-          // Debug logging for problematic token sets
-          const problematicSets = ['tce/fosse-park/components/image-text', 'tce/the-gate/components/features-accordion'];
-          if (problematicSets.includes(file.name)) {
-            console.log(`🔍 PARSING REMOTE TOKEN SET: ${file.name}`);
-            console.log(`   Raw file data:`, file.data);
-          }
-
-          const parsedTokens = parseTokenValues({ [file.name]: file.data });
-
-          if (problematicSets.includes(file.name)) {
-            console.log(`   Parsed tokens:`, parsedTokens);
-            console.log(`   Token names:`, parsedTokens[file.name]?.map(t => t.name) || []);
-          }
-
           data.tokens = {
             ...data.tokens,
-            ...parsedTokens,
+            ...parseTokenValues({ [file.name]: file.data }),
           };
         } else if (file.type === 'metadata') {
           data.metadata = {
