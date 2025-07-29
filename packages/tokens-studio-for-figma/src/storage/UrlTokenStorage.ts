@@ -85,9 +85,7 @@ export class UrlTokenStorage extends RemoteTokenStorage<unknown, SaveOption> {
         }
 
         // Provide detailed validation error information
-        const errorDetails = validationResult.error.issues.map(issue =>
-          `${issue.path.join('.')}: ${issue.message}`
-        ).join('; ');
+        const errorDetails = validationResult.error.issues.map((issue) => `${issue.path.join('.')}: ${issue.message}`).join('; ');
         return {
           errorMessage: `Token validation failed: ${errorDetails}`,
         };

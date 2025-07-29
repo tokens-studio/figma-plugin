@@ -9,7 +9,6 @@ import { GitMultiFileObject, GitSingleFileObject, GitTokenStorage } from './GitT
 import { AnyTokenSet } from '@/types/tokens';
 import { ThemeObjectsList } from '@/types';
 import { SystemFilenames } from '@/constants/SystemFilenames';
-import { ErrorMessages } from '@/constants/ErrorMessages';
 
 type CreatedOrUpdatedFileType = {
   owner: string;
@@ -256,28 +255,28 @@ export class BitbucketTokenStorage extends GitTokenStorage {
           try {
             const parsed = JSON.parse(fileContent) as GitMultiFileObject;
 
-          if (name === SystemFilenames.THEMES) {
+            if (name === SystemFilenames.THEMES) {
+              return {
+                path: filePath,
+                type: 'themes',
+                data: parsed as ThemeObjectsList,
+              };
+            }
+
+            if (name === SystemFilenames.METADATA) {
+              return {
+                path: filePath,
+                type: 'metadata',
+                data: parsed as RemoteTokenStorageMetadata,
+              };
+            }
+
             return {
               path: filePath,
-              type: 'themes',
-              data: parsed as ThemeObjectsList,
+              name,
+              type: 'tokenSet',
+              data: parsed as AnyTokenSet<false>,
             };
-          }
-
-          if (name === SystemFilenames.METADATA) {
-            return {
-              path: filePath,
-              type: 'metadata',
-              data: parsed as RemoteTokenStorageMetadata,
-            };
-          }
-
-          return {
-            path: filePath,
-            name,
-            type: 'tokenSet',
-            data: parsed as AnyTokenSet<false>,
-          };
           } catch (parseError) {
             console.error(`Failed to parse JSON from Bitbucket file ${path}:`, parseError);
             // Return a placeholder that will be filtered out

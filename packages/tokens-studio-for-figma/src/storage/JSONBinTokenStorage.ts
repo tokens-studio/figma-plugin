@@ -7,7 +7,6 @@ import {
 } from './RemoteTokenStorage';
 import { singleFileSchema } from './schemas/singleFileSchema';
 import { SystemFilenames } from '@/constants/SystemFilenames';
-import { ErrorMessages } from '@/constants/ErrorMessages';
 import { SaveOption } from './FileTokenStorage';
 
 type JsonBinMetadata = Partial<{
@@ -133,9 +132,7 @@ export class JSONBinTokenStorage extends RemoteTokenStorage<JsonBinMetadata, Sav
           return this.convertJsonBinDataToFiles(jsonbinData);
         }
         // Provide detailed validation error information
-        const errorDetails = validationResult.error.issues.map(issue =>
-          `${issue.path.join('.')}: ${issue.message}`
-        ).join('; ');
+        const errorDetails = validationResult.error.issues.map((issue) => `${issue.path.join('.')}: ${issue.message}`).join('; ');
         return {
           errorMessage: `Token validation failed: ${errorDetails}`,
         };

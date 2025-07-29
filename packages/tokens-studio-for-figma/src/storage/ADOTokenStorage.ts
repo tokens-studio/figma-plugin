@@ -340,9 +340,7 @@ export class ADOTokenStorage extends GitTokenStorage {
       }
 
       // Provide detailed validation error information
-      const errorDetails = singleItemValidationResult.error.issues.map(issue =>
-        `${issue.path.join('.')}: ${issue.message}`
-      ).join('; ');
+      const errorDetails = singleItemValidationResult.error.issues.map((issue) => `${issue.path.join('.')}: ${issue.message}`).join('; ');
       return {
         errorMessage: `Token validation failed: ${errorDetails}`,
       };

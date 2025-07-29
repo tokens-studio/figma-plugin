@@ -4,7 +4,6 @@ import {
 } from './RemoteTokenStorage';
 import IsJSONString from '@/utils/isJSONString';
 import { complexSingleFileSchema, multiFileSchema } from './schemas';
-import { ErrorMessages } from '@/constants/ErrorMessages';
 import { SystemFilenames } from '@/constants/SystemFilenames';
 
 type StorageFlags = {
@@ -123,9 +122,7 @@ export class FileTokenStorage extends RemoteTokenStorage<unknown, SaveOption> {
                   ]);
                 } else {
                   // Provide detailed validation error information
-                  const errorDetails = validationResult.error.issues.map(issue =>
-                    `${issue.path.join('.')}: ${issue.message}`
-                  ).join('; ');
+                  const errorDetails = validationResult.error.issues.map((issue) => `${issue.path.join('.')}: ${issue.message}`).join('; ');
                   resolve({
                     errorMessage: `Token validation failed: ${errorDetails}`,
                   });
