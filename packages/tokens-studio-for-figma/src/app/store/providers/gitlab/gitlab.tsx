@@ -181,9 +181,10 @@ export function useGitLab() {
       }
     } catch (e) {
       console.log('Error', e);
+      const errorMessage = e instanceof Error ? e.message : String(e);
       return {
         status: 'failure',
-        errorMessage: ErrorMessages.GITLAB_CREDENTIAL_ERROR,
+        errorMessage: `Error fetching from GitLab: ${errorMessage}`,
       };
     }
     return null;
@@ -244,11 +245,13 @@ export function useGitLab() {
       }
       return await pushTokensToGitLab(context);
     } catch (err) {
-      notifyToUI(ErrorMessages.GITLAB_CREDENTIAL_ERROR, { error: true });
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      const displayMessage = `Error syncing with GitLab: ${errorMessage}`;
+      notifyToUI(displayMessage, { error: true });
       console.log('Error', err);
       return {
         status: 'failure',
-        errorMessage: ErrorMessages.GITLAB_CREDENTIAL_ERROR,
+        errorMessage: displayMessage,
       };
     }
   }, [

@@ -171,9 +171,10 @@ export function useGitHub() {
         };
       }
     } catch (e) {
+      const errorMessage = e instanceof Error ? e.message : String(e);
       return {
         status: 'failure',
-        errorMessage: ErrorMessages.GITHUB_CREDENTIAL_ERROR,
+        errorMessage: `Error fetching from GitHub: ${errorMessage}`,
       };
     }
     return null;
@@ -238,11 +239,13 @@ export function useGitHub() {
       }
       return await pushTokensToGitHub(context);
     } catch (e) {
-      notifyToUI(ErrorMessages.GITHUB_CREDENTIAL_ERROR, { error: true });
+      const errorMessage = e instanceof Error ? e.message : String(e);
+      const displayMessage = `Error syncing with GitHub: ${errorMessage}`;
+      notifyToUI(displayMessage, { error: true });
       console.log('Error', e);
       return {
         status: 'failure',
-        errorMessage: ErrorMessages.GITHUB_CREDENTIAL_ERROR,
+        errorMessage: displayMessage,
       };
     }
   }, [

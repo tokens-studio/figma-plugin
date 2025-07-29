@@ -8,7 +8,6 @@ import {
   GitMultiFileObject, GitSingleFileObject, GitTokenStorage,
 } from './GitTokenStorage';
 import { SystemFilenames } from '@/constants/SystemFilenames';
-import { ErrorMessages } from '@/constants/ErrorMessages';
 import { joinPath } from '@/utils/string';
 
 type ExtendedOctokitClient = Omit<Octokit, 'repos'> & {
@@ -237,32 +236,38 @@ export class GithubTokenStorage extends GitTokenStorage {
       } else if (response.data) {
         const data = response.data as unknown as string;
         if (IsJSONString(data)) {
-          const parsed = JSON.parse(data) as GitSingleFileObject;
-          return [
-            {
-              type: 'themes',
-              path: `${this.path}/${SystemFilenames.THEMES}.json`,
-              data: parsed.$themes ?? [],
-            },
-            ...(parsed.$metadata ? [
+          try {
+            const parsed = JSON.parse(data) as GitSingleFileObject;
+            return [
               {
-                type: 'metadata' as const,
-                path: this.path,
-                data: parsed.$metadata,
+                type: 'themes',
+                path: `${this.path}/${SystemFilenames.THEMES}.json`,
+                data: parsed.$themes ?? [],
               },
-            ] : []),
-            ...(Object.entries(parsed).filter(([key]) => (
-              !Object.values<string>(SystemFilenames).includes(key)
-            )) as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile>(([name, tokenSet]) => ({
-              name,
-              type: 'tokenSet',
-              path: `${this.path}/${name}.json`,
-              data: tokenSet,
-            })),
-          ];
+              ...(parsed.$metadata ? [
+                {
+                  type: 'metadata' as const,
+                  path: this.path,
+                  data: parsed.$metadata,
+                },
+              ] : []),
+              ...(Object.entries(parsed).filter(([key]) => (
+                !Object.values<string>(SystemFilenames).includes(key)
+              )) as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile>(([name, tokenSet]) => ({
+                name,
+                type: 'tokenSet',
+                path: `${this.path}/${name}.json`,
+                data: tokenSet,
+              })),
+            ];
+          } catch (parseError) {
+            return {
+              errorMessage: `Failed to parse JSON from GitHub: ${parseError instanceof Error ? parseError.message : String(parseError)}`,
+            };
+          }
         }
         return {
-          errorMessage: ErrorMessages.VALIDATION_ERROR,
+          errorMessage: 'File content from GitHub is not valid JSON',
         };
       }
 

@@ -123,17 +123,27 @@ export class JSONBinTokenStorage extends RemoteTokenStorage<JsonBinMetadata, Sav
     }
 
     if (response.ok) {
-      const parsedJsonData = await response.json();
-      const validationResult = await z.object({
-        record: jsonbinSchema,
-      }).safeParseAsync(parsedJsonData);
-      if (validationResult.success) {
-        const jsonbinData = validationResult.data.record as JsonbinData;
-        return this.convertJsonBinDataToFiles(jsonbinData);
+      try {
+        const parsedJsonData = await response.json();
+        const validationResult = await z.object({
+          record: jsonbinSchema,
+        }).safeParseAsync(parsedJsonData);
+        if (validationResult.success) {
+          const jsonbinData = validationResult.data.record as JsonbinData;
+          return this.convertJsonBinDataToFiles(jsonbinData);
+        }
+        // Provide detailed validation error information
+        const errorDetails = validationResult.error.issues.map(issue =>
+          `${issue.path.join('.')}: ${issue.message}`
+        ).join('; ');
+        return {
+          errorMessage: `Token validation failed: ${errorDetails}`,
+        };
+      } catch (parseError) {
+        return {
+          errorMessage: `Failed to parse JSON response: ${parseError instanceof Error ? parseError.message : String(parseError)}`,
+        };
       }
-      return {
-        errorMessage: ErrorMessages.VALIDATION_ERROR,
-      };
     }
     return [];
   }

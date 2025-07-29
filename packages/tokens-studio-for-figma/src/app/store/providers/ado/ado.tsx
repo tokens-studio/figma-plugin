@@ -164,9 +164,10 @@ export const useADO = () => {
       }
     } catch (e) {
       console.log('Error', e);
+      const errorMessage = e instanceof Error ? e.message : String(e);
       return {
         status: 'failure',
-        errorMessage: ErrorMessages.ADO_CREDENTIAL_ERROR,
+        errorMessage: `Error fetching from ADO: ${errorMessage}`,
       };
     }
     return null;
@@ -227,11 +228,13 @@ export const useADO = () => {
       }
       return await pushTokensToADO(context);
     } catch (e) {
-      notifyToUI(ErrorMessages.ADO_CREDENTIAL_ERROR, { error: true });
+      const errorMessage = e instanceof Error ? e.message : String(e);
+      const displayMessage = `Error syncing with ADO: ${errorMessage}`;
+      notifyToUI(displayMessage, { error: true });
       console.log('Error', e);
       return {
         status: 'failure',
-        errorMessage: ErrorMessages.ADO_CREDENTIAL_ERROR,
+        errorMessage: displayMessage,
       };
     }
   }, [

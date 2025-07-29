@@ -76,3 +76,4 @@ export * from './importedThemesSelector';
 export * from './renamedCollectionsSelector';
 export * from './tokensSizeSelector';
 export * from './themesSizeSelector';
+export * from './lastSyncErrorSelector';

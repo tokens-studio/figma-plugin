@@ -96,33 +96,48 @@ export class FileTokenStorage extends RemoteTokenStorage<unknown, SaveOption> {
             const result = reader.result as string;
 
             if (result && IsJSONString(result)) {
-              const parsedJsonData = JSON.parse(result);
-              const validationResult = await complexSingleFileSchema.safeParseAsync(parsedJsonData);
-              if (validationResult.success) {
-                const { $themes = [], $metadata, ...data } = validationResult.data;
-                resolve([
-                  {
-                    type: 'themes',
-                    path: this.files[0].name,
-                    data: Array.isArray($themes) ? $themes : [],
-                  },
-                  ...($metadata ? [
+              try {
+                const parsedJsonData = JSON.parse(result);
+                const validationResult = await complexSingleFileSchema.safeParseAsync(parsedJsonData);
+                if (validationResult.success) {
+                  const { $themes = [], $metadata, ...data } = validationResult.data;
+                  resolve([
                     {
-                      type: 'metadata' as const,
+                      type: 'themes',
                       path: this.files[0].name,
-                      data: $metadata,
+                      data: Array.isArray($themes) ? $themes : [],
                     },
-                  ] : []),
-                  ...Object.entries(data).map<RemoteTokenStorageFile>(([name, tokenSet]) => ({
-                    name,
-                    type: 'tokenSet',
-                    path: this.files[0].name,
-                    data: !Array.isArray(tokenSet) ? tokenSet : {},
-                  })),
-                ]);
+                    ...($metadata ? [
+                      {
+                        type: 'metadata' as const,
+                        path: this.files[0].name,
+                        data: $metadata,
+                      },
+                    ] : []),
+                    ...Object.entries(data).map<RemoteTokenStorageFile>(([name, tokenSet]) => ({
+                      name,
+                      type: 'tokenSet',
+                      path: this.files[0].name,
+                      data: !Array.isArray(tokenSet) ? tokenSet : {},
+                    })),
+                  ]);
+                } else {
+                  // Provide detailed validation error information
+                  const errorDetails = validationResult.error.issues.map(issue =>
+                    `${issue.path.join('.')}: ${issue.message}`
+                  ).join('; ');
+                  resolve({
+                    errorMessage: `Token validation failed: ${errorDetails}`,
+                  });
+                }
+              } catch (parseError) {
+                resolve({
+                  errorMessage: `Failed to parse JSON: ${parseError instanceof Error ? parseError.message : String(parseError)}`,
+                });
               }
+            } else {
               resolve({
-                errorMessage: ErrorMessages.VALIDATION_ERROR,
+                errorMessage: 'File content is not valid JSON',
               });
             }
             resolve([]);

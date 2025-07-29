@@ -175,9 +175,10 @@ export function useBitbucket() {
         }
       } catch (e) {
         console.log('Error', e);
+        const errorMessage = e instanceof Error ? e.message : String(e);
         return {
           status: 'failure',
-          errorMessage: ErrorMessages.BITBUCKET_CREDENTIAL_ERROR,
+          errorMessage: `Error fetching from Bitbucket: ${errorMessage}`,
         };
       }
       return null;
@@ -239,11 +240,13 @@ export function useBitbucket() {
         }
         return await pushTokensToBitbucket(context);
       } catch (e) {
-        notifyToUI(ErrorMessages.BITBUCKET_CREDENTIAL_ERROR, { error: true });
+        const errorMessage = e instanceof Error ? e.message : String(e);
+        const displayMessage = `Error syncing with Bitbucket: ${errorMessage}`;
+        notifyToUI(displayMessage, { error: true });
         console.log('Error', e);
         return {
           status: 'failure',
-          errorMessage: ErrorMessages.BITBUCKET_CREDENTIAL_ERROR,
+          errorMessage: displayMessage,
         };
       }
     },

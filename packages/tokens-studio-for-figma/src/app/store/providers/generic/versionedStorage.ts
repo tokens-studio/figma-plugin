@@ -93,19 +93,21 @@ export async function updateGenericVersionedTokens({
     }
 
     // eslint-disable-next-line no-console
-    notifyToUI('Error updating Generic Storage, check console (F12) ', { error: true });
+    notifyToUI('Error updating Generic Storage: Unable to save tokens', { error: true });
     console.error('Error updating Generic storage');
     return {
       status: 'failure',
-      errorMessage: ErrorMessages.REMOTE_CREDENTIAL_ERROR,
+      errorMessage: 'Error updating Generic Storage: Unable to save tokens',
     };
   } catch (e) {
     // eslint-disable-next-line no-console
-    notifyToUI('Error updating Generic Storage, check console (F12) ', { error: true });
+    const errorMessage = e instanceof Error ? e.message : String(e);
+    const displayMessage = `Error updating Generic Storage: ${errorMessage}`;
+    notifyToUI(displayMessage, { error: true });
     console.error('Error updating Generic Storage', e);
     return {
       status: 'failure',
-      errorMessage: String(e),
+      errorMessage: displayMessage,
     };
   }
 }

@@ -252,7 +252,9 @@ export class BitbucketTokenStorage extends GitTokenStorage {
           const filePath = path.startsWith(this.path) ? path : `${this.path}/${path}`;
           let name = filePath.substring(this.path.length).replace(/^\/+/, '');
           name = name.replace('.json', '');
-          const parsed = JSON.parse(fileContent) as GitMultiFileObject;
+
+          try {
+            const parsed = JSON.parse(fileContent) as GitMultiFileObject;
 
           if (name === SystemFilenames.THEMES) {
             return {
@@ -276,11 +278,16 @@ export class BitbucketTokenStorage extends GitTokenStorage {
             type: 'tokenSet',
             data: parsed as AnyTokenSet<false>,
           };
-        });
+          } catch (parseError) {
+            console.error(`Failed to parse JSON from Bitbucket file ${path}:`, parseError);
+            // Return a placeholder that will be filtered out
+            return null;
+          }
+        }).filter(Boolean);
       }
 
       return {
-        errorMessage: ErrorMessages.VALIDATION_ERROR,
+        errorMessage: 'No valid JSON files found in Bitbucket repository',
       };
     } catch (e) {
       console.error('Error', e);

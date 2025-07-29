@@ -254,10 +254,12 @@ export function useTokensStudio() {
         };
       } catch (e) {
         console.error('error syncing with Tokens Studio', e);
-        notifyToUI('Error syncing with Tokens Studio, check credentials', { error: true });
+        const errorMessage = e instanceof Error ? e.message : String(e);
+        const displayMessage = `Error syncing with Tokens Studio: ${errorMessage}`;
+        notifyToUI(displayMessage, { error: true });
         return {
           status: 'failure',
-          errorMessage: String(e),
+          errorMessage: displayMessage,
         };
       }
     },

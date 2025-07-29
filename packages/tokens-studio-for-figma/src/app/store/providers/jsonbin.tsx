@@ -42,11 +42,12 @@ export async function updateJSONBinTokens({
     if (oldUpdatedAt) {
       const remoteTokens = await storage.retrieve();
       if (remoteTokens?.status === 'failure') {
-        notifyToUI('Error updating JSONBin, check console (F12)', { error: true });
+        const displayMessage = `Error updating JSONBin: ${remoteTokens?.errorMessage || 'Unknown error'}`;
+        notifyToUI(displayMessage, { error: true });
         console.log('Error updating jsonbin', remoteTokens?.errorMessage);
         return {
           status: 'failure',
-          errorMessage: remoteTokens?.errorMessage,
+          errorMessage: displayMessage,
         };
       }
 
@@ -114,7 +115,8 @@ export function useJSONbin() {
         return result.metadata.id;
       }
     } catch (e) {
-      notifyToUI('Something went wrong. See console for details', { error: true });
+      const errorMessage = e instanceof Error ? e.message : String(e);
+      notifyToUI(`Error updating JSONBin: ${errorMessage}`, { error: true });
       console.error(e);
     }
     return null;
@@ -164,11 +166,13 @@ export function useJSONbin() {
       notifyToUI('No tokens stored on remote', { error: true });
       return null;
     } catch (e) {
-      notifyToUI(ErrorMessages.JSONBIN_CREDENTIAL_ERROR, { error: true });
+      const errorMessage = e instanceof Error ? e.message : String(e);
+      const displayMessage = `Error fetching from JSONbin: ${errorMessage}`;
+      notifyToUI(displayMessage, { error: true });
       console.log('Error:', e);
       return {
         status: 'failure',
-        errorMessage: ErrorMessages.JSONBIN_CREDENTIAL_ERROR,
+        errorMessage: displayMessage,
       };
     }
   }, [dispatch]);

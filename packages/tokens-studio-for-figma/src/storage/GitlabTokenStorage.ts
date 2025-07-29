@@ -89,6 +89,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
       );
       return !!response.name;
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error(err);
       return false;
     }
@@ -106,6 +107,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
       });
       return Number(projectPermission.access_level.toString()) >= GitLabAccessLevel.Developer;
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.error(e);
     }
     return false;
@@ -145,6 +147,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
           gitkeepDeletions,
         );
       } catch (e) {
+        // eslint-disable-next-line no-console
         console.error('Failed to delete .gitkeep files:', e);
       }
     }
@@ -174,31 +177,37 @@ export class GitlabTokenStorage extends GitTokenStorage {
         return compact(jsonFileContents.map<RemoteTokenStorageFile | null>((fileContent, index) => {
           const { path } = jsonFiles[index];
           if (typeof fileContent === 'string' && IsJSONString(fileContent)) {
-            const name = path.replace('.json', '').replace(this.path, '').replace(/^\//, '').replace(/\/$/, '');
-            const parsed = JSON.parse(fileContent) as GitMultiFileObject;
+            try {
+              const name = path.replace('.json', '').replace(this.path, '').replace(/^\//, '').replace(/\/$/, '');
+              const parsed = JSON.parse(fileContent) as GitMultiFileObject;
 
-            if (name === SystemFilenames.THEMES) {
+              if (name === SystemFilenames.THEMES) {
+                return {
+                  path,
+                  type: 'themes',
+                  data: parsed as ThemeObjectsList,
+                };
+              }
+
+              if (name === SystemFilenames.METADATA) {
+                return {
+                  path,
+                  type: 'metadata',
+                  data: parsed as RemoteTokenStorageMetadata,
+                };
+              }
+
               return {
                 path,
-                type: 'themes',
-                data: parsed as ThemeObjectsList,
+                name,
+                type: 'tokenSet',
+                data: parsed as AnyTokenSet<false>,
               };
+            } catch (parseError) {
+              // eslint-disable-next-line no-console
+              console.error(`Failed to parse JSON from GitLab file ${path}:`, parseError);
+              return null;
             }
-
-            if (name === SystemFilenames.METADATA) {
-              return {
-                path,
-                type: 'metadata',
-                data: parsed as RemoteTokenStorageMetadata,
-              };
-            }
-
-            return {
-              path,
-              name,
-              type: 'tokenSet',
-              data: parsed as AnyTokenSet<false>,
-            };
           }
 
           return null;
@@ -209,34 +218,41 @@ export class GitlabTokenStorage extends GitTokenStorage {
       const stringData = typeof data === 'string' ? data : await data.text();
 
       if (IsJSONString(stringData)) {
-        const parsed = JSON.parse(stringData) as GitSingleFileObject;
-        return [
-          {
-            type: 'themes',
-            path: `${this.path}/${SystemFilenames.THEMES}.json`,
-            data: parsed.$themes ?? [],
-          },
-          ...(parsed.$metadata ? [
+        try {
+          const parsed = JSON.parse(stringData) as GitSingleFileObject;
+          return [
             {
-              type: 'metadata' as const,
-              path: this.path,
-              data: parsed.$metadata,
+              type: 'themes',
+              path: `${this.path}/${SystemFilenames.THEMES}.json`,
+              data: parsed.$themes ?? [],
             },
-          ] : []),
-          ...(Object.entries(parsed).filter(([key]) => (
-            !Object.values<string>(SystemFilenames).includes(key)
-          )) as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile>(([name, tokenSet]) => ({
-            name,
-            type: 'tokenSet',
-            path: `${this.path}/${name}.json`,
-            data: tokenSet,
-          })),
-        ];
+            ...(parsed.$metadata ? [
+              {
+                type: 'metadata' as const,
+                path: this.path,
+                data: parsed.$metadata,
+              },
+            ] : []),
+            ...(Object.entries(parsed).filter(([key]) => (
+              !Object.values<string>(SystemFilenames).includes(key)
+            )) as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile>(([name, tokenSet]) => ({
+              name,
+              type: 'tokenSet',
+              path: `${this.path}/${name}.json`,
+              data: tokenSet,
+            })),
+          ];
+        } catch (parseError) {
+          return {
+            errorMessage: `Failed to parse JSON from GitLab: ${parseError instanceof Error ? parseError.message : String(parseError)}`,
+          };
+        }
       }
       return {
-        errorMessage: ErrorMessages.VALIDATION_ERROR,
+        errorMessage: 'File content from GitLab is not valid JSON',
       };
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error(err);
     }
     return [];
@@ -272,6 +288,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
         );
       }
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.error('Error checking directory:', e);
     }
 
@@ -344,6 +361,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
       const committedDate = new Date(commit.committed_date?.toString() ?? '');
       return committedDate ?? null;
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.error('Error', e);
       return null;
     }

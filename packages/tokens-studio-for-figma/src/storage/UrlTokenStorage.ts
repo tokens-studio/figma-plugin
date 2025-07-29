@@ -63,24 +63,38 @@ export class UrlTokenStorage extends RemoteTokenStorage<unknown, SaveOption> {
     });
 
     if (response.ok) {
-      const parsedJsonData = await response.json();
-      const validationResult = await singleFileSchema.safeParseAsync(parsedJsonData);
-      // @README if this validation passes we can assume it is in a newer format
-      if (validationResult.success) {
-        const urlstorageData = validationResult.data as UrlData;
-        return this.convertUrlDataToFiles(urlstorageData);
-      }
+      try {
+        const parsedJsonData = await response.json();
+        const validationResult = await singleFileSchema.safeParseAsync(parsedJsonData);
+        // @README if this validation passes we can assume it is in a newer format
+        if (validationResult.success) {
+          const urlstorageData = validationResult.data as UrlData;
+          return this.convertUrlDataToFiles(urlstorageData);
+        }
 
-      // @README if not this is an older format where we just have tokens
-      const onlyTokensValidationResult = await complexSingleFileSchema.safeParseAsync(parsedJsonData);
-      if (onlyTokensValidationResult.success) {
-        const urlstorageData = onlyTokensValidationResult.data;
-        const { $themes = [], $metadata = {}, ...values } = urlstorageData;
-        return this.convertUrlDataToFiles({
-          values,
-          $themes,
-          $metadata,
-        });
+        // @README if not this is an older format where we just have tokens
+        const onlyTokensValidationResult = await complexSingleFileSchema.safeParseAsync(parsedJsonData);
+        if (onlyTokensValidationResult.success) {
+          const urlstorageData = onlyTokensValidationResult.data;
+          const { $themes = [], $metadata = {}, ...values } = urlstorageData;
+          return this.convertUrlDataToFiles({
+            values,
+            $themes,
+            $metadata,
+          });
+        }
+
+        // Provide detailed validation error information
+        const errorDetails = validationResult.error.issues.map(issue =>
+          `${issue.path.join('.')}: ${issue.message}`
+        ).join('; ');
+        return {
+          errorMessage: `Token validation failed: ${errorDetails}`,
+        };
+      } catch (parseError) {
+        return {
+          errorMessage: `Failed to parse JSON response: ${parseError instanceof Error ? parseError.message : String(parseError)}`,
+        };
       }
       return {
         errorMessage: ErrorMessages.VALIDATION_ERROR,

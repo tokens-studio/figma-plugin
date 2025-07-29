@@ -257,12 +257,19 @@ export class ADOTokenStorage extends GitTokenStorage {
 
         const jsonFileContents = await Promise.all(
           jsonFiles.map(async ({ path }) => {
-            const res = await this.getItem(path);
-            const validationResult = await multiFileSchema.safeParseAsync(res);
-            if (validationResult.success) {
-              return validationResult.data;
+            try {
+              const res = await this.getItem(path);
+              const validationResult = await multiFileSchema.safeParseAsync(res);
+              if (validationResult.success) {
+                return validationResult.data;
+              }
+              // Log validation errors for debugging
+              console.error(`Validation failed for file ${path}:`, validationResult.error.issues);
+              return null;
+            } catch (error) {
+              console.error(`Error processing file ${path}:`, error);
+              return null;
             }
-            return null;
           }),
         );
         return compact(jsonFileContents.map<RemoteTokenStorageFile | null>((fileContent, index) => {
@@ -331,8 +338,13 @@ export class ADOTokenStorage extends GitTokenStorage {
       if (singleItem.errorCode === 0) {
         return [];
       }
+
+      // Provide detailed validation error information
+      const errorDetails = singleItemValidationResult.error.issues.map(issue =>
+        `${issue.path.join('.')}: ${issue.message}`
+      ).join('; ');
       return {
-        errorMessage: ErrorMessages.VALIDATION_ERROR,
+        errorMessage: `Token validation failed: ${errorDetails}`,
       };
     } catch (e) {
       console.log(e);
