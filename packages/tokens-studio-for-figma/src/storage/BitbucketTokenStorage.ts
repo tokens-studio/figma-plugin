@@ -282,7 +282,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
             // Return a placeholder that will be filtered out
             return null;
           }
-        }).filter(Boolean);
+        }).filter(Boolean) as RemoteTokenStorageFile[];
       }
 
       return {
