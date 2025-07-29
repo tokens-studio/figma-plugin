@@ -78,6 +78,7 @@ export interface UIState {
   showEditForm: boolean;
   tokenFilter: string;
   confirmState: ConfirmProps;
+  lastSyncError: string | null;
   showPushDialog: { state: string | false, overrides?: PushOverrides };
   showPullDialog: string | false;
   showEmptyGroups: boolean;
@@ -153,6 +154,7 @@ export const uiState = createModel<RootModel>()({
     sidebarWidth: 150,
     hasRemoteChange: false,
     selectedExportThemes: [],
+    lastSyncError: null,
   } as unknown as UIState,
   reducers: {
     setShowConvertTokenFormatModal: (state, data: boolean) => ({
@@ -261,6 +263,13 @@ export const uiState = createModel<RootModel>()({
       };
     },
     setActiveTab(state, payload: Tabs) {
+      // Notify plugin about tab change
+      const requiresSelectionValues = payload === Tabs.INSPECTOR;
+      AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.CHANGED_TABS,
+        requiresSelectionValues,
+      });
+
       return {
         ...state,
         activeTab: payload,
@@ -423,9 +432,21 @@ export const uiState = createModel<RootModel>()({
       ...state,
       sidebarWidth: data,
     }),
-    setSelectedExportThemes: (state, data: string[]) => ({
+    setSelectedExportThemes: (state, data: string[]) => {
+      // Notify plugin about selected export themes change
+      AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.SET_SELECTED_EXPORT_THEMES,
+        themes: JSON.stringify(data),
+      });
+
+      return {
+        ...state,
+        selectedExportThemes: data,
+      };
+    },
+    setLastSyncError: (state, data: string | null) => ({
       ...state,
-      selectedExportThemes: data,
+      lastSyncError: data,
     }),
   },
   effects: (dispatch) => ({
@@ -458,24 +479,11 @@ export const uiState = createModel<RootModel>()({
         onboardingExplainerInspect: payload,
       });
     },
-    setActiveTab: (payload: Tabs) => {
-      const requiresSelectionValues = payload === Tabs.INSPECTOR;
 
-      AsyncMessageChannel.ReactInstance.message({
-        type: AsyncMessageTypes.CHANGED_TABS,
-        requiresSelectionValues,
-      });
-    },
     toggleShowEmptyGroups(payload: null | boolean, rootState) {
       AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.SET_SHOW_EMPTY_GROUPS,
         showEmptyGroups: payload == null ? rootState.uiState.showEmptyGroups : payload,
-      });
-    },
-    setSelectedExportThemes: (payload: string[]) => {
-      AsyncMessageChannel.ReactInstance.message({
-        type: AsyncMessageTypes.SET_SELECTED_EXPORT_THEMES,
-        themes: JSON.stringify(payload),
       });
     },
   }),

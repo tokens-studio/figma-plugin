@@ -86,25 +86,43 @@ export function pullTokensFactory(
             }
 
             if (remoteData?.status === 'failure') {
-              // If we have some error reading tokens, we let the user know - e.g. schema validation doesn't pass.
               notifyToUI(remoteData.errorMessage, { error: true });
+              try {
+                sessionStorage.setItem('lastSyncError', remoteData.errorMessage);
+              } catch (e) {
+                // eslint-disable-next-line no-console
+                console.error(e);
+              }
+              dispatch.uiState.setLastSyncError(remoteData.errorMessage);
               dispatch.uiState.setActiveTab(Tabs.START);
             } else {
-              // If we succeeded we can move on to show the tokens screen
+              try {
+                sessionStorage.removeItem('lastSyncError');
+              } catch (e) {
+                // eslint-disable-next-line no-console
+                console.error(e);
+              }
+              dispatch.uiState.setLastSyncError(null);
               dispatch.uiState.setActiveTab(Tabs.TOKENS);
             }
           } else {
             dispatch.uiState.setActiveTab(Tabs.TOKENS);
           }
         } catch (err) {
+          // eslint-disable-next-line no-console
           console.error(err);
           Sentry.captureException(err);
           dispatch.uiState.setActiveTab(Tabs.START);
           dispatch.uiState.completeJob(BackgroundJobs.UI_PULLTOKENS);
-          notifyToUI('Failed to fetch tokens, check your credentials', { error: true });
+
+          const errorMessage = err instanceof Error ? err.message : String(err);
+          const displayMessage = `Failed to fetch tokens: ${errorMessage}`;
+          dispatch.uiState.setLastSyncError(displayMessage);
+          notifyToUI(displayMessage, { error: true });
         }
       } else {
         // no API credentials available for storage type
+        dispatch.uiState.setLastSyncError('No credentials available for this storage provider');
         dispatch.uiState.setActiveTab(Tabs.START);
       }
     } else if (params.localTokenData) {

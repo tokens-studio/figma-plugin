@@ -9,7 +9,7 @@ import TokensStudioLogo from '@/icons/tokensstudio-full.svg';
 import Text from './Text';
 import Callout from './Callout';
 import { Dispatch } from '../store';
-import { apiProvidersSelector, storageTypeSelector } from '@/selectors';
+import { apiProvidersSelector, storageTypeSelector, lastSyncErrorSelector } from '@/selectors';
 import Stack from './Stack';
 import { styled } from '@/stitches.config';
 import { Tabs } from '@/constants/Tabs';
@@ -44,6 +44,7 @@ function StartScreen() {
 
   const storageType = useSelector(storageTypeSelector);
   const apiProviders = useSelector(apiProvidersSelector);
+  const lastSyncError = useSelector(lastSyncErrorSelector);
 
   const onSetEmptyTokens = React.useCallback(() => {
     track('Start with empty set');
@@ -68,6 +69,14 @@ function StartScreen() {
         ...storageType,
         new: true,
       };
+    // Clear any previous error from both Redux state and sessionStorage
+    dispatch.uiState.setLastSyncError(null);
+    try {
+      sessionStorage.removeItem('lastSyncError');
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(e);
+    }
     dispatch.uiState.setActiveTab(Tabs.SETTINGS);
     dispatch.tokenState.setEmptyTokens();
     dispatch.uiState.setLocalApiState(credentialsToSet);
@@ -79,6 +88,30 @@ function StartScreen() {
       : undefined),
     [apiProviders, storageType],
   );
+
+  const getErrorDescription = () => {
+    if (lastSyncError) {
+      return lastSyncError;
+    }
+
+    try {
+      const storedError = sessionStorage.getItem('lastSyncError');
+      if (storedError) {
+        return storedError;
+      }
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(e);
+    }
+
+    if (matchingProvider) {
+      return 'There was an error parsing or validating the token file. Check the browser console for detailed error information, or verify your JSON syntax.';
+    }
+
+    return t('unableToFetchRemoteNoCredentials');
+  };
+
+  const shouldShowError = storageType?.provider !== StorageProviderType.LOCAL;
 
   return (
     <Box
@@ -125,23 +158,31 @@ function StartScreen() {
               </HelpfulLink>
             </Stack>
           </Stack>
-          {storageType?.provider !== StorageProviderType.LOCAL ? (
+          {shouldShowError && (
             <Callout
               id="callout-action-setupsync"
               heading={t('couldNotLoadTokens', { provider: transformProviderName(storageType?.provider) })}
-              description={matchingProvider ? t('unableToFetchRemoteWithCredentials') : t('unableToFetchRemoteNoCredentials')}
+              description={getErrorDescription()}
               action={{
                 onClick: onSetSyncClick,
                 text: t('enterCredentials'),
               }}
               secondaryAction={matchingProvider ? {
                 onClick: () => {
+                  dispatch.uiState.setLastSyncError(null);
+                  try {
+                    sessionStorage.removeItem('lastSyncError');
+                  } catch (e) {
+                    // eslint-disable-next-line no-console
+                    console.error(e);
+                  }
                   restoreStoredProvider(matchingProvider);
                 },
                 text: t('retry'),
               } : undefined}
             />
-          ) : (
+          )}
+          {storageType?.provider === StorageProviderType.LOCAL && (
             <Stack direction="row" gap={2}>
               <Button data-testid="button-configure" size="small" variant="primary" onClick={onSetEmptyTokens}>
                 {t('newEmptyFile')}
