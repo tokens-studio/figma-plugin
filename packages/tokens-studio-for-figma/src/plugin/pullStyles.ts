@@ -166,7 +166,7 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
               allVariables,
               tokens,
               TokenTypes.FONT_WEIGHTS,
-              'fontWeights',
+              `fontWeights.${slugify(style.fontName.family)}`,
               idx,
               () => style.fontName.style,
             );
@@ -222,7 +222,7 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
               allVariables,
               tokens,
               TokenTypes.FONT_FAMILIES,
-              'fontFamilies',
+              `fontFamilies.${slugify(style.fontName.family)}`,
               idx,
               () => style.fontName.family,
             );
