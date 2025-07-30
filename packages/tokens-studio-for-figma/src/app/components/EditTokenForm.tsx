@@ -387,7 +387,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
       if (internalEditToken.initialName !== name && internalEditToken.initialName) {
         oldName = internalEditToken.initialName;
       }
-      const trimmedValue = trimValue(value);
+      const trimmedValue = trimValue(value, type);
       const newName = name
         .split('/')
         .map((n) => n.trim())
