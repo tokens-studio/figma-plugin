@@ -7,7 +7,22 @@ describe('processTextStyleProperty', () => {
     { id: 'var1', name: 'fontSize/large' },
     { id: 'var2', name: 'lineHeight/relaxed' },
     { id: 'var3', name: 'letterSpacing/tight' },
-  ] as Variable[];
+    {
+      id: 'var4',
+      name: 'fontWeight/bold',
+      valuesByMode: { default: { type: 'VARIABLE_ALIAS', id: 'var5' } },
+    },
+    {
+      id: 'var5',
+      name: 'fontWeight/base/bold',
+      valuesByMode: { default: 'Bold' },
+    },
+    {
+      id: 'var6',
+      name: 'fontStyle/italic',
+      valuesByMode: { default: 'Italic' },
+    },
+  ] as unknown as Variable[];
 
   const mockTokens = {
     values: {
@@ -224,6 +239,115 @@ describe('processTextStyleProperty', () => {
       name: 'letterSpacing.6',
       value: '-0.5px',
       type: TokenTypes.LETTER_SPACING,
+    });
+  });
+
+  it('should handle VARIABLE_ALIAS and create a reference token', () => {
+    // Mock figma.variables.getVariableById
+    const mockGetVariableById = jest.fn().mockReturnValue({
+      name: 'fontWeight/base/bold',
+    });
+    global.figma = {
+      variables: {
+        getVariableById: mockGetVariableById,
+      },
+    } as any;
+
+    // Create a mock TextStyle with a bound variable that has VARIABLE_ALIAS
+    const mockStyle = {
+      fontName: { family: 'Arial', style: 'Bold' },
+      boundVariables: {
+        fontStyle: { id: 'var4' },
+      },
+    } as unknown as TextStyle;
+
+    const result = processTextStyleProperty(
+      mockStyle,
+      'fontStyle',
+      mockLocalVariables,
+      mockTokens,
+      TokenTypes.FONT_WEIGHTS,
+      'fontWeights',
+      0,
+      (value) => value,
+    );
+
+    // Expect getVariableById to be called with the alias ID
+    expect(mockGetVariableById).toHaveBeenCalledWith('var5');
+
+    // Expect the result to create a reference token
+    expect(result).toEqual({
+      name: 'fontWeight.bold',
+      value: '{fontWeight.base.bold}',
+      type: TokenTypes.FONT_WEIGHTS,
+    });
+  });
+
+  it('should handle VARIABLE_ALIAS with fallback when alias cannot be resolved', () => {
+    // Mock figma.variables.getVariableById to return null
+    const mockGetVariableById = jest.fn().mockReturnValue(null);
+    global.figma = {
+      variables: {
+        getVariableById: mockGetVariableById,
+      },
+    } as any;
+
+    // Create a mock TextStyle with a bound variable that has VARIABLE_ALIAS
+    const mockStyle = {
+      fontName: { family: 'Arial', style: 'Bold' },
+      fontSize: 16, // Add the property that will be accessed
+      boundVariables: {
+        fontSize: { id: 'var4' }, // Use fontSize instead of fontStyle
+      },
+    } as unknown as TextStyle;
+
+    const mockTransformer = jest.fn((value) => String(value));
+
+    const result = processTextStyleProperty(
+      mockStyle,
+      'fontSize', // Use fontSize instead of fontStyle
+      mockLocalVariables,
+      mockTokens,
+      TokenTypes.FONT_SIZES, // Use FONT_SIZES instead of FONT_WEIGHTS
+      'fontSize',
+      0,
+      mockTransformer,
+    );
+
+    expect(mockGetVariableById).toHaveBeenCalledWith('var5');
+
+    expect(mockTransformer).toHaveBeenCalledWith(16);
+
+    expect(result).toEqual({
+      name: 'fontWeight.bold',
+      value: '16',
+      type: TokenTypes.FONT_SIZES,
+    });
+  });
+
+  it('should handle direct variable value without VARIABLE_ALIAS', () => {
+    const mockStyle = {
+      fontName: { family: 'Arial', style: 'Italic' },
+      boundVariables: {
+        fontStyle: { id: 'var6' },
+      },
+    } as unknown as TextStyle;
+
+    const result = processTextStyleProperty(
+      mockStyle,
+      'fontStyle',
+      mockLocalVariables,
+      mockTokens,
+      TokenTypes.FONT_WEIGHTS,
+      'fontWeights',
+      0,
+      (value) => value,
+    );
+
+    expect(result).toEqual({
+      name: 'fontStyle.italic',
+      value: 'Italic',
+      type: TokenTypes.FONT_WEIGHTS,
     });
   });
 });
