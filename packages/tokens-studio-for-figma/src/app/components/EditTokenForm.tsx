@@ -633,7 +633,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
         return (
           <div>
             <DownshiftInput
-              value={internalEditToken.value}
+              value={typeof internalEditToken.value === 'number' ? String(internalEditToken.value) : internalEditToken.value}
               type={internalEditToken.type}
               label={internalEditToken.schema?.property}
               resolvedTokens={resolvedTokens}
