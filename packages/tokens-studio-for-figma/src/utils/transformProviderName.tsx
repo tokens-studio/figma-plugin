@@ -17,7 +17,7 @@ export const transformProviderName = (provider: StorageProviderType) => {
     case StorageProviderType.SUPERNOVA:
       return 'Supernova';
     case StorageProviderType.TOKENS_STUDIO:
-      return 'Tokens Studio (Beta)';
+      return 'Tokens Studio';
     default:
       return provider;
   }
