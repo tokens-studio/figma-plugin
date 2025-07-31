@@ -26,10 +26,7 @@ export const UndoableEnhancerState: UndoableEnhancerStateType = {
   actionsHistory: [],
   push: (...args) => {
     UndoableEnhancerState.actionsHistory = [
-      ...UndoableEnhancerState.actionsHistory.slice(
-        0,
-        UndoableEnhancerState.actionsHistory.length - UndoableEnhancerState.actionsHistoryPointer,
-      ),
+      ...UndoableEnhancerState.actionsHistory.slice(0, UndoableEnhancerState.actionsHistory.length - UndoableEnhancerState.actionsHistoryPointer),
       ...args,
     ];
     UndoableEnhancerState.actionsHistoryPointer = 0;

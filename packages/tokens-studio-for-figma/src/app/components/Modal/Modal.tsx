@@ -1,5 +1,7 @@
 import React from 'react';
-import { Stack, Dialog, IconButton, Box, Heading } from '@tokens-studio/ui';
+import {
+  Stack, Dialog, IconButton, Box, Heading,
+} from '@tokens-studio/ui';
 import { XIcon } from '@primer/octicons-react';
 import { ArrowLeft } from 'iconoir-react';
 import { ModalFooter } from './ModalFooter';

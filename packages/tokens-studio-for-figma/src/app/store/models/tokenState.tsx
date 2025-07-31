@@ -11,7 +11,9 @@ import { notifyToUI } from '@/plugin/notifiers';
 import parseJson from '@/utils/parseJson';
 import { TokenData } from '@/types/SecondScreen';
 import updateTokensOnSources from '../updateSources';
-import { AnyTokenList, ImportToken, SingleToken, TokenStore, TokenToRename } from '@/types/tokens';
+import {
+  AnyTokenList, ImportToken, SingleToken, TokenStore, TokenToRename,
+} from '@/types/tokens';
 import { updateCheckForChangesAtomic } from './effects/updateCheckForChangesAtomic';
 import {
   DeleteTokenPayload,
@@ -176,11 +178,7 @@ export const tokenState = createModel<RootModel>()({
         themes: [
           ...(newThemes.length === 0 && updatedThemes.length === 0 ? data : []),
           ...state.themes.map((existingTheme) => {
-            const updateTheme = updatedThemes.find(
-              (importedTheme) =>
-                importedTheme.$figmaCollectionId === existingTheme.$figmaCollectionId &&
-                importedTheme.$figmaModeId === existingTheme.$figmaModeId,
-            );
+            const updateTheme = updatedThemes.find((importedTheme) => importedTheme.$figmaCollectionId === existingTheme.$figmaCollectionId && importedTheme.$figmaModeId === existingTheme.$figmaModeId);
             return updateTheme ? { ...existingTheme, ...updateTheme } : existingTheme;
           }),
           ...newThemes,
@@ -214,8 +212,7 @@ export const tokenState = createModel<RootModel>()({
         indexOf + 1,
       ]);
     },
-    deleteTokenSet: (state, name: string) =>
-      updateTokenSetsInState(state, (setName, tokenSet) => (setName === name ? null : [setName, tokenSet])),
+    deleteTokenSet: (state, name: string) => updateTokenSetsInState(state, (setName, tokenSet) => (setName === name ? null : [setName, tokenSet])),
     setLastSyncedState: (state, data: string) => ({
       ...state,
       lastSyncedState: data,
@@ -387,8 +384,7 @@ export const tokenState = createModel<RootModel>()({
       const tokenMap = new Map();
       Object.values(state.tokens).forEach((tokenSet) => {
         tokenSet.forEach((token) => {
-          if (!tokenMap.has(token.name)) {
-            // Only store first occurrence
+          if (!tokenMap.has(token.name)) { // Only store first occurrence
             tokenMap.set(token.name, token);
           }
         });
@@ -447,8 +443,8 @@ export const tokenState = createModel<RootModel>()({
               const normalizedOldValueDescription = oldValue.description ?? '';
               const normalizedTokenDescription = token.description ?? '';
               if (
-                isEqual(oldValue.value, token.value) &&
-                isEqual(normalizedOldValueDescription, normalizedTokenDescription)
+                isEqual(oldValue.value, token.value)
+                && isEqual(normalizedOldValueDescription, normalizedTokenDescription)
               ) {
                 existingTokens.push(token);
               } else {
@@ -508,16 +504,16 @@ export const tokenState = createModel<RootModel>()({
           [data.parent]:
             typeof data.index === 'number'
               ? state.tokens[data.parent].filter((token) => {
-                  if (token.name === data.path) {
-                    if (i === data.index) {
-                      i += 1;
-                      return true;
-                    }
+                if (token.name === data.path) {
+                  if (i === data.index) {
                     i += 1;
-                    return false;
+                    return true;
                   }
-                  return token.name !== data.path;
-                })
+                  i += 1;
+                  return false;
+                }
+                return token.name !== data.path;
+              })
               : state.tokens[data.parent].filter((token) => token.name !== data.path),
         },
       };
@@ -539,7 +535,9 @@ export const tokenState = createModel<RootModel>()({
     },
 
     renameTokenGroup: (state, data: RenameTokenGroupPayload) => {
-      const { oldName, newName, type, parent } = data;
+      const {
+        oldName, newName, type, parent,
+      } = data;
       const tokensInParent = state.tokens[parent] ?? [];
       const renamedTokensInParent = tokensInParent.map((token) => {
         if (token.name.startsWith(`${oldName}.`) && token.type === type) {
@@ -564,7 +562,9 @@ export const tokenState = createModel<RootModel>()({
     },
 
     duplicateTokenGroup: (state, data: DuplicateTokenGroupPayload) => {
-      const { parent, oldName, newName, tokenSets, type } = data;
+      const {
+        parent, oldName, newName, tokenSets, type,
+      } = data;
       const selectedTokenGroup = state.tokens[parent].filter(
         (token) => token.name.startsWith(`${oldName}.`) && token.type === type,
       );
@@ -641,7 +641,9 @@ export const tokenState = createModel<RootModel>()({
       tokenFormat: data,
     }),
     renameTokenAcrossSets: (state, data: RenameTokensAcrossSetsPayload) => {
-      const { oldName, newName, type, tokenSets } = data;
+      const {
+        oldName, newName, type, tokenSets,
+      } = data;
       const newTokens: TokenStore['values'] = {};
       Object.keys(state.tokens).forEach((tokenSet) => {
         if (tokenSets.includes(tokenSet)) {
@@ -671,16 +673,14 @@ export const tokenState = createModel<RootModel>()({
 
       themes.forEach((theme) => {
         // Use figmaCollectionId and figmaModeId to identify themes, not just figmaCollectionId
-        const existingTheme = state.themes.find(
-          (t) => t.$figmaCollectionId === theme.$figmaCollectionId && t.$figmaModeId === theme.$figmaModeId,
-        );
+        const existingTheme = state.themes.find((t) => t.$figmaCollectionId === theme.$figmaCollectionId
+          && t.$figmaModeId === theme.$figmaModeId);
 
         if (existingTheme) {
           // Check if anything has changed that requires an update
-          const needsUpdate =
-            !isEqual(existingTheme.selectedTokenSets, theme.selectedTokenSets) ||
-            !isEqual(existingTheme.name, theme.name) ||
-            !isEqual(existingTheme.group, theme.group);
+          const needsUpdate = !isEqual(existingTheme.selectedTokenSets, theme.selectedTokenSets)
+                              || !isEqual(existingTheme.name, theme.name)
+                              || !isEqual(existingTheme.group, theme.group);
 
           if (needsUpdate) {
             updatedThemes.push({
@@ -872,7 +872,9 @@ export const tokenState = createModel<RootModel>()({
       setFormat(payload);
     },
     renameTokenGroup(data: RenameTokenGroupPayload, rootState) {
-      const { oldName, newName, type, parent } = data;
+      const {
+        oldName, newName, type, parent,
+      } = data;
 
       const tokensInParent = rootState.tokenState.tokens[parent] ?? [];
       tokensInParent
@@ -1095,7 +1097,8 @@ export const tokenState = createModel<RootModel>()({
       // If using Tokens Studio storage, update remote data
       if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO) {
         for (const [oldName, newName] of renamedCollections) {
-          if (oldName in rootState.tokenState.tokens || Object.keys(updatedTokens).some((key) => key === newName)) {
+          if (oldName in rootState.tokenState.tokens
+              || Object.keys(updatedTokens).some((key) => key === newName)) {
             updateTokenSetInTokensStudio({
               rootState,
               data: { oldName, newName },

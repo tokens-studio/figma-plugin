@@ -39,14 +39,11 @@ const TokenFilter = () => {
     dispatch.uiState.setTokenFilter(value);
   }, 250);
 
-  const handleChange = React.useCallback(
-    (e: any) => {
-      const { value } = e.target;
-      setTokenString(value);
-      debounced(value);
-    },
-    [debounced],
-  );
+  const handleChange = React.useCallback((e: any) => {
+    const { value } = e.target;
+    setTokenString(value);
+    debounced(value);
+  }, [debounced]);
 
   const handleResetSearchString = React.useCallback(() => {
     setTokenString('');
@@ -65,9 +62,7 @@ const TokenFilter = () => {
         position: 'relative',
       }}
     >
-      <Box css={{ position: 'absolute', left: '$2' }}>
-        <Search />
-      </Box>
+      <Box css={{ position: 'absolute', left: '$2' }}><Search /></Box>
       <StyledInput
         spellCheck={false}
         type="text"

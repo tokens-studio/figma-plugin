@@ -1,4 +1,6 @@
-import { Box, Button, Link, Stack } from '@tokens-studio/ui';
+import {
+  Box, Button, Link, Stack,
+} from '@tokens-studio/ui';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
@@ -35,37 +37,30 @@ export function ConvertToDTCGModal() {
     dispatch.uiState.setShowConvertTokenFormatModal(false);
     if (storageType.provider === StorageProviderType.LOCAL) return;
     pushTokens({
-      overrides: isDTCG
-        ? {
-            branch: 'w3c-dtcg-conversion-revert',
-            commitMessage: 'Revert conversion to W3C DTCG format',
-          }
-        : {
-            branch: 'w3c-dtcg-conversion',
-            commitMessage: 'Convert to W3C DTCG format, read more at https://docs.tokens.studio/convert-to-dtcg-format',
-          },
+      overrides: isDTCG ? {
+        branch: 'w3c-dtcg-conversion-revert',
+        commitMessage: 'Revert conversion to W3C DTCG format',
+      } : {
+        branch: 'w3c-dtcg-conversion',
+        commitMessage: 'Convert to W3C DTCG format, read more at https://docs.tokens.studio/convert-to-dtcg-format',
+      },
     });
   }, [dispatch, pushTokens, isDTCG, storageType]);
 
   const hasRemoteChanges = hasChanges && storageType.provider !== StorageProviderType.LOCAL;
 
   return (
-    <Modal
-      title={isDTCG ? t('w3cformatmodaltitle') : t('w3cconverttitle')}
-      isOpen={showConvertTokenFormatModal}
-      close={handleClose}
-      showClose
-    >
+    <Modal title={isDTCG ? t('w3cformatmodaltitle') : t('w3cconverttitle')} isOpen={showConvertTokenFormatModal} close={handleClose} showClose>
       <Stack direction="column" align="start" gap={4} css={{ color: '$fgMuted', fontSize: '$xsmall' }}>
         <Box as="img" src={isDTCG ? legacyConvertImage : w3cConvertImage} css={{ borderRadius: '$small' }} />
-        <Box>{isDTCG ? t('w3cformatmodaldescription') : t('legacyformatmodaldescription')}</Box>
+        <Box>
+          {isDTCG ? t('w3cformatmodaldescription') : t('legacyformatmodaldescription')}
+        </Box>
         <Stack gap={4} align="center">
           <Button variant="primary" onClick={handleConvert} disabled={hasRemoteChanges}>
             {isDTCG ? t('converttolegacy') : t('converttow3c')}
           </Button>
-          <Link href="https://docs.tokens.studio/manage-settings/token-format" target="_blank">
-            {t('readmoreformat')}
-          </Link>
+          <Link href="https://docs.tokens.studio/manage-settings/token-format" target="_blank">{t('readmoreformat')}</Link>
         </Stack>
         {hasRemoteChanges && <ErrorMessage>{t('pushfirsterror')}</ErrorMessage>}
       </Stack>

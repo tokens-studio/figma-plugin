@@ -32,15 +32,15 @@ export default function BoxShadowInput({
   handleBoxShadowValueChange: (shadow: TokenBoxshadowValue | TokenBoxshadowValue[]) => void;
   handleBoxShadowAliasValueChange: (property: string, value: string) => void;
   handleDownShiftInputChange: (newInputValue: string) => void;
-  onSubmit: () => void;
+  onSubmit: () => void
 }) {
   const seed = useUIDSeed();
-  const isAliasMode = internalEditToken.value && typeof internalEditToken.value === 'string';
+  const isAliasMode = (internalEditToken.value && typeof internalEditToken.value === 'string');
   const [mode, setMode] = useState(isAliasMode ? 'alias' : 'input');
   const [alias, setAlias] = useState('');
 
   const handleMode = React.useCallback(() => {
-    const changeMode = mode === 'input' ? 'alias' : 'input';
+    const changeMode = (mode === 'input') ? 'alias' : 'input';
     setMode(changeMode);
     setAlias('');
   }, [mode]);
@@ -55,8 +55,7 @@ export default function BoxShadowInput({
   }, [internalEditToken, resolvedTokens]);
 
   const mappedItems = React.useMemo(() => {
-    if (typeof internalEditToken.value === 'string' && selectedToken)
-      return selectedToken.value as TokenBoxshadowValue | TokenBoxshadowValue[];
+    if (typeof internalEditToken.value === 'string' && selectedToken) return selectedToken.value as TokenBoxshadowValue | TokenBoxshadowValue[];
     if (typeof internalEditToken.value !== 'string') return internalEditToken.value;
     return undefined;
   }, [internalEditToken.value, selectedToken]);
@@ -71,14 +70,11 @@ export default function BoxShadowInput({
     }
   }, [internalEditToken, handleBoxShadowValueChange]);
 
-  const removeShadow = React.useCallback(
-    (index: number) => {
-      if (Array.isArray(internalEditToken.value) && internalEditToken.value.length > 1) {
-        handleBoxShadowValueChange(internalEditToken.value.filter((_, i) => i !== index));
-      }
-    },
-    [internalEditToken, handleBoxShadowValueChange],
-  );
+  const removeShadow = React.useCallback((index: number) => {
+    if (Array.isArray(internalEditToken.value) && internalEditToken.value.length > 1) {
+      handleBoxShadowValueChange(internalEditToken.value.filter((_, i) => i !== index));
+    }
+  }, [internalEditToken, handleBoxShadowValueChange]);
 
   return (
     <div>
@@ -117,64 +113,68 @@ export default function BoxShadowInput({
         </Box>
       </Box>
       <Box css={{ display: 'flex', flexDirection: 'column', gap: '$4' }}>
-        {mode === 'input' ? (
-          <DndProvider backend={HTML5Backend}>
-            {Array.isArray(mappedItems) ? (
-              mappedItems.map((token, index) => (
+        {
+          mode === 'input' ? (
+            <DndProvider backend={HTML5Backend}>
+              {Array.isArray(mappedItems) ? (
+                mappedItems.map((token, index) => (
+                  <SingleBoxShadowInput
+                    isMultiple
+                    value={mappedItems}
+                    handleBoxShadowValueChange={handleBoxShadowValueChange}
+                    shadowItem={token}
+                    index={index}
+                    id={String(index)}
+                    key={`single-shadow-${seed(index)}`}
+                    onRemove={removeShadow}
+                    resolvedTokens={resolvedTokens}
+                    onSubmit={onSubmit}
+                  />
+                ))
+              ) : (
                 <SingleBoxShadowInput
-                  isMultiple
-                  value={mappedItems}
                   handleBoxShadowValueChange={handleBoxShadowValueChange}
-                  shadowItem={token}
-                  index={index}
-                  id={String(index)}
-                  key={`single-shadow-${seed(index)}`}
+                  index={0}
+                  value={mappedItems}
+                  shadowItem={mappedItems}
                   onRemove={removeShadow}
                   resolvedTokens={resolvedTokens}
                   onSubmit={onSubmit}
                 />
-              ))
-            ) : (
-              <SingleBoxShadowInput
-                handleBoxShadowValueChange={handleBoxShadowValueChange}
-                index={0}
-                value={mappedItems}
-                shadowItem={mappedItems}
-                onRemove={removeShadow}
+              )}
+            </DndProvider>
+          ) : (
+            <Box css={{
+              display: 'flex', flexDirection: 'column', gap: '$2',
+            }}
+            >
+              <DownshiftInput
+                value={!isAliasMode ? '' : String(internalEditToken.value)}
+                type={internalEditToken.type}
+                label={TokenTypes.BOX_SHADOW}
+                inlineLabel
                 resolvedTokens={resolvedTokens}
+                initialName={internalEditToken.initialName}
+                handleChange={handleBoxShadowAliasValueChange}
+                setInputValue={handleDownShiftInputChange}
+                placeholder="Value or {alias}"
+                suffix
                 onSubmit={onSubmit}
               />
-            )}
-          </DndProvider>
-        ) : (
-          <Box
-            css={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '$2',
-            }}
-          >
-            <DownshiftInput
-              value={!isAliasMode ? '' : String(internalEditToken.value)}
-              type={internalEditToken.type}
-              label={TokenTypes.BOX_SHADOW}
-              inlineLabel
-              resolvedTokens={resolvedTokens}
-              initialName={internalEditToken.initialName}
-              handleChange={handleBoxShadowAliasValueChange}
-              setInputValue={handleDownShiftInputChange}
-              placeholder="Value or {alias}"
-              suffix
-              onSubmit={onSubmit}
-            />
-            {isAliasMode &&
-              selectedToken &&
-              typeof internalEditToken.value === 'string' &&
-              checkIfContainsAlias(internalEditToken.value) && (
-                <ResolvedTokenDisplay alias={alias} selectedToken={selectedToken} />
+              {(
+                isAliasMode
+                && selectedToken
+                && typeof internalEditToken.value === 'string'
+                && checkIfContainsAlias(internalEditToken.value)
+              ) && (
+              <ResolvedTokenDisplay
+                alias={alias}
+                selectedToken={selectedToken}
+              />
               )}
-          </Box>
-        )}
+            </Box>
+          )
+        }
       </Box>
     </div>
   );

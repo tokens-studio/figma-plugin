@@ -7,8 +7,7 @@ describe('performCodeGen', () => {
         getSharedPluginData: jest.fn((pluginId, key) => {
           if (key === 'minWidth') {
             return 'sizing.lg';
-          }
-          if (key === 'paddingLeft') {
+          } if (key === 'paddingLeft') {
             return 'spacing.sm';
           }
           return undefined;
@@ -30,8 +29,7 @@ describe('performCodeGen', () => {
         getSharedPluginData: jest.fn((pluginId, key) => {
           if (key === 'minWidth') {
             return 'sizing.lg';
-          }
-          if (key === 'paddingLeft') {
+          } if (key === 'paddingLeft') {
             return 'spacing.sm';
           }
           return undefined;

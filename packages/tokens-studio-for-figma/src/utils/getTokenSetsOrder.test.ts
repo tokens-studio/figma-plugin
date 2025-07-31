@@ -43,16 +43,7 @@ describe('getTokenSetsOrder', () => {
     const result = getTokenSetsOrder(tokens, usedSets, overallConfig, activeTokenSet);
 
     expect(result).toEqual({
-      tokenSetsOrder: [
-        'color/primary',
-        'typography/heading',
-        'mode/dark',
-        'spacing/small',
-        'global',
-        'brand',
-        'spacing/large',
-        'mode/light',
-      ],
+      tokenSetsOrder: ['color/primary', 'typography/heading', 'mode/dark', 'spacing/small', 'global', 'brand', 'spacing/large', 'mode/light'],
       usedSetsList: ['global', 'brand', 'spacing/large', 'mode/light'],
       overallSets: ['color/primary', 'typography/heading', 'mode/dark', 'spacing/small'],
     });

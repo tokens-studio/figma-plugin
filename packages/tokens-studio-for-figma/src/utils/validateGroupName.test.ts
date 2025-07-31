@@ -2,70 +2,56 @@ import { TokenFormatOptions, setFormat } from '@/plugin/TokenFormatStoreClass';
 import { validateRenameGroupName, validateDuplicateGroupName, ErrorType } from './validateGroupName';
 
 const tokens = {
-  global: [
-    {
-      name: 'buttons.foo.default',
-      type: 'color',
-      value: '#0fa',
-    },
-    {
-      name: 'buttons.foo.primary',
-      type: 'color',
-      value: '#0af',
-    },
-    {
-      name: 'buttons.foo.secondary',
-      type: 'color',
-      value: '#a0f',
-    },
-    {
-      name: 'buttons.foo.superlongtokenname',
-      type: 'color',
-      value: '#0af',
-    },
-    {
-      name: 'buttons.default',
-      type: 'sizing',
-      value: '16',
-    },
-    {
-      name: 'buttons.primary',
-      type: 'sizing',
-      value: '12',
-    },
-    {
-      name: 'buttons.superlongtokenname',
-      type: 'sizing',
-      value: '16',
-    },
-    {
-      name: 'buttons2.default',
-      type: 'color',
-      value: '#0af',
-    },
-  ],
-  theme: [
-    {
-      name: 'buttons.test.test.default',
-      type: 'color',
-      value: '#0af',
-    },
-    {
-      name: 'buttons.test.test.primary',
-      type: 'color',
-      value: '#0af',
-    },
-    {
-      name: 'buttons.test.test.secondary',
-      type: 'color',
-      value: '#a0f',
-    },
-    {
-      name: 'buttons.test.test.superlongtokenname',
-      type: 'color',
-      value: '#0af',
-    },
-  ],
+  global: [{
+    name: 'buttons.foo.default',
+    type: 'color',
+    value: '#0fa',
+  }, {
+    name: 'buttons.foo.primary',
+    type: 'color',
+    value: '#0af',
+  }, {
+    name: 'buttons.foo.secondary',
+    type: 'color',
+    value: '#a0f',
+  }, {
+    name: 'buttons.foo.superlongtokenname',
+    type: 'color',
+    value: '#0af',
+  }, {
+    name: 'buttons.default',
+    type: 'sizing',
+    value: '16',
+  }, {
+    name: 'buttons.primary',
+    type: 'sizing',
+    value: '12',
+  }, {
+    name: 'buttons.superlongtokenname',
+    type: 'sizing',
+    value: '16',
+  }, {
+    name: 'buttons2.default',
+    type: 'color',
+    value: '#0af',
+  }],
+  theme: [{
+    name: 'buttons.test.test.default',
+    type: 'color',
+    value: '#0af',
+  }, {
+    name: 'buttons.test.test.primary',
+    type: 'color',
+    value: '#0af',
+  }, {
+    name: 'buttons.test.test.secondary',
+    type: 'color',
+    value: '#a0f',
+  }, {
+    name: 'buttons.test.test.superlongtokenname',
+    type: 'color',
+    value: '#0af',
+  }],
 };
 
 const tokens2 = {
@@ -203,13 +189,11 @@ describe('validateRenameGroupName', () => {
     const newName = 'colors.red';
     expect(validateRenameGroupName(tokens3[activeTokenSet], type, oldName, newName)).toEqual({
       type: ErrorType.OverlappingToken,
-      foundOverlappingTokens: [
-        {
-          name: 'colors.red.bar',
-          type: 'color',
-          value: '#0fa',
-        },
-      ],
+      foundOverlappingTokens: [{
+        name: 'colors.red.bar',
+        type: 'color',
+        value: '#0fa',
+      }],
     });
   });
   it('should not allow renaming group to existing group name with overlapping tokens', () => {
@@ -220,13 +204,11 @@ describe('validateRenameGroupName', () => {
 
     expect(validateRenameGroupName(tokens[activeTokenSet], type, oldName, newName)).toEqual({
       type: ErrorType.OverlappingGroup,
-      possibleDuplicates: [
-        {
-          name: 'buttons.default',
-          type: 'sizing',
-          value: '16',
-        },
-      ],
+      possibleDuplicates: [{
+        name: 'buttons.default',
+        type: 'sizing',
+        value: '16',
+      }],
     });
   });
   it('should prevent overlapping token name with group name', () => {
@@ -236,13 +218,11 @@ describe('validateRenameGroupName', () => {
     const newName = 'buttons.default';
     expect(validateRenameGroupName(tokens[activeTokenSet], type, oldName, newName)).toEqual({
       type: ErrorType.OverlappingToken,
-      foundOverlappingTokens: [
-        {
-          name: 'buttons.default',
-          type: 'sizing',
-          value: '16',
-        },
-      ],
+      foundOverlappingTokens: [{
+        name: 'buttons.default',
+        type: 'sizing',
+        value: '16',
+      }],
     });
   });
   it('should prevent overlapping tokens due to overlapping group name and token names', () => {
@@ -252,23 +232,21 @@ describe('validateRenameGroupName', () => {
     const newName = 'buttons';
     expect(validateRenameGroupName(tokens2[activeTokenSet], type, oldName, newName)).toEqual({
       type: ErrorType.OverlappingGroup,
-      possibleDuplicates: [
-        {
-          name: 'buttons.default',
-          type: 'sizing',
-          value: '16',
-        },
-        {
-          name: 'buttons.primary',
-          type: 'sizing',
-          value: '12',
-        },
-        {
-          name: 'buttons.superlongtokenname',
-          type: 'sizing',
-          value: '16',
-        },
-      ],
+      possibleDuplicates: [{
+        name: 'buttons.default',
+        type: 'sizing',
+        value: '16',
+      },
+      {
+        name: 'buttons.primary',
+        type: 'sizing',
+        value: '12',
+      },
+      {
+        name: 'buttons.superlongtokenname',
+        type: 'sizing',
+        value: '16',
+      }],
     });
   });
   it('should not allow renaming group with existing token name', () => {
@@ -278,16 +256,14 @@ describe('validateRenameGroupName', () => {
     const newName = 'buttons2';
     expect(validateRenameGroupName(tokens2[activeTokenSet], type, oldName, newName)).toEqual({
       type: ErrorType.OverlappingToken,
-      foundOverlappingTokens: [
-        {
-          name: 'buttons2',
-          type: 'sizing',
-          value: '12',
-        },
-      ],
+      foundOverlappingTokens: [{
+        name: 'buttons2',
+        type: 'sizing',
+        value: '12',
+      }],
     });
   });
-  it("should allow renaming group to a group name that exists, but doesn't have overlapping tokens", () => {
+  it('should allow renaming group to a group name that exists, but doesn\'t have overlapping tokens', () => {
     setFormat(TokenFormatOptions.DTCG);
     const type = 'color';
     const oldName = 'buttons123';
@@ -354,13 +330,11 @@ describe('validateDuplicateGroupName', () => {
     expect(validateDuplicateGroupName(tokens, selectedTokenSets, activeTokenSet, type, oldName, newName)).toEqual({
       type: ErrorType.OverlappingToken,
       foundOverlappingTokens: {
-        global: [
-          {
-            name: 'buttons.default',
-            type: 'sizing',
-            value: '16',
-          },
-        ],
+        global: [{
+          name: 'buttons.default',
+          type: 'sizing',
+          value: '16',
+        }],
       },
     });
   });
@@ -374,23 +348,21 @@ describe('validateDuplicateGroupName', () => {
     expect(validateDuplicateGroupName(tokens2, selectedTokenSets, activeTokenSet, type, oldName, newName)).toEqual({
       type: ErrorType.OverlappingGroup,
       possibleDuplicates: {
-        global: [
-          {
-            name: 'buttons.default',
-            type: 'sizing',
-            value: '16',
-          },
-          {
-            name: 'buttons.primary',
-            type: 'sizing',
-            value: '12',
-          },
-          {
-            name: 'buttons.superlongtokenname',
-            type: 'sizing',
-            value: '16',
-          },
-        ],
+        global: [{
+          name: 'buttons.default',
+          type: 'sizing',
+          value: '16',
+        },
+        {
+          name: 'buttons.primary',
+          type: 'sizing',
+          value: '12',
+        },
+        {
+          name: 'buttons.superlongtokenname',
+          type: 'sizing',
+          value: '16',
+        }],
       },
     });
   });
@@ -404,26 +376,22 @@ describe('validateDuplicateGroupName', () => {
     expect(validateDuplicateGroupName(tokens2, selectedTokenSets, activeTokenSet, type, oldName, newName)).toEqual({
       type: ErrorType.OverlappingToken,
       foundOverlappingTokens: {
-        global: [
-          {
-            name: 'buttons2',
-            type: 'sizing',
-            value: '12',
-          },
-        ],
+        global: [{
+          name: 'buttons2',
+          type: 'sizing',
+          value: '12',
+        }],
       },
     });
   });
-  it("should allow renaming group to a group name that exists, but doesn't have overlapping tokens", () => {
+  it('should allow renaming group to a group name that exists, but doesn\'t have overlapping tokens', () => {
     setFormat(TokenFormatOptions.DTCG);
     const activeTokenSet = 'global';
     const type = 'color';
     const selectedTokenSets = ['global'];
     const oldName = 'buttons123';
     const newName = 'buttons3';
-    expect(validateDuplicateGroupName(tokens2, selectedTokenSets, activeTokenSet, type, oldName, newName)).toEqual(
-      null,
-    );
+    expect(validateDuplicateGroupName(tokens2, selectedTokenSets, activeTokenSet, type, oldName, newName)).toEqual(null);
   });
   it('should not allow renaming parent group that would result in token name overlap with group name', () => {
     setFormat(TokenFormatOptions.DTCG);
@@ -435,13 +403,11 @@ describe('validateDuplicateGroupName', () => {
     expect(validateDuplicateGroupName(tokens3, selectedTokenSets, activeTokenSet, type, oldName, newName)).toEqual({
       type: ErrorType.OverlappingToken,
       foundOverlappingTokens: {
-        global: [
-          {
-            name: 'colors.red.bar',
-            type: 'color',
-            value: '#0fa',
-          },
-        ],
+        global: [{
+          name: 'colors.red.bar',
+          type: 'color',
+          value: '#0fa',
+        }],
       },
     });
   });

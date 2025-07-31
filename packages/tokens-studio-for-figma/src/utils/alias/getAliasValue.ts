@@ -15,11 +15,11 @@ type TokenNameNodeType = string | undefined;
 
 function getReturnedValue(token: SingleToken | string | number) {
   if (
-    typeof token === 'object' &&
-    typeof token.value === 'object' &&
-    (token?.type === TokenTypes.BOX_SHADOW ||
-      token?.type === TokenTypes.TYPOGRAPHY ||
-      token?.type === TokenTypes.BORDER)
+    typeof token === 'object'
+    && typeof token.value === 'object'
+    && (token?.type === TokenTypes.BOX_SHADOW
+      || token?.type === TokenTypes.TYPOGRAPHY
+      || token?.type === TokenTypes.BORDER)
   ) {
     return token.value;
   }
@@ -54,8 +54,7 @@ export function getAliasValue(
   // Big O((n ^ 3) (n = amount of tokens)
   let returnedValue: ReturnType<typeof getReturnedValue> | null = getReturnedValue(token);
   try {
-    const tokenReferences: string[] | null =
-      typeof returnedValue === 'string' ? getRootReferences(returnedValue) : null;
+    const tokenReferences: string[] | null = typeof returnedValue === 'string' ? getRootReferences(returnedValue) : null;
     if (tokenReferences?.length) {
       const resolvedReferences = Array.from(tokenReferences).map((ref) => {
         if (ref.length > 1) {
@@ -79,10 +78,9 @@ export function getAliasValue(
           const tokenAliasSplittedLastPrevious: number = Number(tokenAliasSplitted.pop());
           const tokenAliasLastPreviousExcluded = tokenAliasSplitted.join('.');
           const foundToken = tokens.find(
-            (t) =>
-              t.name === nameToLookFor ||
-              t.name === tokenAliasLastExcluded ||
-              t.name === tokenAliasLastPreviousExcluded,
+            (t) => t.name === nameToLookFor
+              || t.name === tokenAliasLastExcluded
+              || t.name === tokenAliasLastPreviousExcluded,
           );
 
           if (foundToken?.name === nameToLookFor) {
@@ -90,9 +88,9 @@ export function getAliasValue(
           }
 
           if (
-            !!tokenAliasSplittedLast &&
-            foundToken?.name === tokenAliasLastExcluded &&
-            foundToken.value?.hasOwnProperty(tokenAliasSplittedLast)
+            !!tokenAliasSplittedLast
+            && foundToken?.name === tokenAliasLastExcluded
+            && foundToken.value?.hasOwnProperty(tokenAliasSplittedLast)
           ) {
             const { value } = foundToken;
             if (typeof value === 'object' && !Array.isArray(value)) {
@@ -102,12 +100,12 @@ export function getAliasValue(
           }
 
           if (
-            tokenAliasSplittedLastPrevious !== undefined &&
-            !!tokenAliasSplittedLast &&
-            foundToken?.name === tokenAliasLastPreviousExcluded &&
-            Array.isArray(foundToken?.rawValue) &&
-            !!foundToken?.rawValue[tokenAliasSplittedLastPrevious] &&
-            foundToken?.rawValue[tokenAliasSplittedLastPrevious].hasOwnProperty(tokenAliasSplittedLast)
+            tokenAliasSplittedLastPrevious !== undefined
+            && !!tokenAliasSplittedLast
+            && foundToken?.name === tokenAliasLastPreviousExcluded
+            && Array.isArray(foundToken?.rawValue)
+            && !!foundToken?.rawValue[tokenAliasSplittedLastPrevious]
+            && foundToken?.rawValue[tokenAliasSplittedLastPrevious].hasOwnProperty(tokenAliasSplittedLast)
           ) {
             const rawValueEntry = foundToken?.rawValue[tokenAliasSplittedLastPrevious];
             return getAliasValue(
@@ -137,16 +135,16 @@ export function getAliasValue(
         if (typeof couldBeNumberValue === 'number') return couldBeNumberValue;
         const rgbColor = convertToRgb(couldBeNumberValue);
         if (
-          typeof token !== 'string' &&
-          typeof token !== 'number' &&
-          token?.$extensions?.['studio.tokens']?.modify &&
-          rgbColor &&
-          !isResolved &&
-          previousCount === 0
+          typeof token !== 'string'
+          && typeof token !== 'number'
+          && token?.$extensions?.['studio.tokens']?.modify
+          && rgbColor
+          && !isResolved
+          && previousCount === 0
         ) {
           if (
-            token?.$extensions?.['studio.tokens']?.modify?.type === ColorModifierTypes.MIX &&
-            checkIfAlias(token?.$extensions?.['studio.tokens']?.modify?.color)
+            token?.$extensions?.['studio.tokens']?.modify?.type === ColorModifierTypes.MIX
+            && checkIfAlias(token?.$extensions?.['studio.tokens']?.modify?.color)
           ) {
             return convertModifiedColorToHex(rgbColor, {
               ...token.$extensions?.['studio.tokens']?.modify,

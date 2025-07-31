@@ -10,10 +10,7 @@ export enum FormatSensitiveTokenKeys {
   DESCRIPTION = 'description',
 }
 
-export function setTokenKey(
-  token: SingleTokenWithoutName | SingleTokenWithoutNameOrType,
-  keyName: FormatSensitiveTokenKeys,
-): SingleTokenWithoutName | SingleTokenWithoutNameOrType {
+export function setTokenKey(token: SingleTokenWithoutName | SingleTokenWithoutNameOrType, keyName: FormatSensitiveTokenKeys): SingleTokenWithoutName | SingleTokenWithoutNameOrType {
   const isDTCG = TokenFormat.format === TokenFormatOptions.DTCG;
 
   if (isDTCG) {

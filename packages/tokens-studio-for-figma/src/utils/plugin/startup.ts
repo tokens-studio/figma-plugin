@@ -1,4 +1,6 @@
-import { ApiProvidersProperty, AuthDataProperty, LicenseKeyProperty, InitialLoadProperty } from '@/figmaStorage';
+import {
+  ApiProvidersProperty, AuthDataProperty, LicenseKeyProperty, InitialLoadProperty,
+} from '@/figmaStorage';
 import { getActiveTheme } from '@/utils/getActiveTheme';
 import { getSelectedExportThemes } from '@/utils/getSelectedExportThemes';
 import { getVariableExportSettings } from '@/utils/getVariableExportSettings';
@@ -64,19 +66,15 @@ export async function startup() {
     localApiProviders,
     licenseKey,
     initialLoad: initialLoad ?? false,
-    localTokenData: localTokenData
-      ? {
-          ...localTokenData,
-          usedTokenSet,
-        }
-      : null,
-    user: figma.currentUser
-      ? {
-          userId,
-          figmaId: figma.currentUser.id,
-          name: figma.currentUser.name,
-        }
-      : null,
+    localTokenData: localTokenData ? {
+      ...localTokenData,
+      usedTokenSet,
+    } : null,
+    user: figma.currentUser ? {
+      userId,
+      figmaId: figma.currentUser.id,
+      name: figma.currentUser.name,
+    } : null,
     authData,
     usedEmail,
     selectedExportThemes,

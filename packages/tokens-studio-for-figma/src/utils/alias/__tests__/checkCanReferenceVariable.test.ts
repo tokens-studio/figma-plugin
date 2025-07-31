@@ -9,7 +9,7 @@ describe('checkCanReferenceVariable', () => {
     expect(checkCanReferenceVariable(token)).toBe(true);
   });
 
-  it("when the token contains color modify, the matching variable doesn't reference the variable", () => {
+  it('when the token contains color modify, the matching variable doesn\'t reference the variable', () => {
     const token = {
       rawValue: '{alias}',
       $extensions: {
@@ -25,7 +25,7 @@ describe('checkCanReferenceVariable', () => {
     expect(checkCanReferenceVariable(token)).toBe(false);
   });
 
-  it("when the token has calculation with alias, the matching variable doesn't reference the variable", () => {
+  it('when the token has calculation with alias, the matching variable doesn\'t reference the variable', () => {
     const token = {
       rawValue: '{alias} + {alias}',
     } as unknown as UpdateTokenPayload;

@@ -48,7 +48,8 @@ jest.mock('@gitbeaker/rest', () => ({
       create: mockCreateCommits,
       show: mockShowCommits,
     },
-  })),
+  }
+  )),
 }));
 
 describe('GitlabTokenStorage', () => {
@@ -63,11 +64,13 @@ describe('GitlabTokenStorage', () => {
   it('should assign projectId by searching in projects', async () => {
     const repoName = 'figma-tokens';
     const namespace = 'six7';
-    mockGetUserName.mockImplementationOnce(() => Promise.resolve([]));
+    mockGetUserName.mockImplementationOnce(() => (
+      Promise.resolve([])
+    ));
 
-    mockGetProjects.mockImplementationOnce(() =>
-      Promise.resolve([
-        {
+    mockGetProjects.mockImplementationOnce(() => (
+      Promise.resolve(
+        [{
           name: repoName,
           id: 35102363,
           path: repoName,
@@ -76,23 +79,29 @@ describe('GitlabTokenStorage', () => {
             full_path: 'six7',
             id: 51634506,
           },
-        },
-      ]),
-    );
+        }],
+      )
+    ));
 
-    expect(await storageProvider.assignProjectId()).toHaveProperty('projectId', 35102363);
-    expect(await storageProvider.assignProjectId()).toHaveProperty('groupId', 51634506);
+    expect(
+      await storageProvider.assignProjectId(),
+    ).toHaveProperty('projectId', 35102363);
+    expect(
+      await storageProvider.assignProjectId(),
+    ).toHaveProperty('groupId', 51634506);
 
     expect(mockGetProjects).toHaveBeenCalledWith({ membership: true, search: repoName, simple: true });
   });
 
   it('should throw an error if no project is found', async () => {
     const provider = new GitlabTokenStorage('', 'test-name', 'fullPath');
-    mockGetUserName.mockImplementationOnce(() => Promise.resolve([]));
+    mockGetUserName.mockImplementationOnce(() => (
+      Promise.resolve([])
+    ));
 
-    mockGetProjects.mockImplementationOnce(() =>
-      Promise.resolve([
-        {
+    mockGetProjects.mockImplementationOnce(() => (
+      Promise.resolve(
+        [{
           name: 'name',
           id: 35102363,
           path: 'name',
@@ -101,31 +110,46 @@ describe('GitlabTokenStorage', () => {
             full_path: 'six7',
             id: 51634506,
           },
-        },
-      ]),
-    );
+        }],
+      )
+    ));
 
-    await expect(provider.assignProjectId()).rejects.toThrow('Project not accessible');
+    await expect(provider.assignProjectId())
+      .rejects
+      .toThrow('Project not accessible');
   });
 
   it('should fetch branches as a simple list', async () => {
-    mockGetBranches.mockImplementationOnce(() => Promise.resolve([{ name: 'main' }, { name: 'development' }]));
+    mockGetBranches.mockImplementationOnce(() => (
+      Promise.resolve(
+        [
+          { name: 'main' },
+          { name: 'development' },
+        ],
+      )
+    ));
 
-    expect(await storageProvider.fetchBranches()).toEqual(['main', 'development']);
+    expect(
+      await storageProvider.fetchBranches(),
+    ).toEqual(
+      ['main', 'development'],
+    );
   });
 
   it('should throw an error if there is no project id when trying to fetch branches', async () => {
     const provider = new GitlabTokenStorage('', '', '');
 
-    await expect(provider.fetchBranches()).rejects.toThrow('Project ID not assigned');
+    await expect(provider.fetchBranches())
+      .rejects
+      .toThrow('Project ID not assigned');
   });
 
   it('should try to create a branch', async () => {
-    mockCreateBranch.mockImplementationOnce(() =>
+    mockCreateBranch.mockImplementationOnce(() => (
       Promise.resolve({
         name: 'development',
-      }),
-    );
+      })
+    ));
     expect(await storageProvider.createBranch('development', 'main')).toBe(true);
     expect(mockCreateBranch).toBeCalledWith(35102363, 'development', 'heads/main');
   });
@@ -133,51 +157,60 @@ describe('GitlabTokenStorage', () => {
   it('should throw an error if there is no project id when trying to create a branch', async () => {
     const provider = new GitlabTokenStorage('', '', '');
 
-    await expect(provider.createBranch('newBranch')).rejects.toThrow('Project ID not assigned');
+    await expect(provider.createBranch('newBranch'))
+      .rejects
+      .toThrow('Project ID not assigned');
   });
 
   it('create a branch should return false when it is failed', async () => {
-    mockCreateBranch.mockImplementationOnce(() => Promise.resolve({}));
+    mockCreateBranch.mockImplementationOnce(() => (
+      Promise.resolve({
+      })
+    ));
     expect(await storageProvider.createBranch('development', 'main')).toBe(false);
     expect(mockCreateBranch).toBeCalledWith(35102363, 'development', 'heads/main');
   });
 
   it('canWrite should return true if user is a collaborator by projectMember', async () => {
-    mockGetCurrentUser.mockImplementationOnce(() =>
+    mockGetCurrentUser.mockImplementationOnce(() => (
       Promise.resolve({
         id: 11289475,
         state: 'active',
-      }),
-    );
-    mockGetGroupMembers.mockImplementationOnce(() => Promise.reject(new Error()));
-    mockGetProjectMembers.mockImplementationOnce(() =>
+      })
+    ));
+    mockGetGroupMembers.mockImplementationOnce(() => (
+      Promise.reject(new Error())
+    ));
+    mockGetProjectMembers.mockImplementationOnce(() => (
       Promise.resolve({
         access_level: 50,
-      }),
-    );
+      })
+    ));
     expect(await storageProvider.canWrite()).toBe(true);
     expect(mockGetProjectMembers).toBeCalledWith(35102363, 11289475, { includeInherited: true });
   });
 
   it('canWrite should return false if user is not a collaborator', async () => {
-    mockGetCurrentUser.mockImplementationOnce(() =>
+    mockGetCurrentUser.mockImplementationOnce(() => (
       Promise.resolve({
         id: 11289475,
         state: 'active',
-      }),
-    );
-    mockGetGroupMembers.mockImplementationOnce(() =>
+      })
+    ));
+    mockGetGroupMembers.mockImplementationOnce(() => (
       Promise.resolve({
         access_level: 20,
-      }),
-    );
+      })
+    ));
     expect(await storageProvider.canWrite()).toBe(false);
   });
 
   it('canWrite should throw an error if there is no project or group id', async () => {
     const provider = new GitlabTokenStorage('', '', '');
     provider.enableMultiFile();
-    await expect(provider.canWrite()).rejects.toThrow('Project ID not assigned');
+    await expect(provider.canWrite())
+      .rejects
+      .toThrow('Project ID not assigned');
   });
 
   it('canWrite should return false if filePath is a folder and multiFileSync flag is false', async () => {
@@ -188,32 +221,32 @@ describe('GitlabTokenStorage', () => {
   });
 
   it('can read from Git in single file format', async () => {
-    mockGetRepositories.mockImplementationOnce(() => Promise.resolve([]));
+    mockGetRepositories.mockImplementationOnce(() => (
+      Promise.resolve([])
+    ));
 
     storageProvider.changePath('data/tokens.json');
-    mockGetRepositoryFiles.mockImplementationOnce(() =>
-      Promise.resolve(
-        JSON.stringify({
-          global: {
-            red: {
-              value: '#ff0000',
-              type: 'color',
-            },
-            black: {
-              value: '#000000',
-              type: 'color',
-            },
+    mockGetRepositoryFiles.mockImplementationOnce(() => (
+      Promise.resolve(JSON.stringify({
+        global: {
+          red: {
+            value: '#ff0000',
+            type: 'color',
           },
-          $themes: {
-            id: 'light',
-            name: 'Light',
-            selectedTokenSets: {
-              global: 'enabled',
-            },
+          black: {
+            value: '#000000',
+            type: 'color',
           },
-        }),
-      ),
-    );
+        },
+        $themes: {
+          id: 'light',
+          name: 'Light',
+          selectedTokenSets: {
+            global: 'enabled',
+          },
+        },
+      }))
+    ));
     expect(await storageProvider.read()).toEqual([
       {
         data: {
@@ -222,6 +255,7 @@ describe('GitlabTokenStorage', () => {
           selectedTokenSets: {
             global: 'enabled',
           },
+
         },
         path: 'data/tokens.json/$themes.json',
         type: 'themes',
@@ -232,8 +266,7 @@ describe('GitlabTokenStorage', () => {
         type: 'tokenSet',
         data: {
           red: {
-            value: '#ff0000',
-            type: 'color',
+            value: '#ff0000', type: 'color',
           },
           black: { value: '#000000', type: 'color' },
         },
@@ -341,14 +374,20 @@ describe('GitlabTokenStorage', () => {
   it('read should throw an error if there is no project id', async () => {
     const provider = new GitlabTokenStorage('', '', '');
 
-    await expect(provider.read()).rejects.toThrow('Missing Project ID');
+    await expect(provider.read())
+      .rejects
+      .toThrow('Missing Project ID');
   });
 
   it('should return a validation error', async () => {
-    mockGetRepositories.mockImplementationOnce(() => Promise.resolve([]));
+    mockGetRepositories.mockImplementationOnce(() => (
+      Promise.resolve([])
+    ));
 
     storageProvider.changePath('data/tokens.json');
-    mockGetRepositoryFiles.mockImplementationOnce(() => Promise.resolve(''));
+    mockGetRepositoryFiles.mockImplementationOnce(() => (
+      Promise.resolve('')
+    ));
     expect(await storageProvider.read()).toEqual({
       errorMessage: ErrorMessages.VALIDATION_ERROR,
     });
@@ -363,85 +402,90 @@ describe('GitlabTokenStorage', () => {
   // });
 
   it('should be able to write', async () => {
-    mockGetBranches.mockImplementation(() => Promise.resolve([{ name: 'main' }, { name: 'development' }]));
+    mockGetBranches.mockImplementation(() => (
+      Promise.resolve(
+        [
+          { name: 'main' },
+          { name: 'development' },
+        ],
+      )
+    ));
     storageProvider.changePath('data/tokens.json');
 
-    mockGetRepositories.mockImplementationOnce(() => Promise.resolve([]));
+    mockGetRepositories.mockImplementationOnce(() => (
+      Promise.resolve([])
+    ));
 
-    mockCreateCommits.mockImplementationOnce(() =>
+    mockCreateCommits.mockImplementationOnce(() => (
       Promise.resolve({
         message: 'create a new file',
-      }),
-    );
+      })
+    ));
 
     const userCommitMessage = 'Initial Commit';
 
-    await storageProvider.write(
+    await storageProvider.write([
+      {
+        type: 'metadata',
+        path: '$metadata.json',
+        data: {},
+      },
+      {
+        type: 'themes',
+        path: '$themes.json',
+        data: [
+          {
+            id: 'light',
+            name: 'Light',
+            selectedTokenSets: {
+              global: TokenSetStatus.ENABLED,
+            },
+          },
+        ],
+      },
+      {
+        type: 'tokenSet',
+        name: 'global',
+        path: 'global.json',
+        data: {
+          red: {
+            type: TokenTypes.COLOR,
+            value: '#ff0000',
+          },
+        },
+      },
+    ], {
+      commitMessage: userCommitMessage,
+      storeTokenIdInJsonEditor: true,
+    });
+
+    expect(mockCreateCommits).toHaveBeenCalledWith(
+      35102363,
+      'main',
+      userCommitMessage,
       [
         {
-          type: 'metadata',
-          path: '$metadata.json',
-          data: {},
-        },
-        {
-          type: 'themes',
-          path: '$themes.json',
-          data: [
-            {
+          action: 'create',
+          content: JSON.stringify({
+            $metadata: {},
+            $themes: [{
               id: 'light',
               name: 'Light',
               selectedTokenSets: {
                 global: TokenSetStatus.ENABLED,
               },
-            },
-          ],
-        },
-        {
-          type: 'tokenSet',
-          name: 'global',
-          path: 'global.json',
-          data: {
-            red: {
-              type: TokenTypes.COLOR,
-              value: '#ff0000',
-            },
-          },
-        },
-      ],
-      {
-        commitMessage: userCommitMessage,
-        storeTokenIdInJsonEditor: true,
-      },
-    );
-
-    expect(mockCreateCommits).toHaveBeenCalledWith(35102363, 'main', userCommitMessage, [
-      {
-        action: 'create',
-        content: JSON.stringify(
-          {
-            $metadata: {},
-            $themes: [
-              {
-                id: 'light',
-                name: 'Light',
-                selectedTokenSets: {
-                  global: TokenSetStatus.ENABLED,
-                },
-              },
-            ],
+            }],
             global: {
               red: {
                 type: TokenTypes.COLOR,
                 value: '#ff0000',
               },
             },
-          },
-          null,
-          2,
-        ),
-        filePath: 'data/tokens.json',
-      },
-    ]);
+          }, null, 2),
+          filePath: 'data/tokens.json',
+        },
+      ],
+    );
   });
 
   // it('should be able to write, update, delete a multifile structure', async () => {
@@ -603,20 +647,22 @@ describe('GitlabTokenStorage', () => {
   it('write should throw an error if there is no project id', async () => {
     const provider = new GitlabTokenStorage('', '', '');
 
-    await expect(provider.write([])).rejects.toThrow('Project ID not assigned');
+    await expect(provider.write([]))
+      .rejects
+      .toThrow('Project ID not assigned');
   });
 
   it('should return the committed date of a JSON file', async () => {
-    mockShowRepositoryFiles.mockImplementationOnce(() =>
+    mockShowRepositoryFiles.mockImplementationOnce(() => (
       Promise.resolve({
         commit_id: '1234',
-      }),
-    );
-    mockShowCommits.mockImplementationOnce(() =>
+      })
+    ));
+    mockShowCommits.mockImplementationOnce(() => (
       Promise.resolve({
         committed_date: '2022-01-31T12:34:56Z',
-      }),
-    );
+      })
+    ));
     expect(await storageProvider.getLatestCommitDate()).toEqual(new Date('2022-01-31T12:34:56Z'));
   });
 

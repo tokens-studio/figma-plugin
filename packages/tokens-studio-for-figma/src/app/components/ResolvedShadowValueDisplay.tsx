@@ -17,19 +17,13 @@ const StyledValueItem = styled('div', {
   marginBottom: '$2',
 });
 
-export const ResolvedShadowValueDisplay: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
-  shadows,
-}) => {
+export const ResolvedShadowValueDisplay: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({ shadows }) => {
   const seed = useUIDSeed();
 
   return (
-    <Box
-      css={{
-        display: 'flex',
-        backgroundColor: '$bgSubtle',
-        padding: '$4',
-        fontSize: '$xsmall',
-      }}
+    <Box css={{
+      display: 'flex', backgroundColor: '$bgSubtle', padding: '$4', fontSize: '$xsmall',
+    }}
     >
       <Box css={{ display: 'grid', marginRight: '$9' }}>
         {shadows.map((shadow, index) => (
@@ -40,7 +34,15 @@ export const ResolvedShadowValueDisplay: React.FC<React.PropsWithChildren<React.
       <Box css={{ display: 'grid', marginLeft: '$6' }}>
         {shadows.map((shadow) => (
           <StyledValueItem key={seed(shadow)}>
-            {shadow.x} {shadow.y} {shadow.blur} {shadow.spread} {shadow.color}
+            {shadow.x}
+            {' '}
+            {shadow.y}
+            {' '}
+            {shadow.blur}
+            {' '}
+            {shadow.spread}
+            {' '}
+            {shadow.color}
           </StyledValueItem>
         ))}
       </Box>

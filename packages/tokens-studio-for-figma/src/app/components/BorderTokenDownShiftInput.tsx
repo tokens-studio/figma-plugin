@@ -60,7 +60,11 @@ export default function BorderTokenDownShiftInput({
       handleChange={handleChange}
       setInputValue={handleBorderDownShiftInputChange}
       placeholder={mapTypeToPlaceHolder[name as keyof typeof mapTypeToPlaceHolder] as unknown as string}
-      prefix={name === 'color' && <ColorPickerTrigger onClick={handleToggleInputHelper} background={resolvedColor} />}
+      prefix={
+        name === 'color' && (
+          <ColorPickerTrigger onClick={handleToggleInputHelper} background={resolvedColor} />
+        )
+      }
       suffix
       onSubmit={onSubmit}
     />

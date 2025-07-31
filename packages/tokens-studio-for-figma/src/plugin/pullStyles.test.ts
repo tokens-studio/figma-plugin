@@ -113,15 +113,33 @@ describe('pullStyles', () => {
           description: 'the big one',
         },
       ],
-      fontFamilies: [{ name: 'fontFamilies.inter', type: 'fontFamilies', value: 'Inter' }],
-      fontWeights: [{ name: 'fontWeights.inter-0', type: 'fontWeights', value: 'Bold' }],
-      fontSizes: [{ name: 'fontSize.0', type: 'fontSizes', value: '24.8' }],
-      letterSpacing: [{ name: 'letterSpacing.0', type: 'letterSpacing', value: '0%' }],
-      lineHeights: [{ name: 'lineHeights.0', type: 'lineHeights', value: 'AUTO' }],
-      paragraphSpacing: [{ name: 'paragraphSpacing.0', type: 'paragraphSpacing', value: '0' }],
-      paragraphIndent: [{ name: 'paragraphIndent.0', type: 'dimension', value: '0px' }],
-      textCase: [{ name: 'textCase.none', type: 'textCase', value: 'none' }],
-      textDecoration: [{ name: 'textDecoration.none', type: 'textDecoration', value: 'none' }],
+      fontFamilies: [
+        { name: 'fontFamilies.inter', type: 'fontFamilies', value: 'Inter' },
+      ],
+      fontWeights: [
+        { name: 'fontWeights.inter-0', type: 'fontWeights', value: 'Bold' },
+      ],
+      fontSizes: [
+        { name: 'fontSize.0', type: 'fontSizes', value: '24.8' },
+      ],
+      letterSpacing: [
+        { name: 'letterSpacing.0', type: 'letterSpacing', value: '0%' },
+      ],
+      lineHeights: [
+        { name: 'lineHeights.0', type: 'lineHeights', value: 'AUTO' },
+      ],
+      paragraphSpacing: [
+        { name: 'paragraphSpacing.0', type: 'paragraphSpacing', value: '0' },
+      ],
+      paragraphIndent: [
+        { name: 'paragraphIndent.0', type: 'dimension', value: '0px' },
+      ],
+      textCase: [
+        { name: 'textCase.none', type: 'textCase', value: 'none' },
+      ],
+      textDecoration: [
+        { name: 'textDecoration.none', type: 'textDecoration', value: 'none' },
+      ],
     });
   });
 
@@ -164,15 +182,33 @@ describe('pullStyles', () => {
           description: 'the regular one',
         },
       ],
-      fontFamilies: [{ name: 'fontFamilies.inter', type: 'fontFamilies', value: 'Inter' }],
-      fontWeights: [{ name: 'fontWeights.inter-0', type: 'fontWeights', value: 'Regular' }],
-      fontSizes: [{ name: 'fontSize.0', type: 'fontSizes', value: '24' }],
-      letterSpacing: [{ name: 'letterSpacing.0', type: 'letterSpacing', value: '-0.5' }],
-      lineHeights: [{ name: 'lineHeights.0', type: 'lineHeights', value: '32' }],
-      paragraphSpacing: [{ name: 'paragraphSpacing.0', type: 'paragraphSpacing', value: '16' }],
-      paragraphIndent: [{ name: 'paragraphIndent.0', type: 'dimension', value: '8px' }],
-      textCase: [{ name: 'textCase.uppercase', type: 'textCase', value: 'uppercase' }],
-      textDecoration: [{ name: 'textDecoration.underline', type: 'textDecoration', value: 'underline' }],
+      fontFamilies: [
+        { name: 'fontFamilies.inter', type: 'fontFamilies', value: 'Inter' },
+      ],
+      fontWeights: [
+        { name: 'fontWeights.inter-0', type: 'fontWeights', value: 'Regular' },
+      ],
+      fontSizes: [
+        { name: 'fontSize.0', type: 'fontSizes', value: '24' },
+      ],
+      letterSpacing: [
+        { name: 'letterSpacing.0', type: 'letterSpacing', value: '-0.5' },
+      ],
+      lineHeights: [
+        { name: 'lineHeights.0', type: 'lineHeights', value: '32' },
+      ],
+      paragraphSpacing: [
+        { name: 'paragraphSpacing.0', type: 'paragraphSpacing', value: '16' },
+      ],
+      paragraphIndent: [
+        { name: 'paragraphIndent.0', type: 'dimension', value: '8px' },
+      ],
+      textCase: [
+        { name: 'textCase.uppercase', type: 'textCase', value: 'uppercase' },
+      ],
+      textDecoration: [
+        { name: 'textDecoration.underline', type: 'textDecoration', value: 'underline' },
+      ],
     });
   });
 

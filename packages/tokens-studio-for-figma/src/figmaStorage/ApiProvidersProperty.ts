@@ -10,6 +10,8 @@ export const ApiProvidersProperty = new FigmaStorageProperty<StorageTypeCredenti
     type PossibleIncomingType = StorageTypeCredentials[] | Record<string, StorageTypeCredentials>;
     const result = tryParseJson<PossibleIncomingType>(outgoing) ?? [];
     if (Array.isArray(result)) return result;
-    return Object.values(result).filter((value) => typeof value === 'object');
+    return Object.values(result).filter((value) => (
+      typeof value === 'object'
+    ));
   },
 );

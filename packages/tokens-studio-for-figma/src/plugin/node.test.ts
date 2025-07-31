@@ -1,13 +1,7 @@
 import { mockRootSetSharedPluginData } from '../../tests/__mocks__/figmaMock';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import {
-  mapValuesToTokens,
-  returnValueToLookFor,
-  saveStorageType,
-  saveOnboardingExplainerSets,
-  saveOnboardingExplainerInspect,
-  saveOnboardingExplainerSyncProviders,
-  destructureTokenForAlias,
+  mapValuesToTokens, returnValueToLookFor, saveStorageType, saveOnboardingExplainerSets, saveOnboardingExplainerInspect, saveOnboardingExplainerSyncProviders, destructureTokenForAlias,
 } from './node';
 import getOnboardingExplainer from '@/utils/getOnboardingExplainer';
 import { TokenTypes } from '@/constants/TokenTypes';
@@ -66,16 +60,14 @@ const borderToken = {
 };
 
 const tokens = new Map([
-  [
-    'global.colors.blue',
+  ['global.colors.blue',
     {
       name: 'global.colors.blue',
       type: 'color' as const,
       value: '#0000ff',
     },
   ],
-  [
-    'global.composition.singleProperty',
+  ['global.composition.singleProperty',
     {
       name: 'global.composition.singleProperty',
       type: 'composition' as const,
@@ -87,8 +79,7 @@ const tokens = new Map([
       },
     },
   ],
-  [
-    'global.composition.multipleProperty',
+  ['global.composition.multipleProperty',
     {
       name: 'global.composition.multipleProperty',
       type: 'composition' as const,
@@ -102,8 +93,7 @@ const tokens = new Map([
       },
     },
   ],
-  [
-    'global.composition.containSingleBoxshadow',
+  ['global.composition.containSingleBoxshadow',
     {
       name: 'global.composition.containSingleBoxshadow',
       type: 'composition' as const,
@@ -115,21 +105,20 @@ const tokens = new Map([
       },
     },
   ],
-  [
-    'global.composition.containMultiBoxshadow',
+  ['global.composition.containMultiBoxshadow',
     {
       name: 'global.composition.containMultiBoxshadow',
       type: 'composition' as const,
       value: {
         boxShadow: multipleShadowToken.value,
       },
-      rawValue: {
+      rawValue:
+      {
         boxShadow: '{global.shadow.multiple}',
       },
     },
   ],
-  [
-    'global.shadow.single',
+  ['global.shadow.single',
     {
       ...singleShadowToken,
       name: 'shadow.single',
@@ -137,8 +126,7 @@ const tokens = new Map([
       value: singleShadowToken.value,
     },
   ],
-  [
-    'global.shadow.multiple',
+  ['global.shadow.multiple',
     {
       ...multipleShadowToken,
       name: 'shadow.multiple',
@@ -146,8 +134,7 @@ const tokens = new Map([
       value: multipleShadowToken.value,
     },
   ],
-  [
-    'global.border.general',
+  ['global.border.general',
     {
       ...borderToken,
       name: 'border.general',
@@ -232,8 +219,7 @@ describe('mapValuesToTokens', () => {
 
   it('return rawValue with modifier', () => {
     const tokens = new Map([
-      [
-        'global.colors.mix',
+      ['global.colors.mix',
         {
           name: 'global.colors.mix',
           type: 'color' as const,
@@ -251,8 +237,7 @@ describe('mapValuesToTokens', () => {
           },
         },
       ],
-      [
-        'global.colors.lighten',
+      ['global.colors.lighten',
         {
           name: 'global.colors.lighten',
           type: 'color' as const,
@@ -271,11 +256,13 @@ describe('mapValuesToTokens', () => {
       ],
     ]);
 
-    const values = [{ tokenValue: 'global.colors.lighten' }, { tokenValue: 'global.colors.mix' }];
+    const values = [
+      { tokenValue: 'global.colors.lighten' },
+      { tokenValue: 'global.colors.mix' },
+    ];
 
     const output = [
-      { tokenValue: '#0000ff / lighten(0.4) / lch' },
-      { tokenValue: '#0000ff / mix(#0033ff, 0.4) / lch' },
+      { tokenValue: '#0000ff / lighten(0.4) / lch' }, { tokenValue: '#0000ff / mix(#0033ff, 0.4) / lch' },
     ];
 
     values.forEach((value, index) => {
@@ -300,46 +287,37 @@ describe('destructureTokenForAlias', () => {
       borderTop: 'delete',
     };
     const tokens = new Map([
-      [
-        'red',
-        {
-          name: 'red',
-          rawValue: '#f00',
-          type: TokenTypes.COLOR,
-          value: '#f00',
+      ['red', {
+        name: 'red',
+        rawValue: '#f00',
+        type: TokenTypes.COLOR,
+        value: '#f00',
+      }],
+      ['borderWidth.10px', {
+        name: 'borderWidth.10px',
+        rawValue: '10',
+        type: TokenTypes.BORDER_WIDTH,
+        value: 10,
+      }],
+      ['test', {
+        name: 'test',
+        rawValue: {
+          color: '{red}',
+          style: 'solid',
+          width: '{borderWidth.10px}',
         },
-      ],
-      [
-        'borderWidth.10px',
-        {
-          name: 'borderWidth.10px',
-          rawValue: '10',
-          type: TokenTypes.BORDER_WIDTH,
-          value: 10,
+        resolvedValueWithReferences: {
+          color: '{red}',
+          style: 'solid',
+          width: '{borderWidth.10px}',
         },
-      ],
-      [
-        'test',
-        {
-          name: 'test',
-          rawValue: {
-            color: '{red}',
-            style: 'solid',
-            width: '{borderWidth.10px}',
-          },
-          resolvedValueWithReferences: {
-            color: '{red}',
-            style: 'solid',
-            width: '{borderWidth.10px}',
-          },
-          type: TokenTypes.BORDER,
-          value: {
-            color: '#f00',
-            width: 10,
-            style: 'solid',
-          },
+        type: TokenTypes.BORDER,
+        value: {
+          color: '#f00',
+          width: 10,
+          style: 'solid',
         },
-      ],
+      }],
     ]);
     expect(destructureTokenForAlias(tokens, values)).toEqual({
       border: 'test',

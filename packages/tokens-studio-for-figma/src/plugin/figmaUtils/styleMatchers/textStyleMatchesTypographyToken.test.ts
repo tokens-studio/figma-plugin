@@ -3,8 +3,8 @@ import { textStyleMatchesTypographyToken } from './textStyleMatchesTypographyTok
 
 describe('textStyleMatchesTypographyToken', () => {
   // tslint:disable-next-line: no-empty
-  const noop: () => void = () => {};
-  const dummyFunc: <T>() => T = <T>() => undefined as unknown as T;
+  const noop: () => void = () => { };
+  const dummyFunc: <T>() => T = <T>() => (undefined as unknown) as T;
   const dummyFigmaTextStyle: TextStyle = {
     description: '',
     type: 'TEXT',

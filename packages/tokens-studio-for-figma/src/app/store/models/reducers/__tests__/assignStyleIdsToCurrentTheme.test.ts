@@ -8,11 +8,7 @@ describe('assignStyleIdsToCurrentTheme', () => {
     const state = {
       activeTheme: { id: 'theme1' },
       themes: [
-        {
-          id: 'theme1',
-          selectedTokenSets: { set1: TokenSetStatus.ENABLED },
-          $figmaStyleReferences: { token1: 'style1' },
-        },
+        { id: 'theme1', selectedTokenSets: { set1: TokenSetStatus.ENABLED }, $figmaStyleReferences: { token1: 'style1' } },
         { id: 'theme2', selectedTokenSets: {}, $figmaStyleReferences: { token1: 'style1' } },
       ],
     } as unknown as TokenState;
@@ -21,17 +17,11 @@ describe('assignStyleIdsToCurrentTheme', () => {
     const expectedState = {
       activeTheme: { id: 'theme1' },
       themes: [
-        {
-          id: 'theme1',
-          selectedTokenSets: { set1: TokenSetStatus.ENABLED },
-          $figmaStyleReferences: { token1: 'style2' },
-        },
+        { id: 'theme1', selectedTokenSets: { set1: TokenSetStatus.ENABLED }, $figmaStyleReferences: { token1: 'style2' } },
         { id: 'theme2', selectedTokenSets: {}, $figmaStyleReferences: { token1: 'style1' } },
       ],
     };
-    expect(assignStyleIdsToCurrentTheme(state, { styleIds, tokens, selectedThemes: ['theme1'] })).toEqual(
-      expectedState,
-    );
+    expect(assignStyleIdsToCurrentTheme(state, { styleIds, tokens, selectedThemes: ['theme1'] })).toEqual(expectedState);
   });
 
   it('should not update the state if there is no selected theme', () => {

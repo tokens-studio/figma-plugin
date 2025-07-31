@@ -22,8 +22,8 @@ export async function applyNumberTokenValuesOnNode(
     } else if ('resize' in node) {
       if (
         !(
-          (await tryApplyVariableId(node, 'width', data.number)) &&
-          (await tryApplyVariableId(node, 'height', data.number))
+          (await tryApplyVariableId(node, 'width', data.number))
+          && (await tryApplyVariableId(node, 'height', data.number))
         )
       ) {
         const size = transformValue(String(values.number), 'sizing', baseFontSize);

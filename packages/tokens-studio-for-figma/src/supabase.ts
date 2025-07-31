@@ -1,6 +1,8 @@
 import { PostgrestClient } from '@supabase/postgrest-js';
 import { StorageClient } from '@supabase/storage-js';
-import { RealtimeChannel, RealtimeChannelOptions, RealtimeClient, RealtimeClientOptions } from '@supabase/realtime-js';
+import {
+  RealtimeChannel, RealtimeChannelOptions, RealtimeClient, RealtimeClientOptions,
+} from '@supabase/realtime-js';
 import { AuthData, AuthInfo } from './types/Auth';
 import { AsyncMessageChannel } from './AsyncMessageChannel';
 import { AsyncMessageTypes } from './types/AsyncMessages';

@@ -1,6 +1,8 @@
 import React, { useCallback } from 'react';
 import { Crosshair2Icon } from '@radix-ui/react-icons';
-import { DropdownMenu, Stack, Button, IconButton } from '@tokens-studio/ui';
+import {
+  DropdownMenu, Stack, Button, IconButton,
+} from '@tokens-studio/ui';
 import Box from '../Box';
 import IconLayers from '@/icons/layers.svg';
 import { selectNodes } from '@/utils/figma/selectNodes';
@@ -30,6 +32,7 @@ export default function TokenNodes({ nodes }: { nodes: NodeInfo[] }) {
       sideOffset={4}
       className={`content content-dark ${nodes.length > VISIBLE_VIEWPORT_NODES ? 'scroll-container' : null}`}
     >
+
       {nodes.map(({ id, name, type }) => (
         <TokenNode key={id} id={id} name={name} type={type} />
       ))}
@@ -37,7 +40,10 @@ export default function TokenNodes({ nodes }: { nodes: NodeInfo[] }) {
   );
 
   return (
-    <Stack align="center" gap={1}>
+    <Stack
+      align="center"
+      gap={1}
+    >
       <DropdownMenu>
         <Box
           css={{

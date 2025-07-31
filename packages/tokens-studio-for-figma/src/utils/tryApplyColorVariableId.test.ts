@@ -24,9 +24,7 @@ describe('tryApplyColorVariableId', () => {
     const tokens: SingleToken[] = [{ name: 'token', value: '8', type: TokenTypes.COLOR }];
     const figmaVariableReferences: RawVariableReferenceMap = new Map([]);
     await defaultTokenValueRetriever.initiate({
-      tokens,
-      variableReferences: figmaVariableReferences,
-      applyVariablesStylesOrRawValue: ApplyVariablesStylesOrRawValues.RAW_VALUES,
+      tokens, variableReferences: figmaVariableReferences, applyVariablesStylesOrRawValue: ApplyVariablesStylesOrRawValues.RAW_VALUES,
     });
     expect(await tryApplyColorVariableId(node, 'token', ColorPaintType.FILLS)).toBe(false);
   });
@@ -35,8 +33,7 @@ describe('tryApplyColorVariableId', () => {
     const tokens: SingleToken[] = [{ name: 'token', value: '8', type: TokenTypes.COLOR }];
     const figmaVariableReferences: RawVariableReferenceMap = new Map([]);
     await defaultTokenValueRetriever.initiate({
-      tokens,
-      variableReferences: figmaVariableReferences,
+      tokens, variableReferences: figmaVariableReferences,
     });
     expect(await tryApplyColorVariableId(node, 'token', ColorPaintType.FILLS)).toBe(false);
   });
@@ -53,8 +50,7 @@ describe('tryApplyColorVariableId', () => {
     const variableReferences = new Map();
     variableReferences.set('token', 'VariableID:519:32875');
     defaultTokenValueRetriever.initiate({
-      tokens: [{ name: 'token', value: '8', type: TokenTypes.COLOR }],
-      variableReferences,
+      tokens: [{ name: 'token', value: '8', type: TokenTypes.COLOR }], variableReferences,
     });
     expect(await tryApplyColorVariableId(node, 'token', ColorPaintType.FILLS)).toBe(true);
     expect(mockImportVariableByKeyAsync).toBeCalledWith('VariableID:519:32875');

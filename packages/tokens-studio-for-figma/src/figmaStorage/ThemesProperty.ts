@@ -9,14 +9,13 @@ export const ThemesProperty = new FigmaStorageProperty<ThemeObjectsList>(
   FigmaStorageType.SHARED_PLUGIN_DATA,
   `${SharedPluginDataNamespaces.TOKENS}/${SharedPluginDataKeys.tokens.themes}`,
   (value) => compressToUTF16(JSON.stringify(value)),
-  (value, isCompressed) =>
-    attemptOrFallback<ThemeObjectsList>(() => {
-      if (!value) return [];
-      if (!isCompressed) {
-        const parsedValue = value ? JSON.parse(value) : [];
-        return Array.isArray(parsedValue) ? parsedValue : [];
-      }
-      const decompressed = decompressFromUTF16(value);
-      return JSON.parse(decompressed);
-    }, []),
+  (value, isCompressed) => attemptOrFallback<ThemeObjectsList>(() => {
+    if (!value) return [];
+    if (!isCompressed) {
+      const parsedValue = value ? JSON.parse(value) : [];
+      return Array.isArray(parsedValue) ? parsedValue : [];
+    }
+    const decompressed = decompressFromUTF16(value);
+    return JSON.parse(decompressed);
+  }, []),
 );

@@ -101,13 +101,11 @@ describe('AttachLocalVariablesToTheme', () => {
     ];
     mockGetLocalVariableCollections.mockImplementationOnce(() => mockLocalVariableCollections);
     mockGetLocalVariables.mockImplementationOnce(() => mockLocalVariables);
-    expect(
-      await attachLocalVariablesToTheme({
-        type: AsyncMessageTypes.ATTACH_LOCAL_VARIABLES_TO_THEME,
-        tokens,
-        theme,
-      }),
-    ).toEqual({
+    expect(await attachLocalVariablesToTheme({
+      type: AsyncMessageTypes.ATTACH_LOCAL_VARIABLES_TO_THEME,
+      tokens,
+      theme,
+    })).toEqual({
       variableInfo: {
         collectionId: 'VariableCollectionId:23:23456',
         modeId: '234',
@@ -154,13 +152,11 @@ describe('AttachLocalVariablesToTheme', () => {
     ];
     mockGetLocalVariableCollections.mockImplementationOnce(() => mockLocalVariableCollections);
     mockGetLocalVariables.mockImplementationOnce(() => mockLocalVariables);
-    expect(
-      await attachLocalVariablesToTheme({
-        type: AsyncMessageTypes.ATTACH_LOCAL_VARIABLES_TO_THEME,
-        tokens,
-        theme,
-      }),
-    ).toEqual({
+    expect(await attachLocalVariablesToTheme({
+      type: AsyncMessageTypes.ATTACH_LOCAL_VARIABLES_TO_THEME,
+      tokens,
+      theme,
+    })).toEqual({
       variableInfo: null,
     });
   });

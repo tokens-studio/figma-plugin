@@ -2,7 +2,7 @@ import { createModel } from '@rematch/core';
 import { RootModel } from '@/types/RootModel';
 
 export interface BranchState {
-  branches: string[];
+  branches: string[]
 }
 
 export const branchState = createModel<RootModel>()({

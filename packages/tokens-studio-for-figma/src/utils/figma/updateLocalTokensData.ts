@@ -3,13 +3,7 @@ import { ThemeObjectsList, UsedTokenSetsMap } from '@/types';
 import { AnyTokenList } from '@/types/tokens';
 import {
   ActiveThemeProperty,
-  ThemesProperty,
-  TokenFormatProperty,
-  UpdatedAtProperty,
-  UsedTokenSetProperty,
-  ValuesProperty,
-  VersionProperty,
-  IsCompressedProperty,
+  ThemesProperty, TokenFormatProperty, UpdatedAtProperty, UsedTokenSetProperty, ValuesProperty, VersionProperty, IsCompressedProperty,
 } from '@/figmaStorage';
 import { CollapsedTokenSetsProperty } from '@/figmaStorage/CollapsedTokenSetsProperty';
 import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
@@ -18,18 +12,18 @@ import { ClientStorageProperty } from '@/figmaStorage/ClientStorageProperty';
 import { getFileKey } from '../../plugin/helpers';
 
 type Payload = {
-  tokens: Record<string, AnyTokenList>;
-  themes: ThemeObjectsList;
-  compressedTokens: string;
-  compressedThemes: string;
-  usedTokenSets: UsedTokenSetsMap;
-  activeTheme: Record<string, string>;
-  updatedAt: string;
-  checkForChanges: boolean;
-  collapsedTokenSets: string[];
-  tokenFormat: TokenFormatOptions;
-  storageProvider: StorageProviderType;
-  storageSize: number;
+  tokens: Record<string, AnyTokenList>
+  themes: ThemeObjectsList
+  compressedTokens: string
+  compressedThemes: string
+  usedTokenSets: UsedTokenSetsMap
+  activeTheme: Record<string, string>
+  updatedAt: string
+  checkForChanges: boolean
+  collapsedTokenSets: string[]
+  tokenFormat: TokenFormatOptions
+  storageProvider: StorageProviderType
+  storageSize: number
 };
 
 export async function updateLocalTokensData(payload: Payload) {

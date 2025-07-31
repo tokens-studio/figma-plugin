@@ -19,13 +19,22 @@ export function DragItem<T>({ item, children }: Props<T>) {
   const editProhibited = useSelector(editProhibitedSelector);
   const contextValue = useMemo(() => ({ controls }), [controls]);
 
-  return !editProhibited ? (
-    <DragControlsContext.Provider value={contextValue}>
-      <ReorderItem dragListener={false} dragControls={controls} value={item} style={{ boxShadow, y }}>
+  return (!editProhibited)
+    ? (
+      <DragControlsContext.Provider value={contextValue}>
+        <ReorderItem
+          dragListener={false}
+          dragControls={controls}
+          value={item}
+          style={{ boxShadow, y }}
+        >
+          {children}
+        </ReorderItem>
+      </DragControlsContext.Provider>
+    )
+    : (
+      <Stack direction="row">
         {children}
-      </ReorderItem>
-    </DragControlsContext.Provider>
-  ) : (
-    <Stack direction="row">{children}</Stack>
-  );
+      </Stack>
+    );
 }

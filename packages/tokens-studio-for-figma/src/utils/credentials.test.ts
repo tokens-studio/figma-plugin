@@ -17,7 +17,9 @@ describe('updateCredentials', () => {
       name: 'mytokens',
       provider: StorageProviderType.JSONBIN,
     };
-    figma.clientStorage.getAsync.mockResolvedValueOnce(undefined).mockResolvedValueOnce(JSON.stringify([apiObject]));
+    figma.clientStorage.getAsync
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce(JSON.stringify([apiObject]));
     await updateCredentials(apiObject);
 
     expect(figma.clientStorage.setAsync).toHaveBeenCalledWith(

@@ -12,7 +12,10 @@ describe('init', () => {
   });
 
   it('should work', async () => {
-    const runAfter = [AsyncMessageChannel.PluginInstance.connect(), AsyncMessageChannel.ReactInstance.connect()];
+    const runAfter = [
+      AsyncMessageChannel.PluginInstance.connect(),
+      AsyncMessageChannel.ReactInstance.connect(),
+    ];
 
     const mockStartupHandler = jest.fn();
     AsyncMessageChannel.ReactInstance.handle(AsyncMessageTypes.STARTUP, mockStartupHandler);

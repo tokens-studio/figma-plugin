@@ -21,10 +21,10 @@ export async function applyTextCharacterValuesOnNode(
 
   // When a text token is applied we want to apply the token value
   if (
-    'characters' in node &&
-    node.fontName !== figma.mixed &&
-    typeof values.text === 'string' &&
-    typeof data.text !== 'undefined'
+    'characters' in node
+    && node.fontName !== figma.mixed
+    && typeof values.text === 'string'
+    && typeof data.text !== 'undefined'
   ) {
     if (!(await tryApplyVariableId(node, 'characters', data.text))) {
       await figma.loadFontAsync(node.fontName);

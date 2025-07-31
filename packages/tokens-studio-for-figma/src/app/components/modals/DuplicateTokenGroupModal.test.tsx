@@ -2,7 +2,9 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { AnyTokenList } from '@/types/tokens';
-import { createMockStore, render, waitFor } from '../../../../tests/config/setupTest';
+import {
+  createMockStore, render, waitFor,
+} from '../../../../tests/config/setupTest';
 import DuplicateTokenGroupModal from './DuplicateTokenGroupModal';
 
 const tokens: Record<string, AnyTokenList> = {
@@ -26,7 +28,12 @@ describe('DuplicateTokenGroupModal', () => {
   it('render without crashing', async () => {
     render(
       <Provider store={store}>
-        <DuplicateTokenGroupModal isOpen type={TokenTypes.COLOR} newName="newName" oldName="oldName" />
+        <DuplicateTokenGroupModal
+          isOpen
+          type={TokenTypes.COLOR}
+          newName="newName"
+          oldName="oldName"
+        />
       </Provider>,
     );
   });
@@ -37,7 +44,12 @@ describe('DuplicateTokenGroupModal', () => {
 
     const { getByText } = render(
       <Provider store={store}>
-        <DuplicateTokenGroupModal isOpen type={TokenTypes.COLOR} newName={newName} oldName={oldName} />
+        <DuplicateTokenGroupModal
+          isOpen
+          type={TokenTypes.COLOR}
+          newName={newName}
+          oldName={oldName}
+        />
       </Provider>,
     );
 
@@ -52,7 +64,12 @@ describe('DuplicateTokenGroupModal', () => {
 
     const { getByText } = render(
       <Provider store={store}>
-        <DuplicateTokenGroupModal isOpen type={TokenTypes.COLOR} newName={newName} oldName={oldName} />
+        <DuplicateTokenGroupModal
+          isOpen
+          type={TokenTypes.COLOR}
+          newName={newName}
+          oldName={oldName}
+        />
       </Provider>,
     );
 

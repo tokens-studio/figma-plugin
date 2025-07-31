@@ -50,10 +50,7 @@ export default function InspectorTokenSingle({
     if (resolvedToken) {
       if (resolvedToken.type === TokenTypes.COMPOSITION) {
         return {
-          name: resolvedToken.name,
-          value: resolvedToken.value,
-          rawValue: resolvedToken.rawValue,
-          type: resolvedToken.type,
+          name: resolvedToken.name, value: resolvedToken.value, rawValue: resolvedToken.rawValue, type: resolvedToken.type,
         };
       }
 
@@ -64,8 +61,7 @@ export default function InspectorTokenSingle({
 
   React.useEffect(() => {
     setChecked(inspectState.selectedTokens.includes(`${token.category}-${token.value}`));
-    if (!resolvedTokens.find((resolvedToken) => resolvedToken.name === token.value) && !token.resolvedValue)
-      setIsBrokenLink(true);
+    if (!resolvedTokens.find((resolvedToken) => resolvedToken.name === token.value) && !token.resolvedValue) setIsBrokenLink(true);
   }, [inspectState.selectedTokens, token]);
 
   React.useEffect(() => {
@@ -123,9 +119,13 @@ export default function InspectorTokenSingle({
           id={`${token.category}-${token.value}`}
           onCheckedChange={onCheckedChanged}
         />
-        {(token.value === 'none' || tokenToDisplay?.value === 'none') && <ValueNoneIcon style={{ flexShrink: 0 }} />}
-        {isBrokenLink && token.value !== 'none' && <IconBrokenLink style={{ flexShrink: 0 }} />}
-        {tokenToDisplay && tokenToDisplay.value !== 'none' && tokenToDisplay.name !== 'none' && (
+        {
+          (token.value === 'none' || tokenToDisplay?.value === 'none') && <ValueNoneIcon style={{ flexShrink: 0 }} />
+        }
+        {
+          isBrokenLink && token.value !== 'none' && <IconBrokenLink style={{ flexShrink: 0 }} />
+        }
+        {(tokenToDisplay && tokenToDisplay.value !== 'none' && tokenToDisplay.name !== 'none') && (
           <InspectorResolvedToken token={tokenToDisplay} />
         )}
         <Box
@@ -136,18 +136,11 @@ export default function InspectorTokenSingle({
             gap: '$1',
           }}
         >
-          {token.appliedType === 'variable' && (
-            <Tooltip label={t('appliedVariable')}>
-              <IconVariable />
-            </Tooltip>
-          )}
-          {token.appliedType === 'style' && (
-            <Tooltip label={t('appliedStyle')}>
-              <StyleIcon />
-            </Tooltip>
-          )}
+          {token.appliedType === 'variable' && <Tooltip label={t('appliedVariable')}><IconVariable /></Tooltip>}
+          {token.appliedType === 'style' && <Tooltip label={t('appliedStyle')}><StyleIcon /></Tooltip>}
           <Box css={{ fontSize: '$small' }}>{token.value}</Box>
-          {!token.resolvedValue && (
+          {
+            !token.resolvedValue && (
             <IconButton
               tooltip={t('changeToAnotherToken')}
               data-testid="button-token-remap"
@@ -156,41 +149,40 @@ export default function InspectorTokenSingle({
               size="small"
               variant="invisible"
             />
-          )}
+            )
+          }
         </Box>
-        {showDialog && (
-          <Modal
-            modal={false}
-            title={t('chooseANewTokenForValue', { value: tokenToDisplay?.name || token.value })}
-            size="large"
-            isOpen
-            close={onCancel}
-          >
-            <form onSubmit={onConfirm}>
-              <Stack direction="column" gap={4}>
-                <DownshiftInput
-                  value={newTokenName}
-                  type={property}
-                  resolvedTokens={resolvedTokens}
-                  handleChange={handleChange}
-                  setInputValue={handleDownShiftInputChange}
-                  placeholder={t('chooseANewToken')}
-                  suffix
-                  onSubmit={onConfirm}
-                />
+        {
+          showDialog && (
+            <Modal modal={false} title={t('chooseANewTokenForValue', { value: tokenToDisplay?.name || token.value })} size="large" isOpen close={onCancel}>
+              <form
+                onSubmit={onConfirm}
+              >
+                <Stack direction="column" gap={4}>
+                  <DownshiftInput
+                    value={newTokenName}
+                    type={property}
+                    resolvedTokens={resolvedTokens}
+                    handleChange={handleChange}
+                    setInputValue={handleDownShiftInputChange}
+                    placeholder={t('chooseANewToken')}
+                    suffix
+                    onSubmit={onConfirm}
+                  />
 
-                <Stack direction="row" gap={4} justify="between">
-                  <Button variant="secondary" onClick={onCancel}>
-                    {t('cancel')}
-                  </Button>
-                  <Button type="submit" variant="primary">
-                    {t('remap')}
-                  </Button>
+                  <Stack direction="row" gap={4} justify="between">
+                    <Button variant="secondary" onClick={onCancel}>
+                      {t('cancel')}
+                    </Button>
+                    <Button type="submit" variant="primary">
+                      {t('remap')}
+                    </Button>
+                  </Stack>
                 </Stack>
-              </Stack>
-            </form>
-          </Modal>
-        )}
+              </form>
+            </Modal>
+          )
+        }
       </Box>
       <TokenNodes nodes={token.nodes} />
     </Box>

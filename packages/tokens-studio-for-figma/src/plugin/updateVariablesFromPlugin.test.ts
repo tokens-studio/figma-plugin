@@ -1,7 +1,5 @@
 import {
-  mockGetLocalVariableCollectionsAsync,
-  mockGetLocalVariablesAsync,
-  mockSetValueForMode,
+  mockGetLocalVariableCollectionsAsync, mockGetLocalVariablesAsync, mockSetValueForMode,
 } from '../../tests/__mocks__/figmaMock';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
@@ -18,21 +16,19 @@ describe('updateVariablesFromPlugin', () => {
     activeTheme: {
       [INTERNAL_THEMES_NO_GROUP]: 'light',
     },
-    themes: [
-      {
-        id: 'light',
-        name: 'light',
-        selectedTokenSets: {
-          global: TokenSetStatus.ENABLED,
-        },
-        $figmaVariableReferences: {
-          'fg.default': '12345',
-          'fg.muted': '23456',
-          'fg.alias': '34567',
-        },
-        $figmaModeId: 'modeID:123',
+    themes: [{
+      id: 'light',
+      name: 'light',
+      selectedTokenSets: {
+        global: TokenSetStatus.ENABLED,
       },
-    ],
+      $figmaVariableReferences: {
+        'fg.default': '12345',
+        'fg.muted': '23456',
+        'fg.alias': '34567',
+      },
+      $figmaModeId: 'modeID:123',
+    }],
   });
   runAfter.push(AsyncMessageChannel.ReactInstance.connect());
   AsyncMessageChannel.ReactInstance.handle(AsyncMessageTypes.GET_THEME_INFO, mockGetThemeInfoHandler);

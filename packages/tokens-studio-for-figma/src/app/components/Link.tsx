@@ -10,14 +10,12 @@ const StyledLink = styled('a', {
 });
 
 type Props = {
-  href: string;
-  children: React.ReactNode;
+  href: string
+  children: React.ReactNode
 };
 
 export default function Link({ href, children }: Props) {
   return (
-    <StyledLink href={href} target="_blank" rel="noreferrer">
-      {children}
-    </StyledLink>
+    <StyledLink href={href} target="_blank" rel="noreferrer">{children}</StyledLink>
   );
 }

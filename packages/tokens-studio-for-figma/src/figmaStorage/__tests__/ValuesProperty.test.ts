@@ -72,13 +72,11 @@ describe('ValuesProperty', () => {
   it('should write large data in chunks', async () => {
     // Create a large mock values object
     const largeValues: Record<string, AnyTokenList> = {
-      global: Array(100)
-        .fill(0)
-        .map((_, i) => ({
-          type: TokenTypes.COLOR,
-          name: `colors.color${i}`,
-          value: '#ff0000',
-        })),
+      global: Array(100).fill(0).map((_, i) => ({
+        type: TokenTypes.COLOR,
+        name: `colors.color${i}`,
+        value: '#ff0000',
+      })),
     };
 
     // Mock getSharedPluginData to simulate existing metadata check
@@ -104,14 +102,10 @@ describe('ValuesProperty', () => {
     jest.mock('@/utils/figmaStorage/writeSharedPluginData', () => ({
       writeSharedPluginData: jest.fn().mockImplementation(() => {
         // Simulate chunked storage metadata
-        mockRootSetSharedPluginData(
-          'tokens',
-          'values_meta',
-          JSON.stringify({
-            type: 'chunked',
-            count: 3,
-          }),
-        );
+        mockRootSetSharedPluginData('tokens', 'values_meta', JSON.stringify({
+          type: 'chunked',
+          count: 3,
+        }));
 
         // Simulate writing chunks
         mockRootSetSharedPluginData('tokens', 'values_chunk_0', 'chunk1');
@@ -135,12 +129,10 @@ describe('ValuesProperty', () => {
 
   it('should read chunked data correctly', async () => {
     // Mock metadata indicating chunked storage with 3 chunks
-    mockRootGetSharedPluginData.mockReturnValueOnce(
-      JSON.stringify({
-        type: 'chunked',
-        count: 3,
-      }),
-    );
+    mockRootGetSharedPluginData.mockReturnValueOnce(JSON.stringify({
+      type: 'chunked',
+      count: 3,
+    }));
 
     // Create the full compressed string
     const compressedString = compressToUTF16(JSON.stringify(mockValues));
@@ -170,12 +162,10 @@ describe('ValuesProperty', () => {
 
   it('should handle missing chunks gracefully', async () => {
     // Mock metadata indicating chunked storage
-    mockRootGetSharedPluginData.mockReturnValueOnce(
-      JSON.stringify({
-        type: 'chunked',
-        count: 3,
-      }),
-    );
+    mockRootGetSharedPluginData.mockReturnValueOnce(JSON.stringify({
+      type: 'chunked',
+      count: 3,
+    }));
 
     // Mock the chunks with one missing
     mockRootGetSharedPluginData.mockReturnValueOnce('chunk1'); // chunk 0
@@ -225,12 +215,10 @@ describe('ValuesProperty', () => {
 
   it('should clean up obsolete chunks when writing new data', async () => {
     // Mock existing metadata with 3 chunks
-    mockRootGetSharedPluginData.mockReturnValueOnce(
-      JSON.stringify({
-        type: 'chunked',
-        count: 3,
-      }),
-    );
+    mockRootGetSharedPluginData.mockReturnValueOnce(JSON.stringify({
+      type: 'chunked',
+      count: 3,
+    }));
 
     // Track which chunks are cleared
     const clearedChunks: string[] = [];

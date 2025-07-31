@@ -11,7 +11,10 @@ interface CreateTokenInTokensStudioPayload {
   payload: DuplicateTokenPayload;
 }
 
-export async function duplicateTokenInTokensStudio({ payload, rootState }: CreateTokenInTokensStudioPayload) {
+export async function duplicateTokenInTokensStudio({
+  payload,
+  rootState,
+}: CreateTokenInTokensStudioPayload) {
   const tokenData = updateTokenPayloadToSingleToken({
     parent: payload.parent,
     name: payload.newName,

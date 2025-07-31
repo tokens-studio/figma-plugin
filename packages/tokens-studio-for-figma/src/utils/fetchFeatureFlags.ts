@@ -6,14 +6,14 @@ import { UserData } from '@/types/userData';
 
 export default async function fetchFeatureFlags(userData: UserData) {
   if (process.env.LAUNCHDARKLY_FLAGS) {
-    return Object.fromEntries(process.env.LAUNCHDARKLY_FLAGS!.split(',').map((flag) => [flag, true]));
+    return Object.fromEntries(process.env.LAUNCHDARKLY_FLAGS!.split(',').map((flag) => (
+      [flag, true]
+    )));
   }
 
   if (userData.licenseKey && userData.userId) {
     const {
-      plan,
-      email: clientEmail,
-      entitlements,
+      plan, email: clientEmail, entitlements,
     } = await validateLicense(userData.licenseKey, userData.userId, userData.userName);
     const userAttributes: Record<string, string | boolean> = {
       plan: plan || '',

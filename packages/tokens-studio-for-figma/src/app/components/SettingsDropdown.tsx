@@ -13,13 +13,13 @@ export default function SettingsDropdown() {
   const localApiState = useSelector(localApiStateSelector);
   const { t } = useTranslation(['tokens']);
 
-  const { updateRemote, updateOnChange, shouldSwapStyles, shouldUpdateStyles } = useSelector(
-    settingsStateSelector,
-    isEqual,
-  );
+  const {
+    updateRemote, updateOnChange, shouldSwapStyles, shouldUpdateStyles,
+  } = useSelector(settingsStateSelector, isEqual);
 
-  const { setUpdateOnChange, setUpdateRemote, setShouldSwapStyles, setShouldUpdateStyles } =
-    useDispatch<Dispatch>().settings;
+  const {
+    setUpdateOnChange, setUpdateRemote, setShouldSwapStyles, setShouldUpdateStyles,
+  } = useDispatch<Dispatch>().settings;
 
   const handleUpdateOnChange = React.useCallback(() => {
     setUpdateOnChange(!updateOnChange);
@@ -54,7 +54,9 @@ export default function SettingsDropdown() {
               <Check />
             </DropdownMenu.ItemIndicator>
             {t('update.onChange.title')}
-            <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>{t('update.onChange.description')}</Box>
+            <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>
+              {t('update.onChange.description')}
+            </Box>
           </DropdownMenu.CheckboxItem>
           {localApiState?.provider === StorageProviderType.JSONBIN ? (
             <DropdownMenu.CheckboxItem
@@ -66,7 +68,9 @@ export default function SettingsDropdown() {
                 <Check />
               </DropdownMenu.ItemIndicator>
               {t('update.remoteJSONBin.title')}
-              <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>{t('update.remoteJSONBin.description')}</Box>
+              <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>
+                {t('update.remoteJSONBin.description')}
+              </Box>
             </DropdownMenu.CheckboxItem>
           ) : null}
           <DropdownMenu.CheckboxItem
@@ -78,7 +82,9 @@ export default function SettingsDropdown() {
               <Check />
             </DropdownMenu.ItemIndicator>
             {t('update.swapStyles.title')}
-            <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>{t('update.swapStyles.description')}</Box>
+            <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>
+              {t('update.swapStyles.description')}
+            </Box>
           </DropdownMenu.CheckboxItem>
           <DropdownMenu.CheckboxItem
             data-testid="should-update-styles"
@@ -89,7 +95,9 @@ export default function SettingsDropdown() {
               <Check />
             </DropdownMenu.ItemIndicator>
             {t('update.shouldUpdateStyles.title')}
-            <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>{t('update.shouldUpdateStyles.description')}</Box>
+            <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>
+              {t('update.shouldUpdateStyles.description')}
+            </Box>
           </DropdownMenu.CheckboxItem>
         </DropdownMenu.Content>
       </DropdownMenu.Portal>

@@ -24,7 +24,7 @@ import { SingleSizingToken } from './SingleSizingToken';
 import { SingleNumberToken } from './SingleNumberToken';
 
 export type SingleToken<Named extends boolean = true, P = unknown> =
-  | SingleColorToken<Named, P>
+  SingleColorToken<Named, P>
   | SingleBorderRadiusToken<Named, P>
   | SingleTextToken<Named, P>
   | SingleTypographyToken<Named, P>

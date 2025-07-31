@@ -40,7 +40,7 @@ describe('applyBorderWidthValuesOnNode', () => {
 
     // Should try to apply variable to strokeWeight directly
     expect(mockTryApplyVariableId).toHaveBeenCalledWith(ellipseNode, 'strokeWeight', 'border-width-token');
-
+    
     // Should not try to apply to individual stroke weight properties
     expect(mockTryApplyVariableId).not.toHaveBeenCalledWith(ellipseNode, 'strokeTopWeight', expect.any(String));
     expect(mockTryApplyVariableId).not.toHaveBeenCalledWith(ellipseNode, 'strokeRightWeight', expect.any(String));
@@ -74,10 +74,8 @@ describe('applyBorderWidthValuesOnNode', () => {
 
     // Mock tryApplyVariableId to return true for all individual stroke weights
     mockTryApplyVariableId.mockImplementation(async (node, type, token) => {
-      if (
-        token === 'border-width-token' &&
-        ['strokeTopWeight', 'strokeRightWeight', 'strokeBottomWeight', 'strokeLeftWeight'].includes(type)
-      ) {
+      if (token === 'border-width-token' && 
+          ['strokeTopWeight', 'strokeRightWeight', 'strokeBottomWeight', 'strokeLeftWeight'].includes(type)) {
         return true;
       }
       return false;

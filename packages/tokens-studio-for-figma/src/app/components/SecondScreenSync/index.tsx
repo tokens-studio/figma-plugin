@@ -2,7 +2,9 @@ import { useCallback, useEffect } from 'react';
 import * as Sentry from '@sentry/react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RealtimeChannel, RealtimePostgresUpdatePayload } from '@supabase/realtime-js';
-import { activeThemeSelector, themesListSelector, tokensSelector, usedTokenSetSelector } from '@/selectors';
+import {
+  activeThemeSelector, themesListSelector, tokensSelector, usedTokenSetSelector,
+} from '@/selectors';
 import { useAuth } from '@/context/AuthContext';
 import { secondScreenSelector } from '@/selectors/secondScreenSelector';
 import supabase from '@/supabase';

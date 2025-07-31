@@ -24,8 +24,7 @@ export const singleTokenToDTCGToken = (token: SingleToken): DTCGToken => ({
  * @param convertToDTCG Set to true to convert to DTCG format
  * @returns
  */
-export const singleTokensToRawTokenSet = (tokens: SingleToken[], convertToDTCG: boolean = false) =>
-  tokens.reduce((acc, token) => {
-    set(acc, token.name?.split('.') || '', convertToDTCG ? singleTokenToDTCGToken(token) : token);
-    return acc;
-  }, {});
+export const singleTokensToRawTokenSet = (tokens: SingleToken[], convertToDTCG: boolean = false) => tokens.reduce((acc, token) => {
+  set(acc, token.name?.split('.') || '', convertToDTCG ? singleTokenToDTCGToken(token) : token);
+  return acc;
+}, {});

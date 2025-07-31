@@ -54,7 +54,11 @@ export default function Changelog() {
               <Heading>{item.title}</Heading>
               <Text size="small">{item.excerpt}</Text>
               {item.read_more_link && (
-                <StyledReadMoreLink target="_blank" rel="noreferrer" href={item.read_more_link}>
+                <StyledReadMoreLink
+                  target="_blank"
+                  rel="noreferrer"
+                  href={item.read_more_link}
+                >
                   {item.read_more_text ? item.read_more_text : t('readMore')}
                 </StyledReadMoreLink>
               )}

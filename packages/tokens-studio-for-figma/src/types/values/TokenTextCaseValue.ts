@@ -1,5 +1,5 @@
 export type TokenTextCaseValue =
-  | 'uppercase'
+  'uppercase'
   | 'upper'
   | 'lowercase'
   | 'lower'

@@ -1,5 +1,8 @@
 import React, { useCallback } from 'react';
-import { Button, IconButton } from '@tokens-studio/ui';
+import {
+  Button,
+  IconButton,
+} from '@tokens-studio/ui';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { Dispatch } from '../store';
@@ -20,34 +23,10 @@ export function TokenFormatBadge({ extended = false }: { extended?: boolean }) {
   }, [dispatch.uiState]);
 
   if (extended) {
-    return isDTCG ? (
-      <Button icon={<DesignTokenIcon />} onClick={handleOpenModal} variant="invisible" size="small">
-        {t('w3cformat')}
-      </Button>
-    ) : (
-      <Button icon={<LegacyFormatIcon />} onClick={handleOpenModal} variant="invisible" size="small">
-        {t('legacyformat')}
-      </Button>
-    );
+    return isDTCG ? <Button icon={<DesignTokenIcon />} onClick={handleOpenModal} variant="invisible" size="small">{t('w3cformat')}</Button> : <Button icon={<LegacyFormatIcon />} onClick={handleOpenModal} variant="invisible" size="small">{t('legacyformat')}</Button>;
   }
 
-  return isDTCG ? (
-    <IconButton
-      tooltip={t('w3cformat')}
-      tooltipSide="top"
-      onClick={handleOpenModal}
-      variant="invisible"
-      size="small"
-      icon={<DesignTokenIcon />}
-    />
-  ) : (
-    <IconButton
-      tooltip={t('legacyformattooltip')}
-      tooltipSide="top"
-      onClick={handleOpenModal}
-      variant="invisible"
-      size="small"
-      icon={<LegacyFormatIcon />}
-    />
+  return isDTCG ? <IconButton tooltip={t('w3cformat')} tooltipSide="top" onClick={handleOpenModal} variant="invisible" size="small" icon={<DesignTokenIcon />} /> : (
+    <IconButton tooltip={t('legacyformattooltip')} tooltipSide="top" onClick={handleOpenModal} variant="invisible" size="small" icon={<LegacyFormatIcon />} />
   );
 }

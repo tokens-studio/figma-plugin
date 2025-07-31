@@ -1,4 +1,6 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback, useEffect, useMemo, useState,
+} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Sentry from '@sentry/react';
 import { settingsStateSelector, tokensSelector, themeByIdSelector } from '@/selectors';
@@ -18,23 +20,29 @@ import { ThemeVariableManagement } from './ThemeVariableManagement';
 type StyleInfoPerCategory = Partial<Record<'typography' | 'colors' | 'effects', Record<string, StyleInfo>>>;
 
 type Props = {
-  id: string;
+  id: string
 };
 
 export const ThemeStyleManagementForm: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({ id }) => {
   const [rawStyleInfo, setRawStyleInfo] = useState<StyleInfoPerCategory>({});
   const [resolvedStyleInfo, setResolvedStyleInfo] = useState<StyleInfoPerCategory>({});
   const dispatch = useDispatch<Dispatch>();
-  const theme = useSelector(useCallback((state: RootState) => themeByIdSelector(state, id), [id]));
+  const theme = useSelector(useCallback((state: RootState) => (
+    themeByIdSelector(state, id)
+  ), [id]));
   const settings = useSelector(settingsStateSelector);
   const tokenSets = useSelector(tokensSelector);
 
   const stylesInfo = useMemo(() => {
     if (theme) {
       const stylePathSlice = settings.ignoreFirstPartForStyles ? 1 : 0;
-      const stylePathPrefix = settings.prefixStylesWithThemeName ? theme.name : null;
-      return mapTokensToStyleInfo(tokenSets, theme.$figmaStyleReferences ?? {}, (name) =>
-        convertTokenNameToPath(name, stylePathPrefix, stylePathSlice),
+      const stylePathPrefix = settings.prefixStylesWithThemeName
+        ? theme.name
+        : null;
+      return mapTokensToStyleInfo(
+        tokenSets,
+        theme.$figmaStyleReferences ?? {},
+        (name) => convertTokenNameToPath(name, stylePathPrefix, stylePathSlice),
       );
     }
 
@@ -47,7 +55,7 @@ export const ThemeStyleManagementForm: React.FC<React.PropsWithChildren<React.Pr
       const colors: (typeof stylesInfo)[string][] = [];
       const effects: (typeof stylesInfo)[string][] = [];
       const entries = Object.entries(stylesInfo);
-      entries.forEach(([, { styleId, token }]) => {
+      entries.forEach(([,{ styleId, token }]) => {
         if (token.type === TokenTypes.TYPOGRAPHY) {
           typography.push({ styleId, token });
         } else if (token.type === TokenTypes.COLOR) {
@@ -63,61 +71,52 @@ export const ThemeStyleManagementForm: React.FC<React.PropsWithChildren<React.Pr
     return null;
   }, [stylesInfo]);
 
-  const attachLocalStyles = useCallback(
-    async (category: AttachLocalStylesToTheme['category']) => {
-      if (theme) {
-        dispatch.uiState.startJob({
-          name: BackgroundJobs.UI_ATTACHING_LOCAL_STYLES,
-          isInfinite: true,
-        });
-        const result = await AsyncMessageChannel.ReactInstance.message({
-          type: AsyncMessageTypes.ATTACH_LOCAL_STYLES_TO_THEME,
-          tokens: tokenSets,
+  const attachLocalStyles = useCallback(async (category: AttachLocalStylesToTheme['category']) => {
+    if (theme) {
+      dispatch.uiState.startJob({
+        name: BackgroundJobs.UI_ATTACHING_LOCAL_STYLES,
+        isInfinite: true,
+      });
+      const result = await AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.ATTACH_LOCAL_STYLES_TO_THEME,
+        tokens: tokenSets,
+        category,
+        theme,
+        settings,
+      });
+      if (result.$figmaStyleReferences) {
+        track('Attach styles to theme', {
           category,
-          theme,
-          settings,
+          count: Object.values(result.$figmaStyleReferences).length,
         });
-        if (result.$figmaStyleReferences) {
-          track('Attach styles to theme', {
-            category,
-            count: Object.values(result.$figmaStyleReferences).length,
-          });
-          dispatch.tokenState.assignStyleIdsToTheme({
-            id: result.id,
-            styleIds: result.$figmaStyleReferences,
-          });
-        }
-        dispatch.uiState.completeJob(BackgroundJobs.UI_ATTACHING_LOCAL_STYLES);
+        dispatch.tokenState.assignStyleIdsToTheme({
+          id: result.id,
+          styleIds: result.$figmaStyleReferences,
+        });
       }
-    },
-    [theme, tokenSets, settings, dispatch],
-  );
+      dispatch.uiState.completeJob(BackgroundJobs.UI_ATTACHING_LOCAL_STYLES);
+    }
+  }, [theme, tokenSets, settings, dispatch]);
 
-  const handleDisconnectStyle = useCallback(
-    (token: string) => {
-      if (theme) {
-        track('Disconnect style', { token });
-        dispatch.tokenState.disconnectStyleFromTheme({
-          id: theme.id,
-          key: token,
-        });
-      }
-    },
-    [theme, dispatch.tokenState],
-  );
+  const handleDisconnectStyle = useCallback((token: string) => {
+    if (theme) {
+      track('Disconnect style', { token });
+      dispatch.tokenState.disconnectStyleFromTheme({
+        id: theme.id,
+        key: token,
+      });
+    }
+  }, [theme, dispatch.tokenState]);
 
-  const handleDisconnectSelectedStyle = useCallback(
-    (tokens: string[]) => {
-      if (theme) {
-        track('Disconnect selected styles', { tokens });
-        dispatch.tokenState.disconnectStyleFromTheme({
-          id: theme.id,
-          key: tokens,
-        });
-      }
-    },
-    [theme, dispatch.tokenState],
-  );
+  const handleDisconnectSelectedStyle = useCallback((tokens: string[]) => {
+    if (theme) {
+      track('Disconnect selected styles', { tokens });
+      dispatch.tokenState.disconnectStyleFromTheme({
+        id: theme.id,
+        key: tokens,
+      });
+    }
+  }, [theme, dispatch.tokenState]);
 
   const handleAttachLocalTextStyles = useCallback(() => {
     attachLocalStyles('typography');
@@ -132,40 +131,29 @@ export const ThemeStyleManagementForm: React.FC<React.PropsWithChildren<React.Pr
   }, [attachLocalStyles]);
 
   useEffect(() => {
-    const allStyleIds = Object.values(rawStyleInfo).reduce<string[]>(
-      (list, map) => list.concat(Object.values(map).map((info) => info.id)),
-      [],
-    );
+    const allStyleIds = Object.values(rawStyleInfo).reduce<string[]>((list, map) => (
+      list.concat(Object.values(map).map((info) => info.id))
+    ), []);
     if (allStyleIds.length > 0) {
       AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.RESOLVE_STYLE_INFO,
         styleIds: allStyleIds,
-      })
-        .then(({ resolvedValues }) => {
-          const nextStyleInfo = Object.fromEntries(
-            Object.entries(rawStyleInfo).map(([category, stylesInfoMap]) => [
-              category,
-              Object.fromEntries(
-                Object.entries(stylesInfoMap).map(([tokenName, styleInfo]) => {
-                  const resolvedInfo = resolvedValues.find((resolved) => resolved.id === styleInfo.id);
-                  return [
-                    tokenName,
-                    {
-                      id: styleInfo.id,
-                      name: resolvedInfo?.name,
-                      failedToResolve: !resolvedInfo?.key,
-                    },
-                  ];
-                }),
-              ),
-            ]),
-          );
-          setResolvedStyleInfo(nextStyleInfo);
-        })
-        .catch((err) => {
-          console.error(err);
-          Sentry.captureException(err);
-        });
+      }).then(({ resolvedValues }) => {
+        const nextStyleInfo = Object.fromEntries(Object.entries(rawStyleInfo).map(([category, stylesInfoMap]) => (
+          [category, Object.fromEntries(Object.entries(stylesInfoMap).map(([tokenName, styleInfo]) => {
+            const resolvedInfo = resolvedValues.find((resolved) => resolved.id === styleInfo.id);
+            return [tokenName, {
+              id: styleInfo.id,
+              name: resolvedInfo?.name,
+              failedToResolve: !resolvedInfo?.key,
+            }];
+          }))]
+        )));
+        setResolvedStyleInfo(nextStyleInfo);
+      }).catch((err) => {
+        console.error(err);
+        Sentry.captureException(err);
+      });
     }
   }, [rawStyleInfo]);
 
@@ -174,7 +162,7 @@ export const ThemeStyleManagementForm: React.FC<React.PropsWithChildren<React.Pr
       const styleInfo = Object.entries(tokenStyleGroups).reduce<StyleInfoPerCategory>((acc, [category, styles]) => {
         if (styles) {
           type StylesInfoMap = Record<string, StyleInfo>;
-          acc[category as keyof StyleInfoPerCategory] = styles.reduce<StylesInfoMap>((map, { styleId, token }) => {
+          acc[(category as keyof StyleInfoPerCategory)] = styles.reduce<StylesInfoMap>((map, { styleId, token }) => {
             map[token.name] = {
               id: styleId,
               failedToResolve: false,
@@ -216,7 +204,9 @@ export const ThemeStyleManagementForm: React.FC<React.PropsWithChildren<React.Pr
         onDisconnectStyle={handleDisconnectStyle}
         onDisconnectSelectedStyle={handleDisconnectSelectedStyle}
       />
-      <ThemeVariableManagement id={id} />
+      <ThemeVariableManagement
+        id={id}
+      />
     </Box>
   );
 };

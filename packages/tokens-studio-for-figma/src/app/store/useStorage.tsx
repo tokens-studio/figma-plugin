@@ -13,18 +13,18 @@ type SetStorageTypeOptions = {
 export default function useStorage() {
   const dispatch = useDispatch<Dispatch>();
 
-  const setStorageType = useCallback(
-    ({ provider, shouldSetInDocument = false }: SetStorageTypeOptions) => {
-      if (shouldSetInDocument) {
-        AsyncMessageChannel.ReactInstance.message({
-          type: AsyncMessageTypes.SET_STORAGE_TYPE,
-          storageType: provider,
-        });
-      }
-      dispatch.uiState.setStorage(provider);
-    },
-    [dispatch],
-  );
+  const setStorageType = useCallback(({
+    provider,
+    shouldSetInDocument = false,
+  }: SetStorageTypeOptions) => {
+    if (shouldSetInDocument) {
+      AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.SET_STORAGE_TYPE,
+        storageType: provider,
+      });
+    }
+    dispatch.uiState.setStorage(provider);
+  }, [dispatch]);
 
   return { setStorageType };
 }

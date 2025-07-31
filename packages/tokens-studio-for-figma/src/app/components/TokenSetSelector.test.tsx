@@ -18,12 +18,9 @@ describe('TokenSetSelector Component', () => {
     store.dispatch.uiState.setOnboardingExplainerSets('true');
 
     const result = render(<TokenSetSelector saveScrollPositionSet={mockSaveScrollPositionSet} />);
-    waitFor(
-      async () => {
-        expect(await result.findByText('sets')).not.toBeUndefined();
-      },
-      { timeout: 10000 },
-    );
+    waitFor(async () => {
+      expect(await result.findByText('sets')).not.toBeUndefined();
+    }, { timeout: 10000 });
   });
 
   it('hide onboarding explainer syncproviders', async () => {
@@ -79,9 +76,7 @@ describe('TokenSetSelector Component', () => {
 
       // Check that all folders are collapsed
       const { collapsedTokenSets } = store.getState().tokenState;
-      expect(collapsedTokenSets).toEqual(
-        expect.arrayContaining(['folder1', 'folder2', 'folder3', 'folder3/subfolder']),
-      );
+      expect(collapsedTokenSets).toEqual(expect.arrayContaining(['folder1', 'folder2', 'folder3', 'folder3/subfolder']));
     }
   });
 

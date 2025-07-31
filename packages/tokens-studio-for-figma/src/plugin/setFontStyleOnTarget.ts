@@ -2,17 +2,11 @@ import { transformValue } from './helpers';
 import { notifyUI } from './notifiers';
 import { ResolvedTypographyObject } from './ResolvedTypographyObject';
 
-export async function setFontStyleOnTarget({
-  target,
-  value,
-  baseFontSize,
-}: {
-  target: BaseNode | TextStyle;
-  value: Pick<ResolvedTypographyObject, 'fontFamily' | 'fontWeight'>;
-  baseFontSize: string;
-}) {
+export async function setFontStyleOnTarget({ target, value, baseFontSize }: { target: BaseNode | TextStyle; value: Pick<ResolvedTypographyObject, 'fontFamily' | 'fontWeight'>; baseFontSize: string }) {
   if (!('fontName' in target)) return;
-  const { fontFamily, fontWeight } = value;
+  const {
+    fontFamily, fontWeight,
+  } = value;
 
   const family = fontFamily?.toString() || (target.fontName !== figma.mixed ? target.fontName.family : '');
   const style = fontWeight?.toString() || (target.fontName !== figma.mixed ? target.fontName.style : '');
@@ -28,7 +22,7 @@ export async function setFontStyleOnTarget({
   } catch (e) {
     const splitFontFamily = family.split(',');
     const candidateStyles = transformValue(style, 'fontWeights', baseFontSize);
-    const candidateFonts: { family: string; style: string }[] = [];
+    const candidateFonts: { family: string; style: string; }[] = [];
     splitFontFamily?.forEach((candidateFontFamily) => {
       const normalizedFontFamily = candidateFontFamily?.replace(/['"]/g, '').trim();
       if (candidateStyles.length > 0) {

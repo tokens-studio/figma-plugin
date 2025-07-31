@@ -21,11 +21,7 @@ type Props = {
 };
 
 const TokenListing: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
-  tokenKey,
-  label,
-  schema,
-  values,
-  isPro,
+  tokenKey, label, schema, values, isPro,
 }) => {
   const showEmptyGroups = useSelector(showEmptyGroupsSelector);
   const collapsedTokenTypeObj = useSelector(collapsedTokenTypeObjSelector);

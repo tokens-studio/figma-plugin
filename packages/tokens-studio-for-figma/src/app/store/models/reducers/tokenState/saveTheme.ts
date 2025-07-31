@@ -7,12 +7,12 @@ import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
 
 type Payload = Omit<ThemeObject, 'id' | '$figmaStyleReferences'> & {
-  id?: string;
-  group?: string;
+  id?: string,
+  group?: string,
   meta?: {
-    oldName?: string;
-    oldGroup?: string;
-  };
+    oldName?: string,
+    oldGroup?: string,
+  }
 };
 
 export function saveTheme(state: TokenState, data: Payload): TokenState {
@@ -20,7 +20,8 @@ export function saveTheme(state: TokenState, data: Payload): TokenState {
   const themeId = data.id || hash([Date.now(), data]);
   const isActiveTheme = Object.values(state.activeTheme).includes(themeId);
   const selectedTokenSets = Object.fromEntries(
-    Object.entries(data.selectedTokenSets).filter(([, status]) => status !== TokenSetStatus.DISABLED),
+    Object.entries(data.selectedTokenSets)
+      .filter(([, status]) => (status !== TokenSetStatus.DISABLED)),
   );
   const themeObjectIndex = state.themes.findIndex((theme) => theme.id === themeId);
   const startIndex = themeObjectIndex > -1 ? themeObjectIndex : state.themes.length;

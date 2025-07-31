@@ -162,10 +162,7 @@ describe('convertStringtoFigmaGradient', () => {
           position: 1,
         },
       ],
-      gradientTransform: [
-        [1, 0, 0],
-        [0, 1, 0],
-      ],
+      gradientTransform: [[1, 0, 0], [0, 1, 0]],
     },
   };
 
@@ -267,8 +264,7 @@ describe('convertStringtoFigmaGradient with OKLCH colors', () => {
 
   it('should convert OKLCH colors with alpha in gradients', () => {
     // Test gradient with OKLCH colors with alpha and mixed color formats
-    const oklchAlphaGradient =
-      'linear-gradient(90deg, oklch(0.5 0.1 180 / 0.5) 0%, oklch(0.8 0.15 240) 50%, rgba(255,0,0,0.8) 100%)';
+    const oklchAlphaGradient = 'linear-gradient(90deg, oklch(0.5 0.1 180 / 0.5) 0%, oklch(0.8 0.15 240) 50%, rgba(255,0,0,0.8) 100%)';
     const oklchAlphaResult = convertStringToFigmaGradient(oklchAlphaGradient);
 
     expect(oklchAlphaResult.gradientStops).toHaveLength(3);

@@ -3,8 +3,8 @@ import type { CSS } from '@stitches/react/types/css-util';
 import type { theme } from '@/stitches.config';
 
 export type StitchesCSS = CSS<
-  ConfigType.Media<Record<string, unknown>>,
+ConfigType.Media<Record<string, unknown>>,
   typeof theme,
-  ConfigType.ThemeMap<DefaultThemeMap>,
-  ConfigType.Utils<Record<string, unknown>>
+ConfigType.ThemeMap<DefaultThemeMap>,
+ConfigType.Utils<Record<string, unknown>>
 >;

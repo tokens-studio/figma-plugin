@@ -29,7 +29,7 @@ type Props = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> & {
   onChange?: React.ChangeEventHandler<HTMLInputElement>;
   disabled?: boolean;
   size?: 'small' | 'large';
-  css?: StitchesCSS;
+  css?: StitchesCSS
 };
 
 const StyledIcon = styled('div', {
@@ -152,97 +152,91 @@ const StyledLabel = styled('label', {
   fontSize: '$small',
 });
 
-const Input = React.forwardRef<HTMLInputElement, Props>(
-  (
-    {
-      form,
-      name,
-      autofocus,
-      error = '',
-      required = false,
-      tabindex = null,
-      label = null,
-      full,
-      onChange,
-      value,
-      defaultValue,
-      type,
-      prefix,
-      suffix,
-      step,
-      custom = '',
-      inputRef,
-      placeholder = '',
-      isMasked = false,
-      size = 'small',
-      ...inputProps
-    },
-    ref,
-  ) => {
-    // if isMasked is true, then we need to handle toggle visibility
-    const [show, setShow] = React.useState(false);
-    const htmlInputRef = React.useRef<HTMLInputElement>(null);
-    const reifiedRef = inputRef || htmlInputRef;
+const Input = React.forwardRef<HTMLInputElement, Props>(({
+  form,
+  name,
+  autofocus,
+  error = '',
+  required = false,
+  tabindex = null,
+  label = null,
+  full,
+  onChange,
+  value,
+  defaultValue,
+  type,
+  prefix,
+  suffix,
+  step,
+  custom = '',
+  inputRef,
+  placeholder = '',
+  isMasked = false,
+  size = 'small',
+  ...inputProps
+}, ref) => {
+  // if isMasked is true, then we need to handle toggle visibility
+  const [show, setShow] = React.useState(false);
+  const htmlInputRef = React.useRef<HTMLInputElement>(null);
+  const reifiedRef = inputRef || htmlInputRef;
 
-    const handleVisibility = useCallback(
-      (e: React.MouseEvent<HTMLButtonElement>) => {
-        e.preventDefault();
-        setShow(!show);
-        if (reifiedRef?.current?.type) {
-          reifiedRef.current.type = reifiedRef?.current?.type === 'password' ? 'text' : 'password';
-        }
-      },
-      [show, reifiedRef],
-    );
+  const handleVisibility = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    setShow(!show);
+    if (reifiedRef?.current?.type) {
+      reifiedRef.current.type = reifiedRef?.current?.type === 'password' ? 'text' : 'password';
+    }
+  }, [show, reifiedRef]);
 
-    React.useEffect(() => {
-      if (autofocus && htmlInputRef && htmlInputRef.current) {
-        htmlInputRef.current.focus();
-      }
-    }, [autofocus, htmlInputRef]);
+  React.useEffect(() => {
+    if (autofocus && htmlInputRef && htmlInputRef.current) {
+      htmlInputRef.current.focus();
+    }
+  }, [autofocus, htmlInputRef]);
 
-    return (
-      <StyledLabel htmlFor={name} css={{ width: full ? '100%' : '' }}>
-        {(!!label || !!error) && (
-          <Stack direction="row" justify="between" align="center" css={{ marginBottom: '$1' }}>
-            {label || null}
-            {error ? <ErrorValidation>{error}</ErrorValidation> : null}
-          </Stack>
+  return (
+    <StyledLabel htmlFor={name} css={{ width: full ? '100%' : '' }}>
+      {(!!label || !!error) && (
+        <Stack direction="row" justify="between" align="center" css={{ marginBottom: '$1' }}>
+          {label || null}
+          {error ? (
+            <ErrorValidation>{error}</ErrorValidation>
+          ) : null}
+        </Stack>
+      )}
+      <Box css={{ display: 'flex', position: 'relative', width: full ? '100%' : '' }} className="input">
+        {!!prefix && <StyledPrefix>{prefix}</StyledPrefix>}
+        <StyledInput
+          form={form}
+          ref={inputRef || ref || htmlInputRef}
+          spellCheck={false}
+          tabIndex={tabindex ?? undefined}
+          type={type}
+          value={value}
+          defaultValue={defaultValue}
+          name={name}
+          onChange={onChange}
+          required={required}
+          autoFocus={autofocus}
+          step={step}
+          data-custom={custom}
+          placeholder={placeholder}
+          hasPrefix={!!prefix}
+          hasSuffix={!!isMasked}
+          size={size}
+          data-testid={`input-${name}`}
+          {...inputProps}
+        />
+        {!!suffix && <span>{suffix}</span>}
+        {isMasked && (
+          <StyledSuffix type="button" onClick={handleVisibility}>
+            <StyledIcon>{show ? <IconVisibility /> : <IconVisibilityOff />}</StyledIcon>
+          </StyledSuffix>
         )}
-        <Box css={{ display: 'flex', position: 'relative', width: full ? '100%' : '' }} className="input">
-          {!!prefix && <StyledPrefix>{prefix}</StyledPrefix>}
-          <StyledInput
-            form={form}
-            ref={inputRef || ref || htmlInputRef}
-            spellCheck={false}
-            tabIndex={tabindex ?? undefined}
-            type={type}
-            value={value}
-            defaultValue={defaultValue}
-            name={name}
-            onChange={onChange}
-            required={required}
-            autoFocus={autofocus}
-            step={step}
-            data-custom={custom}
-            placeholder={placeholder}
-            hasPrefix={!!prefix}
-            hasSuffix={!!isMasked}
-            size={size}
-            data-testid={`input-${name}`}
-            {...inputProps}
-          />
-          {!!suffix && <span>{suffix}</span>}
-          {isMasked && (
-            <StyledSuffix type="button" onClick={handleVisibility}>
-              <StyledIcon>{show ? <IconVisibility /> : <IconVisibilityOff />}</StyledIcon>
-            </StyledSuffix>
-          )}
-        </Box>
-      </StyledLabel>
-    );
-  },
-);
+      </Box>
+    </StyledLabel>
+  );
+});
 
 export default Input;
 export { StyledInput, StyledPrefix, StyledSuffix };

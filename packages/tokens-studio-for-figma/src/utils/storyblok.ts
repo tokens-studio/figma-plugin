@@ -14,10 +14,7 @@ export function formatDate(date?: number | Date) {
   return `${year.value}-${month.value}-${day.value} ${hour.value}:${minute.value}`;
 }
 
-export default async function fetchChangelog(
-  lastOnline: Date,
-  setChangelog: (stories: StoryblokStory['content'][]) => void,
-): Promise<void> {
+export default async function fetchChangelog(lastOnline: Date, setChangelog: (stories: StoryblokStory['content'][]) => void): Promise<void> {
   if (process.env.STORYBLOK_ACCESS_TOKEN && lastOnline.toString() !== '0') {
     const token = process.env.STORYBLOK_ACCESS_TOKEN;
     const formattedDate = formatDate(new Date(lastOnline));
@@ -34,7 +31,7 @@ export default async function fetchChangelog(
       },
     );
 
-    const res = (await response.json()) as {
+    const res = await response.json() as {
       stories: StoryblokStory[];
     };
     if (res.stories) {

@@ -21,13 +21,10 @@ export async function updateUISettings(uiSettings: Partial<SavedSettings>) {
       applyVariablesStylesOrRawValue: uiSettings.applyVariablesStylesOrRawValue ?? data?.applyVariablesStylesOrRawValue,
       shouldUpdateStyles: uiSettings.shouldUpdateStyles ?? data?.shouldUpdateStyles,
       ignoreFirstPartForStyles: uiSettings.ignoreFirstPartForStyles ?? data?.ignoreFirstPartForStyles,
-      createStylesWithVariableReferences:
-        uiSettings.createStylesWithVariableReferences ?? data?.createStylesWithVariableReferences,
+      createStylesWithVariableReferences: uiSettings.createStylesWithVariableReferences ?? data?.createStylesWithVariableReferences,
       prefixStylesWithThemeName: uiSettings.prefixStylesWithThemeName ?? data?.prefixStylesWithThemeName,
-      renameExistingStylesAndVariables:
-        uiSettings.renameExistingStylesAndVariables ?? data?.renameExistingStylesAndVariables,
-      removeStylesAndVariablesWithoutConnection:
-        uiSettings.removeStylesAndVariablesWithoutConnection ?? data?.removeStylesAndVariablesWithoutConnection,
+      renameExistingStylesAndVariables: uiSettings.renameExistingStylesAndVariables ?? data?.renameExistingStylesAndVariables,
+      removeStylesAndVariablesWithoutConnection: uiSettings.removeStylesAndVariablesWithoutConnection ?? data?.removeStylesAndVariablesWithoutConnection,
       variablesBoolean: uiSettings.variablesBoolean ?? data?.variablesBoolean,
       variablesColor: uiSettings.variablesColor ?? data?.variablesColor,
       variablesNumber: uiSettings.variablesNumber ?? data?.variablesNumber,
@@ -89,10 +86,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
       updateMode = data.updateMode || UpdateMode.PAGE;
       updateRemote = typeof data.updateRemote === 'undefined' ? true : data.updateRemote;
       updateOnChange = typeof data.updateOnChange === 'undefined' ? true : data.updateOnChange;
-      applyVariablesStylesOrRawValue =
-        typeof data.applyVariablesStylesOrRawValue === 'undefined'
-          ? ApplyVariablesStylesOrRawValues.VARIABLES_STYLES
-          : data.applyVariablesStylesOrRawValue;
+      applyVariablesStylesOrRawValue = typeof data.applyVariablesStylesOrRawValue === 'undefined' ? ApplyVariablesStylesOrRawValues.VARIABLES_STYLES : data.applyVariablesStylesOrRawValue;
       shouldUpdateStyles = typeof data.shouldUpdateStyles === 'undefined' ? false : data.shouldUpdateStyles;
       variablesColor = typeof data.variablesColor === 'undefined' ? true : data.variablesColor;
       variablesBoolean = typeof data.variablesBoolean === 'undefined' ? true : data.variablesBoolean;
@@ -101,25 +95,17 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
       stylesColor = typeof data.stylesColor === 'undefined' ? false : data.stylesColor;
       stylesTypography = typeof data.stylesTypography === 'undefined' ? true : data.stylesTypography;
       stylesEffect = typeof data.stylesEffect === 'undefined' ? true : data.stylesEffect;
-      ignoreFirstPartForStyles =
-        typeof data.ignoreFirstPartForStyles === 'undefined' ? false : data.ignoreFirstPartForStyles;
-      createStylesWithVariableReferences =
-        typeof data.createStylesWithVariableReferences === 'undefined' ? true : data.createStylesWithVariableReferences;
-      prefixStylesWithThemeName =
-        typeof data.prefixStylesWithThemeName === 'undefined' ? false : data.prefixStylesWithThemeName;
-      renameExistingStylesAndVariables =
-        typeof data.renameExistingStylesAndVariables === 'undefined' ? false : data.renameExistingStylesAndVariables;
-      removeStylesAndVariablesWithoutConnection =
-        typeof data.removeStylesAndVariablesWithoutConnection === 'undefined'
-          ? false
-          : data.removeStylesAndVariablesWithoutConnection;
+      ignoreFirstPartForStyles = typeof data.ignoreFirstPartForStyles === 'undefined' ? false : data.ignoreFirstPartForStyles;
+      createStylesWithVariableReferences = typeof data.createStylesWithVariableReferences === 'undefined' ? true : data.createStylesWithVariableReferences;
+      prefixStylesWithThemeName = typeof data.prefixStylesWithThemeName === 'undefined' ? false : data.prefixStylesWithThemeName;
+      renameExistingStylesAndVariables = typeof data.renameExistingStylesAndVariables === 'undefined' ? false : data.renameExistingStylesAndVariables;
+      removeStylesAndVariablesWithoutConnection = typeof data.removeStylesAndVariablesWithoutConnection === 'undefined' ? false : data.removeStylesAndVariablesWithoutConnection;
       baseFontSize = typeof data.baseFontSize === 'undefined' ? defaultBaseFontSize : data.baseFontSize;
       aliasBaseFontSize = typeof data.aliasBaseFontSize === 'undefined' ? defaultBaseFontSize : data.aliasBaseFontSize;
       inspectDeep = typeof data.inspectDeep === 'undefined' ? false : data.inspectDeep;
       shouldSwapStyles = typeof data.shouldSwapStyles === 'undefined' ? false : data.shouldSwapStyles;
       sessionRecording = typeof data.sessionRecording === 'undefined' ? false : data.sessionRecording;
-      storeTokenIdInJsonEditor =
-        typeof data.storeTokenIdInJsonEditor === 'undefined' ? false : data.storeTokenIdInJsonEditor;
+      storeTokenIdInJsonEditor = typeof data.storeTokenIdInJsonEditor === 'undefined' ? false : data.storeTokenIdInJsonEditor;
       tokenFormat = data.tokenFormat || TokenFormatOptions.Legacy;
       settings = {
         language,

@@ -77,13 +77,19 @@ describe('usePropertiesForTokenType', () => {
         {
           label: 'Horizontal padding',
           name: Properties.horizontalPadding,
-          clear: [Properties.paddingLeft, Properties.paddingRight],
+          clear: [
+            Properties.paddingLeft,
+            Properties.paddingRight,
+          ],
           disabled: false,
         },
         {
           label: 'Vertical padding',
           name: Properties.verticalPadding,
-          clear: [Properties.paddingTop, Properties.paddingBottom],
+          clear: [
+            Properties.paddingTop,
+            Properties.paddingBottom,
+          ],
           disabled: false,
         },
         { label: 'Row gap', name: Properties.counterAxisSpacing, disabled: false },
@@ -95,12 +101,10 @@ describe('usePropertiesForTokenType', () => {
     },
     {
       type: 'text',
-      properties: [
-        {
-          name: 'text',
-          label: 'text',
-        },
-      ],
+      properties: [{
+        name: 'text',
+        label: 'text',
+      }],
     },
     {
       type: 'typography',
@@ -257,13 +261,19 @@ describe('usePropertiesForTokenType', () => {
             {
               label: 'Horizontal padding',
               name: Properties.horizontalPadding,
-              clear: [Properties.paddingLeft, Properties.paddingRight],
+              clear: [
+                Properties.paddingLeft,
+                Properties.paddingRight,
+              ],
               disabled: false,
             },
             {
               label: 'Vertical padding',
               name: Properties.verticalPadding,
-              clear: [Properties.paddingTop, Properties.paddingBottom],
+              clear: [
+                Properties.paddingTop,
+                Properties.paddingBottom,
+              ],
               disabled: false,
             },
             { label: 'Row gap', name: Properties.counterAxisSpacing, disabled: false },
@@ -372,13 +382,19 @@ describe('usePropertiesForTokenType', () => {
             {
               label: 'Horizontal padding',
               name: Properties.horizontalPadding,
-              clear: [Properties.paddingLeft, Properties.paddingRight],
+              clear: [
+                Properties.paddingLeft,
+                Properties.paddingRight,
+              ],
               disabled: false,
             },
             {
               label: 'Vertical padding',
               name: Properties.verticalPadding,
-              clear: [Properties.paddingTop, Properties.paddingBottom],
+              clear: [
+                Properties.paddingTop,
+                Properties.paddingBottom,
+              ],
               disabled: false,
             },
             { label: 'Row gap', name: Properties.counterAxisSpacing, disabled: false },
@@ -519,13 +535,19 @@ describe('usePropertiesForTokenType', () => {
       {
         label: 'Horizontal padding',
         name: Properties.horizontalPadding,
-        clear: [Properties.paddingLeft, Properties.paddingRight],
+        clear: [
+          Properties.paddingLeft,
+          Properties.paddingRight,
+        ],
         disabled: true,
       },
       {
         label: 'Vertical padding',
         name: Properties.verticalPadding,
-        clear: [Properties.paddingTop, Properties.paddingBottom],
+        clear: [
+          Properties.paddingTop,
+          Properties.paddingBottom,
+        ],
         disabled: true,
       },
       { label: 'Row gap', name: Properties.counterAxisSpacing, disabled: true },

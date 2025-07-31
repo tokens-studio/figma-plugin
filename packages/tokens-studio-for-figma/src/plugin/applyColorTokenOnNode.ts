@@ -11,11 +11,11 @@ export async function applyColorTokenOnNode(node: BaseNode, data: NodeTokenRefMa
   const tokenName = data.fill;
   const tokenValue = values.fill;
   if (
-    tokenValue &&
-    typeof tokenValue === 'string' &&
-    'fills' in node &&
-    tokenName &&
-    !(await tryApplyColorVariableId(node, tokenName, ColorPaintType.FILLS))
+    tokenValue
+    && typeof tokenValue === 'string'
+    && 'fills' in node
+    && tokenName
+    && !(await tryApplyColorVariableId(node, tokenName, ColorPaintType.FILLS))
   ) {
     const resolvedToken = defaultTokenValueRetriever.get(tokenName);
     let matchingStyleId = resolvedToken?.styleId;
@@ -41,10 +41,7 @@ export async function applyColorTokenOnNode(node: BaseNode, data: NodeTokenRefMa
 
     if (!matchingStyleId || (matchingStyleId && !(await trySetStyleId(node, 'fill', matchingStyleId)))) {
       setColorValuesOnTarget({
-        target: node,
-        token: tokenName,
-        key: 'fills',
-        givenValue: tokenValue,
+        target: node, token: tokenName, key: 'fills', givenValue: tokenValue,
       });
     }
   }

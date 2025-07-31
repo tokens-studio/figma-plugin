@@ -15,13 +15,10 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
     type: AsyncMessageTypes.GET_THEME_INFO,
   });
   const variableMap = await getVariablesMap();
-  const nameToVariableMap = (await figma.variables.getLocalVariablesAsync())?.reduce<Record<string, Variable>>(
-    (acc, curr) => {
-      acc[curr.name] = curr;
-      return acc;
-    },
-    {},
-  );
+  const nameToVariableMap = (await figma.variables.getLocalVariablesAsync())?.reduce<Record<string, Variable>>((acc, curr) => {
+    acc[curr.name] = curr;
+    return acc;
+  }, {});
 
   themeInfo.themes.forEach((theme) => {
     if (

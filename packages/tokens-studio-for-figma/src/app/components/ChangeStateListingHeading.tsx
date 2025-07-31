@@ -1,6 +1,8 @@
 import React from 'react';
 import { Heading } from '@tokens-studio/ui';
-import { IconCollapseArrow, IconExpandArrow } from '@/icons';
+import {
+  IconCollapseArrow, IconExpandArrow,
+} from '@/icons';
 import Box from './Box';
 import Stack from './Stack';
 import { Count } from './Count';
@@ -34,13 +36,16 @@ const StyledChangedStateGroupHeadingButton = styled('button', {
   },
 });
 
-export default function ChangeStateListingHeading({ isCollapsed, count, label, set, onCollapse }: Props) {
-  const handleCollapse = React.useCallback(
-    (e: React.MouseEvent<HTMLButtonElement>) => {
-      onCollapse(e, label);
-    },
-    [onCollapse, label],
-  );
+export default function ChangeStateListingHeading({
+  isCollapsed,
+  count,
+  label,
+  set,
+  onCollapse,
+}: Props) {
+  const handleCollapse = React.useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    onCollapse(e, label);
+  }, [onCollapse, label]);
 
   return (
     <Stack direction="row" align="center" justify="between" gap={4} css={{ position: 'relative' }}>

@@ -22,7 +22,9 @@ type Props = {
   onChange?: StyledSelectProps['onChange'];
 };
 
-export default function Select({ css, value, id, onChange, children }: React.PropsWithChildren<Props>) {
+export default function Select({
+  css, value, id, onChange, children,
+}: React.PropsWithChildren<Props>) {
   return (
     <StyledSelect css={css} value={value} name={id} data-testid={id} id={id} onChange={onChange}>
       {children}

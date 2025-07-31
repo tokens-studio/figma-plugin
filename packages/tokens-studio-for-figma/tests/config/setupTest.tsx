@@ -14,7 +14,9 @@ import { undoableEnhancer } from '@/app/enhancers/undoableEnhancer';
 
 export const AllTheProviders: FC = ({ children }) => (
   <Provider store={store}>
-    <TooltipProvider>{children}</TooltipProvider>
+    <TooltipProvider>
+      {children}
+    </TooltipProvider>
   </Provider>
 );
 
@@ -24,7 +26,7 @@ const resetStore = () => {
 
 export const createMockStore = (
   initialState: Partial<{
-    [K in keyof RootState]: Partial<RootState[K]>;
+    [K in keyof RootState]: Partial<RootState[K]>
   }>,
 ) => {
   const storeModels = { ...models };
@@ -51,8 +53,7 @@ export const createMockStore = (
   });
 };
 
-const customRender = (ui: ReactElement, options?: Omit<RenderOptions, 'queries' | 'providerProps'>) =>
-  render(ui, { wrapper: AllTheProviders, ...options });
+const customRender = (ui: ReactElement, options?: Omit<RenderOptions, 'queries' | 'providerProps'>) => render(ui, { wrapper: AllTheProviders, ...options });
 
 // msw setup
 beforeAll(() => {
@@ -73,7 +74,7 @@ afterAll(() => {
   server.close();
 });
 
-dotenv.config({});
+dotenv.config({ });
 
 export * from '@testing-library/react';
 

@@ -11,9 +11,9 @@ export const setNodeData: AsyncMessageChannelHandlers[AsyncMessageTypes.SET_NODE
     if (figma.currentPage.selection.length) {
       const tokensMap = tokenArrayGroupToMap(msg.tokens);
       const nodes = figma.currentPage.selection;
-      const { figmaVariableReferences, figmaStyleReferences, stylePathPrefix } = await getThemeReferences(
-        msg.settings.prefixStylesWithThemeName,
-      );
+      const {
+        figmaVariableReferences, figmaStyleReferences, stylePathPrefix,
+      } = await getThemeReferences(msg.settings.prefixStylesWithThemeName);
 
       await defaultTokenValueRetriever.initiate({
         tokens: msg.tokens,
@@ -25,10 +25,7 @@ export const setNodeData: AsyncMessageChannelHandlers[AsyncMessageTypes.SET_NODE
       });
 
       await updatePluginDataAndNodes({
-        entries: nodes,
-        values: msg.values,
-        tokensMap,
-        settings: msg.settings,
+        entries: nodes, values: msg.values, tokensMap, settings: msg.settings,
       });
       sendSelectionChange();
     }

@@ -15,21 +15,17 @@ import { getOverallConfig } from '@/utils/tokenHelpers';
 export type LocalVariableInfo = {
   collectionId: string;
   modeId: string;
-  variableIds: Record<string, string>;
+  variableIds: Record<string, string>
 };
 
 /**
- * This function is used to create and update variables based on themes
- * - It first creates the necessary variable collections and modes or returns existing ones
- * - It then checks if the selected themes generated any collections. It could be a user is in a Free plan and we were unable to create more than 1 mode. If mode wasnt created, we skip the theme.
- * - Then goes on to update variables for each theme
- * - There's another step that we perform where we check if any variables need to be using references to other variables. This is a second step, as we need to have all variables created first before we can reference them.
- * */
-export default async function createLocalVariablesInPlugin(
-  tokens: Record<string, AnyTokenList>,
-  settings: SettingsState,
-  selectedThemes?: string[],
-) {
+* This function is used to create and update variables based on themes
+* - It first creates the necessary variable collections and modes or returns existing ones
+* - It then checks if the selected themes generated any collections. It could be a user is in a Free plan and we were unable to create more than 1 mode. If mode wasnt created, we skip the theme.
+* - Then goes on to update variables for each theme
+* - There's another step that we perform where we check if any variables need to be using references to other variables. This is a second step, as we need to have all variables created first before we can reference them.
+* */
+export default async function createLocalVariablesInPlugin(tokens: Record<string, AnyTokenList>, settings: SettingsState, selectedThemes?: string[]) {
   // Big O (n * m * x): (n: amount of themes, m: amount of variableCollections, x: amount of modes)
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
     type: AsyncMessageTypes.GET_THEME_INFO,
@@ -44,42 +40,30 @@ export default async function createLocalVariablesInPlugin(
 
   let figmaVariablesAfterCreate = 0;
 
-  const checkSetting =
-    !settings.variablesBoolean && !settings.variablesColor && !settings.variablesNumber && !settings.variablesString;
+  const checkSetting = !settings.variablesBoolean && !settings.variablesColor && !settings.variablesNumber && !settings.variablesString;
   if (!checkSetting && selectedThemes && selectedThemes.length > 0) {
     const overallConfig = getOverallConfig(themeInfo.themes, selectedThemes);
     const collections = await createNecessaryVariableCollections(themeInfo.themes, selectedThemes);
 
-    await Promise.all(
-      selectedThemeObjects.map(async (theme) => {
-        const { collection, modeId } = findCollectionAndModeIdForTheme(
-          theme.group ?? theme.name,
-          theme.name,
-          collections,
-        );
+    await Promise.all(selectedThemeObjects.map(async (theme) => {
+      const { collection, modeId } = findCollectionAndModeIdForTheme(theme.group ?? theme.name, theme.name, collections);
 
-        if (!collection || !modeId) return;
+      if (!collection || !modeId) return;
 
-        const allVariableObj = await updateVariables({
-          collection,
-          mode: modeId,
-          theme,
-          tokens,
-          settings,
-          overallConfig,
-        });
-        figmaVariablesAfterCreate += allVariableObj.removedVariables.length;
-        if (Object.keys(allVariableObj.variableIds).length > 0) {
-          allVariableCollectionIds[theme.id] = {
-            collectionId: collection.id,
-            modeId,
-            variableIds: allVariableObj.variableIds,
-          };
-          referenceVariableCandidates = referenceVariableCandidates.concat(allVariableObj.referenceVariableCandidate);
-        }
-        updatedVariableCollections.push(collection);
-      }),
-    );
+      const allVariableObj = await updateVariables({
+        collection, mode: modeId, theme, tokens, settings, overallConfig,
+      });
+      figmaVariablesAfterCreate += allVariableObj.removedVariables.length;
+      if (Object.keys(allVariableObj.variableIds).length > 0) {
+        allVariableCollectionIds[theme.id] = {
+          collectionId: collection.id,
+          modeId,
+          variableIds: allVariableObj.variableIds,
+        };
+        referenceVariableCandidates = referenceVariableCandidates.concat(allVariableObj.referenceVariableCandidate);
+      }
+      updatedVariableCollections.push(collection);
+    }));
     // Gather references that we should use. Merge current theme references with the ones from all themes as well as local variables
     const existingVariables = await mergeVariableReferencesWithLocalVariables(selectedThemeObjects, themeInfo.themes);
 
@@ -93,11 +77,7 @@ export default async function createLocalVariablesInPlugin(
   if (figmaVariablesAfterCreate === figmaVariablesBeforeCreate) {
     notifyUI('No variables were created');
   } else {
-    notifyUI(
-      `${figmaVariableCollectionsAfterCreate - figmaVariableCollectionsBeforeCreate} collections and ${
-        figmaVariablesAfterCreate - figmaVariablesBeforeCreate
-      } variables created`,
-    );
+    notifyUI(`${figmaVariableCollectionsAfterCreate - figmaVariableCollectionsBeforeCreate} collections and ${figmaVariablesAfterCreate - figmaVariablesBeforeCreate} variables created`);
   }
   return {
     allVariableCollectionIds,

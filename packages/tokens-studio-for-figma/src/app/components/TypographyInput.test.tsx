@@ -1,6 +1,8 @@
 import React from 'react';
 import { TokenTypes } from '@/constants/TokenTypes';
-import { EditTokenObject, SingleToken } from '@/types/tokens';
+import {
+  EditTokenObject, SingleToken,
+} from '@/types/tokens';
 import { render } from '../../../tests/config/setupTest';
 import TypographyInput from './TypographyInput';
 
@@ -37,16 +39,14 @@ const mockHandleDownShiftInputChange = jest.fn();
 
 describe('Typography Input', () => {
   it('should display typography token input', () => {
-    const { getByText } = render(
-      <TypographyInput
-        internalEditToken={internalEditToken}
-        handleTypographyValueChange={mockHandleTypographyValueChange}
-        handleTypographyAliasValueChange={mockHandleTypographyAliasValueChange}
-        resolvedTokens={tokens}
-        handleTypographyValueDownShiftInputChange={mockHandleTypographyValueDownShiftInputChange}
-        handleDownShiftInputChange={mockHandleDownShiftInputChange}
-      />,
-    );
+    const { getByText } = render(<TypographyInput
+      internalEditToken={internalEditToken}
+      handleTypographyValueChange={mockHandleTypographyValueChange}
+      handleTypographyAliasValueChange={mockHandleTypographyAliasValueChange}
+      resolvedTokens={tokens}
+      handleTypographyValueDownShiftInputChange={mockHandleTypographyValueDownShiftInputChange}
+      handleDownShiftInputChange={mockHandleDownShiftInputChange}
+    />);
     expect(getByText('types.Typography')).toBeInTheDocument();
   });
 });

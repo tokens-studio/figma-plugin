@@ -20,15 +20,12 @@ export class TokenValueRetriever {
   public createStylesWithVariableReferences;
 
   private getAdjustedTokenName(tokenName: string): [string, string] {
-    const withIgnoredFirstPart =
-      this.ignoreFirstPartForStyles && tokenName.split('.').length > 1
-        ? tokenName.split('.').slice(1).join('.')
-        : tokenName;
+    const withIgnoredFirstPart = this.ignoreFirstPartForStyles && tokenName.split('.').length > 1
+      ? tokenName.split('.').slice(1).join('.')
+      : tokenName;
 
     const adjustedTokenName = [this.stylePathPrefix, tokenName].filter((n) => n).join('.');
-    const adjustedTokenNameWithIgnoreFirstPart = [this.stylePathPrefix, withIgnoredFirstPart]
-      .filter((n) => n)
-      .join('.');
+    const adjustedTokenNameWithIgnoreFirstPart = [this.stylePathPrefix, withIgnoredFirstPart].filter((n) => n).join('.');
 
     return [adjustedTokenName, adjustedTokenNameWithIgnoreFirstPart];
   }
@@ -41,14 +38,14 @@ export class TokenValueRetriever {
     ignoreFirstPartForStyles = false,
     createStylesWithVariableReferences = false,
     applyVariablesStylesOrRawValue = ApplyVariablesStylesOrRawValues.VARIABLES_STYLES,
-  }: {
-    tokens: AnyTokenList;
-    variableReferences?: RawVariableReferenceMap;
-    styleReferences?: Map<string, string>;
-    stylePathPrefix?: string;
-    ignoreFirstPartForStyles?: boolean;
-    createStylesWithVariableReferences?: boolean;
-    applyVariablesStylesOrRawValue?: ApplyVariablesStylesOrRawValues;
+  }: { tokens: AnyTokenList,
+    variableReferences?: RawVariableReferenceMap,
+    styleReferences?: Map<string,
+    string>,
+    stylePathPrefix?: string,
+    ignoreFirstPartForStyles?: boolean,
+    createStylesWithVariableReferences?: boolean,
+    applyVariablesStylesOrRawValue?: ApplyVariablesStylesOrRawValues,
   }) {
     this.stylePathPrefix = typeof stylePathPrefix !== 'undefined' ? stylePathPrefix : null;
     this.ignoreFirstPartForStyles = ignoreFirstPartForStyles;
@@ -58,31 +55,21 @@ export class TokenValueRetriever {
     this.cachedVariableReferences = new Map();
     this.applyVariablesStylesOrRawValue = applyVariablesStylesOrRawValue;
 
-    this.tokens = new Map<string, any>(
-      tokens.map((token) => {
-        const variableId = variableReferences?.get(token.name);
-        // For styles, we need to ignore the first part of the token name as well as consider theme prefix
-        const [adjustedTokenName, adjustedTokenNameWithIgnoreFirstPart] = this.getAdjustedTokenName(token.name);
+    this.tokens = new Map<string, any>(tokens.map((token) => {
+      const variableId = variableReferences?.get(token.name);
+      // For styles, we need to ignore the first part of the token name as well as consider theme prefix
+      const [adjustedTokenName, adjustedTokenNameWithIgnoreFirstPart] = this.getAdjustedTokenName(token.name);
 
-        const styleId =
-          styleReferences?.get(adjustedTokenName) ||
-          styleReferences?.get(adjustedTokenNameWithIgnoreFirstPart) ||
-          styleReferences?.get(token.name);
-        const finalAdjustedTokenName = styleReferences?.has(adjustedTokenName)
-          ? adjustedTokenName
-          : adjustedTokenNameWithIgnoreFirstPart;
+      const styleId = styleReferences?.get(adjustedTokenName) || styleReferences?.get(adjustedTokenNameWithIgnoreFirstPart) || styleReferences?.get(token.name);
+      const finalAdjustedTokenName = styleReferences?.has(adjustedTokenName) ? adjustedTokenName : adjustedTokenNameWithIgnoreFirstPart;
 
-        return [
-          token.name,
-          {
-            ...token,
-            variableId,
-            styleId,
-            adjustedTokenName: styleId ? finalAdjustedTokenName : adjustedTokenName,
-          },
-        ];
-      }),
-    );
+      return [token.name, {
+        ...token,
+        variableId,
+        styleId,
+        adjustedTokenName: styleId ? finalAdjustedTokenName : adjustedTokenName,
+      }];
+    }));
   }
 
   public get(tokenName: string) {
@@ -98,9 +85,7 @@ export class TokenValueRetriever {
       variable = this.cachedVariableReferences.get(tokenName);
       return variable;
     }
-    const variableMapped =
-      this.variableReferences.get(tokenName) ||
-      (isUsingReference ? this.variableReferences.get(storedToken.rawValue.slice(1, -1)) : null);
+    const variableMapped = this.variableReferences.get(tokenName) || (isUsingReference ? this.variableReferences.get(storedToken.rawValue.slice(1, -1)) : null);
     if (!variableMapped) return false;
     if (!hasCachedVariable && typeof variableMapped === 'string') {
       try {

@@ -12,23 +12,17 @@ import { StyledTokenButton, StyledTokenButtonText } from '../TokenButton/StyledT
 import { validateRenameGroupName, ErrorType } from '@/utils/validateGroupName';
 
 type Props = {
-  isOpen: boolean;
-  newName: string;
-  oldName: string;
+  isOpen: boolean
+  newName: string
+  oldName: string
   onClose?: () => void;
-  handleRenameTokenGroupSubmit?: (e: React.FormEvent<HTMLFormElement>) => void;
-  handleNewTokenGroupNameChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  type: string;
+  handleRenameTokenGroupSubmit?: (e: React.FormEvent<HTMLFormElement>) => void
+  handleNewTokenGroupNameChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
+  type: string
 };
 
 export default function RenameTokenGroupModal({
-  isOpen,
-  newName,
-  oldName,
-  onClose,
-  handleRenameTokenGroupSubmit,
-  handleNewTokenGroupNameChange,
-  type,
+  isOpen, newName, oldName, onClose, handleRenameTokenGroupSubmit, handleNewTokenGroupNameChange, type,
 }: Props) {
   const tokens = useSelector(tokensSelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
@@ -49,7 +43,7 @@ export default function RenameTokenGroupModal({
       title={`${t('rename')} ${oldName}`}
       isOpen={isOpen}
       close={onClose}
-      footer={
+      footer={(
         <form id="renameTokenGroup" onSubmit={handleRenameTokenGroupSubmit}>
           <Stack direction="row" justify="end" gap={4}>
             <Button variant="secondary" onClick={onClose}>
@@ -60,56 +54,54 @@ export default function RenameTokenGroupModal({
             </Button>
           </Stack>
         </form>
-      }
+    )}
     >
       <Stack direction="column" gap={4}>
-        <Input full onChange={handleNewTokenGroupNameChange} type="text" value={newName} autofocus required />
+        <Input
+          full
+          onChange={handleNewTokenGroupNameChange}
+          type="text"
+          value={newName}
+          autofocus
+          required
+        />
         {!canRename && error && (
           <ErrorMessage css={{ width: '100%', maxHeight: 150, overflow: 'scroll' }}>
-            {
-              {
-                [ErrorType.EmptyGroupName]: t('duplicateGroupModal.errors.emptyGroupName'),
-                [ErrorType.OverlappingToken]: error.foundOverlappingTokens?.length > 0 && (
-                  <>
-                    {t('renameGroupModal.errors.overlappingToken', {
-                      tokenSet: activeTokenSet,
-                    })}
-                    {error.foundOverlappingTokens?.map((t) => (
-                      <StyledTokenButton
-                        as="div"
-                        css={{
-                          display: 'inline-flex',
-                          borderRadius: '$small',
-                          margin: 0,
-                          marginLeft: '$2',
-                        }}
-                      >
-                        <StyledTokenButtonText key={t.name} css={{ wordBreak: 'break-word' }}>
-                          <span>{t.name}</span>
-                        </StyledTokenButtonText>
+            {{
+              [ErrorType.EmptyGroupName]: t('duplicateGroupModal.errors.emptyGroupName'),
+              [ErrorType.OverlappingToken]: error.foundOverlappingTokens?.length > 0 && (
+                <>
+                  {t('renameGroupModal.errors.overlappingToken', {
+                    tokenSet: activeTokenSet,
+                  })}
+                  {error.foundOverlappingTokens?.map((t) => (
+                    <StyledTokenButton
+                      as="div"
+                      css={{
+                        display: 'inline-flex', borderRadius: '$small', margin: 0, marginLeft: '$2',
+                      }}
+                    >
+                      <StyledTokenButtonText key={t.name} css={{ wordBreak: 'break-word' }}><span>{t.name}</span></StyledTokenButtonText>
+                    </StyledTokenButton>
+                  ))}
+                </>
+              ),
+              [ErrorType.OverlappingGroup]: (
+                <>
+                  {t('renameGroupModal.errors.overlappingGroup', {
+                    groupName: newName,
+                    tokenSet: activeTokenSet,
+                  })}
+                  <Stack direction="row" wrap css={{ marginTop: '$2' }}>
+                    {error.possibleDuplicates?.map(({ name }) => (
+                      <StyledTokenButton as="div" css={{ borderRadius: '$small' }}>
+                        <StyledTokenButtonText css={{ wordBreak: 'break-word' }}><span>{name}</span></StyledTokenButtonText>
                       </StyledTokenButton>
                     ))}
-                  </>
-                ),
-                [ErrorType.OverlappingGroup]: (
-                  <>
-                    {t('renameGroupModal.errors.overlappingGroup', {
-                      groupName: newName,
-                      tokenSet: activeTokenSet,
-                    })}
-                    <Stack direction="row" wrap css={{ marginTop: '$2' }}>
-                      {error.possibleDuplicates?.map(({ name }) => (
-                        <StyledTokenButton as="div" css={{ borderRadius: '$small' }}>
-                          <StyledTokenButtonText css={{ wordBreak: 'break-word' }}>
-                            <span>{name}</span>
-                          </StyledTokenButtonText>
-                        </StyledTokenButton>
-                      ))}
-                    </Stack>
-                  </>
-                ),
-              }[error.type]
-            }
+                  </Stack>
+                </>
+              ),
+            }[error.type]}
           </ErrorMessage>
         )}
         <Text muted>{t('renameGroupModal.infoSameType')}</Text>

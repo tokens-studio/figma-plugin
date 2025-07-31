@@ -6,11 +6,7 @@ export default function setNumberValuesOnVariable(variable: Variable, mode: stri
       throw new Error(`Skipping due to invalid value: ${value}`);
     }
     const existingVariableValue = variable.valuesByMode[mode];
-    if (
-      existingVariableValue === undefined ||
-      !(typeof existingVariableValue === 'number' || isVariableWithAliasReference(existingVariableValue))
-    )
-      return;
+    if (existingVariableValue === undefined || !(typeof existingVariableValue === 'number' || isVariableWithAliasReference(existingVariableValue))) return;
 
     const newValue = value;
 

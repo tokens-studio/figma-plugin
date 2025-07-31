@@ -1,13 +1,11 @@
 import { tokensSharedDataHandler } from '../SharedDataHandler';
 
 type StyleTypeName = 'effects' | 'fills' | 'strokes' | 'typography';
-type StyleType<T> = T extends 'effects'
-  ? EffectStyle
-  : T extends 'fills' | 'strokes'
-  ? PaintStyle
-  : T extends 'typography'
-  ? TextStyle
-  : never;
+type StyleType<T> =
+  T extends 'effects' ? EffectStyle :
+    T extends 'fills' | 'strokes' ? PaintStyle :
+      T extends 'typography' ? TextStyle :
+        never;
 
 export function getStyleId(node: BaseNode, key: StyleTypeName) {
   if (key === 'effects' && key in node && typeof node.effectStyleId === 'string') {

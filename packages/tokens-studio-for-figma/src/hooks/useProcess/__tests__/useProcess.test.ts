@@ -88,10 +88,9 @@ describe('useProcess', () => {
     const steps: ProcessStep<string>[] = [
       {
         key: 'fetch-user-data',
-        fn: async () =>
-          new Promise<void>((resolve) => {
-            setTimeout(resolve, 60000);
-          }),
+        fn: async () => new Promise<void>((resolve) => {
+          setTimeout(resolve, 60000);
+        }),
       },
     ];
 

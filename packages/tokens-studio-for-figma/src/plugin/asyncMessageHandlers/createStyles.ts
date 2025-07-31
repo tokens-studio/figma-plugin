@@ -6,9 +6,9 @@ import { defaultTokenValueRetriever } from '../TokenValueRetriever';
 
 export const createStyles: AsyncMessageChannelHandlers[AsyncMessageTypes.CREATE_STYLES] = async (msg) => {
   try {
-    const { figmaVariableReferences, figmaStyleReferences, stylePathPrefix } = await getThemeReferences(
-      msg.settings.prefixStylesWithThemeName,
-    );
+    const {
+      figmaVariableReferences, figmaStyleReferences, stylePathPrefix,
+    } = await getThemeReferences(msg.settings.prefixStylesWithThemeName);
     defaultTokenValueRetriever.initiate({
       tokens: msg.sourceTokens,
       variableReferences: figmaVariableReferences,

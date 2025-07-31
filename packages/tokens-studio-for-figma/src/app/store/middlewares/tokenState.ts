@@ -20,8 +20,8 @@ export const tokenStateMiddleware = (store) => (next) => (action) => {
   const nextState = store.getState();
 
   if (
-    nextState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO &&
-    actionsToTriggerUpdateInTokensStudio.includes(action.type)
+    nextState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO
+      && actionsToTriggerUpdateInTokensStudio.includes(action.type)
   ) {
     updateThemeGroupsInTokensStudio({
       prevState,

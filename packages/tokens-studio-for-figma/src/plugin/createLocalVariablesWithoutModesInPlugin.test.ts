@@ -52,12 +52,10 @@ describe('createLocalVariablesWithoutModesInPlugin', () => {
     } as unknown as VariableCollection;
     mockGetLocalVariableCollections.mockImplementationOnce(() => mockLocalVariableCollections);
     mockCreateVariableCollection.mockImplementationOnce(() => mockNewCollection);
-    const selectedSets = [
-      {
-        set: 'global',
-        status: TokenSetStatus.ENABLED,
-      },
-    ];
+    const selectedSets = [{
+      set: 'global',
+      status: TokenSetStatus.ENABLED,
+    }];
     expect(await createLocalVariablesWithoutModesInPlugin(tokens, settings, selectedSets)).toEqual({
       allVariableCollectionIds: {},
       totalVariables: 0,

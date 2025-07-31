@@ -33,10 +33,13 @@ describe('updateTokenSetsInState', () => {
   });
 
   it('should delete token sets and update the state appropriately', () => {
-    const nextState = updateTokenSetsInState(defaultTokenState, (name, tokenList) => {
-      if (name === 'dark') return null;
-      return [name, tokenList];
-    });
+    const nextState = updateTokenSetsInState(
+      defaultTokenState,
+      (name, tokenList) => {
+        if (name === 'dark') return null;
+        return [name, tokenList];
+      },
+    );
     expect(nextState).toEqual({
       tokens: {
         global: [],
@@ -61,10 +64,13 @@ describe('updateTokenSetsInState', () => {
   });
 
   it('should rename token sets and update the state appropriately', () => {
-    const nextState = updateTokenSetsInState(defaultTokenState, (name, tokenList) => {
-      if (name === 'dark') return ['dark2', tokenList];
-      return [name, tokenList];
-    });
+    const nextState = updateTokenSetsInState(
+      defaultTokenState,
+      (name, tokenList) => {
+        if (name === 'dark') return ['dark2', tokenList];
+        return [name, tokenList];
+      },
+    );
     expect(nextState).toEqual({
       tokens: {
         global: [],
@@ -92,16 +98,22 @@ describe('updateTokenSetsInState', () => {
   });
 
   it('should reset the activeTokenSet when no token sets are left', () => {
-    const nextState = updateTokenSetsInState(defaultTokenState, () => null);
+    const nextState = updateTokenSetsInState(
+      defaultTokenState,
+      () => null,
+    );
     expect(nextState).toEqual({
-      tokens: {},
+      tokens: {
+      },
       activeTokenSet: '',
-      usedTokenSet: {},
+      usedTokenSet: {
+      },
       themes: [
         {
           id: 'dark',
           name: 'Dark',
-          selectedTokenSets: {},
+          selectedTokenSets: {
+          },
         },
       ],
     });

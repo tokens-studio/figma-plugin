@@ -16,18 +16,20 @@ const mockRetrieve = jest.fn();
 const mockSave = jest.fn();
 
 // Hide log calls unless they are expected
-jest.spyOn(console, 'error').mockImplementation(() => {});
+jest.spyOn(console, 'error').mockImplementation(() => { });
 
 jest.mock('@/storage/GenericVersionedStorage', () => ({
-  GenericVersionedStorage: jest.fn().mockImplementation(() => ({
-    retrieve: mockRetrieve,
-    save: mockSave,
-  })),
+  GenericVersionedStorage: jest.fn().mockImplementation(() => (
+    {
+      retrieve: mockRetrieve,
+      save: mockSave,
+    }
+  )),
 }));
 
-jest.mock('@/plugin/notifiers', () => ({
+jest.mock('@/plugin/notifiers', (() => ({
   notifyToUI: jest.fn(),
-}));
+})));
 
 describe('Generic Versioned Storage', () => {
   beforeEach(() => {
@@ -60,6 +62,7 @@ describe('Generic Versioned Storage', () => {
     flow: GenericVersionedStorageFlow.READ_WRITE_CREATE,
     additionalHeaders: [],
     provider: StorageProviderType.GENERIC_VERSIONED_STORAGE,
+
   };
 
   const readWriteContext = { ...context, flow: GenericVersionedStorageFlow.READ_WRITE };
@@ -72,23 +75,15 @@ describe('Generic Versioned Storage', () => {
     const oldUpdatedAt = '2022-09-20T07:43:03.844Z';
     const remoteUpdatedAt = '2022-09-19T07:43:03.844Z';
 
-    mockRetrieve.mockImplementationOnce(() =>
-      Promise.resolve({
-        metadata: {
-          updatedAt: remoteUpdatedAt,
-        },
-      }),
-    );
+    mockRetrieve.mockImplementationOnce(() => Promise.resolve({
+      metadata: {
+        updatedAt: remoteUpdatedAt,
+      },
+    }));
     mockSave.mockImplementationOnce(() => Promise.resolve(true));
 
     const response = await updateGenericVersionedTokens({
-      tokens: tokens as Record<string, SingleToken[]>,
-      themes: themes as ThemeObjectsList,
-      context,
-      updatedAt,
-      oldUpdatedAt,
-      storeTokenIdInJsonEditor,
-      dispatch: mockStore.dispatch,
+      tokens: tokens as Record<string, SingleToken[]>, themes: themes as ThemeObjectsList, context, updatedAt, oldUpdatedAt, storeTokenIdInJsonEditor, dispatch: mockStore.dispatch,
     });
 
     expect(response).toEqual({
@@ -114,7 +109,9 @@ describe('Generic Versioned Storage', () => {
       metadata: {
         updatedAt,
         version: pjs.version,
-        tokenSetOrder: ['global'],
+        tokenSetOrder: [
+          'global',
+        ],
       },
     });
     expect(notifyToUI).not.toHaveBeenCalled();
@@ -126,32 +123,23 @@ describe('Generic Versioned Storage', () => {
     const oldUpdatedAt = '2021-09-20T07:43:03.844Z';
     const RemoteUpdatedAt = '2023-09-20T07:43:03.844Z';
 
-    mockRetrieve.mockImplementationOnce(() =>
-      Promise.resolve({
-        metadata: {
-          updatedAt: RemoteUpdatedAt,
-        },
-      }),
-    );
+    mockRetrieve.mockImplementationOnce(() => Promise.resolve({
+      metadata: {
+        updatedAt: RemoteUpdatedAt,
+      },
+    }));
     mockSave.mockImplementationOnce(() => Promise.resolve(true));
 
     const response = await updateGenericVersionedTokens({
-      tokens: tokens as Record<string, SingleToken[]>,
-      themes: themes as ThemeObjectsList,
-      context,
-      updatedAt,
-      oldUpdatedAt,
-      storeTokenIdInJsonEditor,
-      dispatch: mockStore.dispatch,
+      tokens: tokens as Record<string, SingleToken[]>, themes: themes as ThemeObjectsList, context, updatedAt, oldUpdatedAt, storeTokenIdInJsonEditor, dispatch: mockStore.dispatch,
     });
 
     expect(response).toEqual({
       status: 'failure',
       errorMessage: 'Remote version is newer than local version',
+
     });
-    expect(notifyToUI).toHaveBeenCalledWith('Error updating tokens as remote is newer, please update first', {
-      error: true,
-    });
+    expect(notifyToUI).toHaveBeenCalledWith('Error updating tokens as remote is newer, please update first', { error: true });
     expect(mockSave).not.toBeCalled();
   });
 
@@ -160,23 +148,13 @@ describe('Generic Versioned Storage', () => {
     const updatedAt = '2022-09-20T08:43:03.844Z';
     const oldUpdatedAt = '2022-09-20T07:43:03.844Z';
 
-    mockRetrieve.mockImplementation(() =>
-      Promise.resolve({
-        status: 'failure',
-        errorMessage: ErrorMessages.GENERAL_CONNECTION_ERROR,
-      }),
-    );
-    expect(
-      await updateGenericVersionedTokens({
-        tokens: tokens as Record<string, SingleToken[]>,
-        themes: themes as ThemeObjectsList,
-        context,
-        updatedAt,
-        oldUpdatedAt,
-        storeTokenIdInJsonEditor,
-        dispatch: mockStore.dispatch,
-      }),
-    ).toEqual({
+    mockRetrieve.mockImplementation(() => Promise.resolve({
+      status: 'failure',
+      errorMessage: ErrorMessages.GENERAL_CONNECTION_ERROR,
+    }));
+    expect(await updateGenericVersionedTokens({
+      tokens: tokens as Record<string, SingleToken[]>, themes: themes as ThemeObjectsList, context, updatedAt, oldUpdatedAt, storeTokenIdInJsonEditor, dispatch: mockStore.dispatch,
+    })).toEqual({
       status: 'failure',
       errorMessage: ErrorMessages.GENERAL_CONNECTION_ERROR,
     });
@@ -242,20 +220,17 @@ describe('Generic Versioned Storage', () => {
         dispatch: mockStore.dispatch,
       });
 
-      expect(mockSave).toHaveBeenCalledWith(
-        {
-          tokens,
-          themes,
-          metadata: {
-            tokenSetOrder: ['global'],
-            updatedAt: '2022-09-20T08:43:03.844Z',
-            version: pjs.version,
-          },
+      expect(mockSave).toHaveBeenCalledWith({
+        tokens,
+        themes,
+        metadata: {
+          tokenSetOrder: ['global'],
+          updatedAt: '2022-09-20T08:43:03.844Z',
+          version: pjs.version,
         },
-        {
-          storeTokenIdInJsonEditor: false,
-        },
-      );
+      }, {
+        storeTokenIdInJsonEditor: false,
+      });
     });
 
     it('requires ID to be set', async () => {
@@ -301,20 +276,17 @@ describe('Generic Versioned Storage', () => {
         dispatch: mockStore.dispatch,
       });
 
-      expect(mockSave).toHaveBeenCalledWith(
-        {
-          tokens,
-          themes,
-          metadata: {
-            tokenSetOrder: ['global'],
-            updatedAt: '2022-09-20T08:43:03.844Z',
-            version: pjs.version,
-          },
+      expect(mockSave).toHaveBeenCalledWith({
+        tokens,
+        themes,
+        metadata: {
+          tokenSetOrder: ['global'],
+          updatedAt: '2022-09-20T08:43:03.844Z',
+          version: pjs.version,
         },
-        {
-          storeTokenIdInJsonEditor: false,
-        },
-      );
+      }, {
+        storeTokenIdInJsonEditor: false,
+      });
     });
   });
 
@@ -343,20 +315,17 @@ describe('Generic Versioned Storage', () => {
         dispatch: mockStore.dispatch,
       });
 
-      expect(mockSave).toHaveBeenCalledWith(
-        {
-          tokens,
-          themes,
-          metadata: {
-            tokenSetOrder: ['global'],
-            updatedAt: '2022-09-20T08:43:03.844Z',
-            version: pjs.version,
-          },
+      expect(mockSave).toHaveBeenCalledWith({
+        tokens,
+        themes,
+        metadata: {
+          tokenSetOrder: ['global'],
+          updatedAt: '2022-09-20T08:43:03.844Z',
+          version: pjs.version,
         },
-        {
-          storeTokenIdInJsonEditor: false,
-        },
-      );
+      }, {
+        storeTokenIdInJsonEditor: false,
+      });
     });
 
     it('updates remote even if retrieve returns null', async () => {
@@ -375,20 +344,17 @@ describe('Generic Versioned Storage', () => {
         dispatch: mockStore.dispatch,
       });
 
-      expect(mockSave).toHaveBeenCalledWith(
-        {
-          tokens,
-          themes,
-          metadata: {
-            tokenSetOrder: ['global'],
-            updatedAt: '2022-09-20T08:43:03.844Z',
-            version: pjs.version,
-          },
+      expect(mockSave).toHaveBeenCalledWith({
+        tokens,
+        themes,
+        metadata: {
+          tokenSetOrder: ['global'],
+          updatedAt: '2022-09-20T08:43:03.844Z',
+          version: pjs.version,
         },
-        {
-          storeTokenIdInJsonEditor: false,
-        },
-      );
+      }, {
+        storeTokenIdInJsonEditor: false,
+      });
     });
 
     it('notify updating error when remote data is newer', async () => {

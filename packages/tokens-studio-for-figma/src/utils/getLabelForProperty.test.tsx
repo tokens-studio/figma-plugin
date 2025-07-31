@@ -1,12 +1,6 @@
 import React from 'react';
 import {
-  IconFontSize,
-  IconLetterSpacing,
-  IconLineHeight,
-  IconParagraphIndent,
-  IconParagraphSpacing,
-  IconTextCase,
-  IconTextDecoration,
+  IconFontSize, IconLetterSpacing, IconLineHeight, IconParagraphIndent, IconParagraphSpacing, IconTextCase, IconTextDecoration,
 } from '@/icons';
 import { getLabelForProperty } from './getLabelForProperty';
 
