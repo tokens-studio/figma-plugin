@@ -188,15 +188,4 @@ SENTRY_REPLAY_SAMPLING=0
 8. For UI components, use @tokens-studio/ui components that we use across the codebase instead of creating from scratch
 9. For UI work, use tokens from @tokens-studio/tokens, found in node_modules/@tokens-studio/tokens/dist/css/dark.css and node_modules/@tokens-studio/tokens/dist/css/core.css instead of using raw hex values.
 
-## MANDATORY: Changeset Creation
 
-**🚨 CRITICAL: You MUST create a changeset for EVERY code change, no exceptions.**
-
-For every pull request or code modification:
-
-1. **IMMEDIATELY run `yarn changeset` after making any code changes**
-2. **Always select "patch" as the version bump (we will decide if major/minor is needed)**
-3. **Write a clear, user-facing description of what changed**
-4. **Commit the generated changeset file along with your code changes**
-
-This is not optional - it is a mandatory requirement for all code changes.
