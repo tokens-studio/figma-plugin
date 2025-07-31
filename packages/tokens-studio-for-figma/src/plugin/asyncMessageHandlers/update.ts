@@ -51,7 +51,7 @@ export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = asy
       updateMode: msg.settings.updateMode,
     });
 
-    await updateNodes(allWithData, msg.settings);
+    await updateNodes(allWithData, String(msg.settings.baseFontSize || 16));
     const shouldApplyStyles = msg.settings.applyVariablesStylesOrRawValue === ApplyVariablesStylesOrRawValues.VARIABLES_STYLES;
     if (msg.activeTheme && msg.themes && msg.settings.shouldSwapStyles && shouldApplyStyles) {
       await swapStyles(msg.activeTheme, msg.themes, msg.settings.updateMode);
