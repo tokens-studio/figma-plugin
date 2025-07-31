@@ -23,9 +23,7 @@ const json = JSON.stringify({
     },
   ],
   $metadata: {
-    tokenSetOrder: [
-      'global',
-    ],
+    tokenSetOrder: ['global'],
   },
 });
 const blob = new Blob([json], { type: 'application/json' });
@@ -55,7 +53,11 @@ describe('FileTokenStorage', () => {
       },
       { data: { tokenSetOrder: ['global'] }, path: 'core.json', type: 'metadata' },
       {
-        data: { primary: { type: 'sizing', value: '1.5' }, secondary: { type: 'sizing', value: '4' } }, name: 'global', path: 'core.json', type: 'tokenSet',
-      }]);
+        data: { primary: { type: 'sizing', value: '1.5' }, secondary: { type: 'sizing', value: '4' } },
+        name: 'global',
+        path: 'core.json',
+        type: 'tokenSet',
+      },
+    ]);
   });
 });

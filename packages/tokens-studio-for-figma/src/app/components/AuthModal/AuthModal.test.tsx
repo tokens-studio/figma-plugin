@@ -1,9 +1,7 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import { mockFetch } from '../../../../tests/__mocks__/fetchMock';
-import {
-  createMockStore, fireEvent, render, resetStore, screen, waitFor,
-} from '../../../../tests/config/setupTest';
+import { createMockStore, fireEvent, render, resetStore, screen, waitFor } from '../../../../tests/config/setupTest';
 import AuthModal from '.';
 import { AuthContextProvider } from '@/context/AuthContext';
 
@@ -110,9 +108,11 @@ describe('Add license key', () => {
     const pass = 'pass';
     const loginError = 'Invalid login credentials';
 
-    mockFetch.mockImplementationOnce(() => Promise.resolve({
-      json: () => Promise.resolve({ error: 'invalid_grant', error_description: loginError }),
-    }));
+    mockFetch.mockImplementationOnce(() =>
+      Promise.resolve({
+        json: () => Promise.resolve({ error: 'invalid_grant', error_description: loginError }),
+      }),
+    );
 
     const mockStore = createMockStore({
       uiState: {
@@ -156,9 +156,11 @@ it('Displays signup error', async () => {
   const pass = 'pass';
   const signupError = 'Error signing up';
 
-  mockFetch.mockImplementationOnce(() => Promise.resolve({
-    json: () => Promise.resolve({ code: 422, msg: signupError }),
-  }));
+  mockFetch.mockImplementationOnce(() =>
+    Promise.resolve({
+      json: () => Promise.resolve({ code: 422, msg: signupError }),
+    }),
+  );
 
   const mockStore = createMockStore({
     uiState: {

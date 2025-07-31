@@ -13,20 +13,20 @@ export function isSingleBoxShadowToken(
   const tokenTypeKey = getTokenTypeKey(ignoreTokenFormat);
   const tokenValueKey = getTokenValueKey(ignoreTokenFormat);
   return (
-    token[tokenTypeKey] === TokenTypes.BOX_SHADOW
-    && (typeof token[tokenValueKey] === 'string'
-      || Array.isArray(token[tokenValueKey])
-      || (typeof token[tokenValueKey] === 'object' && !(tokenValueKey in token[tokenValueKey])))
+    token[tokenTypeKey] === TokenTypes.BOX_SHADOW &&
+    (typeof token[tokenValueKey] === 'string' ||
+      Array.isArray(token[tokenValueKey]) ||
+      (typeof token[tokenValueKey] === 'object' && !(tokenValueKey in token[tokenValueKey])))
   );
 }
 
 export function isSingleBoxShadowTokenInJSON(token: TokenInJSON | Tokens): token is SingleBoxShadowTokenInJSON {
   if (typeof token !== 'object') return false;
   return (
-    token[TokenFormat.tokenTypeKey] === TokenTypes.BOX_SHADOW
-    && (typeof token[TokenFormat.tokenValueKey] === 'string'
-      || Array.isArray(token[TokenFormat.tokenValueKey])
-      || (typeof token[TokenFormat.tokenValueKey] === 'object'
-        && !(TokenFormat.tokenValueKey in token[TokenFormat.tokenValueKey])))
+    token[TokenFormat.tokenTypeKey] === TokenTypes.BOX_SHADOW &&
+    (typeof token[TokenFormat.tokenValueKey] === 'string' ||
+      Array.isArray(token[TokenFormat.tokenValueKey]) ||
+      (typeof token[TokenFormat.tokenValueKey] === 'object' &&
+        !(TokenFormat.tokenValueKey in token[TokenFormat.tokenValueKey])))
   );
 }

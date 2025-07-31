@@ -62,9 +62,7 @@ const getStorageClient = (context: TokensStudioCredentials) => {
   return storageClientObject;
 };
 
-export const pushToTokensStudio = async ({
-  context, action, data, metadata, successCallback,
-}: PushToTokensStudio) => {
+export const pushToTokensStudio = async ({ context, action, data, metadata, successCallback }: PushToTokensStudio) => {
   const storageClient = getStorageClient(context);
 
   storageClient.push({
@@ -219,9 +217,9 @@ export function useTokensStudio() {
 
         if (data) {
           if (
-            !isEqual(data.tokens, tokens)
-            || !isEqual(data.themes, themes)
-            || !isEqual(data.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
+            !isEqual(data.tokens, tokens) ||
+            !isEqual(data.themes, themes) ||
+            !isEqual(data.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
           ) {
             const userDecision = await askUserIfPull();
             if (userDecision) {
@@ -238,7 +236,11 @@ export function useTokensStudio() {
                 themes: data.themes,
                 metadata: data.metadata,
               });
-              const stringifiedRemoteTokens = JSON.stringify(compact([data.tokens, data.themes, TokenFormat.format]), null, 2);
+              const stringifiedRemoteTokens = JSON.stringify(
+                compact([data.tokens, data.themes, TokenFormat.format]),
+                null,
+                2,
+              );
               dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
               dispatch.tokenState.setCollapsedTokenSets([]);
               notifyToUI('Pulled tokens from Tokens Studio');

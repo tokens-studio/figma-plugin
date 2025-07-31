@@ -1,7 +1,10 @@
 import { TokenTypes } from '@/constants/TokenTypes';
 import { SingleToken } from '@/types/tokens';
 
-export function convertTokenTypeToVariableType(type: TokenTypes, value: SingleToken['value']): VariableResolvedDataType {
+export function convertTokenTypeToVariableType(
+  type: TokenTypes,
+  value: SingleToken['value'],
+): VariableResolvedDataType {
   // For numerical font weights we want to create a float variable
   if (type === TokenTypes.FONT_WEIGHTS && parseFloat(String(value))) {
     return 'FLOAT';

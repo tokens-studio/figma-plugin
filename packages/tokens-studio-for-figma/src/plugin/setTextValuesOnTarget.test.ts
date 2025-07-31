@@ -90,7 +90,18 @@ const tokenWithStringValue: SingleToken = {
   value: 'large',
 };
 
-const tokens: SingleToken[] = [typographyToken, typographyTokenWithReferences, fontSizeLarge, lineHeightLarge, letterSpacingLarge, numericalWeightToken, tokenWithoutValue, tokenWithStringValue, typographyTokenWithNumericalWeight, typographyTokenWithNumericalWeightReference];
+const tokens: SingleToken[] = [
+  typographyToken,
+  typographyTokenWithReferences,
+  fontSizeLarge,
+  lineHeightLarge,
+  letterSpacingLarge,
+  numericalWeightToken,
+  tokenWithoutValue,
+  tokenWithStringValue,
+  typographyTokenWithNumericalWeight,
+  typographyTokenWithNumericalWeightReference,
+];
 
 describe('setTextValuesOnTarget', () => {
   let textNodeMock;
@@ -123,12 +134,8 @@ describe('setTextValuesOnTarget', () => {
   });
 
   it('sets the right properties if references are given and they can be found', async () => {
-    loadFontAsyncSpy.mockImplementationOnce(() => (
-      Promise.reject()
-    ));
-    loadFontAsyncSpy.mockImplementation(() => (
-      Promise.resolve()
-    ));
+    loadFontAsyncSpy.mockImplementationOnce(() => Promise.reject());
+    loadFontAsyncSpy.mockImplementation(() => Promise.resolve());
     await setTextValuesOnTarget(textNodeMock, 'text.largeWithReferences');
     expect(textNodeMock).toEqual({
       ...textNodeMock,
@@ -146,29 +153,21 @@ describe('setTextValuesOnTarget', () => {
   });
 
   it('accepts a numerical fontWeight when created using variables)', async () => {
-    loadFontAsyncSpy.mockImplementation(() => (
-      Promise.resolve()
-    ));
+    loadFontAsyncSpy.mockImplementation(() => Promise.resolve());
     await setTextValuesOnTarget(textNodeMock, 'type.withNumericalWeightReference');
     expect(textNodeMock).toEqual({ ...textNodeMock, fontName: { ...textNodeMock.fontName, style: '700' } });
   });
 
   it('converts a numerical fontWeight and sets to the node', async () => {
-    loadFontAsyncSpy.mockImplementationOnce(() => (
-      Promise.reject()
-    ));
+    loadFontAsyncSpy.mockImplementationOnce(() => Promise.reject());
 
-    loadFontAsyncSpy.mockImplementation(() => (
-      Promise.resolve()
-    ));
+    loadFontAsyncSpy.mockImplementation(() => Promise.resolve());
     await setTextValuesOnTarget(textNodeMock, 'type.withNumericalWeight');
     expect(textNodeMock).toEqual({ ...textNodeMock, fontName: { ...textNodeMock.fontName, style: 'Bold' } });
   });
 
-  it('can\'t set number fontWeight to the node if there is no matching fontWeight', async () => {
-    loadFontAsyncSpy.mockImplementation(() => (
-      Promise.reject()
-    ));
+  it("can't set number fontWeight to the node if there is no matching fontWeight", async () => {
+    loadFontAsyncSpy.mockImplementation(() => Promise.reject());
     await setTextValuesOnTarget(textNodeMock, 'type.withNumericalWeight');
     expect(textNodeMock).toEqual({ ...textNodeMock, fontName: { ...textNodeMock.fontName } });
   });

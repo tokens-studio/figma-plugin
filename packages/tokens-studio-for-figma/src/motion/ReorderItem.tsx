@@ -1,17 +1,11 @@
-import {
-  Box, HTMLMotionProps, isMotionValue, motion, PanInfo, useMotionValue, useTransform,
-} from 'framer-motion';
+import { Box, HTMLMotionProps, isMotionValue, motion, PanInfo, useMotionValue, useTransform } from 'framer-motion';
 import * as React from 'react';
-import {
-  useContext,
-  useEffect,
-  useRef,
-} from 'react';
+import { useContext, useEffect, useRef } from 'react';
 import { ReorderContext } from '@/context';
 
 export interface Props<V> {
-  value: V
-  layout?: true | 'position'
+  value: V;
+  layout?: true | 'position';
 }
 
 function useDefaultMotionValue(value: any, defaultValue: number = 0) {
@@ -20,16 +14,14 @@ function useDefaultMotionValue(value: any, defaultValue: number = 0) {
   return isMotionValue(value) ? value : useMotionValue(defaultValue);
 }
 
-export function ReorderItem<V>(
-  {
-    children,
-    style,
-    value,
-    onDrag,
-    layout = true,
-    ...props
-  }: Props<V> & HTMLMotionProps<any> & React.PropsWithChildren<unknown>,
-) {
+export function ReorderItem<V>({
+  children,
+  style,
+  value,
+  onDrag,
+  layout = true,
+  ...props
+}: Props<V> & HTMLMotionProps<any> & React.PropsWithChildren<unknown>) {
   const Component = motion.li;
 
   const context = useContext(ReorderContext);
@@ -44,13 +36,16 @@ export function ReorderItem<V>(
 
   const measuredLayout = useRef<Box | null>(null);
 
-  const handleDrag = React.useCallback((event: MouseEvent | TouchEvent | PointerEvent, gesturePoint: PanInfo) => {
-    const { velocity } = gesturePoint;
-    if (velocity[axis]) {
-      updateOrder(value, point[axis].get(), velocity[axis]);
-    }
-    onDrag?.(event, gesturePoint);
-  }, [axis, point, value, updateOrder, onDrag]);
+  const handleDrag = React.useCallback(
+    (event: MouseEvent | TouchEvent | PointerEvent, gesturePoint: PanInfo) => {
+      const { velocity } = gesturePoint;
+      if (velocity[axis]) {
+        updateOrder(value, point[axis].get(), velocity[axis]);
+      }
+      onDrag?.(event, gesturePoint);
+    },
+    [axis, point, value, updateOrder, onDrag],
+  );
 
   const handleLayoutMeasure = React.useCallback((measured: Box) => {
     measuredLayout.current = measured;

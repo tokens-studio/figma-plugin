@@ -4,8 +4,8 @@ export function waitForMessage<M extends MessageFromPluginTypes>(message: M): Pr
   return new Promise<PostToUIMessage & { type: M }>((res) => {
     type Event = {
       data: {
-        pluginMessage: PostToUIMessage
-      }
+        pluginMessage: PostToUIMessage;
+      };
     };
 
     const handler = (event: Event) => {

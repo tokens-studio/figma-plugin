@@ -21,14 +21,7 @@ export const TokenTooltip: React.FC<React.PropsWithChildren<React.PropsWithChild
   }
 
   return (
-    <Tooltip
-      side="bottom"
-      label={showEditForm ? '' : (
-        <TokenTooltipContent
-          token={token}
-        />
-      )}
-    >
+    <Tooltip side="bottom" label={showEditForm ? '' : <TokenTooltipContent token={token} />}>
       {children}
     </Tooltip>
   );

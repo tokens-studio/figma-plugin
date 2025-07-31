@@ -1,10 +1,7 @@
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import {
-  Button, TextInput, Stack, Text,
-  Tooltip,
-} from '@tokens-studio/ui';
+import { Button, TextInput, Stack, Text, Tooltip } from '@tokens-studio/ui';
 import Modal from '../Modal';
 import { MultiSelectDropdown } from '../MultiSelectDropdown';
 import { ErrorMessage } from '../ErrorMessage';
@@ -23,7 +20,12 @@ type Props = {
 };
 
 export default function DuplicateTokenGroupModal({
-  isOpen, type, newName, oldName, onClose, handleNewTokenGroupNameChange,
+  isOpen,
+  type,
+  newName,
+  oldName,
+  onClose,
+  handleNewTokenGroupNameChange,
 }: Props) {
   const tokens = useSelector(tokensSelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
@@ -35,15 +37,21 @@ export default function DuplicateTokenGroupModal({
     setSelectedTokenSets(selectedItems);
   }, []);
 
-  const handleDuplicateTokenGroupSubmit = React.useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    duplicateGroup({
-      oldName, newName, tokenSets: selectedTokenSets, type,
-    });
-    if (onClose) {
-      onClose();
-    }
-  }, [duplicateGroup, oldName, newName, selectedTokenSets, type, onClose]);
+  const handleDuplicateTokenGroupSubmit = React.useCallback(
+    async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      duplicateGroup({
+        oldName,
+        newName,
+        tokenSets: selectedTokenSets,
+        type,
+      });
+      if (onClose) {
+        onClose();
+      }
+    },
+    [duplicateGroup, oldName, newName, selectedTokenSets, type, onClose],
+  );
 
   const error = useMemo(() => {
     if (!isOpen) {
@@ -70,7 +78,7 @@ export default function DuplicateTokenGroupModal({
       isOpen={isOpen}
       close={onClose}
       size="large"
-      footer={(
+      footer={
         <form id="duplicateTokenGroup" onSubmit={handleDuplicateTokenGroupSubmit}>
           <Stack direction="row" justify="end" gap={4}>
             <Button variant="secondary" onClick={onClose}>
@@ -81,7 +89,7 @@ export default function DuplicateTokenGroupModal({
             </Button>
           </Stack>
         </form>
-    )}
+      }
     >
       <Stack direction="column" justify="center" align="start" gap={4}>
         <TextInput
@@ -97,60 +105,79 @@ export default function DuplicateTokenGroupModal({
         />
         {!canDuplicate && error?.type && (
           <ErrorMessage css={{ width: '100%', maxHeight: 150, overflow: 'scroll' }}>
-            {{
-              [ErrorType.NoSetSelected]: t('duplicateGroupModal.errors.noSetSelected'),
-              [ErrorType.EmptyGroupName]: t('duplicateGroupModal.errors.emptyGroupName'),
-              [ErrorType.ExistingGroup]: t('duplicateGroupModal.errors.existingGroup'),
-              [ErrorType.OverlappingToken]: error.foundOverlappingTokens && (
-                <>
-                  {t('duplicateGroupModal.errors.overlappingToken', {
-                    tokenSets: Object.keys(error.foundOverlappingTokens).map((n) => `“${n}”`).join(', '),
-                  })}
+            {
+              {
+                [ErrorType.NoSetSelected]: t('duplicateGroupModal.errors.noSetSelected'),
+                [ErrorType.EmptyGroupName]: t('duplicateGroupModal.errors.emptyGroupName'),
+                [ErrorType.ExistingGroup]: t('duplicateGroupModal.errors.existingGroup'),
+                [ErrorType.OverlappingToken]: error.foundOverlappingTokens && (
+                  <>
+                    {t('duplicateGroupModal.errors.overlappingToken', {
+                      tokenSets: Object.keys(error.foundOverlappingTokens)
+                        .map((n) => `“${n}”`)
+                        .join(', '),
+                    })}
                     {Object.entries(error.foundOverlappingTokens).map(([selectedSet, overlappingTokens]) => (
                       <>
                         <Tooltip label="Set" side="right">
-                          <Text css={{ marginTop: '$2', marginBottom: '$2', fontWeight: '$bold' }}>
-                            {selectedSet}
-                          </Text>
+                          <Text css={{ marginTop: '$2', marginBottom: '$2', fontWeight: '$bold' }}>{selectedSet}</Text>
                         </Tooltip>
                         <Stack direction="row" gap={2}>
                           {overlappingTokens.map((t) => (
-                            <StyledTokenButton as="div" css={{ display: 'inline-flex', borderRadius: '$small', margin: 0 }}>
-                              <StyledTokenButtonText css={{ wordBreak: 'break-word' }}><span>{t.name}</span></StyledTokenButtonText>
+                            <StyledTokenButton
+                              as="div"
+                              css={{ display: 'inline-flex', borderRadius: '$small', margin: 0 }}
+                            >
+                              <StyledTokenButtonText css={{ wordBreak: 'break-word' }}>
+                                <span>{t.name}</span>
+                              </StyledTokenButtonText>
                             </StyledTokenButton>
                           ))}
                         </Stack>
                       </>
                     ))}
-                </>
-              ),
-              [ErrorType.OverlappingGroup]: (
-                <>
-                  {t('duplicateGroupModal.errors.overlappingGroup', {
-                    groupName: newName, tokenSets: error.possibleDuplicates && Object.keys(error.possibleDuplicates).map((n) => `“${n}”`).join(', '),
-                  })}
-                  {error.possibleDuplicates && Object.entries(error.possibleDuplicates).map(([selectedSet, overlappingTokens]) => (
-                    <>
-                      <Tooltip label="Set" side="right">
-                        <Text css={{ marginTop: '$2', marginBottom: '$2', fontWeight: '$bold' }}>
-                          {selectedSet}
-                        </Text>
-                      </Tooltip>
-                      <Stack direction="row" wrap css={{ marginTop: '$2' }}>
-                        {overlappingTokens.map(({ name }) => (
-                          <StyledTokenButton as="div" css={{ borderRadius: '$small' }}>
-                            <StyledTokenButtonText css={{ wordBreak: 'break-word' }}><span>{name}</span></StyledTokenButtonText>
-                          </StyledTokenButton>
-                        ))}
-                      </Stack>
-                    </>
-                  ))}
-                </>
-              ),
-            }[error.type]}
+                  </>
+                ),
+                [ErrorType.OverlappingGroup]: (
+                  <>
+                    {t('duplicateGroupModal.errors.overlappingGroup', {
+                      groupName: newName,
+                      tokenSets:
+                        error.possibleDuplicates &&
+                        Object.keys(error.possibleDuplicates)
+                          .map((n) => `“${n}”`)
+                          .join(', '),
+                    })}
+                    {error.possibleDuplicates &&
+                      Object.entries(error.possibleDuplicates).map(([selectedSet, overlappingTokens]) => (
+                        <>
+                          <Tooltip label="Set" side="right">
+                            <Text css={{ marginTop: '$2', marginBottom: '$2', fontWeight: '$bold' }}>
+                              {selectedSet}
+                            </Text>
+                          </Tooltip>
+                          <Stack direction="row" wrap css={{ marginTop: '$2' }}>
+                            {overlappingTokens.map(({ name }) => (
+                              <StyledTokenButton as="div" css={{ borderRadius: '$small' }}>
+                                <StyledTokenButtonText css={{ wordBreak: 'break-word' }}>
+                                  <span>{name}</span>
+                                </StyledTokenButtonText>
+                              </StyledTokenButton>
+                            ))}
+                          </Stack>
+                        </>
+                      ))}
+                  </>
+                ),
+              }[error.type]
+            }
           </ErrorMessage>
         )}
-        <MultiSelectDropdown menuItems={Object.keys(tokens)} selectedItems={selectedTokenSets} handleSelectedItemChange={handleSelectedItemChange} />
+        <MultiSelectDropdown
+          menuItems={Object.keys(tokens)}
+          selectedItems={selectedTokenSets}
+          handleSelectedItemChange={handleSelectedItemChange}
+        />
       </Stack>
     </Modal>
   );

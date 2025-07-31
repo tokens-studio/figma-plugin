@@ -7,7 +7,10 @@ import { ThemeObject } from '@/types';
 export function mapTokensToVariableInfo(token: ResolveTokenValuesResult, theme: ThemeObject, settings: SettingsState) {
   return {
     ...token,
-    value: (typeof token.value === 'string' || typeof token.value === 'number') ? transformValue(token.value, token.type, settings?.baseFontSize, true) : token.value,
+    value:
+      typeof token.value === 'string' || typeof token.value === 'number'
+        ? transformValue(token.value, token.type, settings?.baseFontSize, true)
+        : token.value,
     path: token.name.split('.').join('/'),
     variableId: theme.$figmaVariableReferences?.[token.name] ?? '',
   } as VariableToken;

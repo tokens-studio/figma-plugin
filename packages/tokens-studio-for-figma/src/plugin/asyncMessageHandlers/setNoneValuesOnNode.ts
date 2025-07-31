@@ -9,7 +9,9 @@ import { postToUI } from '../notifiers';
 import { defaultWorker } from '../Worker';
 import { ProgressTracker } from '../ProgressTracker';
 
-export const setNoneValuesOnNode: AsyncMessageChannelHandlers[AsyncMessageTypes.SET_NONE_VALUES_ON_NODE] = async (msg) => {
+export const setNoneValuesOnNode: AsyncMessageChannelHandlers[AsyncMessageTypes.SET_NONE_VALUES_ON_NODE] = async (
+  msg,
+) => {
   const nodesToRemove: { [key: string]: Properties[] } = {};
 
   msg.tokensToSet.forEach((token) => {
@@ -31,16 +33,18 @@ export const setNoneValuesOnNode: AsyncMessageChannelHandlers[AsyncMessageTypes.
   const promises: Set<Promise<void>> = new Set();
 
   Object.entries(nodesToRemove).forEach(([nodeId, keys]) => {
-    promises.add(defaultWorker.schedule(async () => {
-      keys.forEach(async (key) => {
-        const nodeToUpdate = figma.getNodeById(nodeId);
-        if (nodeToUpdate) {
-          await setNonePluginData({ nodes: [nodeToUpdate], key });
-        }
-      });
-      tracker.next();
-      tracker.reportIfNecessary();
-    }));
+    promises.add(
+      defaultWorker.schedule(async () => {
+        keys.forEach(async (key) => {
+          const nodeToUpdate = figma.getNodeById(nodeId);
+          if (nodeToUpdate) {
+            await setNonePluginData({ nodes: [nodeToUpdate], key });
+          }
+        });
+        tracker.next();
+        tracker.reportIfNecessary();
+      }),
+    );
   });
 
   await Promise.all(promises);

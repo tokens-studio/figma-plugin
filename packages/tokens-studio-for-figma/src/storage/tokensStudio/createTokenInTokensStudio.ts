@@ -11,10 +11,7 @@ interface CreateTokenInTokensStudioPayload {
   payload: UpdateTokenPayload;
 }
 
-export async function createTokenInTokensStudio({
-  payload,
-  rootState,
-}: CreateTokenInTokensStudioPayload) {
+export async function createTokenInTokensStudio({ payload, rootState }: CreateTokenInTokensStudioPayload) {
   const tokenSet = rootState.tokenState.tokens[payload.parent];
 
   if (!tokenSet) {

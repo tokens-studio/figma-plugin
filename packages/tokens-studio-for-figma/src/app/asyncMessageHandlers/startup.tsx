@@ -36,21 +36,15 @@ const StartupApp = () => {
     };
   }, []);
 
-  const appContainer = (
-    params ? <AppContainer {...params} /> : (
-      <FigmaLoading
-        isLoading
-      >
-        <span />
-      </FigmaLoading>
-    )
+  const appContainer = params ? (
+    <AppContainer {...params} />
+  ) : (
+    <FigmaLoading isLoading>
+      <span />
+    </FigmaLoading>
   );
 
-  return PREVIEW_ENV ? (
-    <PreviewApp>
-      {appContainer}
-    </PreviewApp>
-  ) : appContainer;
+  return PREVIEW_ENV ? <PreviewApp>{appContainer}</PreviewApp> : appContainer;
 };
 
 export const startup = async () => {

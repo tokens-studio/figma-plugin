@@ -15,9 +15,10 @@ export default function useFigmaFonts() {
     dispatch.uiState.setFigmaFonts(figmaFonts.fonts);
   }, [dispatch.uiState]);
 
-  return useMemo(() => ({
-    getFigmaFonts,
-  }), [
-    getFigmaFonts,
-  ]);
+  return useMemo(
+    () => ({
+      getFigmaFonts,
+    }),
+    [getFigmaFonts],
+  );
 }

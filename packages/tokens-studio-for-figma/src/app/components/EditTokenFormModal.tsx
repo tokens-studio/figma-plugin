@@ -38,8 +38,13 @@ const EditTokenFormModal: React.FC<React.PropsWithChildren<React.PropsWithChildr
       modal={false}
       close={handleReset}
       // eslint-disable-next-line no-nested-ternary
-      title={editToken.status === EditTokenFormStatus.CREATE ? t('newToken')
-        : editToken.status === EditTokenFormStatus.DUPLICATE ? t('duplicateToken') : editToken.initialName}
+      title={
+        editToken.status === EditTokenFormStatus.CREATE
+          ? t('newToken')
+          : editToken.status === EditTokenFormStatus.DUPLICATE
+          ? t('duplicateToken')
+          : editToken.initialName
+      }
     >
       <EditTokenForm resolvedTokens={resolvedTokens} />
     </Modal>

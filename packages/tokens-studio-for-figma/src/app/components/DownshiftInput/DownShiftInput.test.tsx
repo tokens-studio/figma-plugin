@@ -1,9 +1,7 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import { DownshiftInput } from './DownshiftInput';
-import {
-  createMockStore, fireEvent, render, waitFor,
-} from '../../../../tests/config/setupTest';
+import { createMockStore, fireEvent, render, waitFor } from '../../../../tests/config/setupTest';
 import { SingleToken } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { BoxShadowTypes } from '@/constants/BoxShadowTypes';
@@ -83,23 +81,27 @@ const resolvedTokens = [
   {
     internal__Parent: 'core',
     name: 'boxShadow.regular',
-    rawValue: [{
-      x: '2',
-      y: '2',
-      blur: '2',
-      spread: '2',
-      color: '#000000',
-      type: BoxShadowTypes.DROP_SHADOW,
-    }],
+    rawValue: [
+      {
+        x: '2',
+        y: '2',
+        blur: '2',
+        spread: '2',
+        color: '#000000',
+        type: BoxShadowTypes.DROP_SHADOW,
+      },
+    ],
     type: TokenTypes.BOX_SHADOW,
-    value: [{
-      x: '2',
-      y: '2',
-      blur: '2',
-      spread: '2',
-      color: '#000000',
-      type: BoxShadowTypes.DROP_SHADOW,
-    }],
+    value: [
+      {
+        x: '2',
+        y: '2',
+        blur: '2',
+        spread: '2',
+        color: '#000000',
+        type: BoxShadowTypes.DROP_SHADOW,
+      },
+    ],
   },
 ] as SingleToken[];
 
@@ -173,7 +175,7 @@ describe('DownShiftInput', () => {
     );
     waitFor(async () => {
       result.getByTestId('downshift-input-suffix-button').click();
-      const searchInput = await result.findByTestId('downshift-search-input') as HTMLInputElement;
+      const searchInput = (await result.findByTestId('downshift-search-input')) as HTMLInputElement;
       fireEvent.change(searchInput, {
         target: { value: 'slate' },
       });
@@ -294,7 +296,7 @@ describe('DownShiftInput', () => {
     );
     waitFor(async () => {
       result.getByTestId('downshift-input-suffix-button').click();
-      const searchInput = await result.findByTestId('downshift-search-input') as HTMLInputElement;
+      const searchInput = (await result.findByTestId('downshift-search-input')) as HTMLInputElement;
       fireEvent.change(searchInput, {
         target: { value: 'nonexist' },
       });

@@ -2,9 +2,9 @@ import { createModel } from '@rematch/core';
 import { RootModel } from '@/types/RootModel';
 
 export interface InspectState {
-  selectedTokens: string[]
-  isShowBrokenReferences: boolean,
-  isShowResolvedReferences: boolean,
+  selectedTokens: string[];
+  isShowBrokenReferences: boolean;
+  isShowResolvedReferences: boolean;
 }
 
 export const inspectState = createModel<RootModel>()({

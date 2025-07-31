@@ -14,7 +14,8 @@ export async function trySetStyleId(node: BaseNode, type: StyleType, styleId: st
       if (localStyle) {
         resolve(localStyle.id);
       } else if (styleKeyMatch) {
-        figma.importStyleByKeyAsync(styleKeyMatch[1])
+        figma
+          .importStyleByKeyAsync(styleKeyMatch[1])
           .then((remoteStyle) => resolve(remoteStyle.id))
           .catch(() => {
             reject(styleId);

@@ -3,7 +3,10 @@ import pjs from '../../package.json';
 import { DeepTokensMap, ThemeObjectsList } from '@/types';
 import { SingleToken } from '@/types/tokens';
 import {
-  RemoteTokenStorage, RemoteTokenstorageErrorMessage, RemoteTokenStorageFile, RemoteTokenStorageMetadata,
+  RemoteTokenStorage,
+  RemoteTokenstorageErrorMessage,
+  RemoteTokenStorageFile,
+  RemoteTokenStorageMetadata,
 } from './RemoteTokenStorage';
 import { singleFileSchema } from './schemas/singleFileSchema';
 import { SystemFilenames } from '@/constants/SystemFilenames';
@@ -11,14 +14,14 @@ import { ErrorMessages } from '@/constants/ErrorMessages';
 import { SaveOption } from './FileTokenStorage';
 
 type JsonBinMetadata = Partial<{
-  version: string
-  updatedAt: string
+  version: string;
+  updatedAt: string;
 }>;
 
 type JsonbinData = JsonBinMetadata & {
-  values: Record<string, Record<string, SingleToken<false> | DeepTokensMap<false>>>
-  $themes?: ThemeObjectsList
-  $metadata?: RemoteTokenStorageMetadata & JsonBinMetadata
+  values: Record<string, Record<string, SingleToken<false> | DeepTokensMap<false>>>;
+  $themes?: ThemeObjectsList;
+  $metadata?: RemoteTokenStorageMetadata & JsonBinMetadata;
 };
 
 const jsonbinSchema = singleFileSchema.extend({
@@ -33,21 +36,32 @@ export class JSONBinTokenStorage extends RemoteTokenStorage<JsonBinMetadata, Sav
 
   private defaultHeaders: Headers;
 
-  public static async create(name: string, updatedAt: string, secret: string): Promise<false | {
-    metadata: { id: string }
-  }> {
+  public static async create(
+    name: string,
+    updatedAt: string,
+    secret: string,
+  ): Promise<
+    | false
+    | {
+        metadata: { id: string };
+      }
+  > {
     const response = await fetch('https://api.jsonbin.io/v3/b', {
       method: 'POST',
       mode: 'cors',
       cache: 'no-cache',
       credentials: 'same-origin',
-      body: JSON.stringify({
-        values: { options: {} },
-        $metadata: {
-          version: pjs.version,
-          updatedAt,
+      body: JSON.stringify(
+        {
+          values: { options: {} },
+          $metadata: {
+            version: pjs.version,
+            updatedAt,
+          },
         },
-      }, null, 2),
+        null,
+        2,
+      ),
       headers: new Headers([
         ['Content-Type', 'application/json'],
         ['X-Master-Key', secret],
@@ -92,9 +106,11 @@ export class JSONBinTokenStorage extends RemoteTokenStorage<JsonBinMetadata, Sav
         data: {
           version: data.$metadata?.version ?? data.version ?? pjs.version,
           updatedAt: data.$metadata?.updatedAt ?? data.updatedAt ?? new Date().toISOString(),
-          ...(data.$metadata?.tokenSetOrder ? {
-            tokenSetOrder: data.$metadata.tokenSetOrder,
-          } : {}),
+          ...(data.$metadata?.tokenSetOrder
+            ? {
+                tokenSetOrder: data.$metadata.tokenSetOrder,
+              }
+            : {}),
         },
       },
       ...Object.entries(data.values).map<RemoteTokenStorageFile<JsonBinMetadata>>(([name, tokenSet]) => ({
@@ -112,10 +128,7 @@ export class JSONBinTokenStorage extends RemoteTokenStorage<JsonBinMetadata, Sav
       mode: 'cors',
       cache: 'no-cache',
       credentials: 'same-origin',
-      headers: new Headers([
-        ...this.defaultHeaders.entries(),
-        ['X-Bin-Meta', '0'],
-      ]),
+      headers: new Headers([...this.defaultHeaders.entries(), ['X-Bin-Meta', '0']]),
     });
 
     if (!response.ok) {
@@ -124,9 +137,11 @@ export class JSONBinTokenStorage extends RemoteTokenStorage<JsonBinMetadata, Sav
 
     if (response.ok) {
       const parsedJsonData = await response.json();
-      const validationResult = await z.object({
-        record: jsonbinSchema,
-      }).safeParseAsync(parsedJsonData);
+      const validationResult = await z
+        .object({
+          record: jsonbinSchema,
+        })
+        .safeParseAsync(parsedJsonData);
       if (validationResult.success) {
         const jsonbinData = validationResult.data.record as JsonbinData;
         return this.convertJsonBinDataToFiles(jsonbinData);
@@ -143,16 +158,13 @@ export class JSONBinTokenStorage extends RemoteTokenStorage<JsonBinMetadata, Sav
       values: {},
       $metadata: {
         version: pjs.version,
-        updatedAt: (new Date()).toISOString(),
+        updatedAt: new Date().toISOString(),
       },
       $themes: [],
     };
     files.forEach((file) => {
       if (file.type === 'themes') {
-        dataObject.$themes = [
-          ...(dataObject.$themes ?? []),
-          ...file.data,
-        ];
+        dataObject.$themes = [...(dataObject.$themes ?? []), ...file.data];
       } else if (file.type === 'metadata') {
         dataObject.$metadata = {
           ...(dataObject.$metadata ?? []),
@@ -172,9 +184,7 @@ export class JSONBinTokenStorage extends RemoteTokenStorage<JsonBinMetadata, Sav
       cache: 'no-cache',
       credentials: 'same-origin',
       body: JSON.stringify(dataObject),
-      headers: new Headers([
-        ...this.defaultHeaders.entries(),
-      ]),
+      headers: new Headers([...this.defaultHeaders.entries()]),
     });
 
     if (!response.ok) {

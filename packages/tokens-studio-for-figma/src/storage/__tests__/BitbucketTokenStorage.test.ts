@@ -116,21 +116,28 @@ describe('BitbucketTokenStorage', () => {
     storageProvider.changePath('global.json');
 
     mockFetch
-      .mockImplementationOnce(() => Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve({
-          $themes: [],
-          global: { red: { name: 'red', type: 'color', value: '#ff0000' } },
+      .mockImplementationOnce(() =>
+        Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve({
+              $themes: [],
+              global: { red: { name: 'red', type: 'color', value: '#ff0000' } },
+            }),
         }),
-      }))
-      .mockImplementationOnce(() => Promise.resolve({
-        ok: true,
-        text: () => Promise.resolve(JSON.stringify({ $themes: [] })),
-      }))
-      .mockImplementationOnce(() => Promise.resolve({
-        ok: true,
-        text: () => Promise.resolve(JSON.stringify({ red: { name: 'red', type: 'color', value: '#ff0000' } })),
-      }));
+      )
+      .mockImplementationOnce(() =>
+        Promise.resolve({
+          ok: true,
+          text: () => Promise.resolve(JSON.stringify({ $themes: [] })),
+        }),
+      )
+      .mockImplementationOnce(() =>
+        Promise.resolve({
+          ok: true,
+          text: () => Promise.resolve(JSON.stringify({ red: { name: 'red', type: 'color', value: '#ff0000' } })),
+        }),
+      );
 
     const result = await storageProvider.read();
 

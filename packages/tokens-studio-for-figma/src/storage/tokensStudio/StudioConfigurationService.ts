@@ -56,9 +56,7 @@ export class StudioConfigurationService {
 
   // Gets the appropriate GraphQL host based on environment
   private getDefaultGraphQLHost(): string {
-    return process.env.ENVIRONMENT === 'development'
-      ? this.DEVELOPMENT_GRAPHQL_HOST
-      : this.PRODUCTION_GRAPHQL_HOST;
+    return process.env.ENVIRONMENT === 'development' ? this.DEVELOPMENT_GRAPHQL_HOST : this.PRODUCTION_GRAPHQL_HOST;
   }
 
   public static getInstance(): StudioConfigurationService {
@@ -95,7 +93,9 @@ export class StudioConfigurationService {
 
       if (!response.ok) {
         const errorText = await response.text().catch(() => 'Unable to read response');
-        throw new Error(`Failed to fetch configuration: ${response.status} ${response.statusText}. Response: ${errorText}`);
+        throw new Error(
+          `Failed to fetch configuration: ${response.status} ${response.statusText}. Response: ${errorText}`,
+        );
       }
 
       const config: StudioInstanceConfiguration = await response.json();
@@ -216,7 +216,8 @@ export class StudioConfigurationService {
         errorMessage = error.message;
         // Provide helpful message for CORS errors
         if (errorMessage.includes('CORS') || errorMessage.includes('cross-origin')) {
-          errorMessage = 'Configuration endpoint exists but CORS headers are not configured. The Studio backend team needs to add CORS headers to allow plugin access.';
+          errorMessage =
+            'Configuration endpoint exists but CORS headers are not configured. The Studio backend team needs to add CORS headers to allow plugin access.';
         }
       }
       return {

@@ -1,5 +1,5 @@
 export type UpdateDocumentPayload = {
-  shouldUpdateNodes?: boolean
-  updateRemote?: boolean
-  checkForChanges?: boolean
+  shouldUpdateNodes?: boolean;
+  updateRemote?: boolean;
+  checkForChanges?: boolean;
 };

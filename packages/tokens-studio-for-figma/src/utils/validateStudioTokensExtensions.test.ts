@@ -71,7 +71,10 @@ describe('validateStudioTokensExtensions', () => {
     expect(validatedTokens).toEqual(undefined);
   });
   it('skips undefined extension', () => {
-    const validatedTokens = validateStudioTokensExtensions({ ...tokens.blue, $extensions: { 'studio.tokens': undefined } } as SingleToken);
+    const validatedTokens = validateStudioTokensExtensions({
+      ...tokens.blue,
+      $extensions: { 'studio.tokens': undefined },
+    } as SingleToken);
     expect(validatedTokens).toEqual(undefined);
   });
   it('strips empty modify', () => {

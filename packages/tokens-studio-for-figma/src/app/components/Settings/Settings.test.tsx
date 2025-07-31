@@ -1,8 +1,6 @@
 import React from 'react';
 import Settings from './Settings';
-import {
-  render, resetStore, fireEvent, waitFor,
-} from '../../../../tests/config/setupTest';
+import { render, resetStore, fireEvent, waitFor } from '../../../../tests/config/setupTest';
 import { store } from '../../store';
 
 describe('Settings Component', () => {

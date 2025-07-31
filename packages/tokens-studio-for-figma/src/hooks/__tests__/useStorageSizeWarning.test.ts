@@ -38,10 +38,12 @@ describe('useStorageSizeWarning', () => {
 
     result.current();
 
-    expect(mockConfirm).toHaveBeenCalledWith(expect.objectContaining({
-      text: 'storageLimitWarning.title',
-      confirmAction: 'storageLimitWarning.switchToRemote',
-    }));
+    expect(mockConfirm).toHaveBeenCalledWith(
+      expect.objectContaining({
+        text: 'storageLimitWarning.title',
+        confirmAction: 'storageLimitWarning.switchToRemote',
+      }),
+    );
 
     // Verify description exists and is an object (React element)
     const callArg = mockConfirm.mock.calls[0][0];

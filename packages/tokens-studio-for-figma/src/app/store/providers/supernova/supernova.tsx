@@ -113,39 +113,53 @@ export function useSupernova() {
         };
       }
     },
-    [dispatch, storageClientFactory, pushDialog, closePushDialog, tokens, themes, localApiState, usedTokenSet, activeTheme],
+    [
+      dispatch,
+      storageClientFactory,
+      pushDialog,
+      closePushDialog,
+      tokens,
+      themes,
+      localApiState,
+      usedTokenSet,
+      activeTheme,
+    ],
   );
 
-  const pullTokensFromSupernova = useCallback(async (context: SupernovaCredentials): Promise<RemoteResponseData | null> => {
-    const storage = storageClientFactory(context);
+  const pullTokensFromSupernova = useCallback(
+    async (context: SupernovaCredentials): Promise<RemoteResponseData | null> => {
+      const storage = storageClientFactory(context);
 
-    try {
-      const content = await storage.retrieve();
-      if (content?.status === 'failure') {
+      try {
+        const content = await storage.retrieve();
+        if (content?.status === 'failure') {
+          return {
+            status: 'failure',
+            errorMessage: content.errorMessage,
+          };
+        }
+        if (content) {
+          // If we didn't get a tokenSetOrder from metadata, use the order of the token sets as they appeared
+          const sortedTokens = applyTokenSetOrder(
+            content.tokens,
+            content.metadata?.tokenSetOrder ?? Object.keys(content.tokens),
+          );
+
+          return {
+            ...content,
+            tokens: sortedTokens,
+          };
+        }
+      } catch (e) {
         return {
           status: 'failure',
-          errorMessage: content.errorMessage,
+          errorMessage: ErrorMessages.SUPERNOVA_CREDENTIAL_ERROR,
         };
       }
-      if (content) {
-        // If we didn't get a tokenSetOrder from metadata, use the order of the token sets as they appeared
-        const sortedTokens = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder ?? Object.keys(content.tokens));
-
-        return {
-          ...content,
-          tokens: sortedTokens,
-        };
-      }
-    } catch (e) {
-      return {
-        status: 'failure',
-        errorMessage: ErrorMessages.SUPERNOVA_CREDENTIAL_ERROR,
-      };
-    }
-    return null;
-  }, [
-    storageClientFactory,
-  ]);
+      return null;
+    },
+    [storageClientFactory],
+  );
 
   // Function to initially check auth and sync tokens with Supernova
   const syncTokensWithSupernova = useCallback(

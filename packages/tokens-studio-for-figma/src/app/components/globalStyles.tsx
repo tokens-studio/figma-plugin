@@ -1,9 +1,7 @@
 import { globalCss } from '@/stitches.config';
 
 export const globalStyles = globalCss({
-  '@import': [
-    "url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap')",
-  ],
+  '@import': ["url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap')"],
   body: {
     fontFamily: '$sans',
     fontSize: '$xsmall',
@@ -55,11 +53,12 @@ export const globalStyles = globalCss({
   '.overflow-x-auto::-webkit-scrollbar': {
     height: '9px',
   },
-  '.content::-webkit-scrollbar-thumb, .overflow-x-auto::-webkit-scrollbar-thumb, .ReactModal__Content::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb': {
-    backgroundColor: '$borderMuted',
-    borderRadius: '9px',
-    border: '2px solid var(--figma-color-bg)',
-  },
+  '.content::-webkit-scrollbar-thumb, .overflow-x-auto::-webkit-scrollbar-thumb, .ReactModal__Content::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb':
+    {
+      backgroundColor: '$borderMuted',
+      borderRadius: '9px',
+      border: '2px solid var(--figma-color-bg)',
+    },
   '.content-dark::-webkit-scrollbar-thumb': {
     backgroundColor: 'var(--colors-contextMenuFgMuted, #000) !important',
     borderColor: 'var(--colors-contextMenuBg, #333) !important',

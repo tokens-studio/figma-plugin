@@ -2,9 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { DotsVerticalIcon, ExclamationTriangleIcon } from '@radix-ui/react-icons';
-import {
-  Button, Box, Badge, Stack, IconButton, DropdownMenu,
-} from '@tokens-studio/ui';
+import { Button, Box, Badge, Stack, IconButton, DropdownMenu } from '@tokens-studio/ui';
 import isSameCredentials from '@/utils/isSameCredentials';
 import useRemoteTokens from '../store/remoteTokens';
 import { storageTypeSelector } from '@/selectors';
@@ -108,9 +106,7 @@ const StorageItem = ({ item, onEdit }: Props) => {
                 maxWidth: '100%',
               }}
             >
-              {id}
-              {' '}
-              {branch && ` (${branch})`}
+              {id} {branch && ` (${branch})`}
             </Box>
           </Stack>
         </Stack>
@@ -133,9 +129,7 @@ const StorageItem = ({ item, onEdit }: Props) => {
       <Box css={{ marginRight: '$1' }}>
         {isActive() ? (
           <Stack gap={2} align="center">
-            {storageType.provider !== StorageProviderType.TOKENS_STUDIO && (
-              <TokenFormatBadge extended />
-            )}
+            {storageType.provider !== StorageProviderType.TOKENS_STUDIO && <TokenFormatBadge extended />}
             <Badge>{t('active')}</Badge>
           </Stack>
         ) : (

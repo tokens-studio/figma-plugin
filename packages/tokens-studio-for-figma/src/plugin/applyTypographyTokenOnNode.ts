@@ -18,23 +18,15 @@ function formatValue(value: any): string | undefined {
 function buildResolvedValueObject(resolvedToken: any, data: any) {
   return {
     fontFamily: formatValue(
-      data.fontFamilies
-        || resolvedToken?.rawValue?.fontFamilies
-        || resolvedToken?.rawValue?.fontFamily,
+      data.fontFamilies || resolvedToken?.rawValue?.fontFamilies || resolvedToken?.rawValue?.fontFamily,
     ),
     fontWeight: formatValue(
-      data.fontWeights
-        || resolvedToken?.rawValue?.fontWeights
-        || resolvedToken?.rawValue?.fontWeight,
+      data.fontWeights || resolvedToken?.rawValue?.fontWeights || resolvedToken?.rawValue?.fontWeight,
     ),
     lineHeight: formatValue(
-      data.lineHeights
-        || resolvedToken?.rawValue?.lineHeights
-        || resolvedToken?.rawValue?.lineHeight,
+      data.lineHeights || resolvedToken?.rawValue?.lineHeights || resolvedToken?.rawValue?.lineHeight,
     ),
-    fontSize: formatValue(
-      data.fontSizes || resolvedToken?.rawValue?.fontSizes || resolvedToken?.rawValue?.fontSize,
-    ),
+    fontSize: formatValue(data.fontSizes || resolvedToken?.rawValue?.fontSizes || resolvedToken?.rawValue?.fontSize),
     letterSpacing: formatValue(data.letterSpacing || resolvedToken?.rawValue?.letterSpacing),
     paragraphSpacing: formatValue(data.paragraphSpacing || resolvedToken?.rawValue?.paragraphSpacing),
     paragraphIndent: formatValue(data.paragraphIndent || resolvedToken?.rawValue?.paragraphIndent),

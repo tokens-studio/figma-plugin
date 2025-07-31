@@ -10,9 +10,6 @@ export const isWaitingForBackgroundJobSelector = createSelector(
   backgroundJobArgSelector,
   (jobs, name) => {
     const jobInfo = jobs.find((job) => job.name === name);
-    return (
-      jobInfo?.isInfinite
-      || (jobInfo && (jobInfo.completedTasks ?? 0) >= (jobInfo.totalTasks ?? 0))
-    ) ?? false;
+    return (jobInfo?.isInfinite || (jobInfo && (jobInfo.completedTasks ?? 0) >= (jobInfo.totalTasks ?? 0))) ?? false;
   },
 );

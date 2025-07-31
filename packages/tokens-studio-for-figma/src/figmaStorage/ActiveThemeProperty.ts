@@ -7,7 +7,5 @@ export const ActiveThemeProperty = new FigmaStorageProperty<Record<string, strin
   FigmaStorageType.SHARED_PLUGIN_DATA,
   `${SharedPluginDataNamespaces.TOKENS}/${SharedPluginDataKeys.tokens.activeTheme}`,
   (value) => JSON.stringify(value),
-  (value) => attemptOrFallback<Record<string, string> | string>(() => (
-    value ? JSON.parse(value) : {}
-  ), value),
+  (value) => attemptOrFallback<Record<string, string> | string>(() => (value ? JSON.parse(value) : {}), value),
 );

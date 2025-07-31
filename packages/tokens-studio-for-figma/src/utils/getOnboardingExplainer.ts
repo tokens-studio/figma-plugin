@@ -1,5 +1,9 @@
 import {
-  OnboardingExplainerSetsProperty, OnboardingExplainerSyncProvidersProperty, OnboardingExplainerInspectProperty, LastOpenedProperty, OnboardingExplainerExportSetsProperty,
+  OnboardingExplainerSetsProperty,
+  OnboardingExplainerSyncProvidersProperty,
+  OnboardingExplainerInspectProperty,
+  LastOpenedProperty,
+  OnboardingExplainerExportSetsProperty,
 } from '@/figmaStorage';
 
 const data = {
@@ -13,12 +17,12 @@ let lastopend: number = 0;
 export default async function getOnboardingExplainer() {
   try {
     // Set onboarding explainer status as true if lastopend none existed
-    lastopend = await LastOpenedProperty.read() || 0;
+    lastopend = (await LastOpenedProperty.read()) || 0;
     if (lastopend) {
-      data.sets = await OnboardingExplainerSetsProperty.read() || false;
-      data.exportSets = await OnboardingExplainerExportSetsProperty.read() || false;
-      data.syncProviders = await OnboardingExplainerSyncProvidersProperty.read() || false;
-      data.inspect = await OnboardingExplainerInspectProperty.read() || false;
+      data.sets = (await OnboardingExplainerSetsProperty.read()) || false;
+      data.exportSets = (await OnboardingExplainerExportSetsProperty.read()) || false;
+      data.syncProviders = (await OnboardingExplainerSyncProvidersProperty.read()) || false;
+      data.inspect = (await OnboardingExplainerInspectProperty.read()) || false;
     } else {
       await OnboardingExplainerSetsProperty.write(true);
       await OnboardingExplainerExportSetsProperty.write(true);

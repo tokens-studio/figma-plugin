@@ -3,15 +3,15 @@
 The following data is being saved on the client of Figma.
 Read more about Figma's client storage [here](https://www.figma.com/plugin-docs/api/figma-clientStorage/).
 
-| Key                           | Type                        | Description                                                                                                                             |
-| ----------------------------- | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `userId`                      | `string`                    | This is an auto generated ID to identify users.                                                                                         |
-| `licenseKey`                  | `string`                    | This is the license key for the plugin. This is coming from our licensing tool (`keygen.sh`)                                            |
-| `lastOpened`                  | `number`                    | This is the last opened timestamp of the plugin (`Date.now()`)                                                                          |
-| `apiProviders`                | `StorageTypeCredentials[]`  | These are the locally saved storage providers / API credentials. These will include their secrets (api keys/personal access tokens...)  |
-| `{fileKey}/tokens/values`     | `string` (compressed JSON)  | Token values for a specific file, compressed with lz-string.                                                                            |
-| `{fileKey}/tokens/themes`     | `string` (compressed JSON)  | Theme configurations for a specific file, compressed with lz-string.                                                                    |
-| `{fileKey}/tokens/checkForChanges` | `string` (compressed JSON) | Flag indicating whether to check for changes in tokens for a specific file.                                                         |
+| Key                                | Type                       | Description                                                                                                                            |
+| ---------------------------------- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `userId`                           | `string`                   | This is an auto generated ID to identify users.                                                                                        |
+| `licenseKey`                       | `string`                   | This is the license key for the plugin. This is coming from our licensing tool (`keygen.sh`)                                           |
+| `lastOpened`                       | `number`                   | This is the last opened timestamp of the plugin (`Date.now()`)                                                                         |
+| `apiProviders`                     | `StorageTypeCredentials[]` | These are the locally saved storage providers / API credentials. These will include their secrets (api keys/personal access tokens...) |
+| `{fileKey}/tokens/values`          | `string` (compressed JSON) | Token values for a specific file, compressed with lz-string.                                                                           |
+| `{fileKey}/tokens/themes`          | `string` (compressed JSON) | Theme configurations for a specific file, compressed with lz-string.                                                                   |
+| `{fileKey}/tokens/checkForChanges` | `string` (compressed JSON) | Flag indicating whether to check for changes in tokens for a specific file.                                                            |
 
 ## FileKey
 

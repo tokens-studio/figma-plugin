@@ -51,12 +51,7 @@ describe('ensureFolderIsTogether', () => {
   ];
 
   it('can move folder children if parent moved', () => {
-    const result = ensureFolderIsTogether(list[1].value, [...list], [
-      list[1],
-      list[0],
-      list[2],
-      list[3],
-    ]);
+    const result = ensureFolderIsTogether(list[1].value, [...list], [list[1], list[0], list[2], list[3]]);
     expect(result[1].value).toEqual(list[2].value);
     expect(result[2].value).toEqual(list[3].value);
   });

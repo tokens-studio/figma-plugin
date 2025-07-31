@@ -16,7 +16,7 @@ type Options = {
   expandShadow?: boolean;
   expandComposition?: boolean;
   expandBorder?: boolean;
-  storeTokenIdInJsonEditor?: boolean
+  storeTokenIdInJsonEditor?: boolean;
 };
 
 export default function formatTokens({
@@ -44,10 +44,10 @@ export default function formatTokens({
         set(tokenObj, nestUnderParent ? [tokenSet, nameToSet].join('.') : nameToSet, token.type, { merge: true });
       }
       if (
-        (token.type === TokenTypes.TYPOGRAPHY && expandTypography)
-        || (token.type === TokenTypes.BOX_SHADOW && expandShadow)
-        || (token.type === TokenTypes.COMPOSITION && expandComposition)
-        || (token.type === TokenTypes.BORDER && expandBorder)
+        (token.type === TokenTypes.TYPOGRAPHY && expandTypography) ||
+        (token.type === TokenTypes.BOX_SHADOW && expandShadow) ||
+        (token.type === TokenTypes.COMPOSITION && expandComposition) ||
+        (token.type === TokenTypes.BORDER && expandBorder)
       ) {
         if (typeof token.value === 'string') {
           const resolvedToken = resolvedTokens.find((t) => t.name === name);

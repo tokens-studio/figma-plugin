@@ -9,7 +9,8 @@ export function useIsProUser() {
   const licenseKeyError = useSelector(licenseKeyErrorSelector);
   const validPAT = useSelector(tokensStudioPATSelector);
 
-  return useMemo(() => (
-    Boolean(existingKey && !licenseKeyError) || Boolean(validPAT)
-  ), [existingKey, licenseKeyError, validPAT]);
+  return useMemo(
+    () => Boolean(existingKey && !licenseKeyError) || Boolean(validPAT),
+    [existingKey, licenseKeyError, validPAT],
+  );
 }

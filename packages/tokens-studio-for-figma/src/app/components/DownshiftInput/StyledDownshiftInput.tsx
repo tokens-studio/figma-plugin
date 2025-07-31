@@ -149,11 +149,5 @@ export const StyledDownshiftInput: React.FC<React.PropsWithChildren<React.PropsW
     onBlur,
   });
 
-  return (
-    <TextInput
-      ref={ref as React.MutableRefObject<HTMLInputElement>}
-      data-testid={dataCy}
-      {...inputProps}
-    />
-  );
+  return <TextInput ref={ref as React.MutableRefObject<HTMLInputElement>} data-testid={dataCy} {...inputProps} />;
 };

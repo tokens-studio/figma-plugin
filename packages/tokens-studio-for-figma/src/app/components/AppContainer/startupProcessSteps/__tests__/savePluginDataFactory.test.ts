@@ -28,10 +28,7 @@ describe('savePluginDataFactory', () => {
       },
     } as unknown as StartupMessage;
 
-    const fn = savePluginDataFactory(
-      mockStore.dispatch,
-      mockParams,
-    );
+    const fn = savePluginDataFactory(mockStore.dispatch, mockParams);
     await fn();
 
     const state = mockStore.getState();
@@ -45,10 +42,7 @@ describe('savePluginDataFactory', () => {
     // this should realistically never happen
     const mockStore = createMockStore({});
 
-    const fn = savePluginDataFactory(
-      mockStore.dispatch,
-      {} as unknown as StartupMessage,
-    );
+    const fn = savePluginDataFactory(mockStore.dispatch, {} as unknown as StartupMessage);
 
     expect(fn()).rejects.toEqual(new Error('User not found'));
   });

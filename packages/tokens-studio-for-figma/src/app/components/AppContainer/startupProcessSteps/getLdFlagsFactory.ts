@@ -22,12 +22,7 @@ export function getLdFlagsFactory(store: Store<RootState>, ldClientPromise: Prom
     if (user?.userId && licenseKey) {
       setUserData({ plan: plan ? 'pro' : 'free' });
       try {
-        await (await ldClientPromise)?.identify(ldUserFactory(
-          user.userId,
-          plan,
-          entitlements,
-          clientEmail,
-        ));
+        await (await ldClientPromise)?.identify(ldUserFactory(user.userId, plan, entitlements, clientEmail));
       } catch (err) {
         console.error(err);
         Sentry.captureException(err);

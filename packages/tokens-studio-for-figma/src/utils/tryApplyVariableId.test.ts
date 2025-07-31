@@ -33,7 +33,9 @@ describe('tryApplyVariableId', () => {
   it('exits early if variable application is turned off', async () => {
     const variableReferences = new Map();
     defaultTokenValueRetriever.initiate({
-      tokens: [{ name: 'token', value: '8', type: TokenTypes.NUMBER }], variableReferences, applyVariablesStylesOrRawValue: ApplyVariablesStylesOrRawValues.RAW_VALUES,
+      tokens: [{ name: 'token', value: '8', type: TokenTypes.NUMBER }],
+      variableReferences,
+      applyVariablesStylesOrRawValue: ApplyVariablesStylesOrRawValues.RAW_VALUES,
     });
     expect(await tryApplyVariableId(node, 'width', 'token')).toBe(false);
   });
@@ -41,7 +43,8 @@ describe('tryApplyVariableId', () => {
   it('when there is no matching variable, should not apply variable and return false', async () => {
     const variableReferences = new Map();
     defaultTokenValueRetriever.initiate({
-      tokens: [{ name: 'token', value: '8', type: TokenTypes.NUMBER }], variableReferences,
+      tokens: [{ name: 'token', value: '8', type: TokenTypes.NUMBER }],
+      variableReferences,
     });
     expect(await tryApplyVariableId(node, 'width', 'token')).toBe(false);
   });
@@ -52,7 +55,8 @@ describe('tryApplyVariableId', () => {
     const variableReferences = new Map();
     variableReferences.set('token', 'VariableID:519:32875');
     defaultTokenValueRetriever.initiate({
-      tokens: [{ name: 'token', value: '8', type: TokenTypes.NUMBER }], variableReferences,
+      tokens: [{ name: 'token', value: '8', type: TokenTypes.NUMBER }],
+      variableReferences,
     });
     expect(await tryApplyVariableId(node, 'width', 'token')).toBe(true);
     expect(mockImportVariableByKeyAsync).toBeCalledWith('VariableID:519:32875');
