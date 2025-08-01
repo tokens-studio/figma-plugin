@@ -355,7 +355,7 @@ export default function BranchSelector() {
                   <>
                     <Box css={{ padding: '$3', borderBottom: '1px solid $borderMuted' }}>
                       <Stack direction="row" align="center" gap={2}>
-                        <Button size="small" variant="ghost" onClick={handleBackToMain}>←</Button>
+                        <Button size="small" variant="invisible" onClick={handleBackToMain}>←</Button>
                         <Text size="small" css={{ fontWeight: 600 }}>Create new branch from</Text>
                       </Stack>
                     </Box>
