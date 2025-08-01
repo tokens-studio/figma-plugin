@@ -4,9 +4,10 @@ import { useTranslation } from 'react-i18next';
 import {
   Button, Heading, Spinner, Stack,
 } from '@tokens-studio/ui';
-import { storageTypeSelector } from '@/selectors';
+import { storageTypeSelector, lastErrorSelector } from '@/selectors';
 import usePullDialog from '../hooks/usePullDialog';
 import Modal from './Modal';
+import Callout from './Callout';
 
 import { transformProviderName } from '@/utils/transformProviderName';
 import ChangedStateList from './ChangedStateList';
@@ -14,6 +15,7 @@ import ChangedStateList from './ChangedStateList';
 function PullDialog() {
   const { onConfirm, onCancel, pullDialogMode } = usePullDialog();
   const storageType = useSelector(storageTypeSelector);
+  const lastError = useSelector(lastErrorSelector);
 
   const { t } = useTranslation(['sync']);
 
@@ -24,6 +26,21 @@ function PullDialog() {
   const handleClose = React.useCallback(() => {
     onCancel();
   }, [onCancel]);
+
+  const getErrorHeading = React.useCallback(() => {
+    if (!lastError) return t('genericError');
+
+    switch (lastError.type) {
+      case 'parsing':
+        return t('failedToParseJSON');
+      case 'credential':
+        return t('credentialError');
+      case 'connectivity':
+        return t('connectivityError');
+      default:
+        return t('genericError');
+    }
+  }, [lastError, t]);
 
   switch (pullDialogMode) {
     case 'initial': {
@@ -60,6 +77,36 @@ function PullDialog() {
           <Stack direction="column" gap={4} justify="center" align="center" css={{ padding: '$4 0' }}>
             <Spinner />
             <Heading size="medium">{t('pullFrom', { provider: transformProviderName(storageType.provider) })}</Heading>
+          </Stack>
+        </Modal>
+      );
+    }
+    case 'error': {
+      return (
+        <Modal
+          title={t('couldNotLoadTokens')}
+          showClose
+          full
+          size="large"
+          isOpen
+          close={onCancel}
+          stickyFooter
+          footer={(
+            <Stack direction="row" gap={4} justify="end">
+              <Button variant="secondary" id="pullDialog-button-cancel" onClick={onCancel}>
+                {t('cancel')}
+              </Button>
+            </Stack>
+          )}
+        >
+          <Stack direction="column" gap={4} css={{ padding: '$4' }}>
+            {lastError && (
+              <Callout
+                id="pull-dialog-error"
+                heading={getErrorHeading()}
+                description={lastError.message}
+              />
+            )}
           </Stack>
         </Modal>
       );

@@ -32,6 +32,7 @@ import usePullDialog from '../hooks/usePullDialog';
 import { Tabs } from '@/constants/Tabs';
 import { useTokensStudio } from './providers/tokens-studio';
 import { notifyToUI } from '@/plugin/notifiers';
+import { categorizeError } from '@/utils/error/categorizeError';
 
 export type PushOverrides = { branch: string; commitMessage: string };
 
@@ -52,7 +53,7 @@ export default function useRemoteTokens() {
   const tokens = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
   const activeTab = useSelector(activeTabSelector);
-  const { showPullDialog, closePullDialog } = usePullDialog();
+  const { showPullDialog, closePullDialog, showPullDialogError } = usePullDialog();
 
   const { setStorageType } = useStorage();
   const { pullTokensFromJSONBin, addJSONBinCredentials, createNewJSONBin } = useJSONbin();
@@ -114,47 +115,66 @@ export default function useRemoteTokens() {
     }: PullTokensOptions) => {
       showPullDialog('loading');
       let remoteData: RemoteResponseData<unknown> | null = null;
-      switch (context.provider) {
-        case StorageProviderType.JSONBIN: {
-          remoteData = await pullTokensFromJSONBin(context);
-          break;
+
+      try {
+        switch (context.provider) {
+          case StorageProviderType.JSONBIN: {
+            remoteData = await pullTokensFromJSONBin(context);
+            break;
+          }
+          case StorageProviderType.GENERIC_VERSIONED_STORAGE: {
+            remoteData = await pullTokensFromGenericVersionedStorage(context);
+            break;
+          }
+          case StorageProviderType.GITHUB: {
+            remoteData = await pullTokensFromGitHub(context, featureFlags);
+            break;
+          }
+          case StorageProviderType.BITBUCKET: {
+            remoteData = await pullTokensFromBitbucket(context, featureFlags);
+            break;
+          }
+          case StorageProviderType.GITLAB: {
+            remoteData = await pullTokensFromGitLab(context, featureFlags);
+            break;
+          }
+          case StorageProviderType.ADO: {
+            remoteData = await pullTokensFromADO(context, featureFlags);
+            break;
+          }
+          case StorageProviderType.URL: {
+            remoteData = await pullTokensFromURL(context);
+            break;
+          }
+          case StorageProviderType.SUPERNOVA: {
+            remoteData = await pullTokensFromSupernova(context);
+            break;
+          }
+          case StorageProviderType.TOKENS_STUDIO: {
+            remoteData = await pullTokensFromTokensStudio(context);
+            dispatch.tokenState.setTokenFormat(TokenFormatOptions.DTCG);
+            break;
+          }
+          default:
+            throw new Error('Not implemented');
         }
-        case StorageProviderType.GENERIC_VERSIONED_STORAGE: {
-          remoteData = await pullTokensFromGenericVersionedStorage(context);
-          break;
-        }
-        case StorageProviderType.GITHUB: {
-          remoteData = await pullTokensFromGitHub(context, featureFlags);
-          break;
-        }
-        case StorageProviderType.BITBUCKET: {
-          remoteData = await pullTokensFromBitbucket(context, featureFlags);
-          break;
-        }
-        case StorageProviderType.GITLAB: {
-          remoteData = await pullTokensFromGitLab(context, featureFlags);
-          break;
-        }
-        case StorageProviderType.ADO: {
-          remoteData = await pullTokensFromADO(context, featureFlags);
-          break;
-        }
-        case StorageProviderType.URL: {
-          remoteData = await pullTokensFromURL(context);
-          break;
-        }
-        case StorageProviderType.SUPERNOVA: {
-          remoteData = await pullTokensFromSupernova(context);
-          break;
-        }
-        case StorageProviderType.TOKENS_STUDIO: {
-          remoteData = await pullTokensFromTokensStudio(context);
-          dispatch.tokenState.setTokenFormat(TokenFormatOptions.DTCG);
-          break;
-        }
-        default:
-          throw new Error('Not implemented');
+      } catch (err) {
+        console.error('Error pulling tokens:', err);
+        // Create a failure response for the error
+        remoteData = {
+          status: 'failure',
+          errorMessage: err instanceof Error ? err.message : String(err),
+        } as RemoteResponseData<unknown>;
       }
+
+      // Handle errors - show error dialog and set error state
+      if (remoteData?.status === 'failure') {
+        const { type, message } = categorizeError(remoteData.errorMessage);
+        dispatch.uiState.setLastError({ type, message });
+        showPullDialogError();
+        return remoteData;
+      }
+
       if (remoteData?.status === 'success') {
         dispatch.tokenState.setRemoteData({
           tokens: remoteData.tokens,
@@ -288,6 +308,7 @@ export default function useRemoteTokens() {
       pullTokensFromURL,
       pullTokensFromADO,
       showPullDialog,
+      showPullDialogError,
       closePullDialog,
       pullTokensFromSupernova,
       pullTokensFromTokensStudio,
