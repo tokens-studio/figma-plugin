@@ -36,6 +36,7 @@ import { defaultTokenResolver } from '@/utils/TokenResolver';
 import { getFormat } from '@/plugin/TokenFormatStoreClass';
 import { ExportTokenSet } from '@/types/ExportTokenSet';
 import { useIsProUser } from '../hooks/useIsProUser';
+import { ModalOptions } from '@/constants/ModalOptions';
 
 type ConfirmResult = ('textStyles' | 'colorStyles' | 'effectStyles' | string)[] | string;
 
@@ -281,37 +282,60 @@ export default function useTokens() {
       tokensToRename: TokenToRename[];
     }) => {
       // TODO: Move all of this logic to individual files, this hook is already way too overloaded
+
+      // Check if tokens in this group exist in other sets
+      const tokenSetsContainingSameTokens: string[] = [];
+      tokensToRename.forEach((tokenToRename) => {
+        Object.entries(tokens).forEach(([tokenSet, tokenList]) => {
+          if (tokenSet !== activeTokenSet && tokenList.find((token) => token.name === tokenToRename.oldName)) {
+            if (!tokenSetsContainingSameTokens.includes(tokenSet)) {
+              tokenSetsContainingSameTokens.push(tokenSet);
+            }
+          }
+        });
+      });
+
+      const choices = [
+        {
+          key: UpdateMode.SELECTION,
+          label: 'Selection',
+          unique: true,
+          enabled: UpdateMode.SELECTION === lastUsedRenameOption,
+        },
+        {
+          key: UpdateMode.PAGE,
+          label: 'Page',
+          unique: true,
+          enabled: UpdateMode.PAGE === lastUsedRenameOption,
+        },
+        {
+          key: UpdateMode.DOCUMENT,
+          label: 'Document',
+          unique: true,
+          enabled: UpdateMode.DOCUMENT === lastUsedRenameOption,
+        },
+        {
+          key: 'rename-variable-token-group',
+          label: 'Rename variables',
+        },
+        {
+          key: 'rename-style-token-group',
+          label: 'Rename styles',
+        },
+      ];
+
+      // Add "Rename in other sets" option if tokens exist in multiple sets
+      if (tokenSetsContainingSameTokens.length > 0) {
+        choices.push({
+          key: ModalOptions.RENAME_ACROSS_SETS,
+          label: 'Rename in other sets',
+        });
+      }
+
       const confirmData = await confirm({
         text: `Remap all tokens that use tokens in ${oldGroupName} group?`,
         description: 'This will change all layers that used the old token name. This could take a while.',
-        choices: [
-          {
-            key: UpdateMode.SELECTION,
-            label: 'Selection',
-            unique: true,
-            enabled: UpdateMode.SELECTION === lastUsedRenameOption,
-          },
-          {
-            key: UpdateMode.PAGE,
-            label: 'Page',
-            unique: true,
-            enabled: UpdateMode.PAGE === lastUsedRenameOption,
-          },
-          {
-            key: UpdateMode.DOCUMENT,
-            label: 'Document',
-            unique: true,
-            enabled: UpdateMode.DOCUMENT === lastUsedRenameOption,
-          },
-          {
-            key: 'rename-variable-token-group',
-            label: 'Rename variables',
-          },
-          {
-            key: 'rename-style-token-group',
-            label: 'Rename styles',
-          },
-        ],
+        choices,
       });
       if (confirmData && confirmData.result) {
         if (
@@ -361,6 +385,27 @@ export default function useTokens() {
             settings,
           });
           dispatch.tokenState.renameStyleIdsToCurrentTheme(renameStylesResult.styleIds, tokensToRename);
+        }
+
+        if (confirmData.data.includes(ModalOptions.RENAME_ACROSS_SETS)) {
+          // For each token to rename, call renameTokensAcrossSets
+          await Promise.all(
+            tokensToRename.map(async (tokenToRename) => {
+              // Find all sets that contain this specific token
+              const setsContainingToken: string[] = [activeTokenSet];
+              Object.entries(tokens).forEach(([tokenSet, tokenList]) => {
+                if (tokenSet !== activeTokenSet && tokenList.find((token) => token.name === tokenToRename.oldName)) {
+                  setsContainingToken.push(tokenSet);
+                }
+              });
+              return dispatch.tokenState.renameTokenAcrossSets({
+                oldName: tokenToRename.oldName,
+                newName: tokenToRename.newName,
+                type,
+                tokenSets: setsContainingToken,
+              });
+            }),
+          );
         }
       }
     },
