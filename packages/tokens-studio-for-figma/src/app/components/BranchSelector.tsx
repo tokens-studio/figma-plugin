@@ -128,7 +128,7 @@ export default function BranchSelector() {
         setStorageType({ provider: { ...apiData, branch } as StorageTypeCredentials, shouldSetInDocument: true });
       }
     },
-    [apiData, localApiState, pullTokens, usedTokenSet, activeTheme, dispatch],
+    [apiData, localApiState, pullTokens, usedTokenSet, activeTheme, dispatch, setStorageType],
   );
 
   const onBranchSelected = React.useCallback(
@@ -181,14 +181,11 @@ export default function BranchSelector() {
   }, []);
 
   const handleOverlayClick = React.useCallback((e: React.MouseEvent) => {
+    // Only close if clicking on the overlay itself, not the content
     if (e.target === e.currentTarget) {
       handleCloseSelector();
     }
   }, [handleCloseSelector]);
-
-  const handleContentClick = React.useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-  }, []);
   const handleCreateBranchFromCurrentChange = React.useCallback(() => {
     createBranchByChange();
     setOpen(false);
@@ -243,12 +240,12 @@ export default function BranchSelector() {
               width: '90vw',
               maxHeight: '70vh',
             }}
-            onClick={handleContentClick}
           >
             <Command>
               <Box css={{ borderBottom: '1px solid $borderMuted' }}>
                 <Command.Input
                   placeholder={t('searchBranches') || 'Search branches...'}
+                  autoFocus
                   style={{
                     border: 'none',
                     borderRadius: 0,
@@ -288,7 +285,13 @@ export default function BranchSelector() {
                             data-testid="branch-selector-create-new-branch-from-current-change"
                             onSelect={handleCreateBranchFromCurrentChange}
                           >
-                            <Box css={{ padding: '$3', cursor: 'pointer', '&[data-selected="true"]': { backgroundColor: '$bgSubtle' } }}>
+                            <Box css={{
+                              padding: '$3',
+                              cursor: 'pointer',
+                              '&:hover': { backgroundColor: '$bgSubtle' },
+                              '&[data-selected="true"]': { backgroundColor: '$bgSubtle' },
+                            }}
+                            >
                               <Stack direction="row" align="center" gap={2}>
                                 <Text>📄</Text>
                                 <Text size="small">{t('currentChanges')}</Text>
@@ -298,7 +301,13 @@ export default function BranchSelector() {
                         )}
 
                         <Command.Item onSelect={handleShowCreateFromMenu}>
-                          <Box css={{ padding: '$3', cursor: 'pointer', '&[data-selected="true"]': { backgroundColor: '$bgSubtle' } }}>
+                          <Box css={{
+                            padding: '$3',
+                            cursor: 'pointer',
+                            '&:hover': { backgroundColor: '$bgSubtle' },
+                            '&[data-selected="true"]': { backgroundColor: '$bgSubtle' },
+                          }}
+                          >
                             <Stack direction="row" align="center" gap={2}>
                               <Text>🌿</Text>
                               <Text size="small">
@@ -336,7 +345,8 @@ export default function BranchSelector() {
                             padding: '$3',
                             cursor: isProUser ? 'pointer' : 'not-allowed',
                             opacity: isProUser ? 1 : 0.5,
-                            '&[data-selected="true"]': { backgroundColor: '$bgSubtle' },
+                            '&:hover': { backgroundColor: isProUser ? '$bgSubtle' : 'transparent' },
+                            '&[data-selected="true"]': { backgroundColor: isProUser ? '$bgSubtle' : 'transparent' },
                           }}
                           >
                             <Stack direction="row" align="center" justify="between">
@@ -365,7 +375,13 @@ export default function BranchSelector() {
                         data-testid="branch-selector-create-new-branch-from-current-change"
                         onSelect={handleCreateBranchFromCurrentChange}
                       >
-                        <Box css={{ padding: '$3', cursor: 'pointer', '&[data-selected="true"]': { backgroundColor: '$bgSubtle' } }}>
+                        <Box css={{
+                          padding: '$3',
+                          cursor: 'pointer',
+                          '&:hover': { backgroundColor: '$bgSubtle' },
+                          '&[data-selected="true"]': { backgroundColor: '$bgSubtle' },
+                        }}
+                        >
                           <Stack direction="row" align="center" gap={2}>
                             <Text>📄</Text>
                             <Text size="small">{t('currentChanges')}</Text>
@@ -380,7 +396,13 @@ export default function BranchSelector() {
                         data-testid={`branch-selector-create-branch-from-branch-${branch}`}
                         onSelect={handleCreateBranchFromSpecific(branch)}
                       >
-                        <Box css={{ padding: '$3', cursor: 'pointer', '&[data-selected="true"]': { backgroundColor: '$bgSubtle' } }}>
+                        <Box css={{
+                          padding: '$3',
+                          cursor: 'pointer',
+                          '&:hover': { backgroundColor: '$bgSubtle' },
+                          '&[data-selected="true"]': { backgroundColor: '$bgSubtle' },
+                        }}
+                        >
                           <Text size="small">{branch}</Text>
                         </Box>
                       </Command.Item>
