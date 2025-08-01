@@ -160,7 +160,7 @@ class TokenResolver {
             const resolvedNestedToken = this.resolveReferences({ ...nestedToken, name: nestedTokenName } as SingleToken, new Set(resolvedReferences));
 
             if (typeof resolvedNestedToken.value === 'string' || typeof resolvedNestedToken.value === 'number') {
-              resolvedPath = resolvedPath.replace(match[0], resolvedNestedToken.value);
+              resolvedPath = resolvedPath.replace(match[0], String(resolvedNestedToken.value));
             }
           } else {
             break;
@@ -199,7 +199,7 @@ class TokenResolver {
 
           // We replace the reference with the resolved value if needed
           if (typeof finalValue === 'string' && (typeof resolvedTokenValue.value === 'string' || typeof resolvedTokenValue.value === 'number')) {
-            finalValue = finalValue.replace(reference, resolvedTokenValue.value);
+            finalValue = finalValue.replace(reference, String(resolvedTokenValue.value));
           } else if (resolvedTokenValue.value !== undefined) {
             finalValue = resolvedTokenValue.value;
           }
@@ -213,7 +213,7 @@ class TokenResolver {
             if (parsedValue === undefined) {
               finalValue = token.value;
             } else {
-              finalValue = (typeof finalValue === 'string' && (typeof parsedValue === 'string' || typeof parsedValue === 'number')) ? finalValue.replace(reference, parsedValue) : parsedValue;
+              finalValue = (typeof finalValue === 'string' && (typeof parsedValue === 'string' || typeof parsedValue === 'number')) ? finalValue.replace(reference, String(parsedValue)) : parsedValue;
             }
           } else {
             // Otherwise, we return the token as is, but mark it as failed to resolve
@@ -226,7 +226,7 @@ class TokenResolver {
 
       let resolvedToken: ResolveTokenValuesResult;
       // When we have a string or number, we need to check if it's a valid token value.
-      if ((typeof finalValue === 'string' || typeof finalValue === 'number') && !AliasRegex.test(finalValue)) {
+      if ((typeof finalValue === 'string' || typeof finalValue === 'number') && !AliasRegex.test(String(finalValue))) {
         // We need to calculate the value of the token, as it might be a color or math transformation
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
         const calculated = this.calculateTokenValue({ ...token, value: finalValue } as SingleToken, resolvedReferences);

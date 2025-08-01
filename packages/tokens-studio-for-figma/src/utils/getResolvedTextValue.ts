@@ -24,7 +24,7 @@ export default function getResolvedTextValue(token: SingleToken) {
     ), []);
     returnValue = array.join(',');
   } else if (typeof token.value === 'string' || typeof token.value === 'number') {
-    returnValue = token.value;
+    returnValue = String(token.value);
   }
   return returnValue;
 }
