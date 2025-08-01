@@ -92,6 +92,10 @@ export interface UIState {
   sidebarWidth: number;
   hasRemoteChange: boolean;
   selectedExportThemes?: string[];
+  lastError?: {
+    type: 'credential' | 'parsing' | 'other';
+    message: string;
+  } | null;
 }
 
 const defaultConfirmState: ConfirmProps = {
@@ -153,6 +157,7 @@ export const uiState = createModel<RootModel>()({
     sidebarWidth: 150,
     hasRemoteChange: false,
     selectedExportThemes: [],
+    lastError: null,
   } as unknown as UIState,
   reducers: {
     setShowConvertTokenFormatModal: (state, data: boolean) => ({
@@ -426,6 +431,10 @@ export const uiState = createModel<RootModel>()({
     setSelectedExportThemes: (state, data: string[]) => ({
       ...state,
       selectedExportThemes: data,
+    }),
+    setLastError: (state, data: { type: 'credential' | 'parsing' | 'other'; message: string } | null) => ({
+      ...state,
+      lastError: data,
     }),
   },
   effects: (dispatch) => ({

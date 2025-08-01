@@ -21,6 +21,7 @@ import { applyTokenSetOrder } from '@/utils/tokenset';
 import { PushOverrides } from '../../remoteTokens';
 import { useIsProUser } from '@/app/hooks/useIsProUser';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
+import { categorizeError } from '@/utils/error/categorizeError';
 
 type AdoCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.ADO; }>;
 type AdoFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.ADO; }>;
@@ -227,8 +228,17 @@ export const useADO = () => {
       }
       return await pushTokensToADO(context);
     } catch (e) {
-      notifyToUI(ErrorMessages.ADO_CREDENTIAL_ERROR, { error: true });
+      const { type, message } = categorizeError(e);
       console.log('Error', e);
+
+      if (type === 'parsing') {
+        notifyToUI('Failed to parse token file - check JSON format', { error: true });
+        return {
+          status: 'failure',
+          errorMessage: message,
+        };
+      }
+      notifyToUI(ErrorMessages.ADO_CREDENTIAL_ERROR, { error: true });
       return {
         status: 'failure',
         errorMessage: ErrorMessages.ADO_CREDENTIAL_ERROR,
@@ -242,6 +252,8 @@ export const useADO = () => {
     themes,
     tokens,
     checkAndSetAccess,
+    activeTheme,
+    usedTokenSet,
   ]);
 
   const addNewADOCredentials = React.useCallback(
@@ -281,9 +293,9 @@ export const useADO = () => {
       dispatch,
       tokens,
       themes,
-      usedTokenSet,
-      activeTheme,
       syncTokensWithADO,
+      localApiState.branch,
+      localApiState.filePath,
     ],
   );
 

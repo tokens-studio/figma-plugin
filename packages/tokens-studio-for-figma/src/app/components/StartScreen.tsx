@@ -9,7 +9,7 @@ import TokensStudioLogo from '@/icons/tokensstudio-full.svg';
 import Text from './Text';
 import Callout from './Callout';
 import { Dispatch } from '../store';
-import { apiProvidersSelector, storageTypeSelector } from '@/selectors';
+import { apiProvidersSelector, storageTypeSelector, lastErrorSelector } from '@/selectors';
 import Stack from './Stack';
 import { styled } from '@/stitches.config';
 import { Tabs } from '@/constants/Tabs';
@@ -44,15 +44,18 @@ function StartScreen() {
 
   const storageType = useSelector(storageTypeSelector);
   const apiProviders = useSelector(apiProvidersSelector);
+  const lastError = useSelector(lastErrorSelector);
 
   const onSetEmptyTokens = React.useCallback(() => {
     track('Start with empty set');
+    dispatch.uiState.setLastError(null);
     dispatch.uiState.setActiveTab(Tabs.TOKENS);
     dispatch.tokenState.setEmptyTokens();
   }, [dispatch]);
 
   const onSetDefaultTokens = React.useCallback(() => {
     track('Start with exmaple set');
+    dispatch.uiState.setLastError(null);
     dispatch.uiState.setActiveTab(Tabs.TOKENS);
     dispatch.tokenState.setDefaultTokens();
   }, [dispatch]);
@@ -68,6 +71,7 @@ function StartScreen() {
         ...storageType,
         new: true,
       };
+    dispatch.uiState.setLastError(null);
     dispatch.uiState.setActiveTab(Tabs.SETTINGS);
     dispatch.tokenState.setEmptyTokens();
     dispatch.uiState.setLocalApiState(credentialsToSet);
@@ -79,6 +83,34 @@ function StartScreen() {
       : undefined),
     [apiProviders, storageType],
   );
+
+  const getCalloutContent = React.useMemo(() => {
+    if (!lastError) {
+      return {
+        heading: t('couldNotLoadTokens', { provider: transformProviderName(storageType?.provider) }),
+        description: matchingProvider ? t('unableToFetchRemoteWithCredentials') : t('unableToFetchRemoteNoCredentials'),
+      };
+    }
+
+    if (lastError.type === 'parsing') {
+      return {
+        heading: t('couldNotLoadTokens', { provider: transformProviderName(storageType?.provider) }),
+        description: lastError.message,
+      };
+    }
+
+    if (lastError.type === 'credential') {
+      return {
+        heading: t('couldNotLoadTokens', { provider: transformProviderName(storageType?.provider) }),
+        description: matchingProvider ? t('unableToFetchRemoteWithCredentials') : t('unableToFetchRemoteNoCredentials'),
+      };
+    }
+
+    return {
+      heading: t('couldNotLoadTokens', { provider: transformProviderName(storageType?.provider) }),
+      description: lastError.message,
+    };
+  }, [lastError, storageType?.provider, matchingProvider, t]);
 
   return (
     <Box
@@ -128,14 +160,15 @@ function StartScreen() {
           {storageType?.provider !== StorageProviderType.LOCAL ? (
             <Callout
               id="callout-action-setupsync"
-              heading={t('couldNotLoadTokens', { provider: transformProviderName(storageType?.provider) })}
-              description={matchingProvider ? t('unableToFetchRemoteWithCredentials') : t('unableToFetchRemoteNoCredentials')}
+              heading={getCalloutContent.heading}
+              description={getCalloutContent.description}
               action={{
                 onClick: onSetSyncClick,
                 text: t('enterCredentials'),
               }}
               secondaryAction={matchingProvider ? {
                 onClick: () => {
+                  dispatch.uiState.setLastError(null);
                   restoreStoredProvider(matchingProvider);
                 },
                 text: t('retry'),

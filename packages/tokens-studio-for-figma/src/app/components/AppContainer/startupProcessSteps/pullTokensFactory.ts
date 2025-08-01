@@ -15,6 +15,7 @@ import { notifyToUI } from '@/plugin/notifiers';
 import type useRemoteTokens from '@/app/store/remoteTokens';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { isGitProvider } from '@/utils/is';
+import { categorizeError } from '@/utils/error/categorizeError';
 
 export function pullTokensFactory(
   store: Store<RootState>,
@@ -64,6 +65,7 @@ export function pullTokensFactory(
 
           dispatch.uiState.setApiData(matchingSet);
           dispatch.uiState.setLocalApiState(matchingSet);
+          dispatch.uiState.setLastError(null);
           // we don't want to update nodes if we're pulling from remote
           dispatch.tokenState.setActiveTheme({ newActiveTheme: activeTheme || null, shouldUpdateNodes: false });
           dispatch.tokenState.setCollapsedTokenSets(params.localTokenData?.collapsedTokenSets || []);
@@ -86,11 +88,19 @@ export function pullTokensFactory(
             }
 
             if (remoteData?.status === 'failure') {
-              // If we have some error reading tokens, we let the user know - e.g. schema validation doesn't pass.
-              notifyToUI(remoteData.errorMessage, { error: true });
+              const { type, message } = categorizeError(remoteData.errorMessage);
+              dispatch.uiState.setLastError({ type, message });
+
+              if (type === 'parsing') {
+                notifyToUI('Failed to parse token file - check JSON format', { error: true });
+              } else if (type === 'credential') {
+                notifyToUI('Failed to fetch tokens, check your credentials', { error: true });
+              } else {
+                notifyToUI('Failed to fetch tokens from remote storage', { error: true });
+              }
               dispatch.uiState.setActiveTab(Tabs.START);
             } else {
-              // If we succeeded we can move on to show the tokens screen
+              dispatch.uiState.setLastError(null);
               dispatch.uiState.setActiveTab(Tabs.TOKENS);
             }
           } else {
@@ -101,7 +111,17 @@ export function pullTokensFactory(
           Sentry.captureException(err);
           dispatch.uiState.setActiveTab(Tabs.START);
           dispatch.uiState.completeJob(BackgroundJobs.UI_PULLTOKENS);
-          notifyToUI('Failed to fetch tokens, check your credentials', { error: true });
+
+          const { type, message } = categorizeError(err);
+          dispatch.uiState.setLastError({ type, message });
+
+          if (type === 'parsing') {
+            notifyToUI('Failed to parse token file - check JSON format', { error: true });
+          } else if (type === 'credential') {
+            notifyToUI('Failed to fetch tokens, check your credentials', { error: true });
+          } else {
+            notifyToUI('Failed to fetch tokens from remote storage', { error: true });
+          }
         }
       } else {
         // no API credentials available for storage type

@@ -19,6 +19,7 @@ import { RemoteResponseData } from '@/types/RemoteResponseData';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
+import { categorizeError } from '@/utils/error/categorizeError';
 
 export async function updateJSONBinTokens({
   tokens, themes, context, updatedAt, oldUpdatedAt = null, storeTokenIdInJsonEditor,
@@ -164,8 +165,17 @@ export function useJSONbin() {
       notifyToUI('No tokens stored on remote', { error: true });
       return null;
     } catch (e) {
-      notifyToUI(ErrorMessages.JSONBIN_CREDENTIAL_ERROR, { error: true });
+      const { type, message } = categorizeError(e);
       console.log('Error:', e);
+
+      if (type === 'parsing') {
+        notifyToUI('Failed to parse token file - check JSON format', { error: true });
+        return {
+          status: 'failure',
+          errorMessage: message,
+        };
+      }
+      notifyToUI(ErrorMessages.JSONBIN_CREDENTIAL_ERROR, { error: true });
       return {
         status: 'failure',
         errorMessage: ErrorMessages.JSONBIN_CREDENTIAL_ERROR,
