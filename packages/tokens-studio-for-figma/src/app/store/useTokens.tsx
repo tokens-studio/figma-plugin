@@ -36,6 +36,7 @@ import { defaultTokenResolver } from '@/utils/TokenResolver';
 import { getFormat } from '@/plugin/TokenFormatStoreClass';
 import { ExportTokenSet } from '@/types/ExportTokenSet';
 import { useIsProUser } from '../hooks/useIsProUser';
+import { ModalOptions } from '@/constants/ModalOptions';
 
 type ConfirmResult = ('textStyles' | 'colorStyles' | 'effectStyles' | string)[] | string;
 
@@ -281,37 +282,44 @@ export default function useTokens() {
       tokensToRename: TokenToRename[];
     }) => {
       // TODO: Move all of this logic to individual files, this hook is already way too overloaded
+
+      const choices = [
+        {
+          key: UpdateMode.SELECTION,
+          label: 'Selection',
+          unique: true,
+          enabled: UpdateMode.SELECTION === lastUsedRenameOption,
+        },
+        {
+          key: UpdateMode.PAGE,
+          label: 'Page',
+          unique: true,
+          enabled: UpdateMode.PAGE === lastUsedRenameOption,
+        },
+        {
+          key: UpdateMode.DOCUMENT,
+          label: 'Document',
+          unique: true,
+          enabled: UpdateMode.DOCUMENT === lastUsedRenameOption,
+        },
+        {
+          key: 'rename-variable-token-group',
+          label: 'Rename variables',
+        },
+        {
+          key: 'rename-style-token-group',
+          label: 'Rename styles',
+        },
+        {
+          key: ModalOptions.RENAME_ACROSS_SETS,
+          label: 'Rename in other sets',
+        },
+      ];
+
       const confirmData = await confirm({
         text: `Remap all tokens that use tokens in ${oldGroupName} group?`,
         description: 'This will change all layers that used the old token name. This could take a while.',
-        choices: [
-          {
-            key: UpdateMode.SELECTION,
-            label: 'Selection',
-            unique: true,
-            enabled: UpdateMode.SELECTION === lastUsedRenameOption,
-          },
-          {
-            key: UpdateMode.PAGE,
-            label: 'Page',
-            unique: true,
-            enabled: UpdateMode.PAGE === lastUsedRenameOption,
-          },
-          {
-            key: UpdateMode.DOCUMENT,
-            label: 'Document',
-            unique: true,
-            enabled: UpdateMode.DOCUMENT === lastUsedRenameOption,
-          },
-          {
-            key: 'rename-variable-token-group',
-            label: 'Rename variables',
-          },
-          {
-            key: 'rename-style-token-group',
-            label: 'Rename styles',
-          },
-        ],
+        choices,
       });
       if (confirmData && confirmData.result) {
         if (
@@ -361,6 +369,30 @@ export default function useTokens() {
             settings,
           });
           dispatch.tokenState.renameStyleIdsToCurrentTheme(renameStylesResult.styleIds, tokensToRename);
+        }
+
+        if (confirmData.data.includes(ModalOptions.RENAME_ACROSS_SETS)) {
+          // Efficiently find all token sets that contain any of the tokens being renamed
+          const relevantTokenSets = new Set<string>();
+
+          // Single pass through all token sets to find which ones contain our tokens
+          Object.entries(tokens).forEach(([tokenSet, tokenList]) => {
+            const hasRelevantToken = tokensToRename.some((tokenToRename) => tokenList.some((token) => token.name === tokenToRename.oldName));
+            if (hasRelevantToken) {
+              relevantTokenSets.add(tokenSet);
+            }
+          });
+
+          // Process each token individually with the full set of relevant token sets
+          // This follows the same pattern as EditTokenForm.tsx
+          await Promise.all(
+            tokensToRename.map((tokenToRename) => dispatch.tokenState.renameTokenAcrossSets({
+              oldName: tokenToRename.oldName,
+              newName: tokenToRename.newName,
+              type,
+              tokenSets: Array.from(relevantTokenSets),
+            })),
+          );
         }
       }
     },
