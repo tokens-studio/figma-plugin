@@ -1,5 +1,14 @@
 # @tokens-studio/figma-plugin
 
+## 2.6.3
+
+### Patch Changes
+
+- 7275dbe4: Fix to display border radius and border width tokens as tokens in the Inspect Panel in the plugin, instead of variables.Only native variables applied from Figma will be displayed as variables.
+- 4a9bdfb5: Fix issue of border width not applying as variable in Figma for non-rectangular shapes like ellipses, ovals or text nodes.
+- 1713750a: Fix missing pull confirmation dialog when switching to Tokens Studio sync provider. Users are now prompted before their local tokens are overwritten when syncing with Tokens Studio, providing the same protection against accidental token overwrites that other sync providers already have.
+- f639cfe4: Improve handling of renamed Figma variable collections and modes. The plugin now updates existing themes and token sets to match the renamed collections and modes, instead of creating new ones earlier.
+
 ## 2.6.2
 
 ### Patch Changes
