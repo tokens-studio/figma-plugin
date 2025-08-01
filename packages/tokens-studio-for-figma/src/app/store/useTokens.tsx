@@ -283,18 +283,6 @@ export default function useTokens() {
     }) => {
       // TODO: Move all of this logic to individual files, this hook is already way too overloaded
 
-      // Check if tokens in this group exist in other sets
-      const tokenSetsContainingSameTokens: string[] = [];
-      tokensToRename.forEach((tokenToRename) => {
-        Object.entries(tokens).forEach(([tokenSet, tokenList]) => {
-          if (tokenSet !== activeTokenSet && tokenList.find((token) => token.name === tokenToRename.oldName)) {
-            if (!tokenSetsContainingSameTokens.includes(tokenSet)) {
-              tokenSetsContainingSameTokens.push(tokenSet);
-            }
-          }
-        });
-      });
-
       const choices = [
         {
           key: UpdateMode.SELECTION,
@@ -322,15 +310,11 @@ export default function useTokens() {
           key: 'rename-style-token-group',
           label: 'Rename styles',
         },
-      ];
-
-      // Add "Rename in other sets" option if tokens exist in multiple sets
-      if (tokenSetsContainingSameTokens.length > 0) {
-        choices.push({
+        {
           key: ModalOptions.RENAME_ACROSS_SETS,
           label: 'Rename in other sets',
-        });
-      }
+        },
+      ];
 
       const confirmData = await confirm({
         text: `Remap all tokens that use tokens in ${oldGroupName} group?`,
@@ -388,23 +372,26 @@ export default function useTokens() {
         }
 
         if (confirmData.data.includes(ModalOptions.RENAME_ACROSS_SETS)) {
-          // For each token to rename, call renameTokensAcrossSets
+          // Efficiently find all token sets that contain any of the tokens being renamed
+          const relevantTokenSets = new Set<string>();
+
+          // Single pass through all token sets to find which ones contain our tokens
+          Object.entries(tokens).forEach(([tokenSet, tokenList]) => {
+            const hasRelevantToken = tokensToRename.some((tokenToRename) => tokenList.some((token) => token.name === tokenToRename.oldName));
+            if (hasRelevantToken) {
+              relevantTokenSets.add(tokenSet);
+            }
+          });
+
+          // Process each token individually with the full set of relevant token sets
+          // This follows the same pattern as EditTokenForm.tsx
           await Promise.all(
-            tokensToRename.map(async (tokenToRename) => {
-              // Find all sets that contain this specific token
-              const setsContainingToken: string[] = [activeTokenSet];
-              Object.entries(tokens).forEach(([tokenSet, tokenList]) => {
-                if (tokenSet !== activeTokenSet && tokenList.find((token) => token.name === tokenToRename.oldName)) {
-                  setsContainingToken.push(tokenSet);
-                }
-              });
-              return dispatch.tokenState.renameTokenAcrossSets({
-                oldName: tokenToRename.oldName,
-                newName: tokenToRename.newName,
-                type,
-                tokenSets: setsContainingToken,
-              });
-            }),
+            tokensToRename.map((tokenToRename) => dispatch.tokenState.renameTokenAcrossSets({
+              oldName: tokenToRename.oldName,
+              newName: tokenToRename.newName,
+              type,
+              tokenSets: Array.from(relevantTokenSets),
+            })),
           );
         }
       }
