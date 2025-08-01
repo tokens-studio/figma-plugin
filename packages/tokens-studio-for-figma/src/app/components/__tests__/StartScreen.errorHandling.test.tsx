@@ -1,7 +1,6 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
 import { Provider } from 'react-redux';
-import { createStore } from '@/app/store';
+import { render, screen, createMockStore } from '../../../../tests/config/setupTest';
 import StartScreen from '../StartScreen';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { ErrorMessages } from '@/constants/ErrorMessages';
@@ -20,24 +19,22 @@ jest.mock('@/app/store/remoteTokens', () => ({
 }));
 
 describe('StartScreen Error Handling', () => {
-  let store: ReturnType<typeof createStore>;
-
-  beforeEach(() => {
-    store = createStore();
-  });
-
   it('should show parsing error message when lastError type is parsing', () => {
-    // Set up state with parsing error
-    store.dispatch.uiState.setStorageType({
-      provider: StorageProviderType.GITHUB,
-      id: 'test-repo',
-      name: 'Test Repo',
-      branch: 'main',
-    });
-    
-    store.dispatch.uiState.setLastError({
-      type: 'parsing',
-      message: `${ErrorMessages.JSON_PARSE_ERROR}: Unexpected token } in JSON at position 10`,
+    const store = createMockStore({
+      uiState: {
+        storageType: {
+          provider: StorageProviderType.GITHUB,
+          id: 'test-repo',
+          name: 'Test Repo',
+          branch: 'main',
+          filePath: 'tokens.json',
+          internalId: 'test-internal-id',
+        },
+        lastError: {
+          type: 'parsing',
+          message: `${ErrorMessages.JSON_PARSE_ERROR}: Unexpected token } in JSON at position 10`,
+        },
+      },
     });
 
     render(
@@ -52,17 +49,21 @@ describe('StartScreen Error Handling', () => {
   });
 
   it('should show credential error message when lastError type is credential', () => {
-    // Set up state with credential error
-    store.dispatch.uiState.setStorageType({
-      provider: StorageProviderType.GITHUB,
-      id: 'test-repo',
-      name: 'Test Repo',
-      branch: 'main',
-    });
-    
-    store.dispatch.uiState.setLastError({
-      type: 'credential',
-      message: '401 Unauthorized',
+    const store = createMockStore({
+      uiState: {
+        storageType: {
+          provider: StorageProviderType.GITHUB,
+          id: 'test-repo',
+          name: 'Test Repo',
+          branch: 'main',
+          filePath: 'tokens.json',
+          internalId: 'test-internal-id',
+        },
+        lastError: {
+          type: 'credential',
+          message: '401 Unauthorized',
+        },
+      },
     });
 
     render(
@@ -73,21 +74,54 @@ describe('StartScreen Error Handling', () => {
 
     // Should show the default credential error message, not the specific 401 message
     expect(screen.getByText(/Unable to fetch tokens from remote storage/)).toBeInTheDocument();
-    expect(screen.getByText(/incorrect credentials/)).toBeInTheDocument();
+    expect(screen.getByText(/This may be due to incorrect credentials/)).toBeInTheDocument();
+  });
+
+  it('should show connectivity error message when lastError type is connectivity', () => {
+    const store = createMockStore({
+      uiState: {
+        storageType: {
+          provider: StorageProviderType.GITHUB,
+          id: 'test-repo',
+          name: 'Test Repo',
+          branch: 'main',
+          filePath: 'tokens.json',
+          internalId: 'test-internal-id',
+        },
+        lastError: {
+          type: 'connectivity',
+          message: 'Network request failed',
+        },
+      },
+    });
+
+    render(
+      <Provider store={store}>
+        <StartScreen />
+      </Provider>
+    );
+
+    // Should show the connectivity error message
+    expect(screen.getByText(/Unable to connect to GitHub/)).toBeInTheDocument();
+    expect(screen.getByText(/check your internet connection or try again later/)).toBeInTheDocument();
   });
 
   it('should show specific error message when lastError type is other', () => {
-    // Set up state with other error
-    store.dispatch.uiState.setStorageType({
-      provider: StorageProviderType.GITHUB,
-      id: 'test-repo',
-      name: 'Test Repo',
-      branch: 'main',
-    });
-    
-    store.dispatch.uiState.setLastError({
-      type: 'other',
-      message: 'Network request failed',
+    const store = createMockStore({
+      uiState: {
+        storageType: {
+          provider: StorageProviderType.GITHUB,
+          id: 'test-repo',
+          name: 'Test Repo',
+          branch: 'main',
+          filePath: 'tokens.json',
+          internalId: 'test-internal-id',
+        },
+        lastError: {
+          type: 'other',
+          message: 'Unknown error occurred',
+        },
+      },
     });
 
     render(
@@ -97,16 +131,22 @@ describe('StartScreen Error Handling', () => {
     );
 
     // Should show the specific error message
-    expect(screen.getByText('Network request failed')).toBeInTheDocument();
+    expect(screen.getByText('Unknown error occurred')).toBeInTheDocument();
   });
 
   it('should show default error message when no lastError is set', () => {
-    // Set up state without error
-    store.dispatch.uiState.setStorageType({
-      provider: StorageProviderType.GITHUB,
-      id: 'test-repo',
-      name: 'Test Repo',
-      branch: 'main',
+    const store = createMockStore({
+      uiState: {
+        storageType: {
+          provider: StorageProviderType.GITHUB,
+          id: 'test-repo',
+          name: 'Test Repo',
+          branch: 'main',
+          filePath: 'tokens.json',
+          internalId: 'test-internal-id',
+        },
+        lastError: null,
+      },
     });
 
     render(
