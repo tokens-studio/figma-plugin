@@ -106,6 +106,13 @@ function StartScreen() {
       };
     }
 
+    if (lastError.type === 'connectivity') {
+      return {
+        heading: t('couldNotLoadTokens', { provider: transformProviderName(storageType?.provider) }),
+        description: `Unable to connect to ${transformProviderName(storageType?.provider)}. Please check your internet connection or try again later.`,
+      };
+    }
+
     return {
       heading: t('couldNotLoadTokens', { provider: transformProviderName(storageType?.provider) }),
       description: lastError.message,

@@ -20,4 +20,11 @@ export enum ErrorMessages {
   GIT_MULTIFILE_PERMISSION_ERROR = 'You try to save a multi-file project as a free user. Upgrade to Pro or add a json file at the end of the filepath (tokens.json)',
   GITLAB_PUSH_TO_PROTECTED_BRANCH_ERROR = '403 Forbidden - You are not allowed to push into this branch',
   JSON_PARSE_ERROR = 'Failed to parse token file - the file contains invalid JSON format',
+  CONNECTIVITY_ERROR = 'Unable to connect to the service. Please check your internet connection or try again later.',
+  GITHUB_CONNECTIVITY_ERROR = 'Unable to connect to GitHub. Please check your internet connection or try again later.',
+  GITLAB_CONNECTIVITY_ERROR = 'Unable to connect to GitLab. Please check your internet connection or try again later.',
+  BITBUCKET_CONNECTIVITY_ERROR = 'Unable to connect to Bitbucket. Please check your internet connection or try again later.',
+  ADO_CONNECTIVITY_ERROR = 'Unable to connect to Azure DevOps. Please check your internet connection or try again later.',
+  TOKENSSTUDIO_CONNECTIVITY_ERROR = 'Unable to connect to Tokens Studio. Please check your internet connection or try again later.',
+  JSONBIN_CONNECTIVITY_ERROR = 'Unable to connect to JSONbin. Please check your internet connection or try again later.',
 }

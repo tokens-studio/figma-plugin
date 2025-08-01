@@ -93,7 +93,7 @@ export interface UIState {
   hasRemoteChange: boolean;
   selectedExportThemes?: string[];
   lastError?: {
-    type: 'credential' | 'parsing' | 'other';
+    type: 'credential' | 'parsing' | 'connectivity' | 'other';
     message: string;
   } | null;
 }
@@ -432,7 +432,7 @@ export const uiState = createModel<RootModel>()({
       ...state,
       selectedExportThemes: data,
     }),
-    setLastError: (state, data: { type: 'credential' | 'parsing' | 'other'; message: string } | null) => ({
+    setLastError: (state, data: { type: 'credential' | 'parsing' | 'connectivity' | 'other'; message: string } | null) => ({
       ...state,
       lastError: data,
     }),
