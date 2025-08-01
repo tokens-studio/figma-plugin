@@ -33,6 +33,33 @@ export function setTokenData(state: TokenState, payload: SetTokenDataPayload): T
     }
   });
 
+  // Apply active theme logic to set correct token sets
+  let finalUsedTokenSets = usedTokenSets;
+  if (newActiveTheme && Object.keys(newActiveTheme).length > 0 && payload.themes) {
+    // Filter activeThemes
+    const activeThemeObjectList = payload.themes.filter((theme) => Object.values(newActiveTheme).some((v) => v === theme.id));
+    // Store all activeTokenSets through all activeThemes
+    const selectedTokenSets: Record<string, TokenSetStatus> = {};
+    activeThemeObjectList.forEach((theme) => {
+      Object.entries(theme.selectedTokenSets).forEach(([tokenSet, status]) => {
+        if (status !== TokenSetStatus.DISABLED) {
+          selectedTokenSets[tokenSet] = status;
+        }
+      });
+    });
+    finalUsedTokenSets = activeThemeObjectList.length > 0
+      ? Object.fromEntries(
+        allAvailableTokenSets.map((tokenSet) => (
+          [tokenSet, selectedTokenSets?.[tokenSet] ?? TokenSetStatus.DISABLED]
+        )),
+      )
+      : Object.fromEntries(
+        allAvailableTokenSets.map((tokenSet) => (
+          [tokenSet, TokenSetStatus.DISABLED]
+        )),
+      );
+  }
+
   const tokenValues = Array.isArray(payload.values) ? payload.values : removeIdPropertyFromTokens(payload.values);
 
   // When the remote data has changed, we will update the last synced state
@@ -58,7 +85,7 @@ export function setTokenData(state: TokenState, payload: SetTokenDataPayload): T
       : {
         activeTokenSet: Array.isArray(payload.values) ? 'global' : Object.keys(payload.values)[0],
       }),
-    usedTokenSet: Array.isArray(payload.values) ? { global: TokenSetStatus.ENABLED } : usedTokenSets,
+    usedTokenSet: Array.isArray(payload.values) ? { global: TokenSetStatus.ENABLED } : finalUsedTokenSets,
     tokensSize,
     themesSize,
   };
