@@ -3,9 +3,10 @@ import { useSelector, useDispatch } from 'react-redux';
 import { GitBranchIcon } from '@primer/octicons-react';
 import { useUIDSeed } from 'react-uid';
 import { useTranslation } from 'react-i18next';
-import { Button, DropdownMenu } from '@tokens-studio/ui';
+import {
+  Button, Box, Stack, Text,
+} from '@tokens-studio/ui';
 import { Command } from 'cmdk';
-import './BranchSelector.css';
 import {
   branchSelector,
   localApiStateBranchSelector,
@@ -48,11 +49,34 @@ export default function BranchSelector() {
   const [createBranchModalVisible, setCreateBranchModalVisible] = useState(false);
   const [isCurrentChanges, setIsCurrentChanges] = useState(false);
   const [open, setOpen] = useState(false);
+  const [showCreateFromMenu, setShowCreateFromMenu] = useState(false);
   const { hasChanges } = useChangedState();
+
+  // Handle ESC key to close modal
+  const handleCloseSelector = React.useCallback(() => {
+    setOpen(false);
+    setShowCreateFromMenu(false);
+  }, []);
 
   useEffect(() => {
     setCurrentBranch(localApiStateBranch);
   }, [localApiStateBranch, setCurrentBranch]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && open) {
+        handleCloseSelector();
+      }
+    };
+
+    if (open) {
+      document.addEventListener('keydown', handleKeyDown);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [open, handleCloseSelector]);
 
   const askUserIfPushChanges = React.useCallback(async () => {
     const confirmResult = await confirm({
@@ -145,154 +169,230 @@ export default function BranchSelector() {
 
   const handleOpenToggle = React.useCallback(() => {
     setOpen(!open);
+    setShowCreateFromMenu(false);
   }, [open]);
 
-  const handlePointerDownOutside = React.useCallback(() => {
-    setOpen(false);
+  const handleShowCreateFromMenu = React.useCallback(() => {
+    setShowCreateFromMenu(true);
   }, []);
 
-  const handleEscapeKeyDown = React.useCallback(() => {
-    setOpen(false);
+  const handleBackToMain = React.useCallback(() => {
+    setShowCreateFromMenu(false);
   }, []);
 
+  const handleOverlayClick = React.useCallback((e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      handleCloseSelector();
+    }
+  }, [handleCloseSelector]);
+
+  const handleContentClick = React.useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+  }, []);
   const handleCreateBranchFromCurrentChange = React.useCallback(() => {
     createBranchByChange();
     setOpen(false);
+    setShowCreateFromMenu(false);
   }, [createBranchByChange]);
-
   const handleCreateBranchFromSpecific = React.useCallback((branch: string) => () => {
     createNewBranchFrom(branch);
     setOpen(false);
+    setShowCreateFromMenu(false);
   }, [createNewBranchFrom]);
 
   const handleBranchSelection = React.useCallback((branch: string) => () => {
     if (isProUser) {
       onBranchSelected(branch);
       setOpen(false);
+      setShowCreateFromMenu(false);
     }
   }, [isProUser, onBranchSelected]);
 
   return currentBranch ? (
     <>
-      <DropdownMenu>
-        <DropdownMenu.Trigger asChild data-testid="branch-selector-menu-trigger">
-          <Button size="small" variant="invisible" icon={<GitBranchIcon />} onClick={handleOpenToggle}>
-            {currentBranch}
-          </Button>
-        </DropdownMenu.Trigger>
+      <Button size="small" variant="invisible" icon={<GitBranchIcon />} onClick={handleOpenToggle} data-testid="branch-selector-menu-trigger">
+        {currentBranch}
+      </Button>
 
-        {open && (
-          <DropdownMenu.Portal>
-            <DropdownMenu.Content
-              side="top"
-              sideOffset={0}
-              className="content scroll-container"
-              css={{ maxWidth: '70vw', padding: 0 }}
-              onPointerDownOutside={handlePointerDownOutside}
-              onEscapeKeyDown={handleEscapeKeyDown}
-            >
-              <Command style={{ width: '100%', minWidth: '240px' }}>
+      {open && (
+        <Box
+          className="branch-selector-overlay"
+          onClick={handleOverlayClick}
+          css={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999,
+          }}
+        >
+          <Box
+            className="branch-selector-content"
+            css={{
+              backgroundColor: '$bgDefault',
+              borderRadius: '$medium',
+              border: '1px solid $borderMuted',
+              boxShadow: '$large',
+              minWidth: '320px',
+              maxWidth: '480px',
+              width: '90vw',
+              maxHeight: '70vh',
+            }}
+            onClick={handleContentClick}
+          >
+            <Command>
+              <Box css={{ borderBottom: '1px solid $borderMuted' }}>
                 <Command.Input
                   placeholder={t('searchBranches') || 'Search branches...'}
                   style={{
                     border: 'none',
-                    borderBottom: '1px solid var(--figma-color-border)',
                     borderRadius: 0,
                     padding: '12px 16px',
                     fontSize: '13px',
                     outline: 'none',
                     background: 'transparent',
+                    width: '100%',
                   }}
                 />
-                <Command.List style={{ maxHeight: '300px', overflow: 'auto' }}>
-                  <Command.Empty style={{ padding: '12px 16px', fontSize: '13px', color: 'var(--figma-color-text-secondary)' }}>
-                    No branches found.
-                  </Command.Empty>
+              </Box>
 
-                  {/* Create new branch section */}
-                  <Command.Group heading={isProUser ? t('createNewBranch') : undefined} style={{ padding: 0 }}>
-                    {!isProUser && (
-                      <div style={{
-                        display: 'flex', justifyContent: 'space-between', padding: '8px 16px', fontSize: '13px',
-                      }}
-                      >
-                        <span>{t('upgradeToPro', { ns: 'licence' })}</span>
-                        <ProBadge campaign="branch-selector" compact />
-                      </div>
+              <Command.List style={{ maxHeight: '320px', overflow: 'auto' }}>
+                <Command.Empty>
+                  <Box css={{
+                    padding: '$3', fontSize: '$small', color: '$fgMuted', textAlign: 'center',
+                  }}
+                  >
+                    No branches found.
+                  </Box>
+                </Command.Empty>
+
+                {!showCreateFromMenu ? (
+                  <>
+                    {/* Create new branch section */}
+                    {!isProUser ? (
+                      <Box css={{ padding: '$3', borderBottom: '1px solid $borderMuted' }}>
+                        <Stack direction="row" align="center" justify="between">
+                          <Text size="small">{t('upgradeToPro', { ns: 'licence' })}</Text>
+                          <ProBadge campaign="branch-selector" compact />
+                        </Stack>
+                      </Box>
+                    ) : (
+                      <>
+                        {hasChanges && (
+                          <Command.Item
+                            data-testid="branch-selector-create-new-branch-from-current-change"
+                            onSelect={handleCreateBranchFromCurrentChange}
+                          >
+                            <Box css={{ padding: '$3', cursor: 'pointer', '&[data-selected="true"]': { backgroundColor: '$bgSubtle' } }}>
+                              <Stack direction="row" align="center" gap={2}>
+                                <Text>📄</Text>
+                                <Text size="small">{t('currentChanges')}</Text>
+                              </Stack>
+                            </Box>
+                          </Command.Item>
+                        )}
+
+                        <Command.Item onSelect={handleShowCreateFromMenu}>
+                          <Box css={{ padding: '$3', cursor: 'pointer', '&[data-selected="true"]': { backgroundColor: '$bgSubtle' } }}>
+                            <Stack direction="row" align="center" gap={2}>
+                              <Text>🌿</Text>
+                              <Text size="small">
+                                {t('createNewBranch')}
+                                ...
+                              </Text>
+                            </Stack>
+                          </Box>
+                        </Command.Item>
+
+                        <Box css={{ height: '1px', backgroundColor: '$borderMuted', margin: '$2 0' }} />
+                      </>
                     )}
 
-                    {isProUser && hasChanges && (
+                    {/* Branch selection section */}
+                    <Box css={{ padding: '$2 0' }}>
+                      <Box css={{ padding: '0 $3 $2 $3' }}>
+                        <Text
+                          size="xsmall"
+                          css={{
+                            color: '$fgMuted', textTransform: 'uppercase', letterSpacing: '0.02em', fontWeight: 600,
+                          }}
+                        >
+                          {t('switchToBranch') || 'Switch to branch'}
+                        </Text>
+                      </Box>
+                      {branchState.branches.length > 0 && branchState.branches.map((branch, index) => (
+                        <Command.Item
+                          key={`switch-to-${seed(index)}`}
+                          data-testid={`branch-switch-menu-radio-element-${branch}`}
+                          disabled={!isProUser}
+                          onSelect={handleBranchSelection(branch)}
+                        >
+                          <Box css={{
+                            padding: '$3',
+                            cursor: isProUser ? 'pointer' : 'not-allowed',
+                            opacity: isProUser ? 1 : 0.5,
+                            '&[data-selected="true"]': { backgroundColor: '$bgSubtle' },
+                          }}
+                          >
+                            <Stack direction="row" align="center" justify="between">
+                              <Text size="small">{branch}</Text>
+                              {currentBranch === branch && (
+                                <Text size="small" css={{ color: '$accentFg' }}>✓</Text>
+                              )}
+                            </Stack>
+                          </Box>
+                        </Command.Item>
+                      ))}
+                    </Box>
+                  </>
+                ) : (
+                  /* Create from branch submenu */
+                  <>
+                    <Box css={{ padding: '$3', borderBottom: '1px solid $borderMuted' }}>
+                      <Stack direction="row" align="center" gap={2}>
+                        <Button size="small" variant="ghost" onClick={handleBackToMain}>←</Button>
+                        <Text size="small" css={{ fontWeight: 600 }}>Create new branch from</Text>
+                      </Stack>
+                    </Box>
+
+                    {hasChanges && (
                       <Command.Item
                         data-testid="branch-selector-create-new-branch-from-current-change"
                         onSelect={handleCreateBranchFromCurrentChange}
-                        style={{
-                          padding: '8px 16px',
-                          fontSize: '13px',
-                          cursor: 'pointer',
-                        }}
-                        className="branch-command-item"
                       >
-                        📄
-                        {' '}
-                        {t('currentChanges')}
+                        <Box css={{ padding: '$3', cursor: 'pointer', '&[data-selected="true"]': { backgroundColor: '$bgSubtle' } }}>
+                          <Stack direction="row" align="center" gap={2}>
+                            <Text>📄</Text>
+                            <Text size="small">{t('currentChanges')}</Text>
+                          </Stack>
+                        </Box>
                       </Command.Item>
                     )}
 
-                    {isProUser && branchState.branches.length > 0 && branchState.branches.map((branch, index) => (
+                    {branchState.branches.length > 0 && branchState.branches.map((branch, index) => (
                       <Command.Item
                         key={`create-from-${seed(index)}`}
                         data-testid={`branch-selector-create-branch-from-branch-${branch}`}
                         onSelect={handleCreateBranchFromSpecific(branch)}
-                        style={{
-                          padding: '8px 16px',
-                          fontSize: '13px',
-                          cursor: 'pointer',
-                        }}
-                        className="branch-command-item"
                       >
-                        🌿
-                        {' '}
-                        {t('createFromBranch', { branch }) || `Create from ${branch}`}
+                        <Box css={{ padding: '$3', cursor: 'pointer', '&[data-selected="true"]': { backgroundColor: '$bgSubtle' } }}>
+                          <Text size="small">{branch}</Text>
+                        </Box>
                       </Command.Item>
                     ))}
+                  </>
+                )}
+              </Command.List>
+            </Command>
+          </Box>
+        </Box>
+      )}
 
-                    {(isProUser && (hasChanges || branchState.branches.length > 0)) && (
-                      <div style={{ height: '1px', backgroundColor: 'var(--figma-color-border)', margin: '4px 0' }} />
-                    )}
-                  </Command.Group>
-
-                  {/* Branch selection section */}
-                  <Command.Group heading={t('switchToBranch') || 'Switch to branch'} style={{ padding: 0 }}>
-                    {branchState.branches.length > 0 && branchState.branches.map((branch, index) => (
-                      <Command.Item
-                        key={`switch-to-${seed(index)}`}
-                        data-testid={`branch-switch-menu-radio-element-${branch}`}
-                        disabled={!isProUser}
-                        onSelect={handleBranchSelection(branch)}
-                        style={{
-                          padding: '8px 16px',
-                          fontSize: '13px',
-                          cursor: isProUser ? 'pointer' : 'not-allowed',
-                          opacity: isProUser ? 1 : 0.5,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                        }}
-                        className="branch-command-item"
-                      >
-                        <span>{branch}</span>
-                        {currentBranch === branch && (
-                          <span style={{ fontSize: '12px', color: 'var(--figma-color-text-brand)' }}>✓</span>
-                        )}
-                      </Command.Item>
-                    ))}
-                  </Command.Group>
-                </Command.List>
-              </Command>
-            </DropdownMenu.Content>
-          </DropdownMenu.Portal>
-        )}
-      </DropdownMenu>
       {createBranchModalVisible && startBranch && (
         <CreateBranchModal
           isOpen={createBranchModalVisible}
