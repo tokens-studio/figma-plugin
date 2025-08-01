@@ -7,7 +7,17 @@ import { convertTypographyNumberToFigma } from '../../figmaTransforms/generic';
 import convertOffsetToFigma from '../../figmaTransforms/offset';
 
 function convertBoxShadowToFigmaEffect(value: TokenBoxshadowValue, baseFontSize: string): Effect {
-  const { color, opacity: a } = convertToFigmaColor(value.color);
+  // Handle Glass effect which maps to BACKGROUND_BLUR
+  if (value.type === 'glass') {
+    return {
+      type: convertBoxShadowTypeToFigma(value.type) as 'BACKGROUND_BLUR',
+      radius: convertTypographyNumberToFigma((value.blur || 0).toString(), baseFontSize),
+      visible: true,
+    };
+  }
+
+  // Handle shadow effects (DROP_SHADOW, INNER_SHADOW) which have all properties
+  const { color, opacity: a } = convertToFigmaColor(value.color!);
   const { r, g, b } = color;
   return {
     color: {
@@ -16,12 +26,12 @@ function convertBoxShadowToFigmaEffect(value: TokenBoxshadowValue, baseFontSize:
       b,
       a,
     },
-    type: convertBoxShadowTypeToFigma(value.type),
-    spread: convertTypographyNumberToFigma(value.spread.toString(), baseFontSize),
-    radius: convertTypographyNumberToFigma(value.blur.toString(), baseFontSize),
+    type: convertBoxShadowTypeToFigma(value.type) as 'DROP_SHADOW' | 'INNER_SHADOW',
+    spread: convertTypographyNumberToFigma(value.spread!.toString(), baseFontSize),
+    radius: convertTypographyNumberToFigma(value.blur!.toString(), baseFontSize),
     offset: convertOffsetToFigma(
-      convertTypographyNumberToFigma(value.x.toString(), baseFontSize),
-      convertTypographyNumberToFigma(value.y.toString(), baseFontSize),
+      convertTypographyNumberToFigma(value.x!.toString(), baseFontSize),
+      convertTypographyNumberToFigma(value.y!.toString(), baseFontSize),
     ),
     blendMode: (value.blendMode || 'NORMAL') as BlendMode,
     visible: true,

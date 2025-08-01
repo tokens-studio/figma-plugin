@@ -41,7 +41,18 @@ async function tryApplyCompositeVariable({
   // 'consumers' only exists in styles, so we can use that to determine if we're creating a style or applying to a layer
   const shouldCreateStylesWithVariables = defaultTokenValueRetriever.createStylesWithVariableReferences || !('consumers' in target);
 
-  const { color, opacity: a } = convertToFigmaColor(value.color);
+  // Handle Glass effect which maps to BACKGROUND_BLUR
+  if (value.type === 'glass') {
+    const effect: Effect = {
+      type: convertBoxShadowTypeToFigma(value.type) as 'BACKGROUND_BLUR',
+      radius: convertTypographyNumberToFigma((value.blur || 0).toString(), baseFontSize),
+      visible: true,
+    };
+    return effect;
+  }
+
+  // Handle shadow effects (DROP_SHADOW, INNER_SHADOW) which have all properties
+  const { color, opacity: a } = convertToFigmaColor(value.color!);
   const { r, g, b } = color;
 
   let effect: Effect = {
@@ -51,10 +62,10 @@ async function tryApplyCompositeVariable({
       b,
       a,
     },
-    type: convertBoxShadowTypeToFigma(value.type),
-    spread: convertTypographyNumberToFigma(value.spread.toString(), baseFontSize),
-    radius: convertTypographyNumberToFigma(value.blur.toString(), baseFontSize),
-    offset: convertOffsetToFigma(convertTypographyNumberToFigma(value.x.toString(), baseFontSize), convertTypographyNumberToFigma(value.y.toString(), baseFontSize)),
+    type: convertBoxShadowTypeToFigma(value.type) as 'DROP_SHADOW' | 'INNER_SHADOW',
+    spread: convertTypographyNumberToFigma(value.spread!.toString(), baseFontSize),
+    radius: convertTypographyNumberToFigma(value.blur!.toString(), baseFontSize),
+    offset: convertOffsetToFigma(convertTypographyNumberToFigma(value.x!.toString(), baseFontSize), convertTypographyNumberToFigma(value.y!.toString(), baseFontSize)),
     blendMode: (value.blendMode || 'NORMAL') as BlendMode,
     visible: true,
     ...value.type === 'dropShadow' && 'effects' in target ? { showShadowBehindNode: getShadowBehindNodeFromEffect(target.effects[0]) } : {},

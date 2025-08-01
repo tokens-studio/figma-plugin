@@ -92,7 +92,20 @@ const mixedShadowToken: SingleToken = {
   resolvedValueWithReferences: mixedShadowTokenValue,
 };
 
-const tokens = [singleShadowToken, multipleShadowToken, mixedShadowToken];
+const glassTokenValue = {
+  type: BoxShadowTypes.GLASS,
+  blur: 10,
+};
+
+const glassToken: SingleToken = {
+  name: 'glass.primary',
+  type: TokenTypes.BOX_SHADOW,
+  description: 'glass effect',
+  value: glassTokenValue,
+  resolvedValueWithReferences: glassTokenValue,
+};
+
+const tokens = [singleShadowToken, multipleShadowToken, mixedShadowToken, glassToken];
 
 describe('setEffectValuesOnTarget', () => {
   let rectangleNodeMock: RectangleNode;
@@ -303,6 +316,53 @@ describe('setEffectValuesOnTarget', () => {
           offset: { x: 0, y: 0 },
           radius: 2,
           spread: 4,
+        },
+      ],
+    });
+  });
+
+  it('sets glass effect tokens', async () => {
+    const rectangleNodeMockOriginal = rectangleNodeMock;
+    await setEffectValuesOnTarget(rectangleNodeMock, 'glass.primary', defaultBaseFontSize);
+    expect(rectangleNodeMock).toEqual({
+      ...rectangleNodeMockOriginal,
+      effects: [
+        {
+          type: 'BACKGROUND_BLUR',
+          radius: 10,
+          visible: true,
+        },
+      ],
+    });
+  });
+
+  it('sets glass effect tokens with custom blur', async () => {
+    const glassTokenWithBlur = {
+      name: 'glass.strong',
+      type: TokenTypes.BOX_SHADOW,
+      value: {
+        type: BoxShadowTypes.GLASS,
+        blur: 20
+      },
+      resolvedValueWithReferences: {
+        type: BoxShadowTypes.GLASS,
+        blur: 20
+      },
+    };
+
+    defaultTokenValueRetriever.initiate({
+      tokens: [glassTokenWithBlur],
+    });
+
+    const rectangleNodeMockOriginal = rectangleNodeMock;
+    await setEffectValuesOnTarget(rectangleNodeMock, 'glass.strong', defaultBaseFontSize);
+    expect(rectangleNodeMock).toEqual({
+      ...rectangleNodeMockOriginal,
+      effects: [
+        {
+          type: 'BACKGROUND_BLUR',
+          radius: 20,
+          visible: true,
         },
       ],
     });
