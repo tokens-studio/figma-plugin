@@ -4,5 +4,8 @@
   "cancel": "Cancel",
   "createNewBranch": "Create new branch from",
   "currentChanges": "Current changes",
-  "unSavedChanges": "You have unsaved changes"
+  "unSavedChanges": "You have unsaved changes",
+  "searchBranches": "Search branches...",
+  "switchToBranch": "Switch to branch",
+  "createFromBranch": "Create from {{branch}}"
 }

@@ -1,0 +1,50 @@
+/* Branch Command Styles */
+.branch-command-item[data-selected="true"] {
+  background-color: var(--figma-color-bg-secondary) !important;
+}
+
+.branch-command-item:hover {
+  background-color: var(--figma-color-bg-hover);
+}
+
+/* Command Input Focus Styles */
+[cmdk-input]:focus {
+  outline: none;
+  border-bottom-color: var(--figma-color-border-brand);
+}
+
+/* Command Group Heading Styles */
+[cmdk-group-heading] {
+  padding: 8px 16px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--figma-color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  background-color: var(--figma-color-bg-tertiary);
+  border-bottom: 1px solid var(--figma-color-border);
+  margin: 0;
+}
+
+/* Command List Scrollbar */
+[cmdk-list] {
+  scrollbar-width: thin;
+  scrollbar-color: var(--figma-color-border) transparent;
+}
+
+[cmdk-list]::-webkit-scrollbar {
+  width: 6px;
+}
+
+[cmdk-list]::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+[cmdk-list]::-webkit-scrollbar-thumb {
+  background: var(--figma-color-border);
+  border-radius: 3px;
+}
+
+[cmdk-list]::-webkit-scrollbar-thumb:hover {
+  background: var(--figma-color-border-strong);
+}

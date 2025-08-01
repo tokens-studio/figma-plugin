@@ -4,5 +4,8 @@
   "cancel": "Annuler",
   "createNewBranch": "Créer une nouvelle branche à partir de",
   "currentChanges": "Changements actuels",
-  "unSavedChanges": "Vous avez des changements non enregistrés"
+  "unSavedChanges": "Vous avez des changements non enregistrés",
+  "searchBranches": "Rechercher des branches...",
+  "switchToBranch": "Basculer vers la branche",
+  "createFromBranch": "Créer depuis {{branch}}"
 }

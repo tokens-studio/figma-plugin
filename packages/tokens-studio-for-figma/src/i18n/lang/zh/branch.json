@@ -4,5 +4,8 @@
   "cancel": "取消",
   "createNewBranch": "创建新分支",
   "currentChanges": "目前的更改",
-  "unSavedChanges": "您有未保存的更改"
+  "unSavedChanges": "您有未保存的更改",
+  "searchBranches": "搜索分支...",
+  "switchToBranch": "切换到分支",
+  "createFromBranch": "从 {{branch}} 创建"
 }

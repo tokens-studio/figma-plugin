@@ -4,5 +4,8 @@
   "cancel": "Cancelar",
   "createNewBranch": "Crear nueva sucursal desde",
   "currentChanges": "Cambios actuales",
-  "unSavedChanges": "Tiene cambios sin guardar"
+  "unSavedChanges": "Tiene cambios sin guardar",
+  "searchBranches": "Buscar ramas...",
+  "switchToBranch": "Cambiar a rama",
+  "createFromBranch": "Crear desde {{branch}}"
 }

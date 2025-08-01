@@ -4,5 +4,8 @@
   "cancel": "Annuleren",
   "createNewBranch": "Maak een nieuwe tak van",
   "currentChanges": "Huidige wijzigingen",
-  "unSavedChanges": "U heeft niet-opgeslagen wijzigingen"
+  "unSavedChanges": "U heeft niet-opgeslagen wijzigingen",
+  "searchBranches": "Zoek branches...",
+  "switchToBranch": "Schakel naar branch",
+  "createFromBranch": "Maak van {{branch}}"
 }

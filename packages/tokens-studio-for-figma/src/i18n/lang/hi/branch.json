@@ -4,5 +4,8 @@
   "cancel": "रद्द करना",
   "createNewBranch": "से नई शाखा बनाएं",
   "currentChanges": "वर्तमान परिवर्तन",
-  "unSavedChanges": "आपके पास सहेजे नहीं गए परिवर्तन हैं"
+  "unSavedChanges": "आपके पास सहेजे नहीं गए परिवर्तन हैं",
+  "searchBranches": "Search branches...",
+  "switchToBranch": "Switch to branch",
+  "createFromBranch": "Create from {{branch}}"
 }
