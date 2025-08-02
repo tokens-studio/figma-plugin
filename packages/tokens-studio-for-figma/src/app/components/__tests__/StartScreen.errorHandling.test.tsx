@@ -71,6 +71,7 @@ describe('StartScreen Error Handling', () => {
             id: 'test-repo',
             branch: 'main',
             filePath: 'tokens.json',
+            secret: 'test-secret',
           },
         ],
       },
