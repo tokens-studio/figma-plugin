@@ -63,6 +63,16 @@ describe('StartScreen Error Handling', () => {
           type: 'credential',
           message: '401 Unauthorized',
         },
+        apiProviders: [
+          {
+            internalId: 'test-internal-id',
+            provider: StorageProviderType.GITHUB,
+            name: 'Test Repo',
+            id: 'test-repo',
+            branch: 'main',
+            filePath: 'tokens.json',
+          },
+        ],
       },
     });
 
@@ -73,8 +83,7 @@ describe('StartScreen Error Handling', () => {
     );
 
     // Should show the default credential error message, not the specific 401 message
-    expect(screen.getByText(/Unable to fetch tokens from remote storage/)).toBeInTheDocument();
-    expect(screen.getByText(/This may be due to incorrect credentials/)).toBeInTheDocument();
+    expect(screen.getByText(/unableToFetchRemoteWithCredentials/)).toBeInTheDocument();
   });
 
   it('should show connectivity error message when lastError type is connectivity', () => {
@@ -146,6 +155,7 @@ describe('StartScreen Error Handling', () => {
           internalId: 'test-internal-id',
         },
         lastError: null,
+        apiProviders: [], // No matching provider
       },
     });
 
@@ -156,6 +166,6 @@ describe('StartScreen Error Handling', () => {
     );
 
     // Should show the default error message
-    expect(screen.getByText(/Unable to fetch tokens from remote storage/)).toBeInTheDocument();
+    expect(screen.getByText(/unableToFetchRemoteNoCredentials/)).toBeInTheDocument();
   });
 });
