@@ -174,8 +174,9 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
                     boxShadow: '$contextMenu',
                     maxHeight: '60vh',
                     overflow: 'hidden',
-                    width: '70vw',
+                    width: 'auto',
                     minWidth: '150px',
+                    maxWidth: '70vw',
                     position: 'relative',
                   }}
                 >
@@ -248,7 +249,7 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
                     />
                   </Box>
 
-                  <Box css={{ maxHeight: '50vh', overflow: 'auto' }}>
+                  <Box css={{ maxHeight: '50vh', overflow: 'auto', padding: '$2' }}>
                     {/* Items List */}
                     {items.length > 0 && items.map((item, index) => {
                       const itemProps = getItemProps({ item, index });
@@ -264,6 +265,7 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
                             display: 'flex',
                             alignItems: 'center',
                             fontFamily: '$mono',
+                            borderRadius: '$medium',
                             gap: '$2',
                             backgroundColor: highlightedIndex === index ? 'var(--colors-bgDefault)' : 'transparent',
                             '&:hover': { backgroundColor: 'var(--colors-bgDefault)' },
@@ -278,7 +280,7 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
                           </Box>
                           )}
                           {!item.isSelected && <Box css={{ width: '16px', flexShrink: 0 }} />}
-                          <span>{item.label}</span>
+                          <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{item.label}</span>
                         </Box>
                       );
                     })}
