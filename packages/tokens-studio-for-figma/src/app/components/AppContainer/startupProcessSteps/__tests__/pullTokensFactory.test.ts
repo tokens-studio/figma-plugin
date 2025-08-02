@@ -14,9 +14,19 @@ jest.mock('uuid', () => ({
   v4: jest.fn(() => 'mock-uuid'),
 }));
 
+jest.mock('@/profiling/transaction', () => ({
+  wrapTransaction: jest.fn((opts, fn) => fn()),
+  spanTransaction: jest.fn((opts, fn) => fn()),
+}));
+
 jest.mock('@/utils/error/categorizeError');
 
 const mockCategorizeError = categorizeError as jest.MockedFunction<typeof categorizeError>;
+
+mockCategorizeError.mockReturnValue({
+  type: 'other',
+  message: 'An error occurred',
+});
 
 describe('pullTokensFactory', () => {
   const mockConfirm = jest.fn();
