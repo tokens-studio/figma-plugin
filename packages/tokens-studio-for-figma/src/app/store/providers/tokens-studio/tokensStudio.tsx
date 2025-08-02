@@ -23,6 +23,7 @@ import usePushDialog from '../../../hooks/usePushDialog';
 import { RemoteResponseData } from '../../../../types/RemoteResponseData';
 import { ErrorMessages } from '../../../../constants/ErrorMessages';
 import { PushOverrides } from '../../remoteTokens';
+import { categorizeError } from '@/utils/error/categorizeError';
 import { RemoteTokenStorageMetadata } from '@/storage/RemoteTokenStorage';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
@@ -254,6 +255,16 @@ export function useTokensStudio() {
         };
       } catch (e) {
         console.error('error syncing with Tokens Studio', e);
+
+        const { type, message } = categorizeError(e);
+
+        if (type === 'parsing') {
+          notifyToUI('Failed to parse token file - check JSON format', { error: true });
+          return {
+            status: 'failure',
+            errorMessage: message,
+          };
+        }
         notifyToUI('Error syncing with Tokens Studio, check credentials', { error: true });
         return {
           status: 'failure',

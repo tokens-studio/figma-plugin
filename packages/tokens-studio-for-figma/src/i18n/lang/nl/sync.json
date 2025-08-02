@@ -17,5 +17,11 @@
   "pushYourLocalChangesToYourSupernovaIoDesignSystem": "Push uw lokale wijzigingen naar uw Supernova.io-ontwerpsysteem.",
   "designSystem": "Ontwerp systeem",
   "pushYourLocalChangesToYourRepository": "Push uw lokale wijzigingen naar uw repository.",
-  "commitMessage": "Commit bericht"
+  "commitMessage": "Commit bericht",
+  "couldNotLoadTokens": "Kon tokens niet laden",
+  "failedToParseJSON": "JSON parseren mislukt",
+  "credentialError": "Inloggegevensfout",
+  "connectivityError": "Connectiviteitsfout",
+  "genericError": "Er is een fout opgetreden",
+  "retry": "Opnieuw proberen"
 }

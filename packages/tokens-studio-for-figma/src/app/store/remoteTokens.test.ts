@@ -34,6 +34,7 @@ const mockPushDialog = jest.fn();
 const mockClosePushDialog = jest.fn();
 const mockShowPullDialog = jest.fn();
 const mockClosePullDialog = jest.fn();
+const mockShowPullDialogError = jest.fn();
 const mockCreateBranch = jest.fn();
 const mockSave = jest.fn();
 const mockSetCollapsedTokenSets = jest.fn();
@@ -43,6 +44,7 @@ const mockGetCommitSha = jest.fn();
 const mockGetLatestCommitDate = jest.fn();
 const mockSetRemoteData = jest.fn();
 const mockSetHasRemoteChange = jest.fn();
+const mockSetLastError = jest.fn();
 
 // Hide log calls unless they are expected
 jest.spyOn(console, 'log').mockImplementation(() => { });
@@ -85,6 +87,7 @@ jest.mock('react-redux', () => ({
       setStorage: mockSetStorage,
       setShowConfirm: mockSetShowConfirm,
       setHasRemoteChange: mockSetHasRemoteChange,
+      setLastError: mockSetLastError,
     },
     tokenState: {
       setLastSyncedState: mockSetLastSyncedState,
@@ -211,6 +214,7 @@ jest.mock('../hooks/usePullDialog', () => ({
   default: () => ({
     showPullDialog: mockShowPullDialog,
     closePullDialog: mockClosePullDialog,
+    showPullDialogError: mockShowPullDialogError,
   }),
 }));
 jest.mock('../../plugin/notifiers', (() => ({

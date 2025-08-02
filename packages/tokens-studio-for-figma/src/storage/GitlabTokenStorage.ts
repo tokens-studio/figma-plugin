@@ -10,6 +10,7 @@ import { AnyTokenSet } from '@/types/tokens';
 import { ThemeObjectsList } from '@/types';
 import { SystemFilenames } from '@/constants/SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
+import { categorizeError } from '@/utils/error/categorizeError';
 
 enum GitLabAccessLevel {
   NoAccess = 0,
@@ -175,6 +176,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
           const { path } = jsonFiles[index];
           if (typeof fileContent === 'string' && IsJSONString(fileContent)) {
             const name = path.replace('.json', '').replace(this.path, '').replace(/^\//, '').replace(/\/$/, '');
+
             const parsed = JSON.parse(fileContent) as GitMultiFileObject;
 
             if (name === SystemFilenames.THEMES) {
@@ -209,35 +211,49 @@ export class GitlabTokenStorage extends GitTokenStorage {
       const stringData = typeof data === 'string' ? data : await data.text();
 
       if (IsJSONString(stringData)) {
-        const parsed = JSON.parse(stringData) as GitSingleFileObject;
-        return [
-          {
-            type: 'themes',
-            path: `${this.path}/${SystemFilenames.THEMES}.json`,
-            data: parsed.$themes ?? [],
-          },
-          ...(parsed.$metadata ? [
+        try {
+          const parsed = JSON.parse(stringData) as GitSingleFileObject;
+          return [
             {
-              type: 'metadata' as const,
-              path: this.path,
-              data: parsed.$metadata,
+              type: 'themes',
+              path: `${this.path}/${SystemFilenames.THEMES}.json`,
+              data: parsed.$themes ?? [],
             },
-          ] : []),
-          ...(Object.entries(parsed).filter(([key]) => (
-            !Object.values<string>(SystemFilenames).includes(key)
-          )) as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile>(([name, tokenSet]) => ({
-            name,
-            type: 'tokenSet',
-            path: `${this.path}/${name}.json`,
-            data: tokenSet,
-          })),
-        ];
+            ...(parsed.$metadata ? [
+              {
+                type: 'metadata' as const,
+                path: this.path,
+                data: parsed.$metadata,
+              },
+            ] : []),
+            ...(Object.entries(parsed).filter(([key]) => (
+              !Object.values<string>(SystemFilenames).includes(key)
+            )) as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile>(([name, tokenSet]) => ({
+              name,
+              type: 'tokenSet',
+              path: `${this.path}/${name}.json`,
+              data: tokenSet,
+            })),
+          ];
+        } catch (parseError) {
+          const { message } = categorizeError(parseError);
+          return {
+            errorMessage: message,
+          };
+        }
       }
       return {
         errorMessage: ErrorMessages.VALIDATION_ERROR,
       };
     } catch (err) {
+      const { type, message } = categorizeError(err);
       console.error(err);
+
+      if (type === 'parsing') {
+        return {
+          errorMessage: message,
+        };
+      }
     }
     return [];
   }

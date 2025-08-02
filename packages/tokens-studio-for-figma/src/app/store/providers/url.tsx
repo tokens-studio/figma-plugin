@@ -13,6 +13,7 @@ import { activeThemeSelector, usedTokenSetSelector } from '@/selectors';
 import { RemoteResponseData } from '@/types/RemoteResponseData';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
+import { categorizeError } from '@/utils/error/categorizeError';
 
 type UrlCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.URL; }>;
 
@@ -79,12 +80,22 @@ export default function useURL() {
         notifyToUI('No tokens stored on remote', { error: true });
       }
     } catch (err) {
-      notifyToUI(ErrorMessages.URL_CREDENTIAL_ERROR, { error: true });
+      const { type, message } = categorizeError(err);
       console.log('Error:', err);
-      return {
-        status: 'failure',
-        errorMessage: ErrorMessages.URL_CREDENTIAL_ERROR,
-      };
+
+      if (type === 'parsing') {
+        notifyToUI('Failed to parse token file - check JSON format', { error: true });
+        return {
+          status: 'failure',
+          errorMessage: message,
+        };
+      } else {
+        notifyToUI(ErrorMessages.URL_CREDENTIAL_ERROR, { error: true });
+        return {
+          status: 'failure',
+          errorMessage: ErrorMessages.URL_CREDENTIAL_ERROR,
+        };
+      }
     }
     return null;
   }, [

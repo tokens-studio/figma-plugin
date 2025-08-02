@@ -21,6 +21,7 @@ import { RemoteResponseData } from '@/types/RemoteResponseData';
 import { PushOverrides } from '../../remoteTokens';
 import { useIsProUser } from '@/app/hooks/useIsProUser';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
+import { categorizeError } from '@/utils/error/categorizeError';
 
 type BitbucketCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.BITBUCKET }>;
 type BitbucketFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.BITBUCKET }>;
@@ -239,8 +240,17 @@ export function useBitbucket() {
         }
         return await pushTokensToBitbucket(context);
       } catch (e) {
-        notifyToUI(ErrorMessages.BITBUCKET_CREDENTIAL_ERROR, { error: true });
+        const { type, message } = categorizeError(e);
         console.log('Error', e);
+
+        if (type === 'parsing') {
+          notifyToUI('Failed to parse token file - check JSON format', { error: true });
+          return {
+            status: 'failure',
+            errorMessage: message,
+          };
+        }
+        notifyToUI(ErrorMessages.BITBUCKET_CREDENTIAL_ERROR, { error: true });
         return {
           status: 'failure',
           errorMessage: ErrorMessages.BITBUCKET_CREDENTIAL_ERROR,

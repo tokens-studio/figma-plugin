@@ -23,6 +23,7 @@ import { ErrorMessages } from '@/constants/ErrorMessages';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { PushOverrides } from '../../remoteTokens';
 import { useIsProUser } from '@/app/hooks/useIsProUser';
+import { categorizeError } from '@/utils/error/categorizeError';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 
 export type GitlabCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITLAB; }>;
@@ -244,8 +245,17 @@ export function useGitLab() {
       }
       return await pushTokensToGitLab(context);
     } catch (err) {
-      notifyToUI(ErrorMessages.GITLAB_CREDENTIAL_ERROR, { error: true });
+      const { type, message } = categorizeError(err);
       console.log('Error', err);
+
+      if (type === 'parsing') {
+        notifyToUI('Failed to parse token file - check JSON format', { error: true });
+        return {
+          status: 'failure',
+          errorMessage: message,
+        };
+      }
+      notifyToUI(ErrorMessages.GITLAB_CREDENTIAL_ERROR, { error: true });
       return {
         status: 'failure',
         errorMessage: ErrorMessages.GITLAB_CREDENTIAL_ERROR,
