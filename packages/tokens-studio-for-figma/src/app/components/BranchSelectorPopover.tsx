@@ -174,6 +174,7 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
                       <IconButton
                         onMouseDown={handleBackButtonClick}
                         icon={<ArrowLeftIcon />}
+                        variant="invisible"
                         title="Go back"
                         size="small"
                         css={{ flexShrink: 0 }}
@@ -213,6 +214,7 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
                       {...getInputProps()}
                       type="text"
                       placeholder={t('search')}
+                      autoFocus
                       value={searchValue}
                       onChange={handleSearchChange}
                       css={{
