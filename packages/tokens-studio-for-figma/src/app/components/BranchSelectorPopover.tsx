@@ -46,7 +46,7 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
 
   // Auto-focus search input when popover opens
   useEffect(() => {
-    if (isOpen && searchInputRef.current && mode === 'switch') {
+    if (isOpen && searchInputRef.current) {
       const timer = setTimeout(() => {
         searchInputRef.current?.focus();
       }, 100);
@@ -54,6 +54,13 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
     }
     return undefined;
   }, [isOpen, mode]);
+
+  // On close reset mode to switch to always start with switch mode
+  useEffect(() => {
+    if (!isOpen) {
+      setMode('switch');
+    }
+  }, [isOpen]);
 
   // Filter branches based on search query
   const filteredBranches = React.useMemo(() => {
@@ -92,6 +99,7 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
       label: string;
       isSelected: boolean;
       onClick?: (() => void) | (() => Promise<void>);
+      isCurrentChanges?: boolean;
     }> = filteredBranches.map((branch) => ({
       id: branch,
       label: branch,
@@ -101,18 +109,28 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
 
     if (hasChanges && mode === 'create') {
       returnedItems.push({
-        id: 'current-changes',
-        label: t('currentChanges'),
+        id: 'TOKENS_STUDIO_CURRENT_CHANGES',
+        label: t('currentChanges') || 'Current changes',
         isSelected: false,
         onClick: onCreateBranchFromCurrentChanges,
+        isCurrentChanges: true,
       });
     }
 
     return returnedItems;
-  }, [mode, hasChanges, filteredBranches, currentBranch, onBranchSelected, onCreateBranchFromCurrentChanges, onCreateBranchFromSelected]);
+  }, [filteredBranches, hasChanges, mode, currentBranch, onBranchSelected, onCreateBranchFromSelected, t, onCreateBranchFromCurrentChanges]);
 
   const handleDownshiftSelect = React.useCallback((selectedItem: any) => {
     if (!isProUser) {
+      return;
+    }
+    if (!selectedItem) {
+      onOpenChange(false);
+      return;
+    }
+
+    if (selectedItem.isCurrentChanges) {
+      onCreateBranchFromCurrentChanges();
       return;
     }
     if (mode === 'switch') {
@@ -121,12 +139,15 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
     if (mode === 'create') {
       onCreateBranchFromSelected(selectedItem.id);
     }
-  }, [mode, onCreateBranchFromSelected, onBranchSelected, isProUser]);
+  }, [isProUser, mode, onOpenChange, onCreateBranchFromCurrentChanges, onBranchSelected, onCreateBranchFromSelected]);
+
+  const handleItemToString = React.useCallback((item: any) => item?.label ?? '', []);
 
   return (
     <Downshift
       isOpen={isOpen}
       onSelect={handleDownshiftSelect}
+      itemToString={handleItemToString}
     >
       {({ getItemProps, getInputProps, highlightedIndex }) => (
         <div style={{ position: 'relative' }}>

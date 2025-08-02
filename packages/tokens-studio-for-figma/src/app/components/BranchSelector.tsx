@@ -50,7 +50,6 @@ export default function BranchSelector() {
   }, []);
 
   const handleOpenChangePopover = React.useCallback((open: boolean) => {
-    console.log('handleOpenChangePopover', open);
     setIsPopoverOpen(open);
   }, []);
 
@@ -71,14 +70,14 @@ export default function BranchSelector() {
     return null;
   }, [confirm, t]);
 
-  const createBranchByChange = React.useCallback(() => {
+  const createBranchFromCurrentChanges = React.useCallback(() => {
     track('Create new branch from current changes');
     setIsCurrentChanges(true);
     setStartBranch(currentBranch ?? null);
     setCreateBranchModalVisible(true);
   }, [currentBranch]);
 
-  const createNewBranchFrom = React.useCallback(
+  const createNewBranchFromSelected = React.useCallback(
     async (branch: string) => {
       track('Create new branch from specific branch');
 
@@ -121,7 +120,6 @@ export default function BranchSelector() {
       } else {
         await changeAndPull(branch);
       }
-      setIsPopoverOpen(false);
     },
     [askUserIfPushChanges, changeAndPull, hasChanges],
   );
@@ -145,8 +143,8 @@ export default function BranchSelector() {
         isOpen={isPopoverOpen}
         onOpenChange={handleOpenChangePopover}
         onBranchSelected={onBranchSelected}
-        onCreateBranchFromSelected={createNewBranchFrom}
-        onCreateBranchFromCurrentChanges={createBranchByChange}
+        onCreateBranchFromSelected={createNewBranchFromSelected}
+        onCreateBranchFromCurrentChanges={createBranchFromCurrentChanges}
         branches={branchState.branches}
         currentBranch={currentBranch}
       />
