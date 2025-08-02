@@ -4,5 +4,10 @@
   "cancel": "Cancel",
   "createNewBranch": "Create new branch from",
   "currentChanges": "Current changes",
-  "unSavedChanges": "You have unsaved changes"
+  "unSavedChanges": "You have unsaved changes",
+  "createNew": "Create new",
+  "search": "Search...",
+  "noBranchesFound": "No branches found",
+  "branchingProFeature": "Branching is a feature of the Pro subscription",
+  "upgradeToPro": "Upgrade to Pro to create and switch branches"
 }
