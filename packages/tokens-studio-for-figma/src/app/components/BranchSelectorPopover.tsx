@@ -190,6 +190,7 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
                       top: 0,
                       display: 'flex',
                       alignItems: 'center',
+                      gap: '$1',
                     }}
                   >
                     {(mode === 'create') && (
