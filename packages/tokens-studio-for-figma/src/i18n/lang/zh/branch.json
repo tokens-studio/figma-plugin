@@ -4,5 +4,10 @@
   "cancel": "取消",
   "createNewBranch": "创建新分支",
   "currentChanges": "目前的更改",
-  "unSavedChanges": "您有未保存的更改"
+  "unSavedChanges": "您有未保存的更改",
+  "createNew": "新建",
+  "search": "搜索...",
+  "noBranchesFound": "未找到分支",
+  "branchingProFeature": "分支管理是Pro订阅的功能",
+  "upgradeToPro": "升级到Pro以创建和切换分支"
 }

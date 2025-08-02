@@ -4,5 +4,10 @@
   "cancel": "रद्द करना",
   "createNewBranch": "से नई शाखा बनाएं",
   "currentChanges": "वर्तमान परिवर्तन",
-  "unSavedChanges": "आपके पास सहेजे नहीं गए परिवर्तन हैं"
+  "unSavedChanges": "आपके पास सहेजे नहीं गए परिवर्तन हैं",
+  "createNew": "नया बनाएं",
+  "search": "खोजें...",
+  "noBranchesFound": "कोई शाखा नहीं मिली",
+  "branchingProFeature": "शाखा प्रबंधन Pro सदस्यता की एक सुविधा है",
+  "upgradeToPro": "शाखाएं बनाने और बदलने के लिए Pro में अपग्रेड करें"
 }
