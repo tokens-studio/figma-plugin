@@ -19,6 +19,7 @@ export function findDifferentState(baseState: CompareStateType, compareState: Co
     const newTokens: ImportToken[] = [];
     const updatedTokens: ImportToken[] = [];
     const removedTokens: ImportToken[] = [];
+
     // Find different tokens and new tokens in compareState
     values.forEach((token) => {
       const oldValue = baseState.tokens[tokenSet]?.find((t) => t.name === token.name);
@@ -40,6 +41,7 @@ export function findDifferentState(baseState: CompareStateType, compareState: Co
         newTokens.push({ ...token, importType: 'NEW' });
       }
     });
+
     // Find the new tokens in baseState
     baseState.tokens[tokenSet]?.forEach((token) => {
       const oldValue = compareState.tokens[tokenSet]?.find((t) => t.name === token.name);
@@ -47,6 +49,7 @@ export function findDifferentState(baseState: CompareStateType, compareState: Co
         removedTokens.push({ ...token, importType: 'REMOVE' });
       }
     });
+
     const totalUpdatedTokens = [...newTokens, ...updatedTokens, ...removedTokens];
     entries.push([tokenSet, totalUpdatedTokens]);
   });
@@ -54,6 +57,7 @@ export function findDifferentState(baseState: CompareStateType, compareState: Co
   // Find the new tokenSet in baseState
   Object.entries(baseState.tokens).forEach(([tokenSet, values]) => {
     const isTokenSetRemoved = typeof compareState.tokens[tokenSet] === 'undefined';
+
     if (isTokenSetRemoved) {
       entries.push([tokenSet, values.map((token) => ({ ...token, importType: 'REMOVE' }))]);
     }

@@ -216,7 +216,30 @@ export class ADOTokenStorage extends GitTokenStorage {
           includeContent: true,
         },
       });
-      return await response.json();
+
+      if (!response.ok) {
+        return {};
+      }
+
+      const jsonData = await response.json();
+
+      // Check if this is the new Azure DevOps API response format with base64 content
+      if (jsonData.content && jsonData.encoding === 'base64') {
+        try {
+          const decodedContent = atob(jsonData.content);
+          const parsedContent = JSON.parse(decodedContent);
+          return parsedContent;
+        } catch (decodeError) {
+          return {};
+        }
+      }
+
+      // Check if this is already parsed JSON content (old format)
+      if (jsonData && typeof jsonData === 'object' && !jsonData.content && !jsonData.encoding) {
+        return jsonData;
+      }
+
+      return jsonData;
     } catch (e) {
       console.log(e);
       return {};
@@ -257,18 +280,55 @@ export class ADOTokenStorage extends GitTokenStorage {
 
         const jsonFileContents = await Promise.all(
           jsonFiles.map(async ({ path }) => {
-            const res = await this.getItem(path);
-            const validationResult = await multiFileSchema.safeParseAsync(res);
-            if (validationResult.success) {
-              return validationResult.data;
+            try {
+              const res = await this.getItem(path);
+
+              if (!res || (typeof res === 'object' && Object.keys(res).length === 0)) {
+                return null;
+              }
+
+              const validationResult = await multiFileSchema.safeParseAsync(res);
+              if (validationResult.success) {
+                return validationResult.data;
+              } else {
+                return null;
+              }
+            } catch (error) {
+              return null;
             }
-            return null;
           }),
         );
+
+        const failedIndices = jsonFileContents
+          .map((content, index) => content === null ? index : -1)
+          .filter(index => index !== -1);
+
+        // Retry failed files sequentially
+        if (failedIndices.length > 0) {
+          for (const failedIndex of failedIndices) {
+            const { path } = jsonFiles[failedIndex];
+            try {
+              const res = await this.getItem(path);
+
+              if (res && !(typeof res === 'object' && Object.keys(res).length === 0)) {
+                const validationResult = await multiFileSchema.safeParseAsync(res);
+                if (validationResult.success) {
+                  jsonFileContents[failedIndex] = validationResult.data;
+                }
+              }
+
+              await new Promise(resolve => setTimeout(resolve, 100));
+            } catch (error) {
+              // Ignore retry errors
+            }
+          }
+        }
+
         return compact(jsonFileContents.map<RemoteTokenStorageFile | null>((fileContent, index) => {
           const { path } = jsonFiles[index];
           if (fileContent) {
             const name = path?.replace(this.path, '')?.replace(/^\/+/, '')?.replace('.json', '');
+
             if (name === SystemFilenames.THEMES && Array.isArray(fileContent)) {
               return {
                 path,
@@ -328,6 +388,7 @@ export class ADOTokenStorage extends GitTokenStorage {
           })),
         ];
       }
+
       if (singleItem.errorCode === 0) {
         return [];
       }

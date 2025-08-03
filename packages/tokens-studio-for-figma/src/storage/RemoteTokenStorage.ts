@@ -96,11 +96,13 @@ export abstract class RemoteTokenStorage<
     // start by reading the files from the remote source
     // it is up to the remote storage implementation to split it up into "File" objects
     const files = await this.read();
+
     // successfully fetch data
     if (Array.isArray(files)) {
       if (files.length === 0) {
         return null;
       }
+
       files.forEach((file) => {
         if (file.type === 'themes') {
           data.themes = [...data.themes, ...file.data];
@@ -116,6 +118,7 @@ export abstract class RemoteTokenStorage<
           };
         }
       });
+
       return {
         status: 'success',
         ...data,
