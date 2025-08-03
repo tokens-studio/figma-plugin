@@ -3,7 +3,7 @@ import { ThemeObjectsList } from '@/types';
 import { StyleIdMap, StyleThemeMap } from '@/types/StyleIdMap';
 import { applySiblingStyleId } from './applySiblingStyle';
 
-function getRootNode(updateMode: UpdateMode) {
+async function getRootNode(updateMode: UpdateMode) {
   const rootNode: SceneNode[] = [];
   switch (updateMode) {
     case UpdateMode.PAGE:
@@ -13,6 +13,8 @@ function getRootNode(updateMode: UpdateMode) {
       if (figma.currentPage.selection) rootNode.push(...figma.currentPage.selection);
       break;
     case UpdateMode.DOCUMENT:
+      // Load all pages first to ensure they're available
+      await figma.loadAllPagesAsync();
       figma.root.children.forEach((page) => rootNode.push(...page.children));
       break;
     default:
@@ -46,7 +48,8 @@ export async function swapStyles(activeTheme: Record<string, string>, themes: Th
     return;
   }
 
-  getRootNode(updateMode).forEach((layer) => {
+  const rootNodes = await getRootNode(updateMode);
+  rootNodes.forEach((layer) => {
     applySiblingStyleId(layer, allStyleIds, mappedStyleReferences, activeThemes);
   });
 }
