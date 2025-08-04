@@ -4,5 +4,10 @@
   "cancel": "Annuleren",
   "createNewBranch": "Maak een nieuwe tak van",
   "currentChanges": "Huidige wijzigingen",
-  "unSavedChanges": "U heeft niet-opgeslagen wijzigingen"
+  "unSavedChanges": "U heeft niet-opgeslagen wijzigingen",
+  "createNew": "Nieuw maken",
+  "search": "Zoeken...",
+  "noBranchesFound": "Geen takken gevonden",
+  "branchingProFeature": "Branching is een functie van het Pro-abonnement",
+  "upgradeToPro": "Upgrade naar Pro om takken te maken en te wisselen"
 }
