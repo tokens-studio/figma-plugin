@@ -22,6 +22,7 @@ import { TabButton } from '../TabButton';
 import { ThemeStyleManagementForm } from './ThemeStyleManagementForm';
 import { TokenSetTreeContent } from '../TokenSetTree/TokenSetTreeContent';
 import { ThemeGroupDropDownMenu } from './ThemeGroupDropDownMenu';
+import { SearchInputWithToggle } from '../SearchInputWithToggle';
 
 export type FormValues = {
   name: string
@@ -47,6 +48,8 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
   const store = useStore<RootState>();
   const [activeTab, setActiveTab] = useState(ThemeFormTabs.SETS);
   const [showGroupInput, setShowGroupInput] = useState(false);
+  const [isSearchActive, setIsSearchActive] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const githubMfsEnabled = useIsGitMultiFileEnabled();
   const selectedTokenSets = useMemo(() => (
     usedTokenSetSelector(store.getState())
@@ -61,6 +64,44 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
       ? tokenSetListToTree(availableTokenSets)
       : tokenSetListToList(availableTokenSets)
   ), [githubMfsEnabled, availableTokenSets]);
+
+  const filteredTreeOrListItems = useMemo(() => {
+    if (!searchTerm || !isSearchActive) {
+      return treeOrListItems;
+    }
+
+    const lowerSearchTerm = searchTerm.toLowerCase();
+    const matchingItems = new Set<string>();
+
+    // First pass: find all items that match the search term
+    treeOrListItems.forEach((item) => {
+      if (item.label.toLowerCase().includes(lowerSearchTerm)) {
+        matchingItems.add(item.path);
+
+        // Add all parent paths
+        let currentParentPath = item.parent;
+        while (currentParentPath && currentParentPath !== '') {
+          matchingItems.add(currentParentPath);
+          const pathToFind = currentParentPath;
+          const parentItem = treeOrListItems.find((i) => i.path === pathToFind);
+          currentParentPath = parentItem?.parent || null;
+        }
+      }
+    });
+
+    // Second pass: include children of matching folders
+    treeOrListItems.forEach((item) => {
+      if (!item.isLeaf && matchingItems.has(item.path)) {
+        treeOrListItems.forEach((child) => {
+          if (child.path.startsWith(`${item.path}/`)) {
+            matchingItems.add(child.path);
+          }
+        });
+      }
+    });
+
+    return treeOrListItems.filter((item) => matchingItems.has(item.path));
+  }, [treeOrListItems, searchTerm, isSearchActive]);
 
   const {
     register, handleSubmit, control, resetField,
@@ -98,6 +139,17 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
   const handleAddGroup = React.useCallback(() => [
     setShowGroupInput(true),
   ], []);
+
+  const handleSearchTermChange = useCallback((term: string) => {
+    setSearchTerm(term);
+  }, []);
+
+  const handleToggleSearch = useCallback(() => {
+    setIsSearchActive(!isSearchActive);
+    if (isSearchActive) {
+      setSearchTerm('');
+    }
+  }, [isSearchActive]);
 
   return (
     <StyledForm id="form-create-or-edit-theme" onSubmit={handleSubmit(onSubmit)}>
@@ -185,20 +237,81 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
         </StyledCreateOrEditThemeFormHeaderFlex>
       </StyledNameInputBox>
       {id && (
+        <>
+          <StyledCreateOrEditThemeFormTabsFlex>
+            <TabButton name={ThemeFormTabs.SETS} activeTab={activeTab} label={t('sets.title')} onSwitch={setActiveTab} small />
+            <TabButton name={ThemeFormTabs.STYLES_VARIABLES} activeTab={activeTab} label={t('stylesAndVariables')} onSwitch={setActiveTab} small />
+          </StyledCreateOrEditThemeFormTabsFlex>
 
-      <StyledCreateOrEditThemeFormTabsFlex>
-        <TabButton name={ThemeFormTabs.SETS} activeTab={activeTab} label={t('sets.title')} onSwitch={setActiveTab} small />
-        <TabButton name={ThemeFormTabs.STYLES_VARIABLES} activeTab={activeTab} label={t('stylesAndVariables')} onSwitch={setActiveTab} small />
-      </StyledCreateOrEditThemeFormTabsFlex>
+          {activeTab === ThemeFormTabs.SETS && (
+            <Box css={{ padding: '$3 $4' }}>
+              <Stack direction="row" justify="between" align="center" gap={4}>
+                <Box css={{
+                  fontSize: '$small', fontWeight: '$sansMedium', color: '$fgDefault', flexShrink: 0, whiteSpace: 'nowrap',
+                }}
+                >
+                  {t('nSets')}
+                </Box>
+                <SearchInputWithToggle
+                  isSearchActive={isSearchActive}
+                  searchTerm={searchTerm}
+                  onToggleSearch={handleToggleSearch}
+                  onSearchTermChange={handleSearchTermChange}
+                  placeholder={t('searchTokenSets')}
+                  tooltip={t('searchSets')}
+                  autofocus
+                />
+              </Stack>
+            </Box>
+          )}
+        </>
+      )}
+      {!id && (
+        <Box css={{ padding: '$3 $4', borderBottom: '1px solid $borderSubtled' }}>
+          <Stack direction="row" justify="between" align="center" gap={isSearchActive ? 2 : 0}>
+            <Box css={{ fontSize: '$small', fontWeight: '$sansMedium', color: '$fgDefault' }}>
+              {t('sets.title')}
+            </Box>
+            <SearchInputWithToggle
+              isSearchActive={isSearchActive}
+              searchTerm={searchTerm}
+              onToggleSearch={handleToggleSearch}
+              onSearchTermChange={handleSearchTermChange}
+              placeholder={t('searchTokenSets')}
+              tooltip={t('searchSets')}
+              autofocus
+            />
+          </Stack>
+        </Box>
       )}
       <Stack direction="column" gap={1}>
-        {activeTab === ThemeFormTabs.SETS && (
+        {(id ? activeTab === ThemeFormTabs.SETS : true) && (
         <Stack direction="column" gap={1} css={{ padding: '$3 $4 $3' }}>
-          <TokenSetTreeContent
-            items={treeOrListItems}
-            renderItemContent={TokenSetThemeItemInput}
-            keyPosition="end"
-          />
+          {(() => {
+            if (filteredTreeOrListItems.length > 0) {
+              return (
+                <TokenSetTreeContent
+                  items={filteredTreeOrListItems}
+                  renderItemContent={TokenSetThemeItemInput}
+                  keyPosition="end"
+                />
+              );
+            }
+            if (isSearchActive && searchTerm) {
+              return (
+                <Box css={{ padding: '$4', textAlign: 'center', color: '$fgMuted' }}>
+                  No sets found
+                </Box>
+              );
+            }
+            return (
+              <TokenSetTreeContent
+                items={filteredTreeOrListItems}
+                renderItemContent={TokenSetThemeItemInput}
+                keyPosition="end"
+              />
+            );
+          })()}
         </Stack>
         )}
         {(activeTab === ThemeFormTabs.STYLES_VARIABLES && id) && (
