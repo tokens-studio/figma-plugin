@@ -1,24 +1,6 @@
 import { SingleToken } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
-
-export function processNumberValue(value: SingleToken['value']): number | string {
-  if (typeof value === 'number') {
-    return value;
-  }
-
-  if (typeof value === 'string') {
-    const trimmedValue = value.trim();
-    const numericValue = Number(trimmedValue);
-    if (!isNaN(numericValue) && isFinite(numericValue) && trimmedValue !== '') {
-      if (/^-?\d*\.?\d+$/.test(trimmedValue)) {
-        return numericValue;
-      }
-    }
-    return trimmedValue;
-  }
-
-  return value as string;
-}
+import { processNumberValue } from './processNumberValue';
 
 export default function trimValue(value: SingleToken['value'], tokenType?: TokenTypes): SingleToken['value'] {
   if (tokenType === TokenTypes.NUMBER) {

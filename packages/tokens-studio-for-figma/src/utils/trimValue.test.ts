@@ -1,6 +1,6 @@
 import { BoxShadowTypes } from '@/constants/BoxShadowTypes';
 import { TokenTypes } from '@/constants/TokenTypes';
-import trimValue, { processNumberValue } from './trimValue';
+import trimValue from './trimValue';
 
 const regularValue = ['#ff00ff', ' #ff00ff', '#ff00ff ', ' #ff00ff '];
 const typographyValue = {
@@ -71,34 +71,6 @@ describe('trimValue', () => {
         type: BoxShadowTypes.DROP_SHADOW,
       },
     ]);
-  });
-
-  describe('processNumberValue', () => {
-    it('should return number as-is when value is already a number', () => {
-      expect(processNumberValue(42)).toBe(42);
-      expect(processNumberValue(0)).toBe(0);
-      expect(processNumberValue(-3.14)).toBe(-3.14);
-    });
-
-    it('should parse valid numeric strings to numbers', () => {
-      expect(processNumberValue('42')).toBe(42);
-      expect(processNumberValue(' 42 ')).toBe(42);
-      expect(processNumberValue('0')).toBe(0);
-      expect(processNumberValue('-3.14')).toBe(-3.14);
-      expect(processNumberValue('1.5')).toBe(1.5);
-    });
-
-    it('should return trimmed string for non-numeric strings', () => {
-      expect(processNumberValue('16px')).toBe('16px');
-      expect(processNumberValue(' hello ')).toBe('hello');
-      expect(processNumberValue('abc')).toBe('abc');
-      expect(processNumberValue('')).toBe('');
-    });
-
-    it('should return trimmed string for invalid numbers', () => {
-      expect(processNumberValue('NaN')).toBe('NaN');
-      expect(processNumberValue('Infinity')).toBe('Infinity');
-    });
   });
 
   describe('number token handling', () => {

@@ -4,7 +4,7 @@ import { AnyTokenList } from '@/types/tokens';
 import removeTokenId from './removeTokenId';
 import { TokenFormat, TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 import { TokenInJSON } from './convertTokens';
-import { processNumberValue } from './trimValue';
+import { processNumberValue } from './processNumberValue';
 import { TokenTypes } from '@/constants/TokenTypes';
 
 export function getGroupTypeName(tokenName: string, groupLevel: number): string {
