@@ -15,7 +15,10 @@ export function processNumberValue(value: SingleToken['value']): number | string
   if (typeof value === 'string') {
     const trimmedValue = value.trim();
     const numericValue = Number(trimmedValue);
+    // Check if the value is a valid number and not empty
     if (!isNaN(numericValue) && isFinite(numericValue) && trimmedValue !== '') {
+      // Use regex to ensure it's a proper numeric format (optional minus, digits, optional decimal point, digits)
+      // This prevents conversion of values like "1e5", "0x10", "Infinity", etc.
       if (/^-?\d*\.?\d+$/.test(trimmedValue)) {
         return numericValue;
       }
