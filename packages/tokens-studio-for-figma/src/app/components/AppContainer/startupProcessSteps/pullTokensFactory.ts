@@ -116,16 +116,7 @@ export function pullTokensFactory(
 
           const { type, message } = categorizeError(err);
           dispatch.uiState.setLastError({ type, message });
-
-          if (type === 'parsing') {
-            notifyToUI('Failed to parse token file - check JSON format', { error: true });
-          } else if (type === 'credential') {
-            notifyToUI('Failed to fetch tokens, check your credentials', { error: true });
-          } else if (type === 'connectivity') {
-            notifyToUI('Unable to connect to the service. Please check your internet connection or try again later.', { error: true });
-          } else {
-            notifyToUI('Failed to fetch tokens from remote storage', { error: true });
-          }
+          notifyToUI(message, { error: true });
         }
       } else {
         // no API credentials available for storage type
