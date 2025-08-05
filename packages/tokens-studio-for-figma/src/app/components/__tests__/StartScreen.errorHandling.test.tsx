@@ -5,11 +5,6 @@ import StartScreen from '../StartScreen';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 
-// Mock the track function
-jest.mock('@/utils/analytics', () => ({
-  track: jest.fn(),
-}));
-
 // Mock the useRemoteTokens hook
 jest.mock('@/app/store/remoteTokens', () => ({
   __esModule: true,
