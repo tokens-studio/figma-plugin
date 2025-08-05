@@ -531,11 +531,13 @@ describe('GithubTokenStorage', () => {
     mockGetContent.mockClear();
   });
 
-  it('should return an empty array when reading results in an error', async () => {
+  it('should return an error message when reading results in an error', async () => {
     mockGetContent.mockImplementationOnce(() => (
       Promise.reject(new Error())
     ));
-    expect(await storageProvider.read()).toEqual([]);
+    const result = await storageProvider.read();
+    expect(result).toHaveProperty('errorMessage');
+    expect(typeof result).toBe('object');
   });
 
   it('should be able to write', async () => {
