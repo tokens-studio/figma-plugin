@@ -111,9 +111,14 @@ export const useADO = () => {
             errorMessage: e.message,
           };
         }
+        const { message } = categorizeError(e, {
+          provider: StorageProviderType.ADO,
+          operation: 'push',
+          hasCredentials: true,
+        });
         return {
           status: 'failure',
-          errorMessage: ErrorMessages.ADO_CREDENTIAL_ERROR,
+          errorMessage: message,
         };
       }
     }

@@ -121,9 +121,14 @@ export function useGitLab() {
             errorMessage: e.message,
           };
         }
+        const { message } = categorizeError(e, {
+          provider: StorageProviderType.GITLAB,
+          operation: 'push',
+          hasCredentials: true,
+        });
         return {
           status: 'failure',
-          errorMessage: ErrorMessages.GITLAB_CREDENTIAL_ERROR,
+          errorMessage: message,
         };
       }
     }
@@ -250,7 +255,11 @@ export function useGitLab() {
       }
       return await pushTokensToGitLab(context);
     } catch (err) {
-      const { type, message } = categorizeError(err);
+      const { type, message } = categorizeError(err, {
+        provider: StorageProviderType.GITLAB,
+        operation: 'sync',
+        hasCredentials: true,
+      });
       console.log('Error', err);
 
       if (type === 'parsing') {
@@ -260,10 +269,10 @@ export function useGitLab() {
           errorMessage: message,
         };
       }
-      notifyToUI(ErrorMessages.GITLAB_CREDENTIAL_ERROR, { error: true });
+      notifyToUI(message, { error: true });
       return {
         status: 'failure',
-        errorMessage: ErrorMessages.GITLAB_CREDENTIAL_ERROR,
+        errorMessage: message,
       };
     }
   }, [

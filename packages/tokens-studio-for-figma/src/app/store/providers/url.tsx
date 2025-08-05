@@ -60,7 +60,7 @@ export default function useURL() {
           },
         });
 
-        if (Object.keys(content.tokens).length) {
+        if (content.tokens && Object.keys(content.tokens).length) {
           dispatch.tokenState.setTokenData({
             values: applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder),
             themes: content.themes,
@@ -77,7 +77,16 @@ export default function useURL() {
           dispatch.tokenState.setEditProhibited(true);
           return content;
         }
+        const { message } = categorizeError(new Error('401 Unauthorized - No tokens found'), {
+          provider: StorageProviderType.URL,
+          operation: 'pull',
+          hasCredentials: true,
+        });
         notifyToUI('No tokens stored on remote', { error: true });
+        return {
+          status: 'failure',
+          errorMessage: message,
+        };
       }
     } catch (err) {
       console.log('Error:', err);

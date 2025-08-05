@@ -108,9 +108,14 @@ export function useGitHub() {
             errorMessage: ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR,
           };
         }
+        const { message } = categorizeError(e, {
+          provider: StorageProviderType.GITHUB,
+          operation: 'push',
+          hasCredentials: true,
+        });
         return {
           status: 'failure',
-          errorMessage: ErrorMessages.GITHUB_CREDENTIAL_ERROR,
+          errorMessage: message,
         };
       }
     }
@@ -244,7 +249,11 @@ export function useGitHub() {
       }
       return await pushTokensToGitHub(context);
     } catch (e) {
-      const { type, message } = categorizeError(e);
+      const { type, message } = categorizeError(e, {
+        provider: StorageProviderType.GITHUB,
+        operation: 'sync',
+        hasCredentials: true,
+      });
       console.log('Error', e);
 
       if (type === 'parsing') {
@@ -254,10 +263,10 @@ export function useGitHub() {
           errorMessage: message,
         };
       }
-      notifyToUI(ErrorMessages.GITHUB_CREDENTIAL_ERROR, { error: true });
+      notifyToUI(message, { error: true });
       return {
         status: 'failure',
-        errorMessage: ErrorMessages.GITHUB_CREDENTIAL_ERROR,
+        errorMessage: message,
       };
     }
   }, [

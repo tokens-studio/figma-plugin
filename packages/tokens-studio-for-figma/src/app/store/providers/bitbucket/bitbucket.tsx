@@ -114,9 +114,14 @@ export function useBitbucket() {
             errorMessage: ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR,
           };
         }
+        const { message } = categorizeError(e, {
+          provider: StorageProviderType.BITBUCKET,
+          operation: 'push',
+          hasCredentials: true,
+        });
         return {
           status: 'failure',
-          errorMessage: ErrorMessages.BITBUCKET_CREDENTIAL_ERROR,
+          errorMessage: message,
         };
       }
     }
