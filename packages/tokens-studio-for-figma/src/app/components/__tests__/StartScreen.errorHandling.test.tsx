@@ -56,7 +56,8 @@ describe('StartScreen Error Handling', () => {
         },
         lastError: {
           type: 'credential',
-          message: '401 Unauthorized',
+          message: 'Could not load tokens from GitHub. Please check your credentials.',
+          header: 'Could not load tokens from GitHub',
         },
         apiProviders: [
           {
@@ -78,8 +79,8 @@ describe('StartScreen Error Handling', () => {
       </Provider>
     );
 
-    // Should show the default credential error message, not the specific 401 message
-    expect(screen.getByText(/unableToFetchRemoteWithCredentials/)).toBeInTheDocument();
+    // Should show the centralized credential error message
+    expect(screen.getByText(/Could not load tokens from GitHub. Please check your credentials./)).toBeInTheDocument();
   });
 
   it('should show connectivity error message when lastError type is connectivity', () => {
@@ -95,7 +96,8 @@ describe('StartScreen Error Handling', () => {
         },
         lastError: {
           type: 'connectivity',
-          message: 'Network request failed',
+          message: 'Unable to connect to GitHub. Please check your internet connection or try again later.',
+          header: 'Could not load tokens from GitHub',
         },
       },
     });
@@ -106,9 +108,8 @@ describe('StartScreen Error Handling', () => {
       </Provider>
     );
 
-    // Should show the connectivity error message
-    expect(screen.getByText(/Unable to connect to GitHub/)).toBeInTheDocument();
-    expect(screen.getByText(/check your internet connection or try again later/)).toBeInTheDocument();
+    // Should show the centralized connectivity error message
+    expect(screen.getByText(/Unable to connect to GitHub. Please check your internet connection or try again later./)).toBeInTheDocument();
   });
 
   it('should show specific error message when lastError type is other', () => {
