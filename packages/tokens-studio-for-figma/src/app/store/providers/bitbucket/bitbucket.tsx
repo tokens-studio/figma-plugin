@@ -176,9 +176,14 @@ export function useBitbucket() {
         }
       } catch (e) {
         console.log('Error', e);
+        const { message } = categorizeError(e, {
+          provider: StorageProviderType.BITBUCKET,
+          operation: 'pull',
+          hasCredentials: true,
+        });
         return {
           status: 'failure',
-          errorMessage: ErrorMessages.BITBUCKET_CREDENTIAL_ERROR,
+          errorMessage: message,
         };
       }
       return null;

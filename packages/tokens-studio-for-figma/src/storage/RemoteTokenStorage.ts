@@ -5,6 +5,7 @@ import convertTokensToObject from '@/utils/convertTokensToObject';
 import parseTokenValues from '@/utils/parseTokenValues';
 import { SystemFilenames } from '@/constants/SystemFilenames';
 import { categorizeError } from '@/utils/error/categorizeError';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 
 export type RemoteTokenStorageMetadata = {
   tokenSetOrder?: string[];
@@ -60,8 +61,12 @@ export abstract class RemoteTokenStorage<
   public abstract write(files: RemoteTokenStorageFile<Metadata>[], saveOptions?: SaveOptions): Promise<boolean>;
   public abstract read(): Promise<RemoteTokenStorageFile<Metadata>[] | RemoteTokenstorageErrorMessage>;
 
-  protected handleError(error: any): RemoteTokenstorageErrorMessage {
-    const { message } = categorizeError(error);
+  protected handleError(error: any, provider?: StorageProviderType): RemoteTokenstorageErrorMessage {
+    const { message } = categorizeError(error, {
+      provider,
+      operation: 'read',
+      hasCredentials: true,
+    });
     return { errorMessage: message };
   }
 

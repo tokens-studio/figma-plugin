@@ -280,13 +280,14 @@ const contextMap = {
   url: urlContext,
 };
 
+// Updated error messages to match centralized error handling with provider context
 const errorMessageMap = {
-  GitHub: ErrorMessages.GITHUB_CREDENTIAL_ERROR,
-  GitLab: ErrorMessages.GITLAB_CREDENTIAL_ERROR,
-  Bitbucket: ErrorMessages.BITBUCKET_CREDENTIAL_ERROR,
-  ADO: ErrorMessages.ADO_CREDENTIAL_ERROR,
-  jsonbin: ErrorMessages.JSONBIN_CREDENTIAL_ERROR,
-  url: ErrorMessages.URL_CREDENTIAL_ERROR,
+  GitHub: 'Could not load tokens from GitHub. Please check your credentials.',
+  GitLab: 'Could not load tokens from GitLab. Please check your credentials.',
+  Bitbucket: 'Could not load tokens from Bitbucket (Beta). Please check your credentials.',
+  ADO: 'Could not load tokens from ADO. Please check your credentials.',
+  jsonbin: 'Could not load tokens from JSONBin.io. Please check your credentials.',
+  url: 'Could not load tokens from URL. Please check your credentials.',
 };
 
 describe('remoteTokens', () => {
@@ -415,7 +416,7 @@ describe('remoteTokens', () => {
     it(`Pull tokens from ${context.provider}, should return credential error message when fetching a data throws an error`, async () => {
       await result.current.pullTokens({ context: context as StorageTypeCredentials });
       mockRetrieve.mockImplementation(() => {
-        throw new Error('Error');
+        throw new Error('401 Unauthorized');
       });
       expect(await result.current.pullTokens({ context: context as StorageTypeCredentials })).toEqual({
         status: 'failure',
@@ -597,7 +598,7 @@ describe('remoteTokens', () => {
         Promise.resolve(['main'])
       ));
       mockRetrieve.mockImplementation(() => {
-        throw new Error('Error');
+        throw new Error('401 Unauthorized');
       });
       await waitFor(() => { result.current.restoreStoredProvider(context as StorageTypeCredentials); });
       expect(notifyToUI).toBeCalledTimes(1);
@@ -826,7 +827,7 @@ describe('remoteTokens', () => {
         ));
         if (context === urlContext) {
           expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
-            errorMessage: ErrorMessages.URL_CREDENTIAL_ERROR,
+            errorMessage: 'Could not load tokens from URL. Please check your credentials.',
             status: 'failure',
           });
         } else {

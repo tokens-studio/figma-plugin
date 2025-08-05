@@ -10,6 +10,7 @@ import { AnyTokenSet } from '@/types/tokens';
 import { ThemeObjectsList } from '@/types';
 import { SystemFilenames } from '@/constants/SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 
 enum GitLabAccessLevel {
   NoAccess = 0,
@@ -235,7 +236,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
             })),
           ];
         } catch (parseError) {
-          return this.handleError(parseError);
+          return this.handleError(parseError, StorageProviderType.GITLAB);
         }
       }
       return {
@@ -243,7 +244,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
       };
     } catch (err) {
       console.error(err);
-      return this.handleError(err);
+      return this.handleError(err, StorageProviderType.GITLAB);
     }
   }
 

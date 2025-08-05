@@ -182,9 +182,14 @@ export function useGitLab() {
       }
     } catch (e) {
       console.log('Error', e);
+      const { message } = categorizeError(e, {
+        provider: StorageProviderType.GITLAB,
+        operation: 'pull',
+        hasCredentials: true,
+      });
       return {
         status: 'failure',
-        errorMessage: ErrorMessages.GITLAB_CREDENTIAL_ERROR,
+        errorMessage: message,
       };
     }
     return null;

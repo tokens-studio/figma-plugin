@@ -166,9 +166,14 @@ export const useADO = () => {
       }
     } catch (e) {
       console.log('Error', e);
+      const { message } = categorizeError(e, {
+        provider: StorageProviderType.ADO,
+        operation: 'pull',
+        hasCredentials: true,
+      });
       return {
         status: 'failure',
-        errorMessage: ErrorMessages.ADO_CREDENTIAL_ERROR,
+        errorMessage: message,
       };
     }
     return null;

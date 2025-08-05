@@ -10,6 +10,7 @@ import { AnyTokenSet } from '@/types/tokens';
 import { ThemeObjectsList } from '@/types';
 import { SystemFilenames } from '@/constants/SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 
 type CreatedOrUpdatedFileType = {
   owner: string;
@@ -285,7 +286,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
       };
     } catch (e) {
       console.error('Error', e);
-      return this.handleError(e);
+      return this.handleError(e, StorageProviderType.BITBUCKET);
     }
   }
 

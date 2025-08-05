@@ -172,9 +172,14 @@ export function useGitHub() {
         };
       }
     } catch (e) {
+      const { message } = categorizeError(e, {
+        provider: StorageProviderType.GITHUB,
+        operation: 'pull',
+        hasCredentials: true,
+      });
       return {
         status: 'failure',
-        errorMessage: ErrorMessages.GITHUB_CREDENTIAL_ERROR,
+        errorMessage: message,
       };
     }
     return null;
