@@ -10,6 +10,7 @@ describe('categorizeError', () => {
       expect(result.type).toBe('parsing');
       expect(result.message).toContain(ErrorMessages.JSON_PARSE_ERROR);
       expect(result.message).toContain('Unexpected token } in JSON at position 10');
+      expect(result.header).toBe('JSON Parsing Error');
     });
 
     it('should categorize unexpected end of JSON input', () => {

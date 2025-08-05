@@ -90,7 +90,8 @@ export function pullTokensFactory(
             if (remoteData?.status === 'failure') {
               const type = remoteData.errorType || 'other';
               const message = remoteData.errorMessage;
-              dispatch.uiState.setLastError({ type, message });
+              const header = remoteData.errorHeader;
+              dispatch.uiState.setLastError({ type, message, header });
               notifyToUI(message, { error: true });
               dispatch.uiState.setActiveTab(Tabs.START);
             } else {
@@ -106,8 +107,8 @@ export function pullTokensFactory(
           dispatch.uiState.setActiveTab(Tabs.START);
           dispatch.uiState.completeJob(BackgroundJobs.UI_PULLTOKENS);
 
-          const { type, message } = categorizeError(err);
-          dispatch.uiState.setLastError({ type, message });
+          const { type, message, header } = categorizeError(err);
+          dispatch.uiState.setLastError({ type, message, header });
           notifyToUI(message, { error: true });
         }
       } else {

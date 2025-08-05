@@ -30,16 +30,8 @@ function PullDialog() {
   const getErrorHeading = React.useCallback(() => {
     if (!lastError) return t('genericError');
 
-    switch (lastError.type) {
-      case 'parsing':
-        return t('failedToParseJSON');
-      case 'credential':
-        return t('credentialError');
-      case 'connectivity':
-        return t('connectivityError');
-      default:
-        return t('genericError');
-    }
+    // Use the centralized header if available, otherwise fall back to generic error
+    return lastError.header || t('genericError');
   }, [lastError, t]);
 
   switch (pullDialogMode) {

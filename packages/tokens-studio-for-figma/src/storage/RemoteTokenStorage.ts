@@ -66,11 +66,12 @@ export abstract class RemoteTokenStorage<
   }
 
   protected createErrorResponse(error: any): RemoteResponseData<Metadata> {
-    const { type, message } = categorizeError(error);
+    const { type, message, header } = categorizeError(error);
     return {
       status: 'failure',
       errorMessage: message,
       errorType: type,
+      errorHeader: header,
     };
   }
 

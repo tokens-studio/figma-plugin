@@ -3,11 +3,12 @@ import { ErrorMessages } from '@/constants/ErrorMessages';
 /**
  * Categorizes an error to determine if it's a JSON parsing error, credential error, connectivity error, or other
  * @param error - The error object or string
- * @returns Object with error type and appropriate error message
+ * @returns Object with error type, message, and optional header for display
  */
 export function categorizeError(error: any): {
   type: 'credential' | 'parsing' | 'connectivity' | 'other';
   message: string;
+  header?: string;
 } {
   const errorString = String(error);
   const errorMessage = error?.message || errorString;
@@ -24,6 +25,7 @@ export function categorizeError(error: any): {
     return {
       type: 'parsing',
       message: `${ErrorMessages.JSON_PARSE_ERROR}: ${errorMessage}`,
+      header: 'JSON Parsing Error',
     };
   }
 
@@ -54,6 +56,7 @@ export function categorizeError(error: any): {
     return {
       type: 'connectivity',
       message: errorMessage,
+      header: 'Connection Error',
     };
   }
 
@@ -71,6 +74,7 @@ export function categorizeError(error: any): {
     return {
       type: 'credential',
       message: errorMessage,
+      header: 'Authentication Error',
     };
   }
 
@@ -78,5 +82,6 @@ export function categorizeError(error: any): {
   return {
     type: 'other',
     message: errorMessage,
+    header: 'Error',
   };
 }

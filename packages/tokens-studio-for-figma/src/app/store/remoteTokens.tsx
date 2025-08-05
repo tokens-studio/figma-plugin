@@ -160,19 +160,22 @@ export default function useRemoteTokens() {
         }
       } catch (err) {
         console.error('Error pulling tokens:', err);
-        const { type, message } = categorizeError(err);
+        const { type, message, header } = categorizeError(err);
         // Create a failure response for the error
         remoteData = {
           status: 'failure',
           errorMessage: message,
           errorType: type,
+          errorHeader: header,
         } as RemoteResponseData<unknown>;
       }
 
       // Handle errors - show error dialog and set error state
       if (remoteData?.status === 'failure') {
-        const { type, message } = categorizeError(remoteData.errorMessage);
-        dispatch.uiState.setLastError({ type, message });
+        const type = remoteData.errorType || 'other';
+        const message = remoteData.errorMessage;
+        const header = remoteData.errorHeader;
+        dispatch.uiState.setLastError({ type, message, header });
         showPullDialogError();
         return remoteData;
       }

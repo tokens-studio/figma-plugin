@@ -92,29 +92,9 @@ function StartScreen() {
       };
     }
 
-    if (lastError.type === 'parsing') {
-      return {
-        heading: t('couldNotLoadTokens', { provider: transformProviderName(storageType?.provider) }),
-        description: lastError.message,
-      };
-    }
-
-    if (lastError.type === 'credential') {
-      return {
-        heading: t('couldNotLoadTokens', { provider: transformProviderName(storageType?.provider) }),
-        description: matchingProvider ? t('unableToFetchRemoteWithCredentials') : t('unableToFetchRemoteNoCredentials'),
-      };
-    }
-
-    if (lastError.type === 'connectivity') {
-      return {
-        heading: t('couldNotLoadTokens', { provider: transformProviderName(storageType?.provider) }),
-        description: `Unable to connect to ${transformProviderName(storageType?.provider)}. Please check your internet connection or try again later.`,
-      };
-    }
-
+    // Use the centralized header and message from the error
     return {
-      heading: t('couldNotLoadTokens', { provider: transformProviderName(storageType?.provider) }),
+      heading: lastError.header || t('couldNotLoadTokens', { provider: transformProviderName(storageType?.provider) }),
       description: lastError.message,
     };
   }, [lastError, storageType?.provider, matchingProvider, t]);
