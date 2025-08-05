@@ -80,22 +80,18 @@ export default function useURL() {
         notifyToUI('No tokens stored on remote', { error: true });
       }
     } catch (err) {
-      const { type, message } = categorizeError(err);
       console.log('Error:', err);
+      const { message } = categorizeError(err, {
+        provider: StorageProviderType.URL,
+        operation: 'pull',
+        hasCredentials: true,
+      });
 
-      if (type === 'parsing') {
-        notifyToUI('Failed to parse token file - check JSON format', { error: true });
-        return {
-          status: 'failure',
-          errorMessage: message,
-        };
-      } else {
-        notifyToUI(ErrorMessages.URL_CREDENTIAL_ERROR, { error: true });
-        return {
-          status: 'failure',
-          errorMessage: ErrorMessages.URL_CREDENTIAL_ERROR,
-        };
-      }
+      notifyToUI(message, { error: true });
+      return {
+        status: 'failure',
+        errorMessage: message,
+      };
     }
     return null;
   }, [

@@ -10,7 +10,6 @@ import { AnyTokenSet } from '@/types/tokens';
 import { ThemeObjectsList } from '@/types';
 import { SystemFilenames } from '@/constants/SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
-import { categorizeError } from '@/utils/error/categorizeError';
 
 enum GitLabAccessLevel {
   NoAccess = 0,
@@ -236,26 +235,16 @@ export class GitlabTokenStorage extends GitTokenStorage {
             })),
           ];
         } catch (parseError) {
-          const { message } = categorizeError(parseError);
-          return {
-            errorMessage: message,
-          };
+          return this.handleError(parseError);
         }
       }
       return {
         errorMessage: ErrorMessages.VALIDATION_ERROR,
       };
     } catch (err) {
-      const { type, message } = categorizeError(err);
       console.error(err);
-
-      if (type === 'parsing') {
-        return {
-          errorMessage: message,
-        };
-      }
+      return this.handleError(err);
     }
-    return [];
   }
 
   public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch?: boolean): Promise<boolean> {

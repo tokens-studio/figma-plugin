@@ -10,7 +10,6 @@ import { AnyTokenSet } from '@/types/tokens';
 import { ThemeObjectsList } from '@/types';
 import { SystemFilenames } from '@/constants/SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
-import { categorizeError } from '@/utils/error/categorizeError';
 
 type CreatedOrUpdatedFileType = {
   owner: string;
@@ -285,16 +284,8 @@ export class BitbucketTokenStorage extends GitTokenStorage {
         errorMessage: ErrorMessages.VALIDATION_ERROR,
       };
     } catch (e) {
-      const { type, message } = categorizeError(e);
       console.error('Error', e);
-
-      if (type === 'parsing') {
-        return {
-          errorMessage: message,
-        };
-      }
-
-      return [];
+      return this.handleError(e);
     }
   }
 

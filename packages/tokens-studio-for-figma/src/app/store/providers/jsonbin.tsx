@@ -165,20 +165,17 @@ export function useJSONbin() {
       notifyToUI('No tokens stored on remote', { error: true });
       return null;
     } catch (e) {
-      const { type, message } = categorizeError(e);
       console.log('Error:', e);
+      const { message } = categorizeError(e, {
+        provider: StorageProviderType.JSONBIN,
+        operation: 'pull',
+        hasCredentials: true,
+      });
 
-      if (type === 'parsing') {
-        notifyToUI('Failed to parse token file - check JSON format', { error: true });
-        return {
-          status: 'failure',
-          errorMessage: message,
-        };
-      }
-      notifyToUI(ErrorMessages.JSONBIN_CREDENTIAL_ERROR, { error: true });
+      notifyToUI(message, { error: true });
       return {
         status: 'failure',
-        errorMessage: ErrorMessages.JSONBIN_CREDENTIAL_ERROR,
+        errorMessage: message,
       };
     }
   }, [dispatch]);

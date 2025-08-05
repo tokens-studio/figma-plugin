@@ -256,19 +256,16 @@ export function useTokensStudio() {
       } catch (e) {
         console.error('error syncing with Tokens Studio', e);
 
-        const { type, message } = categorizeError(e);
+        const { message } = categorizeError(e, {
+          provider: StorageProviderType.TOKENS_STUDIO,
+          operation: 'sync',
+          hasCredentials: true,
+        });
 
-        if (type === 'parsing') {
-          notifyToUI('Failed to parse token file - check JSON format', { error: true });
-          return {
-            status: 'failure',
-            errorMessage: message,
-          };
-        }
-        notifyToUI('Error syncing with Tokens Studio, check credentials', { error: true });
+        notifyToUI(message, { error: true });
         return {
           status: 'failure',
-          errorMessage: String(e),
+          errorMessage: message,
         };
       }
     },

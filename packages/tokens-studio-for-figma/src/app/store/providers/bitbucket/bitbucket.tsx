@@ -240,20 +240,17 @@ export function useBitbucket() {
         }
         return await pushTokensToBitbucket(context);
       } catch (e) {
-        const { type, message } = categorizeError(e);
         console.log('Error', e);
+        const { message } = categorizeError(e, {
+          provider: StorageProviderType.BITBUCKET,
+          operation: 'sync',
+          hasCredentials: true,
+        });
 
-        if (type === 'parsing') {
-          notifyToUI('Failed to parse token file - check JSON format', { error: true });
-          return {
-            status: 'failure',
-            errorMessage: message,
-          };
-        }
-        notifyToUI(ErrorMessages.BITBUCKET_CREDENTIAL_ERROR, { error: true });
+        notifyToUI(message, { error: true });
         return {
           status: 'failure',
-          errorMessage: ErrorMessages.BITBUCKET_CREDENTIAL_ERROR,
+          errorMessage: message,
         };
       }
     },

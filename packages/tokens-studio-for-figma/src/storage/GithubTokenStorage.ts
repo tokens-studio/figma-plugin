@@ -10,7 +10,6 @@ import {
 import { SystemFilenames } from '@/constants/SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { joinPath } from '@/utils/string';
-import { categorizeError } from '@/utils/error/categorizeError';
 
 type ExtendedOctokitClient = Omit<Octokit, 'repos'> & {
   repos: Octokit['repos'] & {
@@ -264,10 +263,7 @@ export class GithubTokenStorage extends GitTokenStorage {
               })),
             ];
           } catch (parseError) {
-            const { message } = categorizeError(parseError);
-            return {
-              errorMessage: message,
-            };
+            return this.handleError(parseError);
           }
         }
         return {
@@ -277,16 +273,8 @@ export class GithubTokenStorage extends GitTokenStorage {
 
       return [];
     } catch (e) {
-      const { type, message } = categorizeError(e);
       console.error('Error', e);
-
-      if (type === 'parsing') {
-        return {
-          errorMessage: message,
-        };
-      }
-
-      return [];
+      return this.handleError(e);
     }
   }
 
