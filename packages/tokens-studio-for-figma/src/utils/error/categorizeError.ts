@@ -1,17 +1,44 @@
 import { ErrorMessages } from '@/constants/ErrorMessages';
+import { transformProviderName } from '@/utils/transformProviderName';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 
 /**
  * Categorizes an error to determine if it's a JSON parsing error, credential error, connectivity error, or other
  * @param error - The error object or string
+ * @param context - Optional context about the provider or operation for more specific error messages
  * @returns Object with error type, message, and optional header for display
  */
-export function categorizeError(error: any): {
-  type: 'credential' | 'parsing' | 'connectivity' | 'other';
-  message: string;
-  header?: string;
-} {
+export function categorizeError(error: any, context?: {
+  provider?: StorageProviderType;
+  operation?: string;
+  hasCredentials?: boolean;
+}): {
+    type: 'credential' | 'parsing' | 'connectivity' | 'other';
+    message: string;
+    header?: string;
+  } {
   const errorString = String(error);
   const errorMessage = error?.message || errorString;
+
+  // Helper function to get provider-specific messages
+  const getProviderSpecificMessage = (baseMessage: string, type: 'credential' | 'connectivity') => {
+    if (!context?.provider) return baseMessage;
+
+    const providerName = transformProviderName(context.provider);
+
+    if (type === 'credential') {
+      if (context.hasCredentials === false) {
+        return `Could not load tokens from ${providerName}. No credentials configured.`;
+      }
+      return `Could not load tokens from ${providerName}. Please check your credentials.`;
+    }
+
+    if (type === 'connectivity') {
+      return `Unable to connect to ${providerName}. Please check your internet connection or try again later.`;
+    }
+
+    return baseMessage;
+  };
 
   // Check if it's a JSON parsing error
   if (
@@ -22,10 +49,15 @@ export function categorizeError(error: any): {
     || errorMessage.includes('Invalid JSON')
     || errorString.includes('SyntaxError')
   ) {
+    const baseMessage = `${ErrorMessages.JSON_PARSE_ERROR}: ${errorMessage}`;
+    const header = context?.provider
+      ? `Could not load tokens from ${transformProviderName(context.provider)}`
+      : 'JSON Parsing Error';
+
     return {
       type: 'parsing',
-      message: `${ErrorMessages.JSON_PARSE_ERROR}: ${errorMessage}`,
-      header: 'JSON Parsing Error',
+      message: baseMessage,
+      header,
     };
   }
 
@@ -53,10 +85,15 @@ export function categorizeError(error: any): {
     || errorMessage.includes('Service Unavailable')
     || errorMessage.includes('Gateway Timeout')
   ) {
+    const message = getProviderSpecificMessage(errorMessage, 'connectivity');
+    const header = context?.provider
+      ? `Could not load tokens from ${transformProviderName(context.provider)}`
+      : 'Connection Error';
+
     return {
       type: 'connectivity',
-      message: errorMessage,
-      header: 'Connection Error',
+      message,
+      header,
     };
   }
 
@@ -71,17 +108,26 @@ export function categorizeError(error: any): {
     || errorMessage.includes('Authentication')
     || errorMessage.includes('permission')
   ) {
+    const message = getProviderSpecificMessage(errorMessage, 'credential');
+    const header = context?.provider
+      ? `Could not load tokens from ${transformProviderName(context.provider)}`
+      : 'Authentication Error';
+
     return {
       type: 'credential',
-      message: errorMessage,
-      header: 'Authentication Error',
+      message,
+      header,
     };
   }
 
   // For other errors, return the original message
+  const header = context?.provider
+    ? `Could not load tokens from ${transformProviderName(context.provider)}`
+    : 'Error';
+
   return {
     type: 'other',
     message: errorMessage,
-    header: 'Error',
+    header,
   };
 }

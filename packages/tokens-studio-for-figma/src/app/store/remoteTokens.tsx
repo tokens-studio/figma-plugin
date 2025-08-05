@@ -160,7 +160,11 @@ export default function useRemoteTokens() {
         }
       } catch (err) {
         console.error('Error pulling tokens:', err);
-        const { type, message, header } = categorizeError(err);
+        const { type, message, header } = categorizeError(err, {
+          provider: context.provider,
+          operation: 'pull',
+          hasCredentials: true,
+        });
         // Create a failure response for the error
         remoteData = {
           status: 'failure',

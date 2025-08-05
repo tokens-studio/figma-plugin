@@ -30,8 +30,8 @@ function PullDialog() {
   const getErrorHeading = React.useCallback(() => {
     if (!lastError) return t('genericError');
 
-    // Use the centralized header if available, otherwise fall back to generic error
-    return lastError.header || t('genericError');
+    // Use the centralized header - no fallback needed since all errors now have headers
+    return lastError.header;
   }, [lastError, t]);
 
   switch (pullDialogMode) {

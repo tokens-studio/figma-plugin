@@ -107,12 +107,25 @@ export function pullTokensFactory(
           dispatch.uiState.setActiveTab(Tabs.START);
           dispatch.uiState.completeJob(BackgroundJobs.UI_PULLTOKENS);
 
-          const { type, message, header } = categorizeError(err);
+          const { type, message, header } = categorizeError(err, {
+            provider: matchingSet.provider,
+            operation: 'pull',
+            hasCredentials: true,
+          });
           dispatch.uiState.setLastError({ type, message, header });
           notifyToUI(message, { error: true });
         }
       } else {
         // no API credentials available for storage type
+        const { type, message, header } = categorizeError(
+          new Error('No credentials configured'),
+          {
+            provider: params.storageType.provider,
+            operation: 'pull',
+            hasCredentials: false,
+          },
+        );
+        dispatch.uiState.setLastError({ type, message, header });
         dispatch.uiState.setActiveTab(Tabs.START);
       }
     } else if (params.localTokenData) {

@@ -92,9 +92,9 @@ function StartScreen() {
       };
     }
 
-    // Use the centralized header and message from the error
+    // Use the centralized header and message from the error - no fallback needed
     return {
-      heading: lastError.header || t('couldNotLoadTokens', { provider: transformProviderName(storageType?.provider) }),
+      heading: lastError.header,
       description: lastError.message,
     };
   }, [lastError, storageType?.provider, matchingProvider, t]);
