@@ -4,6 +4,7 @@ import type { AnyTokenList, SingleToken } from '@/types/tokens';
 import convertTokensToObject from '@/utils/convertTokensToObject';
 import parseTokenValues from '@/utils/parseTokenValues';
 import { SystemFilenames } from '@/constants/SystemFilenames';
+import { categorizeError } from '@/utils/error/categorizeError';
 
 export type RemoteTokenStorageMetadata = {
   tokenSetOrder?: string[];
@@ -39,6 +40,11 @@ export interface RemoteTokenstorageErrorMessage {
   errorMessage: string;
 }
 
+export interface RemoteTokenStorageCategorizedError {
+  type: 'credential' | 'parsing' | 'connectivity' | 'other';
+  message: string;
+}
+
 export type RemoteTokenStorageFile<Metadata = unknown> =
   | RemoteTokenStorageSingleTokenSetFile
   | RemoteTokenStorageThemesFile
@@ -53,6 +59,20 @@ export abstract class RemoteTokenStorage<
 > {
   public abstract write(files: RemoteTokenStorageFile<Metadata>[], saveOptions?: SaveOptions): Promise<boolean>;
   public abstract read(): Promise<RemoteTokenStorageFile<Metadata>[] | RemoteTokenstorageErrorMessage>;
+
+  protected handleError(error: any): RemoteTokenstorageErrorMessage {
+    const { message } = categorizeError(error);
+    return { errorMessage: message };
+  }
+
+  protected createErrorResponse(error: any): RemoteResponseData<Metadata> {
+    const { type, message } = categorizeError(error);
+    return {
+      status: 'failure',
+      errorMessage: message,
+      errorType: type,
+    };
+  }
 
   public async save(data: RemoteTokenStorageData<Metadata>, saveOptions: SaveOptions): Promise<boolean> {
     const files: RemoteTokenStorageFile<Metadata>[] = [];

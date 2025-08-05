@@ -28,11 +28,11 @@ import { getFormat, TokenFormat, TokenFormatOptions } from '@/plugin/TokenFormat
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { isEqual } from '@/utils/isEqual';
+import { categorizeError } from '@/utils/error/categorizeError';
 import usePullDialog from '../hooks/usePullDialog';
 import { Tabs } from '@/constants/Tabs';
 import { useTokensStudio } from './providers/tokens-studio';
 import { notifyToUI } from '@/plugin/notifiers';
-import { categorizeError } from '@/utils/error/categorizeError';
 
 export type PushOverrides = { branch: string; commitMessage: string };
 
@@ -160,10 +160,12 @@ export default function useRemoteTokens() {
         }
       } catch (err) {
         console.error('Error pulling tokens:', err);
+        const { type, message } = categorizeError(err);
         // Create a failure response for the error
         remoteData = {
           status: 'failure',
-          errorMessage: err instanceof Error ? err.message : String(err),
+          errorMessage: message,
+          errorType: type,
         } as RemoteResponseData<unknown>;
       }
 
