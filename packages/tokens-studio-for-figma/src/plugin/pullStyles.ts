@@ -18,6 +18,7 @@ import { getVariablesWithoutZombies } from './getVariablesWithoutZombies';
 import { getTokenData } from './node';
 import { processTextStyleProperty } from './processTextStyleProperty';
 import { findBoundVariable } from '@/utils/findBoundVariable';
+import { getTypographyBoundKey } from './getTypographyBoundKey';
 
 export default async function pullStyles(styleTypes: PullStyleOptions): Promise<void> {
   const tokens = await getTokenData();
@@ -137,9 +138,11 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
         };
       }
 
+      const propertyForWeight = getTypographyBoundKey(matchingStyle, 'fontWeight');
+
       return processTextStyleProperty(
         matchingStyle,
-        'fontStyle',
+        propertyForWeight,
         localVariables,
         tokens,
         TokenTypes.FONT_WEIGHTS,
@@ -227,7 +230,7 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
       const foundFontWeight = fontWeights.find(
         findBoundVariable(
           style,
-          'fontStyle',
+          getTypographyBoundKey(style, 'fontWeight'),
           localVariables,
           (el) => el.name.includes(slugify(style.fontName.family)) && el.value === style.fontName?.style,
         ),
