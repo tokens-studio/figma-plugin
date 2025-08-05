@@ -131,41 +131,41 @@ export function TokenSetItem({
           </ContextMenu.Trigger>
         ) : (
           <ContextMenu.Trigger asChild id={`${item.path}-trigger`}>
-            <StyledDragButton
-              type="button"
-              css={{
-                padding: '$3 $6 $3 $1',
-                paddingLeft: `${5 * item.level}px`,
-              }}
-              data-testid={`tokensetitem-${item.path}`}
-              isActive={isActive}
-              canReorder={canReorder}
-              onClick={handleClick}
-            >
-              <DragGrabber item={item} canReorder={canReorder} onDragStart={handleGrabberPointerDown} />
-              <Box
+            <Tooltip label={item.label} side="right" asChild>
+              <StyledDragButton
+                type="button"
                 css={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '$2',
-                  overflow: 'hidden',
-                  height: '1.5em',
-                  maxWidth: 'calc(100% - $sizes$6)',
-                  whiteSpace: 'nowrap',
-                  textOverflow: 'ellipsis',
-                  userSelect: 'none',
+                  padding: '$3 $6 $3 $1',
+                  paddingLeft: `${5 * item.level}px`,
                 }}
+                data-testid={`tokensetitem-${item.path}`}
+                isActive={isActive}
+                canReorder={canReorder}
+                onClick={handleClick}
               >
-                <Tooltip label={item.label} side="right">
+                <DragGrabber item={item} canReorder={canReorder} onDragStart={handleGrabberPointerDown} />
+                <Box
+                  css={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '$2',
+                    overflow: 'hidden',
+                    height: '1.5em',
+                    maxWidth: 'calc(100% - $sizes$6)',
+                    whiteSpace: 'nowrap',
+                    textOverflow: 'ellipsis',
+                    userSelect: 'none',
+                  }}
+                >
                   <span style={{ overflow: 'hidden' }}>{item.label}</span>
-                </Tooltip>
-                {item.tokenCount !== undefined && item.tokenCount > 0 && (
-                  <Text size="xsmall" muted css={{ flexShrink: 0 }}>
-                    {formatCount(item.tokenCount)}
-                  </Text>
-                )}
-              </Box>
-            </StyledDragButton>
+                  {item.tokenCount !== undefined && item.tokenCount > 0 && (
+                    <Text size="xsmall" muted css={{ flexShrink: 0 }}>
+                      {formatCount(item.tokenCount)}
+                    </Text>
+                  )}
+                </Box>
+              </StyledDragButton>
+            </Tooltip>
           </ContextMenu.Trigger>
         )}
         <ContextMenu.Portal>
