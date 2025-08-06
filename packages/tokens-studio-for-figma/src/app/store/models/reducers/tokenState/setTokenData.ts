@@ -23,8 +23,13 @@ export function setTokenData(state: TokenState, payload: SetTokenDataPayload): T
   const themesSize = payload.themes ? checkStorageSize(payload.themes) : state.themesSize;
 
   const allAvailableTokenSets = Object.keys(values);
+  // If no usedTokenSet preferences exist at all, default new token sets to ENABLED for better UX
+  // Otherwise, preserve existing preferences and default new sets to DISABLED
+  const hasExistingPreferences = payload.usedTokenSet && Object.keys(payload.usedTokenSet).length > 0;
+  const defaultStatus = hasExistingPreferences ? TokenSetStatus.DISABLED : TokenSetStatus.ENABLED;
+
   const usedTokenSets = Object.fromEntries(
-    allAvailableTokenSets.map((tokenSet) => [tokenSet, payload.usedTokenSet?.[tokenSet] ?? TokenSetStatus.DISABLED]),
+    allAvailableTokenSets.map((tokenSet) => [tokenSet, payload.usedTokenSet?.[tokenSet] ?? defaultStatus]),
   );
   const newActiveTheme = payload.activeTheme;
   Object.entries(newActiveTheme ?? {}).forEach(([group, activeTheme]) => {
