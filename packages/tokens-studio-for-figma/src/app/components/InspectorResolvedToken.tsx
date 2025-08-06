@@ -43,49 +43,70 @@ export default function InspectorResolvedToken({ token }: { token: Props }) {
   }
   switch (token?.type) {
     case TokenTypes.COLOR: {
+      const colorToken = {
+        name: token.name,
+        type: TokenTypes.COLOR,
+        value: token.value,
+      } as SingleToken;
       return (
-        <Box
-          css={{
-            background: String(token.value),
-            width: '24px',
-            height: '24px',
-            borderRadius: '100%',
-            border: '1px solid $borderMuted',
-            fontSize: 0,
-            flexShrink: 0,
-          }}
-        />
+        <TokenTooltip token={colorToken}>
+          <Box
+            css={{
+              background: String(token.value),
+              width: '24px',
+              height: '24px',
+              borderRadius: '100%',
+              border: '1px solid $borderMuted',
+              fontSize: 0,
+              flexShrink: 0,
+            }}
+          />
+        </TokenTooltip>
       );
     }
     case TokenTypes.TYPOGRAPHY: {
+      const typographyToken = {
+        name: token.name,
+        type: TokenTypes.TYPOGRAPHY,
+        value: token.value,
+      } as SingleToken;
       return (
-        <Box
-          css={{
-            background: '$bgSubtle',
-            fontSize: '$small',
-            padding: '$2 $3',
-            borderRadius: '$small',
-            width: '40px',
-          }}
-        >
-          aA
-        </Box>
+        <TokenTooltip token={typographyToken}>
+          <Box
+            css={{
+              background: '$bgSubtle',
+              fontSize: '$small',
+              padding: '$2 $3',
+              borderRadius: '$small',
+              width: '40px',
+            }}
+          >
+            aA
+          </Box>
+        </TokenTooltip>
       );
     }
     // TODO: Show shadow preview
     case TokenTypes.BOX_SHADOW: {
+      const shadowToken = {
+        name: token.name,
+        type: TokenTypes.BOX_SHADOW,
+        value: token.value,
+      } as SingleToken;
       return (
-        <Box
-          css={{
-            background: '$bgSubtle',
-            fontSize: '$small',
-            padding: '$2 $3',
-            borderRadius: '$small',
-            width: '40px',
-          }}
-        >
-          <IconShadow />
-        </Box>
+        <TokenTooltip token={shadowToken}>
+          <Box
+            css={{
+              background: '$bgSubtle',
+              fontSize: '$small',
+              padding: '$2 $3',
+              borderRadius: '$small',
+              width: '40px',
+            }}
+          >
+            <IconShadow />
+          </Box>
+        </TokenTooltip>
       );
     }
     case TokenTypes.COMPOSITION: {
@@ -116,52 +137,73 @@ export default function InspectorResolvedToken({ token }: { token: Props }) {
     }
 
     case TokenTypes.ASSET: {
+      const assetToken = {
+        name: token.name,
+        type: TokenTypes.ASSET,
+        value: token.value,
+      } as SingleToken;
       return (
-        <Box
-          css={{
-            background: '$bgSubtle',
-            fontSize: '$small',
-            padding: '$2 $3',
-            borderRadius: '$small',
-            width: '40px',
-          }}
-        >
-          <IconImage />
-        </Box>
+        <TokenTooltip token={assetToken}>
+          <Box
+            css={{
+              background: '$bgSubtle',
+              fontSize: '$small',
+              padding: '$2 $3',
+              borderRadius: '$small',
+              width: '40px',
+            }}
+          >
+            <IconImage />
+          </Box>
+        </TokenTooltip>
       );
     }
 
     case TokenTypes.BORDER: {
+      const borderToken = {
+        name: token.name,
+        type: TokenTypes.BORDER,
+        value: token.value,
+      } as SingleToken;
       return (
-        <Box
-          css={{
-            background: '$bgSubtle',
-            fontSize: '$small',
-            padding: '$2 $3',
-            borderRadius: '$small',
-            width: '40px',
-          }}
-        >
-          <IconBorder />
-        </Box>
+        <TokenTooltip token={borderToken}>
+          <Box
+            css={{
+              background: '$bgSubtle',
+              fontSize: '$small',
+              padding: '$2 $3',
+              borderRadius: '$small',
+              width: '40px',
+            }}
+          >
+            <IconBorder />
+          </Box>
+        </TokenTooltip>
       );
     }
 
     default: {
+      const defaultToken = {
+        name: token.name,
+        type: TokenTypes.OTHER,
+        value: token.value,
+      } as SingleToken;
       return (
-        <Box
-          css={{
-            background: '$bgSubtle',
-            fontSize: '$small',
-            padding: '$2 $3',
-            borderRadius: '$small',
-            width: '40px',
-            fontFamily: '$mono',
-            overflow: 'hidden',
-          }}
-        >
-          {String(token.value)}
-        </Box>
+        <TokenTooltip token={defaultToken}>
+          <Box
+            css={{
+              background: '$bgSubtle',
+              fontSize: '$small',
+              padding: '$2 $3',
+              borderRadius: '$small',
+              width: '40px',
+              fontFamily: '$mono',
+              overflow: 'hidden',
+            }}
+          >
+            {String(token.value)}
+          </Box>
+        </TokenTooltip>
       );
     }
   }
