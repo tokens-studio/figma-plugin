@@ -290,7 +290,15 @@ describe('GithubTokenStorage', () => {
 
       if (opts.path === 'data') {
         return Promise.resolve({
-          data: [],
+          data: [
+            { path: 'data/empty.json', sha: 'sha(data/empty.json)', type: 'file' },
+          ],
+        });
+      }
+
+      if (opts.path === 'data/empty.json') {
+        return Promise.resolve({
+          data: '{}',
         });
       }
 
@@ -301,7 +309,9 @@ describe('GithubTokenStorage', () => {
       Promise.resolve({
         data: {
           sha: 'sha(data)',
-          tree: [],
+          tree: [
+            { path: 'data/empty.json', type: 'blob', sha: 'sha(empty.json)' },
+          ],
         },
       })
     ));

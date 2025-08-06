@@ -226,11 +226,16 @@ export class GithubTokenStorage extends GitTokenStorage {
                 };
               }
 
+              const tokenSet = parsed as AnyTokenSet<false>;
+              if (Object.keys(tokenSet).length === 0) {
+                return null;
+              }
+
               return {
                 path: filePath,
                 name,
                 type: 'tokenSet',
-                data: parsed as AnyTokenSet<false>,
+                data: tokenSet,
               };
             }
             return null;
