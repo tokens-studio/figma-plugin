@@ -80,9 +80,6 @@ describe('Branch switcher', () => {
     cy.get('input[name=branch]').type('new-branch');
     cy.get('button[type=submit]').click();
 
-    // Handle the pull confirmation dialog that appears when switching to the new branch
-    cy.get('#pullDialog-button-override', { timeout: 5000 }).should('be.visible').click();
-
     cy.get('[data-testid=branch-selector-menu-trigger]').click();
     cy.get('[data-testid=branch-switch-menu-radio-element-new-branch]').should('have.length', 1);
   });

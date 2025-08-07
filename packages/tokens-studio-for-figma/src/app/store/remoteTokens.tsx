@@ -174,14 +174,8 @@ export default function useRemoteTokens() {
       }
 
       // Handle errors - show error dialog and set error state
-      // Handle null response (no tokens found) as success with empty tokens
       if (remoteData === null) {
-        remoteData = {
-          status: 'success',
-          tokens: {},
-          themes: [],
-          metadata: {},
-        };
+        return null;
       }
 
       if (remoteData?.status === 'failure') {
