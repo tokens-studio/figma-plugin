@@ -14,6 +14,8 @@ type RemoteResponseSuccess<Metadata = unknown> = {
 type RemoteResponseFailure = {
   status: 'failure',
   errorMessage: string;
+  errorType?: 'credential' | 'parsing' | 'connectivity' | 'other';
+  errorHeader?: string;
 };
 
 export type RemoteResponseData<Metadata = unknown> = RemoteResponseSuccess<Metadata> | RemoteResponseFailure;

@@ -23,6 +23,7 @@ import usePushDialog from '../../../hooks/usePushDialog';
 import { RemoteResponseData } from '../../../../types/RemoteResponseData';
 import { ErrorMessages } from '../../../../constants/ErrorMessages';
 import { PushOverrides } from '../../remoteTokens';
+import { categorizeError } from '@/utils/error/categorizeError';
 import { RemoteTokenStorageMetadata } from '@/storage/RemoteTokenStorage';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
@@ -254,10 +255,17 @@ export function useTokensStudio() {
         };
       } catch (e) {
         console.error('error syncing with Tokens Studio', e);
-        notifyToUI('Error syncing with Tokens Studio, check credentials', { error: true });
+
+        const { message } = categorizeError(e, {
+          provider: StorageProviderType.TOKENS_STUDIO,
+          operation: 'sync',
+          hasCredentials: true,
+        });
+
+        notifyToUI(message, { error: true });
         return {
           status: 'failure',
-          errorMessage: String(e),
+          errorMessage: message,
         };
       }
     },

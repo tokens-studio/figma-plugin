@@ -23,6 +23,7 @@ import { ErrorMessages } from '@/constants/ErrorMessages';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { PushOverrides } from '../../remoteTokens';
 import { useIsProUser } from '@/app/hooks/useIsProUser';
+import { categorizeError } from '@/utils/error/categorizeError';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 
 export type GitlabCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITLAB; }>;
@@ -120,9 +121,14 @@ export function useGitLab() {
             errorMessage: e.message,
           };
         }
+        const { message } = categorizeError(e, {
+          provider: StorageProviderType.GITLAB,
+          operation: 'push',
+          hasCredentials: true,
+        });
         return {
           status: 'failure',
-          errorMessage: ErrorMessages.GITLAB_CREDENTIAL_ERROR,
+          errorMessage: message,
         };
       }
     }
@@ -181,9 +187,14 @@ export function useGitLab() {
       }
     } catch (e) {
       console.log('Error', e);
+      const { message } = categorizeError(e, {
+        provider: StorageProviderType.GITLAB,
+        operation: 'pull',
+        hasCredentials: true,
+      });
       return {
         status: 'failure',
-        errorMessage: ErrorMessages.GITLAB_CREDENTIAL_ERROR,
+        errorMessage: message,
       };
     }
     return null;
@@ -244,11 +255,24 @@ export function useGitLab() {
       }
       return await pushTokensToGitLab(context);
     } catch (err) {
-      notifyToUI(ErrorMessages.GITLAB_CREDENTIAL_ERROR, { error: true });
+      const { type, message } = categorizeError(err, {
+        provider: StorageProviderType.GITLAB,
+        operation: 'sync',
+        hasCredentials: true,
+      });
       console.log('Error', err);
+
+      if (type === 'parsing') {
+        notifyToUI('Failed to parse token file - check JSON format', { error: true });
+        return {
+          status: 'failure',
+          errorMessage: message,
+        };
+      }
+      notifyToUI(message, { error: true });
       return {
         status: 'failure',
-        errorMessage: ErrorMessages.GITLAB_CREDENTIAL_ERROR,
+        errorMessage: message,
       };
     }
   }, [

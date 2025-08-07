@@ -21,6 +21,7 @@ export * from './activeTabSelector';
 export * from './changelogSelector';
 export * from './projectURLSelector';
 export * from './lastSyncedStateSelector';
+export * from './lastErrorSelector';
 export * from './editTokenSelector';
 export * from './importedTokensSelector';
 export * from './showEditFormSelector';

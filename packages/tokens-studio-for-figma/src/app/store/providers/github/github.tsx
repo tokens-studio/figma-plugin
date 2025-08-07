@@ -22,6 +22,7 @@ import { ErrorMessages } from '@/constants/ErrorMessages';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { PushOverrides } from '../../remoteTokens';
 import { useIsProUser } from '@/app/hooks/useIsProUser';
+import { categorizeError } from '@/utils/error/categorizeError';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 
 type GithubCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITHUB; }>;
@@ -107,9 +108,14 @@ export function useGitHub() {
             errorMessage: ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR,
           };
         }
+        const { message } = categorizeError(e, {
+          provider: StorageProviderType.GITHUB,
+          operation: 'push',
+          hasCredentials: true,
+        });
         return {
           status: 'failure',
-          errorMessage: ErrorMessages.GITHUB_CREDENTIAL_ERROR,
+          errorMessage: message,
         };
       }
     }
@@ -171,9 +177,14 @@ export function useGitHub() {
         };
       }
     } catch (e) {
+      const { message } = categorizeError(e, {
+        provider: StorageProviderType.GITHUB,
+        operation: 'pull',
+        hasCredentials: true,
+      });
       return {
         status: 'failure',
-        errorMessage: ErrorMessages.GITHUB_CREDENTIAL_ERROR,
+        errorMessage: message,
       };
     }
     return null;
@@ -238,11 +249,24 @@ export function useGitHub() {
       }
       return await pushTokensToGitHub(context);
     } catch (e) {
-      notifyToUI(ErrorMessages.GITHUB_CREDENTIAL_ERROR, { error: true });
+      const { type, message } = categorizeError(e, {
+        provider: StorageProviderType.GITHUB,
+        operation: 'sync',
+        hasCredentials: true,
+      });
       console.log('Error', e);
+
+      if (type === 'parsing') {
+        notifyToUI('Failed to parse token file - check JSON format', { error: true });
+        return {
+          status: 'failure',
+          errorMessage: message,
+        };
+      }
+      notifyToUI(message, { error: true });
       return {
         status: 'failure',
-        errorMessage: ErrorMessages.GITHUB_CREDENTIAL_ERROR,
+        errorMessage: message,
       };
     }
   }, [

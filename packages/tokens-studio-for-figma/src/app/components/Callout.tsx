@@ -8,7 +8,7 @@ type Props = {
   id: string
   heading: React.ReactNode
   description: React.ReactNode
-  action: {
+  action?: {
     text: React.ReactNode
     onClick: React.ComponentProps<typeof Button>['onClick']
   }
@@ -35,21 +35,25 @@ export default function Callout({
             <Heading>{heading}</Heading>
             <Text muted size="xsmall">{description}</Text>
           </Stack>
-          <Stack direction="row" gap={2}>
-            <Button data-testid={id} size="small" variant="primary" onClick={action.onClick}>
-              {action.text}
-            </Button>
-            {secondaryAction && (
-              <Button
-                data-testid={`${id}-secondary`}
-                size="small"
-                variant="secondary"
-                onClick={secondaryAction.onClick}
-              >
-                {secondaryAction.text}
-              </Button>
-            )}
-          </Stack>
+          {(action || secondaryAction) && (
+            <Stack direction="row" gap={2}>
+              {action && (
+                <Button data-testid={id} size="small" variant="primary" onClick={action.onClick}>
+                  {action.text}
+                </Button>
+              )}
+              {secondaryAction && (
+                <Button
+                  data-testid={`${id}-secondary`}
+                  size="small"
+                  variant="secondary"
+                  onClick={secondaryAction.onClick}
+                >
+                  {secondaryAction.text}
+                </Button>
+              )}
+            </Stack>
+          )}
         </Stack>
       </Stack>
     </Box>
