@@ -79,6 +79,10 @@ describe('Branch switcher', () => {
     cy.get('[data-testid=branch-selector-create-branch-from-branch-main]').click();
     cy.get('input[name=branch]').type('new-branch');
     cy.get('button[type=submit]').click();
+
+    // Handle the pull confirmation dialog that appears when switching to the new branch
+    cy.get('#pullDialog-button-override', { timeout: 5000 }).should('be.visible').click();
+
     cy.get('[data-testid=branch-selector-menu-trigger]').click();
     cy.get('[data-testid=branch-switch-menu-radio-element-new-branch]').should('have.length', 1);
   });
@@ -123,6 +127,11 @@ describe('Branch switcher', () => {
     cy.startup(mockStartupParams);
     cy.get('[data-testid=branch-selector-menu-trigger]').click();
     cy.get('[data-testid=branch-switch-menu-radio-element-development]').click();
+
+    // Handle the error dialog that appears when GitHub connection fails during branch switching
+    // This is expected behavior when GitHub is unreachable in the test environment
+    cy.get('#pullDialog-button-cancel', { timeout: 5000 }).should('be.visible').click();
+
     cy.get('[data-testid=branch-selector-menu-trigger]').click();
     cy.get('[data-testid=branch-switch-menu-radio-element-development] [data-testid=branch-switch-menu-check-icon]').should('have.length', 1);
   });
