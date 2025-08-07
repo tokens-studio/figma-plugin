@@ -113,7 +113,6 @@ export default function useRemoteTokens() {
       collapsedTokenSets,
       updateLocalTokens = false,
     }: PullTokensOptions) => {
-      showPullDialog('loading');
       let remoteData: RemoteResponseData<unknown> | null = null;
 
       try {
@@ -175,6 +174,16 @@ export default function useRemoteTokens() {
       }
 
       // Handle errors - show error dialog and set error state
+      // Handle null response (no tokens found) as success with empty tokens
+      if (remoteData === null) {
+        remoteData = {
+          status: 'success',
+          tokens: {},
+          themes: [],
+          metadata: {},
+        };
+      }
+
       if (remoteData?.status === 'failure') {
         const type = remoteData.errorType || 'other';
         const message = remoteData.errorMessage;
