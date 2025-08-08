@@ -8,7 +8,7 @@ import { convertFigmaToLetterSpacing } from './figmaTransforms/letterSpacing';
 import { convertFigmaToLineHeight } from './figmaTransforms/lineHeight';
 import { convertFigmaToTextCase } from './figmaTransforms/textCase';
 import { convertFigmaToTextDecoration } from './figmaTransforms/textDecoration';
-import { notifyStyleValues } from './notifiers';
+import { notifyStyleValues, postToUI } from './notifiers';
 import { PullStyleOptions } from '@/types';
 import { slugify } from '@/utils/string';
 import { TokenTypes } from '@/constants/TokenTypes';
@@ -17,9 +17,126 @@ import { StyleToCreateToken } from '@/types/payloads';
 import { getVariablesWithoutZombies } from './getVariablesWithoutZombies';
 import { getTokenData } from './node';
 import { processTextStyleProperty } from './processTextStyleProperty';
-import { findBoundVariable } from '@/utils/findBoundVariable';
+import { MessageFromPluginTypes } from '@/types/messages';
+import { BackgroundJobs } from '@/constants/BackgroundJobs';
+
+// Helper function to get only the variables needed for a specific style
+function getRelevantVariablesForStyle(style: TextStyle, allVariables: Variable[]): Variable[] {
+  const relevantVariableIds = new Set<string>();
+
+  // Extract variable IDs from bound variables
+  if (style.boundVariables) {
+    Object.values(style.boundVariables).forEach((boundVar: any) => {
+      if (boundVar?.id) {
+        relevantVariableIds.add(boundVar.id);
+      }
+    });
+  }
+
+  // Return only the variables needed for this style
+  return allVariables.filter((v) => relevantVariableIds.has(v.id));
+}
+
+// Helper function to process styles with variable references in small blocks
+async function processStylesWithVariablesInBlocks<T>(
+  styles: T[],
+  allVariables: Variable[],
+  processor: (style: T, relevantVariables: Variable[], index: number) => any,
+  blockSize: number = 10, // Increased batch size for better performance
+): Promise<any[]> {
+  const results: any[] = [];
+
+  for (let i = 0; i < styles.length; i += blockSize) {
+    const block = styles.slice(i, i + blockSize);
+
+    try {
+      // Process each style in the block with only the variables it needs
+      for (let j = 0; j < block.length; j += 1) {
+        const style = block[j];
+        const styleIndex = i + j;
+
+        // Get only the variables needed for this specific style
+        const relevantVariables = getRelevantVariablesForStyle(style as any, allVariables);
+
+        const result = processor(style, relevantVariables, styleIndex);
+        results.push(result);
+
+        // Give Figma time between each style when processing variables
+        if (relevantVariables.length > 0) {
+          await new Promise((resolve) => {
+            setTimeout(resolve, 5);
+          });
+        }
+      }
+
+      // Clear block and give Figma more time between blocks
+      block.length = 0;
+      await new Promise((resolve) => {
+        setTimeout(resolve, 20);
+      });
+    } catch (error) {
+      // Continue with next block instead of failing completely
+    }
+  }
+
+  return results;
+}
+
+// Special helper for typography processing that needs all variables for token matching
+async function processTypographyInBlocks(
+  styles: TextStyle[],
+  _allVariables: Variable[],
+  processor: (style: TextStyle) => any,
+  blockSize: number = 10, // Increased batch size for better performance
+): Promise<any[]> {
+  const results: any[] = [];
+
+  for (let i = 0; i < styles.length; i += blockSize) {
+    const block = styles.slice(i, i + blockSize);
+
+    try {
+      // Process each style in the block
+      for (let j = 0; j < block.length; j += 1) {
+        const style = block[j];
+
+        const result = processor(style);
+        results.push(result);
+
+        // Give Figma time between each typography style (they're complex)
+        await new Promise((resolve) => {
+          setTimeout(resolve, 10);
+        });
+      }
+
+      // Clear block and give Figma more time between blocks
+      block.length = 0;
+      await new Promise((resolve) => {
+        setTimeout(resolve, 30);
+      });
+    } catch (error) {
+      // Continue with next block instead of failing completely
+    }
+  }
+
+  return results;
+}
 
 export default async function pullStyles(styleTypes: PullStyleOptions): Promise<void> {
+  // Calculate total steps for progress tracking
+  const totalSteps = Object.values(styleTypes).filter(Boolean).length;
+  let currentStepCount = 0;
+
+  // Start the import job
+  postToUI({
+    type: MessageFromPluginTypes.START_JOB,
+    job: {
+      name: BackgroundJobs.UI_IMPORT_STYLES,
+      timePerTask: 1000, // Estimated time per step in ms
+      completedTasks: 0,
+      totalTasks: totalSteps,
+    },
+  });
+
   const tokens = await getTokenData();
   // @TODO should be specifically typed according to their type
   let colors: StyleToCreateToken[] = [];
@@ -73,6 +190,14 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
             : null;
         }),
     );
+
+    // Update progress
+    currentStepCount += 1;
+    postToUI({
+      type: MessageFromPluginTypes.COMPLETE_JOB_TASKS,
+      name: BackgroundJobs.UI_IMPORT_STYLES,
+      count: 1,
+    });
   }
 
   if (styleTypes.textStyles) {
@@ -99,31 +224,41 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
       if (!rawTextDecoration.includes(style.textDecoration)) rawTextDecoration.push(style.textDecoration);
     });
 
-    fontSizes = figmaTextStyles.map((style, idx) => processTextStyleProperty(
-      style,
-      'fontSize',
+    // Process font sizes with block-based variable handling to prevent memory leaks
+    fontSizes = await processStylesWithVariablesInBlocks(
+      figmaTextStyles,
       localVariables,
-      tokens,
-      TokenTypes.FONT_SIZES,
-      'fontSize',
-      idx,
-      (value) => value.toString(),
-    ));
+      (style, relevantVariables, idx) => processTextStyleProperty(
+        style,
+        'fontSize',
+        relevantVariables, // Only pass variables needed for this style
+        tokens,
+        TokenTypes.FONT_SIZES,
+        'fontSize',
+        idx,
+        (value) => value.toString(),
+      ),
+    );
 
     const uniqueFontCombinations = fontCombinations.filter(
       (v, i, a) => a.findIndex((t) => t.family === v.family && t.style === v.style) === i,
     );
 
-    lineHeights = figmaTextStyles.map((style, idx) => processTextStyleProperty(
-      style,
-      'lineHeight',
+    // Process line heights with block-based variable handling
+    lineHeights = await processStylesWithVariablesInBlocks(
+      figmaTextStyles,
       localVariables,
-      tokens,
-      TokenTypes.LINE_HEIGHTS,
-      'lineHeights',
-      idx,
-      (value) => convertFigmaToLineHeight(value).toString(),
-    ));
+      (style, relevantVariables, idx) => processTextStyleProperty(
+        style,
+        'lineHeight',
+        relevantVariables, // Only pass variables needed for this style
+        tokens,
+        TokenTypes.LINE_HEIGHTS,
+        'lineHeights',
+        idx,
+        (value) => convertFigmaToLineHeight(value).toString(),
+      ),
+    );
 
     fontWeights = uniqueFontCombinations.map((font, idx) => {
       const matchingStyle = figmaTextStyles.find((style) => style.fontName.family === font.family
@@ -137,10 +272,12 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
         };
       }
 
+      // Use block-based processing for font weights with variables
+      const relevantVariables = getRelevantVariablesForStyle(matchingStyle, localVariables);
       return processTextStyleProperty(
         matchingStyle,
         'fontStyle',
-        localVariables,
+        relevantVariables, // Only pass variables needed for this style
         tokens,
         TokenTypes.FONT_WEIGHTS,
         `fontWeights.${slugify(font.family)}`,
@@ -160,10 +297,12 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
         };
       }
 
+      // Use block-based processing for font families with variables
+      const relevantVariables = getRelevantVariablesForStyle(matchingStyle, localVariables);
       return processTextStyleProperty(
         matchingStyle,
         'fontFamily',
-        localVariables,
+        relevantVariables, // Only pass variables needed for this style
         tokens,
         TokenTypes.FONT_FAMILIES,
         `fontFamilies.${slugify(fontFamily)}`,
@@ -172,16 +311,21 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
       );
     });
 
-    paragraphSpacing = figmaTextStyles.map((style, idx) => processTextStyleProperty(
-      style,
-      'paragraphSpacing',
+    // Process paragraph spacing with block-based variable handling
+    paragraphSpacing = await processStylesWithVariablesInBlocks(
+      figmaTextStyles,
       localVariables,
-      tokens,
-      TokenTypes.PARAGRAPH_SPACING,
-      'paragraphSpacing',
-      idx,
-      (value) => value.toString(),
-    ));
+      (style, relevantVariables, idx) => processTextStyleProperty(
+        style,
+        'paragraphSpacing',
+        relevantVariables, // Only pass variables needed for this style
+        tokens,
+        TokenTypes.PARAGRAPH_SPACING,
+        'paragraphSpacing',
+        idx,
+        (value) => value.toString(),
+      ),
+    );
 
     paragraphIndent = rawParagraphIndent
       .sort((a, b) => a - b)
@@ -191,16 +335,21 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
         type: TokenTypes.DIMENSION,
       }));
 
-    letterSpacing = figmaTextStyles.map((style, idx) => processTextStyleProperty(
-      style,
-      'letterSpacing',
+    // Process letter spacing with block-based variable handling
+    letterSpacing = await processStylesWithVariablesInBlocks(
+      figmaTextStyles,
       localVariables,
-      tokens,
-      TokenTypes.LETTER_SPACING,
-      'letterSpacing',
-      idx,
-      (value) => convertFigmaToLetterSpacing(value).toString(),
-    ));
+      (style, relevantVariables, idx) => processTextStyleProperty(
+        style,
+        'letterSpacing',
+        relevantVariables, // Only pass variables needed for this style
+        tokens,
+        TokenTypes.LETTER_SPACING,
+        'letterSpacing',
+        idx,
+        (value) => convertFigmaToLetterSpacing(value).toString(),
+      ),
+    );
 
     textCase = rawTextCase.map((value) => ({
       name: `textCase.${convertFigmaToTextCase(value)}`,
@@ -214,93 +363,130 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
       type: TokenTypes.TEXT_DECORATION,
     }));
 
-    typography = figmaTextStyles.map((style) => {
-      const foundFamily = fontFamilies.find(
-        findBoundVariable(
-          style,
-          'fontFamily',
-          localVariables,
-          (el) => el.value === style.fontName.family,
-        ),
-      );
-
-      const foundFontWeight = fontWeights.find(
-        findBoundVariable(
-          style,
-          'fontStyle',
-          localVariables,
-          (el) => el.name.includes(slugify(style.fontName.family)) && el.value === style.fontName?.style,
-        ),
-      );
-
-      const foundLineHeight = lineHeights.find(
-        findBoundVariable(
-          style,
-          'lineHeight',
-          localVariables,
-          (el) => el.value === convertFigmaToLineHeight(style.lineHeight).toString(),
-        ),
-      );
-      const foundFontSize = fontSizes.find(
-        findBoundVariable(
-          style,
-          'fontSize',
-          localVariables,
-          (el) => el.value === style.fontSize.toString(),
-        ),
-      );
-      const foundLetterSpacing = letterSpacing.find(
-        findBoundVariable(
-          style,
-          'letterSpacing',
-          localVariables,
-          (el) => el.value === convertFigmaToLetterSpacing(style.letterSpacing).toString(),
-        ),
-      );
-      const foundParagraphSpacing = paragraphSpacing.find((el: StyleToCreateToken) => {
-        if (style.boundVariables?.paragraphSpacing?.id) {
-          const paragraphSpacingVar = localVariables.find((v) => v.id === style.boundVariables?.paragraphSpacing?.id);
-          if (paragraphSpacingVar) {
-            const normalizedName = paragraphSpacingVar.name.replace(/\//g, '.');
-            return el.name === normalizedName;
+    // Process typography with special block processing that preserves all variables for token matching
+    typography = await processTypographyInBlocks(
+      figmaTextStyles,
+      localVariables,
+      (style) => {
+        // Find the generated tokens for this style
+        // The tokens were created either with variable references or raw values
+        const foundFamily = fontFamilies.find((el) => {
+          // If style has bound variable, look for token with variable name
+          if (style.boundVariables?.fontFamily?.id) {
+            const boundVar = localVariables.find((v) => v.id === style.boundVariables?.fontFamily?.id);
+            if (boundVar) {
+              const normalizedName = boundVar.name.replace(/\//g, '.');
+              return el.name === normalizedName;
+            }
           }
+          // Otherwise, look for token with matching value
+          return el.value === style.fontName.family;
+        });
+
+        const foundFontWeight = fontWeights.find((el) => {
+          // If style has bound variable, look for token with variable name
+          if (style.boundVariables?.fontStyle?.id) {
+            const boundVar = localVariables.find((v) => v.id === style.boundVariables?.fontStyle?.id);
+            if (boundVar) {
+              const normalizedName = boundVar.name.replace(/\//g, '.');
+              return el.name === normalizedName;
+            }
+          }
+          // Otherwise, look for token with matching value and family
+          return el.name.includes(slugify(style.fontName.family)) && el.value === style.fontName?.style;
+        });
+
+        const foundLineHeight = lineHeights.find((el) => {
+          // If style has bound variable, look for token with variable name
+          if (style.boundVariables?.lineHeight?.id) {
+            const boundVar = localVariables.find((v) => v.id === style.boundVariables?.lineHeight?.id);
+            if (boundVar) {
+              const normalizedName = boundVar.name.replace(/\//g, '.');
+              return el.name === normalizedName;
+            }
+          }
+          // Otherwise, look for token with matching value
+          return el.value === convertFigmaToLineHeight(style.lineHeight).toString();
+        });
+
+        const foundFontSize = fontSizes.find((el) => {
+          // If style has bound variable, look for token with variable name
+          if (style.boundVariables?.fontSize?.id) {
+            const boundVar = localVariables.find((v) => v.id === style.boundVariables?.fontSize?.id);
+            if (boundVar) {
+              const normalizedName = boundVar.name.replace(/\//g, '.');
+              return el.name === normalizedName;
+            }
+          }
+          // Otherwise, look for token with matching value
+          return el.value === style.fontSize.toString();
+        });
+
+        const foundLetterSpacing = letterSpacing.find((el) => {
+          // If style has bound variable, look for token with variable name
+          if (style.boundVariables?.letterSpacing?.id) {
+            const boundVar = localVariables.find((v) => v.id === style.boundVariables?.letterSpacing?.id);
+            if (boundVar) {
+              const normalizedName = boundVar.name.replace(/\//g, '.');
+              return el.name === normalizedName;
+            }
+          }
+          // Otherwise, look for token with matching value
+          return el.value === convertFigmaToLetterSpacing(style.letterSpacing).toString();
+        });
+        const foundParagraphSpacing = paragraphSpacing.find((el: StyleToCreateToken) => {
+          if (style.boundVariables?.paragraphSpacing?.id) {
+            const paragraphSpacingVar = localVariables.find((v) => v.id === style.boundVariables?.paragraphSpacing?.id);
+            if (paragraphSpacingVar) {
+              const normalizedName = paragraphSpacingVar.name.replace(/\//g, '.');
+              return el.name === normalizedName;
+            }
+          }
+          return el.value === style.paragraphSpacing.toString();
+        });
+        const foundParagraphIndent = paragraphIndent.find(
+          (el: StyleToCreateToken) => el.value === `${style.paragraphIndent.toString()}px`,
+        );
+        const foundTextCase = textCase.find(
+          (el: StyleToCreateToken) => el.value === convertFigmaToTextCase(style.textCase.toString()),
+        );
+        const foundTextDecoration = textDecoration.find(
+          (el: StyleToCreateToken) => el.value === convertFigmaToTextDecoration(style.textDecoration.toString()),
+        );
+
+        const obj = {
+          fontFamily: `{${foundFamily?.name}}`,
+          fontWeight: `{${foundFontWeight?.name}}`,
+          lineHeight: `{${foundLineHeight?.name}}`,
+          fontSize: `{${foundFontSize?.name}}`,
+          letterSpacing: `{${foundLetterSpacing?.name}}`,
+          paragraphSpacing: `{${foundParagraphSpacing?.name}}`,
+          paragraphIndent: `{${foundParagraphIndent?.name}}`,
+          textCase: `{${foundTextCase?.name}}`,
+          textDecoration: `{${foundTextDecoration?.name}}`,
+        };
+
+        const normalizedName = style.name
+          .split('/')
+          .map((section) => section.trim())
+          .join('.');
+
+        const styleObject: StyleToCreateToken = { name: normalizedName, value: obj, type: TokenTypes.TYPOGRAPHY };
+
+        if (style.description) {
+          styleObject.description = style.description;
         }
-        return el.value === style.paragraphSpacing.toString();
-      });
-      const foundParagraphIndent = paragraphIndent.find(
-        (el: StyleToCreateToken) => el.value === `${style.paragraphIndent.toString()}px`,
-      );
-      const foundTextCase = textCase.find(
-        (el: StyleToCreateToken) => el.value === convertFigmaToTextCase(style.textCase.toString()),
-      );
-      const foundTextDecoration = textDecoration.find(
-        (el: StyleToCreateToken) => el.value === convertFigmaToTextDecoration(style.textDecoration.toString()),
-      );
 
-      const obj = {
-        fontFamily: `{${foundFamily?.name}}`,
-        fontWeight: `{${foundFontWeight?.name}}`,
-        lineHeight: `{${foundLineHeight?.name}}`,
-        fontSize: `{${foundFontSize?.name}}`,
-        letterSpacing: `{${foundLetterSpacing?.name}}`,
-        paragraphSpacing: `{${foundParagraphSpacing?.name}}`,
-        paragraphIndent: `{${foundParagraphIndent?.name}}`,
-        textCase: `{${foundTextCase?.name}}`,
-        textDecoration: `{${foundTextDecoration?.name}}`,
-      };
+        return styleObject;
+      },
+    );
 
-      const normalizedName = style.name
-        .split('/')
-        .map((section) => section.trim())
-        .join('.');
-
-      const styleObject: StyleToCreateToken = { name: normalizedName, value: obj, type: TokenTypes.TYPOGRAPHY };
-
-      if (style.description) {
-        styleObject.description = style.description;
-      }
-
-      return styleObject;
+    // Update progress
+    currentStepCount += 1;
+    postToUI({
+      type: MessageFromPluginTypes.COMPLETE_JOB_TASKS,
+      name: BackgroundJobs.UI_IMPORT_STYLES,
+      count: 1,
     });
   }
 
@@ -345,6 +531,14 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
           return styleObject;
         }),
     );
+
+    // Update progress
+    currentStepCount += 1;
+    postToUI({
+      type: MessageFromPluginTypes.COMPLETE_JOB_TASKS,
+      name: BackgroundJobs.UI_IMPORT_STYLES,
+      count: currentStepCount,
+    });
   }
 
   const stylesObject = {
@@ -372,4 +566,10 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
  }, {});
 
  notifyStyleValues(returnedObject);
+
+ // Complete the import job
+ postToUI({
+   type: MessageFromPluginTypes.COMPLETE_JOB,
+   name: BackgroundJobs.UI_IMPORT_STYLES,
+ });
 }
