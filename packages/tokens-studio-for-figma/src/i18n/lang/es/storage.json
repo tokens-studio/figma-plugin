@@ -66,6 +66,7 @@
     },
     "bitbucket": {
       "appPassword": "Contraseña de la aplicación",
+      "apiToken": "Token de API",
       "projectName": "Nombre del proyecto (opcional)",
       "repository": "Repositorio (espacio de trabajo/repositorio)",
       "username": "nombre de usuario de Bitbucket"
