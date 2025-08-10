@@ -65,10 +65,10 @@
       "readMore": "Lisez le guide de synchronisation Azure DevOps."
     },
     "bitbucket": {
-      "appPassword": "Mot de passe de l'application",
+      "apiToken": "Jeton API",
       "projectName": "Nom du projet (facultatif)",
       "repository": "Dépôt (espace de travail/dépôt)",
-      "username": "Nom d'utilisateur Bitbucket"
+      "username": "Email utilisateur"
     },
     "tokensstudio": {
       "name": "Name",

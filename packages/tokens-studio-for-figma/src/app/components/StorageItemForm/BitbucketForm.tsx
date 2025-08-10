@@ -43,7 +43,7 @@ export default function BitbucketForm({
         branch: zod.string(),
         filePath: zod.string(),
         baseUrl: zod.string().optional(),
-        secret: zod.string(),
+        apiToken: zod.string(),
         internalId: zod.string().optional(),
       });
       const validationResult = zodSchema.safeParse(values);
@@ -88,12 +88,12 @@ export default function BitbucketForm({
           />
         </FormField>
         <FormField>
-          <Label htmlFor="secret">{t('providers.bitbucket.appPassword')}</Label>
+          <Label htmlFor="apiToken">{t('providers.bitbucket.apiToken')}</Label>
           <TextInput
-            value={values.secret || ''}
+            value={values.apiToken || ''}
             onChange={onChange}
-            name="secret"
-            id="secret"
+            name="apiToken"
+            id="apiToken"
             required
             type={isMasked ? 'password' : 'text'}
             trailingAction={(

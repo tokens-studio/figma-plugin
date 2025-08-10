@@ -64,41 +64,112 @@ describe('BitbucketTokenStorage', () => {
   let storageProvider: BitbucketTokenStorage;
 
   beforeEach(() => {
-    // Reset the Bitbucket mock and create a new instance of BitbucketTokenStorage
-    storageProvider = new BitbucketTokenStorage('mock-secret', 'MattOliver', 'figma-tokens-testing', '', 'myusername');
-    storageProvider.selectBranch('main');
+    // Reset all mocks
     jest.clearAllMocks();
+    mockFetch.mockClear();
+
+    // Set up default mock implementation for fetch
+    mockFetch.mockImplementation(() =>
+      Promise.resolve({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({}),
+        text: () => Promise.resolve(''),
+      }),
+    );
+
+    // Reset the Bitbucket mock and create a new instance of BitbucketTokenStorage
+    storageProvider = new BitbucketTokenStorage('', 'MattOliver', 'figma-tokens-testing', '', 'test@example.com', 'mock-api-token');
     storageProvider.selectBranch('main');
     storageProvider.disableMultiFile();
   });
 
   it('canWrite should return false if unauthenticated', async () => {
-    mockGetAuthedUser.mockImplementationOnce(() => {
-      return Promise.resolve({
-        data: {},
-      });
-    });
-
-    mockListPermissions.mockImplementationOnce(() => {
-      return Promise.resolve({
-        data: {
-          values: [],
-        },
-      });
-    });
+    mockFetch.mockImplementationOnce(() =>
+      Promise.resolve({
+        ok: false,
+        status: 401,
+      }),
+    );
 
     expect(await storageProvider.canWrite()).toBe(false);
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      'https://api.bitbucket.org/2.0/user',
+      {
+        headers: {
+          Authorization: `Basic ${btoa('test@example.com:mock-api-token')}`,
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+  });
+
+  it('canWrite should return true if authenticated and has repository access', async () => {
+    // Mock successful user authentication
+    mockFetch.mockImplementationOnce(() =>
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({
+          account_id: 'test-account-id',
+          username: 'testuser',
+        }),
+      }),
+    );
+
+    // Mock successful repository access
+    mockFetch.mockImplementationOnce(() =>
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({
+          name: 'figma-tokens-testing',
+          full_name: 'MattOliver/figma-tokens-testing',
+        }),
+      }),
+    );
+
+    expect(await storageProvider.canWrite()).toBe(true);
+
+    expect(mockFetch).toHaveBeenCalledTimes(2);
+    expect(mockFetch).toHaveBeenNthCalledWith(1,
+      'https://api.bitbucket.org/2.0/user',
+      {
+        headers: {
+          Authorization: `Basic ${btoa('test@example.com:mock-api-token')}`,
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+    expect(mockFetch).toHaveBeenNthCalledWith(2,
+      `https://api.bitbucket.org/2.0/repositories/${storageProvider.owner}/${storageProvider.repository}`,
+      {
+        headers: {
+          Authorization: `Basic ${btoa('test@example.com:mock-api-token')}`,
+        },
+      },
+    );
   });
 
   it('canWrite should return true if user has admin or write permissions', async () => {
-    mockGetAuthedUser.mockImplementationOnce(() =>
+    // Mock successful user authentication
+    mockFetch.mockImplementationOnce(() =>
       Promise.resolve({
-        data: { account_id: '123' },
+        ok: true,
+        json: () => Promise.resolve({
+          account_id: '123',
+          username: 'testuser',
+        }),
       }),
     );
-    mockListPermissions.mockImplementationOnce(() =>
+
+    // Mock successful repository access
+    mockFetch.mockImplementationOnce(() =>
       Promise.resolve({
-        data: { values: [{ permission: 'admin' }] },
+        ok: true,
+        json: () => Promise.resolve({
+          name: 'figma-tokens-testing',
+          full_name: 'MattOliver/figma-tokens-testing',
+        }),
       }),
     );
 
@@ -158,7 +229,7 @@ describe('BitbucketTokenStorage', () => {
       `https://api.bitbucket.org/2.0/repositories/${storageProvider.owner}/${storageProvider.repository}/src/${storageProvider.branch}/global.json`,
       {
         headers: {
-          Authorization: `Basic ${btoa('myusername:mock-secret')}`,
+          Authorization: `Basic ${btoa('test@example.com:mock-api-token')}`,
         },
         cache: 'no-cache',
       },
@@ -166,28 +237,46 @@ describe('BitbucketTokenStorage', () => {
   });
 
   it('listBranches should fetch branches as a simple list', async () => {
-    mockListBranches.mockImplementationOnce(() =>
-      Promise.resolve({ data: { values: [{ name: 'main' }, { name: 'different-branch' }] } }),
-    );
+    // Reset and setup mock specifically for this test
+    mockFetch.mockReset();
+    mockFetch.mockImplementation((url) => {
+      if (url.includes('/refs/branches')) {
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          json: () => Promise.resolve({
+            values: [{ name: 'main' }, { name: 'different-branch' }],
+          }),
+        });
+      }
+      // Default fallback for other calls
+      return Promise.resolve({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({}),
+        text: () => Promise.resolve(''),
+      });
+    });
 
-    expect(await storageProvider.fetchBranches()).toEqual(['main', 'different-branch']);
+    const result = await storageProvider.fetchBranches();
+    expect(result).toEqual(['main', 'different-branch']);
   });
 
   it('should call createBranch', async () => {
     // Arrange
-    const mockCreateBranch = jest.fn().mockResolvedValue(true);
-    storageProvider.createBranch = mockCreateBranch;
+    const mockCreateBranchMethod = jest.fn().mockResolvedValue(true);
+    storageProvider.createBranch = mockCreateBranchMethod;
 
     // Act
     const result = await storageProvider.createBranch('new-branch');
 
     // Assert
     expect(result).toBe(true);
-    expect(mockCreateBranch).toHaveBeenCalledTimes(1);
+    expect(mockCreateBranchMethod).toHaveBeenCalledTimes(1);
   });
 
   it('should try to create a branch', async () => {
-    const result = await storageProvider.createBranch('new-branch').catch((err) => console.error(err));
+    const result = await storageProvider.createBranch('new-branch').catch(() => false);
 
     // Assert
     expect(mockCreateBranch).toHaveBeenCalledWith({
@@ -268,13 +357,13 @@ describe('BitbucketTokenStorage', () => {
         repo: 'figma-tokens-testing',
         createBranch: false,
         changes: changes.map((change) => {
-          const files: { [key: string]: string } = {};
-          if (change.files['$metadata.json']) files['$metadata.json'] = change.files['$metadata.json'];
-          if (change.files['$themes.json']) files['$themes.json'] = change.files['$themes.json'];
-          if (change.files['global.json']) files['global.json'] = change.files['global.json'];
+          const changeFiles: { [key: string]: string } = {};
+          if (change.files['$metadata.json']) changeFiles['$metadata.json'] = change.files['$metadata.json'];
+          if (change.files['$themes.json']) changeFiles['$themes.json'] = change.files['$themes.json'];
+          if (change.files['global.json']) changeFiles['global.json'] = change.files['global.json'];
           return {
             message: change.message,
-            files,
+            files: changeFiles,
           };
         }),
       }),

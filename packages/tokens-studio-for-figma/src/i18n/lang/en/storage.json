@@ -72,8 +72,8 @@
       "projectName": "Project Name"
     },
     "bitbucket": {
-      "username": "Bitbucket username",
-      "appPassword": "App Password",
+      "username": "User Email",
+      "apiToken": "API Token",
       "projectName": "Project Name (optional)",
       "repository": "Repository (workspace/repo)"
     },
