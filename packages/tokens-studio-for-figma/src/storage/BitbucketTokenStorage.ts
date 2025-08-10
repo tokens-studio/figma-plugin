@@ -37,10 +37,11 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     };
 
     // Use API Token if provided, otherwise fall back to App Password
-    // For API tokens, Bitbucket expects username 'x-token-auth' and the token as password
+    // For API tokens, Bitbucket expects Atlassian account email as username and the token as password
+    // For App passwords, use Bitbucket username and app password
     const authConfig = this.apiToken
       ? {
-        username: 'x-token-auth',
+        username: this.username || this.owner, // This should be the Atlassian account email for API tokens
         password: this.apiToken,
       }
       : {
@@ -60,12 +61,9 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     try {
       // Use direct HTTP call for API token compatibility
       if (this.apiToken) {
-        const authString = `x-token-auth:${this.apiToken}`;
+        // For API tokens, use Atlassian account email as username
+        const authString = `${this.username || this.owner}:${this.apiToken}`;
         const authHeader = `Basic ${btoa(authString)}`;
-
-        console.log('API Token auth string length:', authString.length);
-        console.log('API Token starts with:', this.apiToken.substring(0, 10));
-        console.log('Auth header starts with:', authHeader.substring(0, 20));
 
         const response = await fetch(`https://api.bitbucket.org/2.0/repositories/${this.owner}/${this.repository}/refs/branches`, {
           headers: {
@@ -74,13 +72,8 @@ export class BitbucketTokenStorage extends GitTokenStorage {
           },
         });
 
-        console.log('Response status:', response.status);
-        console.log('Response headers:', Object.fromEntries(response.headers.entries()));
-
         if (!response.ok) {
-          const errorText = await response.text();
-          console.log('Error response:', errorText);
-          throw new Error(`Failed to fetch branches: ${response.status} ${response.statusText} - ${errorText}`);
+          throw new Error(`Failed to fetch branches: ${response.status} ${response.statusText}`);
         }
 
         const data = await response.json();
@@ -103,7 +96,6 @@ export class BitbucketTokenStorage extends GitTokenStorage {
       // the first 10 branches which is fine for now
       return branches.data!.values!.map((branch) => branch.name) as string[];
     } catch (error) {
-      console.error('Error fetching branches:', error);
       return ['Error fetching branches'];
     }
   }
@@ -156,7 +148,6 @@ export class BitbucketTokenStorage extends GitTokenStorage {
 
       return newBranch.status === 201;
     } catch (err) {
-      console.error(err);
       return false;
     }
   }
@@ -168,11 +159,9 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     try {
       // Use direct HTTP call for API token compatibility
       if (this.apiToken) {
-        const authString = `x-token-auth:${this.apiToken}`;
+        // For API tokens, use Atlassian account email as username
+        const authString = `${this.username || this.owner}:${this.apiToken}`;
         const authHeader = `Basic ${btoa(authString)}`;
-
-        console.log('canWrite() - API Token auth string:', authString.substring(0, 20) + '...');
-        console.log('canWrite() - Auth header:', authHeader.substring(0, 30) + '...');
 
         // First get current user
         const userResponse = await fetch('https://api.bitbucket.org/2.0/user', {
@@ -182,11 +171,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
           },
         });
 
-        console.log('canWrite() - User response status:', userResponse.status);
-
         if (!userResponse.ok) {
-          const errorText = await userResponse.text();
-          console.log('canWrite() - User error response:', errorText);
           return false;
         }
 
@@ -242,8 +227,8 @@ export class BitbucketTokenStorage extends GitTokenStorage {
 
     while (nextPageUrl) {
       const authHeader = this.apiToken
-        ? `Basic ${btoa(`x-token-auth:${this.apiToken}`)}`
-        : `Basic ${btoa(`${this.username}:${this.secret}`)}`;
+        ? `Basic ${btoa(`${this.username || this.owner}:${this.apiToken}`)}`
+        : `Basic ${btoa(`${this.username || this.owner}:${this.secret}`)}`;
 
       const response = await fetch(nextPageUrl, {
         headers: {
@@ -279,8 +264,8 @@ export class BitbucketTokenStorage extends GitTokenStorage {
 
   private async fetchJsonFile(url: string): Promise<GitSingleFileObject> {
     const authHeader = this.apiToken
-      ? `Basic ${btoa(`x-token-auth:${this.apiToken}`)}`
-      : `Basic ${btoa(`${this.username}:${this.secret}`)}`;
+      ? `Basic ${btoa(`${this.username || this.owner}:${this.apiToken}`)}`
+      : `Basic ${btoa(`${this.username || this.owner}:${this.secret}`)}`;
 
     const response = await fetch(url, {
       headers: {
@@ -342,8 +327,8 @@ export class BitbucketTokenStorage extends GitTokenStorage {
         const jsonFiles = await this.fetchJsonFilesFromDirectory(url);
 
         const authHeader = this.apiToken
-          ? `Basic ${btoa(`x-token-auth:${this.apiToken}`)}`
-          : `Basic ${btoa(`${this.username}:${this.secret}`)}`;
+          ? `Basic ${btoa(`${this.username || this.owner}:${this.apiToken}`)}`
+          : `Basic ${btoa(`${this.username || this.owner}:${this.secret}`)}`;
 
         const jsonFileContents = await Promise.all(
           jsonFiles.map((file: any) => fetch(file.links.self.href, {
@@ -390,7 +375,6 @@ export class BitbucketTokenStorage extends GitTokenStorage {
         errorMessage: ErrorMessages.VALIDATION_ERROR,
       };
     } catch (e) {
-      console.error('Error', e);
       return [];
     }
   }
