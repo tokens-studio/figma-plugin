@@ -31,23 +31,16 @@ export class BitbucketTokenStorage extends GitTokenStorage {
 
   constructor(secret: string, owner: string, repository: string, baseUrl?: string, username?: string, apiToken?: string) {
     super(secret, owner, repository, baseUrl, username);
-    this.apiToken = apiToken;
+    this.apiToken = apiToken || secret; // Use apiToken if provided, otherwise fall back to secret for backward compatibility
     this.flags = {
       multiFileEnabled: false,
     };
 
-    // Use API Token if provided, otherwise fall back to App Password
     // For API tokens, Bitbucket expects Atlassian account email as username and the token as password
-    // For App passwords, use Bitbucket username and app password
-    const authConfig = this.apiToken
-      ? {
-        username: this.username || this.owner, // This should be the Atlassian account email for API tokens
-        password: this.apiToken,
-      }
-      : {
-        username: this.username || this.owner, // technically username is required, but we'll use owner as a fallback
-        password: this.secret,
-      };
+    const authConfig = {
+      username: this.username || this.owner, // This should be the Atlassian account email for API tokens
+      password: this.apiToken,
+    };
 
     this.bitbucketClient = new Bitbucket({
       auth: authConfig,
@@ -59,42 +52,26 @@ export class BitbucketTokenStorage extends GitTokenStorage {
   // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-refs/#api-repositories-workspace-repo-slug-refs-get
   public async fetchBranches(): Promise<string[]> {
     try {
-      // Use direct HTTP call for API token compatibility
-      if (this.apiToken) {
-        // For API tokens, use Atlassian account email as username
-        const authString = `${this.username || this.owner}:${this.apiToken}`;
-        const authHeader = `Basic ${btoa(authString)}`;
+      // Use direct HTTP call for API token authentication
+      const authString = `${this.username || this.owner}:${this.apiToken}`;
+      const authHeader = `Basic ${btoa(authString)}`;
 
-        const response = await fetch(`https://api.bitbucket.org/2.0/repositories/${this.owner}/${this.repository}/refs/branches`, {
-          headers: {
-            Authorization: authHeader,
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`Failed to fetch branches: ${response.status} ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        if (!data.values) {
-          return ['No data'];
-        }
-        return data.values.map((branch: any) => branch.name) as string[];
-      }
-
-      // Fall back to bitbucket client for app passwords
-      const branches = await this.bitbucketClient.repositories.listBranches({
-        workspace: this.owner,
-        repo_slug: this.repository,
+      const response = await fetch(`https://api.bitbucket.org/2.0/repositories/${this.owner}/${this.repository}/refs/branches`, {
+        headers: {
+          Authorization: authHeader,
+          'Content-Type': 'application/json',
+        },
       });
 
-      if (!branches || !branches.data) {
+      if (!response.ok) {
+        throw new Error(`Failed to fetch branches: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      if (!data.values) {
         return ['No data'];
       }
-      // README we'll have to account for paginated branches somehow, this only returns
-      // the first 10 branches which is fine for now
-      return branches.data!.values!.map((branch) => branch.name) as string[];
+      return data.values.map((branch: any) => branch.name) as string[];
     } catch (error) {
       return ['Error fetching branches'];
     }
@@ -157,52 +134,39 @@ export class BitbucketTokenStorage extends GitTokenStorage {
   // this would be best: https://developer.atlassian.com/cloud/bitbucket/rest/api-group-repositories/#api-repositories-workspace-repo-slug-permissions-config-users-selected-user-id-get
   public async canWrite(): Promise<boolean> {
     try {
-      // Use direct HTTP call for API token compatibility
-      if (this.apiToken) {
-        // For API tokens, use Atlassian account email as username
-        const authString = `${this.username || this.owner}:${this.apiToken}`;
-        const authHeader = `Basic ${btoa(authString)}`;
+      // Use direct HTTP call for API token authentication
+      const authString = `${this.username || this.owner}:${this.apiToken}`;
+      const authHeader = `Basic ${btoa(authString)}`;
 
-        // First get current user
-        const userResponse = await fetch('https://api.bitbucket.org/2.0/user', {
-          headers: {
-            Authorization: authHeader,
-            'Content-Type': 'application/json',
-          },
-        });
+      // First get current user
+      const userResponse = await fetch('https://api.bitbucket.org/2.0/user', {
+        headers: {
+          Authorization: authHeader,
+          'Content-Type': 'application/json',
+        },
+      });
 
-        if (!userResponse.ok) {
-          return false;
-        }
-
-        const userData = await userResponse.json();
-        if (!userData.account_id) return false;
-
-        // Check repository permissions
-        const permResponse = await fetch(`https://api.bitbucket.org/2.0/repositories/${this.owner}/${this.repository}`, {
-          headers: {
-            Authorization: authHeader,
-          },
-        });
-
-        if (!permResponse.ok) {
-          return false;
-        }
-
-        // If we can access the repository, assume we have write access
-        // (API tokens are typically created with specific permissions)
-        return true;
+      if (!userResponse.ok) {
+        return false;
       }
 
-      // Fall back to bitbucket client for app passwords
-      const currentUser = await this.bitbucketClient.users.getAuthedUser({});
-      if (!currentUser.data.account_id) return false;
+      const userData = await userResponse.json();
+      if (!userData.account_id) return false;
 
-      const { data } = await this.bitbucketClient.repositories.listPermissions({});
-      const permission = data.values?.[0]?.permission;
+      // Check repository permissions
+      const permResponse = await fetch(`https://api.bitbucket.org/2.0/repositories/${this.owner}/${this.repository}`, {
+        headers: {
+          Authorization: authHeader,
+        },
+      });
 
-      const canWrite = !!(permission === 'admin' || 'write');
-      return !!canWrite;
+      if (!permResponse.ok) {
+        return false;
+      }
+
+      // If we can access the repository, assume we have write access
+      // (API tokens are typically created with specific permissions)
+      return true;
     } catch (e) {
       return false;
     }
@@ -226,9 +190,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     let nextPageUrl: string | null = `${url}?pagelen=100`;
 
     while (nextPageUrl) {
-      const authHeader = this.apiToken
-        ? `Basic ${btoa(`${this.username || this.owner}:${this.apiToken}`)}`
-        : `Basic ${btoa(`${this.username || this.owner}:${this.secret}`)}`;
+      const authHeader = `Basic ${btoa(`${this.username || this.owner}:${this.apiToken}`)}`;
 
       const response = await fetch(nextPageUrl, {
         headers: {
@@ -263,9 +225,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
   }
 
   private async fetchJsonFile(url: string): Promise<GitSingleFileObject> {
-    const authHeader = this.apiToken
-      ? `Basic ${btoa(`${this.username || this.owner}:${this.apiToken}`)}`
-      : `Basic ${btoa(`${this.username || this.owner}:${this.secret}`)}`;
+    const authHeader = `Basic ${btoa(`${this.username || this.owner}:${this.apiToken}`)}`;
 
     const response = await fetch(url, {
       headers: {
@@ -326,9 +286,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
       if (this.flags.multiFileEnabled) {
         const jsonFiles = await this.fetchJsonFilesFromDirectory(url);
 
-        const authHeader = this.apiToken
-          ? `Basic ${btoa(`${this.username || this.owner}:${this.apiToken}`)}`
-          : `Basic ${btoa(`${this.username || this.owner}:${this.secret}`)}`;
+        const authHeader = `Basic ${btoa(`${this.username || this.owner}:${this.apiToken}`)}`;
 
         const jsonFileContents = await Promise.all(
           jsonFiles.map((file: any) => fetch(file.links.self.href, {

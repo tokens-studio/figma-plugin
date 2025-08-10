@@ -43,12 +43,8 @@ export default function BitbucketForm({
         branch: zod.string(),
         filePath: zod.string(),
         baseUrl: zod.string().optional(),
-        secret: zod.string().optional(),
-        apiToken: zod.string().optional(),
+        apiToken: zod.string(),
         internalId: zod.string().optional(),
-      }).refine((data) => data.secret || data.apiToken, {
-        message: 'Either App Password or API Token is required',
-        path: ['secret'],
       });
       const validationResult = zodSchema.safeParse(values);
       if (validationResult.success) {
@@ -92,33 +88,13 @@ export default function BitbucketForm({
           />
         </FormField>
         <FormField>
-          <Label htmlFor="secret">{t('providers.bitbucket.appPassword')}</Label>
-          <TextInput
-            value={values.secret || ''}
-            onChange={onChange}
-            name="secret"
-            id="secret"
-            type={isMasked ? 'password' : 'text'}
-            trailingAction={(
-              <IconButton
-                variant="invisible"
-                size="small"
-                onClick={toggleMask}
-                icon={isMasked ? <EyeClosedIcon /> : <EyeOpenIcon />}
-              />
-            )}
-          />
-          <Text muted size="xsmall">
-            {t('providers.bitbucket.appPasswordDeprecated', 'App Passwords are deprecated. Use API Token instead.')}
-          </Text>
-        </FormField>
-        <FormField>
           <Label htmlFor="apiToken">{t('providers.bitbucket.apiToken')}</Label>
           <TextInput
             value={values.apiToken || ''}
             onChange={onChange}
             name="apiToken"
             id="apiToken"
+            required
             type={isMasked ? 'password' : 'text'}
             trailingAction={(
               <IconButton
@@ -129,9 +105,6 @@ export default function BitbucketForm({
               />
             )}
           />
-          <Text muted size="xsmall">
-            {t('providers.bitbucket.apiTokenPreferred', 'Recommended: Use API Token for new integrations.')}
-          </Text>
         </FormField>
         <FormField>
           <Label htmlFor="id">{t('providers.bitbucket.repository')}</Label>

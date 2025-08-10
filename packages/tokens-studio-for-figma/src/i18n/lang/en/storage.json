@@ -73,10 +73,7 @@
     },
     "bitbucket": {
       "username": "User Email",
-      "appPassword": "App Password",
-      "appPasswordDeprecated": "App Passwords are deprecated. Use API Token instead.",
       "apiToken": "API Token",
-      "apiTokenPreferred": "Recommended: Use API Token for new integrations.",
       "projectName": "Project Name (optional)",
       "repository": "Repository (workspace/repo)"
     },
