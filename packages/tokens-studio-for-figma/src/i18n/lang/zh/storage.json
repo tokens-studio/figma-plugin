@@ -69,7 +69,7 @@
       "apiToken": "API 令牌",
       "projectName": "项目名称（可选）",
       "repository": "存储库（工作区/存储库）",
-      "username": "比特桶用户名"
+      "username": "用户邮箱"
     },
     "tokensstudio": {
       "name": "名称",

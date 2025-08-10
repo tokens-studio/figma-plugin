@@ -69,7 +69,7 @@
       "apiToken": "API-token",
       "projectName": "Projectnaam (optioneel)",
       "repository": "Repository (werkruimte/repository)",
-      "username": "Bitbucket-gebruikersnaam"
+      "username": "Gebruiker e-mail"
     },
     "tokensstudio": {
       "name": "Name",

@@ -69,7 +69,7 @@
       "apiToken": "Token de API",
       "projectName": "Nombre del proyecto (opcional)",
       "repository": "Repositorio (espacio de trabajo/repositorio)",
-      "username": "nombre de usuario de Bitbucket"
+      "username": "Email del usuario"
     },
     "tokensstudio": {
       "name": "Name",
