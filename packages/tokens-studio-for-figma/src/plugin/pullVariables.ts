@@ -61,6 +61,7 @@ export default async function pullVariables(options: PullVariablesOptions, theme
     if (options.selectedCollections && collection) {
       const selectedCollection = options.selectedCollections[collection.id];
       if (!selectedCollection) {
+        // eslint-disable-next-line no-continue
         continue; // Skip this collection if it's not selected
       }
     }

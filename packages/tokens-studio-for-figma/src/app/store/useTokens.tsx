@@ -35,7 +35,6 @@ import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { defaultTokenResolver } from '@/utils/TokenResolver';
 import { getFormat } from '@/plugin/TokenFormatStoreClass';
 import { ExportTokenSet } from '@/types/ExportTokenSet';
-import { useIsProUser } from '../hooks/useIsProUser';
 
 type ConfirmResult = ('textStyles' | 'colorStyles' | 'effectStyles' | string)[] | string;
 
@@ -69,7 +68,6 @@ export default function useTokens() {
   const store = useStore<RootState>();
   const tokensContext = useContext(TokensContext);
   const shouldConfirm = useMemo(() => updateMode === UpdateMode.DOCUMENT, [updateMode]);
-  const proUser = useIsProUser();
   const VALID_TOKEN_TYPES = [
     TokenTypes.DIMENSION,
     TokenTypes.BORDER_RADIUS,
