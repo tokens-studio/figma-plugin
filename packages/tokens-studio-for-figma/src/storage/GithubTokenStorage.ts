@@ -10,6 +10,7 @@ import {
 import { SystemFilenames } from '@/constants/SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { joinPath } from '@/utils/string';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 
 type ExtendedOctokitClient = Omit<Octokit, 'repos'> & {
   repos: Octokit['repos'] & {
@@ -205,6 +206,7 @@ export class GithubTokenStorage extends GitTokenStorage {
               const filePath = path.startsWith(normalizedPath) ? path : `${normalizedPath}/${path}`;
               let name = filePath.substring(this.path.length).replace(/^\/+/, '');
               name = name.replace('.json', '');
+
               const parsed = JSON.parse(fileContent.data as unknown as string) as GitMultiFileObject;
               // @README we will need to ensure these reserved names
 
@@ -224,11 +226,16 @@ export class GithubTokenStorage extends GitTokenStorage {
                 };
               }
 
+              const tokenSet = parsed as AnyTokenSet<false>;
+              if (Object.keys(tokenSet).length === 0) {
+                return null;
+              }
+
               return {
                 path: filePath,
                 name,
                 type: 'tokenSet',
-                data: parsed as AnyTokenSet<false>,
+                data: tokenSet,
               };
             }
             return null;
@@ -237,29 +244,33 @@ export class GithubTokenStorage extends GitTokenStorage {
       } else if (response.data) {
         const data = response.data as unknown as string;
         if (IsJSONString(data)) {
-          const parsed = JSON.parse(data) as GitSingleFileObject;
-          return [
-            {
-              type: 'themes',
-              path: `${this.path}/${SystemFilenames.THEMES}.json`,
-              data: parsed.$themes ?? [],
-            },
-            ...(parsed.$metadata ? [
+          try {
+            const parsed = JSON.parse(data) as GitSingleFileObject;
+            return [
               {
-                type: 'metadata' as const,
-                path: this.path,
-                data: parsed.$metadata,
+                type: 'themes',
+                path: `${this.path}/${SystemFilenames.THEMES}.json`,
+                data: parsed.$themes ?? [],
               },
-            ] : []),
-            ...(Object.entries(parsed).filter(([key]) => (
-              !Object.values<string>(SystemFilenames).includes(key)
-            )) as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile>(([name, tokenSet]) => ({
-              name,
-              type: 'tokenSet',
-              path: `${this.path}/${name}.json`,
-              data: tokenSet,
-            })),
-          ];
+              ...(parsed.$metadata ? [
+                {
+                  type: 'metadata' as const,
+                  path: this.path,
+                  data: parsed.$metadata,
+                },
+              ] : []),
+              ...(Object.entries(parsed).filter(([key]) => (
+                !Object.values<string>(SystemFilenames).includes(key)
+              )) as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile>(([name, tokenSet]) => ({
+                name,
+                type: 'tokenSet',
+                path: `${this.path}/${name}.json`,
+                data: tokenSet,
+              })),
+            ];
+          } catch (parseError) {
+            return this.handleError(parseError, StorageProviderType.GITHUB);
+          }
         }
         return {
           errorMessage: ErrorMessages.VALIDATION_ERROR,
@@ -268,9 +279,8 @@ export class GithubTokenStorage extends GitTokenStorage {
 
       return [];
     } catch (e) {
-      // Raise error (usually this is an auth error)
       console.error('Error', e);
-      return [];
+      return this.handleError(e, StorageProviderType.GITHUB);
     }
   }
 
