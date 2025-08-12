@@ -54,6 +54,7 @@ export const SearchInputWithToggle: React.FC<SearchInputWithToggleProps> = ({
         value={searchTerm}
         onChange={handleInputChange}
         onKeyDown={handleKeyDown}
+        data-testid="search-input-with-toggle-input"
         trailingAction={(
           <IconButton
             icon={<Xmark />}
@@ -61,6 +62,7 @@ export const SearchInputWithToggle: React.FC<SearchInputWithToggleProps> = ({
             variant="invisible"
             onClick={handleClearClick}
             tooltip={t('clearSearch')}
+            data-testid="search-input-with-toggle-clear"
           />
         )}
       />
@@ -73,6 +75,7 @@ export const SearchInputWithToggle: React.FC<SearchInputWithToggleProps> = ({
       variant="invisible"
       onClick={onToggleSearch}
       tooltip={tooltip}
+      data-testid="search-input-with-toggle-button"
     />
   );
 };
