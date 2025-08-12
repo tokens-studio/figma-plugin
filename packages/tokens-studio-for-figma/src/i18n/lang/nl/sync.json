@@ -3,6 +3,7 @@
   "cancel": "Annuleren",
   "pullTokens": "Tokens trekken",
   "pullFrom": "Trek uit {{provider}}",
+  "pullConfirmDescription": "Uw tokens kunnen verschillen van degene die zijn opgeslagen in {{provider}}, wilt u deze nu ophalen?",
   "pushTo": "Duwen naar {{provider}}",
   "goTo": "Ga naar {{provider}}",
   "thisWillPushYourLocalChangesToTheBranch": "Dit zal uw lokale wijzigingen naar de branch pushen:",

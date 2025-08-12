@@ -1,4 +1,4 @@
-import * as pjs from '../../../package.json';
+import pjs from '../../../package.json';
 import { ThemeObjectsList, UsedTokenSetsMap } from '@/types';
 import { AnyTokenList } from '@/types/tokens';
 import {

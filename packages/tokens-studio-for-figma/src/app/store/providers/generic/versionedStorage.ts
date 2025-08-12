@@ -3,7 +3,7 @@ import { useCallback, useMemo } from 'react';
 import compact from 'just-compact';
 import { Dispatch } from '@/app/store';
 import { notifyToUI } from '../../../../plugin/notifiers';
-import * as pjs from '../../../../../package.json';
+import pjs from '../../../../../package.json';
 import useStorage from '../../useStorage';
 import { compareUpdatedAt } from '@/utils/date';
 import {

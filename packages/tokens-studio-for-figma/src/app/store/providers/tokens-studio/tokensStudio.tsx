@@ -1,7 +1,9 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import compact from 'just-compact';
 import { Dispatch } from '@/app/store';
+import useConfirm from '@/app/hooks/useConfirm';
 import { notifyToUI } from '@/plugin/notifiers';
 import {
   activeThemeSelector,
@@ -11,6 +13,7 @@ import {
   tokensSelector,
   usedTokenSetSelector,
 } from '@/selectors';
+import { isEqual } from '@/utils/isEqual';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
@@ -51,11 +54,11 @@ let storageClientObject;
 
 const getStorageClient = (context: TokensStudioCredentials) => {
   if (!storageClientObject) {
-    storageClientObject = new TokensStudioTokenStorage(context.id, context.orgId, context.secret);
+    storageClientObject = new TokensStudioTokenStorage(context.id, context.orgId, context.secret, context.baseUrl);
     return storageClientObject;
   }
 
-  storageClientObject.setContext(context.id, context.orgId, context.secret);
+  storageClientObject.setContext(context.id, context.orgId, context.secret, context.baseUrl);
   return storageClientObject;
 };
 
@@ -81,11 +84,21 @@ export function useTokensStudio() {
   const dispatch = useDispatch<Dispatch>();
   const localApiState = useSelector(localApiStateSelector);
   const { pushDialog, closePushDialog } = usePushDialog();
+  const { confirm } = useConfirm();
+  const { t } = useTranslation(['sync']);
 
   const storageClientFactory = useCallback((context: TokensStudioCredentials) => {
     const storageClient = getStorageClient(context);
     return storageClient;
   }, []);
+
+  const askUserIfPull = useCallback(async () => {
+    const confirmResult = await confirm({
+      text: t('pullFrom', { provider: 'Tokens Studio' }),
+      description: t('pullConfirmDescription', { provider: 'Tokens Studio' }),
+    });
+    return confirmResult;
+  }, [confirm, t]);
 
   const pushTokensToTokensStudio = useCallback(
     async (context: TokensStudioCredentials, overrides?: PushOverrides): Promise<RemoteResponseData> => {
@@ -203,13 +216,36 @@ export function useTokensStudio() {
         if (!data || data.status === 'failure') {
           throw new Error(data?.errorMessage);
         }
-        dispatch.tokenState.setTokenData({
-          values: data.tokens,
-          themes: data.themes,
-          activeTheme,
-          usedTokenSet,
-        });
-        dispatch.tokenState.setCollapsedTokenSets([]);
+
+        if (data) {
+          if (
+            !isEqual(data.tokens, tokens)
+            || !isEqual(data.themes, themes)
+            || !isEqual(data.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
+          ) {
+            const userDecision = await askUserIfPull();
+            if (userDecision) {
+              const sortedValues = applyTokenSetOrder(data.tokens, data.metadata?.tokenSetOrder);
+              dispatch.tokenState.setTokenData({
+                values: sortedValues,
+                themes: data.themes,
+                activeTheme,
+                usedTokenSet,
+                hasChangedRemote: true,
+              });
+              dispatch.tokenState.setRemoteData({
+                tokens: sortedValues,
+                themes: data.themes,
+                metadata: data.metadata,
+              });
+              const stringifiedRemoteTokens = JSON.stringify(compact([data.tokens, data.themes, TokenFormat.format]), null, 2);
+              dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
+              dispatch.tokenState.setCollapsedTokenSets([]);
+              notifyToUI('Pulled tokens from Tokens Studio');
+            }
+          }
+        }
+
         return {
           status: 'success',
           tokens: data.tokens,
@@ -221,11 +257,11 @@ export function useTokensStudio() {
         notifyToUI('Error syncing with Tokens Studio, check credentials', { error: true });
         return {
           status: 'failure',
-          errorMessage: JSON.stringify(e),
+          errorMessage: String(e),
         };
       }
     },
-    [activeTheme, dispatch.tokenState, storageClientFactory, usedTokenSet],
+    [askUserIfPull, dispatch, activeTheme, tokens, themes, usedTokenSet, storageClientFactory],
   );
 
   const addNewTokensStudioCredentials = useCallback(
@@ -242,6 +278,7 @@ export function useTokensStudio() {
         type: AsyncMessageTypes.CREDENTIALS,
         credential: context,
       });
+
       return {
         status: 'success',
         tokens: data.tokens ?? tokens,

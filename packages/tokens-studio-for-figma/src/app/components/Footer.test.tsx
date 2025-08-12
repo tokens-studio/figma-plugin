@@ -2,7 +2,7 @@ import React from 'react';
 import { render, waitFor } from '../../../tests/config/setupTest';
 import { store } from '../store';
 import Footer from './Footer';
-import * as pjs from '../../../package.json';
+import pjs from '../../../package.json';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 
 describe('Footer', () => {

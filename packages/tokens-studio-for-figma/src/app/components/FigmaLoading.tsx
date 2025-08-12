@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Box, Spinner, Stack } from '@tokens-studio/ui';
 import TokensStudioIcon from '@/icons/tokensstudio.svg';
 import TokensStudioWord from '@/icons/tokensstudio-word.svg';
-import * as pjs from '../../../package.json';
+import pjs from '../../../package.json';
 import { styled } from '@/stitches.config';
 
 const StyledLoadingScreen = styled(Stack, {

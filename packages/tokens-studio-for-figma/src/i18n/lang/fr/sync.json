@@ -3,6 +3,7 @@
   "cancel": "Annuler",
   "pullTokens": "Tirer des jetons",
   "pullFrom": "Tirer de {{provider}}",
+  "pullConfirmDescription": "Vos jetons peuvent être différents de ceux stockés dans {{provider}}, voulez-vous les tirer maintenant?",
   "pushTo": "Appuyez sur {{provider}}",
   "goTo": "Aller à {{provider}}",
   "thisWillPushYourLocalChangesToTheBranch": "Cela poussera vos modifications locales vers la branche :",

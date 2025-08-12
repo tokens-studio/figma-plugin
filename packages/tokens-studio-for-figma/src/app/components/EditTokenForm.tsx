@@ -5,7 +5,6 @@ import {
   Button, Heading, Textarea, Label, Stack,
 } from '@tokens-studio/ui';
 import { track } from '@/utils/analytics';
-import { useShortcut } from '@/hooks/useShortcut';
 import { Dispatch } from '../store';
 import useManageTokens from '../store/useManageTokens';
 import CompositionTokenForm from './CompositionTokenForm';
@@ -25,6 +24,7 @@ import { checkIfAlias, checkIfContainsAlias, getAliasValue } from '@/utils/alias
 import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
 import {
   activeTokenSetSelector, editTokenSelector, themesListSelector, tokensSelector,
+  showEditFormSelector,
 } from '@/selectors';
 import { TokenTypes } from '@/constants/TokenTypes';
 import TypographyInput from './TypographyInput';
@@ -387,7 +387,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
       if (internalEditToken.initialName !== name && internalEditToken.initialName) {
         oldName = internalEditToken.initialName;
       }
-      const trimmedValue = trimValue(value);
+      const trimmedValue = trimValue(value, type);
       const newName = name
         .split('/')
         .map((n) => n.trim())
@@ -531,16 +531,26 @@ function EditTokenForm({ resolvedTokens }: Props) {
     checkAndSubmitTokenValue();
   }, [checkAndSubmitTokenValue]);
 
-  const handleSaveShortcut = React.useCallback(
-    (e: KeyboardEvent) => {
-      if (e.metaKey || e.ctrlKey) {
-        checkAndSubmitTokenValue();
-      }
-    },
-    [checkAndSubmitTokenValue],
-  );
+  // Only register the shortcut when this form is actually being used
+  const showEditForm = useSelector(showEditFormSelector);
 
-  useShortcut(['Enter'], handleSaveShortcut);
+  // Conditionally register the shortcut only when the form is active
+  React.useEffect(() => {
+    if (showEditForm) {
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+          e.preventDefault();
+          checkAndSubmitTokenValue();
+        }
+      };
+
+      document.addEventListener('keydown', handleKeyDown);
+      return () => {
+        document.removeEventListener('keydown', handleKeyDown);
+      };
+    }
+    return undefined; // return undefined to avoid eslint error
+  }, [showEditForm, checkAndSubmitTokenValue]);
 
   const handleReset = React.useCallback(() => {
     dispatch.uiState.setShowEditForm(false);
@@ -623,7 +633,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
         return (
           <div>
             <DownshiftInput
-              value={internalEditToken.value}
+              value={typeof internalEditToken.value === 'number' ? String(internalEditToken.value) : internalEditToken.value}
               type={internalEditToken.type}
               label={internalEditToken.schema?.property}
               resolvedTokens={resolvedTokens}
