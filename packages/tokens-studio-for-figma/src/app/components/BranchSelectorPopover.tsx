@@ -213,6 +213,7 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
                       type="button"
                       tooltip={t('createNew')}
                       tooltipSide="top"
+                      aria-label={t('createNew')}
                       onClick={handleCreateButtonClick}
                       css={{ flexShrink: 0 }}
                       variant="invisible"

@@ -75,8 +75,8 @@ describe('Branch switcher', () => {
   it('successfully create a new branch', () => {
     cy.startup(mockStartupParams);
     cy.get('[data-testid=branch-selector-menu-trigger]').click();
-    // Click "Create new" button to switch to create mode
-    cy.contains('Create new').click();
+y    // Click the create new branch icon button to switch to create mode
+    cy.get('button[aria-label*="Create new"], button[title*="Create new"]').first().click();
     // Click on main branch to create from it
     cy.get('[data-testid=popover-item-main]').click();
     // Should now show the create branch modal
@@ -114,8 +114,8 @@ describe('Branch switcher', () => {
       value: '4',
     });
     cy.get('[data-testid=branch-selector-menu-trigger]').click();
-    // Click "Create new" button to switch to create mode
-    cy.contains('Create new').click();
+    // Click the create new branch icon button to switch to create mode
+    cy.get('button[aria-label*="Create new"], button[title*="Create new"]').first().click();
     // Click on "Current changes" option
     cy.contains('Current changes').click();
     // Should now show the create branch modal
