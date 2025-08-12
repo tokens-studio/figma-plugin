@@ -1,6 +1,7 @@
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { transformProviderName } from '@/utils/transformProviderName';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import { ErrorCategory } from '@/types/ErrorCategory';
 
 /**
  * Categorizes an error to determine if it's a JSON parsing error, credential error, connectivity error, or other
@@ -13,7 +14,7 @@ export function categorizeError(error: any, context?: {
   operation?: string;
   hasCredentials?: boolean;
 }): {
-    type: 'credential' | 'parsing' | 'connectivity' | 'other';
+    type: ErrorCategory;
     message: string;
     header?: string;
   } {

@@ -1,4 +1,4 @@
-import { DeepTokensMap, ThemeObjectsList } from '@/types';
+import { DeepTokensMap, ThemeObjectsList, ErrorCategory } from '@/types';
 import { RemoteResponseData } from '@/types/RemoteResponseData';
 import type { AnyTokenList, SingleToken } from '@/types/tokens';
 import convertTokensToObject from '@/utils/convertTokensToObject';
@@ -42,7 +42,7 @@ export interface RemoteTokenstorageErrorMessage {
 }
 
 export interface RemoteTokenStorageCategorizedError {
-  type: 'credential' | 'parsing' | 'connectivity' | 'other';
+  type: ErrorCategory;
   message: string;
 }
 

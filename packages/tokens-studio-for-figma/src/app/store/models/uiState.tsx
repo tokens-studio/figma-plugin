@@ -4,7 +4,7 @@ import { track } from '@/utils/analytics';
 import type { RootModel } from '@/types/RootModel';
 import fetchChangelog from '@/utils/storyblok';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
-import { SelectionGroup, StoryblokStory } from '@/types';
+import { SelectionGroup, StoryblokStory, ErrorCategory } from '@/types';
 import { Tabs } from '@/constants/Tabs';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
@@ -93,7 +93,7 @@ export interface UIState {
   hasRemoteChange: boolean;
   selectedExportThemes?: string[];
   lastError?: {
-    type: 'credential' | 'parsing' | 'connectivity' | 'other';
+    type: ErrorCategory;
     message: string;
     header?: string;
   } | null;
@@ -433,7 +433,7 @@ export const uiState = createModel<RootModel>()({
       ...state,
       selectedExportThemes: data,
     }),
-    setLastError: (state, data: { type: 'credential' | 'parsing' | 'connectivity' | 'other'; message: string; header?: string } | null) => ({
+    setLastError: (state, data: { type: ErrorCategory; message: string; header?: string } | null) => ({
       ...state,
       lastError: data,
     }),
