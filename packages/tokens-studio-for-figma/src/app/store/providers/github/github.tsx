@@ -11,6 +11,7 @@ import {
   storeTokenIdInJsonEditorSelector,
   localApiStateSelector, themesListSelector, tokensSelector, usedTokenSetSelector,
 } from '@/selectors';
+import { useChangedState } from '@/hooks/useChangedState';
 import { GithubTokenStorage } from '@/storage/GithubTokenStorage';
 import { isEqual } from '@/utils/isEqual';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
@@ -34,6 +35,7 @@ export function useGitHub() {
   const localApiState = useSelector(localApiStateSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
+  const { changedPushState } = useChangedState();
   const isProUser = useIsProUser();
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
@@ -68,14 +70,35 @@ export function useGitHub() {
         const metadata = {
           tokenSetOrder: Object.keys(tokens),
         };
-        await storage.save({
-          themes,
-          tokens,
-          metadata,
-        }, {
-          commitMessage,
-          storeTokenIdInJsonEditor,
-        });
+
+        // Check if we should use optimized multi-file sync
+        const isMultiFileMode = isProUser && context.filePath && !context.filePath.endsWith('.json');
+        const hasChanges = Object.keys(changedPushState.tokens).length > 0 || changedPushState.themes.length > 0 || changedPushState.metadata;
+
+        if (isMultiFileMode && hasChanges) {
+          // Use the optimized save method for multi-file mode
+          await (storage as GithubTokenStorage).saveOptimized({
+            themes,
+            tokens,
+            metadata,
+          }, {
+            commitMessage,
+            storeTokenIdInJsonEditor,
+          }, {
+            tokens: changedPushState.tokens,
+            themes: changedPushState.themes,
+            metadata: changedPushState.metadata || null,
+          });
+        } else {
+          await storage.save({
+            themes,
+            tokens,
+            metadata,
+          }, {
+            commitMessage,
+            storeTokenIdInJsonEditor,
+          });
+        }
         const commitSha = await storage.getCommitSha();
         dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as GithubCredentials);
         dispatch.uiState.setApiData({ ...context, branch: customBranch, ...(commitSha ? { commitSha } : {}) });
@@ -101,6 +124,7 @@ export function useGitHub() {
         };
       } catch (e) {
         closePushDialog();
+        // eslint-disable-next-line no-console
         console.log('Error pushing to GitHub', e);
         if (e instanceof Error && e.message === ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR) {
           return {
@@ -137,6 +161,9 @@ export function useGitHub() {
     localApiState,
     usedTokenSet,
     activeTheme,
+    changedPushState,
+    isProUser,
+    storeTokenIdInJsonEditor,
   ]);
 
   const checkAndSetAccess = useCallback(async ({
