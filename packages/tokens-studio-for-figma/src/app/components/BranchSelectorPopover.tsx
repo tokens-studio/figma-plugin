@@ -8,7 +8,7 @@ import {
 } from '@tokens-studio/ui';
 import * as Popover from '@radix-ui/react-popover';
 import Downshift from 'downshift';
-import { ArrowLeftIcon } from '@radix-ui/react-icons';
+import { ArrowLeftIcon, PlusIcon } from '@radix-ui/react-icons';
 import { GitBranchIcon } from '@primer/octicons-react';
 import { useTranslation } from 'react-i18next';
 import ProBadge from './ProBadge';
@@ -178,6 +178,8 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
                     minWidth: '150px',
                     maxWidth: '70vw',
                     position: 'relative',
+                    display: 'flex',
+                    flexDirection: 'column',
                   }}
                 >
                   <Box
@@ -207,15 +209,16 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
                       {getTitle()}
                     </Text>
                     {mode === 'switch' && (
-                    <Button
+                    <IconButton
                       type="button"
+                      tooltip={t('createNew')}
+                      tooltipSide="top"
                       onClick={handleCreateButtonClick}
                       css={{ flexShrink: 0 }}
                       variant="invisible"
                       size="small"
-                    >
-                      {t('createNew')}
-                    </Button>
+                      icon={<PlusIcon />}
+                    />
                     )}
                   </Box>
 
