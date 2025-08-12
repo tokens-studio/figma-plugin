@@ -4,6 +4,8 @@ import { AnyTokenList } from '@/types/tokens';
 import removeTokenId from './removeTokenId';
 import { TokenFormat, TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 import { TokenInJSON } from './convertTokens';
+import { processNumberValue } from './processNumberValue';
+import { TokenTypes } from '@/constants/TokenTypes';
 
 export function getGroupTypeName(tokenName: string, groupLevel: number): string {
   if (tokenName.includes('.')) {
@@ -11,6 +13,13 @@ export function getGroupTypeName(tokenName: string, groupLevel: number): string 
     return `${tokenName.slice(0, lastDotPosition)}.${TokenFormat.tokenTypeKey}`;
   }
   return TokenFormat.tokenTypeKey;
+}
+
+function processTokenValue(value: any, tokenType: string): any {
+  if (tokenType === TokenTypes.NUMBER) {
+    return processNumberValue(value);
+  }
+  return value;
 }
 
 export default function stringifyTokens(
@@ -27,7 +36,7 @@ export default function stringifyTokens(
       const tokenInJSON: TokenInJSON = tokenWithoutInheritTypeLevel;
       // set type of group level
       set(tokenObj, getGroupTypeName(token.name, inheritTypeLevel), tokenInJSON.type);
-      tokenInJSON[TokenFormat.tokenValueKey] = tokenWithoutName.value;
+      tokenInJSON[TokenFormat.tokenValueKey] = processTokenValue(tokenWithoutName.value, tokenWithoutName.type);
       tokenInJSON[TokenFormat.tokenDescriptionKey] = tokenWithoutName.description;
       if (TokenFormat.format === TokenFormatOptions.DTCG) {
         delete tokenInJSON.type;
@@ -39,7 +48,7 @@ export default function stringifyTokens(
     } else {
       const tokenInJSON: TokenInJSON = tokenWithoutName;
       tokenInJSON[TokenFormat.tokenTypeKey] = tokenInJSON.type;
-      tokenInJSON[TokenFormat.tokenValueKey] = tokenInJSON.value;
+      tokenInJSON[TokenFormat.tokenValueKey] = processTokenValue(tokenInJSON.value, tokenInJSON.type);
       tokenInJSON[TokenFormat.tokenDescriptionKey] = tokenInJSON.description;
       if (TokenFormat.format === TokenFormatOptions.DTCG) {
         delete tokenInJSON.type;
