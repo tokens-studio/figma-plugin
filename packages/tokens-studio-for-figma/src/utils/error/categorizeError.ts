@@ -20,21 +20,50 @@ export function categorizeError(error: any, context?: {
   const errorString = String(error);
   const errorMessage = error?.message || errorString;
 
-  // Helper function to get provider-specific messages
+  // Helper function to get provider-specific messages using ErrorMessages constants
   const getProviderSpecificMessage = (baseMessage: string, type: 'credential' | 'connectivity') => {
     if (!context?.provider) return baseMessage;
 
-    const providerName = transformProviderName(context.provider);
-
     if (type === 'credential') {
-      if (context.hasCredentials === false) {
-        return `Could not load tokens from ${providerName}. No credentials configured.`;
+      switch (context.provider) {
+        case StorageProviderType.GITHUB:
+          return ErrorMessages.GITHUB_CREDENTIAL_ERROR;
+        case StorageProviderType.GITLAB:
+          return ErrorMessages.GITLAB_CREDENTIAL_ERROR;
+        case StorageProviderType.BITBUCKET:
+          return ErrorMessages.BITBUCKET_CREDENTIAL_ERROR;
+        case StorageProviderType.ADO:
+          return ErrorMessages.ADO_CREDENTIAL_ERROR;
+        case StorageProviderType.URL:
+          return ErrorMessages.URL_CREDENTIAL_ERROR;
+        case StorageProviderType.JSONBIN:
+          return ErrorMessages.JSONBIN_CREDENTIAL_ERROR;
+        case StorageProviderType.SUPERNOVA:
+          return ErrorMessages.SUPERNOVA_CREDENTIAL_ERROR;
+        case StorageProviderType.TOKENS_STUDIO:
+          return ErrorMessages.TOKENSSTUDIO_CREDENTIAL_ERROR;
+        default:
+          return ErrorMessages.REMOTE_CREDENTIAL_ERROR;
       }
-      return `Could not load tokens from ${providerName}. Please check your credentials.`;
     }
 
     if (type === 'connectivity') {
-      return `Unable to connect to ${providerName}. Please check your internet connection or try again later.`;
+      switch (context.provider) {
+        case StorageProviderType.GITHUB:
+          return ErrorMessages.GITHUB_CONNECTIVITY_ERROR;
+        case StorageProviderType.GITLAB:
+          return ErrorMessages.GITLAB_CONNECTIVITY_ERROR;
+        case StorageProviderType.BITBUCKET:
+          return ErrorMessages.BITBUCKET_CONNECTIVITY_ERROR;
+        case StorageProviderType.ADO:
+          return ErrorMessages.ADO_CONNECTIVITY_ERROR;
+        case StorageProviderType.TOKENS_STUDIO:
+          return ErrorMessages.TOKENSSTUDIO_CONNECTIVITY_ERROR;
+        case StorageProviderType.JSONBIN:
+          return ErrorMessages.JSONBIN_CONNECTIVITY_ERROR;
+        default:
+          return ErrorMessages.CONNECTIVITY_ERROR;
+      }
     }
 
     return baseMessage;

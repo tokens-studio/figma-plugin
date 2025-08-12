@@ -280,14 +280,14 @@ const contextMap = {
   url: urlContext,
 };
 
-// Updated error messages to match centralized error handling with provider context
-const errorMessageMap = {
-  GitHub: 'Could not load tokens from GitHub. Please check your credentials.',
-  GitLab: 'Could not load tokens from GitLab. Please check your credentials.',
-  Bitbucket: 'Could not load tokens from Bitbucket (Beta). Please check your credentials.',
-  ADO: 'Could not load tokens from ADO. Please check your credentials.',
-  jsonbin: 'Could not load tokens from JSONBin.io. Please check your credentials.',
-  url: 'Could not load tokens from URL. Please check your credentials.',
+// Use ErrorMessages constants for provider-specific credential errors
+const credentialErrorMap = {
+  GitHub: ErrorMessages.GITHUB_CREDENTIAL_ERROR,
+  GitLab: ErrorMessages.GITLAB_CREDENTIAL_ERROR,
+  Bitbucket: ErrorMessages.BITBUCKET_CREDENTIAL_ERROR,
+  ADO: ErrorMessages.ADO_CREDENTIAL_ERROR,
+  jsonbin: ErrorMessages.JSONBIN_CREDENTIAL_ERROR,
+  url: ErrorMessages.URL_CREDENTIAL_ERROR,
 };
 
 describe('remoteTokens', () => {
@@ -420,7 +420,7 @@ describe('remoteTokens', () => {
       });
       expect(await result.current.pullTokens({ context: context as StorageTypeCredentials })).toEqual({
         status: 'failure',
-        errorMessage: errorMessageMap[contextName as keyof typeof errorMessageMap],
+        errorMessage: credentialErrorMap[contextName as keyof typeof credentialErrorMap],
       });
     });
   });
@@ -602,7 +602,7 @@ describe('remoteTokens', () => {
       });
       await waitFor(() => { result.current.restoreStoredProvider(context as StorageTypeCredentials); });
       expect(notifyToUI).toBeCalledTimes(1);
-      expect(notifyToUI).toBeCalledWith(errorMessageMap[contextName as keyof typeof errorMessageMap], { error: true });
+      expect(notifyToUI).toBeCalledWith(credentialErrorMap[contextName as keyof typeof credentialErrorMap], { error: true });
     });
   });
 
@@ -770,7 +770,7 @@ describe('remoteTokens', () => {
         expect(mockClosePushDialog).toBeCalledTimes(1);
         expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
           status: 'failure',
-          errorMessage: (context === adoContext || context === gitLabContext) ? ErrorMessages.GENERAL_CONNECTION_ERROR : errorMessageMap[contextName as keyof typeof errorMessageMap],
+          errorMessage: (context === adoContext || context === gitLabContext) ? ErrorMessages.GENERAL_CONNECTION_ERROR : credentialErrorMap[contextName as keyof typeof credentialErrorMap],
         });
       });
     }
@@ -827,7 +827,7 @@ describe('remoteTokens', () => {
         ));
         if (context === urlContext) {
           expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
-            errorMessage: 'Could not load tokens from URL. Please check your credentials.',
+            errorMessage: ErrorMessages.URL_CREDENTIAL_ERROR,
             status: 'failure',
           });
         } else {
