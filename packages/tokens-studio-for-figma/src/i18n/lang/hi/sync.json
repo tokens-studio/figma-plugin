@@ -17,5 +17,11 @@
   "pushYourLocalChangesToYourSupernovaIoDesignSystem": "अपने स्थानीय परिवर्तनों को अपने Supernova.io डिज़ाइन सिस्टम में पुश करें।",
   "designSystem": "डिज़ाइन प्रणाली",
   "pushYourLocalChangesToYourRepository": "अपने स्थानीय परिवर्तनों को अपनी रिपॉजिटरी में पुश करें।",
-  "commitMessage": "प्रतिबद्ध संदेश"
+  "commitMessage": "प्रतिबद्ध संदेश",
+  "couldNotLoadTokens": "टोकन लोड नहीं हो सके",
+  "failedToParseJSON": "JSON पार्स करने में विफल",
+  "credentialError": "क्रेडेंशियल त्रुटि",
+  "connectivityError": "कनेक्टिविटी त्रुटि",
+  "genericError": "एक त्रुटि हुई",
+  "retry": "पुनः प्रयास करें"
 }

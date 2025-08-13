@@ -4,7 +4,7 @@ import { track } from '@/utils/analytics';
 import type { RootModel } from '@/types/RootModel';
 import fetchChangelog from '@/utils/storyblok';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
-import { SelectionGroup, StoryblokStory } from '@/types';
+import { SelectionGroup, StoryblokStory, ErrorCategory } from '@/types';
 import { Tabs } from '@/constants/Tabs';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
@@ -92,6 +92,11 @@ export interface UIState {
   sidebarWidth: number;
   hasRemoteChange: boolean;
   selectedExportThemes?: string[];
+  lastError?: {
+    type: ErrorCategory;
+    message: string;
+    header?: string;
+  } | null;
 }
 
 const defaultConfirmState: ConfirmProps = {
@@ -153,6 +158,7 @@ export const uiState = createModel<RootModel>()({
     sidebarWidth: 150,
     hasRemoteChange: false,
     selectedExportThemes: [],
+    lastError: null,
   } as unknown as UIState,
   reducers: {
     setShowConvertTokenFormatModal: (state, data: boolean) => ({
@@ -426,6 +432,10 @@ export const uiState = createModel<RootModel>()({
     setSelectedExportThemes: (state, data: string[]) => ({
       ...state,
       selectedExportThemes: data,
+    }),
+    setLastError: (state, data: { type: ErrorCategory; message: string; header?: string } | null) => ({
+      ...state,
+      lastError: data,
     }),
   },
   effects: (dispatch) => ({
