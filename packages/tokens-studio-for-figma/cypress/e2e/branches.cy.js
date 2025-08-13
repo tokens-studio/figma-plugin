@@ -68,20 +68,23 @@ describe('Branch switcher', () => {
   it('successfully shows list of branches', () => {
     cy.startup(mockStartupParams);
     cy.get('[data-testid=branch-selector-menu-trigger]').click();
-    cy.get('[data-testid=branch-switch-menu-radio-element-main]').should('have.length', 1);
-    cy.get('[data-testid=branch-switch-menu-radio-element-development]').should('have.length', 1);
+    cy.get('[data-testid=popover-item-main]').should('have.length', 1);
+    cy.get('[data-testid=popover-item-development]').should('have.length', 1);
   });
 
   it('successfully create a new branch', () => {
     cy.startup(mockStartupParams);
     cy.get('[data-testid=branch-selector-menu-trigger]').click();
-    cy.get('[data-testid=branch-selector-create-new-branch-trigger]').click();
-    cy.get('[data-testid=branch-selector-create-branch-from-branch-main]').click();
+    // Click "Create new" icon button to switch to create mode
+    cy.get('button[aria-label*="Create new"], button[title*="Create new"]').first().click();
+    // Click on main branch to create from it
+    cy.get('[data-testid=popover-item-main]').click();
+    // Should now show the create branch modal
     cy.get('input[name=branch]').type('new-branch');
     cy.get('button[type=submit]').click();
-
+    // Verify the new branch appears in the list
     cy.get('[data-testid=branch-selector-menu-trigger]').click();
-    cy.get('[data-testid=branch-switch-menu-radio-element-new-branch]').should('have.length', 1);
+    cy.get('[data-testid=popover-item-new-branch]').should('have.length', 1);
   });
 
   it('successfully create a new branch from current change', () => {
@@ -111,8 +114,11 @@ describe('Branch switcher', () => {
       value: '4',
     });
     cy.get('[data-testid=branch-selector-menu-trigger]').click();
-    cy.get('[data-testid=branch-selector-create-new-branch-trigger]').click();
-    cy.get('[data-testid=branch-selector-create-new-branch-from-current-change]').click();
+    // Click the create new branch icon button to switch to create mode
+    cy.get('button[aria-label*="Create new"], button[title*="Create new"]').first().click();
+    // Click on "Current changes" option
+    cy.contains('Current changes').click();
+    // Should now show the create branch modal
     cy.get('input[name=branch]').type('new-branch');
     cy.get('button[type=submit]').click();
     cy.get('[data-testid=push-dialog-commit-message]').type('push changes');
@@ -123,14 +129,15 @@ describe('Branch switcher', () => {
   it('successfully change to an existing branch', () => {
     cy.startup(mockStartupParams);
     cy.get('[data-testid=branch-selector-menu-trigger]').click();
-    cy.get('[data-testid=branch-switch-menu-radio-element-development]').click();
-
+    cy.get('[data-testid=popover-item-development]').click();
+    
     // Handle the error dialog that appears when GitHub connection fails during branch switching
     // This is expected behavior when GitHub is unreachable in the test environment
     cy.get('#pullDialog-button-cancel', { timeout: 5000 }).should('be.visible').click();
-
+    
     cy.get('[data-testid=branch-selector-menu-trigger]').click();
-    cy.get('[data-testid=branch-switch-menu-radio-element-development] [data-testid=branch-switch-menu-check-icon]').should('have.length', 1);
+    // Check that development branch is now selected (has checkmark)
+    cy.get('[data-testid=popover-item-development]').should('contain', '✓');
   });
 
   it('successfully push change', () => {
@@ -162,5 +169,39 @@ describe('Branch switcher', () => {
     cy.get('[data-testid=push-dialog-commit-message]').type('push changes');
     cy.get('[data-testid=push-dialog-button-push-changes]').click();
     cy.get('[data-testid=push-dialog-success-heading]').should('have.length', 1);
+  });
+
+  it('shows pro upgrade overlay for non-pro users', () => {
+    // Create a non-pro user setup
+    const nonProUserParams = {
+      ...mockStartupParams,
+      licenseKey: null, // Remove license to make user non-pro
+    };
+    
+    cy.startup(nonProUserParams);
+    cy.get('[data-testid=branch-selector-menu-trigger]').click();
+    
+    // Should show pro upgrade overlay
+    cy.contains('Branching is a feature of the Pro subscription').should('be.visible');
+    cy.contains('Upgrade to Pro to create and switch branches').should('be.visible');
+  });
+
+  it('allows searching branches', () => {
+    cy.startup(mockStartupParams);
+    cy.get('[data-testid=branch-selector-menu-trigger]').click();
+    
+    // Type in search input
+    cy.get('input[placeholder="Search..."]').type('main');
+    
+    // Should only show main branch
+    cy.get('[data-testid=popover-item-main]').should('have.length', 1);
+    cy.get('[data-testid=popover-item-development]').should('not.exist');
+    
+    // Clear search
+    cy.get('input[placeholder="Search..."]').clear();
+    
+    // Should show all branches again
+    cy.get('[data-testid=popover-item-main]').should('have.length', 1);
+    cy.get('[data-testid=popover-item-development]').should('have.length', 1);
   });
 });
