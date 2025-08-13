@@ -92,18 +92,48 @@ export class ADOTokenStorage extends GitTokenStorage {
       ? Object.entries(params).reduce<string>((acc, [key, value]) => `${acc}${key}=${value}&`, '') + apiVersion
       : apiVersion;
     const input = `${orgUrl}/${projectId ? `${projectId}/` : ''}_apis/git/repositories/${repositoryId}/${gitResource}?${paramString}`;
-    const res = await fetch(
-      input,
-      {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Basic ${btoa(`:${token}`)}`,
-        },
-        body,
-      },
-    );
-    return res;
+
+    // Retry logic for Azure DevOps IP transition network issues
+    let lastError: any;
+    const maxRetries = 3;
+    let delayMs = 1000;
+
+    for (let attempt = 1; attempt <= maxRetries; attempt += 1) {
+      try {
+        // eslint-disable-next-line no-console
+        console.log(`ADO fetchGit - Attempt ${attempt}/${maxRetries} for ${gitResource}: ${input}`);
+
+        const res = await fetch(
+          input,
+          {
+            method,
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Basic ${btoa(`:${token}`)}`,
+            },
+            body,
+          },
+        );
+
+        return res;
+      } catch (error) {
+        lastError = error;
+
+        if (attempt === maxRetries) {
+          break;
+        }
+        // Wait before retry
+        const currentDelay = delayMs;
+        await new Promise((resolve) => {
+          setTimeout(resolve, currentDelay);
+        });
+
+        // Exponential backoff
+        delayMs *= 2;
+      }
+    }
+
+    throw lastError;
   }
 
   public async canWrite(): Promise<boolean> {
@@ -216,9 +246,26 @@ export class ADOTokenStorage extends GitTokenStorage {
           includeContent: true,
         },
       });
-      return await response.json();
+
+      // Check for network issues related to Azure DevOps IP transition
+      if (!response.ok) {
+        if (response.status === 0 || response.status >= 500 || response.status === 502 || response.status === 503 || response.status === 504) {
+          // eslint-disable-next-line no-console
+          console.error('ADO getItem - Possible network/DNS issue due to Azure DevOps IP transition');
+        }
+
+        return {};
+      }
+
+      const result = await response.json();
+
+      // Check for empty responses (common during network issues)
+      if (!result || (typeof result === 'object' && Object.keys(result).length === 0)) {
+        return {};
+      }
+
+      return result;
     } catch (e) {
-      console.log(e);
       return {};
     }
   }
