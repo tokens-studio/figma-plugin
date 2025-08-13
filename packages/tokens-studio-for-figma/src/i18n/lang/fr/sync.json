@@ -3,6 +3,7 @@
   "cancel": "Annuler",
   "pullTokens": "Tirer des jetons",
   "pullFrom": "Tirer de {{provider}}",
+  "pullConfirmDescription": "Vos jetons peuvent être différents de ceux stockés dans {{provider}}, voulez-vous les tirer maintenant?",
   "pushTo": "Appuyez sur {{provider}}",
   "goTo": "Aller à {{provider}}",
   "thisWillPushYourLocalChangesToTheBranch": "Cela poussera vos modifications locales vers la branche :",
@@ -16,5 +17,11 @@
   "pushYourLocalChangesToYourSupernovaIoDesignSystem": "Poussez vos modifications locales vers votre système de conception Supernova.io.",
   "designSystem": "Système de conception",
   "pushYourLocalChangesToYourRepository": "Poussez vos modifications locales vers votre référentiel.",
-  "commitMessage": "Message de validation"
+  "commitMessage": "Message de validation",
+  "couldNotLoadTokens": "Impossible de charger les jetons",
+  "failedToParseJSON": "Échec de l'analyse JSON",
+  "credentialError": "Erreur d'identification",
+  "connectivityError": "Erreur de connectivité",
+  "genericError": "Une erreur s'est produite",
+  "retry": "Réessayer"
 }

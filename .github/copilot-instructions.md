@@ -10,6 +10,7 @@ Tokens Studio for Figma is a plugin for Figma allowing you to define and use des
 ### Figma Plugin Architecture
 
 As a Figma plugin, our codebase is split into two main environments:
+
 - **UI (iframe)**: The React-based user interface that runs in a browser-like environment
 - **Figma Sandbox**: The code that interacts directly with the Figma document and API
 
@@ -30,6 +31,29 @@ For anything related to the Figma sandbox environment or using the global `figma
 2. Start development: `yarn start` (watches for changes)
 3. Build for production: `yarn build`
 
+## 🚨 MANDATORY: Changeset Requirements
+
+**CRITICAL: Every PR and code change must include a changeset - no exceptions.**
+
+**Before making ANY code changes:**
+
+1. **Run `yarn changeset` immediately after making code changes**
+2. **Always select "patch" as the version bump** (maintainers will upgrade to minor/major if needed)
+3. **Write a clear, user-facing description of what changed**
+4. **Commit the generated changeset file with your changes**
+
+**This is not optional - it is required for all code modifications.**
+
+Example changeset format:
+
+```
+---
+"@tokens-studio/figma-plugin": patch
+---
+
+Brief description of the changes made
+```
+
 ## Build System
 
 ### Core Build Commands
@@ -43,6 +67,7 @@ For anything related to the Figma sandbox environment or using the global `figma
 ### Webpack Configuration
 
 The project uses Webpack with the following key configurations:
+
 - SWC for fast transpilation
 - Different entry points for UI and plugin code
 - Source maps in development mode
@@ -159,6 +184,8 @@ SENTRY_REPLAY_SAMPLING=0
 4. Keep components small and focused
 5. Use appropriate error handling
 6. Document complex logic with comments
-7. Always use `yarn changeset` on every PR to describe your changes
+7. **Always create a changeset (see Changeset Requirements section above)**
 8. For UI components, use @tokens-studio/ui components that we use across the codebase instead of creating from scratch
 9. For UI work, use tokens from @tokens-studio/tokens, found in node_modules/@tokens-studio/tokens/dist/css/dark.css and node_modules/@tokens-studio/tokens/dist/css/core.css instead of using raw hex values.
+
+

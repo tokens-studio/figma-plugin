@@ -3,6 +3,7 @@
   "cancel": "取消",
   "pullTokens": "拉取 Token",
   "pullFrom": "从 {{provider}} 中提取",
+  "pullConfirmDescription": "您的 Token 可能与存储在 {{provider}} 中的不同，您现在想要提取这些吗？",
   "pushTo": "推至 {{provider}}",
   "goTo": "转到{{provider}}",
   "thisWillPushYourLocalChangesToTheBranch": "这会将您的本地更改推送到分支：",
@@ -16,5 +17,11 @@
   "pushYourLocalChangesToYourSupernovaIoDesignSystem": "将本地更改推送到 Supernova.io 设计系统。",
   "designSystem": "设计系统",
   "pushYourLocalChangesToYourRepository": "将本地更改推送到存储库。",
-  "commitMessage": "提交信息"
+  "commitMessage": "提交信息",
+  "couldNotLoadTokens": "无法加载令牌",
+  "failedToParseJSON": "解析 JSON 失败",
+  "credentialError": "凭据错误",
+  "connectivityError": "连接错误",
+  "genericError": "发生错误",
+  "retry": "重试"
 }

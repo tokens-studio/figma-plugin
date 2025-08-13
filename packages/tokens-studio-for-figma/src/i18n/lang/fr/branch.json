@@ -4,5 +4,10 @@
   "cancel": "Annuler",
   "createNewBranch": "Créer une nouvelle branche à partir de",
   "currentChanges": "Changements actuels",
-  "unSavedChanges": "Vous avez des changements non enregistrés"
+  "unSavedChanges": "Vous avez des changements non enregistrés",
+  "createNew": "Créer nouveau",
+  "search": "Rechercher...",
+  "noBranchesFound": "Aucune branche trouvée",
+  "branchingProFeature": "La gestion des branches est une fonctionnalité de l'abonnement Pro",
+  "upgradeToPro": "Passez à Pro pour créer et changer de branches"
 }
