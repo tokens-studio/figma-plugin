@@ -12,7 +12,7 @@ import { SystemFilenames } from '@/constants/SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { AnyTokenSet } from '@/types/tokens';
 
-const apiVersion = 'api-version=6.0';
+const apiVersion = 'api-version=7.0';
 
 enum ChangeType {
   add = 'add',
