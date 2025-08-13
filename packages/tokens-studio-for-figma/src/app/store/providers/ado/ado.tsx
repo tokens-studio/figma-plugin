@@ -21,6 +21,8 @@ import { applyTokenSetOrder } from '@/utils/tokenset';
 import { PushOverrides } from '../../remoteTokens';
 import { useIsProUser } from '@/app/hooks/useIsProUser';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
+import { categorizeError } from '@/utils/error/categorizeError';
+
 
 type AdoCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.ADO; }>;
 type AdoFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.ADO; }>;
@@ -109,9 +111,14 @@ export const useADO = () => {
             errorMessage: e.message,
           };
         }
+        const { message } = categorizeError(e, {
+          provider: StorageProviderType.ADO,
+          operation: 'push',
+          hasCredentials: true,
+        });
         return {
           status: 'failure',
-          errorMessage: ErrorMessages.ADO_CREDENTIAL_ERROR,
+          errorMessage: message,
         };
       }
     }
@@ -164,9 +171,14 @@ export const useADO = () => {
       }
     } catch (e) {
       console.log('Error', e);
+      const { message } = categorizeError(e, {
+        provider: StorageProviderType.ADO,
+        operation: 'pull',
+        hasCredentials: true,
+      });
       return {
         status: 'failure',
-        errorMessage: ErrorMessages.ADO_CREDENTIAL_ERROR,
+        errorMessage: message,
       };
     }
     return null;
@@ -227,11 +239,17 @@ export const useADO = () => {
       }
       return await pushTokensToADO(context);
     } catch (e) {
-      notifyToUI(ErrorMessages.ADO_CREDENTIAL_ERROR, { error: true });
       console.log('Error', e);
+      const { message } = categorizeError(e, {
+        provider: StorageProviderType.ADO,
+        operation: 'sync',
+        hasCredentials: true,
+      });
+
+      notifyToUI(message, { error: true });
       return {
         status: 'failure',
-        errorMessage: ErrorMessages.ADO_CREDENTIAL_ERROR,
+        errorMessage: message,
       };
     }
   }, [
@@ -242,6 +260,8 @@ export const useADO = () => {
     themes,
     tokens,
     checkAndSetAccess,
+    activeTheme,
+    usedTokenSet,
   ]);
 
   const addNewADOCredentials = React.useCallback(
@@ -281,9 +301,9 @@ export const useADO = () => {
       dispatch,
       tokens,
       themes,
-      usedTokenSet,
-      activeTheme,
       syncTokensWithADO,
+      localApiState.branch,
+      localApiState.filePath,
     ],
   );
 

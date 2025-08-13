@@ -25,6 +25,7 @@ export enum MessageFromPluginTypes {
   SET_TOKENS = 'set_tokens',
   NOTIFY_EXCEPTION = 'notify_exception',
   TRACK_FROM_PLUGIN = 'track_from_plugin',
+  RENAME_COLLECTIONS_AND_MODES = 'rename_collections_and_modes',
 }
 
 export type NoSelectionFromPluginMessage = { type: MessageFromPluginTypes.NO_SELECTION };
@@ -130,6 +131,11 @@ export type TrackFromPluginMessage = {
   opts?: Record<string, unknown>;
 };
 
+export type RenameCollectionsAndModesMessage = {
+  type: MessageFromPluginTypes.RENAME_COLLECTIONS_AND_MODES;
+  renamedCollections: [string, string][];
+};
+
 export type PostToUIMessage =
   | NoSelectionFromPluginMessage
   | SelectionFromPluginMessage
@@ -145,4 +151,5 @@ export type PostToUIMessage =
   | CompleteJobTasksFromPluginMessage
   | SetTokensFromPluginMessage
   | NotifyExceptionFromPluginMessage
+  | RenameCollectionsAndModesMessage
   | TrackFromPluginMessage;
