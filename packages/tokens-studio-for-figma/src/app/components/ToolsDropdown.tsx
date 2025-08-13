@@ -11,7 +11,7 @@ import ExportModal from './modals/ExportModal';
 import LivingDocumentationModal from './modals/LivingDocumentationModal';
 import ProBadge from './ProBadge';
 import UpgradeToProModal from './UpgradeToProModal';
-import generateDocumentationImage from '@/app/assets/hints/generateDocumentation.png';
+import generateDocumentationImage from '@/app/assets/hints/generatedocumentation.png';
 
 export default function ToolsDropdown() {
   const editProhibited = useSelector(editProhibitedSelector);
