@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
 import {
+  Box,
   Button, Stack, Text,
 } from '@tokens-studio/ui';
 import Modal from './Modal';
@@ -33,14 +34,16 @@ export default function UpgradeToProModal({
     <Modal title={modalTitle} isOpen={isOpen} close={onClose} size="large">
       <Stack direction="column" gap={4}>
         {image && (
-          <div style={{
+          <Box css={{
             display: 'flex',
             justifyContent: 'center',
-            marginBottom: '16px',
+            marginBottom: '$1',
+            borderRadius: '$small',
+            overflow: 'hidden',
           }}
           >
             <img src={image} alt="Upgrade to Pro" />
-          </div>
+          </Box>
         )}
         <Text size="small">
           {description}
