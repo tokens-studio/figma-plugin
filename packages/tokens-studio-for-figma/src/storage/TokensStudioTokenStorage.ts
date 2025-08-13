@@ -25,14 +25,33 @@ import {
 import { track } from '@/utils/analytics';
 import { ThemeObjectsList } from '@/types';
 import { TokensStudioAction } from '@/app/store/providers/tokens-studio';
+import { StudioConfigurationService } from './tokensStudio/StudioConfigurationService';
+import { shouldUseSecureConnection } from '@/utils/shouldUseSecureConnection';
+import { store } from '@/app/store';
+import { isJWTError, getErrorMessage } from '@/utils/jwtErrorUtils';
 
 const DEFAULT_BRANCH = 'main';
 
-const makeClient = (secret: string) => create({
-  host: process.env.TOKENS_STUDIO_API_HOST || 'localhost:4200',
-  secure: process.env.NODE_ENV !== 'development',
-  auth: `Bearer ${secret}`,
-});
+// Checks if an error is related to invalid JWT token and clears the stored token if so
+function handleJWTError(error: any): void {
+  const errorMessage = getErrorMessage(error);
+
+  if (isJWTError(errorMessage)) {
+    store.dispatch.userState.setTokensStudioPAT(null);
+    notifyToUI('Authentication token expired. Please re-enter your Tokens Studio API key.', { error: true });
+  }
+}
+
+const makeClient = async (secret: string, baseUrl?: string) => {
+  const configService = StudioConfigurationService.getInstance();
+  const host = await configService.getGraphQLHost(baseUrl);
+
+  return create({
+    host,
+    secure: shouldUseSecureConnection(baseUrl, host),
+    auth: `Bearer ${secret}`,
+  });
+};
 
 export type TokensStudioSaveOptions = {
   commitMessage?: string;
@@ -121,6 +140,9 @@ async function getProjectData(id: string, orgId: string, client: any): Promise<P
     Sentry.captureException(e);
     console.error('Error fetching tokens from Tokens Studio', e);
 
+    // Check for JWT/authentication errors and clear token if needed
+    handleJWTError(e);
+
     let errorMessage = 'Error connecting to Tokens Studio';
 
     if (e instanceof Error) {
@@ -150,33 +172,72 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
 
   private orgId: string;
 
+  private baseUrl?: string;
+
   private client: any;
 
   public actionsQueue: any[];
 
   public processQueueTimeout: NodeJS.Timeout | null;
 
-  constructor(id: string, orgId: string, secret: string) {
+  constructor(id: string, orgId: string, secret: string, baseUrl?: string) {
     super();
     this.id = id;
     this.orgId = orgId;
     this.secret = secret;
-    this.client = makeClient(secret);
+    this.baseUrl = baseUrl;
     this.actionsQueue = [];
     this.processQueueTimeout = null;
   }
 
-  public setContext(id: string, orgId: string, secret: string) {
+  public setContext(id: string, orgId: string, secret: string, baseUrl?: string) {
     this.id = id;
     this.orgId = orgId;
     this.secret = secret;
-    this.client = makeClient(secret);
+    this.baseUrl = baseUrl;
+    // Reset client initialization so it will be re-initialized with new context
+    this.clientInitialization = null;
+    this.client = null;
+  }
+
+  private clientInitialization: Promise<void> | null = null;
+
+  private async initializeClient() {
+    if (!this.clientInitialization) {
+      this.clientInitialization = this.doInitializeClient();
+    }
+    return this.clientInitialization;
+  }
+
+  private async doInitializeClient() {
+    try {
+      this.client = await makeClient(this.secret, this.baseUrl);
+    } catch (error) {
+      console.error('Failed to initialize Tokens Studio client:', error);
+      this.client = null;
+      throw error;
+    }
+  }
+
+  private async ensureClient(): Promise<void> {
+    await this.initializeClient();
+    if (!this.client) {
+      throw new Error('Failed to initialize Tokens Studio client. Please check your configuration and credentials.');
+    }
   }
 
   public async read(): Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage> {
     let tokens: AnyTokenSet | null | undefined = {};
     let themes: ThemeObjectsList = [];
     const metadata: RemoteTokenStorageMetadata = {};
+
+    try {
+      await this.ensureClient();
+    } catch (error) {
+      return {
+        errorMessage: 'Failed to initialize Tokens Studio client. Please check your configuration and credentials.',
+      };
+    }
 
     try {
       const projectData = await getProjectData(this.id, this.orgId, this.client);
@@ -192,6 +253,8 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
         metadata.tokenSetOrder = projectData.tokenSetOrder;
       }
     } catch (error) {
+      handleJWTError(error);
+
       // We get errors in a slightly changed format from the backend
       if (tokens?.errors) console.log('Error is', tokens.errors[0].message);
       return {
@@ -271,6 +334,9 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
       if (!data.name) {
         throw new Error('Invalid data');
       }
+
+      await this.ensureClient();
+
       // TODO: export the type for the mutation from sdk
       const responseData = await this.client.mutate({
         mutation: CREATE_TOKEN_SET_MUTATION,
@@ -293,6 +359,8 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
 
       successCallback?.();
     } catch (e) {
+      handleJWTError(e);
+
       Sentry.captureException(e);
       console.error('Error creating token set in Tokens Studio', e);
     }
@@ -300,6 +368,8 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
 
   private async handleUpdateTokenSet(data: any, successCallback: () => void) {
     try {
+      await this.ensureClient();
+
       const responseData = await this.client.mutate({
         mutation: UPDATE_TOKEN_SET_MUTATION,
         variables: {
@@ -336,6 +406,8 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
         throw new Error('Invalid data');
       }
 
+      await this.ensureClient();
+
       const responseData = await this.client.mutate({
         mutation: DELETE_TOKEN_SET_MUTATION,
         variables: {
@@ -362,6 +434,8 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
 
   private async handleUpdateTokenSetOrder(data: any, successCallback: () => void) {
     try {
+      await this.ensureClient();
+
       const responseData = await this.client.mutate({
         mutation: UPDATE_TOKEN_SET_ORDER_MUTATION,
         variables: {
@@ -387,6 +461,8 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
 
   private async handleCreateThemeGroup(data: any, successCallback: () => void) {
     try {
+      await this.ensureClient();
+
       const responseData = await this.client.mutate({
         mutation: CREATE_THEME_GROUP_MUTATION,
         variables: {
@@ -416,6 +492,8 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
 
   private async handleUpdateThemeGroup(data: any, successCallback: () => void) {
     try {
+      await this.ensureClient();
+
       const responseData = await this.client.mutate({
         mutation: UPDATE_THEME_GROUP_MUTATION,
         variables: {
@@ -445,6 +523,8 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
 
   private async handleDeleteThemeGroup(data: any, successCallback: () => void) {
     try {
+      await this.ensureClient();
+
       const responseData = await this.client.mutate({
         mutation: DELETE_THEME_GROUP_MUTATION,
         variables: {

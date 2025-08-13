@@ -1,15 +1,18 @@
 import compact from 'just-compact';
 import { Octokit } from '@octokit/rest';
-import { RemoteTokenstorageErrorMessage, RemoteTokenStorageFile, RemoteTokenStorageMetadata } from './RemoteTokenStorage';
+import {
+  RemoteTokenstorageErrorMessage, RemoteTokenStorageFile, RemoteTokenStorageMetadata, RemoteTokenStorageData,
+} from './RemoteTokenStorage';
 import IsJSONString from '@/utils/isJSONString';
 import { AnyTokenSet } from '@/types/tokens';
 import { ThemeObjectsList } from '@/types';
 import {
-  GitMultiFileObject, GitSingleFileObject, GitTokenStorage,
+  GitMultiFileObject, GitSingleFileObject, GitTokenStorage, GitStorageSaveOption, GitStorageSaveOptions,
 } from './GitTokenStorage';
 import { SystemFilenames } from '@/constants/SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
-import { joinPath } from '@/utils/string';
+import { GitSyncOptimizer, ChangedState } from './GitSyncOptimizer';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 
 type ExtendedOctokitClient = Omit<Octokit, 'repos'> & {
   repos: Octokit['repos'] & {
@@ -205,6 +208,7 @@ export class GithubTokenStorage extends GitTokenStorage {
               const filePath = path.startsWith(normalizedPath) ? path : `${normalizedPath}/${path}`;
               let name = filePath.substring(this.path.length).replace(/^\/+/, '');
               name = name.replace('.json', '');
+
               const parsed = JSON.parse(fileContent.data as unknown as string) as GitMultiFileObject;
               // @README we will need to ensure these reserved names
 
@@ -224,11 +228,16 @@ export class GithubTokenStorage extends GitTokenStorage {
                 };
               }
 
+              const tokenSet = parsed as AnyTokenSet<false>;
+              if (Object.keys(tokenSet).length === 0) {
+                return null;
+              }
+
               return {
                 path: filePath,
                 name,
                 type: 'tokenSet',
-                data: parsed as AnyTokenSet<false>,
+                data: tokenSet,
               };
             }
             return null;
@@ -237,29 +246,33 @@ export class GithubTokenStorage extends GitTokenStorage {
       } else if (response.data) {
         const data = response.data as unknown as string;
         if (IsJSONString(data)) {
-          const parsed = JSON.parse(data) as GitSingleFileObject;
-          return [
-            {
-              type: 'themes',
-              path: `${this.path}/${SystemFilenames.THEMES}.json`,
-              data: parsed.$themes ?? [],
-            },
-            ...(parsed.$metadata ? [
+          try {
+            const parsed = JSON.parse(data) as GitSingleFileObject;
+            return [
               {
-                type: 'metadata' as const,
-                path: this.path,
-                data: parsed.$metadata,
+                type: 'themes',
+                path: `${this.path}/${SystemFilenames.THEMES}.json`,
+                data: parsed.$themes ?? [],
               },
-            ] : []),
-            ...(Object.entries(parsed).filter(([key]) => (
-              !Object.values<string>(SystemFilenames).includes(key)
-            )) as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile>(([name, tokenSet]) => ({
-              name,
-              type: 'tokenSet',
-              path: `${this.path}/${name}.json`,
-              data: tokenSet,
-            })),
-          ];
+              ...(parsed.$metadata ? [
+                {
+                  type: 'metadata' as const,
+                  path: this.path,
+                  data: parsed.$metadata,
+                },
+              ] : []),
+              ...(Object.entries(parsed).filter(([key]) => (
+                !Object.values<string>(SystemFilenames).includes(key)
+              )) as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile>(([name, tokenSet]) => ({
+                name,
+                type: 'tokenSet',
+                path: `${this.path}/${name}.json`,
+                data: tokenSet,
+              })),
+            ];
+          } catch (parseError) {
+            return this.handleError(parseError, StorageProviderType.GITHUB);
+          }
         }
         return {
           errorMessage: ErrorMessages.VALIDATION_ERROR,
@@ -268,9 +281,8 @@ export class GithubTokenStorage extends GitTokenStorage {
 
       return [];
     } catch (e) {
-      // Raise error (usually this is an auth error)
       console.error('Error', e);
-      return [];
+      return this.handleError(e, StorageProviderType.GITHUB);
     }
   }
 
@@ -292,52 +304,53 @@ export class GithubTokenStorage extends GitTokenStorage {
     return !!response;
   }
 
-  public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch?: boolean): Promise<boolean> {
-    try {
-      const response = await this.octokitClient.rest.repos.getContent({
-        owner: this.owner,
-        repo: this.repository,
-        path: this.path,
-        ref: this.branch,
-      });
+  /**
+   * Optimized save method that only pushes changed files based on changedState
+   * @param data Token data to save
+   * @param saveOptions Save options including commit message
+   * @param changedState Object containing information about what has changed
+   * @returns Promise<boolean> indicating success
+   */
+  public async saveOptimized(
+    data: RemoteTokenStorageData<GitStorageSaveOptions>,
+    saveOptions: GitStorageSaveOption,
+    changedState: ChangedState,
+  ): Promise<boolean> {
+    // Use the shared Git sync optimizer
+    const { filteredFiles, filesToDelete, hasChanges } = GitSyncOptimizer.optimizeSync(
+      data,
+      saveOptions,
+      changedState,
+    );
 
-      if (Array.isArray(response.data)) {
-        const directoryTreeResponse = await this.octokitClient.rest.git.createTree({
-          owner: this.owner,
-          repo: this.repository,
-          tree: response.data.map((item) => ({
-            path: item.path,
-            sha: item.sha,
-            mode: getTreeMode(item.type),
-          })),
-        });
-
-        if (directoryTreeResponse.data.tree[0].sha) {
-          const treeResponse = await this.octokitClient.rest.git.getTree({
-            owner: this.owner,
-            repo: this.repository,
-            tree_sha: directoryTreeResponse.data.tree[0].sha,
-            recursive: 'true',
-          });
-
-          if (treeResponse.data.tree.length > 0) {
-            const jsonFiles = treeResponse.data.tree.filter((file) => (
-              file.path?.endsWith('.json')
-            )).sort((a, b) => (
-              (a.path && b.path) ? a.path.localeCompare(b.path) : 0
-            ));
-
-            const filesToDelete = jsonFiles.filter((jsonFile) => !Object.keys(changeset).some((item) => jsonFile.path && item === joinPath(this.path, jsonFile?.path)))
-              .map((fileToDelete) => (`${this.path.split('/')[0]}/${fileToDelete.path}` ?? ''));
-            return await this.createOrUpdate(changeset, message, branch, shouldCreateBranch, filesToDelete, true);
-          }
-        }
-      }
-
-      return await this.createOrUpdate(changeset, message, branch, shouldCreateBranch);
-    } catch {
-      return await this.createOrUpdate(changeset, message, branch, shouldCreateBranch);
+    if (!hasChanges) {
+      return true;
     }
+
+    // Use a custom write method that handles both files and deletions
+    return this.writeOptimized(filteredFiles, saveOptions, filesToDelete);
+  }
+
+  private async writeOptimized(files: RemoteTokenStorageFile<GitStorageSaveOptions>[], saveOptions: GitStorageSaveOption, filesToDelete: string[]): Promise<boolean> {
+    const branches = await this.fetchBranches();
+    if (!branches.length) return false;
+
+    // Use shared utilities to create changeset and prepare file deletions
+    const filesChangeset = GitSyncOptimizer.createMultiFileChangeset(files, this.path);
+    const filesToDeleteWithPath = GitSyncOptimizer.prepareFileDeletions(filesToDelete, this.path);
+
+    return this.createOrUpdate(
+      filesChangeset,
+      saveOptions.commitMessage ?? 'Commit from Figma',
+      this.branch,
+      !branches.includes(this.branch),
+      filesToDeleteWithPath,
+      true,
+    );
+  }
+
+  public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch?: boolean): Promise<boolean> {
+    return await this.createOrUpdate(changeset, message, branch, shouldCreateBranch, [], true);
   }
 
   public async getCommitSha(): Promise<string> {

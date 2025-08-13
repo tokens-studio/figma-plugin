@@ -1,4 +1,5 @@
 import { BoxShadowTypes } from '@/constants/BoxShadowTypes';
+import { TokenTypes } from '@/constants/TokenTypes';
 import trimValue from './trimValue';
 
 const regularValue = ['#ff00ff', ' #ff00ff', '#ff00ff ', ' #ff00ff '];
@@ -70,5 +71,30 @@ describe('trimValue', () => {
         type: BoxShadowTypes.DROP_SHADOW,
       },
     ]);
+  });
+
+  describe('number token handling', () => {
+    it('should return number for number tokens with numeric string values', () => {
+      expect(trimValue('42', TokenTypes.NUMBER)).toBe(42);
+      expect(trimValue(' 16 ', TokenTypes.NUMBER)).toBe(16);
+      expect(trimValue('0', TokenTypes.NUMBER)).toBe(0);
+      expect(trimValue('-3.14', TokenTypes.NUMBER)).toBe(-3.14);
+    });
+
+    it('should return number for number tokens with numeric values', () => {
+      expect(trimValue(42, TokenTypes.NUMBER)).toBe(42);
+      expect(trimValue(0, TokenTypes.NUMBER)).toBe(0);
+      expect(trimValue(-3.14, TokenTypes.NUMBER)).toBe(-3.14);
+    });
+
+    it('should return trimmed string for number tokens with non-numeric values', () => {
+      expect(trimValue('16px', TokenTypes.NUMBER)).toBe('16px');
+      expect(trimValue(' hello ', TokenTypes.NUMBER)).toBe('hello');
+    });
+
+    it('should handle non-number tokens normally', () => {
+      expect(trimValue('42', TokenTypes.COLOR)).toBe('42');
+      expect(trimValue(' hello ', TokenTypes.TEXT)).toBe('hello');
+    });
   });
 });
