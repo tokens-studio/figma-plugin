@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { DropdownMenu, IconButton } from '@tokens-studio/ui';
 
-import { Box, Tools } from 'iconoir-react';
+import { Tools } from 'iconoir-react';
 import { editProhibitedSelector } from '@/selectors';
 import { useIsProUser } from '@/app/hooks/useIsProUser';
 import PresetModal from './modals/PresetModal';
@@ -73,7 +73,7 @@ export default function ToolsDropdown() {
                 width: '100%',
               }}
               >
-                Generate documentation
+                {t('generateDocumentation')}
                 <ProBadge compact campaign="tools-dropdown" />
               </div>
             </DropdownMenu.Item>
@@ -88,9 +88,9 @@ export default function ToolsDropdown() {
           isOpen
           onClose={handleCloseUpgradeModal}
           feature="documentation-feature"
-          title="Upgrade to Pro"
+          title={t('upgradeToPro')}
           image={generateDocumentationImage}
-          description="Generate documentation is a Pro feature that automatically creates comprehensive design system documentation from your tokens."
+          description={t('generateDocumentationDescription')}
         />
       )}
     </>

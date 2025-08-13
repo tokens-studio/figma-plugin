@@ -74,7 +74,7 @@ export default function LivingDocumentationModal({ isOpen, onClose }: Props) {
           <Select value={tokenSet} onValueChange={handleTokenSetChange}>
             <Select.Trigger value={tokenSet} />
             <Select.Content>
-              <Select.Item value="All">All</Select.Item>
+              <Select.Item value="All">{t('all')}</Select.Item>
               {allTokenSets.map((set) => (
                 <Select.Item key={set} value={set}>
                   {set}
@@ -85,7 +85,7 @@ export default function LivingDocumentationModal({ isOpen, onClose }: Props) {
         </Stack>
         <Input full label={t('nameStartsWith')} value={startsWith} onChange={handleStartsWithChange} />
         <Stack direction="row" gap={3} align="center" css={{ width: '100%' }}>
-          <Label htmlFor="apply-tokens">Apply tokens to created layers</Label>
+          <Label htmlFor="apply-tokens">{t('applyTokensToCreatedLayers')}</Label>
           <Switch id="apply-tokens" checked={applyTokens} onCheckedChange={handleApplyTokensChange} />
         </Stack>
         <Stack direction="row" justify="end" gap={4}>
