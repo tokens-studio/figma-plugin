@@ -6,6 +6,7 @@ import { getThemeReferences } from '../asyncMessageHandlers/getThemeReferences';
 import { defaultNodeManager } from '../NodeManager';
 import { updateNodes } from '../updateNodes';
 import { AnyTokenList } from '@/types/tokens';
+import { notifyException } from '../notifiers';
 
 export async function applyTokensToDocumentation(
   container: FrameNode,
@@ -45,6 +46,11 @@ export async function applyTokensToDocumentation(
       await updateNodes(nodesWithData, String(uiSettings?.baseFontSize || 16));
     }
   } catch (error) {
+    notifyException('Generation error', {
+      title: 'Error applying tokens',
+      error,
+    });
+
     console.log('Error applying tokens:', error);
   }
 }
