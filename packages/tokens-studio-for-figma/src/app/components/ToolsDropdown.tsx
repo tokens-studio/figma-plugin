@@ -83,7 +83,7 @@ export default function ToolsDropdown() {
       {exportModalVisible && <ExportModal onClose={handleCloseExportModal} />}
       {presetModalVisible && <PresetModal onClose={handleClosePresetModal} />}
       {docModalVisible && <LivingDocumentationModal isOpen onClose={handleCloseDocModal} />}
-      {!upgradeModalVisible && (
+      {upgradeModalVisible && (
         <UpgradeToProModal
           isOpen
           onClose={handleCloseUpgradeModal}
