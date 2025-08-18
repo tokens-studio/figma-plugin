@@ -128,17 +128,24 @@ export class ADOTokenStorage extends GitTokenStorage {
   public async canWrite(): Promise<boolean> {
     if (!this.path.endsWith('.json') && !this.flags.multiFileEnabled) return false;
 
-    const { status } = await this.fetchGit({
-      gitResource: 'refs',
-      orgUrl: this.orgUrl,
-      params: {
-        filter: 'heads',
-      },
-      projectId: this.projectId,
-      repositoryId: this.repository,
-      token: this.secret,
-    });
-    return status === 200;
+    try {
+      const response = await this.fetchGit({
+        gitResource: 'refs',
+        orgUrl: this.orgUrl,
+        params: {
+          filter: 'heads',
+        },
+        projectId: this.projectId,
+        repositoryId: this.repository,
+        token: this.secret,
+      });
+      return response.status === 200;
+    } catch (error: any) {
+      if (error.response) {
+        return error.response.status === 200;
+      }
+      return false;
+    }
   }
 
   private async getRefs(filter: string = 'heads'): Promise<{ count: number, value: GitInterfaces.GitRef[] }> {
