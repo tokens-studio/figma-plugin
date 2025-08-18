@@ -9,6 +9,7 @@ import { singleFileSchema } from './schemas/singleFileSchema';
 import { SystemFilenames } from '@/constants/SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { SaveOption } from './FileTokenStorage';
+import { retryHttpRequest } from '@/utils/retryWithBackoff';
 
 type JsonBinMetadata = Partial<{
   version: string
@@ -36,25 +37,31 @@ export class JSONBinTokenStorage extends RemoteTokenStorage<JsonBinMetadata, Sav
   public static async create(name: string, updatedAt: string, secret: string): Promise<false | {
     metadata: { id: string }
   }> {
-    const response = await fetch('https://api.jsonbin.io/v3/b', {
-      method: 'POST',
-      mode: 'cors',
-      cache: 'no-cache',
-      credentials: 'same-origin',
-      body: JSON.stringify({
-        values: { options: {} },
-        $metadata: {
-          version: pjs.version,
-          updatedAt,
-        },
-      }, null, 2),
-      headers: new Headers([
-        ['Content-Type', 'application/json'],
-        ['X-Master-Key', secret],
-        ['X-Bin-Name', name],
-        ['versioning', 'false'],
-      ]),
-    });
+    const response = await retryHttpRequest(
+      () => fetch('https://api.jsonbin.io/v3/b', {
+        method: 'POST',
+        mode: 'cors',
+        cache: 'no-cache',
+        credentials: 'same-origin',
+        body: JSON.stringify({
+          values: { options: {} },
+          $metadata: {
+            version: pjs.version,
+            updatedAt,
+          },
+        }, null, 2),
+        headers: new Headers([
+          ['Content-Type', 'application/json'],
+          ['X-Master-Key', secret],
+          ['X-Bin-Name', name],
+          ['versioning', 'false'],
+        ]),
+      }),
+      {
+        maxRetries: 3,
+        initialDelayMs: 100,
+      },
+    );
 
     if (!response.ok) {
       throw Error(response.statusText);
@@ -107,16 +114,22 @@ export class JSONBinTokenStorage extends RemoteTokenStorage<JsonBinMetadata, Sav
   }
 
   public async read(): Promise<RemoteTokenStorageFile<JsonBinMetadata>[] | RemoteTokenstorageErrorMessage> {
-    const response = await fetch(`https://api.jsonbin.io/v3/b/${this.id}/latest`, {
-      method: 'GET',
-      mode: 'cors',
-      cache: 'no-cache',
-      credentials: 'same-origin',
-      headers: new Headers([
-        ...this.defaultHeaders.entries(),
-        ['X-Bin-Meta', '0'],
-      ]),
-    });
+    const response = await retryHttpRequest(
+      () => fetch(`https://api.jsonbin.io/v3/b/${this.id}/latest`, {
+        method: 'GET',
+        mode: 'cors',
+        cache: 'no-cache',
+        credentials: 'same-origin',
+        headers: new Headers([
+          ...this.defaultHeaders.entries(),
+          ['X-Bin-Meta', '0'],
+        ]),
+      }),
+      {
+        maxRetries: 3,
+        initialDelayMs: 100,
+      },
+    );
 
     if (!response.ok) {
       throw Error(response.statusText);
@@ -166,16 +179,26 @@ export class JSONBinTokenStorage extends RemoteTokenStorage<JsonBinMetadata, Sav
       }
     });
 
-    const response = await fetch(`https://api.jsonbin.io/v3/b/${this.id}`, {
-      method: 'PUT',
-      mode: 'cors',
-      cache: 'no-cache',
-      credentials: 'same-origin',
-      body: JSON.stringify(dataObject),
-      headers: new Headers([
-        ...this.defaultHeaders.entries(),
-      ]),
-    });
+    const response = await retryHttpRequest(
+      () => fetch(`https://api.jsonbin.io/v3/b/${this.id}`, {
+        method: 'PUT',
+        mode: 'cors',
+        cache: 'no-cache',
+        credentials: 'same-origin',
+        body: JSON.stringify(dataObject),
+        headers: new Headers([
+          ...this.defaultHeaders.entries(),
+        ]),
+      }),
+      {
+        maxRetries: 3,
+        initialDelayMs: 1000,
+        onRetry: (error, attempt, maxRetries, delayMs) => {
+          // eslint-disable-next-line no-console
+          console.log(`JSONBin write - Attempt ${attempt}/${maxRetries}. Error: ${error.message}. Retrying in ${delayMs}ms`);
+        },
+      },
+    );
 
     if (!response.ok) {
       throw Error(response.statusText);

@@ -11,6 +11,7 @@ import { ThemeObjectsList } from '@/types';
 import { SystemFilenames } from '@/constants/SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import { retryHttpRequest } from '@/utils/retryWithBackoff';
 
 type CreatedOrUpdatedFileType = {
   owner: string;
@@ -147,12 +148,19 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     let nextPageUrl: string | null = `${url}?pagelen=100`;
 
     while (nextPageUrl) {
-      const response = await fetch(nextPageUrl, {
-        headers: {
-          Authorization: `Basic ${btoa(`${this.username}:${this.secret}`)}`,
+      const currentUrl = nextPageUrl; // TypeScript guard to ensure non-null
+      const response = await retryHttpRequest(
+        () => fetch(currentUrl, {
+          headers: {
+            Authorization: `Basic ${btoa(`${this.username}:${this.secret}`)}`,
+          },
+          cache: 'no-cache',
+        }),
+        {
+          maxRetries: 3,
+          initialDelayMs: 100,
         },
-        cache: 'no-cache',
-      });
+      );
 
       if (!response.ok) {
         throw new Error(`Failed to read from Bitbucket: ${response.statusText}`);
@@ -180,12 +188,18 @@ export class BitbucketTokenStorage extends GitTokenStorage {
   }
 
   private async fetchJsonFile(url: string): Promise<GitSingleFileObject> {
-    const response = await fetch(url, {
-      headers: {
-        Authorization: `Basic ${btoa(`${this.username}:${this.secret}`)}`,
+    const response = await retryHttpRequest(
+      () => fetch(url, {
+        headers: {
+          Authorization: `Basic ${btoa(`${this.username}:${this.secret}`)}`,
+        },
+        cache: 'no-cache',
+      }),
+      {
+        maxRetries: 3,
+        initialDelayMs: 100,
       },
-      cache: 'no-cache',
-    });
+    );
 
     if (!response.ok) {
       throw new Error(`Failed to read from Bitbucket: ${response.statusText}`);
@@ -240,12 +254,18 @@ export class BitbucketTokenStorage extends GitTokenStorage {
         const jsonFiles = await this.fetchJsonFilesFromDirectory(url);
 
         const jsonFileContents = await Promise.all(
-          jsonFiles.map((file: any) => fetch(file.links.self.href, {
-            headers: {
-              Authorization: `Basic ${btoa(`${this.username}:${this.secret}`)}`,
+          jsonFiles.map((file: any) => retryHttpRequest(
+            () => fetch(file.links.self.href, {
+              headers: {
+                Authorization: `Basic ${btoa(`${this.username}:${this.secret}`)}`,
+              },
+              cache: 'no-cache',
+            }),
+            {
+              maxRetries: 3,
+              initialDelayMs: 100,
             },
-            cache: 'no-cache',
-          }).then((rsp) => rsp.text())),
+          ).then((rsp) => rsp.text())),
         );
         // Process the content of each JSON file
         return jsonFileContents.map((fileContent, index) => {

@@ -8,6 +8,7 @@ import { SystemFilenames } from '@/constants/SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { complexSingleFileSchema } from './schemas';
 import { SaveOption } from './FileTokenStorage';
+import { retryHttpRequest } from '@/utils/retryWithBackoff';
 
 type UrlData = {
   values: Record<string, RemoteTokenStorageSingleTokenSetFile['data']>
@@ -57,10 +58,16 @@ export class UrlTokenStorage extends RemoteTokenStorage<unknown, SaveOption> {
       ...customHeaders,
     };
 
-    const response = await fetch(this.url, {
-      method: 'GET',
-      headers,
-    });
+    const response = await retryHttpRequest(
+      () => fetch(this.url, {
+        method: 'GET',
+        headers,
+      }),
+      {
+        maxRetries: 3,
+        initialDelayMs: 100,
+      },
+    );
 
     if (response.ok) {
       const parsedJsonData = await response.json();

@@ -11,6 +11,7 @@ import { multiFileSchema, complexSingleFileSchema } from './schemas';
 import { SystemFilenames } from '@/constants/SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { AnyTokenSet } from '@/types/tokens';
+import { retryHttpRequest } from '@/utils/retryWithBackoff';
 
 const apiVersion = 'api-version=7.0';
 
@@ -93,16 +94,9 @@ export class ADOTokenStorage extends GitTokenStorage {
       : apiVersion;
     const input = `${orgUrl}/${projectId ? `${projectId}/` : ''}_apis/git/repositories/${repositoryId}/${gitResource}?${paramString}`;
 
-    // Retry logic for Azure DevOps IP transition network issues
-    let lastError: any;
-    const maxRetries = 3;
-    let delayMs = 1000;
-
-    for (let attempt = 1; attempt <= maxRetries; attempt += 1) {
-      try {
-        // eslint-disable-next-line no-console
-        console.log(`ADO fetchGit - Attempt ${attempt}/${maxRetries} for ${gitResource}: ${input}`);
-
+    // Use shared retry logic for network resilience
+    return retryHttpRequest(
+      async () => {
         const res = await fetch(
           input,
           {
@@ -115,25 +109,20 @@ export class ADOTokenStorage extends GitTokenStorage {
           },
         );
 
-        return res;
-      } catch (error) {
-        lastError = error;
-
-        if (attempt === maxRetries) {
-          break;
+        // Check for HTTP error status codes
+        if (!res.ok) {
+          const error = new Error(`HTTP ${res.status}: ${res.statusText}`);
+          (error as any).response = res;
+          throw error;
         }
-        // Wait before retry
-        const currentDelay = delayMs;
-        await new Promise((resolve) => {
-          setTimeout(resolve, currentDelay);
-        });
 
-        // Exponential backoff
-        delayMs *= 2;
-      }
-    }
-
-    throw lastError;
+        return res;
+      },
+      {
+        maxRetries: 3,
+        initialDelayMs: 100,
+      },
+    );
   }
 
   public async canWrite(): Promise<boolean> {
