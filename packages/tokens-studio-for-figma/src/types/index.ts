@@ -13,3 +13,4 @@ export * from './DeepTokensMap';
 export * from './MapValuesToTokensResult';
 export * from './ShowFormOptions';
 export * from './VariableCollectionSelection';
+export * from './ErrorCategory';

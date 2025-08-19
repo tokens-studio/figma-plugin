@@ -63,6 +63,7 @@ export enum AsyncMessageTypes {
   REMOVE_RELAUNCH_DATA = 'async/remove-relaunch-data',
   SET_VARIABLE_EXPORT_SETTINGS = 'async/set-variable-export-settings',
   SET_SELECTED_EXPORT_THEMES = 'async/set-selected-export-themes',
+  CREATE_LIVING_DOCUMENTATION = 'async/create-living-documentation',
   // the below messages are going from plugin to UI
   STARTUP = 'async/startup',
   GET_THEME_INFO = 'async/get-theme-info',
@@ -184,6 +185,14 @@ export type CreateAnnotationAsyncMessage = AsyncMessage<AsyncMessageTypes.CREATE
   direction: Direction;
 }>;
 export type CreateAnnotationAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_ANNOTATION>;
+
+export type CreateLivingDocumentationAsyncMessage = AsyncMessage<AsyncMessageTypes.CREATE_LIVING_DOCUMENTATION, {
+  tokenSet: string;
+  startsWith: string;
+  applyTokens: boolean;
+  resolvedTokens: AnyTokenList;
+}>;
+export type CreateLivingDocumentationAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_LIVING_DOCUMENTATION>;
 
 export type CreateStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.CREATE_STYLES, {
   tokens: AnyTokenList;
@@ -402,6 +411,7 @@ export type AsyncMessages =
   | SetShowEmptyGroupsAsyncMessage
   | SetUiAsyncMessage
   | CreateAnnotationAsyncMessage
+  | CreateLivingDocumentationAsyncMessage
   | UpdateAsyncMessage
   | UpdateCheckForChangesAsyncMessage
   | GetThemeInfoMessage
@@ -453,6 +463,7 @@ export type AsyncMessageResults =
   | SetShowEmptyGroupsAsyncMessageResult
   | SetUiAsyncMessageResult
   | CreateAnnotationAsyncMessageResult
+  | CreateLivingDocumentationAsyncMessageResult
   | UpdateAsyncMessageResult
   | UpdateCheckForChangesAsyncMessageResult
   | GetThemeInfoMessageResult

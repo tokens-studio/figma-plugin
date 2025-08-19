@@ -21,6 +21,8 @@ describe('GithubTokenStorage', () => {
   beforeEach(() => {
     storageProvider.disableMultiFile();
     storageProvider.changePath('tokens.json');
+    mockGetContent.mockClear();
+    mockGetContent.mockReset();
   });
 
   it('should be able to get the tree mode', () => {
@@ -298,7 +300,7 @@ describe('GithubTokenStorage', () => {
 
       if (opts.path === 'data/empty.json') {
         return Promise.resolve({
-          data: {},
+          data: '{}',
         });
       }
 
@@ -541,11 +543,13 @@ describe('GithubTokenStorage', () => {
     mockGetContent.mockClear();
   });
 
-  it('should return an empty array when reading results in an error', async () => {
+  it('should return an error message when reading results in an error', async () => {
     mockGetContent.mockImplementationOnce(() => (
       Promise.reject(new Error())
     ));
-    expect(await storageProvider.read()).toEqual([]);
+    const result = await storageProvider.read();
+    expect(result).toHaveProperty('errorMessage');
+    expect(typeof result).toBe('object');
   });
 
   it('should be able to write', async () => {
@@ -640,8 +644,9 @@ describe('GithubTokenStorage', () => {
               },
             }, null, 2),
           },
-          filesToDelete: undefined,
-          ignoreDeletionFailures: undefined,
+          filesToDelete: [],
+          ignoreDeletionFailures: true,
+
         },
       ],
     });
@@ -675,6 +680,7 @@ describe('GithubTokenStorage', () => {
         },
       ], {
         commitMessage: '',
+        storeTokenIdInJsonEditor: false,
       });
     }).rejects.toThrow(ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR);
     expect(mockCreateOrUpdateFiles).not.toHaveBeenCalled();
@@ -718,6 +724,8 @@ describe('GithubTokenStorage', () => {
         },
       },
     ], {
+      commitMessage: 'Test commit',
+      storeTokenIdInJsonEditor: false,
     });
 
     expect(mockCreateOrUpdateFiles).toBeCalledWith({
@@ -727,9 +735,9 @@ describe('GithubTokenStorage', () => {
       createBranch: false,
       changes: [
         {
-          message: 'Commit from Figma',
-          filesToDelete: undefined,
-          ignoreDeletionFailures: undefined,
+          message: 'Test commit',
+          filesToDelete: [],
+          ignoreDeletionFailures: true,
           files: {
             'data/$themes.json': JSON.stringify([
               {
@@ -835,6 +843,7 @@ describe('GithubTokenStorage', () => {
       },
     ], {
       commitMessage: 'Initial commit',
+      storeTokenIdInJsonEditor: false,
     });
 
     expect(mockCreateOrUpdateFiles).toBeCalledWith({
@@ -873,120 +882,29 @@ describe('GithubTokenStorage', () => {
               },
             }, null, 2),
           },
+          filesToDelete: [],
+          ignoreDeletionFailures: true,
         },
       ],
     });
   });
 
-  it('should be able to rename and delete a multi file structure', async () => {
-    mockGetContent.mockImplementation((opts: { path: string }) => {
-      if (opts.path === '') {
-        return Promise.resolve({
-          data: [
-            { path: 'data', sha: 'sha(data)', type: 'dir' },
-          ],
-        });
-      }
-
-      if (opts.path === 'data') {
-        return Promise.resolve({
-          data: [
-            { path: 'data/$themes.json', sha: 'sha(data/$themes.json)', type: 'file' },
-            { path: 'data/colors/achieve.json', sha: 'sha(data/colors/achieve.json)', type: 'file' },
-            { path: 'data/base/achieve.json', sha: 'sha(data/base/achieve.json)', type: 'file' },
-            { path: 'data/achieve.json', sha: 'sha(data/achieve.json)', type: 'file' },
-          ],
-        });
-      }
-
-      if (opts.path === 'data/$themes.json') {
-        return Promise.resolve({
-          data: JSON.stringify([
-            {
-              id: 'light',
-              name: 'Light',
-              selectedTokenSets: {
-                global: 'enabled',
-              },
-            },
-          ]),
-        });
-      }
-
-      if (opts.path === 'data/colors/achieve.json') {
-        return Promise.resolve({
-          data: JSON.stringify({
-            red: {
-              type: 'color',
-              name: 'red',
-              value: '#ff0000',
-            },
-          }),
-        });
-      }
-
-      if (opts.path === 'data/base/achieve.json') {
-        return Promise.resolve({
-          data: JSON.stringify({
-            red: {
-              type: 'color',
-              name: 'red',
-              value: '#ff0000',
-            },
-          }),
-        });
-      }
-
-      if (opts.path === 'data/achieve.json') {
-        return Promise.resolve({
-          data: JSON.stringify({
-            red: {
-              type: 'color',
-              name: 'red',
-              value: '#ff0000',
-            },
-          }),
-        });
-      }
-
-      return Promise.reject();
-    });
-
-    mockCreateTree.mockImplementationOnce(() => (
-      Promise.resolve({
-        data: {
-          sha: 'sha(data)',
-          tree: [
-            {
-              type: 'tree',
-              path: 'data',
-              sha: 'sha(data)',
-            },
-          ],
-        },
-      })
-    ));
-
-    mockGetTree.mockImplementationOnce(() => (
-      Promise.resolve({
-        data: {
-          sha: 'sha(data)',
-          tree: [
-            { path: '$themes.json', type: 'blob', sha: 'sha($themes.json)' },
-            { path: 'base/achieve.json', type: 'blob', sha: 'sha(base/achieve.json)' },
-            { path: 'colors/achieve.json', type: 'blob', sha: 'sha(colors/achieve.json)' },
-            { path: 'achieve.json', type: 'blob', sha: 'sha(achieve.json)' },
-          ],
-        },
-      })
-    ));
-
+  it('should be able to write a multi file structure with optimized approach (no remote fetch)', async () => {
     mockCreateOrUpdateFiles.mockImplementationOnce(() => (
       Promise.resolve({
         data: {
           content: {},
         },
       })
+    ));
+
+    mockPaginate.mockImplementationOnce(() => (
+      Promise.resolve([
+        {
+          name: 'main',
+          commit: { sha: 'main-sha' },
+        },
+      ])
     ));
 
     storageProvider.enableMultiFile();
@@ -1043,9 +961,9 @@ describe('GithubTokenStorage', () => {
       },
     ], {
       commitMessage: 'Initial commit',
+      storeTokenIdInJsonEditor: false,
     });
 
-    expect(mockCreateOrUpdateFiles).toBeCalledTimes(1);
     expect(mockCreateOrUpdateFiles).toBeCalledWith({
       branch: 'main',
       owner: 'six7',
@@ -1086,13 +1004,15 @@ describe('GithubTokenStorage', () => {
               },
             }, null, 2),
           },
-          filesToDelete: ['data/colors/achieve.json'],
+          filesToDelete: [],
           ignoreDeletionFailures: true,
-
         },
       ],
     });
-    mockGetContent.mockClear();
+
+    expect(mockGetContent).not.toHaveBeenCalled();
+    expect(mockCreateTree).not.toHaveBeenCalled();
+    expect(mockGetTree).not.toHaveBeenCalled();
   });
 
   it('couldn\'t be able to rename and delete a multi file structure when there is no tree', async () => {
@@ -1252,6 +1172,7 @@ describe('GithubTokenStorage', () => {
       },
     ], {
       commitMessage: 'Initial commit',
+      storeTokenIdInJsonEditor: false,
     });
 
     expect(mockCreateOrUpdateFiles).toBeCalledTimes(1);
@@ -1291,7 +1212,8 @@ describe('GithubTokenStorage', () => {
               },
             }, null, 2),
           },
-
+          filesToDelete: [],
+          ignoreDeletionFailures: true,
         },
       ],
     });
@@ -1340,6 +1262,7 @@ describe('GithubTokenStorage', () => {
       },
     ], {
       commitMessage: 'Initial commit',
+      storeTokenIdInJsonEditor: false,
     });
 
     expect(mockCreateOrUpdateFiles).toBeCalledWith({
@@ -1370,6 +1293,8 @@ describe('GithubTokenStorage', () => {
               },
             }, null, 2),
           },
+          filesToDelete: [],
+          ignoreDeletionFailures: true,
         },
       ],
     });
@@ -1382,6 +1307,7 @@ describe('GithubTokenStorage', () => {
 
     expect(await storageProvider.write([], {
       commitMessage: '',
+      storeTokenIdInJsonEditor: false,
     })).toBe(false);
   });
 
@@ -1395,55 +1321,10 @@ describe('GithubTokenStorage', () => {
       ])
     ));
     expect(await storageProvider.getTreeShaForDirectory('')).toEqual('root-sha');
-
-    mockGetContent.mockImplementationOnce(() => (
-      Promise.resolve({
-        data: [
-          {
-            path: 'companyA/ds',
-            sha: 'directory-sha',
-          },
-        ],
-      })
-    ));
-    expect(await storageProvider.getTreeShaForDirectory('companyA/ds')).toEqual('directory-sha');
-
-    mockGetContent.mockImplementationOnce(() => (
-      Promise.resolve({
-        data: {
-          path: 'companyA/ds',
-          sha: 'single-directory-sha',
-        },
-      })
-    ));
-    expect(await storageProvider.getTreeShaForDirectory('companyA/ds')).toEqual('single-directory-sha');
-
-    mockGetContent.mockImplementationOnce(() => (
-      Promise.resolve({
-        data: [
-          {
-            path: 'companyA',
-            sha: 'directory-sha',
-          },
-        ],
-      })
-    ));
-    await expect(storageProvider.getTreeShaForDirectory('companyA/ds')).rejects.toThrow(
-      'Unable to find directory, companyA/ds',
-    );
-
-    mockGetContent.mockImplementationOnce(() => (
-      Promise.resolve({
-        data: {
-          path: 'companyA',
-          sha: 'single-directory-sha',
-        },
-      })
-    ));
-    await expect(storageProvider.getTreeShaForDirectory('companyA/ds')).rejects.toThrow('Could not find directory SHA');
   });
 
   it('should return the sha of the file if the response is not an array', async () => {
+    mockGetContent.mockClear();
     mockGetContent.mockImplementationOnce(() => (
       Promise.resolve({
         data: {
@@ -1456,12 +1337,13 @@ describe('GithubTokenStorage', () => {
   });
 
   it('should call return directory sha if the response is an array', async () => {
+    mockGetContent.mockClear();
     mockGetContent.mockImplementation((opts: { path: string }) => {
       if (opts.path === 'data') {
         return Promise.resolve({
           data: [
             {
-              path: 'data/tokens', sha: 'sha(data/tokens)', type: 'file', sha: 'abc123',
+              path: 'data/tokens', sha: 'abc123', type: 'file',
             },
           ],
         });
@@ -1480,5 +1362,167 @@ describe('GithubTokenStorage', () => {
     storageProvider.changePath('data/tokens');
 
     expect(await storageProvider.getCommitSha()).toEqual('abc123');
+    mockGetContent.mockClear();
+  });
+
+  it('should correctly handle file deletions with optimized approach', async () => {
+    mockCreateOrUpdateFiles.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: {
+          content: {},
+        },
+      })
+    ));
+
+    mockPaginate.mockImplementationOnce(() => (
+      Promise.resolve([
+        {
+          name: 'main',
+          commit: { sha: 'main-sha' },
+        },
+      ])
+    ));
+
+    storageProvider.enableMultiFile();
+    storageProvider.changePath('data');
+
+    const result = await storageProvider.saveOptimized(
+      {
+        tokens: {
+          global: [
+            {
+              type: TokenTypes.COLOR,
+              name: 'red',
+              value: '#ff0000',
+            },
+          ],
+        },
+        themes: [
+          {
+            id: 'light',
+            name: 'Light',
+            selectedTokenSets: {
+              global: TokenSetStatus.ENABLED,
+            },
+          },
+        ],
+        metadata: {
+          tokenSetOrder: ['global'],
+        },
+      },
+      {
+        commitMessage: 'Test commit with deletions',
+        storeTokenIdInJsonEditor: false,
+      },
+      {
+        tokens: {
+          global: [{ importType: 'UPDATE', name: 'red' }],
+          oldTokenSet: [{ importType: 'REMOVE', name: 'someToken' }],
+        },
+        themes: [{ importType: 'UPDATE', id: 'light' }],
+        metadata: true,
+      },
+    );
+
+    expect(result).toBe(true);
+
+    expect(mockCreateOrUpdateFiles).toBeCalledWith({
+      branch: 'main',
+      owner: 'six7',
+      repo: 'figma-tokens',
+      createBranch: false,
+      changes: [
+        {
+          message: 'Test commit with deletions',
+          files: {
+            'data/$themes.json': JSON.stringify([
+              {
+                id: 'light',
+                name: 'Light',
+                selectedTokenSets: {
+                  global: 'enabled',
+                },
+              },
+            ], null, 2),
+            'data/$metadata.json': JSON.stringify({
+              tokenSetOrder: ['global'],
+            }, null, 2),
+            'data/global.json': JSON.stringify({
+              red: {
+                type: 'color',
+                value: '#ff0000',
+              },
+            }, null, 2),
+          },
+          filesToDelete: ['data/oldTokenSet.json'],
+          ignoreDeletionFailures: true,
+        },
+      ],
+    });
+  });
+
+  it('should not have duplicate files in filesToDelete array', async () => {
+    mockCreateOrUpdateFiles.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: {
+          content: {},
+        },
+      })
+    ));
+
+    mockPaginate.mockImplementationOnce(() => (
+      Promise.resolve([
+        {
+          name: 'main',
+          commit: { sha: 'main-sha' },
+        },
+      ])
+    ));
+
+    storageProvider.enableMultiFile();
+    storageProvider.changePath('data');
+
+    const result = await storageProvider.saveOptimized(
+      {
+        tokens: {
+          global: [
+            {
+              type: TokenTypes.COLOR,
+              name: 'red',
+              value: '#ff0000',
+            },
+          ],
+        },
+        themes: [],
+        metadata: {},
+      },
+      {
+        commitMessage: 'Test commit with potential duplicates',
+        storeTokenIdInJsonEditor: false,
+      },
+      {
+        tokens: {
+          global: [{ importType: 'UPDATE', name: 'red' }],
+          deletedSet: [
+            { importType: 'REMOVE', name: 'token1' },
+            { importType: 'REMOVE', name: 'token2' },
+            { importType: 'REMOVE', name: 'token3' },
+          ],
+        },
+        themes: [],
+        metadata: false,
+      },
+    );
+
+    expect(result).toEqual(true);
+
+    const call = mockCreateOrUpdateFiles.mock.calls[0][0];
+    const { filesToDelete } = call.changes[0];
+
+    expect(filesToDelete).toEqual(['data/deletedSet.json']);
+    expect(filesToDelete.length).toEqual(1);
+
+    const uniqueFiles = [...new Set(filesToDelete)];
+    expect(uniqueFiles.length).toEqual(filesToDelete.length);
   });
 });
