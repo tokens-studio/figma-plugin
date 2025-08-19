@@ -262,7 +262,7 @@ export default function TokensStudioForm({
           {baseUrlError && <Text css={{ color: '$dangerFg' }}>{baseUrlError}</Text>}
           {isValidatingBaseUrl && <Text muted>Validating base URL...</Text>}
           <Text muted>
-            Leave empty to use the default Studio instance. For custom Studio instances, enter the base URL
+            Leave empty to use the default Studio instance (https://app.prod.tokens.studio). For custom Studio instances, enter the base URL
             (e.g., https://app.acme-corp.enterprise.tokens.studio)
           </Text>
         </FormField>
