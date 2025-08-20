@@ -7,7 +7,7 @@ import {
 } from '@tokens-studio/ui';
 import Stack from '../Stack';
 import useManageTokens from '../../store/useManageTokens';
-import { activeApiProviderSelector, activeTokenSetReadOnlySelector, editProhibitedSelector } from '@/selectors';
+import { activeApiProviderSelector, activeTokenSetReadOnlySelector, editProhibitedSelector, activeTokenSetSelector } from '@/selectors';
 import { IconCollapseArrow, IconExpandArrow, IconAdd } from '@/icons';
 import { StyledTokenGroupHeading, StyledTokenGroupAddIcon, StyledTokenGroupHeadingCollapsable } from './StyledTokenGroupHeading';
 import { Dispatch } from '../../store';
@@ -17,6 +17,8 @@ import useTokens from '../../store/useTokens';
 import RenameTokenGroupModal from '../modals/RenameTokenGroupModal';
 import DuplicateTokenGroupModal from '../modals/DuplicateTokenGroupModal';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import { useGenerateDocumentation } from '@/app/hooks/useGenerateDocumentation';
+import ProBadge from '../ProBadge';
 
 export type Props = {
   id: string
@@ -33,6 +35,7 @@ export function TokenGroupHeading({
   const editProhibited = useSelector(editProhibitedSelector);
   const activeTokenSetReadOnly = useSelector(activeTokenSetReadOnlySelector);
   const activeApiProvider = useSelector(activeApiProviderSelector);
+  const activeTokenSet = useSelector(activeTokenSetSelector);
   const [newTokenGroupName, setNewTokenGroupName] = React.useState<string>(path);
   const [showRenameTokenGroupModal, setShowRenameTokenGroupModal] = React.useState<boolean>(false);
   const [showDuplicateTokenGroupModal, setShowDuplicateTokenGroupModal] = React.useState<boolean>(false);
@@ -43,6 +46,11 @@ export function TokenGroupHeading({
   const isTokensStudioProvider = activeApiProvider === StorageProviderType.TOKENS_STUDIO;
 
   const canEdit = !editProhibited && !activeTokenSetReadOnly && !isTokensStudioProvider;
+  
+  const { handleGenerateDocumentation, modals } = useGenerateDocumentation({ 
+    initialTokenSet: activeTokenSet,
+    initialStartsWith: path
+  });
 
   const handleDelete = React.useCallback(() => {
     deleteGroup(path, type);
@@ -86,6 +94,7 @@ export function TokenGroupHeading({
   const handleShowNewForm = useCallback(() => showNewForm({ name: `${path}.` }), [path, showNewForm]);
 
   return (
+    <>
     <StyledTokenGroupHeading>
       <StyledTokenGroupHeadingCollapsable
         collapsed={collapsed.includes(path)}
@@ -109,6 +118,19 @@ export function TokenGroupHeading({
               </ContextMenu.Item>
               <ContextMenu.Item disabled={!canEdit} onSelect={handleDelete}>
                 {t('delete')}
+              </ContextMenu.Item>
+              <ContextMenu.Separator />
+              <ContextMenu.Item onSelect={handleGenerateDocumentation}>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  width: '100%',
+                }}
+                >
+                  {t('generateDocumentation')}
+                  <ProBadge compact campaign="tokengroup-context-menu" />
+                </div>
               </ContextMenu.Item>
             </ContextMenu.Content>
           </ContextMenu.Portal>
@@ -145,5 +167,7 @@ export function TokenGroupHeading({
         variant="invisible"
       />
     </StyledTokenGroupHeading>
+    {modals}
+    </>
   );
 }

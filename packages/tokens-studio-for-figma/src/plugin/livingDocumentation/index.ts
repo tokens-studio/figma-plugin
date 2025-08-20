@@ -38,7 +38,7 @@ export const createLivingDocumentation: AsyncMessageChannelHandlers[AsyncMessage
   const hasUserTemplate = selectedTemplate && ('clone' in selectedTemplate);
 
   // Create main container
-  const container = createMainContainer();
+  const container = await createMainContainer();
 
   // Process all token sets
   await processTokenSets(tokensBySet, container, progressTracker, hasUserTemplate ? selectedTemplate : null);

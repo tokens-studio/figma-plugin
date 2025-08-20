@@ -1,6 +1,6 @@
 import { defaultWorker } from '../Worker';
 import {
-  createSetHeading as createSetHeadingFrame, createSetContainer, createCombinedSetContainer,
+  createSetHeading as createSetHeadingFrame, createSetContainer, createCombinedSetContainer, createColumnHeaders,
 } from './frameUtils';
 
 /**
@@ -76,6 +76,10 @@ export async function createSetStructure(
 
   // Create heading for this set and append to combined container
   await createAndAppendSetHeading(setName, tokens.length, combinedContainer);
+
+  // Add column headers after the heading
+  const columnHeaders = await createColumnHeaders();
+  combinedContainer.appendChild(columnHeaders);
 
   // Create tokens container for this set and append to combined container
   const tokensContainer = await createTokensContainer(setName, combinedContainer);

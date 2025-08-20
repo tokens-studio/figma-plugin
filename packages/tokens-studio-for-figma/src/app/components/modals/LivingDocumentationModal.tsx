@@ -15,9 +15,14 @@ import {
 import { mergeTokenGroups, getOverallConfig } from '@/utils/tokenHelpers';
 import { defaultTokenResolver } from '@/utils/TokenResolver';
 
-type Props = { isOpen: boolean; onClose: () => void };
+type Props = { 
+  isOpen: boolean; 
+  onClose: () => void;
+  initialTokenSet?: string;
+  initialStartsWith?: string;
+};
 
-export default function LivingDocumentationModal({ isOpen, onClose }: Props) {
+export default function LivingDocumentationModal({ isOpen, onClose, initialTokenSet, initialStartsWith }: Props) {
   const { t } = useTranslation(['tokens']);
   const allTokenSets = useSelector(allTokenSetsSelector);
   const tokens = useSelector(tokensSelector);
@@ -25,9 +30,17 @@ export default function LivingDocumentationModal({ isOpen, onClose }: Props) {
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const activeTheme = useSelector(activeThemeSelector);
   const themes = useSelector(themesListSelector);
-  const [tokenSet, setTokenSet] = React.useState('All');
-  const [startsWith, setStartsWith] = React.useState('');
+  const [tokenSet, setTokenSet] = React.useState(initialTokenSet || 'All');
+  const [startsWith, setStartsWith] = React.useState(initialStartsWith || '');
   const [applyTokens, setApplyTokens] = React.useState(true);
+
+  // Reset values when modal opens with new initial values
+  React.useEffect(() => {
+    if (isOpen) {
+      setTokenSet(initialTokenSet || 'All');
+      setStartsWith(initialStartsWith || '');
+    }
+  }, [isOpen, initialTokenSet, initialStartsWith]);
 
   // Get resolved tokens using the same pattern as other components, including proper theme configuration
   const resolvedTokens = React.useMemo(() => {

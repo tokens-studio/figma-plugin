@@ -15,6 +15,8 @@ import { TreeItem } from '@/utils/tokenset';
 import { DragGrabber } from '../StyledDragger/DragGrabber';
 import { StyledDragButton } from '../StyledDragger/StyledDragButton';
 import { formatCount } from '@/utils/formatCount';
+import { useGenerateDocumentation } from '@/app/hooks/useGenerateDocumentation';
+import ProBadge from '../ProBadge';
 
 export type TokenSetItemProps = {
   item: TreeItem & { tokenCount?: number };
@@ -56,6 +58,9 @@ export function TokenSetItem({
   const statusSelector = useCallback((state: RootState) => tokenSetStatusSelector(state, item.path), [item]);
   const tokenSetStatus = useSelector(statusSelector);
   const { t } = useTranslation(['tokens']);
+  const { handleGenerateDocumentation, modals } = useGenerateDocumentation({ 
+    initialTokenSet: item.isLeaf ? item.path : undefined 
+  });
 
   const handleClick = useCallback(() => {
     onClick(item);
@@ -109,6 +114,7 @@ export function TokenSetItem({
   );
 
   return (
+    <>
     <StyledWrapper>
       <ContextMenu>
         {!item.isLeaf ? (
@@ -178,6 +184,19 @@ export function TokenSetItem({
                   {t('delete')}
                 </ContextMenu.Item>
                 <ContextMenu.Separator />
+                <ContextMenu.Item onSelect={handleGenerateDocumentation}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    width: '100%',
+                  }}
+                  >
+                    {t('generateDocumentation')}
+                    <ProBadge compact campaign="tokenset-context-menu" />
+                  </div>
+                </ContextMenu.Item>
+                <ContextMenu.Separator />
                 <ContextMenu.CheckboxItem
                   checked={tokenSetStatus === TokenSetStatus.SOURCE}
                   onSelect={handleTreatAsSource}
@@ -214,5 +233,7 @@ export function TokenSetItem({
         )}
       </StyledCheckbox>
     </StyledWrapper>
+    {modals}
+    </>
   );
 }
