@@ -154,8 +154,8 @@ export default function Footer() {
           ) : null}
       </Stack>
       <Stack direction="row" gap={4} align="center">
-        <Box css={{ color: '$fgMuted', fontSize: '$xsmall' }}>
-          <a href="https://tokens.studio/changelog" target="_blank" rel="noreferrer">{`V ${pjs.version}`}</a>
+        <Box css={{ color: '$fgMuted', fontSize: '$xsmall', flexShrink: 0 }}>
+          <a href="https://tokens.studio/changelog" target="_blank" rel="noreferrer" style={{ whiteSpace: 'nowrap' }}>{`V ${pjs.version}`}</a>
         </Box>
         <Stack direction="row" gap={1}>
           <ProBadge campaign="footer" />
