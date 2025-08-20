@@ -118,10 +118,6 @@ export class ADOTokenStorage extends GitTokenStorage {
 
         return res;
       },
-      {
-        maxRetries: 3,
-        initialDelayMs: 100,
-      },
     );
   }
 

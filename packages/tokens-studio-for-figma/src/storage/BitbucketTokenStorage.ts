@@ -156,10 +156,6 @@ export class BitbucketTokenStorage extends GitTokenStorage {
           },
           cache: 'no-cache',
         }),
-        {
-          maxRetries: 3,
-          initialDelayMs: 100,
-        },
       );
 
       if (!response.ok) {
@@ -195,10 +191,6 @@ export class BitbucketTokenStorage extends GitTokenStorage {
         },
         cache: 'no-cache',
       }),
-      {
-        maxRetries: 3,
-        initialDelayMs: 100,
-      },
     );
 
     if (!response.ok) {
@@ -261,10 +253,6 @@ export class BitbucketTokenStorage extends GitTokenStorage {
               },
               cache: 'no-cache',
             }),
-            {
-              maxRetries: 3,
-              initialDelayMs: 100,
-            },
           ).then((rsp) => rsp.text())),
         );
         // Process the content of each JSON file

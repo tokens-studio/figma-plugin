@@ -57,10 +57,6 @@ export class JSONBinTokenStorage extends RemoteTokenStorage<JsonBinMetadata, Sav
           ['versioning', 'false'],
         ]),
       }),
-      {
-        maxRetries: 3,
-        initialDelayMs: 100,
-      },
     );
 
     if (!response.ok) {
@@ -125,10 +121,6 @@ export class JSONBinTokenStorage extends RemoteTokenStorage<JsonBinMetadata, Sav
           ['X-Bin-Meta', '0'],
         ]),
       }),
-      {
-        maxRetries: 3,
-        initialDelayMs: 100,
-      },
     );
 
     if (!response.ok) {

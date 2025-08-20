@@ -35,7 +35,7 @@ export async function retryWithBackoff<T>(
 ): Promise<T> {
   const {
     maxRetries = 3,
-    initialDelayMs = 1000,
+    initialDelayMs = 100,
     backoffMultiplier = 2,
     maxDelayMs = 30000,
     shouldRetry = defaultShouldRetry,

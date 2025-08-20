@@ -63,10 +63,6 @@ export class UrlTokenStorage extends RemoteTokenStorage<unknown, SaveOption> {
         method: 'GET',
         headers,
       }),
-      {
-        maxRetries: 3,
-        initialDelayMs: 100,
-      },
     );
 
     if (response.ok) {

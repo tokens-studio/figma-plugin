@@ -62,10 +62,6 @@ export class GitlabTokenStorage extends GitTokenStorage {
         search: this.repository,
         simple: true,
       }),
-      {
-        maxRetries: 3,
-        initialDelayMs: 100,
-      },
     );
     if (projects) {
       const project = projects.filter((p) => p.path_with_namespace === this.repoPathWithNamespace)[0];
@@ -85,10 +81,6 @@ export class GitlabTokenStorage extends GitTokenStorage {
     if (!this.projectId) throw new Error('Project ID not assigned');
     const branches = await retryWithBackoff(
       () => this.gitlabClient.Branches.all(this.projectId!),
-      {
-        maxRetries: 3,
-        initialDelayMs: 100,
-      },
     );
     return branches.map((branch) => branch.name);
   }
@@ -102,10 +94,6 @@ export class GitlabTokenStorage extends GitTokenStorage {
           branch,
           `heads/${source || this.branch}`,
         ),
-        {
-          maxRetries: 3,
-          initialDelayMs: 100,
-        },
       );
       return !!response.name;
     } catch (err) {
@@ -240,10 +228,6 @@ export class GitlabTokenStorage extends GitTokenStorage {
 
       const data = await retryWithBackoff(
         () => this.gitlabClient.RepositoryFiles.showRaw(this.projectId!, this.path, this.branch),
-        {
-          maxRetries: 3,
-          initialDelayMs: 100,
-        },
       );
       const stringData = typeof data === 'string' ? data : await data.text();
 
@@ -355,10 +339,6 @@ export class GitlabTokenStorage extends GitTokenStorage {
           message,
           gitlabActions,
         ),
-        {
-          maxRetries: 3,
-          initialDelayMs: 100,
-        },
       );
     } catch (e: any) {
       if (e.cause.description && String(e.cause.description).includes(ErrorMessages.GITLAB_PUSH_TO_PROTECTED_BRANCH_ERROR)) {
@@ -414,17 +394,9 @@ export class GitlabTokenStorage extends GitTokenStorage {
       }
       const file = await retryWithBackoff(
         () => this.gitlabClient.RepositoryFiles.show(this.projectId!, this.path, this.branch),
-        {
-          maxRetries: 3,
-          initialDelayMs: 100,
-        },
       );
       const commit = await retryWithBackoff(
         () => this.gitlabClient.Commits.show(this.projectId!, file.commit_id.toString()),
-        {
-          maxRetries: 3,
-          initialDelayMs: 100,
-        },
       );
       const committedDate = new Date(commit.committed_date?.toString() ?? '');
       return committedDate ?? null;
