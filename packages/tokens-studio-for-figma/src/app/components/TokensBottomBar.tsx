@@ -11,6 +11,7 @@ import StylesDropdown from './StylesDropdown';
 import Stack from './Stack';
 import SettingsDropdown from './SettingsDropdown';
 import ToolsDropdown from './ToolsDropdown';
+import GenerateDocumentationButton from './GenerateDocumentationButton';
 
 // State
 import useTokens from '../store/useTokens';
@@ -108,6 +109,7 @@ export default function TokensBottomBar({ handleError }: Props) {
           >
             <Stack direction="row" gap={1} css={{ color: '$fgMuted', fontSize: '$xsmall' }}>
               <ToolsDropdown />
+              <GenerateDocumentationButton />
               <StylesDropdown />
             </Stack>
             <Stack direction="row" gap={2}>
