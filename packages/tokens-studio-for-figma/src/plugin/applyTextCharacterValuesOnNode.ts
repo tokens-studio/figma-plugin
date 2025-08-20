@@ -2,6 +2,48 @@ import { MapValuesToTokensResult } from '@/types';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { tryApplyVariableId } from '@/utils/tryApplyVariableId';
 
+// Utility function to format objects and arrays nicely for display
+function formatValueForDisplay(value: any): string {
+  try {
+    if (Array.isArray(value)) {
+      if (value.length === 0) return '';
+
+      // For arrays, format each item on a new line with proper indentation
+      const formattedItems = value.map((item) => {
+        if (typeof item === 'object' && item !== null) {
+          const formattedItem = formatValueForDisplay(item);
+          return formattedItem;
+        }
+        return `${item}`;
+      });
+
+      return formattedItems.join('\n\n');
+    }
+
+    if (typeof value === 'object' && value !== null) {
+      // For objects, format each property on a new line with proper indentation
+      const entries = Object.entries(value);
+      if (entries.length === 0) return '';
+
+      const formattedProps = entries.map(([key, propValue]) => {
+        if (typeof propValue === 'object' && propValue !== null) {
+          const formattedProp = formatValueForDisplay(propValue);
+          return `${key}: ${formattedProp}`;
+        }
+        return `${key}: ${propValue}`;
+      });
+
+      return formattedProps.join('\n');
+    }
+
+    // For primitive values, return as string
+    return String(value);
+  } catch (e) {
+    // Fallback to JSON.stringify if formatting fails
+    return JSON.stringify(value);
+  }
+}
+
 // Generic function to apply text character values to a node, useful for documentation purposes where users want to apply certain metadata of a token to their layers
 export async function applyTextCharacterValuesOnNode(
   node: BaseNode,
@@ -13,8 +55,8 @@ export async function applyTextCharacterValuesOnNode(
     if ('characters' in node && node.fontName !== figma.mixed) {
       await figma.loadFontAsync(node.fontName);
 
-      // If we're inserting an object, stringify that
-      const value = typeof values.tokenValue === 'object' ? JSON.stringify(values.tokenValue) : values.tokenValue;
+      // Use formatted display for objects and arrays, fallback to string for primitives
+      const value = typeof values.tokenValue === 'object' ? formatValueForDisplay(values.tokenValue) : values.tokenValue;
       node.characters = String(value);
     }
   }
@@ -35,8 +77,8 @@ export async function applyTextCharacterValuesOnNode(
   if ('value' in values) {
     if ('characters' in node && node.fontName !== figma.mixed) {
       await figma.loadFontAsync(node.fontName);
-      // If we're inserting an object, stringify that
-      const value = typeof values.value === 'object' ? JSON.stringify(values.value) : values.value;
+      // Use formatted display for objects and arrays, fallback to string for primitives
+      const value = typeof values.value === 'object' ? formatValueForDisplay(values.value) : values.value;
       node.characters = String(value);
     }
   }

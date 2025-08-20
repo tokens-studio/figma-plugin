@@ -66,6 +66,7 @@ export async function createSetStructure(
   setName: string,
   tokens: any[],
   container: FrameNode,
+  hasUserTemplate: boolean = false,
 ): Promise<{ combinedContainer: FrameNode | null; tokensContainer: FrameNode | null }> {
   // Create combined container for this set (heading + tokens)
   const combinedContainer = await createCombinedContainer(setName, container);
@@ -77,9 +78,11 @@ export async function createSetStructure(
   // Create heading for this set and append to combined container
   await createAndAppendSetHeading(setName, tokens.length, combinedContainer);
 
-  // Add column headers after the heading
-  const columnHeaders = await createColumnHeaders();
-  combinedContainer.appendChild(columnHeaders);
+  // Add column headers after the heading (only if no user template)
+  if (!hasUserTemplate) {
+    const columnHeaders = await createColumnHeaders();
+    combinedContainer.appendChild(columnHeaders);
+  }
 
   // Create tokens container for this set and append to combined container
   const tokensContainer = await createTokensContainer(setName, combinedContainer);

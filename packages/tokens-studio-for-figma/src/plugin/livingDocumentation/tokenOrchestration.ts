@@ -52,7 +52,7 @@ export async function processTokenSets(
   // Process each set sequentially
   for (const [setName, tokens] of Object.entries(tokensBySet)) {
     // Create the complete structure for this set
-    const { tokensContainer } = await createSetStructure(setName, tokens, container);
+    const { tokensContainer } = await createSetStructure(setName, tokens, container, !!userTemplate);
 
     // Process tokens in batches within this set (only if container was created successfully)
     if (tokensContainer) {
