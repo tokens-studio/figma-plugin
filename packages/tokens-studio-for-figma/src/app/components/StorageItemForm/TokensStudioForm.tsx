@@ -99,6 +99,14 @@ export default function TokensStudioForm({
     setShowTeaser(false);
   }, []);
 
+  const handleLearnMore = React.useCallback(() => {
+    window.open('https://tokens.studio/studio', '_blank');
+  }, []);
+
+  const handleMigrationGuide = React.useCallback(() => {
+    window.open('https://documentation.tokens.studio/guides/migrating-from-tokens-studio-for-figma-plugin-to-the-tokens-studio-platform', '_blank');
+  }, []);
+
   const validateBaseUrl = React.useCallback(async (baseUrl: string) => {
     if (!baseUrl.trim()) {
       setBaseUrlError(null);
@@ -206,18 +214,24 @@ export default function TokensStudioForm({
   return showTeaser ? (
     <Stack direction="column" align="start" gap={5}>
       <StyledTokensStudioWord />
-      <Stack direction="column" gap={3}>
-        <Heading size="large">A dedicated design tokens management platform</Heading>
+      <Stack direction="column" gap={4}>
+        <Heading size="large">Design Systems don&apos;t stop at design tools. Neither do we.</Heading>
         <Box>
-          We are working a dedicated design tokens management platform built on our powerful node-based graph engine
-          including plug and play token transformation - suitable for enterprises! Still in early access, sign up for
-          the waitlist!
+          Design tokens are powerful, but only if they&apos;re structured. Most systems stop at style values. We go further: conditions, inheritance, multi-brand theming, and developer-ready outputs.
+          <br />
+          <br />
+          With Tokens Studio, design tokens become shared language. And used across tools, platforms, and teams.
         </Box>
-        <Link href="https://tokens.studio/studio" target="_blank" rel="noreferrer">
-          Learn more
-        </Link>
+        <Stack direction="row" gap={3}>
+          <Button variant="primary" onClick={handleDismissTeaser}>Start free trial</Button>
+          <Button variant="secondary" onClick={handleLearnMore}>
+            Learn more
+          </Button>
+          <Button variant="secondary" onClick={handleMigrationGuide}>
+            Migration guide
+          </Button>
+        </Stack>
       </Stack>
-      <Button onClick={handleDismissTeaser}>Already got access?</Button>
     </Stack>
   ) : (
     <form onSubmit={handleSubmit}>
