@@ -40,8 +40,12 @@ export default function ToolsDropdown() {
 
         <DropdownMenu.Portal>
           <DropdownMenu.Content side="top">
-            <DropdownMenu.Item disabled={editProhibited} onSelect={handleShowPresetModal}>{t('loadFromFileOrPreset')}</DropdownMenu.Item>
-            <DropdownMenu.Item disabled={editProhibited} onSelect={handleShowExportModal}>{t('exportToFile')}</DropdownMenu.Item>
+            <DropdownMenu.Item disabled={editProhibited} onSelect={handleShowPresetModal}>
+              {t('loadFromFileOrPreset')}
+            </DropdownMenu.Item>
+            <DropdownMenu.Item disabled={editProhibited} onSelect={handleShowExportModal}>
+              {t('exportToFile')}
+            </DropdownMenu.Item>
           </DropdownMenu.Content>
         </DropdownMenu.Portal>
       </DropdownMenu>

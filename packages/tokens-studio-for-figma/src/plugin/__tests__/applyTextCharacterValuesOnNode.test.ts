@@ -68,17 +68,25 @@ describe('applyTextCharacterValuesOnNode', () => {
       const values = {
         tokenValue: [
           {
-            x: 0, y: 2, blur: 4, color: 'rgba(0, 0, 0, 0.1)',
+            x: 0,
+            y: 2,
+            blur: 4,
+            color: 'rgba(0, 0, 0, 0.1)',
           },
           {
-            x: 0, y: 4, blur: 8, color: 'rgba(0, 0, 0, 0.15)',
+            x: 0,
+            y: 4,
+            blur: 8,
+            color: 'rgba(0, 0, 0, 0.15)',
           },
         ],
       };
 
       await applyTextCharacterValuesOnNode(mockNode, mockData, values);
 
-      expect(mockNode.characters).toBe('x: 0\ny: 2\nblur: 4\ncolor: rgba(0, 0, 0, 0.1)\n\nx: 0\ny: 4\nblur: 8\ncolor: rgba(0, 0, 0, 0.15)');
+      expect(mockNode.characters).toBe(
+        'x: 0\ny: 2\nblur: 4\ncolor: rgba(0, 0, 0, 0.1)\n\nx: 0\ny: 4\nblur: 8\ncolor: rgba(0, 0, 0, 0.15)',
+      );
     });
 
     it('should format empty arrays correctly', async () => {
@@ -103,12 +111,7 @@ describe('applyTextCharacterValuesOnNode', () => {
 
     it('should handle mixed array content correctly', async () => {
       const values = {
-        tokenValue: [
-          'simple string',
-          { x: 0, y: 2 },
-          42,
-          { color: 'red', size: 'large' },
-        ],
+        tokenValue: ['simple string', { x: 0, y: 2 }, 42, { color: 'red', size: 'large' }],
       };
 
       await applyTextCharacterValuesOnNode(mockNode, mockData, values);
@@ -131,10 +134,16 @@ describe('applyTextCharacterValuesOnNode', () => {
         tokenValue: {
           shadows: [
             {
-              x: 0, y: 2, blur: 4, color: 'rgba(0, 0, 0, 0.1)',
+              x: 0,
+              y: 2,
+              blur: 4,
+              color: 'rgba(0, 0, 0, 0.1)',
             },
             {
-              x: 0, y: 4, blur: 8, color: 'rgba(0, 0, 0, 0.15)',
+              x: 0,
+              y: 4,
+              blur: 8,
+              color: 'rgba(0, 0, 0, 0.15)',
             },
           ],
           colors: {
@@ -148,9 +157,9 @@ describe('applyTextCharacterValuesOnNode', () => {
       await applyTextCharacterValuesOnNode(mockNode, mockData, values);
 
       expect(mockNode.characters).toBe(
-        'shadows: x: 0\ny: 2\nblur: 4\ncolor: rgba(0, 0, 0, 0.1)\n\nx: 0\ny: 4\nblur: 8\ncolor: rgba(0, 0, 0, 0.15)\n'
-        + 'colors: primary: #007AFF\nsecondary: #5856D6\n'
-        + 'spacing: 8\n\n16\n\n24\n\n32',
+        'shadows: x: 0\ny: 2\nblur: 4\ncolor: rgba(0, 0, 0, 0.1)\n\nx: 0\ny: 4\nblur: 8\ncolor: rgba(0, 0, 0, 0.15)\n' +
+          'colors: primary: #007AFF\nsecondary: #5856D6\n' +
+          'spacing: 8\n\n16\n\n24\n\n32',
       );
     });
 

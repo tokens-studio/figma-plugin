@@ -34,36 +34,39 @@ export function useGenerateDocumentation(options: UseGenerateDocumentationOption
     }
   }, [isProUser]);
 
-  const modals = React.useMemo(() => (
-    <>
-      {docModalVisible && (
-        <LivingDocumentationModal
-          isOpen
-          onClose={handleCloseDocModal}
-          initialTokenSet={initialTokenSet}
-          initialStartsWith={initialStartsWith}
-        />
-      )}
-      {upgradeModalVisible && (
-        <UpgradeToProModal
-          isOpen
-          onClose={handleCloseUpgradeModal}
-          feature="documentation-feature"
-          title={t('upgradeToPro')}
-          image={generateDocumentationImage}
-          description={t('generateDocumentationDescription')}
-        />
-      )}
-    </>
-  ), [
-    docModalVisible,
-    upgradeModalVisible,
-    handleCloseDocModal,
-    handleCloseUpgradeModal,
-    initialTokenSet,
-    initialStartsWith,
-    t,
-  ]);
+  const modals = React.useMemo(
+    () => (
+      <>
+        {docModalVisible && (
+          <LivingDocumentationModal
+            isOpen
+            onClose={handleCloseDocModal}
+            initialTokenSet={initialTokenSet}
+            initialStartsWith={initialStartsWith}
+          />
+        )}
+        {upgradeModalVisible && (
+          <UpgradeToProModal
+            isOpen
+            onClose={handleCloseUpgradeModal}
+            feature="documentation-feature"
+            title={t('upgradeToPro')}
+            image={generateDocumentationImage}
+            description={t('generateDocumentationDescription')}
+          />
+        )}
+      </>
+    ),
+    [
+      docModalVisible,
+      upgradeModalVisible,
+      handleCloseDocModal,
+      handleCloseUpgradeModal,
+      initialTokenSet,
+      initialStartsWith,
+      t,
+    ],
+  );
 
   return {
     handleGenerateDocumentation,

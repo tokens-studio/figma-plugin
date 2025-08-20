@@ -2,9 +2,7 @@ import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { CheckIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
-import {
-  Checkbox, ContextMenu, Tooltip, Box, Text,
-} from '@tokens-studio/ui';
+import { Checkbox, ContextMenu, Tooltip, Box, Text } from '@tokens-studio/ui';
 import { StyledCheckbox } from '../StyledDragger/StyledCheckbox';
 import { StyledWrapper } from './StyledWrapper';
 import { tokenSetStatusSelector } from '@/selectors';
@@ -58,8 +56,8 @@ export function TokenSetItem({
   const statusSelector = useCallback((state: RootState) => tokenSetStatusSelector(state, item.path), [item]);
   const tokenSetStatus = useSelector(statusSelector);
   const { t } = useTranslation(['tokens']);
-  const { handleGenerateDocumentation, modals } = useGenerateDocumentation({ 
-    initialTokenSet: item.isLeaf ? item.path : undefined 
+  const { handleGenerateDocumentation, modals } = useGenerateDocumentation({
+    initialTokenSet: item.isLeaf ? item.path : undefined,
   });
 
   const handleClick = useCallback(() => {
@@ -115,105 +113,119 @@ export function TokenSetItem({
 
   return (
     <>
-    <StyledWrapper>
-      <ContextMenu>
-        {!item.isLeaf ? (
-          <ContextMenu.Trigger asChild id={`${item.path}-trigger`}>
-            <StyledDragButton
-              itemType="folder"
-              type="button"
-              data-testid={`tokensetitem-${item.path}`}
-              css={{
-                padding: '$3 $7 $3 $1',
-                paddingLeft: `${5 * item.level}px`,
-              }}
-              isActive={isActive}
-              canReorder={canReorder}
-              onClick={handleClick}
-            >
-              <DragGrabber item={item} canReorder={canReorder} onDragStart={handleGrabberPointerDown} />
-              {extraBefore}
-            </StyledDragButton>
-          </ContextMenu.Trigger>
-        ) : (
-          <ContextMenu.Trigger asChild id={`${item.path}-trigger`}>
-            <StyledDragButton
-              type="button"
-              css={{
-                padding: '$3 $6 $3 $1',
-                paddingLeft: `${5 * item.level}px`,
-              }}
-              data-testid={`tokensetitem-${item.path}`}
-              isActive={isActive}
-              canReorder={canReorder}
-              onClick={handleClick}
-            >
-              <DragGrabber item={item} canReorder={canReorder} onDragStart={handleGrabberPointerDown} />
-              <Box
+      <StyledWrapper>
+        <ContextMenu>
+          {!item.isLeaf ? (
+            <ContextMenu.Trigger asChild id={`${item.path}-trigger`}>
+              <StyledDragButton
+                itemType="folder"
+                type="button"
+                data-testid={`tokensetitem-${item.path}`}
                 css={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '$2',
-                  overflow: 'hidden',
-                  height: '1.5em',
-                  maxWidth: 'calc(100% - $sizes$6)',
-                  whiteSpace: 'nowrap',
-                  textOverflow: 'ellipsis',
-                  userSelect: 'none',
+                  padding: '$3 $7 $3 $1',
+                  paddingLeft: `${5 * item.level}px`,
                 }}
+                isActive={isActive}
+                canReorder={canReorder}
+                onClick={handleClick}
               >
-                <Tooltip label={item.label} side="right">
-                  <span style={{ overflow: 'hidden' }}>{item.label}</span>
-                </Tooltip>
-                {item.tokenCount !== undefined && item.tokenCount > 0 && (
-                  <Text size="xsmall" muted css={{ flexShrink: 0 }}>
-                    {formatCount(item.tokenCount)}
-                  </Text>
-                )}
-              </Box>
-            </StyledDragButton>
-          </ContextMenu.Trigger>
-        )}
-        <ContextMenu.Portal>
-          <ContextMenu.Content>
-            <ContextMenu.Item onSelect={handleRename} disabled={!canEdit}>{t('rename')}</ContextMenu.Item>
-            {item.isLeaf && (
-              <>
-                <ContextMenu.Item disabled={!canEdit || !canDuplicate} onSelect={handleDuplicate}>{t('duplicate')}</ContextMenu.Item>
-                <ContextMenu.Item disabled={!canEdit || !canDelete} onSelect={handleDelete}>
-                  {t('delete')}
-                </ContextMenu.Item>
-                <ContextMenu.Separator />
-                <ContextMenu.Item onSelect={handleGenerateDocumentation}>
-                  <div style={{
+                <DragGrabber item={item} canReorder={canReorder} onDragStart={handleGrabberPointerDown} />
+                {extraBefore}
+              </StyledDragButton>
+            </ContextMenu.Trigger>
+          ) : (
+            <ContextMenu.Trigger asChild id={`${item.path}-trigger`}>
+              <StyledDragButton
+                type="button"
+                css={{
+                  padding: '$3 $6 $3 $1',
+                  paddingLeft: `${5 * item.level}px`,
+                }}
+                data-testid={`tokensetitem-${item.path}`}
+                isActive={isActive}
+                canReorder={canReorder}
+                onClick={handleClick}
+              >
+                <DragGrabber item={item} canReorder={canReorder} onDragStart={handleGrabberPointerDown} />
+                <Box
+                  css={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '8px',
-                    width: '100%',
+                    gap: '$2',
+                    overflow: 'hidden',
+                    height: '1.5em',
+                    maxWidth: 'calc(100% - $sizes$6)',
+                    whiteSpace: 'nowrap',
+                    textOverflow: 'ellipsis',
+                    userSelect: 'none',
                   }}
-                  >
-                    {t('generateDocumentation')}
-                    <ProBadge compact campaign="tokenset-context-menu" />
-                  </div>
-                </ContextMenu.Item>
-                <ContextMenu.Separator />
-                <ContextMenu.CheckboxItem
-                  checked={tokenSetStatus === TokenSetStatus.SOURCE}
-                  onSelect={handleTreatAsSource}
                 >
-                  <ContextMenu.ItemIndicator>
-                    <CheckIcon />
-                  </ContextMenu.ItemIndicator>
-                  {t('sets.treatAsSource')}
-                </ContextMenu.CheckboxItem>
-              </>
-            )}
-          </ContextMenu.Content>
-        </ContextMenu.Portal>
-      </ContextMenu>
-      <StyledCheckbox checked={isChecked}>
-        {item.isLeaf ? (
-          <Tooltip label={getCheckboxTooltip()} side="right">
+                  <Tooltip label={item.label} side="right">
+                    <span style={{ overflow: 'hidden' }}>{item.label}</span>
+                  </Tooltip>
+                  {item.tokenCount !== undefined && item.tokenCount > 0 && (
+                    <Text size="xsmall" muted css={{ flexShrink: 0 }}>
+                      {formatCount(item.tokenCount)}
+                    </Text>
+                  )}
+                </Box>
+              </StyledDragButton>
+            </ContextMenu.Trigger>
+          )}
+          <ContextMenu.Portal>
+            <ContextMenu.Content>
+              <ContextMenu.Item onSelect={handleRename} disabled={!canEdit}>
+                {t('rename')}
+              </ContextMenu.Item>
+              {item.isLeaf && (
+                <>
+                  <ContextMenu.Item disabled={!canEdit || !canDuplicate} onSelect={handleDuplicate}>
+                    {t('duplicate')}
+                  </ContextMenu.Item>
+                  <ContextMenu.Item disabled={!canEdit || !canDelete} onSelect={handleDelete}>
+                    {t('delete')}
+                  </ContextMenu.Item>
+                  <ContextMenu.Separator />
+                  <ContextMenu.Item onSelect={handleGenerateDocumentation}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        width: '100%',
+                      }}
+                    >
+                      {t('generateDocumentation')}
+                      <ProBadge compact campaign="tokenset-context-menu" />
+                    </div>
+                  </ContextMenu.Item>
+                  <ContextMenu.Separator />
+                  <ContextMenu.CheckboxItem
+                    checked={tokenSetStatus === TokenSetStatus.SOURCE}
+                    onSelect={handleTreatAsSource}
+                  >
+                    <ContextMenu.ItemIndicator>
+                      <CheckIcon />
+                    </ContextMenu.ItemIndicator>
+                    {t('sets.treatAsSource')}
+                  </ContextMenu.CheckboxItem>
+                </>
+              )}
+            </ContextMenu.Content>
+          </ContextMenu.Portal>
+        </ContextMenu>
+        <StyledCheckbox checked={isChecked}>
+          {item.isLeaf ? (
+            <Tooltip label={getCheckboxTooltip()} side="right">
+              <Checkbox
+                id={item.path}
+                data-testid={`tokensetitem-${item.path}-checkbox`}
+                checked={isChecked}
+                renderIcon={renderIcon}
+                onCheckedChange={handleCheckedChange}
+              />
+            </Tooltip>
+          ) : (
             <Checkbox
               id={item.path}
               data-testid={`tokensetitem-${item.path}-checkbox`}
@@ -221,19 +233,10 @@ export function TokenSetItem({
               renderIcon={renderIcon}
               onCheckedChange={handleCheckedChange}
             />
-          </Tooltip>
-        ) : (
-          <Checkbox
-            id={item.path}
-            data-testid={`tokensetitem-${item.path}-checkbox`}
-            checked={isChecked}
-            renderIcon={renderIcon}
-            onCheckedChange={handleCheckedChange}
-          />
-        )}
-      </StyledCheckbox>
-    </StyledWrapper>
-    {modals}
+          )}
+        </StyledCheckbox>
+      </StyledWrapper>
+      {modals}
     </>
   );
 }

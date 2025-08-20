@@ -1,7 +1,5 @@
 import React from 'react';
-import {
-  Button, Stack, Select, Switch, Label,
-} from '@tokens-studio/ui';
+import { Button, Stack, Select, Switch, Label } from '@tokens-studio/ui';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import Modal from '../Modal';
@@ -9,14 +7,18 @@ import Input from '../Input';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import {
-  allTokenSetsSelector, tokensSelector, usedTokenSetSelector, activeTokenSetSelector,
-  activeThemeSelector, themesListSelector,
+  allTokenSetsSelector,
+  tokensSelector,
+  usedTokenSetSelector,
+  activeTokenSetSelector,
+  activeThemeSelector,
+  themesListSelector,
 } from '@/selectors';
 import { mergeTokenGroups, getOverallConfig } from '@/utils/tokenHelpers';
 import { defaultTokenResolver } from '@/utils/TokenResolver';
 
-type Props = { 
-  isOpen: boolean; 
+type Props = {
+  isOpen: boolean;
   onClose: () => void;
   initialTokenSet?: string;
   initialStartsWith?: string;

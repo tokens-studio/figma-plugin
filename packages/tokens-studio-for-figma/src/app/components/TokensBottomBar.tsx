@@ -45,18 +45,19 @@ export default function TokensBottomBar({ handleError }: Props) {
   const { handleJSONUpdate } = useTokens();
 
   const hasDuplicates = useMemo(
-    () => Object.keys(tokens).some((setName) => {
-      const currentSetTokens = tokens[setName];
-      const seenNames = new Set();
+    () =>
+      Object.keys(tokens).some((setName) => {
+        const currentSetTokens = tokens[setName];
+        const seenNames = new Set();
 
-      return currentSetTokens.some((token) => {
-        if (seenNames.has(token.name)) {
-          return true;
-        }
-        seenNames.add(token.name);
-        return false;
-      });
-    }),
+        return currentSetTokens.some((token) => {
+          if (seenNames.has(token.name)) {
+            return true;
+          }
+          seenNames.add(token.name);
+          return false;
+        });
+      }),
     [tokens],
   );
 
@@ -74,9 +75,11 @@ export default function TokensBottomBar({ handleError }: Props) {
   const { t } = useTranslation(['general']);
 
   return (
-    <Box css={{
-      width: '100%', backgroundColor: '$bgDefault',
-    }}
+    <Box
+      css={{
+        width: '100%',
+        backgroundColor: '$bgDefault',
+      }}
     >
       {hasUnsavedChanges ? (
         <Box
@@ -91,43 +94,40 @@ export default function TokensBottomBar({ handleError }: Props) {
         >
           <Box css={{ fontSize: '$xsmall' }}>{t('unsavedChanges')}</Box>
           <Button variant="primary" onClick={handleSaveJSON}>
-            {t('save')}
-            {' '}
-            JSON
+            {t('save')} JSON
           </Button>
         </Box>
-      )
-        : (
-          <Stack
-            direction="row"
-            gap={2}
-            justify="between"
-            align="center"
-            css={{
-              padding: '$3',
-            }}
-          >
-            <Stack direction="row" gap={1} css={{ color: '$fgMuted', fontSize: '$xsmall' }}>
-              <ToolsDropdown />
-              <GenerateDocumentationButton />
-              <StylesDropdown />
-            </Stack>
-            <Stack direction="row" gap={2}>
-              {hasDuplicates && (
-                <IconButton
-                  onClick={handleResolveDuplicateOpen}
-                  icon={<WarningTriangleSolid />}
-                  data-testid="resolve-duplicate-modal-open-button"
-                  variant="danger"
-                  size="small"
-                  tooltip="Duplicate Tokens Found"
-                />
-              )}
-              <ApplySelector />
-              <SettingsDropdown />
-            </Stack>
+      ) : (
+        <Stack
+          direction="row"
+          gap={2}
+          justify="between"
+          align="center"
+          css={{
+            padding: '$3',
+          }}
+        >
+          <Stack direction="row" gap={1} css={{ color: '$fgMuted', fontSize: '$xsmall' }}>
+            <ToolsDropdown />
+            <GenerateDocumentationButton />
+            <StylesDropdown />
           </Stack>
-        )}
+          <Stack direction="row" gap={2}>
+            {hasDuplicates && (
+              <IconButton
+                onClick={handleResolveDuplicateOpen}
+                icon={<WarningTriangleSolid />}
+                data-testid="resolve-duplicate-modal-open-button"
+                variant="danger"
+                size="small"
+                tooltip="Duplicate Tokens Found"
+              />
+            )}
+            <ApplySelector />
+            <SettingsDropdown />
+          </Stack>
+        </Stack>
+      )}
       {showResolveDuplicateTokensModal && (
         <ResolveDuplicateTokensModal
           isOpen={showResolveDuplicateTokensModal}

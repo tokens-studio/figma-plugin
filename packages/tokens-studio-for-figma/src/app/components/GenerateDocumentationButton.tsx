@@ -14,23 +14,19 @@ export default function GenerateDocumentationButton() {
     <>
       <DropdownMenu>
         <DropdownMenu.Trigger asChild>
-          <IconButton
-            tooltip="Tools"
-            aria-label="Tools"
-            size="small"
-            icon={<SparksSolid />}
-          />
+          <IconButton tooltip="Tools" aria-label="Tools" size="small" icon={<SparksSolid />} />
         </DropdownMenu.Trigger>
 
         <DropdownMenu.Portal>
           <DropdownMenu.Content side="top">
             <DropdownMenu.Item onSelect={handleGenerateDocumentation}>
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                width: '100%',
-              }}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  width: '100%',
+                }}
               >
                 {t('generateDocumentation')}
                 <ProBadge compact campaign="generate-documentation-dropdown" />
