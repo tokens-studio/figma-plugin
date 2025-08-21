@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { DropdownMenu, IconButton } from '@tokens-studio/ui';
 
-import { Tools } from 'iconoir-react';
+import { FileZipIcon } from '@primer/octicons-react';
 import { editProhibitedSelector } from '@/selectors';
 import PresetModal from './modals/PresetModal';
 import ExportModal from './modals/ExportModal';
@@ -35,7 +35,7 @@ export default function ToolsDropdown() {
     <>
       <DropdownMenu>
         <DropdownMenu.Trigger asChild>
-          <IconButton tooltip="Load an export" aria-label="Load an export" size="small" icon={<Tools />} />
+          <IconButton tooltip={t('load_export')} aria-label={t('load_export')} size="small" icon={<FileZipIcon />} />
         </DropdownMenu.Trigger>
 
         <DropdownMenu.Portal>
