@@ -1,15 +1,15 @@
 import { defaultWorker } from '../Worker';
 import {
-  createSetHeading as createSetHeadingFrame, createSetContainer, createCombinedSetContainer,
+  createSetHeading as createSetHeadingFrame,
+  createSetContainer,
+  createCombinedSetContainer,
+  createColumnHeaders,
 } from './frameUtils';
 
 /**
  * Create combined container for a set (heading + tokens)
  */
-export async function createCombinedContainer(
-  setName: string,
-  container: FrameNode,
-): Promise<FrameNode | null> {
+export async function createCombinedContainer(setName: string, container: FrameNode): Promise<FrameNode | null> {
   return defaultWorker.schedule(async () => {
     try {
       const combinedContainer = createCombinedSetContainer(setName);
@@ -43,10 +43,7 @@ export async function createAndAppendSetHeading(
 /**
  * Create and append tokens container for a set
  */
-export async function createTokensContainer(
-  setName: string,
-  combinedContainer: FrameNode,
-): Promise<FrameNode | null> {
+export async function createTokensContainer(setName: string, combinedContainer: FrameNode): Promise<FrameNode | null> {
   return defaultWorker.schedule(async () => {
     try {
       const tokenListContainer = createSetContainer(setName);
@@ -66,6 +63,7 @@ export async function createSetStructure(
   setName: string,
   tokens: any[],
   container: FrameNode,
+  hasUserTemplate: boolean = false,
 ): Promise<{ combinedContainer: FrameNode | null; tokensContainer: FrameNode | null }> {
   // Create combined container for this set (heading + tokens)
   const combinedContainer = await createCombinedContainer(setName, container);
@@ -76,6 +74,12 @@ export async function createSetStructure(
 
   // Create heading for this set and append to combined container
   await createAndAppendSetHeading(setName, tokens.length, combinedContainer);
+
+  // Add column headers after the heading (only if no user template)
+  if (!hasUserTemplate) {
+    const columnHeaders = await createColumnHeaders();
+    combinedContainer.appendChild(columnHeaders);
+  }
 
   // Create tokens container for this set and append to combined container
   const tokensContainer = await createTokensContainer(setName, combinedContainer);
