@@ -3,10 +3,8 @@ import { useDispatch } from 'react-redux';
 import { useDebounce } from 'use-debounce';
 import zod from 'zod';
 import {
-  Box,
   Button,
   FormField,
-  Heading,
   IconButton,
   Label,
   Link,
@@ -14,8 +12,11 @@ import {
   Stack,
   Text,
   TextInput,
+  Tooltip,
+  Heading,
+  Box,
 } from '@tokens-studio/ui';
-import { EyeClosedIcon, EyeOpenIcon } from '@radix-ui/react-icons';
+import { EyeClosedIcon, EyeOpenIcon, QuestionMarkCircledIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
 import { create, Organization } from '@tokens-studio/sdk';
 import { StorageProviderType } from '@/constants/StorageProviderType';
@@ -23,18 +24,11 @@ import { StorageTypeFormValues } from '@/types/StorageType';
 import { generateId } from '@/utils/generateId';
 import { ChangeEventHandler } from './types';
 import { ErrorMessage } from '../ErrorMessage';
-import TokensStudioWord from '@/icons/tokensstudio-word.svg';
-import { styled } from '@/stitches.config';
 import { GET_ORGS_QUERY } from '@/storage/tokensStudio/graphql';
 import { Dispatch } from '@/app/store';
 import { StudioConfigurationService } from '@/storage/tokensStudio/StudioConfigurationService';
 import { shouldUseSecureConnection } from '@/utils/shouldUseSecureConnection';
 import { isJWTError, getErrorMessage } from '@/utils/jwtErrorUtils';
-
-const StyledTokensStudioWord = styled(TokensStudioWord, {
-  width: '200px',
-  height: '25px',
-});
 
 type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.TOKENS_STUDIO }>;
 type Props = {
@@ -54,7 +48,6 @@ export default function TokensStudioForm({
   const [baseUrlError, setBaseUrlError] = React.useState<string | null>(null);
   const [orgData, setOrgData] = React.useState<Organization[]>([]);
   const [isMasked, setIsMasked] = React.useState(true);
-  const [showTeaser, setShowTeaser] = React.useState(true);
   const [isValidatingBaseUrl, setIsValidatingBaseUrl] = React.useState(false);
   const dispatch = useDispatch<Dispatch>();
 
@@ -89,14 +82,8 @@ export default function TokensStudioForm({
     [values, onSubmit],
   );
 
-  React.useEffect(() => {
-    if (values.secret) {
-      setShowTeaser(false);
-    }
-  }, [values]);
-
-  const handleDismissTeaser = React.useCallback(() => {
-    setShowTeaser(false);
+  const handleStartTrial = React.useCallback(() => {
+    window.open('https://app.prod.tokens.studio', '_blank');
   }, []);
 
   const validateBaseUrl = React.useCallback(async (baseUrl: string) => {
@@ -203,53 +190,56 @@ export default function TokensStudioForm({
     [validateBaseUrl],
   );
 
-  return showTeaser ? (
-    <Stack direction="column" align="start" gap={5}>
-      <StyledTokensStudioWord />
-      <Stack direction="column" gap={3}>
-        <Heading size="large">A dedicated design tokens management platform</Heading>
-        <Box>
-          We are working a dedicated design tokens management platform built on our powerful node-based graph engine
-          including plug and play token transformation - suitable for enterprises! Still in early access, sign up for
-          the waitlist!
-        </Box>
-        <Link href="https://tokens.studio/studio" target="_blank" rel="noreferrer">
-          Learn more
-        </Link>
-      </Stack>
-      <Button onClick={handleDismissTeaser}>Already got access?</Button>
-    </Stack>
-  ) : (
+  return (
     <form onSubmit={handleSubmit}>
       <Stack direction="column" gap={5}>
-        <Text muted>
-          {t('providers.tokensstudio.descriptionFirstPart')}
-          {' '}
-          <Link
-            href="https://q2gsw2tok1e.typeform.com/to/pJCwLVh2?typeform-source=tokens.studio"
-            target="_blank"
-            rel="noreferrer"
-          >
-            {t('providers.tokensstudio.signupText')}
-          </Link>
-        </Text>
-        <Text muted css={{ marginTop: '$2' }}>
-          {t('providers.tokensstudio.descriptionSecondPart')}
-          <Link
-            href="https://docs.tokens.studio/token-storage/remote/sync-cloud-studio-platform?ref=addprovider"
-            target="_blank"
-            rel="noreferrer"
-          >
-            {t('providers.tokensstudio.tokensStudioSyncGuide')}
-          </Link>
-        </Text>
+        <Stack direction="column" align="start" gap={4}>
+          <Heading size="large">{t('tokensStudioForm.heading')}</Heading>
+          <Box>
+            {t('tokensStudioForm.description')}
+            <br />
+            <br />
+            {t('tokensStudioForm.description2')}
+            <br />
+            <Link
+              href="https://tokens.studio/studio"
+              target="_blank"
+              rel="noreferrer"
+            >
+              {t('tokensStudioForm.learnMore')}
+            </Link>
+            {' '}
+            or check out our
+            {' '}
+            <Link
+              href="https://documentation.tokens.studio/guides/migrating-from-tokens-studio-for-figma-plugin-to-the-tokens-studio-platform"
+              target="_blank"
+              rel="noreferrer"
+            >
+              {t('tokensStudioForm.migrationGuide')}
+            </Link>
+            .
+          </Box>
+          <Stack direction="row" gap={3}>
+            <Button variant="primary" onClick={handleStartTrial}>{t('tokensStudioForm.startFreeTrial')}</Button>
+          </Stack>
+        </Stack>
         <FormField>
-          <Label htmlFor="name">{t('providers.tokensstudio.name')}</Label>
+          <Stack direction="row" align="center" gap={2}>
+            <Label htmlFor="name">{t('providers.tokensstudio.name')}</Label>
+            <Tooltip label={t('nameHelpText')}>
+              <QuestionMarkCircledIcon style={{ width: '16px', height: '16px', color: 'var(--color-fg-muted)' }} />
+            </Tooltip>
+          </Stack>
           <TextInput name="name" id="name" value={values.name || ''} onChange={onChange} type="text" required />
-          <Text muted>{t('nameHelpText')}</Text>
         </FormField>
         <FormField>
-          <Label htmlFor="baseUrl">Studio Base URL (optional)</Label>
+          <Stack direction="row" align="center" gap={2}>
+            <Label htmlFor="baseUrl">{t('tokensStudioForm.studioBaseUrl')}</Label>
+            <Tooltip label={t('tokensStudioForm.baseUrlTooltip')}>
+              <QuestionMarkCircledIcon style={{ width: '16px', height: '16px', color: 'var(--color-fg-muted)' }} />
+            </Tooltip>
+          </Stack>
           <TextInput
             name="baseUrl"
             id="baseUrl"
@@ -257,14 +247,10 @@ export default function TokensStudioForm({
             onChange={onChange}
             onBlur={handleBaseUrlBlur}
             type="text"
-            placeholder="https://app.your-studio-instance.com"
+            placeholder="https://app.prod.tokens.studio"
           />
           {baseUrlError && <Text css={{ color: '$dangerFg' }}>{baseUrlError}</Text>}
-          {isValidatingBaseUrl && <Text muted>Validating base URL...</Text>}
-          <Text muted>
-            Leave empty to use the default Studio instance (https://app.prod.tokens.studio). For custom Studio instances, enter the base URL
-            (e.g., https://app.acme-corp.enterprise.tokens.studio)
-          </Text>
+          {isValidatingBaseUrl && <Text muted>{t('tokensStudioForm.validatingBaseUrl')}</Text>}
         </FormField>
         <FormField>
           <Label htmlFor="secret">{t('providers.tokensstudio.pat')}</Label>
@@ -292,7 +278,7 @@ export default function TokensStudioForm({
             <Label htmlFor="org">{t('providers.tokensstudio.selectOrgLabel')}</Label>
             <div>
               <Select value={values.orgId ?? ''} onValueChange={onOrgChange} name="org">
-                <Select.Trigger value={selectedOrg?.label || 'Choose an organization'} />
+                <Select.Trigger value={selectedOrg?.label || t('tokensStudioForm.chooseOrganization')} />
                 <Select.Content>
                   {orgOptions?.map((option) => (
                     <Select.Item key={option.value} value={option.value}>
@@ -310,7 +296,7 @@ export default function TokensStudioForm({
             <Label htmlFor="org">{t('providers.tokensstudio.selectProjectLabel')}</Label>
             <div>
               <Select value={values.id ?? ''} onValueChange={onProjectChange} name="id">
-                <Select.Trigger value={selectedProject?.label || 'Choose a project'} />
+                <Select.Trigger value={selectedProject?.label || t('tokensStudioForm.chooseProject')} />
                 <Select.Content>
                   {projectOptions?.map((option) => (
                     <Select.Item key={option.value} value={option.value}>
