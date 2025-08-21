@@ -5,6 +5,14 @@ import { tryApplyVariableId } from '@/utils/tryApplyVariableId';
 // Utility function to format objects and arrays nicely for display
 function formatValueForDisplay(value: any): string {
   try {
+    // Handle null and undefined gracefully
+    if (value === null) {
+      return 'null';
+    }
+    if (value === undefined) {
+      return 'undefined';
+    }
+
     if (Array.isArray(value)) {
       if (value.length === 0) return '';
 
@@ -51,23 +59,22 @@ export async function applyTextCharacterValuesOnNode(
   values: MapValuesToTokensResult,
 ) {
   // Raw value for text layers
-  if (values.tokenValue) {
+  if ('tokenValue' in values) {
     if ('characters' in node && node.fontName !== figma.mixed) {
       await figma.loadFontAsync(node.fontName);
 
       // Use formatted display for objects and arrays, fallback to string for primitives
-      const value =
-        typeof values.tokenValue === 'object' ? formatValueForDisplay(values.tokenValue) : values.tokenValue;
+      const value = typeof values.tokenValue === 'object' ? formatValueForDisplay(values.tokenValue) : values.tokenValue;
       node.characters = String(value);
     }
   }
 
   // When a text token is applied we want to apply the token value
   if (
-    'characters' in node &&
-    node.fontName !== figma.mixed &&
-    typeof values.text === 'string' &&
-    typeof data.text !== 'undefined'
+    'characters' in node
+    && node.fontName !== figma.mixed
+    && typeof values.text === 'string'
+    && typeof data.text !== 'undefined'
   ) {
     if (!(await tryApplyVariableId(node, 'characters', data.text))) {
       await figma.loadFontAsync(node.fontName);

@@ -1,7 +1,10 @@
 import React from 'react';
-import { Button, Stack, Select, Switch, Label } from '@tokens-studio/ui';
+import {
+  Button, Stack, Select, Switch, Label, Text,
+} from '@tokens-studio/ui';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
+import { styled } from '@/stitches.config';
 import Modal from '../Modal';
 import Input from '../Input';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
@@ -17,6 +20,14 @@ import {
 import { mergeTokenGroups, getOverallConfig } from '@/utils/tokenHelpers';
 import { defaultTokenResolver } from '@/utils/TokenResolver';
 
+const StyledCode = styled('code', {
+  backgroundColor: '$bgSubtle',
+  padding: '$1 $2',
+  borderRadius: '$small',
+  fontFamily: '$mono',
+  fontSize: '$xsmall',
+});
+
 type Props = {
   isOpen: boolean;
   onClose: () => void;
@@ -24,7 +35,9 @@ type Props = {
   initialStartsWith?: string;
 };
 
-export default function LivingDocumentationModal({ isOpen, onClose, initialTokenSet, initialStartsWith }: Props) {
+export default function LivingDocumentationModal({
+  isOpen, onClose, initialTokenSet, initialStartsWith,
+}: Props) {
   const { t } = useTranslation(['tokens']);
   const allTokenSets = useSelector(allTokenSetsSelector);
   const tokens = useSelector(tokensSelector);
@@ -84,6 +97,32 @@ export default function LivingDocumentationModal({ isOpen, onClose, initialToken
   return (
     <Modal title={t('generateDocumentation')} isOpen={isOpen} close={onClose} size="large">
       <Stack direction="column" gap={4}>
+        <Stack direction="column" gap={3}>
+          <Text size="small" muted>
+            Generate living documentation to showcase your design tokens in Figma.
+            {' '}
+            <a
+              href="https://docs.tokens.studio/figma/generate-documentation"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: '$accent', textDecoration: 'underline' }}
+            >
+              Learn more
+            </a>
+          </Text>
+          <Text size="small" muted>
+            Use our preset template, or select a custom template frame with layers named with properties like
+            {' '}
+            <StyledCode>__tokenName</StyledCode>
+            ,
+            {' '}
+            <StyledCode>__value</StyledCode>
+            ,
+            {' '}
+            <StyledCode>__tokenValue</StyledCode>
+            , etc.
+          </Text>
+        </Stack>
         <Stack direction="column" gap={2}>
           <label htmlFor="tokenSet">{t('tokenSetRequired')}</label>
           <Select value={tokenSet} onValueChange={handleTokenSetChange}>
