@@ -6,6 +6,7 @@ import {
 } from '@tokens-studio/ui';
 import { NavArrowLeft } from 'iconoir-react';
 import { useTranslation } from 'react-i18next';
+import { useDebouncedCallback } from 'use-debounce';
 import { allTokenSetsSelector, themesListSelector, usedTokenSetSelector } from '@/selectors';
 import { StyledNameInputBox } from './StyledNameInputBox';
 import { StyledCreateOrEditThemeFormHeaderFlex } from './StyledCreateOrEditThemeFormHeaderFlex';
@@ -23,6 +24,7 @@ import { ThemeStyleManagementForm } from './ThemeStyleManagementForm';
 import { TokenSetTreeContent } from '../TokenSetTree/TokenSetTreeContent';
 import { ThemeGroupDropDownMenu } from './ThemeGroupDropDownMenu';
 import { SearchInputWithToggle } from '../SearchInputWithToggle';
+import { track } from '@/utils/analytics';
 
 export type FormValues = {
   name: string
@@ -139,10 +141,23 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
   const handleAddGroup = React.useCallback(() => [
     setShowGroupInput(true),
   ], []);
+  // Debounced tracking for search events to reduce the number of events
+  const debouncedTrackSearch = useDebouncedCallback((term: string) => {
+    if (searchTerm.trim()) {
+      track('Manage Themes Search', {
+        searchTerm: term.trim(),
+        searchLength: term.trim().length,
+        hasResults: filteredTreeOrListItems.length > 0,
+        resultCount: filteredTreeOrListItems.length,
+        totalItems: treeOrListItems.length,
+      });
+    }
+  }, 1000); // 1 second debounce
 
-  const handleSearchTermChange = useCallback((term: string) => {
+  const handleSearchTermChangeWithTracking = useCallback((term: string) => {
     setSearchTerm(term);
-  }, []);
+    debouncedTrackSearch(term);
+  }, [debouncedTrackSearch]);
 
   const handleToggleSearch = useCallback(() => {
     setIsSearchActive(!isSearchActive);
@@ -256,7 +271,7 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
                   isSearchActive={isSearchActive}
                   searchTerm={searchTerm}
                   onToggleSearch={handleToggleSearch}
-                  onSearchTermChange={handleSearchTermChange}
+                  onSearchTermChange={handleSearchTermChangeWithTracking}
                   placeholder={t('searchTokenSets')}
                   tooltip={t('searchSets')}
                   autofocus
@@ -276,7 +291,7 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
               isSearchActive={isSearchActive}
               searchTerm={searchTerm}
               onToggleSearch={handleToggleSearch}
-              onSearchTermChange={handleSearchTermChange}
+              onSearchTermChange={handleSearchTermChangeWithTracking}
               placeholder={t('searchTokenSets')}
               tooltip={t('searchSets')}
               autofocus

@@ -10,10 +10,12 @@ import Downshift from 'downshift';
 import { ArrowLeftIcon, PlusIcon } from '@radix-ui/react-icons';
 import { GitBranchIcon } from '@primer/octicons-react';
 import { useTranslation } from 'react-i18next';
+import { useDebouncedCallback } from 'use-debounce';
 import { useIsProUser } from '../hooks/useIsProUser';
 import { useChangedState } from '@/hooks/useChangedState';
 import UpgradeToProModal from './UpgradeToProModal';
 import branchingImage from '@/app/assets/hints/branchselector.png';
+import { track } from '@/utils/analytics';
 
 type PopoverMode = 'switch' | 'create';
 
@@ -80,9 +82,20 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
     handleSetMode('create');
   }, [handleSetMode]);
 
-  const handleSearchChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchValue(e.target.value);
-  }, []);
+  // Debounced tracking for search events to reduce the number of events
+  const debouncedTrackSearch = useDebouncedCallback((value: string) => {
+    if (searchValue.trim()) {
+      track('Branch Selector Search', {
+        totalBranches: branches.length,
+      });
+    }
+  }, 1000); // 1 second debounce
+
+  const handleSearchChangeWithTracking = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    setSearchValue(value);
+    debouncedTrackSearch(value);
+  }, [debouncedTrackSearch]);
 
   const handleBackButtonClick = React.useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -280,7 +293,7 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
                           placeholder={t('search')}
                           autoFocus
                           value={searchValue}
-                          onChange={handleSearchChange}
+                          onChange={handleSearchChangeWithTracking}
                           css={{
                             flex: 1,
                             border: 'none',
