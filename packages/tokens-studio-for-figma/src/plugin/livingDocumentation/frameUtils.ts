@@ -9,6 +9,7 @@ export async function createTokenTemplate(tokenType: TokenTypes): Promise<FrameN
   // Load default font first
   await figma.loadFontAsync({ family: 'Geist Mono', style: 'Regular' });
   await figma.loadFontAsync({ family: 'Geist Mono', style: 'Medium' });
+  await figma.loadFontAsync({ family: 'Inter', style: 'Regular' });
 
   const frame = figma.createFrame();
   frame.name = `Token Template - ${tokenType}`;
@@ -22,7 +23,7 @@ export async function createTokenTemplate(tokenType: TokenTypes): Promise<FrameN
   frame.paddingBottom = 8;
   frame.cornerRadius = 0;
   frame.clipsContent = false;
-  frame.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }]; // White background
+  frame.fills = [];
 
   // Create token name text
   const tokenNameText = figma.createText();
@@ -59,8 +60,20 @@ export async function createTokenTemplate(tokenType: TokenTypes): Promise<FrameN
     case TokenTypes.TYPOGRAPHY: {
       const textNode = figma.createText();
       textNode.name = '__typography';
-      textNode.fontName = { family: 'Geist Mono', style: 'Regular' };
-      textNode.fontSize = 12;
+      textNode.fontName = { family: 'Inter', style: 'Regular' };
+      textNode.fontSize = 16; // Default size for preview
+      textNode.characters = 'aA';
+      textNode.fills = [{ type: 'SOLID', color: { r: 0, g: 0, b: 0 } }];
+      frame.appendChild(textNode);
+      break;
+    }
+
+    case TokenTypes.FONT_SIZES: {
+      // For font sizes, use "aA" characters with the actual font size
+      const textNode = figma.createText();
+      textNode.name = '__fontSizes';
+      textNode.fontName = { family: 'Inter', style: 'Regular' };
+      textNode.fontSize = 16; // Default size for preview
       textNode.characters = 'aA';
       textNode.fills = [{ type: 'SOLID', color: { r: 0, g: 0, b: 0 } }];
       frame.appendChild(textNode);
@@ -71,7 +84,6 @@ export async function createTokenTemplate(tokenType: TokenTypes): Promise<FrameN
     case TokenTypes.PARAGRAPH_INDENT:
     case TokenTypes.LINE_HEIGHTS:
     case TokenTypes.LETTER_SPACING:
-    case TokenTypes.FONT_SIZES:
     case TokenTypes.SPACING:
     case TokenTypes.SIZING: {
       // Create a horizontal auto layout frame
@@ -87,6 +99,7 @@ export async function createTokenTemplate(tokenType: TokenTypes): Promise<FrameN
       sizingFrame.paddingTop = 0;
       sizingFrame.paddingBottom = 0;
       sizingFrame.fills = [];
+      sizingFrame.clipsContent = false;
 
       // First vertical line (16px height, 2px width)
       const leftLine = figma.createRectangle();
@@ -189,6 +202,7 @@ export async function createSetHeading(setName: string, tokenCount: number): Pro
   headingContainer.primaryAxisSizingMode = 'AUTO';
   headingContainer.counterAxisSizingMode = 'AUTO';
   headingContainer.fills = [];
+  headingContainer.clipsContent = false;
 
   // Create heading texts
   const { setNameText, tokenCountText } = await createSetHeadingTexts(setName, tokenCount);
@@ -199,7 +213,7 @@ export async function createSetHeading(setName: string, tokenCount: number): Pro
   return headingContainer;
 }
 
-export function createMainContainer(): FrameNode {
+export async function createMainContainer(): Promise<FrameNode> {
   const container = figma.createFrame();
   container.name = 'Living Documentation';
   container.layoutMode = 'VERTICAL';
@@ -210,6 +224,7 @@ export function createMainContainer(): FrameNode {
   container.paddingRight = 32;
   container.paddingTop = 32;
   container.paddingBottom = 32;
+  container.clipsContent = false;
 
   return container;
 }
@@ -218,10 +233,11 @@ export function createSetContainer(setName: string): FrameNode {
   const setContainer = figma.createFrame();
   setContainer.name = `${setName} Tokens`;
   setContainer.layoutMode = 'VERTICAL';
-  setContainer.itemSpacing = 0;
+  setContainer.itemSpacing = 8;
   setContainer.layoutSizingHorizontal = 'HUG';
   setContainer.layoutSizingVertical = 'HUG';
   setContainer.fills = [];
+  setContainer.clipsContent = false;
 
   return setContainer;
 }
@@ -234,6 +250,7 @@ export function createCombinedSetContainer(setName: string): FrameNode {
   combinedContainer.layoutSizingHorizontal = 'HUG';
   combinedContainer.layoutSizingVertical = 'HUG';
   combinedContainer.fills = [];
+  combinedContainer.clipsContent = false;
 
   return combinedContainer;
 }
@@ -243,5 +260,46 @@ export function applyTemplateLayoutProperties(template: any): void {
     // Set horizontal sizing to fill container width, but keep vertical as hug
     template.layoutSizingHorizontal = 'FILL';
     template.layoutSizingVertical = 'HUG';
+    // Ensure no clipping for shadows
+    template.clipsContent = false;
   }
+}
+
+export async function createColumnHeaders(): Promise<FrameNode> {
+  // Load Inter font for headers
+  await figma.loadFontAsync({ family: 'Inter', style: 'Regular' });
+
+  const headerContainer = figma.createFrame();
+  headerContainer.name = 'Column Headers';
+  headerContainer.layoutMode = 'HORIZONTAL';
+  headerContainer.itemSpacing = 16;
+  headerContainer.layoutSizingHorizontal = 'HUG';
+  headerContainer.layoutSizingVertical = 'HUG';
+  headerContainer.paddingLeft = 0;
+  headerContainer.paddingRight = 0;
+  headerContainer.paddingTop = 0;
+  headerContainer.paddingBottom = 16;
+  headerContainer.fills = [];
+  headerContainer.clipsContent = false;
+
+  // Create header texts for each column
+  const headers = [
+    { name: 'Token Name', width: 200 },
+    { name: 'Token Value', width: 300 },
+    { name: 'Resolved Value', width: 300 },
+    { name: 'Visual Preview', width: 100 },
+  ];
+
+  for (const header of headers) {
+    const headerText = figma.createText();
+    headerText.name = `Header - ${header.name}`;
+    headerText.fontName = { family: 'Inter', style: 'Regular' };
+    headerText.fontSize = 11;
+    headerText.characters = header.name;
+    headerText.fills = [{ type: 'SOLID', color: { r: 0.4, g: 0.4, b: 0.4 } }]; // Muted color
+    headerText.resize(header.width, headerText.height);
+    headerContainer.appendChild(headerText);
+  }
+
+  return headerContainer;
 }

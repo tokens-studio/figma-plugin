@@ -25,6 +25,10 @@ const SyncSettings = () => {
 
   const providers = useMemo(() => [
     {
+      text: 'Tokens Studio',
+      type: StorageProviderType.TOKENS_STUDIO,
+    },
+    {
       text: t('providers.url.title'),
       type: StorageProviderType.URL,
     },
@@ -56,10 +60,6 @@ const SyncSettings = () => {
     {
       text: t('providers.generic.title'),
       type: StorageProviderType.GENERIC_VERSIONED_STORAGE,
-    },
-    {
-      text: 'Tokens Studio',
-      type: StorageProviderType.TOKENS_STUDIO,
     },
   ], [t]);
 

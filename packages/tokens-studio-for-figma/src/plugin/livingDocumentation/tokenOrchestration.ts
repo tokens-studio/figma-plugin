@@ -17,16 +17,20 @@ export function filterAndGroupTokens(
   if (tokenSet === 'All') {
     // Group all matching tokens by their set
     const filteredTokens = resolvedTokens.filter((t) => t.name.startsWith(startsWith));
-    tokensBySet = filteredTokens.reduce((acc, token) => {
-      const setName = token.internal__Parent || 'Default';
-      if (!acc[setName]) acc[setName] = [];
-      acc[setName].push(token);
-      return acc;
-    }, {} as Record<string, any[]>);
+    tokensBySet = filteredTokens.reduce(
+      (acc, token) => {
+        const setName = token.internal__Parent || 'Default';
+        if (!acc[setName]) acc[setName] = [];
+        acc[setName].push(token);
+        return acc;
+      },
+      {} as Record<string, any[]>,
+    );
   } else {
     // Use only tokens from the specified set
-    const filteredTokens = resolvedTokens.filter((t) => t.name.startsWith(startsWith)
-      && (t.internal__Parent === tokenSet || !t.internal__Parent));
+    const filteredTokens = resolvedTokens.filter(
+      (t) => t.name.startsWith(startsWith) && (t.internal__Parent === tokenSet || !t.internal__Parent),
+    );
     if (filteredTokens.length > 0) {
       tokensBySet[tokenSet] = filteredTokens;
     }
@@ -52,7 +56,7 @@ export async function processTokenSets(
   // Process each set sequentially
   for (const [setName, tokens] of Object.entries(tokensBySet)) {
     // Create the complete structure for this set
-    const { tokensContainer } = await createSetStructure(setName, tokens, container);
+    const { tokensContainer } = await createSetStructure(setName, tokens, container, !!userTemplate);
 
     // Process tokens in batches within this set (only if container was created successfully)
     if (tokensContainer) {
