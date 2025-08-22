@@ -14,6 +14,7 @@ import {
 } from '@/selectors';
 import { mergeTokenGroups, getOverallConfig } from '@/utils/tokenHelpers';
 import { defaultTokenResolver } from '@/utils/TokenResolver';
+import { track } from '@/utils/analytics';
 
 type Props = { isOpen: boolean; onClose: () => void };
 
@@ -28,6 +29,12 @@ export default function LivingDocumentationModal({ isOpen, onClose }: Props) {
   const [tokenSet, setTokenSet] = React.useState('All');
   const [startsWith, setStartsWith] = React.useState('');
   const [applyTokens, setApplyTokens] = React.useState(true);
+
+  React.useEffect(() => {
+    if (isOpen) {
+      track('Living Documentation Modal Opened');
+    }
+  }, [isOpen]);
 
   // Get resolved tokens using the same pattern as other components, including proper theme configuration
   const resolvedTokens = React.useMemo(() => {
@@ -56,6 +63,16 @@ export default function LivingDocumentationModal({ isOpen, onClose }: Props) {
   }, []);
 
   const handleGenerate = React.useCallback(() => {
+    // Track when user starts creating living documentation with detailed properties
+    track('Living Documentation Creation Started', {
+      tokenSetChoice: tokenSet === 'All' ? 'ALL' : 'SETS',
+      tokenSetCount: tokenSet === 'All' ? allTokenSets.length : 1,
+      startsWithFilled: !!startsWith.trim(),
+      applyTokensChecked: applyTokens,
+      // Track if we started based on a selection (using their template) or no selection (using our template)
+      hasUserTemplate: false, // This will be determined in the plugin side
+    });
+
     AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.CREATE_LIVING_DOCUMENTATION,
       tokenSet,
@@ -64,7 +81,7 @@ export default function LivingDocumentationModal({ isOpen, onClose }: Props) {
       resolvedTokens,
     });
     onClose();
-  }, [tokenSet, startsWith, applyTokens, resolvedTokens, onClose]);
+  }, [tokenSet, startsWith, applyTokens, resolvedTokens, onClose, allTokenSets.length]);
 
   return (
     <Modal title={t('generateDocumentation')} isOpen={isOpen} close={onClose} size="large">

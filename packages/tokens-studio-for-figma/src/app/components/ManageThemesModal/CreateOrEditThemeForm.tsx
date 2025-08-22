@@ -268,7 +268,7 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
       )}
       {!id && (
         <Box css={{ padding: '$3 $4', borderBottom: '1px solid $borderSubtled' }}>
-          <Stack direction="row" justify="between" align="center" gap={isSearchActive ? 2 : 0}>
+          <Stack direction="row" justify="between" align="center" gap={3}>
             <Box css={{ fontSize: '$small', fontWeight: '$sansMedium', color: '$fgDefault' }}>
               {t('sets.title')}
             </Box>
