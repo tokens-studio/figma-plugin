@@ -40,6 +40,7 @@ export default function UpgradeToProModal({
             marginBottom: '$1',
             borderRadius: '$small',
             overflow: 'hidden',
+            border: '1px solid $borderSubtle',
           }}
           >
             <img src={image} alt="Upgrade to Pro" />

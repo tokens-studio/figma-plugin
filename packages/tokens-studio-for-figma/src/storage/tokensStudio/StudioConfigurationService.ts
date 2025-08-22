@@ -44,6 +44,8 @@ export class StudioConfigurationService {
 
   private readonly PRODUCTION_GRAPHQL_HOST = 'graphql.app.tokens.studio';
 
+  private readonly DEFAULT_BASE_URL = 'https://app.prod.tokens.studio';
+
   private normalizedBaseUrl?: string;
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -59,6 +61,11 @@ export class StudioConfigurationService {
     return process.env.ENVIRONMENT === 'development'
       ? this.DEVELOPMENT_GRAPHQL_HOST
       : this.PRODUCTION_GRAPHQL_HOST;
+  }
+
+  // Gets the default base URL
+  public getDefaultBaseUrl(): string {
+    return this.DEFAULT_BASE_URL;
   }
 
   public static getInstance(): StudioConfigurationService {
@@ -131,8 +138,16 @@ export class StudioConfigurationService {
    */
   public async getGraphQLHost(baseUrl?: string): Promise<string> {
     if (!baseUrl) {
-      // When no baseUrl is provided, use environment-specific default
-      return this.getDefaultGraphQLHost();
+      // When no baseUrl is provided, use the default base URL and fetch its configuration
+      try {
+        const config = await this.discoverConfiguration(this.DEFAULT_BASE_URL);
+        // Extract host from legacy_graphql_endpoint
+        const url = new URL(`https://${config.legacy_graphql_endpoint}`);
+        return url.host;
+      } catch (error) {
+        // Fallback to environment-specific default if configuration discovery fails
+        return this.getDefaultGraphQLHost();
+      }
     }
 
     try {
@@ -167,12 +182,10 @@ export class StudioConfigurationService {
    * Gets the full configuration for a Studio instance
    */
   public async getConfiguration(baseUrl?: string): Promise<StudioInstanceConfiguration | null> {
-    if (!baseUrl) {
-      return null;
-    }
+    const targetUrl = baseUrl || this.DEFAULT_BASE_URL;
 
     try {
-      return await this.discoverConfiguration(baseUrl);
+      return await this.discoverConfiguration(targetUrl);
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Failed to get configuration:', error);

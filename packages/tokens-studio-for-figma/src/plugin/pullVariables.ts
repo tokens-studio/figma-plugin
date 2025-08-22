@@ -59,6 +59,16 @@ export default async function pullVariables(options: PullVariablesOptions, theme
         collectionsCache.set(variable.variableCollectionId, collection);
       }
     }
+
+    // Filter collections and modes based on selectedCollections option
+    if (options.selectedCollections && collection) {
+      const selectedCollection = options.selectedCollections[collection.id];
+      if (!selectedCollection) {
+        // eslint-disable-next-line no-continue
+        continue; // Skip this collection if it's not selected
+      }
+    }
+
     if (collection) {
       collections.set(collection.name, collection);
     }
@@ -68,6 +78,14 @@ export default async function pullVariables(options: PullVariablesOptions, theme
       switch (variable.resolvedType) {
         case 'COLOR':
           Object.entries(variable.valuesByMode).forEach(([mode, value]) => {
+            // Filter modes based on selectedCollections option
+            if (options.selectedCollections && collection) {
+              const selectedCollection = options.selectedCollections[collection.id];
+              if (selectedCollection && !selectedCollection.selectedModes.includes(mode)) {
+                return; // Skip this mode if it's not selected
+              }
+            }
+
             let tokenValue;
 
             if (typeof value === 'object' && 'type' in value && value.type === 'VARIABLE_ALIAS') {
@@ -91,6 +109,14 @@ export default async function pullVariables(options: PullVariablesOptions, theme
           break;
         case 'BOOLEAN':
           Object.entries(variable.valuesByMode).forEach(([mode, value]) => {
+            // Filter modes based on selectedCollections option
+            if (options.selectedCollections && collection) {
+              const selectedCollection = options.selectedCollections[collection.id];
+              if (selectedCollection && !selectedCollection.selectedModes.includes(mode)) {
+                return; // Skip this mode if it's not selected
+              }
+            }
+
             const modeName = collection?.modes.find((m) => m.modeId === mode)?.name;
             let tokenValue;
             if (typeof value === 'object' && 'type' in value && value.type === 'VARIABLE_ALIAS') {
@@ -111,6 +137,14 @@ export default async function pullVariables(options: PullVariablesOptions, theme
           break;
         case 'STRING':
           Object.entries(variable.valuesByMode).forEach(([mode, value]) => {
+            // Filter modes based on selectedCollections option
+            if (options.selectedCollections && collection) {
+              const selectedCollection = options.selectedCollections[collection.id];
+              if (selectedCollection && !selectedCollection.selectedModes.includes(mode)) {
+                return; // Skip this mode if it's not selected
+              }
+            }
+
             const modeName = collection?.modes.find((m) => m.modeId === mode)?.name;
             let tokenValue;
             if (typeof value === 'object' && 'type' in value && value.type === 'VARIABLE_ALIAS') {
@@ -131,6 +165,14 @@ export default async function pullVariables(options: PullVariablesOptions, theme
           break;
         case 'FLOAT':
           Object.entries(variable.valuesByMode).forEach(([mode, value]) => {
+            // Filter modes based on selectedCollections option
+            if (options.selectedCollections && collection) {
+              const selectedCollection = options.selectedCollections[collection.id];
+              if (selectedCollection && !selectedCollection.selectedModes.includes(mode)) {
+                return; // Skip this mode if it's not selected
+              }
+            }
+
             let tokenValue: string | number = value as number;
             if (typeof value === 'object' && 'type' in value && value.type === 'VARIABLE_ALIAS') {
               const alias = figma.variables.getVariableById(value.id);
@@ -210,7 +252,23 @@ export default async function pullVariables(options: PullVariablesOptions, theme
     });
 
     await Promise.all(Array.from(collections.values()).map(async (collection) => {
+      // Filter collections based on selectedCollections option
+      if (options.selectedCollections) {
+        const selectedCollection = options.selectedCollections[collection.id];
+        if (!selectedCollection) {
+          return; // Skip this collection if it's not selected
+        }
+      }
+
       await Promise.all(collection.modes.map(async (mode) => {
+        // Filter modes based on selectedCollections option
+        if (options.selectedCollections) {
+          const selectedCollection = options.selectedCollections[collection.id];
+          if (selectedCollection && !selectedCollection.selectedModes.includes(mode.modeId)) {
+            return; // Skip this mode if it's not selected
+          }
+        }
+
         const collectionVariables = localVariables.filter((v) => v.variableCollectionId === collection.id);
 
         const variableReferences = collectionVariables.reduce((acc, variable) => ({

@@ -176,6 +176,46 @@ jest.mock('@tokens-studio/sdk', () => ({
   gql: jest.fn(),
 }));
 
+// Mock StudioConfigurationService to prevent network calls during testing
+jest.mock('@/storage/tokensStudio/StudioConfigurationService', () => ({
+  StudioConfigurationService: {
+    getInstance: jest.fn(() => ({
+      getGraphQLHost: jest.fn().mockResolvedValue('graphql.app.tokens.studio'),
+      discoverConfiguration: jest.fn().mockResolvedValue({
+        legacy_graphql_endpoint: 'graphql.app.tokens.studio',
+        auth_domain: 'https://auth.app.tokens.studio',
+        frontend_base_url: 'https://app.tokens.studio',
+      }),
+    })),
+  },
+}));
+
+// Mock shouldUseSecureConnection utility
+jest.mock('@/utils/shouldUseSecureConnection', () => ({
+  shouldUseSecureConnection: jest.fn().mockReturnValue(true),
+}));
+
+// Mock Sentry to prevent transaction errors
+jest.mock('@sentry/react', () => ({
+  Replay: jest.fn().mockImplementation(() => ({})),
+  init: jest.fn(),
+  captureException: jest.fn(),
+}));
+
+jest.mock('@sentry/browser', () => ({
+  startTransaction: jest.fn(() => ({
+    startChild: jest.fn(() => ({
+      finish: jest.fn(),
+      setStatus: jest.fn(),
+    })),
+    finish: jest.fn(),
+    setMeasurement: jest.fn(),
+  })),
+  getCurrentHub: jest.fn(() => ({
+    configureScope: jest.fn(),
+  })),
+}));
+
 const storeInitialState = {
   redux: {
     initialState: {
