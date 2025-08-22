@@ -55,7 +55,6 @@ export default function LivingDocumentationModal({
     if (isOpen) {
       setTokenSet(initialTokenSet || 'All');
       setStartsWith(initialStartsWith || '');
-      track('Living Documentation Modal Opened');
     }
   }, [isOpen, initialTokenSet, initialStartsWith]);
 
