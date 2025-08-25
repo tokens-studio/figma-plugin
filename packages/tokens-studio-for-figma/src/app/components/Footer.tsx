@@ -75,9 +75,11 @@ export default function Footer() {
         flexShrink: 0,
         padding: '$3',
         borderTop: '1px solid $borderMuted',
+        overflow: 'hidden',
+        gap: '$2',
       }}
     >
-      <Stack direction="row" align="center" gap={2}>
+      <Stack direction="row" align="center" gap={2} css={{ overflow: 'hidden' }}>
         {storageType.provider === StorageProviderType.LOCAL && (tokensSize > 100 || themesSize > 100) && (
           <Button
             icon={<WarningTriangleSolid />}
@@ -154,8 +156,8 @@ export default function Footer() {
           ) : null}
       </Stack>
       <Stack direction="row" gap={4} align="center">
-        <Box css={{ color: '$fgMuted', fontSize: '$xsmall' }}>
-          <a href="https://tokens.studio/changelog" target="_blank" rel="noreferrer">{`V ${pjs.version}`}</a>
+        <Box css={{ color: '$fgMuted', fontSize: '$xsmall', flexShrink: 0 }}>
+          <a href="https://tokens.studio/changelog" target="_blank" rel="noreferrer" style={{ whiteSpace: 'nowrap' }}>{`V ${pjs.version}`}</a>
         </Box>
         <Stack direction="row" gap={1}>
           <ProBadge campaign="footer" />

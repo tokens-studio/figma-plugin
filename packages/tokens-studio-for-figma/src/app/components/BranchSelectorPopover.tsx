@@ -1,19 +1,21 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useUIDSeed } from 'react-uid';
 import {
   Box, Text, Button,
   IconButton,
   TextInput,
-  Heading,
 } from '@tokens-studio/ui';
 import * as Popover from '@radix-ui/react-popover';
 import Downshift from 'downshift';
 import { ArrowLeftIcon, PlusIcon } from '@radix-ui/react-icons';
 import { GitBranchIcon } from '@primer/octicons-react';
 import { useTranslation } from 'react-i18next';
-import ProBadge from './ProBadge';
+import { useDebouncedCallback } from 'use-debounce';
 import { useIsProUser } from '../hooks/useIsProUser';
 import { useChangedState } from '@/hooks/useChangedState';
+import UpgradeToProModal from './UpgradeToProModal';
+import branchingImage from '@/app/assets/hints/branchselector.png';
+import { track } from '@/utils/analytics';
 
 type PopoverMode = 'switch' | 'create';
 
@@ -40,6 +42,7 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [mode, setMode] = React.useState<PopoverMode>('switch');
   const [searchValue, setSearchValue] = React.useState('');
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const isProUser = useIsProUser();
   const { hasChanges } = useChangedState();
   const { t } = useTranslation(['branch']);
@@ -79,9 +82,20 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
     handleSetMode('create');
   }, [handleSetMode]);
 
-  const handleSearchChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchValue(e.target.value);
-  }, []);
+  // Debounced tracking for search events to reduce the number of events
+  const debouncedTrackSearch = useDebouncedCallback(() => {
+    if (searchValue.trim()) {
+      track('Branch Selector Search', {
+        totalBranches: branches.length,
+      });
+    }
+  }, 1000); // 1 second debounce
+
+  const handleSearchChangeWithTracking = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    setSearchValue(value);
+    debouncedTrackSearch();
+  }, [debouncedTrackSearch]);
 
   const handleBackButtonClick = React.useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -89,6 +103,14 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
 
     handleSetMode('switch');
   }, [handleSetMode]);
+
+  const handleNonProUserClick = React.useCallback(() => {
+    setShowUpgradeModal(true);
+  }, []);
+
+  const handleCloseUpgradeModal = React.useCallback(() => {
+    setShowUpgradeModal(false);
+  }, []);
 
   const getTitle = () => ((mode === 'switch') ? 'Switch branch' : 'Create branch from');
 
@@ -144,192 +166,213 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
   const handleItemToString = React.useCallback((item: any) => item?.label ?? '', []);
 
   return (
-    <Downshift
-      isOpen={isOpen}
-      onSelect={handleDownshiftSelect}
-      itemToString={handleItemToString}
-    >
-      {({ getItemProps, getInputProps, highlightedIndex }) => (
-        <div style={{ position: 'relative' }}>
-          <Popover.Root open={isOpen} onOpenChange={onOpenChange}>
-            <Popover.Trigger asChild>
-              <Button size="small" variant="invisible" icon={<GitBranchIcon />} data-testid="branch-selector-menu-trigger">
-                {currentBranch}
-              </Button>
-            </Popover.Trigger>
+    <>
+      {/* For non-pro users, show a simple button that opens a dialog */}
+      {!isProUser ? (
+        <>
+          <Button
+            size="small"
+            variant="invisible"
+            icon={<GitBranchIcon />}
+            onClick={handleNonProUserClick}
+            data-testid="branch-selector-menu-trigger"
+            style={{
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              flexShrink: 1,
+            }}
+          >
+            {currentBranch}
+          </Button>
 
-            <Popover.Portal>
-              <Popover.Content
-                side="top"
-                align="start"
-                sideOffset={4}
-                style={{ width: 'auto' }}
-              >
-                <Box
-                  css={{
-                    backgroundColor: '$bgCanvas',
-                    border: '1px solid',
-                    borderColor: '$borderSubtle',
-                    borderRadius: '$medium',
-                    boxShadow: '$contextMenu',
-                    maxHeight: '60vh',
-                    overflow: 'hidden',
-                    width: 'auto',
-                    minWidth: '150px',
-                    maxWidth: '70vw',
-                    position: 'relative',
-                    display: 'flex',
-                    flexDirection: 'column',
-                  }}
-                >
-                  <Box
-                    css={{
-                      padding: '$3 $4',
-                      paddingBottom: 0,
-                      background: 'var(--colors-bgCanvas)',
-                      position: 'sticky',
-                      zIndex: 10,
-                      top: 0,
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '$1',
+          <UpgradeToProModal
+            isOpen={showUpgradeModal}
+            onClose={handleCloseUpgradeModal}
+            feature="branching-feature"
+            image={branchingImage}
+            title={t('branchingProFeature')}
+            description="You can switch branches, create new ones from current changes or any other branch, easily find branches, and collaborate seamlessly with your team. Branching enables powerful version control and team collaboration workflows."
+          />
+        </>
+      ) : (
+        /* For pro users, show the full popover functionality */
+        <Downshift
+          isOpen={isOpen}
+          onSelect={handleDownshiftSelect}
+          itemToString={handleItemToString}
+        >
+          {({ getItemProps, getInputProps, highlightedIndex }) => (
+            <div style={{
+              position: 'relative',
+              flexShrink: 1,
+              overflow: 'hidden',
+            }}
+            >
+              <Popover.Root open={isOpen} onOpenChange={onOpenChange}>
+                <Popover.Trigger asChild>
+                  <Button
+                    size="small"
+                    variant="invisible"
+                    icon={<GitBranchIcon />}
+                    data-testid="branch-selector-menu-trigger"
+                    style={{
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
                     }}
                   >
-                    {(mode === 'create') && (
-                      <IconButton
-                        onMouseDown={handleBackButtonClick}
-                        icon={<ArrowLeftIcon />}
-                        variant="invisible"
-                        title="Go back"
-                        size="small"
-                        css={{ flexShrink: 0 }}
-                      />
-                    )}
-                    <Text size="small" bold css={{ flex: 1 }}>
-                      {getTitle()}
-                    </Text>
-                    {mode === 'switch' && (
-                    <IconButton
-                      type="button"
-                      tooltip={t('createNew')}
-                      tooltipSide="top"
-                      aria-label={t('createNew')}
-                      onClick={handleCreateButtonClick}
-                      css={{ flexShrink: 0 }}
-                      variant="invisible"
-                      size="small"
-                      icon={<PlusIcon />}
-                    />
-                    )}
-                  </Box>
+                    {currentBranch}
+                  </Button>
+                </Popover.Trigger>
 
-                  <Box
-                    css={{
-                      padding: '$3',
-                      borderBottom: '1px solid $borderSubtle',
-                      background: 'var(--colors-bgCanvas)',
-                      position: 'sticky',
-                      zIndex: 10,
-                      top: 0,
-                      display: 'flex',
-                      gap: '$2',
-                      alignItems: 'center',
-                    }}
+                <Popover.Portal>
+                  <Popover.Content
+                    side="top"
+                    align="start"
+                    sideOffset={4}
+                    style={{ width: 'auto' }}
                   >
-                    <TextInput
-                      ref={searchInputRef}
-                      {...getInputProps()}
-                      type="text"
-                      placeholder={t('search')}
-                      autoFocus
-                      value={searchValue}
-                      onChange={handleSearchChange}
+                    <Box
                       css={{
-                        flex: 1,
-                        border: 'none',
-                        outline: 'none',
-                        backgroundColor: 'transparent',
-                        fontFamily: '$mono',
+                        backgroundColor: '$bgCanvas',
+                        border: '1px solid',
+                        borderColor: '$borderSubtle',
+                        borderRadius: '$medium',
+                        boxShadow: '$contextMenu',
+                        minHeight: '300px',
+                        maxHeight: '90vh',
+                        overflow: 'hidden',
+                        width: 'auto',
+                        minWidth: '200px',
+                        maxWidth: '80vw',
+                        position: 'relative',
+                        display: 'flex',
+                        flexDirection: 'column',
                       }}
-                    />
-                  </Box>
+                    >
+                      <Box
+                        css={{
+                          padding: '$3 $4',
+                          paddingBottom: 0,
+                          background: 'var(--colors-bgCanvas)',
+                          position: 'sticky',
+                          zIndex: 10,
+                          top: 0,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '$1',
+                        }}
+                      >
+                        {(mode === 'create') && (
+                          <IconButton
+                            onMouseDown={handleBackButtonClick}
+                            icon={<ArrowLeftIcon />}
+                            variant="invisible"
+                            title="Go back"
+                            size="small"
+                            css={{ flexShrink: 0 }}
+                          />
+                        )}
+                        <Text size="small" bold css={{ flex: 1 }}>
+                          {getTitle()}
+                        </Text>
+                        {mode === 'switch' && (
+                        <IconButton
+                          type="button"
+                          tooltip={t('createNew')}
+                          tooltipSide="top"
+                          aria-label={t('createNew')}
+                          onClick={handleCreateButtonClick}
+                          css={{ flexShrink: 0 }}
+                          variant="invisible"
+                          size="small"
+                          icon={<PlusIcon />}
+                        />
+                        )}
+                      </Box>
 
-                  <Box css={{ maxHeight: '50vh', overflow: 'auto', padding: '$2' }}>
-                    {/* Items List */}
-                    {items.length > 0 && items.map((item, index) => {
-                      const itemProps = getItemProps({ item, index });
-
-                      return (
-                        <Box
-                          key={seed(index)}
-                          {...itemProps}
-                          data-testid={`popover-item-${item.id}`}
+                      <Box
+                        css={{
+                          padding: '$3',
+                          borderBottom: '1px solid $borderSubtle',
+                          background: 'var(--colors-bgCanvas)',
+                          position: 'sticky',
+                          zIndex: 10,
+                          top: 0,
+                          display: 'flex',
+                          gap: '$2',
+                          alignItems: 'center',
+                        }}
+                      >
+                        <TextInput
+                          ref={searchInputRef}
+                          {...getInputProps()}
+                          type="text"
+                          placeholder={t('search')}
+                          autoFocus
+                          value={searchValue}
+                          onChange={handleSearchChangeWithTracking}
                           css={{
-                            padding: '$3',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
+                            flex: 1,
+                            border: 'none',
+                            outline: 'none',
+                            backgroundColor: 'transparent',
                             fontFamily: '$mono',
-                            borderRadius: '$medium',
-                            gap: '$2',
-                            backgroundColor: highlightedIndex === index ? 'var(--colors-bgDefault)' : 'transparent',
-                            '&:hover': { backgroundColor: 'var(--colors-bgDefault)' },
                           }}
-                        >
-                          {item.isSelected && (
-                          <Box css={{
-                            width: '16px', height: '16px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          }}
-                          >
-                            ✓
-                          </Box>
-                          )}
-                          {!item.isSelected && <Box css={{ width: '16px', flexShrink: 0 }} />}
-                          <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{item.label}</span>
+                        />
+                      </Box>
+
+                      <Box css={{ maxHeight: '50vh', overflow: 'auto', padding: '$2' }}>
+                        {/* Items List */}
+                        {items.length > 0 && items.map((item, index) => {
+                          const itemProps = getItemProps({ item, index });
+
+                          return (
+                            <Box
+                              key={seed(index)}
+                              {...itemProps}
+                              data-testid={`popover-item-${item.id}`}
+                              css={{
+                                padding: '$3',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                fontFamily: '$mono',
+                                borderRadius: '$medium',
+                                gap: '$2',
+                                backgroundColor: highlightedIndex === index ? 'var(--colors-bgDefault)' : 'transparent',
+                                '&:hover': { backgroundColor: 'var(--colors-bgDefault)' },
+                              }}
+                            >
+                              {item.isSelected && (
+                              <Box css={{
+                                width: '16px', height: '16px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              }}
+                              >
+                                ✓
+                              </Box>
+                              )}
+                              {!item.isSelected && <Box css={{ width: '16px', flexShrink: 0 }} />}
+                              <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{item.label}</span>
+                            </Box>
+                          );
+                        })}
+
+                        {/* Empty State */}
+                        {items.length === 0 && searchValue && (
+                        <Box css={{ padding: '12px', textAlign: 'center', color: 'var(--colors-fgMuted)' }}>
+                          {t('noBranchesFound')}
                         </Box>
-                      );
-                    })}
+                        )}
 
-                    {/* Empty State */}
-                    {items.length === 0 && searchValue && (
-                    <Box css={{ padding: '12px', textAlign: 'center', color: 'var(--colors-fgMuted)' }}>
-                      {t('noBranchesFound')}
+                      </Box>
                     </Box>
-                    )}
-
-                  </Box>
-                  {!isProUser && (
-                  <Box
-                    css={{
-                      padding: '$3 $4',
-                      position: 'absolute',
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      top: 0,
-                      zIndex: 10,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '$2',
-                    }}
-                  >
-                    <Box css={{
-                      position: 'absolute', zIndex: -1, top: 0, left: 0, right: 0, bottom: 0, backgroundColor: '$bgDefault', opacity: 0.8,
-                    }}
-                    />
-                    <Heading>{t('branchingProFeature')}</Heading>
-                    <Text muted>{t('upgradeToPro')}</Text>
-                    <ProBadge campaign="branch-selector" />
-                  </Box>
-                  )}
-                </Box>
-              </Popover.Content>
-            </Popover.Portal>
-          </Popover.Root>
-        </div>
+                  </Popover.Content>
+                </Popover.Portal>
+              </Popover.Root>
+            </div>
+          )}
+        </Downshift>
       )}
-    </Downshift>
+    </>
   );
 };

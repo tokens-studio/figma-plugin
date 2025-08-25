@@ -2,7 +2,7 @@ import { AsyncMessageChannelHandlers } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { ProgressTracker } from '../ProgressTracker';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
-import { postToUI } from '../notifiers';
+import { postToUI, trackFromPlugin } from '../notifiers';
 import { MessageFromPluginTypes } from '@/types/messages';
 import { createMainContainer } from './frameUtils';
 import { filterAndGroupTokens, processTokenSets } from './tokenProcessing';
@@ -30,15 +30,24 @@ export const createLivingDocumentation: AsyncMessageChannelHandlers[AsyncMessage
     },
   });
 
+  // Check if user has selected a template
+  const [selectedTemplate] = figma.currentPage.selection;
+  const hasUserTemplate = selectedTemplate && 'clone' in selectedTemplate;
+
+  // Track when living documentation creation actually starts in the plugin with template information
+  trackFromPlugin('Living Documentation Creation Started in Plugin', {
+    tokenSetChoice: tokenSet === 'All' ? 'ALL' : 'SETS',
+    tokenSetCount: tokenSet === 'All' ? Object.keys(resolvedTokens).length : 1,
+    startsWithFilled: !!startsWith.trim(),
+    applyTokensChecked: applyTokens,
+    hasUserTemplate,
+  });
+
   // Initialize progress tracker
   const progressTracker = new ProgressTracker(BackgroundJobs.UI_CREATE_LIVING_DOCUMENTATION);
 
-  // Check if user has selected a template
-  const [selectedTemplate] = figma.currentPage.selection;
-  const hasUserTemplate = selectedTemplate && ('clone' in selectedTemplate);
-
   // Create main container
-  const container = createMainContainer();
+  const container = await createMainContainer();
 
   // Process all token sets
   await processTokenSets(tokensBySet, container, progressTracker, hasUserTemplate ? selectedTemplate : null);

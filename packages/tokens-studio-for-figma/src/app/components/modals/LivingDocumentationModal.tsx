@@ -1,23 +1,44 @@
 import React from 'react';
 import {
-  Button, Stack, Select, Switch, Label,
+  Button, Stack, Select, Switch, Label, Text,
 } from '@tokens-studio/ui';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
+import { styled } from '@/stitches.config';
 import Modal from '../Modal';
 import Input from '../Input';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import {
-  allTokenSetsSelector, tokensSelector, usedTokenSetSelector, activeTokenSetSelector,
-  activeThemeSelector, themesListSelector,
+  allTokenSetsSelector,
+  tokensSelector,
+  usedTokenSetSelector,
+  activeTokenSetSelector,
+  activeThemeSelector,
+  themesListSelector,
 } from '@/selectors';
 import { mergeTokenGroups, getOverallConfig } from '@/utils/tokenHelpers';
 import { defaultTokenResolver } from '@/utils/TokenResolver';
+import { track } from '@/utils/analytics';
 
-type Props = { isOpen: boolean; onClose: () => void };
+const StyledCode = styled('code', {
+  backgroundColor: '$bgSubtle',
+  padding: '$1 $2',
+  borderRadius: '$small',
+  fontFamily: '$mono',
+  fontSize: '$xsmall',
+});
 
-export default function LivingDocumentationModal({ isOpen, onClose }: Props) {
+type Props = {
+  isOpen: boolean;
+  onClose: () => void;
+  initialTokenSet?: string;
+  initialStartsWith?: string;
+};
+
+export default function LivingDocumentationModal({
+  isOpen, onClose, initialTokenSet, initialStartsWith,
+}: Props) {
   const { t } = useTranslation(['tokens']);
   const allTokenSets = useSelector(allTokenSetsSelector);
   const tokens = useSelector(tokensSelector);
@@ -25,9 +46,17 @@ export default function LivingDocumentationModal({ isOpen, onClose }: Props) {
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const activeTheme = useSelector(activeThemeSelector);
   const themes = useSelector(themesListSelector);
-  const [tokenSet, setTokenSet] = React.useState('All');
-  const [startsWith, setStartsWith] = React.useState('');
+  const [tokenSet, setTokenSet] = React.useState(initialTokenSet || 'All');
+  const [startsWith, setStartsWith] = React.useState(initialStartsWith || '');
   const [applyTokens, setApplyTokens] = React.useState(true);
+
+  // Reset values when modal opens with new initial values
+  React.useEffect(() => {
+    if (isOpen) {
+      setTokenSet(initialTokenSet || 'All');
+      setStartsWith(initialStartsWith || '');
+    }
+  }, [isOpen, initialTokenSet, initialStartsWith]);
 
   // Get resolved tokens using the same pattern as other components, including proper theme configuration
   const resolvedTokens = React.useMemo(() => {
@@ -56,6 +85,16 @@ export default function LivingDocumentationModal({ isOpen, onClose }: Props) {
   }, []);
 
   const handleGenerate = React.useCallback(() => {
+    // Track when user starts creating living documentation with detailed properties
+    track('Living Documentation Creation Started', {
+      tokenSetChoice: tokenSet === 'All' ? 'ALL' : 'SETS',
+      tokenSetCount: tokenSet === 'All' ? allTokenSets.length : 1,
+      startsWithFilled: !!startsWith.trim(),
+      applyTokensChecked: applyTokens,
+      // Track if we started based on a selection (using their template) or no selection (using our template)
+      hasUserTemplate: false, // This will be determined in the plugin side
+    });
+
     AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.CREATE_LIVING_DOCUMENTATION,
       tokenSet,
@@ -64,11 +103,37 @@ export default function LivingDocumentationModal({ isOpen, onClose }: Props) {
       resolvedTokens,
     });
     onClose();
-  }, [tokenSet, startsWith, applyTokens, resolvedTokens, onClose]);
+  }, [tokenSet, startsWith, applyTokens, resolvedTokens, onClose, allTokenSets.length]);
 
   return (
     <Modal title={t('generateDocumentation')} isOpen={isOpen} close={onClose} size="large">
       <Stack direction="column" gap={4}>
+        <Stack direction="column" gap={3}>
+          <Text size="small" muted>
+            Generate living documentation to showcase your design tokens in Figma.
+            {' '}
+            <a
+              href="https://docs.tokens.studio/figma/generate-documentation"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: '$accent', textDecoration: 'underline' }}
+            >
+              Learn more
+            </a>
+          </Text>
+          <Text size="small" muted>
+            Use our preset template, or select a custom template frame with layers named with properties like
+            {' '}
+            <StyledCode>__tokenName</StyledCode>
+            ,
+            {' '}
+            <StyledCode>__value</StyledCode>
+            ,
+            {' '}
+            <StyledCode>__tokenValue</StyledCode>
+            , etc.
+          </Text>
+        </Stack>
         <Stack direction="column" gap={2}>
           <label htmlFor="tokenSet">{t('tokenSetRequired')}</label>
           <Select value={tokenSet} onValueChange={handleTokenSetChange}>
