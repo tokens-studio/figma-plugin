@@ -11,8 +11,9 @@ import { multiFileSchema, complexSingleFileSchema } from './schemas';
 import { SystemFilenames } from '@/constants/SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { AnyTokenSet } from '@/types/tokens';
+import { retryHttpRequest } from '@/utils/retryWithBackoff';
 
-const apiVersion = 'api-version=6.0';
+const apiVersion = 'api-version=7.0';
 
 enum ChangeType {
   add = 'add',
@@ -92,34 +93,55 @@ export class ADOTokenStorage extends GitTokenStorage {
       ? Object.entries(params).reduce<string>((acc, [key, value]) => `${acc}${key}=${value}&`, '') + apiVersion
       : apiVersion;
     const input = `${orgUrl}/${projectId ? `${projectId}/` : ''}_apis/git/repositories/${repositoryId}/${gitResource}?${paramString}`;
-    const res = await fetch(
-      input,
-      {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Basic ${btoa(`:${token}`)}`,
-        },
-        body,
+
+    // Use shared retry logic for network resilience
+    return retryHttpRequest(
+      async () => {
+        const res = await fetch(
+          input,
+          {
+            method,
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Basic ${btoa(`:${token}`)}`,
+            },
+            body,
+          },
+        );
+
+        // Check for HTTP error status codes
+        if (!res.ok) {
+          const error = new Error(`HTTP ${res.status}: ${res.statusText}`);
+          (error as any).response = res;
+          throw error;
+        }
+
+        return res;
       },
     );
-    return res;
   }
 
   public async canWrite(): Promise<boolean> {
     if (!this.path.endsWith('.json') && !this.flags.multiFileEnabled) return false;
 
-    const { status } = await this.fetchGit({
-      gitResource: 'refs',
-      orgUrl: this.orgUrl,
-      params: {
-        filter: 'heads',
-      },
-      projectId: this.projectId,
-      repositoryId: this.repository,
-      token: this.secret,
-    });
-    return status === 200;
+    try {
+      const response = await this.fetchGit({
+        gitResource: 'refs',
+        orgUrl: this.orgUrl,
+        params: {
+          filter: 'heads',
+        },
+        projectId: this.projectId,
+        repositoryId: this.repository,
+        token: this.secret,
+      });
+      return response.status === 200;
+    } catch (error: any) {
+      if (error.response) {
+        return error.response.status === 200;
+      }
+      return false;
+    }
   }
 
   private async getRefs(filter: string = 'heads'): Promise<{ count: number, value: GitInterfaces.GitRef[] }> {
@@ -216,9 +238,26 @@ export class ADOTokenStorage extends GitTokenStorage {
           includeContent: true,
         },
       });
-      return await response.json();
+
+      // Check for network issues related to Azure DevOps IP transition
+      if (!response.ok) {
+        if (response.status === 0 || response.status >= 500 || response.status === 502 || response.status === 503 || response.status === 504) {
+          // eslint-disable-next-line no-console
+          console.error('ADO getItem - Possible network/DNS issue due to Azure DevOps IP transition');
+        }
+
+        return {};
+      }
+
+      const result = await response.json();
+
+      // Check for empty responses (common during network issues)
+      if (!result || (typeof result === 'object' && Object.keys(result).length === 0)) {
+        return {};
+      }
+
+      return result;
     } catch (e) {
-      console.log(e);
       return {};
     }
   }
