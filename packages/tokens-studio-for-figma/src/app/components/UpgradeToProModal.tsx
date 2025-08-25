@@ -1,9 +1,10 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import {
   Box,
   Button, Stack, Text,
 } from '@tokens-studio/ui';
 import Modal from './Modal';
+import { track } from '@/utils/analytics';
 
 type UpgradeToProModalProps = {
   isOpen: boolean;
@@ -22,7 +23,23 @@ export default function UpgradeToProModal({
   description,
   image,
 }: UpgradeToProModalProps) {
+  // Track when upgrade to pro modal is opened
+  useEffect(() => {
+    if (isOpen) {
+      track('Upgrade to Pro Modal Opened', {
+        feature,
+        source: 'upgrade-modal',
+      });
+    }
+  }, [isOpen, feature]);
+
   const handleUpgrade = useCallback(() => {
+    // Track when user clicks upgrade to pro button
+    track('Upgrade to Pro Button Clicked', {
+      feature,
+      source: 'upgrade-modal',
+    });
+
     const link = `https://tokens.studio/pro?ref=figma-plugin&utm_source=figma-plugin&utm_medium=upgrade-modal&utm_campaign=${encodeURIComponent(feature)}`;
     window.open(link, '_blank');
     onClose();

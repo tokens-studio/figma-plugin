@@ -2,7 +2,9 @@ import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { CheckIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
-import { Checkbox, ContextMenu, Tooltip, Box, Text } from '@tokens-studio/ui';
+import {
+  Checkbox, ContextMenu, Tooltip, Box, Text,
+} from '@tokens-studio/ui';
 import { StyledCheckbox } from '../StyledDragger/StyledCheckbox';
 import { StyledWrapper } from './StyledWrapper';
 import { tokenSetStatusSelector } from '@/selectors';
@@ -58,6 +60,7 @@ export function TokenSetItem({
   const { t } = useTranslation(['tokens']);
   const { handleGenerateDocumentation, modals } = useGenerateDocumentation({
     initialTokenSet: item.isLeaf ? item.path : undefined,
+    source: 'tokenset-context-menu',
   });
 
   const handleClick = useCallback(() => {

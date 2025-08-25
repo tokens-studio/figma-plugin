@@ -19,6 +19,7 @@ import {
 } from '@/selectors';
 import { mergeTokenGroups, getOverallConfig } from '@/utils/tokenHelpers';
 import { defaultTokenResolver } from '@/utils/TokenResolver';
+import { track } from '@/utils/analytics';
 
 const StyledCode = styled('code', {
   backgroundColor: '$bgSubtle',
@@ -84,6 +85,16 @@ export default function LivingDocumentationModal({
   }, []);
 
   const handleGenerate = React.useCallback(() => {
+    // Track when user starts creating living documentation with detailed properties
+    track('Living Documentation Creation Started', {
+      tokenSetChoice: tokenSet === 'All' ? 'ALL' : 'SETS',
+      tokenSetCount: tokenSet === 'All' ? allTokenSets.length : 1,
+      startsWithFilled: !!startsWith.trim(),
+      applyTokensChecked: applyTokens,
+      // Track if we started based on a selection (using their template) or no selection (using our template)
+      hasUserTemplate: false, // This will be determined in the plugin side
+    });
+
     AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.CREATE_LIVING_DOCUMENTATION,
       tokenSet,
@@ -92,7 +103,7 @@ export default function LivingDocumentationModal({
       resolvedTokens,
     });
     onClose();
-  }, [tokenSet, startsWith, applyTokens, resolvedTokens, onClose]);
+  }, [tokenSet, startsWith, applyTokens, resolvedTokens, onClose, allTokenSets.length]);
 
   return (
     <Modal title={t('generateDocumentation')} isOpen={isOpen} close={onClose} size="large">

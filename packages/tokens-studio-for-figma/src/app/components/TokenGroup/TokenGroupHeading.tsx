@@ -54,6 +54,7 @@ export function TokenGroupHeading({ label, path, id, type, showNewForm }: Props)
   const { handleGenerateDocumentation, modals } = useGenerateDocumentation({
     initialTokenSet: activeTokenSet,
     initialStartsWith: path,
+    source: 'tokengroup-context-menu',
   });
 
   const handleDelete = React.useCallback(() => {

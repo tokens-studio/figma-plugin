@@ -4,14 +4,16 @@ import { useIsProUser } from './useIsProUser';
 import LivingDocumentationModal from '../components/modals/LivingDocumentationModal';
 import UpgradeToProModal from '../components/UpgradeToProModal';
 import generateDocumentationImage from '@/app/assets/hints/generatedocumentation.png';
+import { track } from '@/utils/analytics';
 
 type UseGenerateDocumentationOptions = {
   initialTokenSet?: string;
   initialStartsWith?: string;
+  source?: 'footer' | 'tokenset-context-menu' | 'tokengroup-context-menu';
 };
 
 export function useGenerateDocumentation(options: UseGenerateDocumentationOptions = {}) {
-  const { initialTokenSet, initialStartsWith } = options;
+  const { initialTokenSet, initialStartsWith, source = 'footer' } = options;
   const isProUser = useIsProUser();
   const { t } = useTranslation(['tokens']);
 
@@ -29,10 +31,14 @@ export function useGenerateDocumentation(options: UseGenerateDocumentationOption
   const handleGenerateDocumentation = React.useCallback(() => {
     if (isProUser) {
       setDocModalVisible(true);
+      // Track when generate documentation is launched from different sources
+      track('Generate Documentation Launched', {
+        source,
+      });
     } else {
       setUpgradeModalVisible(true);
     }
-  }, [isProUser]);
+  }, [isProUser, source]);
 
   const modals = React.useMemo(
     () => (

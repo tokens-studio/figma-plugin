@@ -75,9 +75,11 @@ export default function Footer() {
         flexShrink: 0,
         padding: '$3',
         borderTop: '1px solid $borderMuted',
+        overflow: 'hidden',
+        gap: '$2',
       }}
     >
-      <Stack direction="row" align="center" gap={2}>
+      <Stack direction="row" align="center" gap={2} css={{ overflow: 'hidden' }}>
         {storageType.provider === StorageProviderType.LOCAL && (tokensSize > 100 || themesSize > 100) && (
           <Button
             icon={<WarningTriangleSolid />}

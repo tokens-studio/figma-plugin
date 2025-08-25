@@ -8,7 +8,9 @@ import ProBadge from './ProBadge';
 
 export default function GenerateDocumentationButton() {
   const { t } = useTranslation(['tokens']);
-  const { handleGenerateDocumentation, modals } = useGenerateDocumentation();
+  const { handleGenerateDocumentation, modals } = useGenerateDocumentation({
+    source: 'footer',
+  });
 
   return (
     <>
