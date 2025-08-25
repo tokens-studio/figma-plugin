@@ -176,6 +176,11 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
             icon={<GitBranchIcon />}
             onClick={handleNonProUserClick}
             data-testid="branch-selector-menu-trigger"
+            style={{
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              flexShrink: 1,
+            }}
           >
             {currentBranch}
           </Button>
@@ -187,8 +192,6 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
             image={branchingImage}
             title={t('branchingProFeature')}
             description="You can switch branches, create new ones from current changes or any other branch, easily find branches, and collaborate seamlessly with your team. Branching enables powerful version control and team collaboration workflows."
-            // TODO: Add image when available
-            // image={branchingImage}
           />
         </>
       ) : (
@@ -199,10 +202,24 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
           itemToString={handleItemToString}
         >
           {({ getItemProps, getInputProps, highlightedIndex }) => (
-            <div style={{ position: 'relative' }}>
+            <div style={{
+              position: 'relative',
+              flexShrink: 1,
+              overflow: 'hidden',
+            }}
+            >
               <Popover.Root open={isOpen} onOpenChange={onOpenChange}>
                 <Popover.Trigger asChild>
-                  <Button size="small" variant="invisible" icon={<GitBranchIcon />} data-testid="branch-selector-menu-trigger">
+                  <Button
+                    size="small"
+                    variant="invisible"
+                    icon={<GitBranchIcon />}
+                    data-testid="branch-selector-menu-trigger"
+                    style={{
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
+                  >
                     {currentBranch}
                   </Button>
                 </Popover.Trigger>
