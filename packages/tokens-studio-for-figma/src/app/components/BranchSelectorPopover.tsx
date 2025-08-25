@@ -83,7 +83,7 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
   }, [handleSetMode]);
 
   // Debounced tracking for search events to reduce the number of events
-  const debouncedTrackSearch = useDebouncedCallback((value: string) => {
+  const debouncedTrackSearch = useDebouncedCallback(() => {
     if (searchValue.trim()) {
       track('Branch Selector Search', {
         totalBranches: branches.length,
@@ -94,7 +94,7 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
   const handleSearchChangeWithTracking = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     setSearchValue(value);
-    debouncedTrackSearch(value);
+    debouncedTrackSearch();
   }, [debouncedTrackSearch]);
 
   const handleBackButtonClick = React.useCallback((e: React.MouseEvent) => {
