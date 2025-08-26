@@ -76,4 +76,68 @@ describe('usedTokenSet preservation during remote sync', () => {
     expect(usedTokenSet.global).toBe(TokenSetStatus.ENABLED);
     expect(usedTokenSet.theme).toBe(TokenSetStatus.SOURCE);
   });
+
+  it('should override existing usedTokenSet when explicit values are provided from remote', () => {
+    // Set up initial state
+    store.dispatch.tokenState.setUsedTokenSet({
+      global: TokenSetStatus.ENABLED,
+      theme: TokenSetStatus.SOURCE,
+    });
+
+    // Simulate pulling tokens from remote with explicit usedTokenSet data
+    store.dispatch.tokenState.setTokenData({
+      values: {
+        global: [{ name: 'color.primary', value: '#0000ff', type: 'color' }],
+        theme: [{ name: 'color.background', value: '#ffffff', type: 'color' }],
+      },
+      themes: [],
+      activeTheme: {},
+      usedTokenSet: {
+        global: TokenSetStatus.DISABLED,
+        theme: TokenSetStatus.ENABLED,
+      },
+      hasChangedRemote: true,
+    });
+
+    const { usedTokenSet } = store.getState().tokenState;
+
+    // Should use the explicitly provided values from remote
+    expect(usedTokenSet.global).toBe(TokenSetStatus.DISABLED);
+    expect(usedTokenSet.theme).toBe(TokenSetStatus.ENABLED);
+  });
+
+  it('should handle mixed scenarios where some token sets have explicit values and others need to be preserved', () => {
+    // Set up initial state
+    store.dispatch.tokenState.setUsedTokenSet({
+      global: TokenSetStatus.ENABLED,
+      theme: TokenSetStatus.SOURCE,
+      semantic: TokenSetStatus.DISABLED,
+    });
+
+    // Simulate partial usedTokenSet data from remote (some sets have values, others don't)
+    store.dispatch.tokenState.setTokenData({
+      values: {
+        global: [{ name: 'color.primary', value: '#0000ff', type: 'color' }],
+        theme: [{ name: 'color.background', value: '#ffffff', type: 'color' }],
+        semantic: [{ name: 'color.accent', value: '$color.primary', type: 'color' }],
+        newSet: [{ name: 'color.new', value: '#ff0000', type: 'color' }],
+      },
+      themes: [],
+      activeTheme: {},
+      usedTokenSet: {
+        global: TokenSetStatus.SOURCE, // explicitly set to different value
+        // theme and semantic are not specified, should be preserved
+        // newSet is not specified, should default to DISABLED
+      },
+      hasChangedRemote: true,
+    });
+
+    const { usedTokenSet } = store.getState().tokenState;
+
+    // Should use explicit value for global, preserve existing for theme/semantic, default for newSet
+    expect(usedTokenSet.global).toBe(TokenSetStatus.SOURCE);
+    expect(usedTokenSet.theme).toBe(TokenSetStatus.SOURCE); // preserved
+    expect(usedTokenSet.semantic).toBe(TokenSetStatus.DISABLED); // preserved
+    expect(usedTokenSet.newSet).toBe(TokenSetStatus.DISABLED); // new set defaults to DISABLED
+  });
 });
