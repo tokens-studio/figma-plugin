@@ -1,139 +1,133 @@
-# Tokens Studio for Figma - Development Guidelines
+# Tokens Studio для Figma — Руководство по разработке
 
-## Repository Overview
+### Архитектура плагина Figma
 
-Tokens Studio for Figma is a plugin for Figma allowing you to define and use design tokens. The repository is a monorepo managed with Yarn workspaces:
+Как плагин Figma, наш код разделен на две основные среды:
 
-- `packages/tokens-studio-for-figma` - Main Figma plugin package
-- `developer-knowledgebase` - Technical documentation
+- **UI (iframe)**: пользовательский интерфейс на основе React, который работает в среде, похожей на браузер
+- **Figma Sandbox**: код, который напрямую взаимодействует с документом Figma и API
 
-### Figma Plugin Architecture
+Плагины Figma работают на основе архитектуры передачи сообщений между этими двумя средами. UI отправляет сообщения в sandbox с запросом на выполнение операций с документом Figma, а sandbox отвечает результатами или событиями.
 
-As a Figma plugin, our codebase is split into two main environments:
+По всем вопросам, связанным со средой Figma sandbox или использованием глобального объекта `figma`, всегда обращайтесь к официальной документации по API плагинов Figma по адресу https://www.figma.com/plugin-docs/. Эта документация необходима для понимания возможностей и ограничений при работе с API Figma.
 
-- **UI (iframe)**: The React-based user interface that runs in a browser-like environment
-- **Figma Sandbox**: The code that interacts directly with the Figma document and API
+## Настройка разработки
 
-Figma plugins operate on a message-passing architecture between these two environments. The UI sends messages to the sandbox to request operations on the Figma document, and the sandbox responds with results or events.
-
-For anything related to the Figma sandbox environment or using the global `figma` object, always consult the official Figma Plugin API documentation at https://www.figma.com/plugin-docs/. This documentation is essential for understanding the capabilities and limitations when working with Figma's API.
-
-## Development Setup
-
-### Prerequisites
+### Необходимые условия
 
 - Node.js 18.x
 - Yarn 1.22.x
 
-### Getting Started
+### Начало работы
 
-1. Install dependencies: `yarn --frozen-lockfile --immutable`
-2. Start development: `yarn start` (watches for changes)
-3. Build for production: `yarn build`
+1. Установите зависимости: `yarn --frozen-lockfile --immutable`
+2. Начните разработку: `yarn start` (следит за изменениями)
+3. Сборка для производства: `yarn build`
 
-## 🚨 MANDATORY: Changeset Requirements
+## 🚨 ОБЯЗАТЕЛЬНО: Требования к набору изменений
 
-**CRITICAL: Every PR and code change must include a changeset - no exceptions.**
+**КРИТИЧЕСКОЕ: Каждый PR и изменение кода должны включать набор изменений — без исключений.**
 
-**Before making ANY code changes:**
+**Перед внесением ЛЮБЫХ изменений в код:**
 
-1. **Run `yarn changeset` immediately after making code changes**
-2. **Always select "patch" as the version bump** (maintainers will upgrade to minor/major if needed)
-3. **Write a clear, user-facing description of what changed**
-4. **Commit the generated changeset file with your changes**
+1. **Запустите `yarn changeset` сразу после внесения изменений в код**
+2. **Всегда выбирайте «patch» в качестве версии** (при необходимости сопровождающие обновят версию до minor/major)
+3. **Напишите понятное для пользователя описание изменений**
+4. **Зафиксируйте сгенерированный файл набора изменений с вашими изменениями**
 
-**This is not optional - it is required for all code modifications.**
+**Это не является опциональным — это обязательно для всех изменений кода.**
 
-Example changeset format:
+Пример формата набора изменений:
 
 ```
 ---
-"@tokens-studio/figma-plugin": patch
+«@tokens-studio/figma-plugin»: patch
 ---
 
-Brief description of the changes made
+Краткое описание внесенных изменений
 ```
 
-## Build System
+## Система сборки
 
-### Core Build Commands
+### Основные команды сборки
 
-- `yarn build` - Production build
-- `yarn build:dev` - Development build
-- `yarn build:preview` - Build for browser preview
-- `yarn build:cy` - Build with feature flags for Cypress tests
-- `yarn start` - Development build with watch mode
+- `yarn build` — сборка для производства
+- `yarn build:dev` — сборка для разработки
+- `yarn build:preview` — сборка для предварительного просмотра в браузере
+- `yarn build:cy` — сборка с флагами функций для тестов Cypress
+- `yarn start` — сборка для разработки с режимом наблюдения
 
-### Webpack Configuration
+### Конфигурация Webpack
 
-The project uses Webpack with the following key configurations:
+В проекте используется Webpack со следующими ключевыми настройками:
 
-- SWC for fast transpilation
-- Different entry points for UI and plugin code
-- Source maps in development mode
-- Environment variables loaded via dotenv-webpack
+- SWC для быстрой трансляции
+- Различные точки входа для кода пользовательского интерфейса и плагина
+- Карты источников в режиме разработки
+- Переменные среды, загружаемые через dotenv-webpack
 
-## Testing
 
-### Unit Tests
+## Тестирование
 
-- Jest is used as the test framework
-- Run tests: `yarn test`
-- Run in watch mode: `yarn test:watch`
-- With coverage: `yarn test:coverage`
+### Модульные тесты
 
-### End-to-end Tests
+- В качестве тестовой среды используется Jest
+- Запуск тестов: `yarn test`
+- Запуск в режиме наблюдения: `yarn test:watch`
+- С покрытием: `yarn test:coverage`
 
-- Cypress is used for E2E testing
-- Start Cypress UI: `yarn cy:open`
-- Run headless: `yarn cy:run`
-- Serves on localhost:58630
+### Сквозные тесты
 
-### Performance Testing
+- Cypress используется для сквозного тестирования
+- Запуск Cypress UI: `yarn cy:open`
+- Запуск без интерфейса: `yarn cy:run`
+- Обслуживание на localhost:58630
 
-- Benchmarking tools available: `yarn benchmark:build` and `yarn benchmark:run`
+### Тестирование производительности
 
-## Code Style
+- Доступные инструменты для тестирования производительности: `yarn benchmark:build` и `yarn benchmark:run`
 
-### Linting & Formatting
+## Стиль кода
 
-- ESLint with Airbnb config: `yarn lint` (auto-fixes issues)
-- Without auto-fix: `yarn lint:nofix`
+### Линтинг и форматирование
+
+- ESLint с конфигурацией Airbnb: `yarn lint` (автоматическое исправление проблем)
+- Без автоматического исправления: `yarn lint:nofix`
 - Prettier: `yarn prettier:format`
-- Pre-commit hooks using Husky and lint-staged
+- Пре-коммит хуки с использованием Husky и lint-staged
 
 ### TypeScript
 
-- TypeScript is used throughout the codebase
-- Check the tsconfig.json for configuration
-- Jest uses ts-jest for TypeScript support
+- TypeScript используется во всей кодовой базе
+- Проверьте tsconfig.json для конфигурации
+- Jest использует ts-jest для поддержки TypeScript
 
-## Architecture
+## Архитектура
 
-### Plugin Structure
+### Структура плагина
 
-- `src/app` - React UI components
-- `src/plugin` - Figma plugin code
-- `src/storage` - Storage providers for tokens
-- `src/types` - TypeScript type definitions
+- `src/app` - React UI компоненты
+- `src/plugin` - код плагина Figma
+- `src/storage` - поставщики хранилищ для токенов
+- `src/types` - определения типов TypeScript
 
-### State Management
+### Управление состоянием
 
-- Redux with Rematch for state management
-- React hooks for component state
+- Redux с Rematch для управления состоянием
+- React hooks для состояния компонентов
 
-### Key Technologies
+### Ключевые технологии
 
 - React 18
 - Redux/Rematch
 - TypeScript
-- SWC for transpilation
-- Monaco editor for JSON editing
-- Radix UI components
+- SWC для транспайлирования
+- Редактор Monaco для редактирования JSON
+- Компоненты интерфейса Radix
 
-## Environment Configuration
+## Настройка среды
 
-Required environment variables in `.env` files:
+Необходимые переменные среды в файлах `.env`:
 
 ```
 MIXPANEL_ACCESS_TOKEN=
@@ -148,44 +142,43 @@ SENTRY_PROFILE_SAMPLING=0.1
 SENTRY_REPLAY_SAMPLING=0
 ```
 
-## Translation System
+## Система перевода
 
-- Translation files in `src/i18n/lang/[language]`
-- Supports: English, Spanish, French, Hindi, Dutch, Chinese
-- Add translations with `yarn translate`
-- Uses i18next for internationalization
+- Файлы перевода в `src/i18n/lang/[язык]`
+- Поддерживаемые языки: английский, испанский, французский, хинди, голландский, китайский.
+- Добавление переводов с помощью `yarn translate`.
+- Использование i18next для интернационализации.
 
-## API Integrations
+## Интеграция API
 
-- GitHub, GitLab, BitBucket, Azure DevOps - For token storage/sync
-- Sentry - Error tracking
-- Mixpanel - Analytics
-- LaunchDarkly - Feature flags
+- GitHub, GitLab, BitBucket, Azure DevOps — для хранения/синхронизации токенов.
+- Sentry - отслеживание ошибок
+- Mixpanel - аналитика
+- LaunchDarkly - флаги функций
 
-## Common Workflows
+## Общие рабочие процессы
 
-## Debugging
+## Отладка
 
-- Use console.log in plugin code (visible in Figma's developer console)
-- React dev tools for UI debugging
-- Performance benchmarking with `yarn benchmark:run`
+- Используйте console.log в коде плагина (отображается в консоли разработчика Figma)
+- React dev tools для отладки пользовательского интерфейса
+- Тестирование производительности с помощью `yarn benchmark:run`
 
-## Common Issues & Solutions
+## Распространенные проблемы и решения
 
-- "Cannot read property document of undefined" - Clear Figma cache
-- Build failures - Check your Node version and dependencies
-- Test failures - Check for environment variables and mocks
+- «Невозможно прочитать свойство документа undefined» — очистите кэш Figma
+- Сбои при сборке — проверьте версию Node и зависимости
+- Сбои при тестировании — проверьте переменные среды и макеты
 
-## Code Patterns to Follow
+## Шаблоны кода, которым следует следовать
 
-1. Use functional React components with hooks
-2. Strongly type all props and state
-3. Follow the existing component structure
-4. Keep components small and focused
-5. Use appropriate error handling
-6. Document complex logic with comments
-7. **Always create a changeset (see Changeset Requirements section above)**
-8. For UI components, use @tokens-studio/ui components that we use across the codebase instead of creating from scratch
-9. For UI work, use tokens from @tokens-studio/tokens, found in node_modules/@tokens-studio/tokens/dist/css/dark.css and node_modules/@tokens-studio/tokens/dist/css/core.css instead of using raw hex values.
-
+1. Используйте функциональные компоненты React с хуками.
+2. Присваивайте строгий тип всем пропсам и состояниям.
+3. Следуйте существующей структуре компонентов.
+4. Сохраняйте компоненты небольшими и сфокусированными.
+5. Используйте подходящую обработку ошибок.
+6. Документируйте сложную логику с помощью комментариев.
+7. **Всегда создавайте набор изменений (см. раздел «Требования к набору изменений» выше).**
+8. Для компонентов пользовательского интерфейса используйте компоненты @tokens-studio/ui, которые мы используем во всей кодовой базе, вместо того, чтобы создавать их с нуля.
+9. Для работы с пользовательским интерфейсом используйте токены из @tokens-studio/tokens, которые можно найти на node_modules/@tokens-studio/tokens/dist/css/dark.css и node_modules/@tokens-studio/tokens/dist/css/core.css, вместо использования необработанных шестнадцатеричных значений.
 
