@@ -43,65 +43,55 @@ describe('Group Description Parsing', () => {
         }
       };
 
-      // Convert tokens to array - this should work as before
+      // Convert tokens to array - this should now return both tokens and groups
       const result = convertToTokenArray({ tokens: tokensWithGroupDescriptions });
 
-      // Verify that tokens are still parsed correctly
+      // Expect the new structure with both tokens and groups
       expect(result).toEqual(
-        expect.arrayContaining([
-          { 
-            name: 'global.colors.brand.primary', 
-            value: '#007bff', 
-            type: 'color',
-            description: 'Primary brand color'
-          },
-          { 
-            name: 'global.colors.brand.secondary', 
-            value: '#6c757d', 
-            type: 'color'
-          },
-          { 
-            name: 'global.colors.semantic.success', 
-            value: '#28a745', 
-            type: 'color'
-          },
-          { 
-            name: 'global.spacing.small', 
-            value: '8px', 
-            type: 'dimension'
-          }
-        ])
+        expect.objectContaining({
+          tokens: expect.arrayContaining([
+            { 
+              name: 'global.colors.brand.primary', 
+              value: '#007bff', 
+              type: 'color',
+              description: 'Primary brand color'
+            },
+            { 
+              name: 'global.colors.brand.secondary', 
+              value: '#6c757d', 
+              type: 'color'
+            },
+            { 
+              name: 'global.colors.semantic.success', 
+              value: '#28a745', 
+              type: 'color'
+            },
+            { 
+              name: 'global.spacing.small', 
+              value: '8px', 
+              type: 'dimension'
+            }
+          ]),
+          groups: expect.arrayContaining([
+            {
+              path: 'global.colors',
+              description: 'Brand and semantic color tokens'
+            },
+            {
+              path: 'global.colors.brand', 
+              description: 'Primary brand colors'
+            },
+            {
+              path: 'global.colors.semantic',
+              description: 'Semantic color system'
+            },
+            {
+              path: 'global.spacing',
+              description: 'Design system spacing scale'
+            }
+          ])
+        })
       );
-
-      // This test will fail initially because group descriptions aren't captured yet
-      // TODO: Once implemented, this should capture group descriptions:
-      // expect(result).toEqual(
-      //   expect.objectContaining({
-      //     tokens: expect.arrayContaining([...]),
-      //     groupMetadata: expect.arrayContaining([
-      //       {
-      //         path: 'global.colors',
-      //         description: 'Brand and semantic color tokens',
-      //         tokenSet: 'global'
-      //       },
-      //       {
-      //         path: 'global.colors.brand', 
-      //         description: 'Primary brand colors',
-      //         tokenSet: 'global'
-      //       },
-      //       {
-      //         path: 'global.colors.semantic',
-      //         description: 'Semantic color system', 
-      //         tokenSet: 'global'
-      //       },
-      //       {
-      //         path: 'global.spacing',
-      //         description: 'Design system spacing scale',
-      //         tokenSet: 'global'
-      //       }
-      //     ])
-      //   })
-      // );
     });
 
     it('should distinguish between token descriptions and group descriptions', () => {
@@ -120,20 +110,25 @@ describe('Group Description Parsing', () => {
 
       const result = convertToTokenArray({ tokens: mixedDescriptions });
 
-      // Verify token description is preserved
+      // Expect new structure with both tokens and groups
       expect(result).toEqual(
-        expect.arrayContaining([
-          {
-            name: 'global.colors.primary',
-            value: '#007bff',
-            type: 'color', 
-            description: 'This is a TOKEN description (has $value)'
-          }
-        ])
+        expect.objectContaining({
+          tokens: expect.arrayContaining([
+            {
+              name: 'global.colors.primary',
+              value: '#007bff',
+              type: 'color', 
+              description: 'This is a TOKEN description (has $value)'
+            }
+          ]),
+          groups: expect.arrayContaining([
+            {
+              path: 'global.colors',
+              description: 'This is a GROUP description (no $value)'
+            }
+          ])
+        })
       );
-
-      // Group description should be captured separately (will fail initially)
-      // TODO: Implement group description capture
     });
 
     it('should handle nested group descriptions', () => {
@@ -157,18 +152,32 @@ describe('Group Description Parsing', () => {
 
       const result = convertToTokenArray({ tokens: nestedGroups });
 
-      // Token parsing should work
+      // Expect new structure with both tokens and groups
       expect(result).toEqual(
-        expect.arrayContaining([
-          {
-            name: 'global.design.colors.brand.primary',
-            value: '#007bff',
-            type: 'color'
-          }
-        ])
+        expect.objectContaining({
+          tokens: expect.arrayContaining([
+            {
+              name: 'global.design.colors.brand.primary',
+              value: '#007bff',
+              type: 'color'
+            }
+          ]),
+          groups: expect.arrayContaining([
+            {
+              path: 'global.design',
+              description: 'Top level design tokens'
+            },
+            {
+              path: 'global.design.colors',
+              description: 'Color system'
+            },
+            {
+              path: 'global.design.colors.brand',
+              description: 'Brand colors only'
+            }
+          ])
+        })
       );
-
-      // TODO: Nested group descriptions should be captured
     });
 
     it('should not break existing token parsing when no group descriptions are present', () => {
@@ -186,19 +195,23 @@ describe('Group Description Parsing', () => {
 
       const result = convertToTokenArray({ tokens: regularTokens });
 
-      expect(result).toEqual([
-        {
-          name: 'global.colors.primary',
-          value: '#007bff',
-          type: 'color',
-          description: 'Primary color'
-        }
-      ]);
+      // When no groups are present, should still return new structure but with empty groups
+      expect(result).toEqual({
+        tokens: [
+          {
+            name: 'global.colors.primary',
+            value: '#007bff',
+            type: 'color',
+            description: 'Primary color'
+          }
+        ],
+        groups: []
+      });
     });
   });
 
   describe('parseTokenValues with group descriptions', () => {
-    it('should parse token values without breaking when group descriptions are present', () => {
+    it('should parse token values and return groups separately', () => {
       const tokenPayload = {
         global: {
           colors: {
@@ -211,20 +224,84 @@ describe('Group Description Parsing', () => {
         }
       };
 
-      // This should continue to work as before
+      // This should now return both tokens and groups
       const result = parseTokenValues(tokenPayload);
 
       expect(result).toEqual({
-        global: expect.arrayContaining([
-          {
-            name: 'global.colors.primary',
-            value: '#007bff',
-            type: 'color'
-          }
-        ])
+        global: expect.objectContaining({
+          tokens: expect.arrayContaining([
+            {
+              name: 'global.colors.primary',
+              value: '#007bff',
+              type: 'color'
+            }
+          ]),
+          groups: expect.arrayContaining([
+            {
+              path: 'global.colors',
+              description: 'Color tokens group'
+            }
+          ])
+        })
       });
+    });
 
-      // TODO: Eventually this should also return group metadata
+    it('should handle multiple token sets with groups', () => {
+      const tokenPayload = {
+        light: {
+          colors: {
+            $description: 'Light theme colors',
+            primary: {
+              $type: 'color',
+              $value: '#007bff'
+            }
+          }
+        },
+        dark: {
+          colors: {
+            $description: 'Dark theme colors',
+            primary: {
+              $type: 'color',
+              $value: '#0056b3'
+            }
+          }
+        }
+      };
+
+      const result = parseTokenValues(tokenPayload);
+
+      expect(result).toEqual({
+        light: expect.objectContaining({
+          tokens: expect.arrayContaining([
+            {
+              name: 'light.colors.primary',
+              value: '#007bff',
+              type: 'color'
+            }
+          ]),
+          groups: expect.arrayContaining([
+            {
+              path: 'light.colors',
+              description: 'Light theme colors'
+            }
+          ])
+        }),
+        dark: expect.objectContaining({
+          tokens: expect.arrayContaining([
+            {
+              name: 'dark.colors.primary',
+              value: '#0056b3',
+              type: 'color'
+            }
+          ]),
+          groups: expect.arrayContaining([
+            {
+              path: 'dark.colors',
+              description: 'Dark theme colors'
+            }
+          ])
+        })
+      });
     });
   });
 });
