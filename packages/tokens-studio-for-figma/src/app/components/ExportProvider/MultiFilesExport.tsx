@@ -10,6 +10,7 @@ import { IconFile } from '@/icons';
 import {
   tokensSelector, themesListSelector, storeTokenIdInJsonEditorSelector,
 } from '@/selectors';
+import { groupMetadataSelector } from '@/app/store/selectors/groupMetadataSelector';
 import { SystemFilenames } from '@/constants/SystemFilenames';
 import { track } from '@/utils/analytics';
 
@@ -21,11 +22,12 @@ export default function MultiFilesExport({ onClose }: Props) {
   const tokens = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
   const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
+  const groupMetadata = useSelector(groupMetadataSelector);
   const seed = useUIDSeed();
 
   const filesChangeset = React.useMemo(() => {
     const changeObj: Record<string, string> = {};
-    Object.entries(convertTokensToObject(tokens, storeTokenIdInJsonEditor)).forEach(([key, value]) => {
+    Object.entries(convertTokensToObject(tokens, storeTokenIdInJsonEditor, groupMetadata)).forEach(([key, value]) => {
       changeObj[`${key}.json`] = JSON.stringify(value, null, 2);
     });
     changeObj[`${SystemFilenames.THEMES}.json`] = JSON.stringify(themes, null, 2);
@@ -34,7 +36,7 @@ export default function MultiFilesExport({ onClose }: Props) {
     };
     changeObj[`${SystemFilenames.METADATA}.json`] = JSON.stringify(metadata, null, 2);
     return changeObj;
-  }, [tokens, themes]);
+  }, [tokens, themes, groupMetadata, storeTokenIdInJsonEditor]);
 
   const downLoadDataAsZip = React.useCallback(() => {
     const zip = new JSZip();

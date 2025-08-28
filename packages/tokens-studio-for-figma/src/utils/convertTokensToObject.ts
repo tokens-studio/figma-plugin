@@ -1,11 +1,15 @@
 import set from 'set-value';
 import { appendTypeToToken } from '@/app/components/createTokenObj';
-import { AnyTokenList, AnyTokenSet } from '@/types/tokens';
+import { AnyTokenList, AnyTokenSet, GroupMetadataMap } from '@/types/tokens';
 import { getGroupTypeName } from './stringifyTokens';
 import removeTokenId from './removeTokenId';
 import { setTokenKey, FormatSensitiveTokenKeys } from './setTokenKey';
 
-export default function convertTokensToObject(tokens: Record<string, AnyTokenList>, storeTokenIdInJsonEditor: boolean) {
+export default function convertTokensToObject(
+  tokens: Record<string, AnyTokenList>, 
+  storeTokenIdInJsonEditor: boolean,
+  groupMetadata?: GroupMetadataMap
+) {
   const tokenObj = Object.entries(tokens).reduce<Record<string, AnyTokenSet<false>>>((acc, [key, val]) => {
     const tokenGroupObj: AnyTokenSet<false> = {};
     val.forEach((token) => {
@@ -41,6 +45,20 @@ export default function convertTokensToObject(tokens: Record<string, AnyTokenLis
         set(tokenGroupObj, name, tokenWithoutName, { merge: true });
       }
     });
+
+    // Inject group descriptions at appropriate levels
+    if (groupMetadata) {
+      Object.entries(groupMetadata).forEach(([metadataKey, metadata]) => {
+        const [tokenSet, ...pathParts] = metadataKey.split('.');
+        if (tokenSet === key) {
+          // Remove the token set prefix to get the group path within this token set
+          const groupPath = pathParts.join('.');
+          // Set the $description at the group level
+          set(tokenGroupObj, `${groupPath}.${FormatSensitiveTokenKeys.DESCRIPTION}`, metadata.description);
+        }
+      });
+    }
+
     acc[key] = tokenGroupObj;
     return acc;
   }, {});

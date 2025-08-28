@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { Heading, ContextMenu } from '@tokens-studio/ui';
+import { Heading, ContextMenu, Text } from '@tokens-studio/ui';
 import Stack from '../Stack';
 import useManageTokens from '../../store/useManageTokens';
 import {
@@ -10,6 +10,7 @@ import {
   editProhibitedSelector,
   activeTokenSetSelector,
 } from '@/selectors';
+import { getGroupDescriptionSelector } from '@/app/store/selectors/groupMetadataSelector';
 import { IconCollapseArrow, IconExpandArrow, IconAdd } from '@/icons';
 import {
   StyledTokenGroupHeading,
@@ -22,6 +23,7 @@ import { ShowNewFormOptions } from '@/types';
 import useTokens from '../../store/useTokens';
 import RenameTokenGroupModal from '../modals/RenameTokenGroupModal';
 import DuplicateTokenGroupModal from '../modals/DuplicateTokenGroupModal';
+import { EditGroupDescriptionModal } from '../modals/EditGroupDescriptionModal';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { useGenerateDocumentation } from '@/app/hooks/useGenerateDocumentation';
 import ProBadge from '../ProBadge';
@@ -40,9 +42,11 @@ export function TokenGroupHeading({ label, path, id, type, showNewForm }: Props)
   const activeTokenSetReadOnly = useSelector(activeTokenSetReadOnlySelector);
   const activeApiProvider = useSelector(activeApiProviderSelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
+  const groupDescription = useSelector(getGroupDescriptionSelector(activeTokenSet, path));
   const [newTokenGroupName, setNewTokenGroupName] = React.useState<string>(path);
   const [showRenameTokenGroupModal, setShowRenameTokenGroupModal] = React.useState<boolean>(false);
   const [showDuplicateTokenGroupModal, setShowDuplicateTokenGroupModal] = React.useState<boolean>(false);
+  const [showEditDescriptionModal, setShowEditDescriptionModal] = React.useState<boolean>(false);
   const { deleteGroup, renameGroup } = useManageTokens();
   const dispatch = useDispatch<Dispatch>();
   const collapsed = useSelector(collapsedTokensSelector);
@@ -93,6 +97,14 @@ export function TokenGroupHeading({ label, path, id, type, showNewForm }: Props)
     setShowDuplicateTokenGroupModal(false);
   }, []);
 
+  const handleEditDescription = React.useCallback(() => {
+    setShowEditDescriptionModal(true);
+  }, []);
+
+  const handleEditDescriptionModalClose = React.useCallback(() => {
+    setShowEditDescriptionModal(false);
+  }, []);
+
   const handleDuplicate = React.useCallback(() => {
     setNewTokenGroupName(`${path}-copy`);
     setShowDuplicateTokenGroupModal(true);
@@ -109,49 +121,62 @@ export function TokenGroupHeading({ label, path, id, type, showNewForm }: Props)
   return (
     <>
       <StyledTokenGroupHeading>
-        <StyledTokenGroupHeadingCollapsable
-          collapsed={collapsed.includes(path)}
-          data-testid={`tokenlisting-group-${path}`}
-          type="button"
-        >
-          <ContextMenu>
-            <ContextMenu.Trigger data-testid={`group-heading-${path}-${label}-${id}`} onClick={handleToggleCollapsed}>
-              <Stack direction="row" gap={2} align="center" css={{ color: '$fgMuted' }}>
-                {collapsed.includes(path) ? <IconCollapseArrow /> : <IconExpandArrow />}
-                <Heading muted size="small">
-                  {label}
-                </Heading>
-              </Stack>
-            </ContextMenu.Trigger>
-            <ContextMenu.Portal>
-              <ContextMenu.Content>
-                <ContextMenu.Item disabled={!canEdit} onSelect={handleRename}>
-                  {t('rename')}
-                </ContextMenu.Item>
-                <ContextMenu.Item disabled={!canEdit} onSelect={handleDuplicate}>
-                  {t('duplicate')}
-                </ContextMenu.Item>
-                <ContextMenu.Item disabled={!canEdit} onSelect={handleDelete}>
-                  {t('delete')}
-                </ContextMenu.Item>
-                <ContextMenu.Separator />
-                <ContextMenu.Item onSelect={handleGenerateDocumentation}>
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      width: '100%',
-                    }}
-                  >
-                    {t('generateDocumentation')}
-                    <ProBadge compact campaign="tokengroup-context-menu" />
-                  </div>
-                </ContextMenu.Item>
-              </ContextMenu.Content>
-            </ContextMenu.Portal>
-          </ContextMenu>
-        </StyledTokenGroupHeadingCollapsable>
+        <Stack direction="column" gap={1}>
+          <StyledTokenGroupHeadingCollapsable
+            collapsed={collapsed.includes(path)}
+            data-testid={`tokenlisting-group-${path}`}
+            type="button"
+          >
+            <ContextMenu>
+              <ContextMenu.Trigger data-testid={`group-heading-${path}-${label}-${id}`} onClick={handleToggleCollapsed}>
+                <Stack direction="row" gap={2} align="center" css={{ color: '$fgMuted' }}>
+                  {collapsed.includes(path) ? <IconCollapseArrow /> : <IconExpandArrow />}
+                  <Heading muted size="small">
+                    {label}
+                  </Heading>
+                </Stack>
+              </ContextMenu.Trigger>
+              <ContextMenu.Portal>
+                <ContextMenu.Content>
+                  <ContextMenu.Item disabled={!canEdit} onSelect={handleEditDescription}>
+                    Edit Description
+                  </ContextMenu.Item>
+                  <ContextMenu.Separator />
+                  <ContextMenu.Item disabled={!canEdit} onSelect={handleRename}>
+                    {t('rename')}
+                  </ContextMenu.Item>
+                  <ContextMenu.Item disabled={!canEdit} onSelect={handleDuplicate}>
+                    {t('duplicate')}
+                  </ContextMenu.Item>
+                  <ContextMenu.Item disabled={!canEdit} onSelect={handleDelete}>
+                    {t('delete')}
+                  </ContextMenu.Item>
+                  <ContextMenu.Separator />
+                  <ContextMenu.Item onSelect={handleGenerateDocumentation}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        width: '100%',
+                      }}
+                    >
+                      {t('generateDocumentation')}
+                      <ProBadge compact campaign="tokengroup-context-menu" />
+                    </div>
+                  </ContextMenu.Item>
+                </ContextMenu.Content>
+              </ContextMenu.Portal>
+            </ContextMenu>
+          </StyledTokenGroupHeadingCollapsable>
+          
+          {/* Group description display */}
+          {groupDescription && (
+            <Text size="small" css={{ color: '$fgMuted', marginLeft: '$6' }}>
+              {groupDescription}
+            </Text>
+          )}
+        </Stack>
 
         <RenameTokenGroupModal
           isOpen={showRenameTokenGroupModal}
@@ -170,6 +195,14 @@ export function TokenGroupHeading({ label, path, id, type, showNewForm }: Props)
           oldName={path}
           onClose={handleDuplicateTokenGroupModalClose}
           handleNewTokenGroupNameChange={handleNewTokenGroupNameChange}
+        />
+
+        <EditGroupDescriptionModal
+          isOpen={showEditDescriptionModal}
+          onClose={handleEditDescriptionModalClose}
+          groupPath={path}
+          tokenSet={activeTokenSet}
+          currentDescription={groupDescription}
         />
 
         <StyledTokenGroupAddIcon
