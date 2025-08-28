@@ -1,5 +1,5 @@
 import { TokenFormatOptions, setFormat } from '@/plugin/TokenFormatStoreClass';
-import convertToTokenArray from '../convertTokens';
+import { convertToTokenArrayWithGroups } from '../convertTokens';
 import parseTokenValues from '../parseTokenValues';
 
 describe('Group Description Parsing', () => {
@@ -7,7 +7,7 @@ describe('Group Description Parsing', () => {
     setFormat(TokenFormatOptions.DTCG);
   });
 
-  describe('convertToTokenArray with group descriptions', () => {
+  describe('convertToTokenArrayWithGroups with group descriptions', () => {
     it('should identify and capture group descriptions in DTCG format', () => {
       const tokensWithGroupDescriptions = {
         global: {
@@ -44,7 +44,7 @@ describe('Group Description Parsing', () => {
       };
 
       // Convert tokens to array - this should now return both tokens and groups
-      const result = convertToTokenArray({ tokens: tokensWithGroupDescriptions });
+      const result = convertToTokenArrayWithGroups({ tokens: tokensWithGroupDescriptions });
 
       // Expect the new structure with both tokens and groups
       expect(result).toEqual(
@@ -108,7 +108,7 @@ describe('Group Description Parsing', () => {
         }
       };
 
-      const result = convertToTokenArray({ tokens: mixedDescriptions });
+      const result = convertToTokenArrayWithGroups({ tokens: mixedDescriptions });
 
       // Expect new structure with both tokens and groups
       expect(result).toEqual(
@@ -150,7 +150,7 @@ describe('Group Description Parsing', () => {
         }
       };
 
-      const result = convertToTokenArray({ tokens: nestedGroups });
+      const result = convertToTokenArrayWithGroups({ tokens: nestedGroups });
 
       // Expect new structure with both tokens and groups
       expect(result).toEqual(
@@ -193,7 +193,7 @@ describe('Group Description Parsing', () => {
         }
       };
 
-      const result = convertToTokenArray({ tokens: regularTokens });
+      const result = convertToTokenArrayWithGroups({ tokens: regularTokens });
 
       // When no groups are present, should still return new structure but with empty groups
       expect(result).toEqual({
