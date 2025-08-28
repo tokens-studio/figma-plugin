@@ -11,7 +11,24 @@ export type TokenStoreWithGroups = {
   };
 };
 
-export default function parseTokenValues(tokens: SetTokenDataPayload['values']): TokenStore['values'] | TokenStoreWithGroups {
+// Utility function to extract just tokens from the enhanced result
+export function extractTokensOnly(result: Record<string, AnyTokenList | { tokens: AnyTokenList; groups: GroupDescription[] }>): TokenStore['values'] {
+  const extractedTokens: TokenStore['values'] = {};
+  
+  Object.entries(result).forEach(([key, value]) => {
+    if (Array.isArray(value)) {
+      // Regular token array
+      extractedTokens[key] = value;
+    } else if (value && typeof value === 'object' && 'tokens' in value) {
+      // New structure with tokens and groups
+      extractedTokens[key] = value.tokens;
+    }
+  });
+  
+  return extractedTokens;
+}
+
+export default function parseTokenValues(tokens: SetTokenDataPayload['values']): Record<string, AnyTokenList | { tokens: AnyTokenList; groups: GroupDescription[] }> {
   // If we receive an array of tokens, move them all to the global set
   if (Array.isArray(tokens)) {
     return {

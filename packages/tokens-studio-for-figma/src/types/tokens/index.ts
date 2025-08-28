@@ -34,3 +34,6 @@ export * from './SingleAssetToken';
 export * from './SingleBooleanToken';
 export * from './SingleNumberToken';
 export * from './TokenToRename';
+
+// Group metadata exports
+export type { GroupMetadata, GroupMetadataMap } from '../GroupMetadata';

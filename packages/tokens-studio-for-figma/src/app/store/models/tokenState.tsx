@@ -6,13 +6,13 @@ import extend from 'just-extend';
 import { v4 as uuidv4 } from 'uuid';
 import * as tokenStateReducers from './reducers/tokenState';
 import * as tokenStateEffects from './effects/tokenState';
-import parseTokenValues from '@/utils/parseTokenValues';
+import parseTokenValues, { extractTokensOnly } from '@/utils/parseTokenValues';
 import { notifyToUI } from '@/plugin/notifiers';
 import parseJson from '@/utils/parseJson';
 import { TokenData } from '@/types/SecondScreen';
 import updateTokensOnSources from '../updateSources';
 import {
-  AnyTokenList, ImportToken, SingleToken, TokenStore, TokenToRename,
+  AnyTokenList, ImportToken, SingleToken, TokenStore, TokenToRename, GroupMetadataMap,
 } from '@/types/tokens';
 import { updateCheckForChangesAtomic } from './effects/updateCheckForChangesAtomic';
 import {
@@ -89,6 +89,7 @@ export interface TokenState {
   tokensSize: number;
   themesSize: number;
   renamedCollections: [string, string][] | null;
+  groupMetadata: GroupMetadataMap; // New addition for group descriptions
 }
 
 export const tokenState = createModel<RootModel>()({
@@ -134,6 +135,7 @@ export const tokenState = createModel<RootModel>()({
     tokensSize: 0,
     themesSize: 0,
     renamedCollections: null,
+    groupMetadata: {}, // Initialize empty group metadata
   } as unknown as TokenState,
   reducers: {
     setTokensSize: (state, size: number) => ({
@@ -239,6 +241,36 @@ export const tokenState = createModel<RootModel>()({
       ...state,
       renamedCollections,
     }),
+    setGroupMetadata: (state, payload: GroupMetadataMap) => ({
+      ...state,
+      groupMetadata: payload,
+    }),
+    updateGroupDescription: (state, payload: { path: string; description: string; tokenSet: string }) => {
+      const key = `${payload.tokenSet}.${payload.path}`;
+      return {
+        ...state,
+        groupMetadata: {
+          ...state.groupMetadata,
+          [key]: {
+            path: payload.path,
+            description: payload.description,
+            tokenSet: payload.tokenSet,
+            lastModified: new Date().toISOString(),
+          },
+        },
+      };
+    },
+    deleteGroupMetadata: (state, payload: { path: string; tokenSet: string }) => {
+      const key = `${payload.tokenSet}.${payload.path}`;
+      const newGroupMetadata = { ...state.groupMetadata };
+      if (newGroupMetadata[key]) {
+        delete newGroupMetadata[key];
+      }
+      return {
+        ...state,
+        groupMetadata: newGroupMetadata,
+      };
+    },
     resetImportedTokens: (state) => ({
       ...state,
       importedTokens: {
@@ -254,7 +286,7 @@ export const tokenState = createModel<RootModel>()({
         ...state,
         tokens: {
           ...state.tokens,
-          ...addIdPropertyToTokens(values),
+          ...addIdPropertyToTokens(extractTokensOnly(values)),
         },
       };
     },
