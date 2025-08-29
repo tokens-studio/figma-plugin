@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
 import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
 import { ThemeObject, ThemeObjectsList } from '@/types';
 
@@ -12,6 +11,11 @@ export type TreeItem = {
   value: string | ThemeObject;
   id: string;
 };
+
+// Generate deterministic ID based on content to ensure stable identities
+function generateStableId(isLeaf: boolean, groupOrThemeId: string): string {
+  return isLeaf ? `theme-${groupOrThemeId}` : `group-${groupOrThemeId}`;
+}
 
 export function themeListToTree(items: ThemeObjectsList) {
   const tree = items.reduce<TreeItem[]>((acc, curr) => {
@@ -30,7 +34,7 @@ export function themeListToTree(items: ThemeObjectsList) {
         path: curr?.group ?? INTERNAL_THEMES_NO_GROUP,
         level: 0,
         label: curr?.group ?? INTERNAL_THEMES_NO_GROUP,
-        id: uuidv4(),
+        id: generateStableId(false, curr?.group ?? INTERNAL_THEMES_NO_GROUP),
       });
       acc.push({
         isLeaf: true,
@@ -40,7 +44,7 @@ export function themeListToTree(items: ThemeObjectsList) {
         path: `${curr?.group ?? INTERNAL_THEMES_NO_GROUP}/${curr.id}`,
         level: 1,
         label: curr.id,
-        id: uuidv4(),
+        id: generateStableId(true, curr.id),
       });
     } else {
       const childrenLength = acc.filter(
@@ -56,7 +60,7 @@ export function themeListToTree(items: ThemeObjectsList) {
         path: `${curr?.group ?? INTERNAL_THEMES_NO_GROUP}/${curr.name}`,
         level: 1,
         label: curr.id,
-        id: uuidv4(),
+        id: generateStableId(true, curr.id),
       });
     }
     return acc;

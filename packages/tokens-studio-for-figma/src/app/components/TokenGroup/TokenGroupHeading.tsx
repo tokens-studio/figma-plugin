@@ -34,7 +34,9 @@ export type Props = {
   showNewForm: (opts: ShowNewFormOptions) => void;
 };
 
-export function TokenGroupHeading({ label, path, id, type, showNewForm }: Props) {
+export function TokenGroupHeading({
+  label, path, id, type, showNewForm,
+}: Props) {
   const { t } = useTranslation(['tokens']);
   const editProhibited = useSelector(editProhibitedSelector);
   const activeTokenSetReadOnly = useSelector(activeTokenSetReadOnlySelector);
