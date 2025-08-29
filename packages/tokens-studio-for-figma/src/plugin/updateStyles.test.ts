@@ -353,7 +353,7 @@ describe('updateStyles', () => {
       styleId: '5678',
       internal__Parent: 'global',
     };
-    
+
     const regularColorToken = {
       name: 'color.primary',
       path: 'color/primary',
@@ -364,36 +364,36 @@ describe('updateStyles', () => {
     };
 
     // Test with stylesGradient disabled (default)
-    const styleIdsWithoutGradient = await updateStyles([gradientToken, regularColorToken], { 
-      stylesColor: true, 
-      stylesGradient: false 
+    await updateStyles([gradientToken, regularColorToken], {
+      stylesColor: true,
+      stylesGradient: false,
     } as SettingsState);
 
     // Should only process regular color token
     expect(colorSpy).toHaveBeenCalledWith(
       expect.arrayContaining([
-        expect.objectContaining({ name: 'color.primary' })
+        expect.objectContaining({ name: 'color.primary' }),
       ]),
       false,
-      undefined
+      undefined,
     );
-    
+
     colorSpy.mockClear();
-    
+
     // Test with stylesGradient enabled
-    const styleIdsWithGradient = await updateStyles([gradientToken, regularColorToken], { 
-      stylesColor: true, 
-      stylesGradient: true 
+    await updateStyles([gradientToken, regularColorToken], {
+      stylesColor: true,
+      stylesGradient: true,
     } as SettingsState);
-    
+
     // Should process both tokens
     expect(colorSpy).toHaveBeenCalledWith(
       expect.arrayContaining([
         expect.objectContaining({ name: 'color.primary' }),
-        expect.objectContaining({ name: 'gradient.primary' })
+        expect.objectContaining({ name: 'gradient.primary' }),
       ]),
       false,
-      undefined
+      undefined,
     );
   });
 });
