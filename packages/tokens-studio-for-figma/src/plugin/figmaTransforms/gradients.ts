@@ -117,6 +117,18 @@ export function convertStringToFigmaGradient(value: string) {
 
   const normalisedCos = Math.cos(normalizedAngleRad);
   scale = normalisedCos;
+  
+  // FIXME: The current scaling computation can cause gradient anchor point positioning issues
+  // especially for non-45° angles. Users reported that gradient positions shift when tokens
+  // are applied to shapes (issue #2331). The original fallback computation might be more accurate
+  // for preserving gradient anchor points across different node types and angles.
+  // 
+  // For angles that are not multiples of 45°, use the more geometrically accurate scale computation
+  // that accounts for the gradient line length in the rotated coordinate system.
+  if (angle % 45 !== 0) {
+    // Use the original scale computation for non-45° angles to preserve anchor points
+    scale = Math.sqrt(1 + Math.tan(angle * (Math.PI / 180)) ** 2);
+  }
   // Implement fallback if bugs are caused by obscure node types. This appears to be unnecessary
   // if (!['RECTANGLE', 'FRAME', 'VECTOR'].includes(node?.type || '')) {
   //   // Old scale computation:
