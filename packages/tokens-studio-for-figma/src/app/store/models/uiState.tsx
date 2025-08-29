@@ -92,6 +92,7 @@ export interface UIState {
   sidebarWidth: number;
   hasRemoteChange: boolean;
   selectedExportThemes?: string[];
+  showBitbucketMigrationDialog: boolean;
 }
 
 const defaultConfirmState: ConfirmProps = {
@@ -153,6 +154,7 @@ export const uiState = createModel<RootModel>()({
     sidebarWidth: 150,
     hasRemoteChange: false,
     selectedExportThemes: [],
+    showBitbucketMigrationDialog: false,
   } as unknown as UIState,
   reducers: {
     setShowConvertTokenFormatModal: (state, data: boolean) => ({
@@ -426,6 +428,10 @@ export const uiState = createModel<RootModel>()({
     setSelectedExportThemes: (state, data: string[]) => ({
       ...state,
       selectedExportThemes: data,
+    }),
+    setShowBitbucketMigrationDialog: (state, data: boolean) => ({
+      ...state,
+      showBitbucketMigrationDialog: data,
     }),
   },
   effects: (dispatch) => ({

@@ -17,6 +17,7 @@ import { StorageTypeCredentials } from '@/types/StorageType';
 import LocalStorageItem from './LocalStorageItem';
 import { getProviderIcon } from '@/utils/getProviderIcon';
 import { StyledBetaBadge } from './SecondScreen';
+import BitbucketMigrationHelper from './BitbucketMigrationHelper';
 
 const SyncSettings = () => {
   const localApiState = useSelector(localApiStateSelector);
@@ -180,6 +181,10 @@ const SyncSettings = () => {
               </Dialog.Portal>
             </Dialog>
           </Stack>
+
+          {/* Bitbucket Migration Helper */}
+          <BitbucketMigrationHelper onEditCredential={(credential) => handleEditClick(credential)()} />
+
           <Stack direction="column" gap={2} width="full" align="start">
             <LocalStorageItem />
             {apiProviders.length > 0 && apiProviders.map((item) => (

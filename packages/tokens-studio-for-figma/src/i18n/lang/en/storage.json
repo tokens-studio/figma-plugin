@@ -74,8 +74,24 @@
     "bitbucket": {
       "username": "User Email",
       "apiToken": "API Token",
+      "appPassword": "App Password",
       "projectName": "Project Name (optional)",
       "repository": "Repository (workspace/repo)"
+    },
+    "bitbucketMigration": {
+      "title": "Bitbucket App Password Migration Required",
+      "description": "Bitbucket App Passwords are being deprecated by Atlassian and will be discontinued. You have {{count}} Bitbucket sync(s) using App Passwords that need to be migrated to API Tokens.",
+      "affectedSyncs": "Affected syncs:",
+      "instructions": "API Tokens provide better security and will continue to work after App Passwords are discontinued. You can migrate your existing syncs or create new ones with API Tokens.",
+      "learnMore": "Learn how to create API Tokens →",
+      "remindLater": "Remind me later",
+      "migrate": "Migrate to API Tokens",
+      "appPasswordDeprecated": "App Passwords are deprecated. Consider migrating to API Tokens.",
+      "apiTokenRequired": "API Tokens are required for new Bitbucket syncs.",
+      "allUpToDate": "All your Bitbucket syncs are using API Tokens. No migration needed!",
+      "migrationNeeded": "Bitbucket Migration Needed",
+      "helperDescription": "You have {{count}} Bitbucket sync(s) using deprecated App Passwords. Migrate them to API Tokens to ensure continued access.",
+      "syncsToMigrate": "Syncs to migrate:"
     },
     "tokensstudio": {
       "name": "Name",

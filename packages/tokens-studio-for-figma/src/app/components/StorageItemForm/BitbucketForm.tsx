@@ -10,6 +10,7 @@ import { StorageTypeFormValues } from '@/types/StorageType';
 import { generateId } from '@/utils/generateId';
 import { ChangeEventHandler } from './types';
 import { ErrorMessage } from '../ErrorMessage';
+import { isUsingAppPassword } from '@/utils/bitbucketMigration';
 
 type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.BITBUCKET }>;
 type Props = {
@@ -31,6 +32,10 @@ export default function BitbucketForm({
     setIsMasked((prev) => !prev);
   }, []);
 
+  // Determine if this is an existing sync using app password
+  const isEditingAppPasswordSync = !values.new && values.secret && !values.apiToken;
+  const isNewSync = values.new;
+
   const handleSubmit = React.useCallback(
     (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
@@ -43,9 +48,23 @@ export default function BitbucketForm({
         branch: zod.string(),
         filePath: zod.string(),
         baseUrl: zod.string().optional(),
-        apiToken: zod.string(),
+        secret: zod.string().optional(),
+        apiToken: zod.string().optional(),
         internalId: zod.string().optional(),
+      }).refine((data) => {
+        // For new syncs, require API token
+        if (isNewSync) {
+          return data.apiToken && data.apiToken.trim() !== '';
+        }
+        // For existing syncs, require either secret (app password) or API token
+        return (data.secret && data.secret.trim() !== '') || (data.apiToken && data.apiToken.trim() !== '');
+      }, {
+        message: isNewSync
+          ? 'API Token is required for new syncs'
+          : 'Either App Password or API Token is required',
+        path: ['apiToken'],
       });
+
       const validationResult = zodSchema.safeParse(values);
       if (validationResult.success) {
         const formFields = {
@@ -55,7 +74,7 @@ export default function BitbucketForm({
         onSubmit(formFields);
       }
     },
-    [values, onSubmit],
+    [values, onSubmit, isNewSync],
   );
 
   return (
@@ -87,25 +106,60 @@ export default function BitbucketForm({
             required
           />
         </FormField>
-        <FormField>
-          <Label htmlFor="apiToken">{t('providers.bitbucket.apiToken')}</Label>
-          <TextInput
-            value={values.apiToken || ''}
-            onChange={onChange}
-            name="apiToken"
-            id="apiToken"
-            required
-            type={isMasked ? 'password' : 'text'}
-            trailingAction={(
-              <IconButton
-                variant="invisible"
-                size="small"
-                onClick={toggleMask}
-                icon={isMasked ? <EyeClosedIcon /> : <EyeOpenIcon />}
-              />
+
+        {/* Show app password field for existing syncs that use app passwords */}
+        {isEditingAppPasswordSync && (
+          <FormField>
+            <Label htmlFor="secret">{t('providers.bitbucket.appPassword')}</Label>
+            <TextInput
+              value={values.secret || ''}
+              onChange={onChange}
+              name="secret"
+              id="secret"
+              required
+              type={isMasked ? 'password' : 'text'}
+              trailingAction={(
+                <IconButton
+                  variant="invisible"
+                  size="small"
+                  onClick={toggleMask}
+                  icon={isMasked ? <EyeClosedIcon /> : <EyeOpenIcon />}
+                />
+              )}
+            />
+            <Text muted size="xsmall">
+              {t('bitbucketMigration.appPasswordDeprecated', 'App Passwords are deprecated. Consider migrating to API Tokens.')}
+            </Text>
+          </FormField>
+        )}
+
+        {/* Show API token field for new syncs or existing syncs that already use API tokens */}
+        {(isNewSync || !isEditingAppPasswordSync) && (
+          <FormField>
+            <Label htmlFor="apiToken">{t('providers.bitbucket.apiToken')}</Label>
+            <TextInput
+              value={values.apiToken || ''}
+              onChange={onChange}
+              name="apiToken"
+              id="apiToken"
+              required={isNewSync}
+              type={isMasked ? 'password' : 'text'}
+              trailingAction={(
+                <IconButton
+                  variant="invisible"
+                  size="small"
+                  onClick={toggleMask}
+                  icon={isMasked ? <EyeClosedIcon /> : <EyeOpenIcon />}
+                />
+              )}
+            />
+            {isNewSync && (
+              <Text muted size="xsmall">
+                {t('bitbucketMigration.apiTokenRequired', 'API Tokens are required for new Bitbucket syncs.')}
+              </Text>
             )}
-          />
-        </FormField>
+          </FormField>
+        )}
         <FormField>
           <Label htmlFor="id">{t('providers.bitbucket.repository')}</Label>
           <TextInput value={values.id || ''} onChange={onChange} type="text" name="id" id="id" required />
@@ -133,7 +187,16 @@ export default function BitbucketForm({
           <Button variant="secondary" onClick={onCancel}>
             {t('cancel')}
           </Button>
-          <Button variant="primary" type="submit" disabled={!values.secret && !values.name}>
+          <Button
+            variant="primary"
+            type="submit"
+            disabled={
+              !values.name ||
+              (isNewSync && !values.apiToken) ||
+              (isEditingAppPasswordSync && !values.secret) ||
+              (!isEditingAppPasswordSync && !isNewSync && !values.apiToken)
+            }
+          >
             {t('save')}
           </Button>
         </Stack>

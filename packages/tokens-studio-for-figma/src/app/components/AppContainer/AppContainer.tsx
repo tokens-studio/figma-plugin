@@ -25,6 +25,8 @@ import PullDialog from '../PullDialog';
 import { useFigmaTheme } from '@/hooks/useFigmaTheme';
 import Box from '../Box';
 import { darkThemeMode, lightThemeMode } from '@/stitches.config';
+import BitbucketMigrationDialog from '../BitbucketMigrationDialog';
+import { useBitbucketMigration } from '@/app/hooks/useBitbucketMigration';
 
 type Props = StartupMessage & {
   // @README only for unit testing purposes
@@ -43,6 +45,12 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
   const { isDarkTheme } = useFigmaTheme();
   const dispatch = useDispatch<Dispatch>();
   const startupProcess = useStartupProcess(params);
+  const {
+    showDialog: showMigrationDialog,
+    appPasswordCredentials,
+    hideMigrationDialog,
+    checkAndShowMigrationDialog
+  } = useBitbucketMigration();
 
   const [showLoadingScreen, setShowLoadingScreen] = useState(true);
 
@@ -69,8 +77,12 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
       }
     } else if (startupProcess.isComplete) {
       setShowLoadingScreen(false);
+      // Check for app password migration after startup is complete
+      setTimeout(() => {
+        checkAndShowMigrationDialog();
+      }, 1000); // Small delay to let the UI settle
     }
-  }, [startupProcess]);
+  }, [startupProcess, checkAndShowMigrationDialog]);
 
   useEffect(() => {
     handlePerformStartup();
@@ -83,6 +95,16 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
       document.body.className = lightThemeMode;
     }
   }, [isDarkTheme]);
+
+  const handleMigrationDialogClose = useCallback(() => {
+    hideMigrationDialog();
+  }, [hideMigrationDialog]);
+
+  const handleMigrationStart = useCallback(() => {
+    hideMigrationDialog();
+    // Navigate to settings to help user migrate
+    dispatch.uiState.setActiveTab(Tabs.SETTINGS);
+  }, [hideMigrationDialog, dispatch]);
 
   globalStyles();
 
@@ -107,6 +129,12 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
       <Changelog />
       <SecondScreenSync />
       <AuthModal />
+      <BitbucketMigrationDialog
+        isOpen={showMigrationDialog}
+        onClose={handleMigrationDialogClose}
+        onMigrate={handleMigrationStart}
+        appPasswordCredentials={appPasswordCredentials}
+      />
     </Box>
   );
 
