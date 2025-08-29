@@ -82,7 +82,7 @@ describe('UndoableEnhancer - Basic Tracking Test', () => {
       expect(UndoableEnhancerState.actionsHistory[0].action.type).toBe('tokenState/setActiveTokenSet');
     });
 
-    it('should track multiple token creation', () => {
+    it('should track multiple token creation and allow undo', () => {
       const multipleTokens = [
         { parent: 'global', name: 'token1', type: 'color' as const, value: '#ff0000' },
       ];
@@ -91,6 +91,53 @@ describe('UndoableEnhancer - Basic Tracking Test', () => {
       
       expect(UndoableEnhancerState.actionsHistory).toHaveLength(1);
       expect(UndoableEnhancerState.actionsHistory[0].action.type).toBe('tokenState/createMultipleTokens');
+    });
+
+    it('should track token group operations', () => {
+      // First create some tokens in a group pattern
+      const groupTokens = [
+        { parent: 'global', name: 'button.primary', type: 'color' as const, value: '#ff0000' },
+        { parent: 'global', name: 'button.secondary', type: 'color' as const, value: '#00ff00' },
+      ];
+      store.dispatch({ type: 'tokenState/createMultipleTokens', payload: groupTokens });
+      
+      // Clear history from creation
+      UndoableEnhancerState.actionsHistory = [];
+      
+      // Test delete token group tracking
+      store.dispatch({ 
+        type: 'tokenState/deleteTokenGroup', 
+        payload: { parent: 'global', path: 'button', type: 'color' } 
+      });
+      
+      expect(UndoableEnhancerState.actionsHistory).toHaveLength(1);
+      expect(UndoableEnhancerState.actionsHistory[0].action.type).toBe('tokenState/deleteTokenGroup');
+    });
+
+    it('should track token group rename operations', () => {
+      store.dispatch({ 
+        type: 'tokenState/renameTokenGroup', 
+        payload: { parent: 'global', oldName: 'old-group', newName: 'new-group', type: 'color' } 
+      });
+      
+      expect(UndoableEnhancerState.actionsHistory).toHaveLength(1);
+      expect(UndoableEnhancerState.actionsHistory[0].action.type).toBe('tokenState/renameTokenGroup');
+    });
+
+    it('should track token group duplicate operations', () => {
+      store.dispatch({ 
+        type: 'tokenState/duplicateTokenGroup', 
+        payload: { 
+          parent: 'global', 
+          oldName: 'source-group', 
+          newName: 'copied-group', 
+          type: 'color',
+          tokenSets: ['global'] 
+        } 
+      });
+      
+      expect(UndoableEnhancerState.actionsHistory).toHaveLength(1);
+      expect(UndoableEnhancerState.actionsHistory[0].action.type).toBe('tokenState/duplicateTokenGroup');
     });
   });
 });

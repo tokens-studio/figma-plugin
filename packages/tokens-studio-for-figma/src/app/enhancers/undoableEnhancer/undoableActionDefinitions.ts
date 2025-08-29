@@ -408,4 +408,138 @@ export const undoableActionDefinitions = [
   }> | null, AnyAction<true> & {
     type: 'tokenState/editMultipleTokens'
   }>,
+  
+  // Token Group Operations
+  {
+    type: 'tokenState/deleteTokenGroup',
+    getStateSnapshot: ({ payload }, state) => {
+      if (!state?.tokenState.tokens[payload.parent]) return null;
+      
+      // Find all tokens that match the group pattern
+      const deletedTokens = state.tokenState.tokens[payload.parent].filter(
+        (token) => token.name.startsWith(`${payload.path}.`) && token.type === payload.type
+      );
+      
+      return {
+        parent: payload.parent,
+        path: payload.path,
+        type: payload.type,
+        deletedTokens,
+      };
+    },
+    redo: (dispatch, action) => {
+      dispatch({
+        type: 'tokenState/deleteTokenGroup',
+        payload: action.payload,
+        meta: { silent: true },
+      });
+    },
+    undo: (dispatch, action, snapshot) => {
+      if (snapshot && snapshot.deletedTokens.length > 0) {
+        // Restore all deleted tokens
+        const tokensToRestore = snapshot.deletedTokens.map((token) => ({
+          parent: snapshot.parent,
+          name: token.name,
+          type: token.type,
+          value: token.value,
+          description: token.description,
+          $extensions: token.$extensions,
+        }));
+        
+        dispatch({
+          type: 'tokenState/createMultipleTokens',
+          payload: tokensToRestore,
+          meta: { silent: true },
+        });
+      }
+    },
+  } as UndoableActionDefinition<{
+    parent: string;
+    path: string;
+    type: string;
+    deletedTokens: SingleToken[];
+  } | null, AnyAction<true> & {
+    type: 'tokenState/deleteTokenGroup'
+  }>,
+  
+  {
+    type: 'tokenState/renameTokenGroup',
+    getStateSnapshot: ({ payload }) => ({
+      parent: payload.parent,
+      oldName: payload.oldName,
+      newName: payload.newName,
+      type: payload.type,
+    }),
+    redo: (dispatch, action) => {
+      dispatch({
+        type: 'tokenState/renameTokenGroup',
+        payload: action.payload,
+        meta: { silent: true },
+      });
+    },
+    undo: (dispatch, action, snapshot) => {
+      if (snapshot) {
+        // Rename back to original name
+        dispatch({
+          type: 'tokenState/renameTokenGroup',
+          payload: {
+            parent: snapshot.parent,
+            oldName: snapshot.newName,
+            newName: snapshot.oldName,
+            type: snapshot.type,
+          },
+          meta: { silent: true },
+        });
+      }
+    },
+  } as UndoableActionDefinition<{
+    parent: string;
+    oldName: string;
+    newName: string;
+    type: string;
+  } | null, AnyAction<true> & {
+    type: 'tokenState/renameTokenGroup'
+  }>,
+  
+  {
+    type: 'tokenState/duplicateTokenGroup',
+    getStateSnapshot: ({ payload }) => ({
+      parent: payload.parent,
+      oldName: payload.oldName,
+      newName: payload.newName,
+      type: payload.type,
+      tokenSets: payload.tokenSets,
+    }),
+    redo: (dispatch, action) => {
+      dispatch({
+        type: 'tokenState/duplicateTokenGroup',
+        payload: action.payload,
+        meta: { silent: true },
+      });
+    },
+    undo: (dispatch, action, snapshot) => {
+      if (snapshot) {
+        // Delete all the duplicated tokens from all affected token sets
+        snapshot.tokenSets.forEach((tokenSetName: string) => {
+          dispatch({
+            type: 'tokenState/deleteTokenGroup',
+            payload: {
+              parent: tokenSetName,
+              path: snapshot.newName,
+              type: snapshot.type,
+            },
+            meta: { silent: true },
+          });
+        });
+      }
+    },
+  } as UndoableActionDefinition<{
+    parent: string;
+    oldName: string;
+    newName: string;
+    type: string;
+    tokenSets: string[];
+  } | null, AnyAction<true> & {
+    type: 'tokenState/duplicateTokenGroup'
+  }>,
 ] as UndoableActionDefinition[];
