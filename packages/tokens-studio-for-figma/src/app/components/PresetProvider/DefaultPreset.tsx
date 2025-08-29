@@ -12,7 +12,6 @@ import materialJSON from '@/config/material.json';
 import modernJSON from '@/config/modern.json';
 import parseTokenValues from '@/utils/parseTokenValues';
 import { SetTokenDataPayload } from '@/types/payloads';
-import { TokenSetStatus } from '@/constants/TokenSetStatus';
 
 type Props = {
   onCancel: () => void;
@@ -25,42 +24,43 @@ const presetData = {
   'modern.json': modernJSON,
 } as const;
 
-
-
 export default function DefaultPreset({ onCancel }: Props) {
   const dispatch = useDispatch<Dispatch>();
   const [selectedPreset, setSelectedPreset] = useState(AVAILABLE_PRESETS[0]);
 
   const handleSetDefault = React.useCallback(() => {
     track('Load preset', { preset: selectedPreset.id });
-    
+
     // Get the selected preset data
     const selectedPresetData = presetData[selectedPreset.fileName as keyof typeof presetData] || defaultJSON;
-    
-    // Determine which token sets are available in the preset
-    const availableTokenSets = Object.keys(selectedPresetData);
-    const usedTokenSet: Record<string, TokenSetStatus> = {};
-    
-    // Set the first token set as SOURCE and others as ENABLED
-    availableTokenSets.forEach((setName, index) => {
-      usedTokenSet[setName] = index === 0 ? TokenSetStatus.SOURCE : TokenSetStatus.ENABLED;
-    });
 
-    // Load the preset tokens directly
+    // Use the themes defined in the preset instead of manually creating usedTokenSet
+    const presetThemes = selectedPreset.themes;
+    const defaultTheme = presetThemes[0]; // Use the first theme as default active theme
+
+    // Load the preset tokens with the predefined themes
     dispatch.tokenState.setTokenData({
       values: parseTokenValues(selectedPresetData as unknown as SetTokenDataPayload['values']),
-      themes: [],
-      activeTheme: {},
-      usedTokenSet,
+      themes: presetThemes,
+      activeTheme: { [defaultTheme.id]: defaultTheme.name },
+      usedTokenSet: defaultTheme.selectedTokenSets,
     });
 
     dispatch.tokenState.updateDocument({
       shouldUpdateNodes: false,
       updateRemote: false,
     });
-    
+
     onCancel();
   }, [dispatch, onCancel, selectedPreset]);
+
+  const handlePresetClick = React.useCallback((event: React.MouseEvent<HTMLDivElement>) => {
+    const presetId = event.currentTarget.getAttribute('data-preset-id');
+    const preset = AVAILABLE_PRESETS.find((p) => p.id === presetId);
+    if (preset) {
+      setSelectedPreset(preset);
+    }
+  }, []);
 
   return (
     <Stack direction="column" gap={4}>
@@ -70,11 +70,12 @@ export default function DefaultPreset({ onCancel }: Props) {
         </Heading>
         <Text>Select from our curated token presets. Warning: This will override your current tokens!</Text>
       </Stack>
-      
+
       <Stack direction="column" gap={3}>
         {AVAILABLE_PRESETS.map((preset) => (
           <Box
             key={preset.id}
+            data-preset-id={preset.id}
             css={{
               padding: '$3',
               border: selectedPreset.id === preset.id ? '2px solid $colors$accent9' : '1px solid $colors$border',
@@ -84,7 +85,7 @@ export default function DefaultPreset({ onCancel }: Props) {
                 backgroundColor: '$colors$bgSubtle',
               },
             }}
-            onClick={() => setSelectedPreset(preset)}
+            onClick={handlePresetClick}
           >
             <Stack direction="column" gap={1}>
               <Text size="small" css={{ fontWeight: '$fontWeights$medium' }}>{preset.name}</Text>
@@ -99,7 +100,9 @@ export default function DefaultPreset({ onCancel }: Props) {
           Cancel
         </Button>
         <Button variant="primary" onClick={handleSetDefault}>
-          Load {selectedPreset.name}
+          Load
+          {' '}
+          {selectedPreset.name}
         </Button>
       </Stack>
     </Stack>
