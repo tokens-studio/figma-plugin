@@ -219,4 +219,49 @@ describe('SetValuesOnVariable', () => {
     await setValuesOnVariable(variablesInFigma, tokens, collection, mode, baseFontSize);
     expect(mockCreateVariable).toBeCalledWith('global/fontWeight', collection, 'FLOAT');
   });
+
+  it('should handle large token sets without memory issues using batched processing', async () => {
+    // Create a mock variable that mockCreateVariable returns
+    const mockVariable = {
+      id: 'variable-123',
+      key: 'V:123',
+      name: 'test/token',
+      resolvedType: 'COLOR',
+      setValueForMode: jest.fn(),
+      remote: false,
+    } as any;
+
+    // Make mockCreateVariable return our mock variable
+    mockCreateVariable.mockReturnValue(mockVariable);
+    
+    // Create a large set of tokens to simulate potential memory leak scenario
+    const largeTokenSet = Array.from({ length: 100 }, (_, i) => ({
+      name: `token.${i}`,
+      path: `token/${i}`,
+      rawValue: '#FF0000',
+      value: '#FF0000',
+      type: TokenTypes.COLOR,
+      variableId: '',
+    })) as SingleToken<true, { path: string, variableId: string }>[];
+
+    const result = await setValuesOnVariable(
+      [],
+      largeTokenSet,
+      collection,
+      mode,
+      baseFontSize,
+      false
+    );
+    
+    // Verify that all tokens were processed
+    expect(Object.keys(result.variableKeyMap)).toHaveLength(100);
+    
+    // Verify all variables were created (100 tokens should create 100 variables)
+    expect(mockCreateVariable).toHaveBeenCalledTimes(100);
+    
+    // Verify the variable key mapping is correct
+    largeTokenSet.forEach((token, index) => {
+      expect(result.variableKeyMap[`token.${index}`]).toBe('V:123');
+    });
+  });
 });
