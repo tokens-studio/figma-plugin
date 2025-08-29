@@ -404,6 +404,24 @@ describe('radial and conic gradients', () => {
     expect(result.gradientStops[0].position).toEqual(0);
     expect(result.gradientStops[1].position).toEqual(1);
   });
+
+  it('should fallback to linear gradient for unknown types', () => {
+    const result = convertStringToFigmaGradient('unknown-gradient(#ff0000, #0000ff)');
+    expect(result.type).toEqual('GRADIENT_LINEAR');
+    expect(result.gradientStops).toHaveLength(2);
+  });
+
+  it('should handle radial gradient with shape/size parameters', () => {
+    const result = convertStringToFigmaGradient('radial-gradient(circle at center, #ff0000, #0000ff)');
+    expect(result.type).toEqual('GRADIENT_RADIAL');
+    expect(result.gradientStops).toHaveLength(2);
+  });
+
+  it('should handle conic gradient with at position', () => {
+    const result = convertStringToFigmaGradient('conic-gradient(from 45deg at 50% 50%, #ff0000, #0000ff)');
+    expect(result.type).toEqual('GRADIENT_ANGULAR');
+    expect(result.gradientStops).toHaveLength(2);
+  });
 });
 
 describe('convertFigmaGradientToString with gradient types', () => {
