@@ -25,14 +25,14 @@ export default async function setValuesOnVariable(
   const variableKeyMap: Record<string, string> = {};
   const referenceVariableCandidates: ReferenceVariableType[] = [];
   const renamedVariableKeys: string[] = [];
-  
+
   // Process tokens in batches to prevent memory issues with large token sets
   const BATCH_SIZE = 50; // Process 50 tokens at a time
-  
+
   try {
     for (let i = 0; i < tokens.length; i += BATCH_SIZE) {
       const batch = tokens.slice(i, i + BATCH_SIZE);
-      
+
       await Promise.all(batch.map(async (token) => {
         const variableType = convertTokenTypeToVariableType(token.type, token.value);
         // If id matches the variableId, or name patches the token path, we can use it to update the variable instead of re-creating.
@@ -102,10 +102,12 @@ export default async function setValuesOnVariable(
           }
         }
       }));
-      
+
       // Allow garbage collection between batches
       if (i % (BATCH_SIZE * 4) === 0) {
-        await new Promise(resolve => setTimeout(resolve, 0));
+        await new Promise<void>((resolve) => {
+          setTimeout(() => resolve(), 0);
+        });
       }
     }
   } catch (e) {

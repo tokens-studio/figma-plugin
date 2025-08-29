@@ -233,7 +233,7 @@ describe('SetValuesOnVariable', () => {
 
     // Make mockCreateVariable return our mock variable
     mockCreateVariable.mockReturnValue(mockVariable);
-    
+
     // Create a large set of tokens to simulate potential memory leak scenario
     const largeTokenSet = Array.from({ length: 100 }, (_, i) => ({
       name: `token.${i}`,
@@ -250,15 +250,15 @@ describe('SetValuesOnVariable', () => {
       collection,
       mode,
       baseFontSize,
-      false
+      false,
     );
-    
+
     // Verify that all tokens were processed
     expect(Object.keys(result.variableKeyMap)).toHaveLength(100);
-    
+
     // Verify all variables were created (100 tokens should create 100 variables)
     expect(mockCreateVariable).toHaveBeenCalledTimes(100);
-    
+
     // Verify the variable key mapping is correct
     largeTokenSet.forEach((token, index) => {
       expect(result.variableKeyMap[`token.${index}`]).toBe('V:123');
