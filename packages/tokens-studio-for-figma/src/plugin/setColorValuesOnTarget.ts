@@ -23,7 +23,8 @@ const getLinearGradientPaint = async (fallbackValue, token) => {
   const gradientString = typeof fallbackValue === 'object' && fallbackValue.fill
     ? fallbackValue.fill
     : fallbackValue;
-  const { gradientStops, gradientTransform } = convertStringToFigmaGradient(gradientString);
+  const gradientResult = convertStringToFigmaGradient(gradientString);
+  const { gradientStops, gradientTransform, type } = gradientResult;
 
   const rawValue = defaultTokenValueRetriever.get(token)?.rawValue;
   let gradientStopsWithReferences = gradientStops;
@@ -51,7 +52,7 @@ const getLinearGradientPaint = async (fallbackValue, token) => {
     }
   }
   const newPaint: GradientPaint = {
-    type: 'GRADIENT_LINEAR',
+    type: type || 'GRADIENT_LINEAR',
     gradientTransform,
     gradientStops: gradientStopsWithReferences,
   };

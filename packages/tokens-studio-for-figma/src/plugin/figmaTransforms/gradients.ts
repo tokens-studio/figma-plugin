@@ -7,14 +7,32 @@ export function convertDegreeToNumber(degreeString: string): number {
 }
 
 export function convertFigmaGradientToString(paint: GradientPaint) {
-  const { gradientTransform, gradientStops } = paint;
+  const { gradientTransform, gradientStops, type } = paint;
   const gradientStopsString = gradientStops
     .map((stop) => `${figmaRGBToHex(stop.color)} ${Math.round(stop.position * 100 * 100) / 100}%`)
     .join(', ');
-  const { start, end } = extractLinearGradientParamsFromTransform(1, 1, gradientTransform);
-  const angleInRad = Math.atan2(end[1] - start[1], end[0] - start[0]);
-  const angleInDeg = Math.round((angleInRad * 180) / Math.PI);
-  return `linear-gradient(${angleInDeg + 90}deg, ${gradientStopsString})`;
+
+  switch (type) {
+    case 'GRADIENT_RADIAL':
+      // For radial gradients, return basic radial-gradient syntax
+      return `radial-gradient(${gradientStopsString})`;
+    
+    case 'GRADIENT_ANGULAR':
+      // For angular/conic gradients, return basic conic-gradient syntax
+      return `conic-gradient(${gradientStopsString})`;
+    
+    case 'GRADIENT_DIAMOND':
+      // Diamond gradients don't have a direct CSS equivalent, fall back to radial
+      return `radial-gradient(${gradientStopsString})`;
+    
+    case 'GRADIENT_LINEAR':
+    default:
+      // Linear gradients (existing logic)
+      const { start, end } = extractLinearGradientParamsFromTransform(1, 1, gradientTransform);
+      const angleInRad = Math.atan2(end[1] - start[1], end[0] - start[0]);
+      const angleInDeg = Math.round((angleInRad * 180) / Math.PI);
+      return `linear-gradient(${angleInDeg + 90}deg, ${gradientStopsString})`;
+  }
 }
 
 const roundToPrecision = (value, precision = 10) => {
@@ -56,9 +74,34 @@ function parseGradientParts(innerContent: string): string[] {
 }
 
 // if node type check is needed due to bugs caused by obscure node types, use (value: string/*, node?: BaseNode | PaintStyle) and convertStringToFigmaGradient(value, target)
-export function convertStringToFigmaGradient(value: string) {
+export function convertStringToFigmaGradient(value: string): {
+  gradientStops: ColorStop[];
+  gradientTransform: Transform;
+  type?: 'GRADIENT_LINEAR' | 'GRADIENT_RADIAL' | 'GRADIENT_ANGULAR';
+} {
+  // Detect gradient type from the CSS function name
+  const gradientType = value.substring(0, value.indexOf('('));
   const innerContent = value.substring(value.indexOf('(') + 1, value.lastIndexOf(')'));
   const parts = parseGradientParts(innerContent);
+
+  switch (gradientType) {
+    case 'linear-gradient':
+      return convertLinearGradient(parts);
+    case 'radial-gradient':
+      return convertRadialGradient(parts);
+    case 'conic-gradient':
+      return convertConicGradient(parts);
+    default:
+      // Fallback to linear gradient for backward compatibility
+      return convertLinearGradient(parts);
+  }
+}
+
+function convertLinearGradient(parts: string[]): {
+  gradientStops: ColorStop[];
+  gradientTransform: Transform;
+  type: 'GRADIENT_LINEAR';
+} {
 
   // Default angle is to top (180 degrees)
   let angle = 180;
@@ -139,7 +182,18 @@ export function convertStringToFigmaGradient(value: string) {
 
   const gradientTransformMatrix = transformationMatrix.to2DArray();
 
-  const gradientStops = parts.map((stop, i, arr) => {
+  const gradientStops = parseColorStops(parts);
+
+  return {
+    type: 'GRADIENT_LINEAR' as const,
+    gradientStops,
+    gradientTransform: [gradientTransformMatrix[0], gradientTransformMatrix[1]] as Transform,
+  };
+}
+
+// Helper function to parse color stops from gradient parts
+function parseColorStops(parts: string[]): ColorStop[] {
+  return parts.map((stop, i, arr) => {
     // Separate color from position by finding the last space outside parentheses
     let colorPart = stop;
     let positionPart = '';
@@ -174,9 +228,79 @@ export function convertStringToFigmaGradient(value: string) {
       position: positionPart ? parseFloat(positionPart) / 100 : i / (arr.length - 1),
     };
   }) as ColorStop[];
+}
+
+function convertRadialGradient(parts: string[]): {
+  gradientStops: ColorStop[];
+  gradientTransform: Transform;
+  type: 'GRADIENT_RADIAL';
+} {
+  // Parse radial gradient syntax: radial-gradient([shape size] [at position], color-stops)
+  // For Figma, we'll use a basic radial transform centered at 0.5, 0.5
+  // More complex positioning and sizing could be added later
+  
+  // Skip shape/size/position parameters for now and focus on color stops
+  let colorStopsStart = 0;
+  if (parts.length > 0 && !parts[0].includes('#') && !parts[0].includes('rgb') && !parts[0].includes('hsl')) {
+    // First part might be shape/size/position, skip it
+    colorStopsStart = 1;
+  }
+  
+  const colorStopParts = parts.slice(colorStopsStart);
+  const gradientStops = parseColorStops(colorStopParts);
+  
+  // Create identity transform for basic radial gradient centered at 0.5, 0.5
+  const gradientTransform: Transform = [
+    [1, 0, 0],
+    [0, 1, 0],
+  ];
 
   return {
+    type: 'GRADIENT_RADIAL' as const,
     gradientStops,
-    gradientTransform: [gradientTransformMatrix[0], gradientTransformMatrix[1]] as Transform,
+    gradientTransform,
+  };
+}
+
+function convertConicGradient(parts: string[]): {
+  gradientStops: ColorStop[];
+  gradientTransform: Transform;
+  type: 'GRADIENT_ANGULAR';
+} {
+  // Parse conic gradient syntax: conic-gradient([from angle] [at position], color-stops)
+  // For Figma GRADIENT_ANGULAR, we'll use a basic angular transform
+  
+  let colorStopsStart = 0;
+  let startAngle = 0;
+  
+  // Check if first part specifies angle or position
+  if (parts.length > 0 && (parts[0].includes('from') || parts[0].includes('at'))) {
+    if (parts[0].includes('from') && parts[0].includes('deg')) {
+      // Extract angle from "from Xdeg" syntax
+      const angleMatch = parts[0].match(/from\s+(\d+(?:\.\d+)?)deg/);
+      if (angleMatch) {
+        startAngle = parseFloat(angleMatch[1]);
+      }
+    }
+    colorStopsStart = 1;
+  }
+  
+  const colorStopParts = parts.slice(colorStopsStart);
+  const gradientStops = parseColorStops(colorStopParts);
+  
+  // Create transform matrix for angular gradient with optional rotation
+  const rad = (startAngle * Math.PI) / 180;
+  const cos = Math.cos(rad);
+  const sin = Math.sin(rad);
+  
+  const gradientTransform: Transform = [
+    [cos, -sin, 0.5 - 0.5 * cos + 0.5 * sin],
+    [sin, cos, 0.5 - 0.5 * sin - 0.5 * cos],
+  ];
+
+  return {
+    type: 'GRADIENT_ANGULAR' as const,
+    gradientStops,
+    gradientTransform,
   };
 }
