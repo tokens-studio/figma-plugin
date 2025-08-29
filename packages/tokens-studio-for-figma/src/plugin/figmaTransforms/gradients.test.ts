@@ -365,3 +365,39 @@ describe('convertDegreeToNumber', () => {
     expect(convertDegreeToNumber('90deg')).toEqual(90);
   });
 });
+
+describe('Gradient anchor points preservation', () => {
+  it('should preserve exact anchor points from issue #2331', () => {
+    // This test case reproduces the issue where gradient anchor points change
+    // Original: linear-gradient(153.43deg, #AD00FF 0%, rgba(82, 255, 0, 0) 83.33%)
+    // Expected to maintain the same positioning when converted back
+    const originalGradient = 'linear-gradient(153.43deg, #AD00FF 0%, rgba(82, 255, 0, 0) 83.33%)';
+    const figmaGradient = convertStringToFigmaGradient(originalGradient);
+    
+    // Check that the positions are preserved correctly
+    expect(figmaGradient.gradientStops).toHaveLength(2);
+    expect(figmaGradient.gradientStops[0].position).toBeCloseTo(0, 4); // 0%
+    expect(figmaGradient.gradientStops[1].position).toBeCloseTo(0.8333, 4); // 83.33%
+    
+    // Convert back to string to verify round-trip preservation
+    const backToString = convertFigmaGradientToString({
+      type: 'GRADIENT_LINEAR',
+      gradientStops: figmaGradient.gradientStops,
+      gradientTransform: figmaGradient.gradientTransform,
+    });
+    
+    // The positions should be preserved (allowing for rounding)
+    expect(backToString).toMatch(/0%/);
+    expect(backToString).toMatch(/83\.33%/);
+  });
+
+  it('should handle gradients with negative anchor points', () => {
+    // Another case from the issue where gradients have negative positions
+    const gradientWithNegative = 'linear-gradient(136.98deg, #AD00FF -28.11%, rgba(82, 255, 0, 0) 123.5%)';
+    const figmaGradient = convertStringToFigmaGradient(gradientWithNegative);
+    
+    expect(figmaGradient.gradientStops).toHaveLength(2);
+    expect(figmaGradient.gradientStops[0].position).toBeCloseTo(-0.2811, 4); // -28.11%
+    expect(figmaGradient.gradientStops[1].position).toBeCloseTo(1.235, 4); // 123.5%
+  });
+});
