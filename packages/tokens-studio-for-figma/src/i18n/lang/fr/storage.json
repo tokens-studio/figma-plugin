@@ -68,7 +68,8 @@
       "apiToken": "Jeton API",
       "projectName": "Nom du projet (facultatif)",
       "repository": "Dépôt (espace de travail/dépôt)",
-      "username": "Email utilisateur"
+      "username": "Email utilisateur",
+      "usernameAppPassword": "Nom d'utilisateur"
     },
     "tokensstudio": {
       "name": "Name",

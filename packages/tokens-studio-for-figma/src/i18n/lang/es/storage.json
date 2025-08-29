@@ -68,7 +68,8 @@
       "apiToken": "Token de API",
       "projectName": "Nombre del proyecto (opcional)",
       "repository": "Repositorio (espacio de trabajo/repositorio)",
-      "username": "Email del usuario"
+      "username": "Email del usuario",
+      "usernameAppPassword": "Nombre de usuario"
     },
     "tokensstudio": {
       "name": "Name",

@@ -73,6 +73,7 @@
     },
     "bitbucket": {
       "username": "User Email",
+      "usernameAppPassword": "User Name",
       "apiToken": "API Token",
       "appPassword": "App Password",
       "projectName": "Project Name (optional)",

@@ -10,7 +10,6 @@ import { StorageTypeFormValues } from '@/types/StorageType';
 import { generateId } from '@/utils/generateId';
 import { ChangeEventHandler } from './types';
 import { ErrorMessage } from '../ErrorMessage';
-import { isUsingAppPassword } from '@/utils/bitbucketMigration';
 
 type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.BITBUCKET }>;
 type Props = {
@@ -96,7 +95,11 @@ export default function BitbucketForm({
           <Text muted>{t('nameHelpText')}</Text>
         </FormField>
         <FormField>
-          <Label htmlFor="name">{t('providers.bitbucket.username')}</Label>
+          <Label htmlFor="username">
+            {isEditingAppPasswordSync
+              ? t('providers.bitbucket.usernameAppPassword')
+              : t('providers.bitbucket.username')}
+          </Label>
           <TextInput
             value={values.username || ''}
             onChange={onChange}
@@ -191,10 +194,7 @@ export default function BitbucketForm({
             variant="primary"
             type="submit"
             disabled={
-              !values.name ||
-              (isNewSync && !values.apiToken) ||
-              (isEditingAppPasswordSync && !values.secret) ||
-              (!isEditingAppPasswordSync && !isNewSync && !values.apiToken)
+              !values.name || (isNewSync && !values.apiToken) || (isEditingAppPasswordSync && !values.secret) || (!isEditingAppPasswordSync && !isNewSync && !values.apiToken)
             }
           >
             {t('save')}
