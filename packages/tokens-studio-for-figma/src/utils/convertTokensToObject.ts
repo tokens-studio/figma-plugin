@@ -4,6 +4,7 @@ import { AnyTokenList, AnyTokenSet, GroupMetadataMap } from '@/types/tokens';
 import { getGroupTypeName } from './stringifyTokens';
 import removeTokenId from './removeTokenId';
 import { setTokenKey, FormatSensitiveTokenKeys } from './setTokenKey';
+import { injectGroupDescriptionsMultiSet } from './injectGroupDescriptions';
 
 export default function convertTokensToObject(
   tokens: Record<string, AnyTokenList>, 
@@ -46,22 +47,12 @@ export default function convertTokensToObject(
       }
     });
 
-    // Inject group descriptions at appropriate levels
-    if (groupMetadata) {
-      Object.entries(groupMetadata).forEach(([metadataKey, metadata]) => {
-        const [tokenSet, ...pathParts] = metadataKey.split('.');
-        if (tokenSet === key) {
-          // Remove the token set prefix to get the group path within this token set
-          const groupPath = pathParts.join('.');
-          // Set the $description at the group level
-          set(tokenGroupObj, `${groupPath}.${FormatSensitiveTokenKeys.DESCRIPTION}`, metadata.description);
-        }
-      });
-    }
-
     acc[key] = tokenGroupObj;
     return acc;
   }, {});
+
+  // Inject group descriptions using central utility
+  injectGroupDescriptionsMultiSet(tokenObj, groupMetadata);
 
   return tokenObj;
 }
