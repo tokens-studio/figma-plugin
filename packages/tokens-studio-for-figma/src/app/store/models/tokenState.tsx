@@ -765,7 +765,7 @@ export const tokenState = createModel<RootModel>()({
           });
         }
       }
-      
+
       // Update resolved tokens when a token is edited
       dispatch.tokenState.updateResolvedTokens(null);
     },
@@ -855,7 +855,7 @@ export const tokenState = createModel<RootModel>()({
       if (payload.shouldUpdate) {
         dispatch.tokenState.updateDocument();
       }
-      
+
       // Update resolved tokens when token data changes
       dispatch.tokenState.updateResolvedTokens(null);
     },
@@ -1138,9 +1138,9 @@ export const tokenState = createModel<RootModel>()({
         {},
         rootState.tokenState.activeTokenSet,
       );
-      
+
       const resolvedTokens = defaultTokenResolver.setTokens(mergedTokens);
-      
+
       // Identify token sets with broken references
       const brokenReferenceSets = new Set<string>();
       resolvedTokens.forEach((token) => {
@@ -1150,16 +1150,14 @@ export const tokenState = createModel<RootModel>()({
           if (nameParts.length > 1) {
             // Find which token set this token belongs to by checking against available token sets
             const tokenSets = Object.keys(rootState.tokenState.tokens);
-            const belongsToTokenSet = tokenSets.find(set => 
-              rootState.tokenState.tokens[set].some(t => t.name === token.name)
-            );
+            const belongsToTokenSet = tokenSets.find((set) => rootState.tokenState.tokens[set].some((t) => t.name === token.name));
             if (belongsToTokenSet) {
               brokenReferenceSets.add(belongsToTokenSet);
             }
           }
         }
       });
-      
+
       dispatch.tokenState.setResolvedTokens(resolvedTokens);
       dispatch.tokenState.setTokenSetsWithBrokenReferences(Array.from(brokenReferenceSets));
     },
