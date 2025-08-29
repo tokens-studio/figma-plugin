@@ -3,7 +3,6 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ToggleGroup, IconButton } from '@tokens-studio/ui';
-import { mergeTokenGroups } from '@/utils/tokenHelpers';
 import TokenListing from './TokenListing';
 import TokensBottomBar from './TokensBottomBar';
 import ToggleEmptyButton from './ToggleEmptyButton';
@@ -19,7 +18,7 @@ import useTokens from '../store/useTokens';
 import AttentionIcon from '@/icons/attention.svg';
 import { TokensContext } from '@/context';
 import {
-  activeTokenSetSelector, aliasBaseFontSizeSelector, manageThemesModalOpenSelector, scrollPositionSetSelector, showEditFormSelector, tokenFilterSelector, tokensSelector, tokenTypeSelector, usedTokenSetSelector,
+  activeTokenSetSelector, aliasBaseFontSizeSelector, manageThemesModalOpenSelector, scrollPositionSetSelector, showEditFormSelector, tokenFilterSelector, tokensSelector, tokenTypeSelector, usedTokenSetSelector, resolvedTokensSelector,
 } from '@/selectors';
 import { ThemeSelector } from './ThemeSelector';
 import { ManageThemesModal } from './ManageThemesModal';
@@ -27,7 +26,6 @@ import { activeTokensTabSelector } from '@/selectors/activeTokensTabSelector';
 import { stringTokensSelector } from '@/selectors/stringTokensSelector';
 import { getAliasValue } from '@/utils/alias';
 import SidebarIcon from '@/icons/sidebar.svg';
-import { defaultTokenResolver } from '@/utils/TokenResolver';
 import { tokenFormatSelector } from '@/selectors/tokenFormatSelector';
 import { IconJson } from '@/icons';
 
@@ -110,12 +108,13 @@ function Tokens({ isActive }: { isActive: boolean }) {
     }
   }, [activeTokenSet]);
 
-  const resolvedTokens = React.useMemo(
-    () => defaultTokenResolver.setTokens(mergeTokenGroups(tokens, usedTokenSet, {}, activeTokenSet)),
-    [tokens, usedTokenSet, activeTokenSet],
-  );
-
+  const resolvedTokens = useSelector(resolvedTokensSelector);
   const tokenType = useSelector(tokenTypeSelector);
+
+  // Trigger resolved tokens update when dependencies change
+  React.useEffect(() => {
+    dispatch.tokenState.updateResolvedTokens(null);
+  }, [tokens, usedTokenSet, activeTokenSet, dispatch]);
 
   const [error, setError] = React.useState<string | null>(null);
 
