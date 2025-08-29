@@ -57,7 +57,8 @@
 "styles": {
   "color": "Color",
   "typography": "Typography",
-  "effects": "Effects"
+  "effects": "Effects",
+  "gradients": "Gradients"
 },
 "exportThemesTab": {
   "headingPro": "Create themes to get started",

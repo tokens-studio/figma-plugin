@@ -71,6 +71,7 @@ export type SavedSettings = {
   stylesColor: boolean;
   stylesTypography: boolean;
   stylesEffect: boolean;
+  stylesGradient: boolean;
   ignoreFirstPartForStyles: boolean;
   createStylesWithVariableReferences: boolean;
   prefixStylesWithThemeName: boolean;
@@ -102,6 +103,7 @@ export function notifyUISettings(
     stylesColor,
     stylesTypography,
     stylesEffect,
+    stylesGradient,
     ignoreFirstPartForStyles,
     createStylesWithVariableReferences,
     prefixStylesWithThemeName,
@@ -138,6 +140,7 @@ export function notifyUISettings(
       stylesColor,
       stylesEffect,
       stylesTypography,
+      stylesGradient,
       ignoreFirstPartForStyles,
       createStylesWithVariableReferences,
       prefixStylesWithThemeName,
