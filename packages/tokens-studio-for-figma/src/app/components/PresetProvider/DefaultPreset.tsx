@@ -6,24 +6,26 @@ import {
 import { Dispatch } from '@/app/store';
 import { track } from '@/utils/analytics';
 import { AVAILABLE_PRESETS } from '@/config/presets';
+import defaultJSON from '@/config/default.json';
+import minimalJSON from '@/config/minimal.json';
+import materialJSON from '@/config/material.json';
+import modernJSON from '@/config/modern.json';
+import parseTokenValues from '@/utils/parseTokenValues';
+import { SetTokenDataPayload } from '@/types/payloads';
+import { TokenSetStatus } from '@/constants/TokenSetStatus';
 
 type Props = {
   onCancel: () => void;
 };
 
-// Helper function to set up a preset before loading
-const loadSelectedPreset = (dispatch: Dispatch, presetFileName: string) => {
-  // For now, we'll use setDefaultTokens and implement preset selection via a different approach
-  // Store the selected preset fileName in localStorage for the setDefaultTokens effect to use
-  if (typeof window !== 'undefined') {
-    window.localStorage.setItem('selectedPreset', presetFileName);
-  }
-  dispatch.tokenState.setDefaultTokens();
-  // Clean up after loading
-  if (typeof window !== 'undefined') {
-    window.localStorage.removeItem('selectedPreset');
-  }
-};
+const presetData = {
+  'default.json': defaultJSON,
+  'minimal.json': minimalJSON,
+  'material.json': materialJSON,
+  'modern.json': modernJSON,
+} as const;
+
+
 
 export default function DefaultPreset({ onCancel }: Props) {
   const dispatch = useDispatch<Dispatch>();
@@ -31,7 +33,32 @@ export default function DefaultPreset({ onCancel }: Props) {
 
   const handleSetDefault = React.useCallback(() => {
     track('Load preset', { preset: selectedPreset.id });
-    loadSelectedPreset(dispatch, selectedPreset.fileName);
+    
+    // Get the selected preset data
+    const selectedPresetData = presetData[selectedPreset.fileName as keyof typeof presetData] || defaultJSON;
+    
+    // Determine which token sets are available in the preset
+    const availableTokenSets = Object.keys(selectedPresetData);
+    const usedTokenSet: Record<string, TokenSetStatus> = {};
+    
+    // Set the first token set as SOURCE and others as ENABLED
+    availableTokenSets.forEach((setName, index) => {
+      usedTokenSet[setName] = index === 0 ? TokenSetStatus.SOURCE : TokenSetStatus.ENABLED;
+    });
+
+    // Load the preset tokens directly
+    dispatch.tokenState.setTokenData({
+      values: parseTokenValues(selectedPresetData as unknown as SetTokenDataPayload['values']),
+      themes: [],
+      activeTheme: {},
+      usedTokenSet,
+    });
+
+    dispatch.tokenState.updateDocument({
+      shouldUpdateNodes: false,
+      updateRemote: false,
+    });
+    
     onCancel();
   }, [dispatch, onCancel, selectedPreset]);
 
