@@ -279,8 +279,18 @@ export function useGenericVersionedStorage() {
             tokenSetOrder: Object.keys(content.tokens),
           },
         });
+        // Clean up themes to match the format used in comparison (remove disabled token sets)
+        const cleanedThemes = content.themes.map((theme) => ({
+          ...theme,
+          selectedTokenSets: Object.fromEntries(
+            Object.entries(theme.selectedTokenSets).filter(
+              ([setName, status]) => Object.keys(content.tokens).includes(setName) && status !== 'disabled',
+            ),
+          ),
+        }));
+
         const stringifiedRemoteTokens = JSON.stringify(
-          compact([content.tokens, content.themes, TokenFormat.format]),
+          compact([content.tokens, cleanedThemes, TokenFormat.format]),
           null,
           2,
         );

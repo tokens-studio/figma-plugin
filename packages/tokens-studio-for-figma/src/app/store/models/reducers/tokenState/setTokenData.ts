@@ -36,7 +36,20 @@ export function setTokenData(state: TokenState, payload: SetTokenDataPayload): T
   const tokenValues = Array.isArray(payload.values) ? payload.values : removeIdPropertyFromTokens(payload.values);
 
   // When the remote data has changed, we will update the last synced state
-  const lastSyncedState = payload.hasChangedRemote ? JSON.stringify(compact([tokenValues, payload.themes, TokenFormat.format]), null, 2) : state.lastSyncedState;
+  const lastSyncedState = payload.hasChangedRemote
+    ? (() => {
+      // Clean up themes to match the format used in comparison (remove disabled token sets)
+      const cleanedThemes = (payload.themes ?? []).map((theme) => ({
+        ...theme,
+        selectedTokenSets: Object.fromEntries(
+          Object.entries(theme.selectedTokenSets).filter(
+            ([setName, status]) => allAvailableTokenSets.includes(setName) && status !== 'disabled',
+          ),
+        ),
+      }));
+      return JSON.stringify(compact([tokenValues, cleanedThemes, TokenFormat.format]), null, 2);
+    })()
+    : state.lastSyncedState;
 
   // @README (1) for the sake of normalization we will set the DISABLED status for all available token sets
   // this way we can always be certain the status is available. This behavior is also reflected in the createTokenSet logic

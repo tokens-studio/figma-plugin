@@ -72,7 +72,17 @@ export default function useURL() {
             themes: content.themes,
             metadata: content.metadata,
           });
-          const stringifiedRemoteTokens = JSON.stringify(compact([applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder), content.themes, TokenFormat.format]), null, 2);
+          // Clean up themes to match the format used in comparison (remove disabled token sets)
+          const cleanedThemes = content.themes.map((theme) => ({
+            ...theme,
+            selectedTokenSets: Object.fromEntries(
+              Object.entries(theme.selectedTokenSets).filter(
+                ([setName, status]) => Object.keys(content.tokens).includes(setName) && status !== 'disabled',
+              ),
+            ),
+          }));
+
+          const stringifiedRemoteTokens = JSON.stringify(compact([applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder), cleanedThemes, TokenFormat.format]), null, 2);
           dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
           dispatch.tokenState.setEditProhibited(true);
           return content;

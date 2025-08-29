@@ -103,7 +103,17 @@ export function useGitLab() {
         });
         const branches = await storage.fetchBranches();
         dispatch.branchState.setBranches(branches);
-        const stringifiedRemoteTokens = JSON.stringify(compact([tokens, themes, TokenFormat.format]), null, 2);
+        // Clean up themes to match the format used in comparison (remove disabled token sets)
+        const cleanedThemes = themes.map((theme) => ({
+          ...theme,
+          selectedTokenSets: Object.fromEntries(
+            Object.entries(theme.selectedTokenSets).filter(
+              ([setName, status]) => Object.keys(tokens).includes(setName) && status !== 'disabled',
+            ),
+          ),
+        }));
+
+        const stringifiedRemoteTokens = JSON.stringify(compact([tokens, cleanedThemes, TokenFormat.format]), null, 2);
         dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
         pushDialog({ state: 'success' });
         return {
@@ -244,7 +254,17 @@ export function useGitLab() {
               themes: content.themes,
               metadata: content.metadata,
             });
-            const stringifiedRemoteTokens = JSON.stringify(compact([content.tokens, content.themes, TokenFormat.format]), null, 2);
+            // Clean up themes to match the format used in comparison (remove disabled token sets)
+            const cleanedThemes = content.themes.map((theme) => ({
+              ...theme,
+              selectedTokenSets: Object.fromEntries(
+                Object.entries(theme.selectedTokenSets).filter(
+                  ([setName, status]) => Object.keys(content.tokens).includes(setName) && status !== 'disabled',
+                ),
+              ),
+            }));
+
+            const stringifiedRemoteTokens = JSON.stringify(compact([content.tokens, cleanedThemes, TokenFormat.format]), null, 2);
             dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
             dispatch.tokenState.setCollapsedTokenSets([]);
             dispatch.uiState.setApiData({ ...context, ...(latestCommitDate ? { commitDate: latestCommitDate } : {}) });
