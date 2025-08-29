@@ -21,9 +21,8 @@ import { Dispatch } from '../../store';
 import { collapsedTokensSelector } from '@/selectors/collapsedTokensSelector';
 import { ShowNewFormOptions } from '@/types';
 import useTokens from '../../store/useTokens';
-import RenameTokenGroupModal from '../modals/RenameTokenGroupModal';
 import DuplicateTokenGroupModal from '../modals/DuplicateTokenGroupModal';
-import { EditGroupDescriptionModal } from '../modals/EditGroupDescriptionModal';
+import { EditTokenGroupModal } from '../modals/EditTokenGroupModal';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { useGenerateDocumentation } from '@/app/hooks/useGenerateDocumentation';
 import ProBadge from '../ProBadge';
@@ -44,9 +43,8 @@ export function TokenGroupHeading({ label, path, id, type, showNewForm }: Props)
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const groupDescription = useSelector(getGroupDescriptionSelector(activeTokenSet, path));
   const [newTokenGroupName, setNewTokenGroupName] = React.useState<string>(path);
-  const [showRenameTokenGroupModal, setShowRenameTokenGroupModal] = React.useState<boolean>(false);
   const [showDuplicateTokenGroupModal, setShowDuplicateTokenGroupModal] = React.useState<boolean>(false);
-  const [showEditDescriptionModal, setShowEditDescriptionModal] = React.useState<boolean>(false);
+  const [showEditTokenGroupModal, setShowEditTokenGroupModal] = React.useState<boolean>(false);
   const { deleteGroup, renameGroup } = useManageTokens();
   const dispatch = useDispatch<Dispatch>();
   const collapsed = useSelector(collapsedTokensSelector);
@@ -65,44 +63,33 @@ export function TokenGroupHeading({ label, path, id, type, showNewForm }: Props)
     deleteGroup(path, type);
   }, [deleteGroup, path, type]);
 
-  const handleRename = React.useCallback(() => {
-    setNewTokenGroupName(path);
-    setShowRenameTokenGroupModal(true);
-  }, [path]);
+  const handleEdit = React.useCallback(() => {
+    setShowEditTokenGroupModal(true);
+  }, []);
 
-  const handleRenameTokenGroupSubmit = React.useCallback(
-    async (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      const tokensToRename = await renameGroup(path, newTokenGroupName, type);
+  const handleEditTokenGroupModalClose = React.useCallback(() => {
+    setShowEditTokenGroupModal(false);
+  }, []);
+
+  const handleRenameFromEditModal = React.useCallback(
+    async (oldName: string, newName: string) => {
+      const tokensToRename = await renameGroup(oldName, newName, type);
       await remapTokensInGroup({
-        oldGroupName: `${path}.`,
-        newGroupName: `${newTokenGroupName}.`,
+        oldGroupName: `${oldName}.`,
+        newGroupName: `${newName}.`,
         type,
         tokensToRename,
       });
-      setShowRenameTokenGroupModal(false);
     },
-    [newTokenGroupName, path, renameGroup, type, remapTokensInGroup],
+    [renameGroup, type, remapTokensInGroup],
   );
-
-  const handleNewTokenGroupNameChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewTokenGroupName(e.target.value);
-  }, []);
-
-  const handleRenameTokenGroupModalClose = React.useCallback(() => {
-    setShowRenameTokenGroupModal(false);
-  }, []);
 
   const handleDuplicateTokenGroupModalClose = React.useCallback(() => {
     setShowDuplicateTokenGroupModal(false);
   }, []);
 
-  const handleEditDescription = React.useCallback(() => {
-    setShowEditDescriptionModal(true);
-  }, []);
-
-  const handleEditDescriptionModalClose = React.useCallback(() => {
-    setShowEditDescriptionModal(false);
+  const handleNewTokenGroupNameChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewTokenGroupName(e.target.value);
   }, []);
 
   const handleDuplicate = React.useCallback(() => {
@@ -138,13 +125,10 @@ export function TokenGroupHeading({ label, path, id, type, showNewForm }: Props)
               </ContextMenu.Trigger>
               <ContextMenu.Portal>
                 <ContextMenu.Content>
-                  <ContextMenu.Item disabled={!canEdit} onSelect={handleEditDescription}>
-                    Edit Description
+                  <ContextMenu.Item disabled={!canEdit} onSelect={handleEdit}>
+                    {t('edit')}
                   </ContextMenu.Item>
                   <ContextMenu.Separator />
-                  <ContextMenu.Item disabled={!canEdit} onSelect={handleRename}>
-                    {t('rename')}
-                  </ContextMenu.Item>
                   <ContextMenu.Item disabled={!canEdit} onSelect={handleDuplicate}>
                     {t('duplicate')}
                   </ContextMenu.Item>
@@ -178,16 +162,6 @@ export function TokenGroupHeading({ label, path, id, type, showNewForm }: Props)
           )}
         </Stack>
 
-        <RenameTokenGroupModal
-          isOpen={showRenameTokenGroupModal}
-          newName={newTokenGroupName}
-          oldName={path}
-          onClose={handleRenameTokenGroupModalClose}
-          handleRenameTokenGroupSubmit={handleRenameTokenGroupSubmit}
-          handleNewTokenGroupNameChange={handleNewTokenGroupNameChange}
-          type={type}
-        />
-
         <DuplicateTokenGroupModal
           isOpen={showDuplicateTokenGroupModal}
           type={type}
@@ -197,12 +171,14 @@ export function TokenGroupHeading({ label, path, id, type, showNewForm }: Props)
           handleNewTokenGroupNameChange={handleNewTokenGroupNameChange}
         />
 
-        <EditGroupDescriptionModal
-          isOpen={showEditDescriptionModal}
-          onClose={handleEditDescriptionModalClose}
+        <EditTokenGroupModal
+          isOpen={showEditTokenGroupModal}
+          onClose={handleEditTokenGroupModalClose}
           groupPath={path}
           tokenSet={activeTokenSet}
+          type={type}
           currentDescription={groupDescription}
+          onRename={handleRenameFromEditModal}
         />
 
         <StyledTokenGroupAddIcon
