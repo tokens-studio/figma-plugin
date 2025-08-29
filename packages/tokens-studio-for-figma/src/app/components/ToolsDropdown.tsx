@@ -7,6 +7,7 @@ import { FileZipIcon } from '@primer/octicons-react';
 import { editProhibitedSelector } from '@/selectors';
 import PresetModal from './modals/PresetModal';
 import ExportModal from './modals/ExportModal';
+import AIHelperModal from './modals/AIHelperModal';
 
 export default function ToolsDropdown() {
   const editProhibited = useSelector(editProhibitedSelector);
@@ -15,6 +16,7 @@ export default function ToolsDropdown() {
 
   const [presetModalVisible, showPresetModal] = React.useState(false);
   const [exportModalVisible, showExportModal] = React.useState(false);
+  const [aiHelperModalVisible, showAIHelperModal] = React.useState(false);
 
   const handleCloseExportModal = useCallback(() => {
     showExportModal(false);
@@ -29,6 +31,13 @@ export default function ToolsDropdown() {
   }, []);
   const handleShowExportModal = useCallback(() => {
     showExportModal(true);
+  }, []);
+
+  const handleCloseAIHelperModal = useCallback(() => {
+    showAIHelperModal(false);
+  }, []);
+  const handleShowAIHelperModal = useCallback(() => {
+    showAIHelperModal(true);
   }, []);
 
   return (
@@ -46,11 +55,16 @@ export default function ToolsDropdown() {
             <DropdownMenu.Item disabled={editProhibited} onSelect={handleShowExportModal}>
               {t('exportToFile')}
             </DropdownMenu.Item>
+            <DropdownMenu.Separator />
+            <DropdownMenu.Item disabled={editProhibited} onSelect={handleShowAIHelperModal}>
+              {t('aiHelper')}
+            </DropdownMenu.Item>
           </DropdownMenu.Content>
         </DropdownMenu.Portal>
       </DropdownMenu>
       {exportModalVisible && <ExportModal onClose={handleCloseExportModal} />}
       {presetModalVisible && <PresetModal onClose={handleClosePresetModal} />}
+      {aiHelperModalVisible && <AIHelperModal onClose={handleCloseAIHelperModal} />}
     </>
   );
 }
