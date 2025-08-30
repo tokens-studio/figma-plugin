@@ -157,7 +157,6 @@ export type PullVariablesAsyncMessage = AsyncMessage<AsyncMessageTypes.PULL_VARI
 }>;
 export type PullVariablesMessageResult = AsyncMessage<AsyncMessageTypes.PULL_VARIABLES>;
 
-
 export type NotifyAsyncMessage = AsyncMessage<AsyncMessageTypes.NOTIFY, {
   msg: string;
   opts: {

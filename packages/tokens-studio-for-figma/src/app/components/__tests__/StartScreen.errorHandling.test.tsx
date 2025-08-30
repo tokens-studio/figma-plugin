@@ -35,7 +35,7 @@ describe('StartScreen Error Handling', () => {
     render(
       <Provider store={store}>
         <StartScreen />
-      </Provider>
+      </Provider>,
     );
 
     // Should show the specific parsing error message
@@ -76,7 +76,7 @@ describe('StartScreen Error Handling', () => {
     render(
       <Provider store={store}>
         <StartScreen />
-      </Provider>
+      </Provider>,
     );
 
     // Should show the centralized credential error message
@@ -105,7 +105,7 @@ describe('StartScreen Error Handling', () => {
     render(
       <Provider store={store}>
         <StartScreen />
-      </Provider>
+      </Provider>,
     );
 
     // Should show the centralized connectivity error message
@@ -133,7 +133,7 @@ describe('StartScreen Error Handling', () => {
     render(
       <Provider store={store}>
         <StartScreen />
-      </Provider>
+      </Provider>,
     );
 
     // Should show the specific error message
@@ -159,7 +159,7 @@ describe('StartScreen Error Handling', () => {
     render(
       <Provider store={store}>
         <StartScreen />
-      </Provider>
+      </Provider>,
     );
 
     // Should show the default error message
