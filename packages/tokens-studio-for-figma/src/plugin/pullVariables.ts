@@ -95,7 +95,6 @@ export default async function pullVariables(options: PullVariablesOptions, theme
     }
 
     const variableName = normalizeVariableName(variable.name);
-    console.log('Varname', varable);
     try {
       switch (variable.resolvedType) {
         case 'COLOR':
