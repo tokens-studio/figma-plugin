@@ -1,6 +1,6 @@
 {
-  "name": "Tokens Studio for Figma: Beta - 2.0",
-  "id": "843461159747178978",
+  "name": "Tokens Studio for Figma: Variable Scopes & Code Syntax",
+  "id": "924651847392156789",
   "api": "1.0.0",
   "main": "dist/code.js",
   "ui": "dist/index.html",

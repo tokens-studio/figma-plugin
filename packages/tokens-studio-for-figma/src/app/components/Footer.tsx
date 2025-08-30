@@ -154,9 +154,14 @@ export default function Footer() {
           ) : null}
       </Stack>
       <Stack direction="row" gap={4} align="center">
-        <Box css={{ color: '$fgMuted', fontSize: '$xsmall' }}>
-          <a href="https://tokens.studio/changelog" target="_blank" rel="noreferrer">{`V ${pjs.version}`}</a>
-        </Box>
+        <Stack direction="column" gap={1} align="end">
+          <Box css={{ color: '$fgMuted', fontSize: '$xsmall' }}>
+            <a href="https://tokens.studio/changelog" target="_blank" rel="noreferrer">{`V ${pjs.version}`}</a>
+          </Box>
+          <Box css={{ color: '$fgMuted', fontSize: '$xxs', opacity: 0.7 }}>
+            Figma Variable Scopes & Code Syntax - Dev Build 2025-01-27 10:34 UTC
+          </Box>
+        </Stack>
         <Stack direction="row" gap={1}>
           <ProBadge campaign="footer" />
           <IconButton

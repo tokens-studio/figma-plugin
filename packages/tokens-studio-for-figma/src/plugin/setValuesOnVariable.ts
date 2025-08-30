@@ -48,6 +48,33 @@ export default async function setValuesOnVariable(
         }
         variable.description = token.description ?? '';
 
+        // Set variable scopes if defined in token extensions
+        const figmaExtensions = token.$extensions?.['com.figma'];
+        if (figmaExtensions?.scopes && Array.isArray(figmaExtensions.scopes)) {
+          try {
+            variable.scopes = figmaExtensions.scopes as VariableScope[];
+          } catch (e) {
+            console.error('Failed to set variable scopes:', e);
+          }
+        }
+
+        // Set variable code syntax if defined in token extensions
+        if (figmaExtensions?.codeSyntax && typeof figmaExtensions.codeSyntax === 'object') {
+          try {
+            Object.entries(figmaExtensions.codeSyntax).forEach(([platform, syntax]) => {
+              if (typeof syntax === 'string' && syntax.trim()) {
+                // Map our platform names to Figma's expected values
+                const figmaPlatform = platform === 'Web' ? 'WEB' : 
+                                     platform === 'Android' ? 'ANDROID' : 
+                                     platform === 'iOS' ? 'iOS' : platform;
+                variable.setVariableCodeSyntax(figmaPlatform as 'WEB' | 'ANDROID' | 'iOS', syntax);
+              }
+            });
+          } catch (e) {
+            console.error('Failed to set variable code syntax:', e);
+          }
+        }
+
         switch (variableType) {
           case 'BOOLEAN':
             if (typeof token.value === 'string' && !token.value.includes('{')) {
