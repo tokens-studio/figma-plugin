@@ -4,5 +4,10 @@
   "cancel": "Cancelar",
   "createNewBranch": "Crear nueva sucursal desde",
   "currentChanges": "Cambios actuales",
-  "unSavedChanges": "Tiene cambios sin guardar"
+  "unSavedChanges": "Tiene cambios sin guardar",
+  "createNew": "Crear nuevo",
+  "search": "Buscar...",
+  "noBranchesFound": "No se encontraron ramas",
+  "branchingProFeature": "La gestión de ramas es una función de la suscripción Pro",
+  "upgradeToPro": "Actualice a Pro para crear y cambiar ramas"
 }

@@ -23,6 +23,7 @@ import { RenameVariableToken } from '@/app/store/models/reducers/tokenState';
 import { UpdateTokenVariablePayload } from './payloads/UpdateTokenVariablePayload';
 import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 import { ExportTokenSet } from './ExportTokenSet';
+import type { VariableCollectionInfo } from './VariableCollectionSelection';
 
 export enum AsyncMessageTypes {
   // the below messages are going from UI to plugin
@@ -62,6 +63,7 @@ export enum AsyncMessageTypes {
   REMOVE_RELAUNCH_DATA = 'async/remove-relaunch-data',
   SET_VARIABLE_EXPORT_SETTINGS = 'async/set-variable-export-settings',
   SET_SELECTED_EXPORT_THEMES = 'async/set-selected-export-themes',
+  CREATE_LIVING_DOCUMENTATION = 'async/create-living-documentation',
   // the below messages are going from plugin to UI
   STARTUP = 'async/startup',
   GET_THEME_INFO = 'async/get-theme-info',
@@ -75,6 +77,7 @@ export enum AsyncMessageTypes {
   UPDATE_VARIABLES = 'async/update-variables',
   SET_INITIAL_LOAD = 'async/set-initial-load',
   PREVIEW_REQUEST_STARTUP = 'async/preview-request-startup',
+  GET_AVAILABLE_VARIABLE_COLLECTIONS = 'async/get-available-variable-collections',
 }
 
 export type AsyncMessage<T extends AsyncMessageTypes, P = unknown> = P & { type: T };
@@ -184,6 +187,14 @@ export type CreateAnnotationAsyncMessage = AsyncMessage<AsyncMessageTypes.CREATE
 }>;
 export type CreateAnnotationAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_ANNOTATION>;
 
+export type CreateLivingDocumentationAsyncMessage = AsyncMessage<AsyncMessageTypes.CREATE_LIVING_DOCUMENTATION, {
+  tokenSet: string;
+  startsWith: string;
+  applyTokens: boolean;
+  resolvedTokens: AnyTokenList;
+}>;
+export type CreateLivingDocumentationAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_LIVING_DOCUMENTATION>;
+
 export type CreateStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.CREATE_STYLES, {
   tokens: AnyTokenList;
   sourceTokens: AnyTokenList;
@@ -281,6 +292,12 @@ export type GetFigmaFontsMessage = AsyncMessage<AsyncMessageTypes.GET_FIGMA_FONT
 export type GetFigmaFontsMessageResult = AsyncMessage<AsyncMessageTypes.GET_FIGMA_FONTS, {
   fonts: Array<Font>
 }>;
+
+export type GetAvailableVariableCollectionsMessage = AsyncMessage<AsyncMessageTypes.GET_AVAILABLE_VARIABLE_COLLECTIONS>;
+export type GetAvailableVariableCollectionsMessageResult = AsyncMessage<AsyncMessageTypes.GET_AVAILABLE_VARIABLE_COLLECTIONS, {
+  collections: VariableCollectionInfo[]
+}>;
+
 export type RemoveStylesWithoutConnectionMessage = AsyncMessage<AsyncMessageTypes.REMOVE_STYLES_WITHOUT_CONNECTION, {
   usedStyleIds: string[]
 }>;
@@ -395,6 +412,7 @@ export type AsyncMessages =
   | SetShowEmptyGroupsAsyncMessage
   | SetUiAsyncMessage
   | CreateAnnotationAsyncMessage
+  | CreateLivingDocumentationAsyncMessage
   | UpdateAsyncMessage
   | UpdateCheckForChangesAsyncMessage
   | GetThemeInfoMessage
@@ -405,6 +423,7 @@ export type AsyncMessages =
   | ResolveStyleInfo
   | SetNoneValuesOnNodeAsyncMessage
   | GetFigmaFontsMessage
+  | GetAvailableVariableCollectionsMessage
   | SetAuthDataMessage
   | SetUsedEmailMessage
   | CreateLocalVariablesAsyncMessage
@@ -445,6 +464,7 @@ export type AsyncMessageResults =
   | SetShowEmptyGroupsAsyncMessageResult
   | SetUiAsyncMessageResult
   | CreateAnnotationAsyncMessageResult
+  | CreateLivingDocumentationAsyncMessageResult
   | UpdateAsyncMessageResult
   | UpdateCheckForChangesAsyncMessageResult
   | GetThemeInfoMessageResult
@@ -455,6 +475,7 @@ export type AsyncMessageResults =
   | ResolveStyleInfoResult
   | SetNoneValuesOnNodeAsyncMessageResult
   | GetFigmaFontsMessageResult
+  | GetAvailableVariableCollectionsMessageResult
   | SetAuthDataMessageResult
   | SetUsedEmailMessageResult
   | CreateLocalVariablesAsyncMessageResult

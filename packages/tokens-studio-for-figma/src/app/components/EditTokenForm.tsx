@@ -418,7 +418,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
       if (internalEditToken.initialName !== name && internalEditToken.initialName) {
         oldName = internalEditToken.initialName;
       }
-      const trimmedValue = trimValue(value);
+      const trimmedValue = trimValue(value, type);
       const newName = name
         .split('/')
         .map((n) => n.trim())
@@ -664,7 +664,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
         return (
           <div>
             <DownshiftInput
-              value={internalEditToken.value}
+              value={typeof internalEditToken.value === 'number' ? String(internalEditToken.value) : internalEditToken.value}
               type={internalEditToken.type}
               label={internalEditToken.schema?.property}
               resolvedTokens={resolvedTokens}
