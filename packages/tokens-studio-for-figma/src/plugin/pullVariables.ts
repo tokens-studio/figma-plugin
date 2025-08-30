@@ -48,12 +48,12 @@ export default async function pullVariables(options: PullVariablesOptions, theme
 
   const createFigmaExtensions = (variable: Variable) => {
     const extensions: any = {};
-    
+
     // Add scopes if they exist and are not default
     if (variable.scopes && variable.scopes.length > 0) {
       extensions.scopes = variable.scopes;
     }
-    
+
     // Add code syntax if it exists
     const codeSyntax: Record<string, string> = {};
     try {
@@ -62,18 +62,18 @@ export default async function pullVariables(options: PullVariablesOptions, theme
       const webSyntax = variableAny.codeSyntax?.WEB;
       const androidSyntax = variableAny.codeSyntax?.ANDROID;
       const iosSyntax = variableAny.codeSyntax?.iOS;
-      
+
       if (webSyntax) codeSyntax.Web = webSyntax;
       if (androidSyntax) codeSyntax.Android = androidSyntax;
       if (iosSyntax) codeSyntax.iOS = iosSyntax;
-      
+
       if (Object.keys(codeSyntax).length > 0) {
         extensions.codeSyntax = codeSyntax;
       }
     } catch (e) {
       // Ignore errors accessing codeSyntax - it might not be available
     }
-    
+
     return Object.keys(extensions).length > 0 ? { 'com.figma': extensions } : undefined;
   };
 
@@ -95,6 +95,7 @@ export default async function pullVariables(options: PullVariablesOptions, theme
     }
 
     const variableName = normalizeVariableName(variable.name);
+    console.log('Varname', varable);
     try {
       switch (variable.resolvedType) {
         case 'COLOR':
@@ -119,11 +120,6 @@ export default async function pullVariables(options: PullVariablesOptions, theme
                 ...(variable.description ? { description: variable.description } : {}),
                 ...(figmaExtensions ? { $extensions: figmaExtensions } : {}),
               };
-              console.log('=== COLOR TOKEN DEBUG ===');
-              console.log('Variable name:', variable.name);
-              console.log('figmaExtensions:', figmaExtensions);
-              console.log('Final token:', token);
-              console.log('=== END COLOR TOKEN DEBUG ===');
               colors.push(token);
             }
           });
@@ -148,11 +144,6 @@ export default async function pullVariables(options: PullVariablesOptions, theme
               ...(variable.description ? { description: variable.description } : {}),
               ...(figmaExtensions ? { $extensions: figmaExtensions } : {}),
             };
-            console.log('=== BOOLEAN TOKEN DEBUG ===');
-            console.log('Variable name:', variable.name);
-            console.log('figmaExtensions:', figmaExtensions);
-            console.log('Final token:', token);
-            console.log('=== END BOOLEAN TOKEN DEBUG ===');
             booleans.push(token);
           });
           break;
@@ -349,18 +340,6 @@ export default async function pullVariables(options: PullVariablesOptions, theme
       }
       return acc;
     }, {});
-    
-    console.log('=== PROCESSED TOKENS DEBUG ===');
-    console.log('processedTokens:', processedTokens);
-    // Log first few tokens to see if extensions are still there
-    if (processedTokens.colors?.length > 0) {
-      console.log('First color token:', processedTokens.colors[0]);
-    }
-    if (processedTokens.booleans?.length > 0) {
-      console.log('First boolean token:', processedTokens.booleans[0]);
-    }
-    console.log('=== END PROCESSED TOKENS DEBUG ===');
-    
     notifyVariableValues(
       processedTokens,
       themesToCreate,
