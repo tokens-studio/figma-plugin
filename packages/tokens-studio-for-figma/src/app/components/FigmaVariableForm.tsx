@@ -1,5 +1,4 @@
 import React, { useCallback, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
 import {
   IconButton, Heading, Checkbox, Text, Stack, Label,
 } from '@tokens-studio/ui';
@@ -9,6 +8,7 @@ import { EditTokenObject } from '@/types/tokens';
 import Box from './Box';
 import Input from './Input';
 import { tokenTypesToCreateVariable } from '@/constants/VariableTypes';
+import { TokenTypes } from '@/constants/TokenTypes';
 
 type VariableScope = 'ALL_SCOPES' | 'TEXT_CONTENT' | 'CORNER_RADIUS' | 'WIDTH_HEIGHT' | 'GAP' | 'OPACITY' | 'STROKE_FLOAT' | 'EFFECT_FLOAT' | 'FONT_WEIGHT' | 'FONT_SIZE' | 'LINE_HEIGHT' | 'LETTER_SPACING' | 'PARAGRAPH_SPACING' | 'PARAGRAPH_INDENT' | 'ALL_FILLS' | 'FRAME_FILL' | 'SHAPE_FILL' | 'TEXT_FILL' | 'STROKE_COLOR' | 'EFFECT_COLOR' | 'FONT_FAMILY' | 'FONT_STYLE';
 type CodeSyntaxPlatform = 'Web' | 'Android' | 'iOS';
@@ -38,6 +38,61 @@ const variableScopeOptions: { value: VariableScope; label: string }[] = [
   { value: 'FONT_STYLE', label: 'Font style' },
 ];
 
+// Map token types to relevant variable scopes
+const tokenTypeToScopesMap: Record<string, VariableScope[]> = {
+  [TokenTypes.COLOR]: [
+    'ALL_SCOPES', 'ALL_FILLS', 'FRAME_FILL', 'SHAPE_FILL', 'TEXT_FILL', 'STROKE_COLOR', 'EFFECT_COLOR',
+  ],
+  [TokenTypes.BORDER_RADIUS]: [
+    'ALL_SCOPES', 'CORNER_RADIUS',
+  ],
+  [TokenTypes.SIZING]: [
+    'ALL_SCOPES', 'WIDTH_HEIGHT', 'GAP',
+  ],
+  [TokenTypes.SPACING]: [
+    'ALL_SCOPES', 'WIDTH_HEIGHT', 'GAP',
+  ],
+  [TokenTypes.DIMENSION]: [
+    'ALL_SCOPES', 'WIDTH_HEIGHT', 'GAP', 'CORNER_RADIUS',
+  ],
+  [TokenTypes.BORDER_WIDTH]: [
+    'ALL_SCOPES', 'STROKE_FLOAT',
+  ],
+  [TokenTypes.OPACITY]: [
+    'ALL_SCOPES', 'OPACITY',
+  ],
+  [TokenTypes.FONT_FAMILIES]: [
+    'ALL_SCOPES', 'FONT_FAMILY',
+  ],
+  [TokenTypes.FONT_WEIGHTS]: [
+    'ALL_SCOPES', 'FONT_WEIGHT',
+  ],
+  [TokenTypes.FONT_SIZES]: [
+    'ALL_SCOPES', 'FONT_SIZE',
+  ],
+  [TokenTypes.LINE_HEIGHTS]: [
+    'ALL_SCOPES', 'LINE_HEIGHT',
+  ],
+  [TokenTypes.LETTER_SPACING]: [
+    'ALL_SCOPES', 'LETTER_SPACING',
+  ],
+  [TokenTypes.PARAGRAPH_SPACING]: [
+    'ALL_SCOPES', 'PARAGRAPH_SPACING',
+  ],
+  [TokenTypes.PARAGRAPH_INDENT]: [
+    'ALL_SCOPES', 'PARAGRAPH_INDENT',
+  ],
+  [TokenTypes.TEXT]: [
+    'ALL_SCOPES', 'TEXT_CONTENT',
+  ],
+  [TokenTypes.BOOLEAN]: [
+    'ALL_SCOPES',
+  ],
+  [TokenTypes.NUMBER]: [
+    'ALL_SCOPES', 'WIDTH_HEIGHT', 'GAP', 'CORNER_RADIUS', 'STROKE_FLOAT', 'EFFECT_FLOAT', 'OPACITY', 'FONT_WEIGHT', 'FONT_SIZE', 'LINE_HEIGHT', 'LETTER_SPACING', 'PARAGRAPH_SPACING', 'PARAGRAPH_INDENT',
+  ],
+};
+
 const codeSyntaxPlatformOptions: { value: CodeSyntaxPlatform; label: string }[] = [
   { value: 'Web', label: 'Web' },
   { value: 'Android', label: 'Android' },
@@ -53,19 +108,18 @@ export default function FigmaVariableForm({
   handleFigmaVariableChange: (scopes: VariableScope[], codeSyntax: Partial<Record<CodeSyntaxPlatform, string>>) => void;
   handleRemoveFigmaVariable: () => void;
 }) {
-  const { t } = useTranslation(['tokens']);
   const [figmaVariableVisible, setFigmaVariableVisible] = React.useState(false);
 
-  const currentScopes = useMemo(() => {
-    return internalEditToken?.$extensions?.['com.figma']?.scopes as VariableScope[] || [];
-  }, [internalEditToken]);
+  const currentScopes = useMemo(() => internalEditToken?.$extensions?.['com.figma']?.scopes as VariableScope[] || [], [internalEditToken]);
 
-  const currentCodeSyntax = useMemo(() => {
-    return internalEditToken?.$extensions?.['com.figma']?.codeSyntax as Partial<Record<CodeSyntaxPlatform, string>> || {};
-  }, [internalEditToken]);
+  const currentCodeSyntax = useMemo(() => internalEditToken?.$extensions?.['com.figma']?.codeSyntax as Partial<Record<CodeSyntaxPlatform, string>> || {}, [internalEditToken]);
 
-  const shouldShowFigmaVariableSection = useMemo(() => {
-    return tokenTypesToCreateVariable.includes(internalEditToken.type);
+  const shouldShowFigmaVariableSection = useMemo(() => tokenTypesToCreateVariable.includes(internalEditToken.type), [internalEditToken.type]);
+
+  // Filter variable scope options based on token type
+  const relevantScopeOptions = useMemo(() => {
+    const allowedScopes = tokenTypeToScopesMap[internalEditToken.type] || ['ALL_SCOPES'];
+    return variableScopeOptions.filter((option) => allowedScopes.includes(option.value));
   }, [internalEditToken.type]);
 
   React.useEffect(() => {
@@ -86,21 +140,19 @@ export default function FigmaVariableForm({
 
   const handleScopeChange = useCallback((scope: VariableScope, checked: boolean) => {
     let newScopes: VariableScope[];
-    
+
     if (scope === 'ALL_SCOPES') {
       // If selecting ALL_SCOPES, clear all other scopes
       // If deselecting ALL_SCOPES, keep other scopes as they are
-      newScopes = checked ? ['ALL_SCOPES'] : currentScopes.filter(s => s !== 'ALL_SCOPES');
-    } else {
+      newScopes = checked ? ['ALL_SCOPES'] : currentScopes.filter((s) => s !== 'ALL_SCOPES');
+    } else if (checked) {
       // If selecting any other scope, add it and remove ALL_SCOPES
+      newScopes = [...currentScopes.filter((s) => s !== 'ALL_SCOPES'), scope];
+    } else {
       // If deselecting, just remove the specific scope
-      if (checked) {
-        newScopes = [...currentScopes.filter(s => s !== 'ALL_SCOPES'), scope];
-      } else {
-        newScopes = currentScopes.filter(s => s !== scope);
-      }
+      newScopes = currentScopes.filter((s) => s !== scope);
     }
-    
+
     handleFigmaVariableChange(newScopes, currentCodeSyntax);
   }, [currentScopes, currentCodeSyntax, handleFigmaVariableChange]);
 
@@ -119,6 +171,18 @@ export default function FigmaVariableForm({
     newCodeSyntax[platform] = value;
     handleFigmaVariableChange(currentScopes, newCodeSyntax);
   }, [currentScopes, currentCodeSyntax, handleFigmaVariableChange]);
+
+  const handleScopeCheckedChange = useCallback((scope: VariableScope) => (checked: boolean | string) => {
+    handleScopeChange(scope, !!checked);
+  }, [handleScopeChange]);
+
+  const handleCodeSyntaxCheckedChange = useCallback((platform: CodeSyntaxPlatform) => (checked: boolean | string) => {
+    handleCodeSyntaxPlatformChange(platform, !!checked);
+  }, [handleCodeSyntaxPlatformChange]);
+
+  const handleCodeSyntaxInputChange = useCallback((platform: CodeSyntaxPlatform) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleCodeSyntaxValueChange(platform, e.target.value);
+  }, [handleCodeSyntaxValueChange]);
 
   if (!shouldShowFigmaVariableSection) {
     return null;
@@ -156,12 +220,12 @@ export default function FigmaVariableForm({
                 Variable scopes
               </Text>
               <Stack gap={2} direction="column">
-                {variableScopeOptions.map((option) => (
+                {relevantScopeOptions.map((option) => (
                   <Stack key={option.value} direction="row" gap={2} css={{ alignItems: 'center' }}>
                     <Checkbox
                       id={`scope-${option.value}`}
                       checked={currentScopes.includes(option.value)}
-                      onCheckedChange={(checked) => handleScopeChange(option.value, !!checked)}
+                      onCheckedChange={handleScopeCheckedChange(option.value)}
                     />
                     <Label css={{ fontWeight: '$sansRegular', fontSize: '$small' }} htmlFor={`scope-${option.value}`}>
                       {option.label}
@@ -170,7 +234,7 @@ export default function FigmaVariableForm({
                 ))}
               </Stack>
             </Box>
-            
+
             <Box>
               <Text muted size="small" css={{ marginBottom: '$2' }}>
                 Code syntax
@@ -182,7 +246,7 @@ export default function FigmaVariableForm({
                       <Checkbox
                         id={`syntax-${option.value}`}
                         checked={option.value in currentCodeSyntax}
-                        onCheckedChange={(checked) => handleCodeSyntaxPlatformChange(option.value, !!checked)}
+                        onCheckedChange={handleCodeSyntaxCheckedChange(option.value)}
                       />
                       <Label css={{ fontWeight: '$sansRegular', fontSize: '$small' }} htmlFor={`syntax-${option.value}`}>
                         {option.label}
@@ -193,7 +257,7 @@ export default function FigmaVariableForm({
                         <Input
                           full
                           value={currentCodeSyntax[option.value] || ''}
-                          onChange={(e) => handleCodeSyntaxValueChange(option.value, e.target.value)}
+                          onChange={handleCodeSyntaxInputChange(option.value)}
                           placeholder={`${option.label} syntax (e.g., --token-name)`}
                           type="text"
                         />

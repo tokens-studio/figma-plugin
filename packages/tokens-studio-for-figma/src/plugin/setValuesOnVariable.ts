@@ -64,10 +64,17 @@ export default async function setValuesOnVariable(
             Object.entries(figmaExtensions.codeSyntax).forEach(([platform, syntax]) => {
               if (typeof syntax === 'string' && syntax.trim()) {
                 // Map our platform names to Figma's expected values
-                const figmaPlatform = platform === 'Web' ? 'WEB' : 
-                                     platform === 'Android' ? 'ANDROID' : 
-                                     platform === 'iOS' ? 'iOS' : platform;
-                variable.setVariableCodeSyntax(figmaPlatform as 'WEB' | 'ANDROID' | 'iOS', syntax);
+                let figmaPlatform: 'WEB' | 'ANDROID' | 'iOS';
+                if (platform === 'Web') {
+                  figmaPlatform = 'WEB';
+                } else if (platform === 'Android') {
+                  figmaPlatform = 'ANDROID';
+                } else if (platform === 'iOS') {
+                  figmaPlatform = 'iOS';
+                } else {
+                  figmaPlatform = platform as 'WEB' | 'ANDROID' | 'iOS';
+                }
+                variable.setVariableCodeSyntax(figmaPlatform, syntax);
               }
             });
           } catch (e) {
