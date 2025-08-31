@@ -205,4 +205,187 @@ describe('TokenListing', () => {
     cy.get('[data-testid="tokensettheme-item--ToggleGroup-content--design-tokens--enabled"]').should('not.exist');
     cy.get('[data-testid="tokensettheme-item--ToggleGroup-content--spacing-system--enabled"]').should('not.exist');
   });
+
+  // This test validates that the fix for theme duplication during operations works correctly
+  // The bug was caused by using setThemes instead of replaceThemes, which triggered
+  // import logic that could cause exponential growth of themes (2 -> 1000+)
+  it('Can create themes without duplication', () => {
+    cy.startup(mockStartupParams);
+    cy.get('[data-testid="button-configure"]').should('be.visible');
+    cy.receiveSetTokens({
+      version: '5',
+      values: {
+        options: [{
+          name: 'sizing.xs',
+          value: 4,
+          type: 'sizing'
+        }],
+        global: [{
+          name: 'sizing.xs',
+          value: 4,
+          type: 'sizing'
+        }],
+      },
+    });
+
+    // Create multiple token sets for themes to use
+    createTokenSet({ name: 'token-set-1' });
+    createTokenSet({ name: 'token-set-2' });
+    createTokenSet({ name: 'token-set-3' });
+
+    // Open manage themes modal
+    cy.get('[data-testid="themeselector-dropdown"]').click();
+    cy.get('[data-testid="themeselector-managethemes"]').click();
+
+    // Create first theme
+    cy.get('[data-testid="button-manage-themes-modal-new-theme"]').click();
+    cy.get('[data-testid="create-or-edit-theme-form--input--name"]').type('Theme A');
+    cy.get('[data-testid="tokensettheme-item--ToggleGroup-content--token-set-1--enabled"]').click();
+    cy.get('[data-testid="button-manage-themes-modal-save-theme"]').click({ force: true });
+
+    // Create second theme
+    cy.get('[data-testid="button-manage-themes-modal-new-theme"]').click();
+    cy.get('[data-testid="create-or-edit-theme-form--input--name"]').type('Theme B');
+    cy.get('[data-testid="tokensettheme-item--ToggleGroup-content--token-set-2--enabled"]').click();
+    cy.get('[data-testid="button-manage-themes-modal-save-theme"]').click({ force: true });
+
+    // Create third theme
+    cy.get('[data-testid="button-manage-themes-modal-new-theme"]').click();
+    cy.get('[data-testid="create-or-edit-theme-form--input--name"]').type('Theme C');
+    cy.get('[data-testid="tokensettheme-item--ToggleGroup-content--token-set-3--enabled"]').click();
+    cy.get('[data-testid="button-manage-themes-modal-save-theme"]').click({ force: true });
+
+    // After saving, we should be back to the theme list view
+    // Wait a moment for the form to close and return to theme list
+    cy.wait(500);
+
+    // Verify initial theme count is exactly 3
+    cy.get('[data-testid="manage-themes-modal"]').within(() => {
+      cy.get('[data-testid="singlethemeentry"]').should('have.length', 3);
+    });
+
+    // Verify initial theme order
+    cy.get('[data-testid="manage-themes-modal"]').within(() => {
+      cy.get('[data-testid="singlethemeentry"]').eq(0).should('contain', 'Theme A');
+      cy.get('[data-testid="singlethemeentry"]').eq(1).should('contain', 'Theme B');
+      cy.get('[data-testid="singlethemeentry"]').eq(2).should('contain', 'Theme C');
+    });
+
+    // Test that theme count remains stable during multiple operations
+    // This validates that the fix prevents the duplication bug
+    for (let i = 0; i < 5; i++) {
+      // Close and reopen modal to trigger potential state issues
+      cy.get('[data-testid="close-button"]').click();
+      cy.get('[data-testid="themeselector-dropdown"]').click();
+      cy.get('[data-testid="themeselector-managethemes"]').click();
+
+      // Verify theme count is still exactly 3 (no duplication)
+      cy.get('[data-testid="manage-themes-modal"]').within(() => {
+        cy.get('[data-testid="singlethemeentry"]').should('have.length', 3);
+      });
+
+      // Verify all themes are still present
+      cy.get('[data-testid="manage-themes-modal"]').within(() => {
+        cy.get('[data-testid="singlethemeentry"]').should('contain', 'Theme A');
+        cy.get('[data-testid="singlethemeentry"]').should('contain', 'Theme B');
+        cy.get('[data-testid="singlethemeentry"]').should('contain', 'Theme C');
+      });
+    }
+
+    // Final verification that theme count is exactly 3
+    cy.get('[data-testid="manage-themes-modal"]').within(() => {
+      cy.get('[data-testid="singlethemeentry"]').should('have.length', 3);
+    });
+  });
+
+  // This test validates that the fix prevents theme duplication during operations
+  // and ensures theme count remains stable
+  it('Can maintain theme count without duplication', () => {
+    cy.startup(mockStartupParams);
+    cy.get('[data-testid="button-configure"]').should('be.visible');
+    cy.receiveSetTokens({
+      version: '5',
+      values: {
+        options: [{
+          name: 'sizing.xs',
+          value: 4,
+          type: 'sizing'
+        }],
+        global: [{
+          name: 'sizing.xs',
+          value: 4,
+          type: 'sizing'
+        }],
+      },
+    });
+
+    // Create multiple token sets for themes to use
+    createTokenSet({ name: 'token-set-1' });
+    createTokenSet({ name: 'token-set-2' });
+    createTokenSet({ name: 'token-set-3' });
+
+    // Open manage themes modal
+    cy.get('[data-testid="themeselector-dropdown"]').click();
+    cy.get('[data-testid="themeselector-managethemes"]').click();
+
+    // Create first theme
+    cy.get('[data-testid="button-manage-themes-modal-new-theme"]').click();
+    cy.get('[data-testid="create-or-edit-theme-form--input--name"]').type('Theme A');
+    cy.get('[data-testid="tokensettheme-item--ToggleGroup-content--token-set-1--enabled"]').click();
+    cy.get('[data-testid="button-manage-themes-modal-save-theme"]').click({ force: true });
+
+    // Create second theme
+    cy.get('[data-testid="button-manage-themes-modal-new-theme"]').click();
+    cy.get('[data-testid="create-or-edit-theme-form--input--name"]').type('Theme B');
+    cy.get('[data-testid="tokensettheme-item--ToggleGroup-content--token-set-2--enabled"]').click();
+    cy.get('[data-testid="button-manage-themes-modal-save-theme"]').click({ force: true });
+
+    // Create third theme
+    cy.get('[data-testid="button-manage-themes-modal-new-theme"]').click();
+    cy.get('[data-testid="create-or-edit-theme-form--input--name"]').type('Theme C');
+    cy.get('[data-testid="tokensettheme-item--ToggleGroup-content--token-set-3--enabled"]').click();
+    cy.get('[data-testid="button-manage-themes-modal-save-theme"]').click({ force: true });
+
+    // After saving, we should be back to the theme list view
+    // Wait a moment for the form to close and return to theme list
+    cy.wait(500);
+
+    // Verify initial theme count is exactly 3
+    cy.get('[data-testid="manage-themes-modal"]').within(() => {
+      cy.get('[data-testid="singlethemeentry"]').should('have.length', 3);
+    });
+
+    // Verify initial theme order
+    cy.get('[data-testid="manage-themes-modal"]').within(() => {
+      cy.get('[data-testid="singlethemeentry"]').eq(0).should('contain', 'Theme A');
+      cy.get('[data-testid="singlethemeentry"]').eq(1).should('contain', 'Theme B');
+      cy.get('[data-testid="singlethemeentry"]').eq(2).should('contain', 'Theme C');
+    });
+
+    // Test that theme count remains stable during multiple operations
+    // This validates that the fix prevents the duplication bug
+    for (let i = 0; i < 3; i++) {
+      // Close and reopen modal to trigger potential state issues
+      cy.get('[data-testid="close-button"]').click();
+      cy.get('[data-testid="themeselector-dropdown"]').click();
+      cy.get('[data-testid="themeselector-managethemes"]').click();
+
+      // Verify theme count is still exactly 3 (no duplication)
+      cy.get('[data-testid="manage-themes-modal"]').within(() => {
+        cy.get('[data-testid="singlethemeentry"]').should('have.length', 3);
+      });
+
+      // Verify all themes are still present
+      cy.get('[data-testid="manage-themes-modal"]').within(() => {
+        cy.get('[data-testid="singlethemeentry"]').should('contain', 'Theme A');
+        cy.get('[data-testid="singlethemeentry"]').should('contain', 'Theme B');
+        cy.get('[data-testid="singlethemeentry"]').eq(2).should('contain', 'Theme C');
+      });
+    }
+
+    // Final verification that theme count is exactly 3
+    cy.get('[data-testid="manage-themes-modal"]').within(() => {
+      cy.get('[data-testid="singlethemeentry"]').should('have.length', 3);
+    });
+  });
 });
