@@ -10,7 +10,7 @@ import StorageItem from './StorageItem';
 import EditStorageItemModal from './modals/EditStorageItemModal';
 import CreateStorageItemModal from './modals/CreateStorageItemModal';
 import { Dispatch } from '../store';
-import { apiProvidersSelector, localApiStateSelector } from '@/selectors';
+import { apiProvidersSelector, localApiStateSelector, triggerMigrationEditSelector } from '@/selectors';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import useRemoteTokens from '../store/remoteTokens';
 import { StorageTypeCredentials } from '@/types/StorageType';
@@ -21,6 +21,7 @@ import BitbucketMigrationHelper from './BitbucketMigrationHelper';
 
 const SyncSettings = () => {
   const localApiState = useSelector(localApiStateSelector);
+  const triggerMigrationEdit = useSelector(triggerMigrationEditSelector);
 
   const { t } = useTranslation(['storage']);
 
@@ -75,6 +76,17 @@ const SyncSettings = () => {
   const [createStorageItemModalVisible, setShowCreateStorageModalVisible] = React.useState(false);
   const [storageProvider, setStorageProvider] = React.useState(localApiState.provider);
 
+  // Handle migration trigger from AppContainer
+  React.useEffect(() => {
+    if (triggerMigrationEdit) {
+      dispatch.uiState.setLocalApiState(triggerMigrationEdit);
+      setShowEditStorageModalVisible(true);
+      setLocalBranches(triggerMigrationEdit);
+      // Clear the trigger
+      dispatch.uiState.setTriggerMigrationEdit(null);
+    }
+  }, [triggerMigrationEdit, dispatch, setLocalBranches]);
+
   const setLocalBranches = React.useCallback(
     async (provider: StorageTypeCredentials) => {
       const branches = await fetchBranches(provider);
@@ -86,9 +98,9 @@ const SyncSettings = () => {
   );
 
   const handleEditClick = React.useCallback(
-    (provider: any) => () => {
+    (provider: any, migrating = false) => () => {
       track('Edit Credentials');
-      dispatch.uiState.setLocalApiState(provider);
+      dispatch.uiState.setLocalApiState({ ...provider, migrating });
       setShowEditStorageModalVisible(true);
       setLocalBranches(provider);
     },
@@ -183,7 +195,7 @@ const SyncSettings = () => {
           </Stack>
 
           {/* Bitbucket Migration Helper */}
-          <BitbucketMigrationHelper onEditCredential={(credential) => handleEditClick(credential)()} />
+          <BitbucketMigrationHelper onEditCredential={(credential) => handleEditClick(credential, true)()} />
 
           <Stack direction="column" gap={2} width="full" align="start">
             <LocalStorageItem />

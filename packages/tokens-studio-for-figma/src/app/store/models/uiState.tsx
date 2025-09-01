@@ -93,6 +93,7 @@ export interface UIState {
   hasRemoteChange: boolean;
   selectedExportThemes?: string[];
   showBitbucketMigrationDialog: boolean;
+  triggerMigrationEdit?: any;
 }
 
 const defaultConfirmState: ConfirmProps = {
@@ -155,6 +156,7 @@ export const uiState = createModel<RootModel>()({
     hasRemoteChange: false,
     selectedExportThemes: [],
     showBitbucketMigrationDialog: false,
+    triggerMigrationEdit: null,
   } as unknown as UIState,
   reducers: {
     setShowConvertTokenFormatModal: (state, data: boolean) => ({
@@ -432,6 +434,10 @@ export const uiState = createModel<RootModel>()({
     setShowBitbucketMigrationDialog: (state, data: boolean) => ({
       ...state,
       showBitbucketMigrationDialog: data,
+    }),
+    setTriggerMigrationEdit: (state, data: any) => ({
+      ...state,
+      triggerMigrationEdit: data,
     }),
   },
   effects: (dispatch) => ({

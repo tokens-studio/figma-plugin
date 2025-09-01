@@ -14,7 +14,7 @@ import { BitbucketCredentials } from '@/utils/bitbucketMigration';
 type Props = {
   isOpen: boolean;
   onClose: () => void;
-  onMigrate: () => void;
+  onMigrate: (credential: BitbucketCredentials) => void;
   appPasswordCredentials: BitbucketCredentials[];
 };
 
@@ -55,13 +55,33 @@ export default function BitbucketMigrationDialog({
             {t('bitbucketMigration.affectedSyncs', 'Affected syncs:')}
           </Text>
           {appPasswordCredentials.map((credential) => (
-            <Text key={credential.internalId} size="small" css={{ 
-              padding: '$2', 
-              backgroundColor: '$bgSubtle',
-              borderRadius: '$small'
-            }}>
-              • {credential.name} ({credential.id})
-            </Text>
+            <Stack
+              key={credential.internalId}
+              direction="row"
+              justify="between"
+              align="center"
+              css={{
+                padding: '$2',
+                backgroundColor: '$bgSubtle',
+                borderRadius: '$small'
+              }}
+            >
+              <Stack direction="column" gap={1}>
+                <Text size="small" css={{ fontWeight: '$semibold' }}>
+                  {credential.name}
+                </Text>
+                <Text size="xsmall" muted>
+                  {credential.id} • {credential.branch}
+                </Text>
+              </Stack>
+              <Button
+                variant="secondary"
+                size="small"
+                onClick={() => onMigrate(credential)}
+              >
+                {t('bitbucketMigration.migrate', 'Migrate')}
+              </Button>
+            </Stack>
           ))}
         </Stack>
 
@@ -83,9 +103,6 @@ export default function BitbucketMigrationDialog({
         <Stack direction="row" justify="end" gap={3}>
           <Button variant="secondary" onClick={onClose}>
             {t('bitbucketMigration.remindLater', 'Remind me later')}
-          </Button>
-          <Button variant="primary" onClick={onMigrate}>
-            {t('bitbucketMigration.migrate', 'Migrate to API Tokens')}
           </Button>
         </Stack>
       </Stack>

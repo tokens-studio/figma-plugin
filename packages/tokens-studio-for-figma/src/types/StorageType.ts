@@ -155,7 +155,7 @@ export type StorageTypeFormValues<Incomplete extends boolean = false> =
   Incomplete,
   Omit<StorageTypeCredential<GitLabStorageType>, 'provider'>
   >)
-  | ({ new?: boolean; provider: StorageProviderType.BITBUCKET } & OptionalPartial<
+  | ({ new?: boolean; migrating?: boolean; provider: StorageProviderType.BITBUCKET } & OptionalPartial<
   Incomplete,
   Omit<StorageTypeCredential<BitbucketStorageType>, 'provider'>
   >)

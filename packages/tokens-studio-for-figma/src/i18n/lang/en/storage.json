@@ -84,6 +84,7 @@
       "description": "Bitbucket App Passwords are being deprecated by Atlassian and will be discontinued. You have {{count}} Bitbucket sync(s) using App Passwords that need to be migrated to API Tokens.",
       "affectedSyncs": "Affected syncs:",
       "instructions": "API Tokens provide better security and will continue to work after App Passwords are discontinued. You can migrate your existing syncs or create new ones with API Tokens.",
+      "migrationInProgress": "Migrating from App Password to API Token. Please enter your new API Token.",
       "learnMore": "Learn how to create API Tokens →",
       "remindLater": "Remind me later",
       "migrate": "Migrate to API Tokens",

@@ -77,3 +77,4 @@ export * from './renamedCollectionsSelector';
 export * from './tokensSizeSelector';
 export * from './themesSizeSelector';
 export * from './showBitbucketMigrationDialogSelector';
+export * from './triggerMigrationEditSelector';

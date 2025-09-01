@@ -32,8 +32,10 @@ export default function BitbucketForm({
   }, []);
 
   // Determine if this is an existing sync using app password
-  const isEditingAppPasswordSync = !values.new && values.secret && !values.apiToken;
-  const isNewSync = values.new;
+  // If migrating is true, treat as API token mode even for existing credentials
+  const isEditingAppPasswordSync = !values.new && values.secret && !values.apiToken && !values.migrating;
+  const isNewSync = values.new || values.migrating;
+  const isMigrating = values.migrating;
 
   const handleSubmit = React.useCallback(
     (event: React.FormEvent<HTMLFormElement>) => {
@@ -51,7 +53,7 @@ export default function BitbucketForm({
         apiToken: zod.string().optional(),
         internalId: zod.string().optional(),
       }).refine((data) => {
-        // For new syncs, require API token
+        // For new syncs or migration, require API token
         if (isNewSync) {
           return data.apiToken && data.apiToken.trim() !== '';
         }
@@ -70,10 +72,18 @@ export default function BitbucketForm({
           ...validationResult.data,
           internalId: validationResult.data.internalId || generateId(24),
         } as ValidatedFormValues;
+
+        // When migrating, clear the secret (app password) field
+        if (isMigrating) {
+          const { secret, migrating, ...cleanedFields } = formFields as any;
+          onSubmit(cleanedFields);
+          return;
+        }
+
         onSubmit(formFields);
       }
     },
-    [values, onSubmit, isNewSync],
+    [values, onSubmit, isNewSync, isMigrating],
   );
 
   return (
@@ -156,9 +166,14 @@ export default function BitbucketForm({
                 />
               )}
             />
-            {isNewSync && (
+            {isNewSync && !isMigrating && (
               <Text muted size="xsmall">
                 {t('bitbucketMigration.apiTokenRequired', 'API Tokens are required for new Bitbucket syncs.')}
+              </Text>
+            )}
+            {isMigrating && (
+              <Text muted size="xsmall">
+                {t('bitbucketMigration.migrationInProgress', 'Migrating from App Password to API Token. Please enter your new API Token.')}
               </Text>
             )}
           </FormField>

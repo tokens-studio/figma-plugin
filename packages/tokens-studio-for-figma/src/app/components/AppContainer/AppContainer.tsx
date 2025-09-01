@@ -100,10 +100,11 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
     hideMigrationDialog();
   }, [hideMigrationDialog]);
 
-  const handleMigrationStart = useCallback(() => {
+  const handleMigrationStart = useCallback((credential: any) => {
     hideMigrationDialog();
-    // Navigate to settings to help user migrate
+    // Navigate to settings and trigger migration edit for the specific credential
     dispatch.uiState.setActiveTab(Tabs.SETTINGS);
+    dispatch.uiState.setTriggerMigrationEdit({ ...credential, migrating: true });
   }, [hideMigrationDialog, dispatch]);
 
   globalStyles();
