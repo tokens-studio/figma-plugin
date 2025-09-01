@@ -15,6 +15,38 @@ export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK
     const { oldName, newName } = msg;
     const allWithData = await defaultNodeManager.findBaseNodesWithData({ updateMode: msg.updateMode });
     const namespace = SharedPluginDataNamespaces.TOKENS;
+
+    // Capture the before-state for undo functionality
+    const nodeDataToRestore: Array<{ nodeId: string; data: Record<string, string> }> = [];
+
+    allWithData.forEach(({ node }) => {
+      // Get all current shared plugin data for this node
+      const allKeys = node.getSharedPluginDataKeys(namespace);
+      const currentData: Record<string, string> = {};
+      allKeys.forEach((key) => {
+        const value = node.getSharedPluginData(namespace, key);
+        if (value) {
+          currentData[key] = value;
+        }
+      });
+
+      nodeDataToRestore.push({
+        nodeId: node.id,
+        data: currentData,
+      });
+    });
+
+    // Send undo data to UI for undo tracking
+    postToUI({
+      type: MessageFromPluginTypes.BULK_REMAP_UNDO_DATA,
+      undoData: {
+        oldName,
+        newName,
+        updateMode: msg.updateMode,
+        nodeDataToRestore,
+      },
+    });
+
     postToUI({
       type: MessageFromPluginTypes.START_JOB,
       job: {

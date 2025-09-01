@@ -13,6 +13,7 @@ import { StorageType, StorageTypeCredentials, StorageTypeFormValues } from '@/ty
 import { EditTokenObject } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
+import { UpdateMode } from '@/constants/UpdateMode';
 import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 import { PushOverrides } from '../remoteTokens';
 
@@ -97,6 +98,15 @@ export interface UIState {
     message: string;
     header?: string;
   } | null;
+  bulkRemapUndoData?: {
+    oldName: string;
+    newName: string;
+    updateMode: UpdateMode;
+    nodeDataToRestore: Array<{
+      nodeId: string;
+      data: Record<string, string>;
+    }>;
+  } | null;
 }
 
 const defaultConfirmState: ConfirmProps = {
@@ -159,6 +169,7 @@ export const uiState = createModel<RootModel>()({
     hasRemoteChange: false,
     selectedExportThemes: [],
     lastError: null,
+    bulkRemapUndoData: null,
   } as unknown as UIState,
   reducers: {
     setShowConvertTokenFormatModal: (state, data: boolean) => ({
@@ -488,5 +499,17 @@ export const uiState = createModel<RootModel>()({
         themes: JSON.stringify(payload),
       });
     },
+    setBulkRemapUndoData: (state, payload: {
+      oldName: string;
+      newName: string;
+      updateMode: UpdateMode;
+      nodeDataToRestore: Array<{
+        nodeId: string;
+        data: Record<string, string>;
+      }>;
+    }) => ({
+      ...state,
+      bulkRemapUndoData: payload,
+    }),
   }),
 });

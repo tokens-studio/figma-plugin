@@ -26,6 +26,7 @@ export enum MessageFromPluginTypes {
   NOTIFY_EXCEPTION = 'notify_exception',
   TRACK_FROM_PLUGIN = 'track_from_plugin',
   RENAME_COLLECTIONS_AND_MODES = 'rename_collections_and_modes',
+  BULK_REMAP_UNDO_DATA = 'bulk_remap_undo_data',
 }
 
 export type NoSelectionFromPluginMessage = { type: MessageFromPluginTypes.NO_SELECTION };
@@ -136,6 +137,19 @@ export type RenameCollectionsAndModesMessage = {
   renamedCollections: [string, string][];
 };
 
+export type BulkRemapUndoDataMessage = {
+  type: MessageFromPluginTypes.BULK_REMAP_UNDO_DATA;
+  undoData: {
+    oldName: string;
+    newName: string;
+    updateMode: UpdateMode;
+    nodeDataToRestore: Array<{
+      nodeId: string;
+      data: Record<string, string>;
+    }>;
+  };
+};
+
 export type PostToUIMessage =
   | NoSelectionFromPluginMessage
   | SelectionFromPluginMessage
@@ -152,4 +166,5 @@ export type PostToUIMessage =
   | SetTokensFromPluginMessage
   | NotifyExceptionFromPluginMessage
   | RenameCollectionsAndModesMessage
+  | BulkRemapUndoDataMessage
   | TrackFromPluginMessage;
