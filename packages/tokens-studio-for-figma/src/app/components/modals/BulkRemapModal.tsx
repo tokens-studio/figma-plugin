@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Checkbox } from '@tokens-studio/ui';
+import { Button, Checkbox, Switch } from '@tokens-studio/ui';
 import Modal from '../Modal';
 import Stack from '../Stack';
 import Input from '../Input';
@@ -17,6 +17,7 @@ export default function BulkRemapModal({ isOpen, onClose }: Props) {
   const [oldName, setOldName] = React.useState('');
   const [newName, setNewName] = React.useState('');
   const [shouldRemapDocument, setShouldRemapDocument] = React.useState(false);
+  const [useRegex, setUseRegex] = React.useState(false);
   const { handleBulkRemap } = useTokens();
 
   const handleClose = React.useCallback(() => {
@@ -25,9 +26,9 @@ export default function BulkRemapModal({ isOpen, onClose }: Props) {
 
   const onConfirm = React.useCallback(async () => {
     const updateMode = shouldRemapDocument ? UpdateMode.DOCUMENT : UpdateMode.SELECTION;
-    await handleBulkRemap(newName, oldName, updateMode);
+    await handleBulkRemap(newName, oldName, updateMode, useRegex);
     onClose();
-  }, [handleBulkRemap, onClose, newName, oldName, shouldRemapDocument]);
+  }, [handleBulkRemap, onClose, newName, oldName, shouldRemapDocument, useRegex]);
 
   const handleOldNameChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((e) => {
     setOldName(e.target.value);
@@ -40,6 +41,10 @@ export default function BulkRemapModal({ isOpen, onClose }: Props) {
   const updateShouldRemapDocument = React.useCallback(() => {
     setShouldRemapDocument(!shouldRemapDocument);
   }, [shouldRemapDocument]);
+
+  const updateUseRegex = React.useCallback(() => {
+    setUseRegex(!useRegex);
+  }, [useRegex]);
 
   return (
     <Modal size="large" showClose isOpen={isOpen} close={handleClose} title="Bulk remap">
@@ -79,6 +84,19 @@ export default function BulkRemapModal({ isOpen, onClose }: Props) {
             />
             <Label htmlFor="remapDocument" css={{ fontSize: '$small', fontWeight: '$sansBold' }}>
               Remap across document (slow)
+            </Label>
+          </Box>
+          <Box css={{
+            display: 'flex', alignItems: 'center', gap: '$3', fontSize: '$small',
+          }}
+          >
+            <Switch
+              checked={useRegex}
+              id="useRegex"
+              onCheckedChange={updateUseRegex}
+            />
+            <Label htmlFor="useRegex" css={{ fontSize: '$small', fontWeight: '$sansBold' }}>
+              Use regular expressions
             </Label>
           </Box>
           <Stack direction="row" gap={4} justify="between">

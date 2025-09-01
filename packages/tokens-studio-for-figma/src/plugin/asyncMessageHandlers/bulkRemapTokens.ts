@@ -17,7 +17,7 @@ function escapeRegex(string: string): string {
 export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK_REMAP_TOKENS] = async (msg) => {
   // Big O(n * m) + Big O(updatePluginData) + Big O(sendSelectionChange): (n = amount of nodes, m = amount of tokens in the node)
   try {
-    const { oldName, newName } = msg;
+    const { oldName, newName, useRegex } = msg;
     const allWithData = await defaultNodeManager.findBaseNodesWithData({ updateMode: msg.updateMode });
     const namespace = SharedPluginDataNamespaces.TOKENS;
     postToUI({
@@ -37,9 +37,17 @@ export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK
     allWithData.forEach(({ node, tokens }) => {
       promises.add(defaultWorker.schedule(async () => {
         Object.entries(tokens).forEach(([key, value]) => {
-          const regexTest = oldName.match(regexPattern);
-          // If the pattern passed is a regex, use it, otherwise escape special characters for literal matching
-          const pattern = regexTest ? new RegExp(regexTest[1], regexTest[2]) : new RegExp(escapeRegex(oldName), 'g');
+          let pattern: RegExp;
+          
+          if (useRegex) {
+            // When regex mode is enabled, check if the pattern is wrapped in /pattern/flags format
+            const regexTest = oldName.match(regexPattern);
+            pattern = regexTest ? new RegExp(regexTest[1], regexTest[2]) : new RegExp(oldName, 'g');
+          } else {
+            // When regex mode is disabled, treat oldName as literal string and escape special characters
+            pattern = new RegExp(escapeRegex(oldName), 'g');
+          }
+          
           if (pattern.test(value)) {
             const newValue = value.replace(pattern, newName);
             const jsonValue = JSON.stringify(newValue);
