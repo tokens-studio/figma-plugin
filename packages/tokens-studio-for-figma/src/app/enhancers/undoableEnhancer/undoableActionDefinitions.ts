@@ -4,6 +4,7 @@ import type { RootState } from '@/app/store';
 import { SingleToken } from '@/types/tokens';
 import { UpdateTokenPayload } from '@/types/payloads';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import { UpdateMode } from '@/constants/UpdateMode';
 
 // @TODO improve dispatch typing
 type Effect<S = any, A extends AnyAction<true> = AnyAction<true>> = (dispatch: Dispatch<AnyAction<true>>, action: A, snapshot: S) => void;
@@ -541,5 +542,47 @@ export const undoableActionDefinitions = [
     tokenSets: string[];
   } | null, AnyAction<true> & {
     type: 'tokenState/duplicateTokenGroup'
+  }>,
+  
+  // Bulk Remap Operations  
+  {
+    type: 'bulkRemap/completed',
+    getStateSnapshot: ({ payload }) => payload,
+    redo: (dispatch, action, snapshot) => {
+      if (snapshot) {
+        // Re-apply the bulk remap operation
+        dispatch({
+          type: 'asyncAction/bulkRemap' as any,
+          payload: {
+            oldName: snapshot.oldName,
+            newName: snapshot.newName,
+            updateMode: snapshot.updateMode,
+          },
+          meta: { silent: true },
+        });
+      }
+    },
+    undo: (dispatch, action, snapshot) => {
+      if (snapshot && snapshot.nodeDataToRestore) {
+        // Restore the original node data by sending message to plugin
+        dispatch({
+          type: 'asyncAction/restoreNodeData' as any,
+          payload: {
+            nodeDataToRestore: snapshot.nodeDataToRestore,
+          },
+          meta: { silent: true },
+        });
+      }
+    },
+  } as UndoableActionDefinition<{
+    oldName: string;
+    newName: string;
+    updateMode: UpdateMode;
+    nodeDataToRestore: Array<{
+      nodeId: string;
+      data: Record<string, string>;
+    }>;
+  } | null, AnyAction<true> & {
+    type: 'bulkRemap/completed'
   }>,
 ] as UndoableActionDefinition[];

@@ -42,6 +42,7 @@ export enum AsyncMessageTypes {
   REMOVE_TOKENS_BY_VALUE = 'async/remove-tokens-by-value',
   REMAP_TOKENS = 'async/remap-tokens',
   BULK_REMAP_TOKENS = 'async/bulk-remap-tokens',
+  RESTORE_NODE_DATA = 'async/restore-node-data',
   GOTO_NODE = 'async/goto-node',
   SELECT_NODES = 'async/select-nodes',
   PULL_STYLES = 'async/pull-styles',
@@ -138,6 +139,14 @@ export type BulkRemapTokensAsyncMessage = AsyncMessage<AsyncMessageTypes.BULK_RE
   updateMode: UpdateMode;
 }>;
 export type BulkRemapTokensMessageAsyncResult = AsyncMessage<AsyncMessageTypes.BULK_REMAP_TOKENS>;
+
+export type RestoreNodeDataAsyncMessage = AsyncMessage<AsyncMessageTypes.RESTORE_NODE_DATA, {
+  nodeDataToRestore: Array<{
+    nodeId: string;
+    data: Record<string, string>;
+  }>;
+}>;
+export type RestoreNodeDataMessageAsyncResult = AsyncMessage<AsyncMessageTypes.RESTORE_NODE_DATA>;
 
 export type GotoNodeAsyncMessage = AsyncMessage<AsyncMessageTypes.GOTO_NODE, {
   id: string;
@@ -401,6 +410,7 @@ export type AsyncMessages =
   | RemoveTokensByValueAsyncMessage
   | RemapTokensAsyncMessage
   | BulkRemapTokensAsyncMessage
+  | RestoreNodeDataAsyncMessage
   | GotoNodeAsyncMessage
   | SelectNodesAsyncMessage
   | PullStylesAsyncMessage
@@ -453,6 +463,7 @@ export type AsyncMessageResults =
   | RemoveTokensByValueAsyncMessageResult
   | RemapTokensMessageAsyncResult
   | BulkRemapTokensMessageAsyncResult
+  | RestoreNodeDataMessageAsyncResult
   | GotoNodeMessageAsyncResult
   | SelectNodesMessageAsyncResult
   | PullStylesAsyncMessageResult
