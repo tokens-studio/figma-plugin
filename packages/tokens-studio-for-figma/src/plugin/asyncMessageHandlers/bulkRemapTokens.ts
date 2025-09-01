@@ -9,6 +9,11 @@ import { postToUI } from '../notifiers';
 import { ProgressTracker } from '../ProgressTracker';
 import { defaultWorker } from '../Worker';
 
+// Escapes special regex characters for literal string matching
+function escapeRegex(string: string): string {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK_REMAP_TOKENS] = async (msg) => {
   // Big O(n * m) + Big O(updatePluginData) + Big O(sendSelectionChange): (n = amount of nodes, m = amount of tokens in the node)
   try {
@@ -33,8 +38,8 @@ export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK
       promises.add(defaultWorker.schedule(async () => {
         Object.entries(tokens).forEach(([key, value]) => {
           const regexTest = oldName.match(regexPattern);
-          // If the pattern passed is a regex, use it, otherwise use the old name with a global flag
-          const pattern = regexTest ? new RegExp(regexTest[1], regexTest[2]) : new RegExp(oldName, 'g');
+          // If the pattern passed is a regex, use it, otherwise escape special characters for literal matching
+          const pattern = regexTest ? new RegExp(regexTest[1], regexTest[2]) : new RegExp(escapeRegex(oldName), 'g');
           if (pattern.test(value)) {
             const newValue = value.replace(pattern, newName);
             const jsonValue = JSON.stringify(newValue);
