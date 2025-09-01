@@ -100,7 +100,7 @@ describe('UndoableEnhancer - Expanded Functionality', () => {
     it('should track token set deletion and allow undo', () => {
       // First add a set to delete
       store.dispatch({ type: 'tokenState/addTokenSet', payload: 'temp-set' });
-      
+
       // Clear history from the add operation
       UndoableEnhancerState.actionsHistory = [];
 
@@ -124,7 +124,7 @@ describe('UndoableEnhancer - Expanded Functionality', () => {
     it('should track active token set changes and allow undo', () => {
       // Add another set
       store.dispatch({ type: 'tokenState/addTokenSet', payload: 'other-set' });
-      
+
       // Clear history
       UndoableEnhancerState.actionsHistory = [];
 
@@ -151,7 +151,7 @@ describe('UndoableEnhancer - Expanded Functionality', () => {
     it('should track token set renaming and allow undo', () => {
       // Add a set to rename
       store.dispatch({ type: 'tokenState/addTokenSet', payload: 'old-name' });
-      
+
       // Clear history
       UndoableEnhancerState.actionsHistory = [];
 
@@ -178,7 +178,7 @@ describe('UndoableEnhancer - Expanded Functionality', () => {
       // Add more sets
       store.dispatch({ type: 'tokenState/addTokenSet', payload: 'set-a' });
       store.dispatch({ type: 'tokenState/addTokenSet', payload: 'set-b' });
-      
+
       // Clear history
       UndoableEnhancerState.actionsHistory = [];
 
@@ -226,8 +226,8 @@ describe('UndoableEnhancer - Expanded Functionality', () => {
 
       // Verify tokens were created
       const tokens = store.getState().tokenState.tokens.global;
-      expect(tokens.find(t => t.name === 'token1')).toBeDefined();
-      expect(tokens.find(t => t.name === 'token2')).toBeDefined();
+      expect(tokens.find((t) => t.name === 'token1')).toBeDefined();
+      expect(tokens.find((t) => t.name === 'token2')).toBeDefined();
 
       // Verify history was tracked
       expect(UndoableEnhancerState.actionsHistory).toHaveLength(1);
@@ -238,8 +238,8 @@ describe('UndoableEnhancer - Expanded Functionality', () => {
 
       // Verify tokens were removed
       const tokensAfterUndo = store.getState().tokenState.tokens.global;
-      expect(tokensAfterUndo.find(t => t.name === 'token1')).toBeUndefined();
-      expect(tokensAfterUndo.find(t => t.name === 'token2')).toBeUndefined();
+      expect(tokensAfterUndo.find((t) => t.name === 'token1')).toBeUndefined();
+      expect(tokensAfterUndo.find((t) => t.name === 'token2')).toBeUndefined();
     });
 
     it('should track multiple token edits and allow undo', () => {
@@ -283,8 +283,8 @@ describe('UndoableEnhancer - Expanded Functionality', () => {
 
       // Verify tokens were edited
       const tokens = store.getState().tokenState.tokens.global;
-      expect(tokens.find(t => t.name === 'edit-token1')?.value).toBe('#0000ff');
-      expect(tokens.find(t => t.name === 'edit-token2')?.value).toBe('#ffff00');
+      expect(tokens.find((t) => t.name === 'edit-token1')?.value).toBe('#0000ff');
+      expect(tokens.find((t) => t.name === 'edit-token2')?.value).toBe('#ffff00');
 
       // Verify history was tracked
       expect(UndoableEnhancerState.actionsHistory).toHaveLength(1);
@@ -295,8 +295,8 @@ describe('UndoableEnhancer - Expanded Functionality', () => {
 
       // Verify tokens were restored to original values
       const tokensAfterUndo = store.getState().tokenState.tokens.global;
-      expect(tokensAfterUndo.find(t => t.name === 'edit-token1')?.value).toBe('#ff0000');
-      expect(tokensAfterUndo.find(t => t.name === 'edit-token2')?.value).toBe('#00ff00');
+      expect(tokensAfterUndo.find((t) => t.name === 'edit-token1')?.value).toBe('#ff0000');
+      expect(tokensAfterUndo.find((t) => t.name === 'edit-token2')?.value).toBe('#00ff00');
     });
   });
 
@@ -304,7 +304,7 @@ describe('UndoableEnhancer - Expanded Functionality', () => {
     it('should track toggle used token set and allow undo', () => {
       // Add another set
       store.dispatch({ type: 'tokenState/addTokenSet', payload: 'test-set' });
-      
+
       // Clear history
       UndoableEnhancerState.actionsHistory = [];
 
@@ -331,7 +331,7 @@ describe('UndoableEnhancer - Expanded Functionality', () => {
     it('should track toggle treat as source and allow undo', () => {
       // Add another set
       store.dispatch({ type: 'tokenState/addTokenSet', payload: 'source-set' });
-      
+
       // Clear history
       UndoableEnhancerState.actionsHistory = [];
 
@@ -367,8 +367,8 @@ describe('UndoableEnhancer - Expanded Functionality', () => {
       expect(UndoableEnhancerState.actionsHistory).toHaveLength(3);
 
       // Verify final state
-      expect(store.getState().tokenState.tokens['set1']).toBeDefined();
-      expect(store.getState().tokenState.tokens['set2']).toBeDefined();
+      expect(store.getState().tokenState.tokens.set1).toBeDefined();
+      expect(store.getState().tokenState.tokens.set2).toBeDefined();
       expect(store.getState().tokenState.activeTokenSet).toBe('set1');
 
       // Undo operations in reverse order
@@ -376,10 +376,10 @@ describe('UndoableEnhancer - Expanded Functionality', () => {
       expect(store.getState().tokenState.activeTokenSet).toBe('global');
 
       UndoableEnhancerState.undo(); // Undo addTokenSet(set2)
-      expect(store.getState().tokenState.tokens['set2']).toBeUndefined();
+      expect(store.getState().tokenState.tokens.set2).toBeUndefined();
 
       UndoableEnhancerState.undo(); // Undo addTokenSet(set1)
-      expect(store.getState().tokenState.tokens['set1']).toBeUndefined();
+      expect(store.getState().tokenState.tokens.set1).toBeUndefined();
     });
 
     it('should handle redo operations', () => {

@@ -173,7 +173,7 @@ export function Initiator() {
           case MessageFromPluginTypes.BULK_REMAP_UNDO_DATA: {
             // Store the undo data and trigger a trackable action for the undo system
             dispatch.uiState.setBulkRemapUndoData(pluginMessage.undoData);
-            
+
             // Dispatch a trackable action for the undo enhancer
             dispatch({
               type: 'bulkRemap/completed' as any,

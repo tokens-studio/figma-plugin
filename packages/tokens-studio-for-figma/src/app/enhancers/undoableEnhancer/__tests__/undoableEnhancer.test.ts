@@ -92,7 +92,7 @@ describe('UndoableEnhancer', () => {
       // Verify token was created
       const tokensAfterCreate = store.getState().tokenState.tokens.global;
       expect(tokensAfterCreate).toHaveLength(2);
-      expect(tokensAfterCreate.find(t => t.name === 'new-token')).toBeDefined();
+      expect(tokensAfterCreate.find((t) => t.name === 'new-token')).toBeDefined();
 
       // Verify history was tracked
       expect(UndoableEnhancerState.actionsHistory).toHaveLength(1);
@@ -104,7 +104,7 @@ describe('UndoableEnhancer', () => {
       // Verify token was removed
       const tokensAfterUndo = store.getState().tokenState.tokens.global;
       expect(tokensAfterUndo).toHaveLength(1);
-      expect(tokensAfterUndo.find(t => t.name === 'new-token')).toBeUndefined();
+      expect(tokensAfterUndo.find((t) => t.name === 'new-token')).toBeUndefined();
     });
 
     it('should track token deletion and allow undo', () => {
@@ -130,7 +130,7 @@ describe('UndoableEnhancer', () => {
       // Verify token was restored
       const tokensAfterUndo = store.getState().tokenState.tokens.global;
       expect(tokensAfterUndo).toHaveLength(1);
-      expect(tokensAfterUndo.find(t => t.name === 'test-token')).toBeDefined();
+      expect(tokensAfterUndo.find((t) => t.name === 'test-token')).toBeDefined();
     });
 
     it('should track token duplication and allow undo', () => {
@@ -149,7 +149,7 @@ describe('UndoableEnhancer', () => {
       // Verify token was duplicated
       const tokensAfterDuplicate = store.getState().tokenState.tokens.global;
       expect(tokensAfterDuplicate).toHaveLength(2);
-      expect(tokensAfterDuplicate.find(t => t.name === 'test-token-copy')).toBeDefined();
+      expect(tokensAfterDuplicate.find((t) => t.name === 'test-token-copy')).toBeDefined();
 
       // Verify history was tracked
       expect(UndoableEnhancerState.actionsHistory).toHaveLength(1);
@@ -161,7 +161,7 @@ describe('UndoableEnhancer', () => {
       // Verify duplicated token was removed
       const tokensAfterUndo = store.getState().tokenState.tokens.global;
       expect(tokensAfterUndo).toHaveLength(1);
-      expect(tokensAfterUndo.find(t => t.name === 'test-token-copy')).toBeUndefined();
+      expect(tokensAfterUndo.find((t) => t.name === 'test-token-copy')).toBeUndefined();
     });
   });
 
@@ -180,7 +180,7 @@ describe('UndoableEnhancer', () => {
     it('should NOT track token set deletion', () => {
       // First add a set to delete
       store.dispatch({ type: 'tokenState/addTokenSet', payload: 'temp-set' });
-      
+
       // Clear history from the add operation (not tracked anyway)
       UndoableEnhancerState.actionsHistory = [];
 
@@ -197,7 +197,7 @@ describe('UndoableEnhancer', () => {
     it('should NOT track active token set changes', () => {
       // Add another set
       store.dispatch({ type: 'tokenState/addTokenSet', payload: 'other-set' });
-      
+
       // Clear history
       UndoableEnhancerState.actionsHistory = [];
 
@@ -232,8 +232,8 @@ describe('UndoableEnhancer', () => {
 
       // Verify tokens were created
       const tokens = store.getState().tokenState.tokens.global;
-      expect(tokens.find(t => t.name === 'token1')).toBeDefined();
-      expect(tokens.find(t => t.name === 'token2')).toBeDefined();
+      expect(tokens.find((t) => t.name === 'token1')).toBeDefined();
+      expect(tokens.find((t) => t.name === 'token2')).toBeDefined();
 
       // Verify history was NOT tracked (this is what we want to fix)
       expect(UndoableEnhancerState.actionsHistory).toHaveLength(0);
@@ -261,7 +261,7 @@ describe('UndoableEnhancer', () => {
       // Redo
       UndoableEnhancerState.redo();
       expect(store.getState().tokenState.tokens.global).toHaveLength(2);
-      expect(store.getState().tokenState.tokens.global.find(t => t.name === 'test-redo')).toBeDefined();
+      expect(store.getState().tokenState.tokens.global.find((t) => t.name === 'test-redo')).toBeDefined();
     });
   });
 });

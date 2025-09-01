@@ -89,7 +89,7 @@ export const undoableActionDefinitions = [
   } as UndoableActionDefinition<null, AnyAction<true> & {
     type: 'tokenState/duplicateToken'
   }>,
-  
+
   // Token Set Operations
   {
     type: 'tokenState/addTokenSet',
@@ -104,14 +104,14 @@ export const undoableActionDefinitions = [
     undo: (dispatch, { payload }) => {
       dispatch({
         type: 'tokenState/deleteTokenSet',
-        payload: payload,
+        payload,
         meta: { silent: true },
       });
     },
   } as UndoableActionDefinition<null, AnyAction<true> & {
     type: 'tokenState/addTokenSet'
   }>,
-  
+
   {
     type: 'tokenState/deleteTokenSet',
     getStateSnapshot: ({ payload }, state) => {
@@ -138,7 +138,7 @@ export const undoableActionDefinitions = [
           payload: snapshot.name,
           meta: { silent: true },
         });
-        
+
         // Restore the tokens
         if (snapshot.tokens.length > 0) {
           dispatch({
@@ -147,7 +147,7 @@ export const undoableActionDefinitions = [
             meta: { silent: true },
           });
         }
-        
+
         // Restore active token set if it was active
         if (snapshot.wasActive) {
           dispatch({
@@ -156,7 +156,7 @@ export const undoableActionDefinitions = [
             meta: { silent: true },
           });
         }
-        
+
         // Restore used token set status
         if (snapshot.usedTokenSetStatus) {
           // Note: In a real implementation, we'd need access to current state
@@ -172,7 +172,7 @@ export const undoableActionDefinitions = [
   } | null, AnyAction<true> & {
     type: 'tokenState/deleteTokenSet'
   }>,
-  
+
   {
     type: 'tokenState/duplicateTokenSet',
     getStateSnapshot: () => null,
@@ -196,7 +196,7 @@ export const undoableActionDefinitions = [
   } as UndoableActionDefinition<null, AnyAction<true> & {
     type: 'tokenState/duplicateTokenSet'
   }>,
-  
+
   {
     type: 'tokenState/renameTokenSet',
     getStateSnapshot: ({ payload }) => ({
@@ -225,7 +225,7 @@ export const undoableActionDefinitions = [
   } | null, AnyAction<true> & {
     type: 'tokenState/renameTokenSet'
   }>,
-  
+
   {
     type: 'tokenState/setTokenSetOrder',
     getStateSnapshot: (action, state) => {
@@ -251,7 +251,7 @@ export const undoableActionDefinitions = [
   } as UndoableActionDefinition<string[] | null, AnyAction<true> & {
     type: 'tokenState/setTokenSetOrder'
   }>,
-  
+
   // Token Set State Operations
   {
     type: 'tokenState/setActiveTokenSet',
@@ -275,7 +275,7 @@ export const undoableActionDefinitions = [
   } as UndoableActionDefinition<string | null, AnyAction<true> & {
     type: 'tokenState/setActiveTokenSet'
   }>,
-  
+
   {
     type: 'tokenState/toggleUsedTokenSet',
     getStateSnapshot: (action, state) => {
@@ -301,7 +301,7 @@ export const undoableActionDefinitions = [
   } as UndoableActionDefinition<Record<string, TokenSetStatus> | null, AnyAction<true> & {
     type: 'tokenState/toggleUsedTokenSet'
   }>,
-  
+
   {
     type: 'tokenState/toggleTreatAsSource',
     getStateSnapshot: (action, state) => {
@@ -327,7 +327,7 @@ export const undoableActionDefinitions = [
   } as UndoableActionDefinition<Record<string, TokenSetStatus> | null, AnyAction<true> & {
     type: 'tokenState/toggleTreatAsSource'
   }>,
-  
+
   // Bulk Token Operations
   {
     type: 'tokenState/createMultipleTokens',
@@ -352,12 +352,12 @@ export const undoableActionDefinitions = [
   } as UndoableActionDefinition<null, AnyAction<true> & {
     type: 'tokenState/createMultipleTokens'
   }>,
-  
+
   {
     type: 'tokenState/editMultipleTokens',
     getStateSnapshot: ({ payload }, state) => {
       if (!state?.tokenState.tokens) return null;
-      
+
       const originalTokens: Array<{ parent: string; name: string; originalData: SingleToken | null }> = [];
       payload.forEach((editToken: any) => {
         const tokenSet = state.tokenState.tokens[editToken.parent];
@@ -370,7 +370,7 @@ export const undoableActionDefinitions = [
           });
         }
       });
-      
+
       return originalTokens;
     },
     redo: (dispatch, action) => {
@@ -392,7 +392,7 @@ export const undoableActionDefinitions = [
             description: item.originalData!.description,
             $extensions: item.originalData!.$extensions,
           }));
-        
+
         if (restorePayload.length > 0) {
           dispatch({
             type: 'tokenState/editMultipleTokens',
@@ -409,18 +409,18 @@ export const undoableActionDefinitions = [
   }> | null, AnyAction<true> & {
     type: 'tokenState/editMultipleTokens'
   }>,
-  
+
   // Token Group Operations
   {
     type: 'tokenState/deleteTokenGroup',
     getStateSnapshot: ({ payload }, state) => {
       if (!state?.tokenState.tokens[payload.parent]) return null;
-      
+
       // Find all tokens that match the group pattern
       const deletedTokens = state.tokenState.tokens[payload.parent].filter(
-        (token) => token.name.startsWith(`${payload.path}.`) && token.type === payload.type
+        (token) => token.name.startsWith(`${payload.path}.`) && token.type === payload.type,
       );
-      
+
       return {
         parent: payload.parent,
         path: payload.path,
@@ -446,7 +446,7 @@ export const undoableActionDefinitions = [
           description: token.description,
           $extensions: token.$extensions,
         }));
-        
+
         dispatch({
           type: 'tokenState/createMultipleTokens',
           payload: tokensToRestore,
@@ -462,7 +462,7 @@ export const undoableActionDefinitions = [
   } | null, AnyAction<true> & {
     type: 'tokenState/deleteTokenGroup'
   }>,
-  
+
   {
     type: 'tokenState/renameTokenGroup',
     getStateSnapshot: ({ payload }) => ({
@@ -501,7 +501,7 @@ export const undoableActionDefinitions = [
   } | null, AnyAction<true> & {
     type: 'tokenState/renameTokenGroup'
   }>,
-  
+
   {
     type: 'tokenState/duplicateTokenGroup',
     getStateSnapshot: ({ payload }) => ({
@@ -543,8 +543,8 @@ export const undoableActionDefinitions = [
   } | null, AnyAction<true> & {
     type: 'tokenState/duplicateTokenGroup'
   }>,
-  
-  // Bulk Remap Operations  
+
+  // Bulk Remap Operations
   {
     type: 'bulkRemap/completed',
     getStateSnapshot: ({ payload }) => payload,

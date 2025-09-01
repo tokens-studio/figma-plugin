@@ -15,11 +15,11 @@ export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK
     const { oldName, newName } = msg;
     const allWithData = await defaultNodeManager.findBaseNodesWithData({ updateMode: msg.updateMode });
     const namespace = SharedPluginDataNamespaces.TOKENS;
-    
+
     // Capture the before-state for undo functionality
     const nodeDataToRestore: Array<{ nodeId: string; data: Record<string, string> }> = [];
-    
-    allWithData.forEach(({ node, tokens }) => {
+
+    allWithData.forEach(({ node }) => {
       // Get all current shared plugin data for this node
       const allKeys = node.getSharedPluginDataKeys(namespace);
       const currentData: Record<string, string> = {};
@@ -29,7 +29,7 @@ export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK
           currentData[key] = value;
         }
       });
-      
+
       nodeDataToRestore.push({
         nodeId: node.id,
         data: currentData,

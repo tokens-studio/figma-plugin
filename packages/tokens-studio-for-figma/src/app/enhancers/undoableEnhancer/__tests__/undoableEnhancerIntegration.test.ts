@@ -91,7 +91,7 @@ describe('UndoableEnhancer - Integration Test', () => {
     it('should properly undo and redo active token set changes', () => {
       // Add another token set first
       store.dispatch({ type: 'tokenState/addTokenSet', payload: 'themes' });
-      
+
       // Clear history from the add operation
       UndoableEnhancerState.actionsHistory = [];
 
@@ -126,9 +126,15 @@ describe('UndoableEnhancer - Integration Test', () => {
 
       // Create multiple tokens
       const tokens = [
-        { parent: 'global', name: 'primary', type: 'color' as const, value: '#007bff' },
-        { parent: 'global', name: 'secondary', type: 'color' as const, value: '#6c757d' },
-        { parent: 'global', name: 'success', type: 'color' as const, value: '#28a745' },
+        {
+          parent: 'global', name: 'primary', type: 'color' as const, value: '#007bff',
+        },
+        {
+          parent: 'global', name: 'secondary', type: 'color' as const, value: '#6c757d',
+        },
+        {
+          parent: 'global', name: 'success', type: 'color' as const, value: '#28a745',
+        },
       ];
 
       store.dispatch({ type: 'tokenState/createMultipleTokens', payload: tokens });
@@ -136,9 +142,9 @@ describe('UndoableEnhancer - Integration Test', () => {
       // Verify tokens were created
       const tokensAfterCreate = store.getState().tokenState.tokens.global;
       expect(tokensAfterCreate).toHaveLength(3);
-      expect(tokensAfterCreate.find(t => t.name === 'primary')).toBeTruthy();
-      expect(tokensAfterCreate.find(t => t.name === 'secondary')).toBeTruthy();
-      expect(tokensAfterCreate.find(t => t.name === 'success')).toBeTruthy();
+      expect(tokensAfterCreate.find((t) => t.name === 'primary')).toBeTruthy();
+      expect(tokensAfterCreate.find((t) => t.name === 'secondary')).toBeTruthy();
+      expect(tokensAfterCreate.find((t) => t.name === 'success')).toBeTruthy();
       expect(UndoableEnhancerState.actionsHistory).toHaveLength(1);
 
       // Undo the creation
@@ -153,7 +159,7 @@ describe('UndoableEnhancer - Integration Test', () => {
       // Verify tokens were restored
       const tokensAfterRedo = store.getState().tokenState.tokens.global;
       expect(tokensAfterRedo).toHaveLength(3);
-      expect(tokensAfterRedo.find(t => t.name === 'primary')).toBeTruthy();
+      expect(tokensAfterRedo.find((t) => t.name === 'primary')).toBeTruthy();
     });
   });
 
@@ -165,8 +171,12 @@ describe('UndoableEnhancer - Integration Test', () => {
 
       // Step 2: Create some tokens
       const colorTokens = [
-        { parent: 'colors', name: 'brand.primary', type: 'color' as const, value: '#007bff' },
-        { parent: 'colors', name: 'brand.secondary', type: 'color' as const, value: '#6c757d' },
+        {
+          parent: 'colors', name: 'brand.primary', type: 'color' as const, value: '#007bff',
+        },
+        {
+          parent: 'colors', name: 'brand.secondary', type: 'color' as const, value: '#6c757d',
+        },
       ];
       store.dispatch({ type: 'tokenState/createMultipleTokens', payload: colorTokens });
       expect(store.getState().tokenState.tokens.colors).toHaveLength(2);
@@ -179,7 +189,7 @@ describe('UndoableEnhancer - Integration Test', () => {
       expect(UndoableEnhancerState.actionsHistory).toHaveLength(3);
 
       // Undo operations in reverse order
-      
+
       // Undo step 3: active token set change
       UndoableEnhancerState.undo();
       expect(store.getState().tokenState.activeTokenSet).toBe('global');
@@ -193,7 +203,7 @@ describe('UndoableEnhancer - Integration Test', () => {
       expect(Object.keys(store.getState().tokenState.tokens)).toEqual(['global']);
 
       // Now redo all operations
-      
+
       // Redo step 1: token set addition
       UndoableEnhancerState.redo();
       expect(Object.keys(store.getState().tokenState.tokens)).toContain('colors');
@@ -207,8 +217,8 @@ describe('UndoableEnhancer - Integration Test', () => {
       expect(store.getState().tokenState.activeTokenSet).toBe('colors');
 
       // Verify final state matches original
-      expect(store.getState().tokenState.tokens.colors.find(t => t.name === 'brand.primary')).toBeTruthy();
-      expect(store.getState().tokenState.tokens.colors.find(t => t.name === 'brand.secondary')).toBeTruthy();
+      expect(store.getState().tokenState.tokens.colors.find((t) => t.name === 'brand.primary')).toBeTruthy();
+      expect(store.getState().tokenState.tokens.colors.find((t) => t.name === 'brand.secondary')).toBeTruthy();
     });
   });
 
@@ -217,7 +227,7 @@ describe('UndoableEnhancer - Integration Test', () => {
       // Try to undo when nothing has been done
       const initialPointer = UndoableEnhancerState.actionsHistoryPointer;
       UndoableEnhancerState.undo();
-      
+
       // Pointer shouldn't change
       expect(UndoableEnhancerState.actionsHistoryPointer).toBe(initialPointer);
     });
@@ -225,11 +235,11 @@ describe('UndoableEnhancer - Integration Test', () => {
     it('should handle redo when no actions have been undone', () => {
       // Add an action
       store.dispatch({ type: 'tokenState/addTokenSet', payload: 'test' });
-      
+
       // Try to redo without undoing first
       const initialPointer = UndoableEnhancerState.actionsHistoryPointer;
       UndoableEnhancerState.redo();
-      
+
       // Pointer shouldn't change
       expect(UndoableEnhancerState.actionsHistoryPointer).toBe(initialPointer);
     });
@@ -238,7 +248,7 @@ describe('UndoableEnhancer - Integration Test', () => {
       // Perform two actions
       store.dispatch({ type: 'tokenState/addTokenSet', payload: 'set1' });
       store.dispatch({ type: 'tokenState/addTokenSet', payload: 'set2' });
-      
+
       expect(UndoableEnhancerState.actionsHistory).toHaveLength(2);
 
       // Undo one action
@@ -247,11 +257,11 @@ describe('UndoableEnhancer - Integration Test', () => {
 
       // Perform a new action - this should clear the redo history
       store.dispatch({ type: 'tokenState/addTokenSet', payload: 'set3' });
-      
+
       // Should now have 2 actions (the first one + the new one), and pointer reset
       expect(UndoableEnhancerState.actionsHistory).toHaveLength(2);
       expect(UndoableEnhancerState.actionsHistoryPointer).toBe(0);
-      
+
       // The last action should be the new one we just added
       expect(UndoableEnhancerState.actionsHistory[1].action.payload).toBe('set3');
     });
