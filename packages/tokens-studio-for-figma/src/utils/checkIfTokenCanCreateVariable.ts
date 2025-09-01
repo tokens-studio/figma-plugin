@@ -4,6 +4,12 @@ import { numberMatchesPercentage } from '@/plugin/figmaTransforms/numberMatchesP
 import { SettingsState } from '@/app/store/models/settings';
 
 export default function checkIfTokenCanCreateVariable(token: ResolveTokenValuesResult, settings: SettingsState): boolean {
+  // Only create variables for tokens that have explicitly defined scopes (opt-in behavior)
+  const figmaExtensions = token.$extensions?.['com.figma'];
+  if (!figmaExtensions?.scopes || !Array.isArray(figmaExtensions.scopes) || figmaExtensions.scopes.length === 0) {
+    return false;
+  }
+
   if (
     (token.type === TokenTypes.COLOR && settings.variablesColor)
     || (ExportNumberVariablesTokenTypes.includes(token.type) && settings.variablesNumber)
