@@ -49,12 +49,14 @@ export default function LivingDocumentationModal({
   const [tokenSet, setTokenSet] = React.useState(initialTokenSet || 'All');
   const [startsWith, setStartsWith] = React.useState(initialStartsWith || '');
   const [applyTokens, setApplyTokens] = React.useState(true);
+  const [useRegex, setUseRegex] = React.useState(false);
 
   // Reset values when modal opens with new initial values
   React.useEffect(() => {
     if (isOpen) {
       setTokenSet(initialTokenSet || 'All');
       setStartsWith(initialStartsWith || '');
+      setUseRegex(false); // Reset regex mode when modal opens
     }
   }, [isOpen, initialTokenSet, initialStartsWith]);
 
@@ -84,6 +86,10 @@ export default function LivingDocumentationModal({
     setApplyTokens(checked === true);
   }, []);
 
+  const handleUseRegexChange = React.useCallback((checked: boolean | string) => {
+    setUseRegex(checked === true);
+  }, []);
+
   const handleGenerate = React.useCallback(() => {
     // Track when user starts creating living documentation with detailed properties
     track('Living Documentation Creation Started', {
@@ -101,9 +107,10 @@ export default function LivingDocumentationModal({
       startsWith,
       applyTokens,
       resolvedTokens,
+      useRegex,
     });
     onClose();
-  }, [tokenSet, startsWith, applyTokens, resolvedTokens, onClose, allTokenSets.length]);
+  }, [tokenSet, startsWith, applyTokens, resolvedTokens, onClose, allTokenSets.length, useRegex]);
 
   return (
     <Modal title={t('generateDocumentation')} isOpen={isOpen} close={onClose} size="large">
@@ -148,7 +155,19 @@ export default function LivingDocumentationModal({
             </Select.Content>
           </Select>
         </Stack>
-        <Input full label={t('nameStartsWith')} value={startsWith} onChange={handleStartsWithChange} />
+        <Stack direction="column" gap={2}>
+          <Stack direction="row" gap={3} align="center" css={{ width: '100%' }}>
+            <Label htmlFor="use-regex">{t('useRegexPattern')}</Label>
+            <Switch id="use-regex" checked={useRegex} onCheckedChange={handleUseRegexChange} />
+          </Stack>
+          <Input
+            full
+            label={useRegex ? t('nameMatchesPattern') : t('nameStartsWith')}
+            value={startsWith}
+            onChange={handleStartsWithChange}
+            placeholder={useRegex ? 'color\\.(primary|secondary)' : 'color'}
+          />
+        </Stack>
         <Stack direction="row" gap={3} align="center" css={{ width: '100%' }}>
           <Label htmlFor="apply-tokens">{t('applyTokensToCreatedLayers')}</Label>
           <Switch id="apply-tokens" checked={applyTokens} onCheckedChange={handleApplyTokensChange} />

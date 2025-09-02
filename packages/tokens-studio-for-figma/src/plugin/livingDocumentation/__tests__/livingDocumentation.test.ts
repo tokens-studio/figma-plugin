@@ -217,5 +217,118 @@ describe('Living Documentation', () => {
         ],
       });
     });
+
+    describe('regex mode', () => {
+      it('should filter tokens using regex when useRegex is true', () => {
+        const result = filterAndGroupTokens(mockTokens, 'All', '^color\\.(primary|secondary)$', true);
+
+        expect(result).toEqual({
+          core: [
+            {
+              name: 'color.primary',
+              type: TokenTypes.COLOR,
+              value: '#FF0000',
+              internal__Parent: 'core',
+            },
+            {
+              name: 'color.secondary',
+              type: TokenTypes.COLOR,
+              value: '#00FF00',
+              internal__Parent: 'core',
+            },
+          ],
+        });
+      });
+
+      it('should filter tokens with regex pattern for spacing', () => {
+        const result = filterAndGroupTokens(mockTokens, 'All', 'spacing\\.(small|medium)', true);
+
+        expect(result).toEqual({
+          base: [
+            {
+              name: 'spacing.small',
+              type: TokenTypes.SPACING,
+              value: '8px',
+              internal__Parent: 'base',
+            },
+            {
+              name: 'spacing.medium',
+              type: TokenTypes.SPACING,
+              value: '16px',
+              internal__Parent: 'base',
+            },
+          ],
+        });
+      });
+
+      it('should fall back to startsWith when regex is invalid', () => {
+        const result = filterAndGroupTokens(mockTokens, 'All', 'co[lor', true); // Invalid regex - falls back to startsWith 'co[lor'
+
+        // Since 'co[lor' doesn't start any of our token names, result should be empty
+        expect(result).toEqual({});
+      });
+
+      it('should handle empty regex pattern', () => {
+        const result = filterAndGroupTokens(mockTokens, 'All', '', true);
+
+        expect(result).toEqual({
+          core: [
+            {
+              name: 'color.primary',
+              type: TokenTypes.COLOR,
+              value: '#FF0000',
+              internal__Parent: 'core',
+            },
+            {
+              name: 'color.secondary',
+              type: TokenTypes.COLOR,
+              value: '#00FF00',
+              internal__Parent: 'core',
+            },
+          ],
+          base: [
+            {
+              name: 'spacing.small',
+              type: TokenTypes.SPACING,
+              value: '8px',
+              internal__Parent: 'base',
+            },
+            {
+              name: 'spacing.medium',
+              type: TokenTypes.SPACING,
+              value: '16px',
+              internal__Parent: 'base',
+            },
+            {
+              name: 'typography.heading',
+              type: TokenTypes.TYPOGRAPHY,
+              value: '24px',
+              internal__Parent: 'base',
+            },
+          ],
+        });
+      });
+
+      it('should work with specific token set and regex', () => {
+        const result = filterAndGroupTokens(mockTokens, 'core', 'color\\.(primary)', true);
+
+        expect(result).toEqual({
+          core: [
+            {
+              name: 'color.primary',
+              type: TokenTypes.COLOR,
+              value: '#FF0000',
+              internal__Parent: 'core',
+            },
+          ],
+        });
+      });
+
+      it('should return empty when regex matches no tokens', () => {
+        const result = filterAndGroupTokens(mockTokens, 'All', 'nonexistent.*', true);
+
+        expect(result).toEqual({});
+      });
+    });
   });
 });
