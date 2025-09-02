@@ -99,7 +99,6 @@ describe('categorizeError', () => {
   });
 
   describe('other errors', () => {
-
     it('should handle string errors', () => {
       const error = 'Something went wrong';
       const result = categorizeError(error);
