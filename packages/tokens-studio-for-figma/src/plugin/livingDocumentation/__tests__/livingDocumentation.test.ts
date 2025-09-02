@@ -58,8 +58,12 @@ describe('Living Documentation', () => {
       });
     });
 
-    it('should group tokens by set when tokenSet is "All"', () => {
+    it('should group tokens by set when tokenSet is "All" and respect token set order', () => {
       const result = filterAndGroupTokens(mockTokens, 'All', '');
+
+      // Should maintain the order from the input tokens (core appears first, then base)
+      const setKeys = Object.keys(result);
+      expect(setKeys).toEqual(['core', 'base']);
 
       expect(result).toEqual({
         core: [
@@ -78,15 +82,15 @@ describe('Living Documentation', () => {
         ],
         base: [
           {
-            name: 'spacing.small',
-            type: TokenTypes.SPACING,
-            value: '8px',
-            internal__Parent: 'base',
-          },
-          {
             name: 'spacing.medium',
             type: TokenTypes.SPACING,
             value: '16px',
+            internal__Parent: 'base',
+          },
+          {
+            name: 'spacing.small',
+            type: TokenTypes.SPACING,
+            value: '8px',
             internal__Parent: 'base',
           },
           {
@@ -97,6 +101,34 @@ describe('Living Documentation', () => {
           },
         ],
       });
+    });
+
+    it('should sort tokens alphabetically within each set', () => {
+      // Create tokens that are not in alphabetical order
+      const unorderedTokens: SingleToken[] = [
+        {
+          name: 'zeta.token',
+          type: TokenTypes.COLOR,
+          value: '#FF0000',
+          internal__Parent: 'test',
+        },
+        {
+          name: 'alpha.token',
+          type: TokenTypes.COLOR,
+          value: '#00FF00',
+          internal__Parent: 'test',
+        },
+        {
+          name: 'beta.token',
+          type: TokenTypes.COLOR,
+          value: '#0000FF',
+          internal__Parent: 'test',
+        },
+      ];
+
+      const result = filterAndGroupTokens(unorderedTokens, 'All', '');
+
+      expect(result.test.map((t) => t.name)).toEqual(['alpha.token', 'beta.token', 'zeta.token']);
     });
 
     it('should filter by specific set when tokenSet is provided', () => {
@@ -166,7 +198,7 @@ describe('Living Documentation', () => {
       });
     });
 
-    it('should handle multiple sets with different token types', () => {
+    it('should handle multiple sets with different token types and maintain token set order', () => {
       const multiSetTokens: SingleToken[] = [
         {
           name: 'color.primary',
@@ -189,6 +221,10 @@ describe('Living Documentation', () => {
       ];
 
       const result = filterAndGroupTokens(multiSetTokens, 'All', '');
+
+      // Should maintain order: core, base, semantic
+      const setKeys = Object.keys(result);
+      expect(setKeys).toEqual(['core', 'base', 'semantic']);
 
       expect(result).toEqual({
         core: [
@@ -216,6 +252,36 @@ describe('Living Documentation', () => {
           },
         ],
       });
+    });
+
+    it('should respect the token set order from resolvedTokens input order', () => {
+      // Tokens arranged in a specific order that should be preserved
+      const orderedTokens: SingleToken[] = [
+        {
+          name: 'token.in.third',
+          type: TokenTypes.COLOR,
+          value: '#000000',
+          internal__Parent: 'third-set',
+        },
+        {
+          name: 'token.in.first',
+          type: TokenTypes.COLOR,
+          value: '#FF0000',
+          internal__Parent: 'first-set',
+        },
+        {
+          name: 'token.in.second',
+          type: TokenTypes.COLOR,
+          value: '#00FF00',
+          internal__Parent: 'second-set',
+        },
+      ];
+
+      const result = filterAndGroupTokens(orderedTokens, 'All', '');
+
+      // The sets should appear in the order they first appear in the input
+      const setKeys = Object.keys(result);
+      expect(setKeys).toEqual(['third-set', 'first-set', 'second-set']);
     });
   });
 });

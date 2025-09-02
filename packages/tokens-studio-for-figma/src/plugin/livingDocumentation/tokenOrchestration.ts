@@ -5,7 +5,7 @@ import { createSetStructure } from './containerCreation';
 import { processTokenBatch, appendTokenClones } from './tokenProcessing';
 
 /**
- * Filter and group tokens by set
+ * Filter and group tokens by set, applying proper token set order and alphabetical sorting within sets
  */
 export function filterAndGroupTokens(
   resolvedTokens: AnyTokenList,
@@ -36,7 +36,41 @@ export function filterAndGroupTokens(
     }
   }
 
-  return tokensBySet;
+  // Extract the token set order from the resolvedTokens (they should already be ordered correctly by mergeTokenGroups)
+  const tokenSetOrder: string[] = [];
+  const seenSets = new Set<string>();
+
+  for (const token of resolvedTokens) {
+    const setName = token.internal__Parent || 'Default';
+    if (!seenSets.has(setName)) {
+      tokenSetOrder.push(setName);
+      seenSets.add(setName);
+    }
+  }
+
+  // Sort tokens within each set alphabetically by name
+  Object.keys(tokensBySet).forEach((setName) => {
+    tokensBySet[setName].sort((a, b) => a.name.localeCompare(b.name));
+  });
+
+  // Create the final ordered result using the correct token set order
+  const orderedTokensBySet: Record<string, any[]> = {};
+
+  // First, add sets in the order they appear in resolvedTokens (which respects user's token set order)
+  for (const setName of tokenSetOrder) {
+    if (tokensBySet[setName]) {
+      orderedTokensBySet[setName] = tokensBySet[setName];
+    }
+  }
+
+  // Then add any remaining sets (edge case for sets not in resolvedTokens)
+  for (const setName of Object.keys(tokensBySet)) {
+    if (!orderedTokensBySet[setName]) {
+      orderedTokensBySet[setName] = tokensBySet[setName];
+    }
+  }
+
+  return orderedTokensBySet;
 }
 
 /**
