@@ -57,6 +57,8 @@ import { CreateSingleTokenData, EditSingleTokenData } from '../useManageTokens';
 import { singleTokensToRawTokenSet } from '@/utils/convert';
 import { checkStorageSize } from '@/utils/checkStorageSize';
 import { compareLastSyncedState } from '@/utils/compareLastSyncedState';
+import { ResolveTokenValuesResult, mergeTokenGroups } from '@/utils/tokenHelpers';
+import { defaultTokenResolver } from '@/utils/TokenResolver';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
@@ -89,6 +91,8 @@ export interface TokenState {
   tokensSize: number;
   themesSize: number;
   renamedCollections: [string, string][] | null;
+  resolvedTokens: ResolveTokenValuesResult[];
+  tokenSetsWithBrokenReferences: string[];
 }
 
 export const tokenState = createModel<RootModel>()({
@@ -134,6 +138,8 @@ export const tokenState = createModel<RootModel>()({
     tokensSize: 0,
     themesSize: 0,
     renamedCollections: null,
+    resolvedTokens: [],
+    tokenSetsWithBrokenReferences: [],
   } as unknown as TokenState,
   reducers: {
     setTokensSize: (state, size: number) => ({
@@ -147,6 +153,14 @@ export const tokenState = createModel<RootModel>()({
     setStringTokens: (state, payload: string) => ({
       ...state,
       stringTokens: payload,
+    }),
+    setResolvedTokens: (state, payload: ResolveTokenValuesResult[]) => ({
+      ...state,
+      resolvedTokens: payload,
+    }),
+    setTokenSetsWithBrokenReferences: (state, payload: string[]) => ({
+      ...state,
+      tokenSetsWithBrokenReferences: payload,
     }),
     setEditProhibited(state, payload: boolean) {
       return {
@@ -751,6 +765,9 @@ export const tokenState = createModel<RootModel>()({
           });
         }
       }
+
+      // Update resolved tokens when a token is edited
+      dispatch.tokenState.updateResolvedTokens(null);
     },
     deleteToken(payload: DeleteTokenPayload, rootState) {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
@@ -838,15 +855,21 @@ export const tokenState = createModel<RootModel>()({
       if (payload.shouldUpdate) {
         dispatch.tokenState.updateDocument();
       }
+
+      // Update resolved tokens when token data changes
+      dispatch.tokenState.updateResolvedTokens(null);
     },
     toggleUsedTokenSet() {
       dispatch.tokenState.updateDocument({ updateRemote: false });
+      dispatch.tokenState.updateResolvedTokens(null);
     },
     toggleManyTokenSets() {
       dispatch.tokenState.updateDocument({ updateRemote: false });
+      dispatch.tokenState.updateResolvedTokens(null);
     },
     toggleTreatAsSource() {
       dispatch.tokenState.updateDocument({ updateRemote: false });
+      dispatch.tokenState.updateResolvedTokens(null);
     },
     duplicateToken(payload: DuplicateTokenPayload, rootState) {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
@@ -1107,6 +1130,36 @@ export const tokenState = createModel<RootModel>()({
           }
         }
       }
+    },
+    updateResolvedTokens(_, rootState) {
+      const mergedTokens = mergeTokenGroups(
+        rootState.tokenState.tokens,
+        rootState.tokenState.usedTokenSet,
+        {},
+        rootState.tokenState.activeTokenSet,
+      );
+
+      const resolvedTokens = defaultTokenResolver.setTokens(mergedTokens);
+
+      // Identify token sets with broken references
+      const brokenReferenceSets = new Set<string>();
+      resolvedTokens.forEach((token) => {
+        if (token.failedToResolve && token.name) {
+          // Extract token set from token name - tokens usually have format "tokenset.tokenname"
+          const nameParts = token.name.split('.');
+          if (nameParts.length > 1) {
+            // Find which token set this token belongs to by checking against available token sets
+            const tokenSets = Object.keys(rootState.tokenState.tokens);
+            const belongsToTokenSet = tokenSets.find((set) => rootState.tokenState.tokens[set].some((t) => t.name === token.name));
+            if (belongsToTokenSet) {
+              brokenReferenceSets.add(belongsToTokenSet);
+            }
+          }
+        }
+      });
+
+      dispatch.tokenState.setResolvedTokens(resolvedTokens);
+      dispatch.tokenState.setTokenSetsWithBrokenReferences(Array.from(brokenReferenceSets));
     },
     ...Object.fromEntries(Object.entries(tokenStateEffects).map(([key, factory]) => [key, factory(dispatch)])),
   }),
