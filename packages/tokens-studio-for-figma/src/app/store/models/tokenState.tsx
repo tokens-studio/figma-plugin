@@ -6,13 +6,14 @@ import extend from 'just-extend';
 import { v4 as uuidv4 } from 'uuid';
 import * as tokenStateReducers from './reducers/tokenState';
 import * as tokenStateEffects from './effects/tokenState';
-import parseTokenValues from '@/utils/parseTokenValues';
+import parseTokenValues, { extractTokensOnly, TokenStoreWithGroups } from '@/utils/parseTokenValues';
+import { GroupDescription } from '@/utils/convertTokens';
 import { notifyToUI } from '@/plugin/notifiers';
 import parseJson from '@/utils/parseJson';
 import { TokenData } from '@/types/SecondScreen';
 import updateTokensOnSources from '../updateSources';
 import {
-  AnyTokenList, ImportToken, SingleToken, TokenStore, TokenToRename,
+  AnyTokenList, ImportToken, SingleToken, TokenStore, TokenToRename, GroupMetadataMap,
 } from '@/types/tokens';
 import { updateCheckForChangesAtomic } from './effects/updateCheckForChangesAtomic';
 import {
@@ -89,6 +90,36 @@ export interface TokenState {
   tokensSize: number;
   themesSize: number;
   renamedCollections: [string, string][] | null;
+  groupMetadata: GroupMetadataMap; // New addition for group descriptions
+}
+
+// Utility function to extract group metadata from parsing result
+function extractGroupMetadata(
+  result: Record<string, AnyTokenList | { tokens: AnyTokenList; groups: GroupDescription[] }>
+): GroupMetadataMap {
+  const groupMetadata: GroupMetadataMap = {};
+
+  Object.entries(result).forEach(([tokenSetName, value]) => {
+    if (value && typeof value === 'object' && 'groups' in value && value.groups) {
+      value.groups.forEach((group) => {
+        // Remove the tokenSet prefix from the path since it's already in the key structure
+        const pathWithoutTokenSet = group.path.startsWith(`${tokenSetName}.`) 
+          ? group.path.substring(`${tokenSetName}.`.length)
+          : group.path;
+
+        if (!groupMetadata[tokenSetName]) {
+          groupMetadata[tokenSetName] = {};
+        }
+        
+        groupMetadata[tokenSetName][pathWithoutTokenSet] = {
+          description: group.description,
+          lastModified: new Date().toISOString(),
+        };
+      });
+    }
+  });
+
+  return groupMetadata;
 }
 
 export const tokenState = createModel<RootModel>()({
@@ -134,6 +165,7 @@ export const tokenState = createModel<RootModel>()({
     tokensSize: 0,
     themesSize: 0,
     renamedCollections: null,
+    groupMetadata: {}, // Initialize empty group metadata
   } as unknown as TokenState,
   reducers: {
     setTokensSize: (state, size: number) => ({
@@ -212,7 +244,21 @@ export const tokenState = createModel<RootModel>()({
         indexOf + 1,
       ]);
     },
-    deleteTokenSet: (state, name: string) => updateTokenSetsInState(state, (setName, tokenSet) => (setName === name ? null : [setName, tokenSet])),
+    deleteTokenSet: (state, name: string) => {
+      const newState = updateTokenSetsInState(state, (setName, tokenSet) => (setName === name ? null : [setName, tokenSet]));
+      
+      // Clean up group metadata for the deleted token set
+      if (newState.groupMetadata && newState.groupMetadata[name]) {
+        const newGroupMetadata = { ...newState.groupMetadata };
+        delete newGroupMetadata[name];
+        return {
+          ...newState,
+          groupMetadata: newGroupMetadata,
+        };
+      }
+      
+      return newState;
+    },
     setLastSyncedState: (state, data: string) => ({
       ...state,
       lastSyncedState: data,
@@ -231,6 +277,27 @@ export const tokenState = createModel<RootModel>()({
       ...state,
       tokenSetMetadata: data,
     }),
+    renameTokenSetWithMetadata: (state, payload: { oldName: string; newName: string }) => {
+      // Rename the token set in tokens
+      const newTokens = { ...state.tokens };
+      if (newTokens[payload.oldName]) {
+        newTokens[payload.newName] = newTokens[payload.oldName];
+        delete newTokens[payload.oldName];
+      }
+
+      // Rename the token set in group metadata
+      const newGroupMetadata = { ...state.groupMetadata };
+      if (newGroupMetadata[payload.oldName]) {
+        newGroupMetadata[payload.newName] = newGroupMetadata[payload.oldName];
+        delete newGroupMetadata[payload.oldName];
+      }
+
+      return {
+        ...state,
+        tokens: newTokens,
+        groupMetadata: newGroupMetadata,
+      };
+    },
     replaceThemes: (state, themes: ThemeObjectsList) => ({
       ...state,
       themes,
@@ -239,6 +306,43 @@ export const tokenState = createModel<RootModel>()({
       ...state,
       renamedCollections,
     }),
+    setGroupMetadata: (state, payload: GroupMetadataMap) => ({
+      ...state,
+      groupMetadata: payload,
+    }),
+    updateGroupDescription: (state, payload: { path: string; description: string; tokenSet: string }) => {
+      return {
+        ...state,
+        groupMetadata: {
+          ...state.groupMetadata,
+          [payload.tokenSet]: {
+            ...state.groupMetadata?.[payload.tokenSet],
+            [payload.path]: {
+              description: payload.description,
+              lastModified: new Date().toISOString(),
+            },
+          },
+        },
+      };
+    },
+    deleteGroupMetadata: (state, payload: { path: string; tokenSet: string }) => {
+      const newGroupMetadata = { ...state.groupMetadata };
+      if (newGroupMetadata[payload.tokenSet]?.[payload.path]) {
+        const tokenSetMetadata = { ...newGroupMetadata[payload.tokenSet] };
+        delete tokenSetMetadata[payload.path];
+        
+        // If token set has no more metadata, remove the token set key entirely
+        if (Object.keys(tokenSetMetadata).length === 0) {
+          delete newGroupMetadata[payload.tokenSet];
+        } else {
+          newGroupMetadata[payload.tokenSet] = tokenSetMetadata;
+        }
+      }
+      return {
+        ...state,
+        groupMetadata: newGroupMetadata,
+      };
+    },
     resetImportedTokens: (state) => ({
       ...state,
       importedTokens: {
@@ -250,11 +354,19 @@ export const tokenState = createModel<RootModel>()({
       const parsedTokens = parseJson(payload);
       parseTokenValues(parsedTokens);
       const values = parseTokenValues({ [state.activeTokenSet]: parsedTokens });
+      
+      // Extract group metadata from the parsing result
+      const extractedGroupMetadata = extractGroupMetadata(values);
+      
       return {
         ...state,
         tokens: {
           ...state.tokens,
-          ...addIdPropertyToTokens(values),
+          ...addIdPropertyToTokens(extractTokensOnly(values)),
+        },
+        groupMetadata: {
+          ...state.groupMetadata,
+          ...extractedGroupMetadata,
         },
       };
     },
