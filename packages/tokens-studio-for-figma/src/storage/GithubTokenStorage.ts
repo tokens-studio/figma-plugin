@@ -13,6 +13,7 @@ import { SystemFilenames } from '@/constants/SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { GitSyncOptimizer, ChangedState } from './GitSyncOptimizer';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import { retryWithBackoff } from '@/utils/retryWithBackoff';
 
 type ExtendedOctokitClient = Omit<Octokit, 'repos'> & {
   repos: Octokit['repos'] & {
@@ -157,47 +158,68 @@ export class GithubTokenStorage extends GitTokenStorage {
   public async read(): Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage> {
     try {
       const normalizedPath = compact(this.path.split('/')).join('/');
-      const response = await this.octokitClient.rest.repos.getContent({
-        path: normalizedPath,
-        owner: this.owner,
-        repo: this.repository,
-        ref: this.branch,
-        headers: {
-          ...octokitClientDefaultHeaders,
-          // Setting this makes github return the raw file instead of a json object.
-          Accept: 'application/vnd.github.raw',
+      const response = await retryWithBackoff(
+        () => this.octokitClient.rest.repos.getContent({
+          path: normalizedPath,
+          owner: this.owner,
+          repo: this.repository,
+          ref: this.branch,
+          headers: {
+            ...octokitClientDefaultHeaders,
+            // Setting this makes github return the raw file instead of a json object.
+            Accept: 'application/vnd.github.raw',
+          },
+        }),
+        {
+          maxRetries: 3,
+          initialDelayMs: 100,
         },
-      });
+      );
 
       // read entire directory
       if (Array.isArray(response.data)) {
         const directorySha = await this.getTreeShaForDirectory(normalizedPath);
-        const treeResponse = await this.octokitClient.rest.git.getTree({
-          owner: this.owner,
-          repo: this.repository,
-          tree_sha: directorySha,
-          recursive: 'true',
-          headers: octokitClientDefaultHeaders,
-        });
+        const treeResponse = await retryWithBackoff(
+          () => this.octokitClient.rest.git.getTree({
+            owner: this.owner,
+            repo: this.repository,
+            tree_sha: directorySha,
+            recursive: 'true',
+            headers: octokitClientDefaultHeaders,
+          }),
+          {
+            maxRetries: 3,
+            initialDelayMs: 100,
+          },
+        );
         if (treeResponse && treeResponse.data.tree.length > 0) {
           const jsonFiles = treeResponse.data.tree.filter((file) => (
             file.path?.endsWith('.json')
           )).sort((a, b) => (
             (a.path && b.path) ? a.path.localeCompare(b.path) : 0
           ));
-          const jsonFileContents = await Promise.all(jsonFiles.map((treeItem) => (
-            treeItem.path ? this.octokitClient.rest.repos.getContent({
-              owner: this.owner,
-              repo: this.repository,
-              path: treeItem.path.startsWith(normalizedPath) ? treeItem.path : `${normalizedPath}/${treeItem.path}`,
-              ref: this.branch,
-              headers: {
-                ...octokitClientDefaultHeaders,
-                // Setting this makes github return the raw file instead of a json object.
-                Accept: 'application/vnd.github.raw',
+          const jsonFileContents = await Promise.all(jsonFiles.map((treeItem) => {
+            if (!treeItem.path) return Promise.resolve(null);
+
+            const itemPath = treeItem.path;
+            return retryWithBackoff(
+              () => this.octokitClient.rest.repos.getContent({
+                owner: this.owner,
+                repo: this.repository,
+                path: itemPath.startsWith(normalizedPath) ? itemPath : `${normalizedPath}/${itemPath}`,
+                ref: this.branch,
+                headers: {
+                  ...octokitClientDefaultHeaders,
+                  // Setting this makes github return the raw file instead of a json object.
+                  Accept: 'application/vnd.github.raw',
+                },
+              }),
+              {
+                maxRetries: 3,
+                initialDelayMs: 100,
               },
-            }) : Promise.resolve(null)
-          )));
+            );
+          }));
           return compact(jsonFileContents.map<RemoteTokenStorageFile | null>((fileContent, index) => {
             const { path } = jsonFiles[index];
             if (
@@ -287,20 +309,26 @@ export class GithubTokenStorage extends GitTokenStorage {
   }
 
   public async createOrUpdate(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch?: boolean, filesToDelete?: string[], ignoreDeletionFailures?: boolean): Promise<boolean> {
-    const response = await this.octokitClient.repos.createOrUpdateFiles({
-      branch,
-      owner: this.owner,
-      repo: this.repository,
-      createBranch: shouldCreateBranch,
-      changes: [
-        {
-          message,
-          files: changeset,
-          filesToDelete,
-          ignoreDeletionFailures,
-        },
-      ],
-    });
+    const response = await retryWithBackoff(
+      () => this.octokitClient.repos.createOrUpdateFiles({
+        branch,
+        owner: this.owner,
+        repo: this.repository,
+        createBranch: shouldCreateBranch,
+        changes: [
+          {
+            message,
+            files: changeset,
+            filesToDelete,
+            ignoreDeletionFailures,
+          },
+        ],
+      }),
+      {
+        maxRetries: 3,
+        initialDelayMs: 100,
+      },
+    );
     return !!response;
   }
 
@@ -356,13 +384,19 @@ export class GithubTokenStorage extends GitTokenStorage {
   public async getCommitSha(): Promise<string> {
     try {
       const normalizedPath = compact(this.path.split('/')).join('/');
-      const response = await this.octokitClient.rest.repos.getContent({
-        path: normalizedPath,
-        owner: this.owner,
-        repo: this.repository,
-        ref: this.branch,
-        headers: octokitClientDefaultHeaders,
-      });
+      const response = await retryWithBackoff(
+        () => this.octokitClient.rest.repos.getContent({
+          path: normalizedPath,
+          owner: this.owner,
+          repo: this.repository,
+          ref: this.branch,
+          headers: octokitClientDefaultHeaders,
+        }),
+        {
+          maxRetries: 3,
+          initialDelayMs: 100,
+        },
+      );
       // read entire directory
       if (Array.isArray(response.data)) {
         const directorySha = await this.getTreeShaForDirectory(normalizedPath);

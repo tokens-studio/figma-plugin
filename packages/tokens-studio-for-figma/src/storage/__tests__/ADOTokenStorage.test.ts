@@ -70,7 +70,7 @@ describe('ADOTokenStorage', () => {
     expect(mockFetch).toBeCalledTimes(2);
     expect(mockFetch).toHaveBeenNthCalledWith(
       2,
-      `${baseUrl}/${projectId}/_apis/git/repositories/${repositoryId}/refs?api-version=6.0`,
+      `${baseUrl}/${projectId}/_apis/git/repositories/${repositoryId}/refs?api-version=7.0`,
       {
         method: 'POST',
         headers: {
@@ -188,7 +188,7 @@ describe('ADOTokenStorage', () => {
   it('should return validation error when the content(s) are invalid', async () => {
     mockFetch.mockImplementationOnce(() => Promise.resolve({
       ok: true,
-      json: () => Promise.resolve(''),
+      json: () => Promise.resolve({ invalidData: 'this is not a valid token structure' }),
     }));
 
     storageProvider.changePath('data/tokens.json');
@@ -364,7 +364,7 @@ describe('ADOTokenStorage', () => {
     })).toBe(true);
     expect(mockFetch).toHaveBeenNthCalledWith(
       6,
-      `${baseUrl}/${projectId}/_apis/git/repositories/${repositoryId}/pushes?api-version=6.0`,
+      `${baseUrl}/${projectId}/_apis/git/repositories/${repositoryId}/pushes?api-version=7.0`,
       {
         method: 'POST',
         headers: {
@@ -544,7 +544,7 @@ describe('ADOTokenStorage', () => {
     })).toBe(true);
     expect(mockFetch).toHaveBeenNthCalledWith(
       8,
-      `${baseUrl}/${projectId}/_apis/git/repositories/${repositoryId}/pushes?api-version=6.0`,
+      `${baseUrl}/${projectId}/_apis/git/repositories/${repositoryId}/pushes?api-version=7.0`,
       {
         method: 'POST',
         headers: {
