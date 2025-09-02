@@ -29,7 +29,7 @@ function getStyleFromNode(node: BaseNode, styleIdBackupKey: string, styleType: '
       styleObject.value = figmaRGBToHex({
         r, g, b, a,
       });
-    } else if (paint.type === 'GRADIENT_LINEAR') {
+    } else if (paint.type === 'GRADIENT_LINEAR' || paint.type === 'GRADIENT_RADIAL' || paint.type === 'GRADIENT_ANGULAR' || paint.type === 'GRADIENT_DIAMOND') {
       styleObject.value = convertFigmaGradientToString(paint);
     } else {
       styleObject = null;

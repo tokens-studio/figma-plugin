@@ -54,7 +54,7 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
               b,
               a,
             });
-          } else if (paint.type === 'GRADIENT_LINEAR') {
+          } else if (paint.type === 'GRADIENT_LINEAR' || paint.type === 'GRADIENT_RADIAL' || paint.type === 'GRADIENT_ANGULAR' || paint.type === 'GRADIENT_DIAMOND') {
             styleObject.value = convertFigmaGradientToString(paint);
           } else {
             styleObject = null;
