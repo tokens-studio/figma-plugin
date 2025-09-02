@@ -25,7 +25,13 @@ export function pullTokensFactory(
   useConfirmResult: ReturnType<typeof useConfirm>,
   useRemoteTokensResult: ReturnType<typeof useRemoteTokens>,
 ) {
-  const activeTheme = typeof params.activeTheme === 'string' ? { [INTERNAL_THEMES_NO_GROUP]: params.activeTheme } : params.activeTheme;
+  const startupParams = params as StartupMessage & {
+    activeTheme: Record<string, string>;
+    localApiProviders: any[];
+    localTokenData: any;
+  };
+
+  const activeTheme = typeof startupParams.activeTheme === 'string' ? { [INTERNAL_THEMES_NO_GROUP]: startupParams.activeTheme } : (startupParams.activeTheme || {});
 
   const askUserIfRecoverLocalChanges = async () => {
     const shouldRecoverLocalChanges = await useConfirmResult.confirm({
@@ -40,7 +46,7 @@ export function pullTokensFactory(
     const storageType = storageTypeSelector(state);
 
     if (isRemoteStorage) {
-      const matchingSet = params.localApiProviders?.find((provider) => (
+      const matchingSet = startupParams.localApiProviders?.find((provider) => (
         isSameCredentials(provider, storageType)
       ));
 
@@ -67,15 +73,17 @@ export function pullTokensFactory(
           dispatch.uiState.setLocalApiState(matchingSet);
           dispatch.uiState.setLastError(null);
           // we don't want to update nodes if we're pulling from remote
-          dispatch.tokenState.setActiveTheme({ newActiveTheme: activeTheme || null, shouldUpdateNodes: false });
-          dispatch.tokenState.setCollapsedTokenSets(params.localTokenData?.collapsedTokenSets || []);
+          // NOTE: Removed setActiveTheme call here as it was being called before themes are loaded,
+          // causing all token sets to be disabled. The pullTokens -> setTokenData process will
+          // handle setting the activeTheme correctly after themes are loaded.
+          dispatch.tokenState.setCollapsedTokenSets(startupParams.localTokenData?.collapsedTokenSets || []);
 
           const remoteData = await useRemoteTokensResult.pullTokens({
             context: matchingSet,
             featureFlags: flags,
             activeTheme,
-            usedTokenSet: params.localTokenData?.usedTokenSet,
-            collapsedTokenSets: params.localTokenData?.collapsedTokenSets,
+            usedTokenSet: startupParams.localTokenData?.usedTokenSet,
+            collapsedTokenSets: startupParams.localTokenData?.collapsedTokenSets,
             updateLocalTokens: shouldPull,
           });
 
@@ -128,10 +136,10 @@ export function pullTokensFactory(
         dispatch.uiState.setLastError({ type, message, header });
         dispatch.uiState.setActiveTab(Tabs.START);
       }
-    } else if (params.localTokenData) {
-      if (params.localTokenData.tokenFormat) dispatch.tokenState.setTokenFormat(params.localTokenData.tokenFormat);
-      dispatch.tokenState.setTokenData({ ...params.localTokenData, activeTheme });
-      const existTokens = hasTokenValues(params.localTokenData.values);
+    } else if (startupParams.localTokenData) {
+      if (startupParams.localTokenData.tokenFormat) dispatch.tokenState.setTokenFormat(startupParams.localTokenData.tokenFormat);
+      dispatch.tokenState.setTokenData({ ...startupParams.localTokenData, activeTheme });
+      const existTokens = hasTokenValues(startupParams.localTokenData.values);
       if (existTokens) dispatch.uiState.setActiveTab(Tabs.TOKENS);
       else dispatch.uiState.setActiveTab(Tabs.START);
     }
@@ -152,15 +160,15 @@ export function pullTokensFactory(
       StorageProviderType.TOKENS_STUDIO,
     ].includes(storageType.provider);
 
-    const hasLocalData = params.localTokenData
-                         && Object.values(params.localTokenData?.values ?? {}).some((value) => value.length > 0);
+    const hasLocalData = startupParams.localTokenData
+                         && Object.values(startupParams.localTokenData?.values ?? {}).some((value: any) => value.length > 0);
 
     // Check if storage is remote and local data is empty
     if (isRemoteStorage && !hasLocalData) {
       // Pull tokens from remote since local data is empty
       await getApiCredentials(true, isRemoteStorage);
-    } else if (params.localTokenData) {
-      const checkForChanges = params.localTokenData.checkForChanges ?? false;
+    } else if (startupParams.localTokenData) {
+      const checkForChanges = startupParams.localTokenData.checkForChanges ?? false;
 
       if (
         !checkForChanges
@@ -172,9 +180,9 @@ export function pullTokensFactory(
         // get API credentials
         await getApiCredentials(true, isRemoteStorage);
       } else {
-        if (params.localTokenData.tokenFormat) dispatch.tokenState.setTokenFormat(params.localTokenData.tokenFormat);
+        if (startupParams.localTokenData.tokenFormat) dispatch.tokenState.setTokenFormat(startupParams.localTokenData.tokenFormat);
         // User confirmed to recover local changes
-        dispatch.tokenState.setTokenData({ ...params.localTokenData, activeTheme });
+        dispatch.tokenState.setTokenData({ ...startupParams.localTokenData, activeTheme });
 
         if (hasLocalData) {
           // local tokens found
