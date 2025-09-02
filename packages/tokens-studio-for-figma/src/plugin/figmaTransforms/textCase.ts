@@ -20,7 +20,11 @@ export function convertTextCaseToFigma(value: string): TextCase {
   }
 }
 
-export function convertFigmaToTextCase(value: string) {
+export function convertFigmaToTextCase(value: string | null | undefined): string {
+  if (!value || typeof value !== 'string') {
+    return 'none';
+  }
+
   switch (value) {
     case 'UPPER':
       return 'uppercase';

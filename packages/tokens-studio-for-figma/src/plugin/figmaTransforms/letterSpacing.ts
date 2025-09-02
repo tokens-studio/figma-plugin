@@ -22,7 +22,11 @@ export function convertLetterSpacingToFigma(inputValue: string, baseFontSize: st
   return letterSpacing;
 }
 
-export function convertFigmaToLetterSpacing(inputValue: LetterSpacing): string | number {
+export function convertFigmaToLetterSpacing(inputValue: LetterSpacing | null | undefined): string | number {
+  if (!inputValue || typeof inputValue !== 'object' || typeof inputValue.value !== 'number') {
+    return 0;
+  }
+
   const { unit, value } = inputValue;
   if (unit === 'PERCENT') {
     return `${+value.toFixed(2)}%`;
