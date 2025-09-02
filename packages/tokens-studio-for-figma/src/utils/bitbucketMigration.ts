@@ -13,12 +13,12 @@ export function isUsingAppPassword(credential: BitbucketCredentials): boolean {
   if (credential.apiToken && credential.apiToken.trim() !== '') {
     return false;
   }
-  
+
   // If secret exists but no apiToken, it's using app password
   if (credential.secret && credential.secret.trim() !== '') {
     return true;
   }
-  
+
   // Default to false (API token) for safety
   return false;
 }
@@ -30,9 +30,7 @@ export function isUsingAppPassword(credential: BitbucketCredentials): boolean {
  */
 export function findAppPasswordCredentials(apiProviders: StorageTypeCredentials[]): BitbucketCredentials[] {
   return apiProviders
-    .filter((provider): provider is BitbucketCredentials => 
-      provider.provider === StorageProviderType.BITBUCKET
-    )
+    .filter((provider): provider is BitbucketCredentials => provider.provider === StorageProviderType.BITBUCKET)
     .filter(isUsingAppPassword);
 }
 

@@ -17,7 +17,6 @@ import { StorageTypeCredentials } from '@/types/StorageType';
 import LocalStorageItem from './LocalStorageItem';
 import { getProviderIcon } from '@/utils/getProviderIcon';
 import { StyledBetaBadge } from './SecondScreen';
-import BitbucketMigrationHelper from './BitbucketMigrationHelper';
 
 const SyncSettings = () => {
   const localApiState = useSelector(localApiStateSelector);
@@ -76,17 +75,6 @@ const SyncSettings = () => {
   const [createStorageItemModalVisible, setShowCreateStorageModalVisible] = React.useState(false);
   const [storageProvider, setStorageProvider] = React.useState(localApiState.provider);
 
-  // Handle migration trigger from AppContainer
-  React.useEffect(() => {
-    if (triggerMigrationEdit) {
-      dispatch.uiState.setLocalApiState(triggerMigrationEdit);
-      setShowEditStorageModalVisible(true);
-      setLocalBranches(triggerMigrationEdit);
-      // Clear the trigger
-      dispatch.uiState.setTriggerMigrationEdit(null);
-    }
-  }, [triggerMigrationEdit, dispatch, setLocalBranches]);
-
   const setLocalBranches = React.useCallback(
     async (provider: StorageTypeCredentials) => {
       const branches = await fetchBranches(provider);
@@ -96,6 +84,18 @@ const SyncSettings = () => {
     },
     [dispatch.branchState, fetchBranches],
   );
+
+  // Handle migration trigger from AppContainer
+  React.useEffect(() => {
+    if (triggerMigrationEdit) {
+      dispatch.uiState.setLocalApiState(triggerMigrationEdit);
+      setShowEditStorageModalVisible(true);
+      // Handle async branch fetching with error handling
+      setLocalBranches(triggerMigrationEdit);
+      // Clear the trigger
+      dispatch.uiState.setTriggerMigrationEdit(null);
+    }
+  }, [triggerMigrationEdit, dispatch, setLocalBranches]);
 
   const handleEditClick = React.useCallback(
     (provider: any, migrating = false) => () => {
@@ -194,15 +194,13 @@ const SyncSettings = () => {
             </Dialog>
           </Stack>
 
-          {/* Bitbucket Migration Helper */}
-          <BitbucketMigrationHelper onEditCredential={(credential) => handleEditClick(credential, true)()} />
-
           <Stack direction="column" gap={2} width="full" align="start">
             <LocalStorageItem />
             {apiProviders.length > 0 && apiProviders.map((item) => (
               <StorageItem
                 key={item?.internalId || `${item.provider}-${item.id}`}
                 onEdit={handleEditClick(item)}
+                onMigrate={handleEditClick(item, true)}
                 item={item}
               />
             ))}

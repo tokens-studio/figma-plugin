@@ -92,7 +92,7 @@ describe('BitbucketTokenStorage', () => {
       }),
     );
 
-    expect(await storageProvider.canWrite()).toBe(false);
+    await expect(storageProvider.canWrite()).rejects.toThrow('BITBUCKET_UNAUTHORIZED');
 
     expect(mockFetch).toHaveBeenCalledWith(
       'https://api.bitbucket.org/2.0/user',

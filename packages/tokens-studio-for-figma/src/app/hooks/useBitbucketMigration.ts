@@ -8,7 +8,9 @@ import {
 import {
   hasAppPasswordCredentials,
   findAppPasswordCredentials,
+  BitbucketCredentials,
 } from '@/utils/bitbucketMigration';
+import { Tabs } from '@/constants/Tabs';
 
 export function useBitbucketMigration() {
   const dispatch = useDispatch<Dispatch>();
@@ -32,6 +34,17 @@ export function useBitbucketMigration() {
     }
   }, [hasAppPasswords, showMigrationDialog]);
 
+  const handleMigrate = useCallback((credential: BitbucketCredentials) => {
+    hideMigrationDialog();
+    // Navigate to settings and trigger migration edit for the specific credential
+    dispatch.uiState.setActiveTab(Tabs.SETTINGS);
+    dispatch.uiState.setTriggerMigrationEdit({ ...credential, migrating: true });
+  }, [hideMigrationDialog, dispatch]);
+
+  const closeDialog = useCallback(() => {
+    hideMigrationDialog();
+  }, [hideMigrationDialog]);
+
   return {
     showDialog,
     hasAppPasswords,
@@ -39,5 +52,7 @@ export function useBitbucketMigration() {
     showMigrationDialog,
     hideMigrationDialog,
     checkAndShowMigrationDialog,
+    handleMigrate,
+    closeDialog,
   };
 }

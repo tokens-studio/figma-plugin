@@ -64,16 +64,24 @@ export class BitbucketTokenStorage extends GitTokenStorage {
       });
 
       if (!response.ok) {
+        // Re-throw authentication errors instead of catching them
+        if (response.status === 401) {
+          throw new Error('BITBUCKET_UNAUTHORIZED');
+        }
         throw new Error(`Failed to fetch branches: ${response.status} ${response.statusText}`);
       }
 
       const data = await response.json();
       if (!data.values) {
-        return ['No data'];
+        return [];
       }
       return data.values.map((branch: any) => branch.name) as string[];
     } catch (error) {
-      return ['Error fetching branches'];
+      // Re-throw authentication errors and other specific errors
+      if (error instanceof Error && error.message === 'BITBUCKET_UNAUTHORIZED') {
+        throw error;
+      }
+      throw new Error('Error fetching branches');
     }
   }
 
@@ -147,6 +155,10 @@ export class BitbucketTokenStorage extends GitTokenStorage {
       });
 
       if (!userResponse.ok) {
+        // Throw authentication errors instead of returning false
+        if (userResponse.status === 401) {
+          throw new Error('BITBUCKET_UNAUTHORIZED');
+        }
         return false;
       }
 
@@ -161,6 +173,9 @@ export class BitbucketTokenStorage extends GitTokenStorage {
       });
 
       if (!permResponse.ok) {
+        if (permResponse.status === 401) {
+          throw new Error('BITBUCKET_UNAUTHORIZED');
+        }
         return false;
       }
 
@@ -168,6 +183,10 @@ export class BitbucketTokenStorage extends GitTokenStorage {
       // (API tokens are typically created with specific permissions)
       return true;
     } catch (e) {
+      // Re-throw authentication errors
+      if (e instanceof Error && e.message === 'BITBUCKET_UNAUTHORIZED') {
+        throw e;
+      }
       return false;
     }
   }

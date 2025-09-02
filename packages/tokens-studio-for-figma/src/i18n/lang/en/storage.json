@@ -88,12 +88,15 @@
       "learnMore": "Learn how to create API Tokens →",
       "remindLater": "Remind me later",
       "migrate": "Migrate to API Tokens",
-      "appPasswordDeprecated": "App Passwords are deprecated. Consider migrating to API Tokens.",
+      "appPasswordDeprecated": "Atlassian deprecated App Passwords, migrate to API tokens.",
       "apiTokenRequired": "API Tokens are required for new Bitbucket syncs.",
-      "allUpToDate": "All your Bitbucket syncs are using API Tokens. No migration needed!",
       "migrationNeeded": "Bitbucket Migration Needed",
       "helperDescription": "You have {{count}} Bitbucket sync(s) using deprecated App Passwords. Migrate them to API Tokens to ensure continued access.",
-      "syncsToMigrate": "Syncs to migrate:"
+      "syncsToMigrate": "Syncs to migrate:",
+      "appPasswordWarning": "App Password migration required",
+      "clickToMigrate": "Click to migrate",
+      "calloutDescription": "App Passwords are being deprecated by Atlassian. Migrate to API Tokens for better security and continued access.",
+      "switchToMigrationMode": "Migrate"
     },
     "tokensstudio": {
       "name": "Name",

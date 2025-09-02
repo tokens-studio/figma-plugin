@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -7,52 +7,52 @@ import {
   Heading,
   Link,
 } from '@tokens-studio/ui';
-import { ExclamationTriangleIcon } from '@radix-ui/react-icons';
 import Modal from './Modal';
-import { BitbucketCredentials } from '@/utils/bitbucketMigration';
+import { useBitbucketMigration } from '@/app/hooks/useBitbucketMigration';
 
-type Props = {
-  isOpen: boolean;
-  onClose: () => void;
-  onMigrate: (credential: BitbucketCredentials) => void;
-  appPasswordCredentials: BitbucketCredentials[];
-};
-
-export default function BitbucketMigrationDialog({
-  isOpen,
-  onClose,
-  onMigrate,
-  appPasswordCredentials,
-}: Props) {
+export default function BitbucketMigrationDialog() {
+  const {
+    showDialog,
+    appPasswordCredentials,
+    closeDialog,
+    handleMigrate,
+    checkAndShowMigrationDialog,
+  } = useBitbucketMigration();
   const { t } = useTranslation(['storage']);
+  const [hasMigrationBeenChecked, setHasMigrationBeenChecked] = useState(false);
+
+  const createMigrateHandler = React.useCallback((credential: any) => () => {
+    handleMigrate(credential);
+  }, [handleMigrate]);
+
+  // Check for migration dialog once on mount (simulating startup completion)
+  useEffect(() => {
+    if (!hasMigrationBeenChecked) {
+      // Small delay to let the UI settle after startup
+      const timer = setTimeout(() => {
+        checkAndShowMigrationDialog();
+        setHasMigrationBeenChecked(true);
+      }, 1000);
+
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, [hasMigrationBeenChecked, checkAndShowMigrationDialog]);
 
   return (
-    <Modal isOpen={isOpen} close={onClose} title="">
+    <Modal isOpen={showDialog} close={closeDialog} title="">
       <Stack direction="column" gap={4} css={{ padding: '$4' }}>
-        <Stack direction="row" gap={3} align="center">
-          <ExclamationTriangleIcon 
-            style={{ 
-              color: 'var(--colors-warning-fg)', 
-              width: '24px', 
-              height: '24px' 
-            }} 
-          />
-          <Heading size="medium">
-            {t('bitbucketMigration.title', 'Bitbucket App Password Migration Required')}
-          </Heading>
-        </Stack>
+        <Heading size="medium">
+          {t('providers.bitbucketMigration.title')}
+        </Heading>
 
         <Text>
-          {t('bitbucketMigration.description', 
-            'Bitbucket App Passwords are being deprecated by Atlassian and will be discontinued. ' +
-            'You have {{count}} Bitbucket sync(s) using App Passwords that need to be migrated to API Tokens.',
-            { count: appPasswordCredentials.length }
-          )}
+          {t('providers.bitbucketMigration.description', { count: appPasswordCredentials.length })}
         </Text>
 
         <Stack direction="column" gap={2}>
           <Text size="small" muted>
-            {t('bitbucketMigration.affectedSyncs', 'Affected syncs:')}
+            {t('providers.bitbucketMigration.affectedSyncs')}
           </Text>
           {appPasswordCredentials.map((credential) => (
             <Stack
@@ -63,7 +63,7 @@ export default function BitbucketMigrationDialog({
               css={{
                 padding: '$2',
                 backgroundColor: '$bgSubtle',
-                borderRadius: '$small'
+                borderRadius: '$small',
               }}
             >
               <Stack direction="column" gap={1}>
@@ -71,25 +71,24 @@ export default function BitbucketMigrationDialog({
                   {credential.name}
                 </Text>
                 <Text size="xsmall" muted>
-                  {credential.id} • {credential.branch}
+                  {credential.id}
+                  {' • '}
+                  {credential.branch}
                 </Text>
               </Stack>
               <Button
                 variant="secondary"
                 size="small"
-                onClick={() => onMigrate(credential)}
+                onClick={createMigrateHandler(credential)}
               >
-                {t('bitbucketMigration.migrate', 'Migrate')}
+                {t('providers.bitbucketMigration.migrate')}
               </Button>
             </Stack>
           ))}
         </Stack>
 
         <Text size="small" muted>
-          {t('bitbucketMigration.instructions', 
-            'API Tokens provide better security and will continue to work after App Passwords are discontinued. ' +
-            'You can migrate your existing syncs or create new ones with API Tokens.'
-          )}
+          {t('providers.bitbucketMigration.instructions')}
         </Text>
 
         <Link
@@ -97,12 +96,12 @@ export default function BitbucketMigrationDialog({
           target="_blank"
           rel="noreferrer"
         >
-          {t('bitbucketMigration.learnMore', 'Learn how to create API Tokens →')}
+          {t('providers.bitbucketMigration.learnMore')}
         </Link>
 
         <Stack direction="row" justify="end" gap={3}>
-          <Button variant="secondary" onClick={onClose}>
-            {t('bitbucketMigration.remindLater', 'Remind me later')}
+          <Button variant="secondary" onClick={closeDialog}>
+            {t('providers.bitbucketMigration.remindLater')}
           </Button>
         </Stack>
       </Stack>

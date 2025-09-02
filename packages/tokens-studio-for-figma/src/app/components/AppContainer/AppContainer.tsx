@@ -26,7 +26,6 @@ import { useFigmaTheme } from '@/hooks/useFigmaTheme';
 import Box from '../Box';
 import { darkThemeMode, lightThemeMode } from '@/stitches.config';
 import BitbucketMigrationDialog from '../BitbucketMigrationDialog';
-import { useBitbucketMigration } from '@/app/hooks/useBitbucketMigration';
 
 type Props = StartupMessage & {
   // @README only for unit testing purposes
@@ -45,13 +44,6 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
   const { isDarkTheme } = useFigmaTheme();
   const dispatch = useDispatch<Dispatch>();
   const startupProcess = useStartupProcess(params);
-  const {
-    showDialog: showMigrationDialog,
-    appPasswordCredentials,
-    hideMigrationDialog,
-    checkAndShowMigrationDialog
-  } = useBitbucketMigration();
-
   const [showLoadingScreen, setShowLoadingScreen] = useState(true);
 
   const handleCancelLoadingScreen = useCallback(() => {
@@ -77,12 +69,8 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
       }
     } else if (startupProcess.isComplete) {
       setShowLoadingScreen(false);
-      // Check for app password migration after startup is complete
-      setTimeout(() => {
-        checkAndShowMigrationDialog();
-      }, 1000); // Small delay to let the UI settle
     }
-  }, [startupProcess, checkAndShowMigrationDialog]);
+  }, [startupProcess]);
 
   useEffect(() => {
     handlePerformStartup();
@@ -95,17 +83,6 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
       document.body.className = lightThemeMode;
     }
   }, [isDarkTheme]);
-
-  const handleMigrationDialogClose = useCallback(() => {
-    hideMigrationDialog();
-  }, [hideMigrationDialog]);
-
-  const handleMigrationStart = useCallback((credential: any) => {
-    hideMigrationDialog();
-    // Navigate to settings and trigger migration edit for the specific credential
-    dispatch.uiState.setActiveTab(Tabs.SETTINGS);
-    dispatch.uiState.setTriggerMigrationEdit({ ...credential, migrating: true });
-  }, [hideMigrationDialog, dispatch]);
 
   globalStyles();
 
@@ -130,12 +107,7 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
       <Changelog />
       <SecondScreenSync />
       <AuthModal />
-      <BitbucketMigrationDialog
-        isOpen={showMigrationDialog}
-        onClose={handleMigrationDialogClose}
-        onMigrate={handleMigrationStart}
-        appPasswordCredentials={appPasswordCredentials}
-      />
+      <BitbucketMigrationDialog />
     </Box>
   );
 

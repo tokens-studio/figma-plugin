@@ -3,7 +3,7 @@ import zod from 'zod';
 import {
   Button, TextInput, Stack, FormField, Label, Link, IconButton, Text,
 } from '@tokens-studio/ui';
-import { EyeClosedIcon, EyeOpenIcon } from '@radix-ui/react-icons';
+import { EyeClosedIcon, EyeOpenIcon, ExclamationTriangleIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeFormValues } from '@/types/StorageType';
@@ -30,6 +30,10 @@ export default function BitbucketForm({
   const toggleMask = React.useCallback(() => {
     setIsMasked((prev) => !prev);
   }, []);
+
+  const handleMigrationMode = React.useCallback(() => {
+    onChange({ target: { name: 'migrating', value: true } } as any);
+  }, [onChange]);
 
   // Determine if this is an existing sync using app password
   // If migrating is true, treat as API token mode even for existing credentials
@@ -102,7 +106,7 @@ export default function BitbucketForm({
         <FormField>
           <Label htmlFor="name">{t('name')}</Label>
           <TextInput value={values.name || ''} onChange={onChange} type="text" name="name" id="name" required />
-          <Text muted>{t('nameHelpText')}</Text>
+          <Text muted size="xsmall">{t('nameHelpText')}</Text>
         </FormField>
         <FormField>
           <Label htmlFor="username">
@@ -122,28 +126,53 @@ export default function BitbucketForm({
 
         {/* Show app password field for existing syncs that use app passwords */}
         {isEditingAppPasswordSync && (
-          <FormField>
-            <Label htmlFor="secret">{t('providers.bitbucket.appPassword')}</Label>
-            <TextInput
-              value={values.secret || ''}
-              onChange={onChange}
-              name="secret"
-              id="secret"
-              required
-              type={isMasked ? 'password' : 'text'}
-              trailingAction={(
-                <IconButton
-                  variant="invisible"
-                  size="small"
-                  onClick={toggleMask}
-                  icon={isMasked ? <EyeClosedIcon /> : <EyeOpenIcon />}
+          <>
+            <FormField>
+              <Label htmlFor="secret">{t('providers.bitbucket.appPassword')}</Label>
+              <TextInput
+                value={values.secret || ''}
+                onChange={onChange}
+                name="secret"
+                id="secret"
+                required
+                type={isMasked ? 'password' : 'text'}
+                trailingAction={(
+                  <IconButton
+                    variant="invisible"
+                    size="small"
+                    onClick={toggleMask}
+                    icon={isMasked ? <EyeClosedIcon /> : <EyeOpenIcon />}
+                  />
+                )}
+              />
+              <Text muted size="xsmall">
+                {t('providers.bitbucketMigration.appPasswordDeprecated')}
+              </Text>
+            </FormField>
+
+            {/* Migration warning below app password field */}
+            <Stack direction="row" justify="between" align="center" css={{ marginTop: '$2' }}>
+              <Stack direction="row" gap={2} align="center">
+                <ExclamationTriangleIcon
+                  style={{
+                    color: 'var(--colors-dangerFg)',
+                    width: '14px',
+                    height: '14px',
+                  }}
                 />
-              )}
-            />
-            <Text muted size="xsmall">
-              {t('bitbucketMigration.appPasswordDeprecated', 'App Passwords are deprecated. Consider migrating to API Tokens.')}
-            </Text>
-          </FormField>
+                <Text size="small" css={{ color: '$dangerFg' }}>
+                  {t('providers.bitbucketMigration.appPasswordDeprecated')}
+                </Text>
+              </Stack>
+              <Button
+                variant="secondary"
+                size="small"
+                onClick={handleMigrationMode}
+              >
+                {t('providers.bitbucketMigration.switchToMigrationMode')}
+              </Button>
+            </Stack>
+          </>
         )}
 
         {/* Show API token field for new syncs or existing syncs that already use API tokens */}
@@ -168,12 +197,12 @@ export default function BitbucketForm({
             />
             {isNewSync && !isMigrating && (
               <Text muted size="xsmall">
-                {t('bitbucketMigration.apiTokenRequired', 'API Tokens are required for new Bitbucket syncs.')}
+                {t('providers.bitbucketMigration.apiTokenRequired')}
               </Text>
             )}
             {isMigrating && (
               <Text muted size="xsmall">
-                {t('bitbucketMigration.migrationInProgress', 'Migrating from App Password to API Token. Please enter your new API Token.')}
+                {t('providers.bitbucketMigration.migrationInProgress')}
               </Text>
             )}
           </FormField>
