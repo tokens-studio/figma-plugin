@@ -136,6 +136,7 @@ export type BulkRemapTokensAsyncMessage = AsyncMessage<AsyncMessageTypes.BULK_RE
   oldName: string;
   newName: string;
   updateMode: UpdateMode;
+  useRegex: boolean;
 }>;
 export type BulkRemapTokensMessageAsyncResult = AsyncMessage<AsyncMessageTypes.BULK_REMAP_TOKENS>;
 

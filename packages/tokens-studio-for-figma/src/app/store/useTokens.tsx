@@ -214,7 +214,7 @@ export default function useTokens() {
   );
 
   const handleBulkRemap = useCallback(
-    async (newName: string, oldName: string, bulkUpdateMode = UpdateMode.SELECTION) => {
+    async (newName: string, oldName: string, bulkUpdateMode = UpdateMode.SELECTION, useRegex = false) => {
       track('bulkRemapToken', { fromInspect: true });
 
       wrapTransaction({ name: 'bulkRemapToken' }, async () => AsyncMessageChannel.ReactInstance.message({
@@ -222,6 +222,7 @@ export default function useTokens() {
         oldName,
         newName,
         updateMode: bulkUpdateMode,
+        useRegex,
       }));
     },
     [],
