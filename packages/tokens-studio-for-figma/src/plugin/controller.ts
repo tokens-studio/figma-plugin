@@ -7,6 +7,7 @@ import { sendSelectionChange } from './sendSelectionChange';
 import { init } from '@/utils/plugin';
 import { sendDocumentChange } from './sendDocumentChange';
 import { performCodeGen } from './performCodeGen';
+import { notifyInstancesCreated } from './notifiers';
 
 AsyncMessageChannel.PluginInstance.connect();
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CREDENTIALS, asyncHandlers.credentials);
@@ -86,8 +87,28 @@ figma.on('selectionchange', () => {
   sendSelectionChange();
 });
 
-figma.on('documentchange', (event: DocumentChangeEvent) => {
+figma.on('documentchange', async (event: DocumentChangeEvent) => {
   sendDocumentChange(event);
+
+  // Look for CREATE events of instance nodes and notify UI
+  const instanceCreations = event.documentChanges.filter(
+    (change) => change.type === 'CREATE' && change.origin === 'LOCAL',
+  );
+
+  if (instanceCreations.length > 0) {
+    // Check if any of the created nodes are instance nodes
+    const createdInstanceNodes = instanceCreations
+      .map((change) => figma.getNodeById(change.id))
+      .filter((node) => node && node.type === 'INSTANCE');
+
+    if (createdInstanceNodes.length > 0) {
+      // Set selection to the new instance nodes for potential token application
+      figma.currentPage.selection = createdInstanceNodes as SceneNode[];
+
+      // Notify UI that instances were created - UI will decide if it should apply tokens
+      notifyInstancesCreated(createdInstanceNodes.length);
+    }
+  }
 });
 
 figma.codegen.on('generate', (event: any): CodegenResult[] => performCodeGen(event));
