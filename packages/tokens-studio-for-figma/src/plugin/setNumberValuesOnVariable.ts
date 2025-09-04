@@ -11,6 +11,7 @@ export default function setNumberValuesOnVariable(variable: Variable, mode: stri
     const newValue = value;
 
     if (existingVariableValue !== newValue) {
+      console.log('Setting number value on variable', variable.name, variable.valuesByMode[mode], newValue);
       variable.setValueForMode(mode, newValue);
     }
   } catch (e) {

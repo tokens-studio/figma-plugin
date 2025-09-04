@@ -36,6 +36,7 @@ export default async function setValuesOnVariable(
       if (variable) {
         // First, rename all variables that should be renamed (if the user choose to do so)
         if (variable.name !== token.path && shouldRename) {
+          console.log('Renaming variable', variable.name, token.path);
           renamedVariableKeys.push(variable.key);
           variable.name = token.path;
         }
@@ -51,6 +52,7 @@ export default async function setValuesOnVariable(
         switch (variableType) {
           case 'BOOLEAN':
             if (typeof token.value === 'string' && !token.value.includes('{')) {
+              console.log('Setting boolean value on variable', variable.name, variable.valuesByMode[mode], token.value);
               setBooleanValuesOnVariable(variable, mode, token.value);
             }
             break;
@@ -69,10 +71,12 @@ export default async function setValuesOnVariable(
           }
           case 'STRING':
             if (typeof token.value === 'string' && !token.value.includes('{')) {
+              console.log('Setting string value on variable', variable.name, variable.valuesByMode[mode], token.value);
               setStringValuesOnVariable(variable, mode, token.value);
               // Given we cannot determine the combined family of a variable, we cannot use fallback weights from our estimates.
               // This is not an issue because users can set numerical font weights with variables, so we opt-out of the guesswork and just apply the numerical weight.
             } else if (token.type === TokenTypes.FONT_WEIGHTS && Array.isArray(token.value)) {
+              console.log('Setting string value on variable', variable.name, variable.valuesByMode[mode], token.value[0]);
               setStringValuesOnVariable(variable, mode, token.value[0]);
             }
             break;
