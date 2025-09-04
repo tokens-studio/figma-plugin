@@ -1,5 +1,6 @@
 import { isVariableWithAliasReference } from '@/utils/isAliasReference';
 import { convertToFigmaColor } from './figmaTransforms/colors';
+import { normalizeVariableName } from '@/utils/normalizeVariableName';
 
 export function normalizeFigmaColor({
   r, g, b, a,
@@ -23,63 +24,54 @@ function isFigmaColorObject(obj: VariableValue): obj is RGBOrRGBA {
     && (!('a' in obj) || typeof obj.a === 'number');
 }
 
-function resolveVariableAlias(aliasValue: VariableAlias, mode: string): VariableValue | null {
+function getReferencedVariableName(aliasValue: VariableAlias): string | null {
   try {
     const referencedVariable = figma.variables.getVariableById(aliasValue.id);
-    if (!referencedVariable) return null;
-
-    const resolvedValue = referencedVariable.valuesByMode[mode];
-    if (!resolvedValue) return null;
-
-    // If the resolved value is also an alias, resolve it recursively
-    if (isVariableWithAliasReference(resolvedValue)) {
-      return resolveVariableAlias(resolvedValue, mode);
-    }
-
-    return resolvedValue;
+    return referencedVariable?.name || null;
   } catch (e) {
-    console.error('Error resolving variable alias:', e);
+    console.error('Error getting referenced variable name:', e);
     return null;
   }
 }
 
-export default function setColorValuesOnVariable(variable: Variable, mode: string, value: string) {
+export default function setColorValuesOnVariable(variable: Variable, mode: string, value: string, tokenName?: string, rawValue?: string) {
   try {
     const { color, opacity } = convertToFigmaColor(value);
     const existingVariableValue = variable.valuesByMode[mode];
     if (!existingVariableValue || !(isFigmaColorObject(existingVariableValue) || isVariableWithAliasReference(existingVariableValue))) return;
 
-    let existingValue: VariableValue;
+    // If the existing value is an alias and we have a rawValue with reference, compare the referenced variable name
+    if (isVariableWithAliasReference(existingVariableValue) && rawValue && rawValue.startsWith('{') && rawValue.endsWith('}')) {
+      const referenceName = rawValue.slice(1, -1); // Remove { and }
+      const referencedVariableName = getReferencedVariableName(existingVariableValue);
+
+      if (referencedVariableName) {
+        const normalizedReferencedName = normalizeVariableName(referencedVariableName);
+        const normalizedReferenceName = normalizeVariableName(referenceName);
+
+        if (normalizedReferencedName === normalizedReferenceName) {
+          // The alias already points to the correct variable, no update needed
+          return;
+        }
+      }
+    }
+
+    const newValue = normalizeFigmaColor({ ...color, a: opacity });
+
+    // For direct color values, compare the actual color values
     if (isFigmaColorObject(existingVariableValue)) {
-      existingValue = normalizeFigmaColor({
+      const existingValue = normalizeFigmaColor({
         ...existingVariableValue,
         a: 'a' in existingVariableValue ? existingVariableValue.a : 1,
       });
-    } else if (isVariableWithAliasReference(existingVariableValue)) {
-      // Resolve the alias to get the actual color value
-      const resolvedValue = resolveVariableAlias(existingVariableValue, mode);
-      if (!resolvedValue || !isFigmaColorObject(resolvedValue)) {
-        // If we can't resolve the alias or it's not a color, proceed with update
-        existingValue = existingVariableValue;
-      } else {
-        existingValue = normalizeFigmaColor({
-          ...resolvedValue,
-          a: 'a' in resolvedValue ? resolvedValue.a : 1,
-        });
-      }
-    } else {
-      existingValue = existingVariableValue;
-    }
-    const newValue = normalizeFigmaColor({ ...color, a: opacity });
 
-    if (isFigmaColorObject(existingValue) && isFigmaColorObject(newValue)) {
       const existingA = 'a' in existingValue ? existingValue.a : 1;
       const newA = 'a' in newValue ? newValue.a : 1;
       if ((existingValue.r === newValue.r)
         && (existingValue.g === newValue.g)
         && (existingValue.b === newValue.b)
         && (existingA === newA)) {
-      // return if values match
+        // return if values match
         return;
       }
     }
