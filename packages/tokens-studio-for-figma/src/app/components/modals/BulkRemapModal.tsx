@@ -1,8 +1,10 @@
 import React from 'react';
-import { Button, Checkbox, Switch } from '@tokens-studio/ui';
+import {
+  Button, Checkbox, FormField, IconButton, Switch, TextInput,
+} from '@tokens-studio/ui';
+import { Asterisk } from 'iconoir-react';
 import Modal from '../Modal';
 import Stack from '../Stack';
-import Input from '../Input';
 import useTokens from '../../store/useTokens';
 import Box from '../Box';
 import Label from '../Label';
@@ -52,27 +54,32 @@ export default function BulkRemapModal({ isOpen, onClose }: Props) {
         onSubmit={onConfirm}
       >
         <Stack direction="column" gap={4}>
-          <Input
-            full
-            required
-            autofocus
-            type="text"
-            label="Match"
-            value={oldName}
-            placeholder=""
-            onChange={handleOldNameChange}
-            name="oldName"
-          />
-          <Input
-            required
-            full
-            type="text"
-            label="Remap"
-            value={newName}
-            placeholder=""
-            onChange={handleNewNameChange}
-            name="newName"
-          />
+          <FormField>
+            <Label htmlFor="oldName">Match</Label>
+            <TextInput
+              required
+              id="oldName"
+              autoFocus
+              type="text"
+              value={oldName}
+              placeholder={useRegex ? 'e.g. ^grey (regex active)' : 'e.g. grey'}
+              onChange={handleOldNameChange}
+              name="oldName"
+              trailingAction={<IconButton tooltip={useRegex ? 'Disable regex' : 'Enable regex'} size="small" onClick={updateUseRegex} icon={<Asterisk />} variant={useRegex ? 'primary' : 'invisible'} />}
+            />
+          </FormField>
+          <FormField>
+            <Label htmlFor="newName">Remap</Label>
+            <TextInput
+              required
+              id="newName"
+              type="text"
+              value={newName}
+              placeholder="e.g. gray"
+              onChange={handleNewNameChange}
+            />
+          </FormField>
+
           <Box css={{
             display: 'flex', alignItems: 'center', gap: '$3', fontSize: '$small',
           }}
@@ -84,19 +91,6 @@ export default function BulkRemapModal({ isOpen, onClose }: Props) {
             />
             <Label htmlFor="remapDocument" css={{ fontSize: '$small', fontWeight: '$sansBold' }}>
               Remap across document (slow)
-            </Label>
-          </Box>
-          <Box css={{
-            display: 'flex', alignItems: 'center', gap: '$3', fontSize: '$small',
-          }}
-          >
-            <Switch
-              checked={useRegex}
-              id="useRegex"
-              onCheckedChange={updateUseRegex}
-            />
-            <Label htmlFor="useRegex" css={{ fontSize: '$small', fontWeight: '$sansBold' }}>
-              Use regular expressions
             </Label>
           </Box>
           <Stack direction="row" gap={4} justify="between">
