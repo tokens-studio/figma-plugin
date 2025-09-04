@@ -9,11 +9,6 @@ import { postToUI } from '../notifiers';
 import { ProgressTracker } from '../ProgressTracker';
 import { defaultWorker } from '../Worker';
 
-// Escapes special regex characters for literal string matching
-function escapeRegex(string: string): string {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
 export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK_REMAP_TOKENS] = async (msg) => {
   // Big O(n * m) + Big O(updatePluginData) + Big O(sendSelectionChange): (n = amount of nodes, m = amount of tokens in the node)
   try {
@@ -37,21 +32,23 @@ export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK
     allWithData.forEach(({ node, tokens }) => {
       promises.add(defaultWorker.schedule(async () => {
         Object.entries(tokens).forEach(([key, value]) => {
-          let pattern: RegExp;
-          
           if (useRegex) {
             // When regex mode is enabled, check if the pattern is wrapped in /pattern/flags format
             const regexTest = oldName.match(regexPattern);
-            pattern = regexTest ? new RegExp(regexTest[1], regexTest[2]) : new RegExp(oldName, 'g');
+            const pattern = regexTest ? new RegExp(regexTest[1], regexTest[2]) : new RegExp(oldName, 'g');
+            
+            if (pattern.test(value)) {
+              const newValue = value.replace(pattern, newName);
+              const jsonValue = JSON.stringify(newValue);
+              node.setSharedPluginData(namespace, key, jsonValue);
+            }
           } else {
-            // When regex mode is disabled, treat oldName as literal string and escape special characters
-            pattern = new RegExp(escapeRegex(oldName), 'g');
-          }
-          
-          if (pattern.test(value)) {
-            const newValue = value.replace(pattern, newName);
-            const jsonValue = JSON.stringify(newValue);
-            node.setSharedPluginData(namespace, key, jsonValue);
+            // When regex mode is disabled, use simple string replacement
+            if (value.includes(oldName)) {
+              const newValue = value.split(oldName).join(newName);
+              const jsonValue = JSON.stringify(newValue);
+              node.setSharedPluginData(namespace, key, jsonValue);
+            }
           }
         });
         tracker.next();
