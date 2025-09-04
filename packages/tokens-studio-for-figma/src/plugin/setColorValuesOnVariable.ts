@@ -1,6 +1,6 @@
 import { isVariableWithAliasReference } from '@/utils/isAliasReference';
 import { convertToFigmaColor } from './figmaTransforms/colors';
-import { normalizeVariableName } from '@/utils/normalizeVariableName';
+import { checkVariableAliasEquality } from '@/utils/checkVariableAliasEquality';
 
 export function normalizeFigmaColor({
   r, g, b, a,
@@ -24,36 +24,16 @@ function isFigmaColorObject(obj: VariableValue): obj is RGBOrRGBA {
     && (!('a' in obj) || typeof obj.a === 'number');
 }
 
-function getReferencedVariableName(aliasValue: VariableAlias): string | null {
-  try {
-    const referencedVariable = figma.variables.getVariableById(aliasValue.id);
-    return referencedVariable?.name || null;
-  } catch (e) {
-    console.error('Error getting referenced variable name:', e);
-    return null;
-  }
-}
-
 export default function setColorValuesOnVariable(variable: Variable, mode: string, value: string, tokenName?: string, rawValue?: string) {
   try {
     const { color, opacity } = convertToFigmaColor(value);
     const existingVariableValue = variable.valuesByMode[mode];
     if (!existingVariableValue || !(isFigmaColorObject(existingVariableValue) || isVariableWithAliasReference(existingVariableValue))) return;
 
-    // If the existing value is an alias and we have a rawValue with reference, compare the referenced variable name
-    if (isVariableWithAliasReference(existingVariableValue) && rawValue && rawValue.startsWith('{') && rawValue.endsWith('}')) {
-      const referenceName = rawValue.slice(1, -1); // Remove { and }
-      const referencedVariableName = getReferencedVariableName(existingVariableValue);
-
-      if (referencedVariableName) {
-        const normalizedReferencedName = normalizeVariableName(referencedVariableName);
-        const normalizedReferenceName = normalizeVariableName(referenceName);
-
-        if (normalizedReferencedName === normalizedReferenceName) {
-          // The alias already points to the correct variable, no update needed
-          return;
-        }
-      }
+    // Check if the alias already points to the correct variable
+    if (checkVariableAliasEquality(existingVariableValue, rawValue)) {
+      // The alias already points to the correct variable, no update needed
+      return;
     }
 
     const newValue = normalizeFigmaColor({ ...color, a: opacity });

@@ -53,7 +53,7 @@ export default async function setValuesOnVariable(
           case 'BOOLEAN':
             if (typeof token.value === 'string' && !token.value.includes('{')) {
               console.log('Setting boolean value on variable', variable.name, variable.valuesByMode[mode], token.value);
-              setBooleanValuesOnVariable(variable, mode, token.value);
+              setBooleanValuesOnVariable(variable, mode, token.value, typeof token.rawValue === 'string' ? token.rawValue : undefined);
             }
             break;
           case 'COLOR':
@@ -65,19 +65,19 @@ export default async function setValuesOnVariable(
             const value = String(token.value);
             if (typeof value === 'string' && !value.includes('{')) {
               const transformedValue = transformValue(value, token.type, baseFontSize, true);
-              setNumberValuesOnVariable(variable, mode, Number(transformedValue));
+              setNumberValuesOnVariable(variable, mode, Number(transformedValue), typeof token.rawValue === 'string' ? token.rawValue : undefined);
             }
             break;
           }
           case 'STRING':
             if (typeof token.value === 'string' && !token.value.includes('{')) {
               console.log('Setting string value on variable', variable.name, variable.valuesByMode[mode], token.value);
-              setStringValuesOnVariable(variable, mode, token.value);
+              setStringValuesOnVariable(variable, mode, token.value, typeof token.rawValue === 'string' ? token.rawValue : undefined);
               // Given we cannot determine the combined family of a variable, we cannot use fallback weights from our estimates.
               // This is not an issue because users can set numerical font weights with variables, so we opt-out of the guesswork and just apply the numerical weight.
             } else if (token.type === TokenTypes.FONT_WEIGHTS && Array.isArray(token.value)) {
               console.log('Setting string value on variable', variable.name, variable.valuesByMode[mode], token.value[0]);
-              setStringValuesOnVariable(variable, mode, token.value[0]);
+              setStringValuesOnVariable(variable, mode, token.value[0], typeof token.rawValue === 'string' ? token.rawValue : undefined);
             }
             break;
           default:
