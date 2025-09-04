@@ -38,7 +38,6 @@ export function setTokenData(state: TokenState, payload: SetTokenDataPayload): T
   // When the remote data has changed, we will update the last synced state
   const lastSyncedState = payload.hasChangedRemote
     ? (() => {
-      // Clean up themes to match the format used in comparison (remove disabled token sets)
       const cleanedThemes = (payload.themes ?? []).map((theme) => ({
         ...theme,
         selectedTokenSets: Object.fromEntries(

@@ -226,7 +226,6 @@ export function useJSONbin() {
         themes: content.themes,
         metadata: { tokenSetOrder: Object.keys(tokens) },
       });
-      // Clean up themes to match the format used in comparison (remove disabled token sets)
       const cleanedThemes = content.themes.map((theme) => ({
         ...theme,
         selectedTokenSets: Object.fromEntries(

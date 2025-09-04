@@ -279,7 +279,6 @@ export function useGenericVersionedStorage() {
             tokenSetOrder: Object.keys(content.tokens),
           },
         });
-        // Clean up themes to match the format used in comparison (remove disabled token sets)
         const cleanedThemes = content.themes.map((theme) => ({
           ...theme,
           selectedTokenSets: Object.fromEntries(

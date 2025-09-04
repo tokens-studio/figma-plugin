@@ -72,7 +72,6 @@ export default function useURL() {
             themes: content.themes,
             metadata: content.metadata,
           });
-          // Clean up themes to match the format used in comparison (remove disabled token sets)
           const cleanedThemes = content.themes.map((theme) => ({
             ...theme,
             selectedTokenSets: Object.fromEntries(

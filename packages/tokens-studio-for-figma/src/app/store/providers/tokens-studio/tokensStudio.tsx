@@ -136,7 +136,6 @@ export function useTokensStudio() {
             themes,
             metadata,
           });
-          // Clean up themes to match the format used in comparison (remove disabled token sets)
           const cleanedThemes = themes.map((theme) => ({
             ...theme,
             selectedTokenSets: Object.fromEntries(
@@ -249,7 +248,6 @@ export function useTokensStudio() {
                 themes: data.themes,
                 metadata: data.metadata,
               });
-              // Clean up themes to match the format used in comparison (remove disabled token sets)
               const cleanedThemes = data.themes.map((theme) => ({
                 ...theme,
                 selectedTokenSets: Object.fromEntries(
