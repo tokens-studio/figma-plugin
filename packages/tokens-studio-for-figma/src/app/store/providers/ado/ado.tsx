@@ -93,7 +93,16 @@ export const useADO = () => {
         });
         const branches = await storage.fetchBranches();
         dispatch.branchState.setBranches(branches);
-        const stringifiedRemoteTokens = JSON.stringify(compact([tokens, themes, TokenFormat.format]), null, 2);
+        const cleanedThemes = themes.map((theme) => ({
+          ...theme,
+          selectedTokenSets: Object.fromEntries(
+            Object.entries(theme.selectedTokenSets).filter(
+              ([setName, status]) => Object.keys(tokens).includes(setName) && status !== 'disabled',
+            ),
+          ),
+        }));
+
+        const stringifiedRemoteTokens = JSON.stringify(compact([tokens, cleanedThemes, TokenFormat.format]), null, 2);
         dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
         pushDialog({ state: 'success' });
 
@@ -229,7 +238,16 @@ export const useADO = () => {
               themes: content.themes,
               metadata: content.metadata,
             });
-            const stringifiedRemoteTokens = JSON.stringify(compact([sortedValues, content.themes, TokenFormat.format]), null, 2);
+            const cleanedThemes = content.themes.map((theme) => ({
+              ...theme,
+              selectedTokenSets: Object.fromEntries(
+                Object.entries(theme.selectedTokenSets).filter(
+                  ([setName, status]) => Object.keys(sortedValues).includes(setName) && status !== 'disabled',
+                ),
+              ),
+            }));
+
+            const stringifiedRemoteTokens = JSON.stringify(compact([sortedValues, cleanedThemes, TokenFormat.format]), null, 2);
             dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
             dispatch.tokenState.setCollapsedTokenSets([]);
             notifyToUI('Pulled tokens from ADO');

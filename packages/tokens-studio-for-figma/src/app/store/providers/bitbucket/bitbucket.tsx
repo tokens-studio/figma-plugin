@@ -97,7 +97,16 @@ export function useBitbucket() {
           themes,
           metadata,
         });
-        const stringifiedRemoteTokens = JSON.stringify(compact([tokens, themes, TokenFormat.format]), null, 2);
+        const cleanedThemes = themes.map((theme) => ({
+          ...theme,
+          selectedTokenSets: Object.fromEntries(
+            Object.entries(theme.selectedTokenSets).filter(
+              ([setName, status]) => Object.keys(tokens).includes(setName) && status !== 'disabled',
+            ),
+          ),
+        }));
+
+        const stringifiedRemoteTokens = JSON.stringify(compact([tokens, cleanedThemes, TokenFormat.format]), null, 2);
         dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
         pushDialog({ state: 'success' });
         return {

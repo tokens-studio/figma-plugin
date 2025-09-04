@@ -226,7 +226,16 @@ export function useJSONbin() {
         themes: content.themes,
         metadata: { tokenSetOrder: Object.keys(tokens) },
       });
-      const stringifiedRemoteTokens = JSON.stringify(compact([applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder), content.themes, TokenFormat.format]), null, 2);
+      const cleanedThemes = content.themes.map((theme) => ({
+        ...theme,
+        selectedTokenSets: Object.fromEntries(
+          Object.entries(theme.selectedTokenSets).filter(
+            ([setName, status]) => Object.keys(content.tokens).includes(setName) && status !== 'disabled',
+          ),
+        ),
+      }));
+
+      const stringifiedRemoteTokens = JSON.stringify(compact([applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder), cleanedThemes, TokenFormat.format]), null, 2);
       dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
       return content;
     }
