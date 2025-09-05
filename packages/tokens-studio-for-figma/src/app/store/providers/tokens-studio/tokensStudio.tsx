@@ -27,6 +27,7 @@ import { categorizeError } from '@/utils/error/categorizeError';
 import { RemoteTokenStorageMetadata } from '@/storage/RemoteTokenStorage';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
+import { cleanThemesSelectedTokenSets } from '@/utils/cleanThemesSelectedTokenSets';
 
 type TokensStudioCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.TOKENS_STUDIO }>;
 type TokensStudioFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.TOKENS_STUDIO }>;
@@ -136,7 +137,9 @@ export function useTokensStudio() {
             themes,
             metadata,
           });
-          const stringifiedRemoteTokens = JSON.stringify(compact([tokens, themes, TokenFormat.format]), null, 2);
+          const cleanedThemes = cleanThemesSelectedTokenSets(themes, Object.keys(tokens));
+
+          const stringifiedRemoteTokens = JSON.stringify(compact([tokens, cleanedThemes, TokenFormat.format]), null, 2);
           dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
           pushDialog({ state: 'success' });
           return {
@@ -239,7 +242,9 @@ export function useTokensStudio() {
                 themes: data.themes,
                 metadata: data.metadata,
               });
-              const stringifiedRemoteTokens = JSON.stringify(compact([data.tokens, data.themes, TokenFormat.format]), null, 2);
+              const cleanedThemes = cleanThemesSelectedTokenSets(data.themes, Object.keys(data.tokens));
+
+              const stringifiedRemoteTokens = JSON.stringify(compact([data.tokens, cleanedThemes, TokenFormat.format]), null, 2);
               dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
               dispatch.tokenState.setCollapsedTokenSets([]);
               notifyToUI('Pulled tokens from Tokens Studio');

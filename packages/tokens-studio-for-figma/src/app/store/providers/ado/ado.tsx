@@ -22,6 +22,7 @@ import { PushOverrides } from '../../remoteTokens';
 import { useIsProUser } from '@/app/hooks/useIsProUser';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 import { categorizeError } from '@/utils/error/categorizeError';
+import { cleanThemesSelectedTokenSets } from '@/utils/cleanThemesSelectedTokenSets';
 
 
 type AdoCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.ADO; }>;
@@ -93,7 +94,9 @@ export const useADO = () => {
         });
         const branches = await storage.fetchBranches();
         dispatch.branchState.setBranches(branches);
-        const stringifiedRemoteTokens = JSON.stringify(compact([tokens, themes, TokenFormat.format]), null, 2);
+        const cleanedThemes = cleanThemesSelectedTokenSets(themes, Object.keys(tokens));
+
+        const stringifiedRemoteTokens = JSON.stringify(compact([tokens, cleanedThemes, TokenFormat.format]), null, 2);
         dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
         pushDialog({ state: 'success' });
 
@@ -229,7 +232,9 @@ export const useADO = () => {
               themes: content.themes,
               metadata: content.metadata,
             });
-            const stringifiedRemoteTokens = JSON.stringify(compact([sortedValues, content.themes, TokenFormat.format]), null, 2);
+            const cleanedThemes = cleanThemesSelectedTokenSets(content.themes, Object.keys(sortedValues));
+
+            const stringifiedRemoteTokens = JSON.stringify(compact([sortedValues, cleanedThemes, TokenFormat.format]), null, 2);
             dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
             dispatch.tokenState.setCollapsedTokenSets([]);
             notifyToUI('Pulled tokens from ADO');

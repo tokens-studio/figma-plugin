@@ -27,6 +27,7 @@ import {
 import { RemoteResponseData } from '@/types/RemoteResponseData';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
+import { cleanThemesSelectedTokenSets } from '@/utils/cleanThemesSelectedTokenSets';
 
 export async function updateGenericVersionedTokens({
   tokens,
@@ -279,8 +280,10 @@ export function useGenericVersionedStorage() {
             tokenSetOrder: Object.keys(content.tokens),
           },
         });
+        const cleanedThemes = cleanThemesSelectedTokenSets(content.themes, Object.keys(content.tokens));
+
         const stringifiedRemoteTokens = JSON.stringify(
-          compact([content.tokens, content.themes, TokenFormat.format]),
+          compact([content.tokens, cleanedThemes, TokenFormat.format]),
           null,
           2,
         );

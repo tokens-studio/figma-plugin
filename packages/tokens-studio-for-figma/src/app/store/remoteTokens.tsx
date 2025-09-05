@@ -33,6 +33,7 @@ import usePullDialog from '../hooks/usePullDialog';
 import { Tabs } from '@/constants/Tabs';
 import { useTokensStudio } from './providers/tokens-studio';
 import { notifyToUI } from '@/plugin/notifiers';
+import { cleanThemesSelectedTokenSets } from '@/utils/cleanThemesSelectedTokenSets';
 
 export type PushOverrides = { branch: string; commitMessage: string };
 
@@ -188,14 +189,20 @@ export default function useRemoteTokens() {
       }
 
       if (remoteData?.status === 'success') {
+        // Type assertion since we know remoteData is success type here
+        const successData = remoteData as Extract<typeof remoteData, { status: 'success' }>;
+
         dispatch.tokenState.setRemoteData({
-          tokens: remoteData.tokens,
-          themes: remoteData.themes,
-          metadata: remoteData.metadata,
+          tokens: successData.tokens,
+          themes: successData.themes,
+          metadata: successData.metadata,
         });
         dispatch.uiState.setHasRemoteChange(false);
+        // Clean up themes to match the format used in comparison (remove disabled token sets)
+        const cleanedThemes = cleanThemesSelectedTokenSets(successData.themes, Object.keys(successData.tokens));
+
         const stringifiedRemoteTokens = JSON.stringify(
-          compact([remoteData.tokens, remoteData.themes, TokenFormat.format]),
+          compact([successData.tokens, cleanedThemes, TokenFormat.format]),
           null,
           2,
         );

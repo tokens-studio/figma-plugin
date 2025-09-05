@@ -22,6 +22,7 @@ import { ErrorMessages } from '../../../../constants/ErrorMessages';
 import { applyTokenSetOrder } from '../../../../utils/tokenset';
 import { PushOverrides } from '../../remoteTokens';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
+import { cleanThemesSelectedTokenSets } from '@/utils/cleanThemesSelectedTokenSets';
 
 type SupernovaCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.SUPERNOVA }>;
 type SupernovaFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.SUPERNOVA }>;
@@ -76,7 +77,9 @@ export function useSupernova() {
             themes,
             metadata,
           });
-          const stringifiedRemoteTokens = JSON.stringify(compact([tokens, themes, TokenFormat.format]), null, 2);
+          const cleanedThemes = cleanThemesSelectedTokenSets(themes, Object.keys(tokens));
+
+          const stringifiedRemoteTokens = JSON.stringify(compact([tokens, cleanedThemes, TokenFormat.format]), null, 2);
           dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
           pushDialog({ state: 'success' });
           return {
