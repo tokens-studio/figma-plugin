@@ -173,7 +173,6 @@ export function Initiator() {
             break;
           }
           case MessageFromPluginTypes.INSTANCES_CREATED: {
-            const { count } = pluginMessage;
             // Only apply tokens if the setting is enabled
             if (autoApplyThemeOnDrop) {
               // Trigger the updateDocument action to apply tokens to the selection
