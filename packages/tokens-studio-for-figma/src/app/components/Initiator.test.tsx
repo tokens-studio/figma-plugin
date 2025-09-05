@@ -677,6 +677,8 @@ describe('Initiator', () => {
       uiState: {},
     });
 
+    const updateDocumentSpy = jest.spyOn(mockStore.dispatch.tokenState, 'updateDocument');
+
     render(
       <Provider store={mockStore}>
         <Initiator />
@@ -695,8 +697,8 @@ describe('Initiator', () => {
       }),
     );
 
-    // The test passes if no errors are thrown when auto-apply is disabled
-    expect(true).toBe(true);
+    // The updateDocument function should not be called when auto-apply is disabled
+    expect(updateDocumentSpy).not.toHaveBeenCalled();
   });
 
   it('should handle instances created when auto-apply is enabled', () => {
@@ -718,6 +720,8 @@ describe('Initiator', () => {
       uiState: {},
     });
 
+    const updateDocumentSpy = jest.spyOn(mockStore.dispatch.tokenState, 'updateDocument');
+
     render(
       <Provider store={mockStore}>
         <Initiator />
@@ -736,7 +740,7 @@ describe('Initiator', () => {
       }),
     );
 
-    // The test passes if no errors are thrown when auto-apply is enabled
-    expect(true).toBe(true);
+    // The updateDocument function should be called when auto-apply is enabled
+    expect(updateDocumentSpy).toHaveBeenCalledWith({ shouldUpdateNodes: true });
   });
 });
