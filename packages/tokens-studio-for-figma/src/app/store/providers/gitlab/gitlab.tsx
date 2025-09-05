@@ -25,6 +25,7 @@ import { PushOverrides } from '../../remoteTokens';
 import { useIsProUser } from '@/app/hooks/useIsProUser';
 import { categorizeError } from '@/utils/error/categorizeError';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
+import { cleanThemesSelectedTokenSets } from '@/utils/cleanThemesSelectedTokenSets';
 
 export type GitlabCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITLAB; }>;
 type GitlabFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITLAB }>;
@@ -103,14 +104,7 @@ export function useGitLab() {
         });
         const branches = await storage.fetchBranches();
         dispatch.branchState.setBranches(branches);
-        const cleanedThemes = themes.map((theme) => ({
-          ...theme,
-          selectedTokenSets: Object.fromEntries(
-            Object.entries(theme.selectedTokenSets).filter(
-              ([setName, status]) => Object.keys(tokens).includes(setName) && status !== 'disabled',
-            ),
-          ),
-        }));
+        const cleanedThemes = cleanThemesSelectedTokenSets(themes, Object.keys(tokens));
 
         const stringifiedRemoteTokens = JSON.stringify(compact([tokens, cleanedThemes, TokenFormat.format]), null, 2);
         dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
@@ -253,14 +247,7 @@ export function useGitLab() {
               themes: content.themes,
               metadata: content.metadata,
             });
-            const cleanedThemes = content.themes.map((theme) => ({
-              ...theme,
-              selectedTokenSets: Object.fromEntries(
-                Object.entries(theme.selectedTokenSets).filter(
-                  ([setName, status]) => Object.keys(content.tokens).includes(setName) && status !== 'disabled',
-                ),
-              ),
-            }));
+            const cleanedThemes = cleanThemesSelectedTokenSets(content.themes, Object.keys(content.tokens));
 
             const stringifiedRemoteTokens = JSON.stringify(compact([content.tokens, cleanedThemes, TokenFormat.format]), null, 2);
             dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);

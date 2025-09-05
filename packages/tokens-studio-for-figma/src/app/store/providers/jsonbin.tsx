@@ -20,6 +20,7 @@ import { ErrorMessages } from '@/constants/ErrorMessages';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 import { categorizeError } from '@/utils/error/categorizeError';
+import { cleanThemesSelectedTokenSets } from '@/utils/cleanThemesSelectedTokenSets';
 
 export async function updateJSONBinTokens({
   tokens, themes, context, updatedAt, oldUpdatedAt = null, storeTokenIdInJsonEditor,
@@ -226,14 +227,7 @@ export function useJSONbin() {
         themes: content.themes,
         metadata: { tokenSetOrder: Object.keys(tokens) },
       });
-      const cleanedThemes = content.themes.map((theme) => ({
-        ...theme,
-        selectedTokenSets: Object.fromEntries(
-          Object.entries(theme.selectedTokenSets).filter(
-            ([setName, status]) => Object.keys(content.tokens).includes(setName) && status !== 'disabled',
-          ),
-        ),
-      }));
+      const cleanedThemes = cleanThemesSelectedTokenSets(content.themes, Object.keys(content.tokens));
 
       const stringifiedRemoteTokens = JSON.stringify(compact([applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder), cleanedThemes, TokenFormat.format]), null, 2);
       dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);

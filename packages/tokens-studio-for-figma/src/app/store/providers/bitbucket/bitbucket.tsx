@@ -22,6 +22,7 @@ import { PushOverrides } from '../../remoteTokens';
 import { useIsProUser } from '@/app/hooks/useIsProUser';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 import { categorizeError } from '@/utils/error/categorizeError';
+import { cleanThemesSelectedTokenSets } from '@/utils/cleanThemesSelectedTokenSets';
 
 type BitbucketCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.BITBUCKET }>;
 type BitbucketFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.BITBUCKET }>;
@@ -97,14 +98,7 @@ export function useBitbucket() {
           themes,
           metadata,
         });
-        const cleanedThemes = themes.map((theme) => ({
-          ...theme,
-          selectedTokenSets: Object.fromEntries(
-            Object.entries(theme.selectedTokenSets).filter(
-              ([setName, status]) => Object.keys(tokens).includes(setName) && status !== 'disabled',
-            ),
-          ),
-        }));
+        const cleanedThemes = cleanThemesSelectedTokenSets(themes, Object.keys(tokens));
 
         const stringifiedRemoteTokens = JSON.stringify(compact([tokens, cleanedThemes, TokenFormat.format]), null, 2);
         dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);

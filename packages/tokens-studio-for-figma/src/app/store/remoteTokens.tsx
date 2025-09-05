@@ -33,6 +33,7 @@ import usePullDialog from '../hooks/usePullDialog';
 import { Tabs } from '@/constants/Tabs';
 import { useTokensStudio } from './providers/tokens-studio';
 import { notifyToUI } from '@/plugin/notifiers';
+import { cleanThemesSelectedTokenSets } from '@/utils/cleanThemesSelectedTokenSets';
 
 export type PushOverrides = { branch: string; commitMessage: string };
 
@@ -198,14 +199,7 @@ export default function useRemoteTokens() {
         });
         dispatch.uiState.setHasRemoteChange(false);
         // Clean up themes to match the format used in comparison (remove disabled token sets)
-        const cleanedThemes = successData.themes.map((theme) => ({
-          ...theme,
-          selectedTokenSets: Object.fromEntries(
-            Object.entries(theme.selectedTokenSets).filter(
-              ([setName, status]) => Object.keys(successData.tokens).includes(setName) && status !== 'disabled',
-            ),
-          ),
-        }));
+        const cleanedThemes = cleanThemesSelectedTokenSets(successData.themes, Object.keys(successData.tokens));
 
         const stringifiedRemoteTokens = JSON.stringify(
           compact([successData.tokens, cleanedThemes, TokenFormat.format]),

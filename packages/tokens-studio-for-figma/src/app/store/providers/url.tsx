@@ -14,6 +14,7 @@ import { RemoteResponseData } from '@/types/RemoteResponseData';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 import { categorizeError } from '@/utils/error/categorizeError';
+import { cleanThemesSelectedTokenSets } from '@/utils/cleanThemesSelectedTokenSets';
 
 type UrlCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.URL; }>;
 
@@ -72,14 +73,7 @@ export default function useURL() {
             themes: content.themes,
             metadata: content.metadata,
           });
-          const cleanedThemes = content.themes.map((theme) => ({
-            ...theme,
-            selectedTokenSets: Object.fromEntries(
-              Object.entries(theme.selectedTokenSets).filter(
-                ([setName, status]) => Object.keys(content.tokens).includes(setName) && status !== 'disabled',
-              ),
-            ),
-          }));
+          const cleanedThemes = cleanThemesSelectedTokenSets(content.themes, Object.keys(content.tokens));
 
           const stringifiedRemoteTokens = JSON.stringify(compact([applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder), cleanedThemes, TokenFormat.format]), null, 2);
           dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);

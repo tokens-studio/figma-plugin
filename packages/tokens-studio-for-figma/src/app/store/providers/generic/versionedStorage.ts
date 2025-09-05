@@ -27,6 +27,7 @@ import {
 import { RemoteResponseData } from '@/types/RemoteResponseData';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
+import { cleanThemesSelectedTokenSets } from '@/utils/cleanThemesSelectedTokenSets';
 
 export async function updateGenericVersionedTokens({
   tokens,
@@ -279,14 +280,7 @@ export function useGenericVersionedStorage() {
             tokenSetOrder: Object.keys(content.tokens),
           },
         });
-        const cleanedThemes = content.themes.map((theme) => ({
-          ...theme,
-          selectedTokenSets: Object.fromEntries(
-            Object.entries(theme.selectedTokenSets).filter(
-              ([setName, status]) => Object.keys(content.tokens).includes(setName) && status !== 'disabled',
-            ),
-          ),
-        }));
+        const cleanedThemes = cleanThemesSelectedTokenSets(content.themes, Object.keys(content.tokens));
 
         const stringifiedRemoteTokens = JSON.stringify(
           compact([content.tokens, cleanedThemes, TokenFormat.format]),

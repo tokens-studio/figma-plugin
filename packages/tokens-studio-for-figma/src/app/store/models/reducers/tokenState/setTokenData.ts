@@ -7,6 +7,7 @@ import removeIdPropertyFromTokens from '@/utils/removeIdPropertyFromTokens';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 import { TokenStore } from '@/types/tokens';
 import { checkStorageSize } from '@/utils/checkStorageSize';
+import { cleanThemesSelectedTokenSets } from '@/utils/cleanThemesSelectedTokenSets';
 
 export function setTokenData(state: TokenState, payload: SetTokenDataPayload): TokenState {
   if (payload.values.length === 0) {
@@ -38,14 +39,7 @@ export function setTokenData(state: TokenState, payload: SetTokenDataPayload): T
   // When the remote data has changed, we will update the last synced state
   const lastSyncedState = payload.hasChangedRemote
     ? (() => {
-      const cleanedThemes = (payload.themes ?? []).map((theme) => ({
-        ...theme,
-        selectedTokenSets: Object.fromEntries(
-          Object.entries(theme.selectedTokenSets).filter(
-            ([setName, status]) => allAvailableTokenSets.includes(setName) && status !== 'disabled',
-          ),
-        ),
-      }));
+      const cleanedThemes = cleanThemesSelectedTokenSets(payload.themes ?? [], allAvailableTokenSets);
       return JSON.stringify(compact([tokenValues, cleanedThemes, TokenFormat.format]), null, 2);
     })()
     : state.lastSyncedState;
@@ -56,14 +50,7 @@ export function setTokenData(state: TokenState, payload: SetTokenDataPayload): T
     ...state,
     lastSyncedState,
     tokens: values,
-    themes: (payload.themes ?? []).map((theme) => ({
-      ...theme,
-      selectedTokenSets: Object.fromEntries(
-        Object.entries(theme.selectedTokenSets).filter(
-          ([setName, status]) => allAvailableTokenSets.includes(setName) && status !== TokenSetStatus.DISABLED,
-        ),
-      ),
-    })),
+    themes: cleanThemesSelectedTokenSets(payload.themes ?? [], allAvailableTokenSets),
     activeTheme: newActiveTheme ?? {},
     ...(Object.keys(payload.values).includes(state.activeTokenSet)
       ? {}
