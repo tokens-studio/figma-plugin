@@ -35,7 +35,7 @@ function isFigmaColorObject(obj: VariableValue): obj is RGBOrRGBA {
   );
 }
 
-export default function setColorValuesOnVariable(variable: Variable, mode: string, value: string, _tokenName?: string) {
+export default function setColorValuesOnVariable(variable: Variable, mode: string, value: string) {
   try {
     const { color, opacity } = convertToFigmaColor(value);
     const existingVariableValue = variable.valuesByMode[mode];

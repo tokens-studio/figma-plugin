@@ -75,7 +75,7 @@ export default async function setValuesOnVariable(
               break;
             case 'COLOR':
               if (typeof token.value === 'string' && !token.value.includes('{')) {
-                setColorValuesOnVariable(variable, mode, token.value, token.path);
+                setColorValuesOnVariable(variable, mode, token.value);
               }
               break;
             case 'FLOAT': {
