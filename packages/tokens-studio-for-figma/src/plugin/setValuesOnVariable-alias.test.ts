@@ -11,7 +11,9 @@ const baseFontSize = '16px';
 
 describe('SetValuesOnVariable - Alias Reference Testing', () => {
   const mockSetValueForMode = jest.fn();
-  const mockCheckVariableAliasEquality = checkVariableAliasEquality as jest.MockedFunction<typeof checkVariableAliasEquality>;
+  const mockCheckVariableAliasEquality = checkVariableAliasEquality as jest.MockedFunction<
+    typeof checkVariableAliasEquality
+  >;
 
   // Mock variables with alias references for each type
   const variablesInFigma = [
@@ -82,7 +84,7 @@ describe('SetValuesOnVariable - Alias Reference Testing', () => {
       },
       {
         name: 'sizing.large',
-        path: 'sizing/large', 
+        path: 'sizing/large',
         rawValue: '{sizing.xl}',
         value: '32',
         type: TokenTypes.SIZING,
@@ -104,13 +106,13 @@ describe('SetValuesOnVariable - Alias Reference Testing', () => {
         type: TokenTypes.TEXT,
         variableId: 'string-key-1',
       },
-    ] as SingleToken<true, { path: string, variableId: string }>[];
+    ] as SingleToken<true, { path: string; variableId: string }>[];
 
     await setValuesOnVariable(variablesInFigma, tokens, collection, mode, baseFontSize);
 
     // Verify that setValueForMode was never called since aliases already point to correct variables
     expect(mockSetValueForMode).not.toHaveBeenCalled();
-    
+
     // Verify that alias equality check was called for each token
     expect(mockCheckVariableAliasEquality).toHaveBeenCalledTimes(4);
   });
@@ -152,17 +154,23 @@ describe('SetValuesOnVariable - Alias Reference Testing', () => {
         type: TokenTypes.TEXT,
         variableId: 'string-key-1',
       },
-    ] as SingleToken<true, { path: string, variableId: string }>[];
+    ] as SingleToken<true, { path: string; variableId: string }>[];
 
     await setValuesOnVariable(variablesInFigma, tokens, collection, mode, baseFontSize);
 
     // Verify that setValueForMode was called for each variable
     expect(mockSetValueForMode).toHaveBeenCalledTimes(4);
-    
+
     // Verify specific calls
-    expect(mockSetValueForMode).toHaveBeenCalledWith(mode, expect.objectContaining({
-      r: 0, g: 1, b: 0, a: 1, // #00FF00
-    }));
+    expect(mockSetValueForMode).toHaveBeenCalledWith(
+      mode,
+      expect.objectContaining({
+        r: 0,
+        g: 1,
+        b: 0,
+        a: 1, // #00FF00
+      }),
+    );
     expect(mockSetValueForMode).toHaveBeenCalledWith(mode, 24);
     expect(mockSetValueForMode).toHaveBeenCalledWith(mode, false);
     expect(mockSetValueForMode).toHaveBeenCalledWith(mode, 'New Heading');
@@ -171,9 +179,9 @@ describe('SetValuesOnVariable - Alias Reference Testing', () => {
   it('should handle mixed scenarios where some aliases match and others do not', async () => {
     // Mock selective responses: color and boolean match, number and string do not
     mockCheckVariableAliasEquality
-      .mockReturnValueOnce(true)  // color alias matches
+      .mockReturnValueOnce(true) // color alias matches
       .mockReturnValueOnce(false) // number alias does not match
-      .mockReturnValueOnce(true)  // boolean alias matches
+      .mockReturnValueOnce(true) // boolean alias matches
       .mockReturnValueOnce(false); // string alias does not match
 
     const tokens = [
@@ -209,7 +217,7 @@ describe('SetValuesOnVariable - Alias Reference Testing', () => {
         type: TokenTypes.TEXT,
         variableId: 'string-key-1',
       },
-    ] as SingleToken<true, { path: string, variableId: string }>[];
+    ] as SingleToken<true, { path: string; variableId: string }>[];
 
     await setValuesOnVariable(variablesInFigma, tokens, collection, mode, baseFontSize);
 
@@ -229,14 +237,14 @@ describe('SetValuesOnVariable - Alias Reference Testing', () => {
         type: TokenTypes.COLOR,
         variableId: 'color-key-1',
       },
-    ] as SingleToken<true, { path: string, variableId: string }>[];
+    ] as SingleToken<true, { path: string; variableId: string }>[];
 
     await setValuesOnVariable(variablesInFigma, tokens, collection, mode, baseFontSize);
 
     // Should call checkVariableAliasEquality with undefined rawValue
     expect(mockCheckVariableAliasEquality).toHaveBeenCalledWith(
       { type: 'VARIABLE_ALIAS', id: 'VariableID:referenced:color' },
-      '#FF0000'
+      '#FF0000',
     );
   });
 });
