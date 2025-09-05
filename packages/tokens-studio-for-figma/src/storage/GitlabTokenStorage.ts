@@ -280,8 +280,8 @@ export class GitlabTokenStorage extends GitTokenStorage {
       recursive: true,
     });
 
-    let gitlabActions = Object.entries(changeset).map(([filePath, content]) => {
-      const action = tree.some((file) => file.path === filePath) ? 'update' : 'create';
+    let gitlabActions: CommitAction[] = Object.entries(changeset).map(([filePath, content]) => {
+      const action = tree.some((file) => file.path === filePath) ? 'update' as const : 'create' as const;
       return { action, filePath, content };
     });
 
@@ -297,8 +297,9 @@ export class GitlabTokenStorage extends GitTokenStorage {
     if (filesToDelete.length > 0 && !this.path.endsWith('.json')) {
       gitlabActions = gitlabActions.concat(
         filesToDelete.map((filePath) => ({
-          action: 'delete',
+          action: 'delete' as const,
           filePath,
+          content: '', // Required for CommitAction type, but not used for delete actions
         })),
       );
     }
