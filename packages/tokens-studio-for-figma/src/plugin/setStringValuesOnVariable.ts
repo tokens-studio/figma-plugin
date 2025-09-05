@@ -4,10 +4,9 @@ export default function setStringValuesOnVariable(variable: Variable, mode: stri
   try {
     const existingVariableValue = variable.valuesByMode[mode];
     if (
-      !existingVariableValue ||
-      !(typeof existingVariableValue === 'string' || isVariableWithAliasReference(existingVariableValue))
-    )
-      return;
+      !existingVariableValue
+      || !(typeof existingVariableValue === 'string' || isVariableWithAliasReference(existingVariableValue))
+    ) return;
 
     if (existingVariableValue !== value) {
       console.log('Setting string value on variable', variable.name, variable.valuesByMode[mode], value);

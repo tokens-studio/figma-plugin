@@ -4,10 +4,9 @@ export default function setBooleanValuesOnVariable(variable: Variable, mode: str
   try {
     const existingVariableValue = variable.valuesByMode[mode];
     if (
-      existingVariableValue === undefined ||
-      !(typeof existingVariableValue === 'boolean' || isVariableWithAliasReference(existingVariableValue))
-    )
-      return;
+      existingVariableValue === undefined
+      || !(typeof existingVariableValue === 'boolean' || isVariableWithAliasReference(existingVariableValue))
+    ) return;
 
     const newValue = value === 'true';
 
