@@ -543,6 +543,16 @@ describe('GithubTokenStorage', () => {
     mockGetContent.mockClear();
   });
 
+  it('should return an empty array when reading results in an error', async () => {
+    const error404 = new Error('404 Not Found');
+    (error404 as any).status = 404;
+    mockGetContent.mockImplementationOnce(() => (
+      Promise.reject(error404)
+    ));
+    const result = await storageProvider.read();
+    expect(result).toEqual([]);
+  });
+
   it('should return an error message when reading results in an error', async () => {
     mockGetContent.mockImplementationOnce(() => (
       Promise.reject(new Error())
@@ -1524,5 +1534,89 @@ describe('GithubTokenStorage', () => {
 
     const uniqueFiles = [...new Set(filesToDelete)];
     expect(uniqueFiles.length).toEqual(filesToDelete.length);
+  });
+
+  it('should handle missing directory during writeChangeset', async () => {
+    storageProvider.changePath('new-tokens-folder');
+
+    // Mock getContent to fail (directory doesn't exist)
+    mockGetContent.mockImplementationOnce(() => (
+      Promise.reject(new Error('404 Not Found'))
+    ));
+
+    // Mock createOrUpdateFiles to succeed
+    mockCreateOrUpdateFiles.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: {
+          content: {},
+        },
+      })
+    ));
+
+    const changeset = {
+      'new-tokens-folder/tokens.json': '{"test": {"value": "#ff0000", "type": "color"}}',
+    };
+
+    const result = await storageProvider.writeChangeset(changeset, 'Initial commit', 'main');
+
+    expect(result).toEqual(true);
+    expect(mockCreateOrUpdateFiles).toBeCalledWith({
+      branch: 'main',
+      owner: 'six7',
+      repo: 'figma-tokens',
+      createBranch: false,
+      changes: [
+        {
+          message: 'Initial commit',
+          files: {
+            'new-tokens-folder/tokens.json': '{"test": {"value": "#ff0000", "type": "color"}}',
+          },
+          filesToDelete: [],
+          ignoreDeletionFailures: true,
+        },
+      ],
+    });
+  });
+
+  it('should handle missing single file during writeChangeset', async () => {
+    storageProvider.changePath('tokens.json');
+
+    // Mock getContent to fail (file doesn't exist)
+    mockGetContent.mockImplementationOnce(() => (
+      Promise.reject(new Error('404 Not Found'))
+    ));
+
+    // Mock createOrUpdateFiles to succeed
+    mockCreateOrUpdateFiles.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: {
+          content: {},
+        },
+      })
+    ));
+
+    const changeset = {
+      'tokens.json': '{"test": {"value": "#ff0000", "type": "color"}}',
+    };
+
+    const result = await storageProvider.writeChangeset(changeset, 'Initial commit', 'main');
+
+    expect(result).toEqual(true);
+    expect(mockCreateOrUpdateFiles).toBeCalledWith({
+      branch: 'main',
+      owner: 'six7',
+      repo: 'figma-tokens',
+      createBranch: false,
+      changes: [
+        {
+          message: 'Initial commit',
+          files: {
+            'tokens.json': '{"test": {"value": "#ff0000", "type": "color"}}',
+          },
+          filesToDelete: [],
+          ignoreDeletionFailures: true,
+        },
+      ],
+    });
   });
 });
