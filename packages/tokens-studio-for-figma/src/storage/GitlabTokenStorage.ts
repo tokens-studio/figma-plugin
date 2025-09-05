@@ -244,8 +244,8 @@ export class GitlabTokenStorage extends GitTokenStorage {
       };
     } catch (err) {
       console.error(err);
-      return this.handleError(err, StorageProviderType.GITLAB);
     }
+    return [];
   }
 
   public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch?: boolean): Promise<boolean> {
@@ -253,11 +253,25 @@ export class GitlabTokenStorage extends GitTokenStorage {
 
     const branches = await this.fetchBranches();
     const rootPath = this.path.endsWith('.json') ? this.path.split('/').slice(0, -1).join('/') : this.path;
-    const pathToCreate = this.path.endsWith('.json') ? this.path : `${this.path}/.gitkeep`;
 
     if (shouldCreateBranch && !branches.includes(branch)) {
       const sourceBranch = this.previousSourceBranch || this.source;
       await this.createBranch(branch, sourceBranch);
+    }
+
+    // Directories cannot be created empty (Source: https://gitlab.com/gitlab-org/gitlab/-/issues/247503)
+    // Try to check if the path exists, if not create it
+    const pathToCreate = this.path.endsWith('.json') ? this.path : `${this.path}/.gitkeep`;
+    try {
+      await this.gitlabClient.RepositoryFiles.show(this.projectId, pathToCreate, branch);
+    } catch {
+      await this.gitlabClient.RepositoryFiles.create(
+        this.projectId,
+        pathToCreate,
+        branch,
+        '{}',
+        message,
+      );
     }
 
     const tree = await this.gitlabClient.Repositories.allRepositoryTrees(this.projectId, {
@@ -266,22 +280,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
       recursive: true,
     });
 
-    try {
-      // Only create .gitkeep if the directory is completely empty/non-existent
-      if (tree.length === 0) {
-        await this.gitlabClient.RepositoryFiles.create(
-          this.projectId,
-          pathToCreate,
-          branch,
-          '{}',
-          message,
-        );
-      }
-    } catch (e) {
-      console.error('Error checking directory:', e);
-    }
-
-    let gitlabActions: CommitAction[] = Object.entries(changeset).map(([filePath, content]) => {
+    let gitlabActions = Object.entries(changeset).map(([filePath, content]) => {
       const action = tree.some((file) => file.path === filePath) ? 'update' : 'create';
       return { action, filePath, content };
     });
