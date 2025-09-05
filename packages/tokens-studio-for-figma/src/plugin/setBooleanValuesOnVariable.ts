@@ -8,6 +8,7 @@ export default function setBooleanValuesOnVariable(variable: Variable, mode: str
     const newValue = value === 'true';
 
     if (existingVariableValue !== newValue) {
+      console.log('Setting boolean value on variable', variable.name, variable.valuesByMode[mode], newValue);
       variable.setValueForMode(mode, newValue);
     }
   } catch (e) {

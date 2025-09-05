@@ -6,6 +6,7 @@ export default function setStringValuesOnVariable(variable: Variable, mode: stri
     if (!existingVariableValue || !(typeof existingVariableValue === 'string' || isVariableWithAliasReference(existingVariableValue))) return;
 
     if (existingVariableValue !== value) {
+      console.log('Setting string value on variable', variable.name, variable.valuesByMode[mode], value);
       variable.setValueForMode(mode, value);
     }
   } catch (e) {

@@ -7,6 +7,7 @@ import { convertTokenTypeToVariableType } from '@/utils/convertTokenTypeToVariab
 import { checkCanReferenceVariable } from '@/utils/alias/checkCanReferenceVariable';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { transformValue } from './helpers';
+import { checkVariableAliasEquality } from '@/utils/checkVariableAliasEquality';
 
 export type ReferenceVariableType = {
   variable: Variable;
@@ -49,6 +50,15 @@ export default async function setValuesOnVariable(
         }
         variable.description = token.description ?? '';
 
+        // Check if the variable already has the correct alias reference before updating
+        const existingVariableValue = variable.valuesByMode[mode];
+        const rawValue = typeof token.rawValue === 'string' ? token.rawValue : undefined;
+        
+        if (checkVariableAliasEquality(existingVariableValue, rawValue)) {
+          // The alias already points to the correct variable, no update needed
+          return;
+        }
+
         switch (variableType) {
           case 'BOOLEAN':
             if (typeof token.value === 'string' && !token.value.includes('{')) {
@@ -58,7 +68,7 @@ export default async function setValuesOnVariable(
             break;
           case 'COLOR':
             if (typeof token.value === 'string' && !token.value.includes('{')) {
-              setColorValuesOnVariable(variable, mode, token.value, token.path, typeof token.rawValue === 'string' ? token.rawValue : undefined);
+              setColorValuesOnVariable(variable, mode, token.value, token.path);
             }
             break;
           case 'FLOAT': {
