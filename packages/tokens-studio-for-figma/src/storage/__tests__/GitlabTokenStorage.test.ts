@@ -394,12 +394,72 @@ describe('GitlabTokenStorage', () => {
     expect(mockGetRepositoryFiles).toBeCalledWith(35102363, 'data/tokens.json', 'main');
   });
 
-  // it('should return an empty array when reading results in an error', async () => {
-  //   mockGetRepositories.mockImplementationOnce(() => (
-  //     Promise.reject(new Error())
-  //   ));
-  //   expect(await storageProvider.read()).toEqual([]);
-  // });
+  it('should handle missing directory during writeChangeset', async () => {
+    storageProvider.changePath('new-tokens-folder');
+
+    mockGetBranches.mockImplementationOnce(() => (
+      Promise.resolve([{ name: 'main' }])
+    ));
+
+    mockShowRepositoryFiles.mockImplementationOnce(() => (
+      Promise.reject(new Error('404 invalid revision or path Not Found'))
+    ));
+
+    mockCreateRepositoryFiles.mockImplementationOnce(() => (
+      Promise.resolve({ file_path: 'new-tokens-folder/.gitkeep' })
+    ));
+
+    mockGetRepositories.mockImplementationOnce(() => (
+      Promise.resolve([])
+    ));
+
+    mockCreateCommits.mockImplementationOnce(() => (
+      Promise.resolve({ id: 'commit123' })
+    ));
+
+    const changeset = {
+      'new-tokens-folder/tokens.json': '{"test": {"value": "#ff0000", "type": "color"}}',
+    };
+
+    expect(await storageProvider.writeChangeset(changeset, 'Initial commit', 'main')).toEqual(true);
+    expect(mockShowRepositoryFiles).toBeCalledWith(35102363, 'new-tokens-folder/.gitkeep', 'main');
+    expect(mockCreateRepositoryFiles).toBeCalledWith(35102363, 'new-tokens-folder/.gitkeep', 'main', '{}', 'Initial commit');
+  });
+
+  it('should handle missing single file during writeChangeset', async () => {
+    storageProvider.changePath('tokens.json');
+
+    mockGetBranches.mockImplementationOnce(() => (
+      Promise.resolve([{ name: 'main' }])
+    ));
+
+    // Mock RepositoryFiles.show to fail (file doesn't exist)
+    mockShowRepositoryFiles.mockImplementationOnce(() => (
+      Promise.reject(new Error('404 invalid revision or path Not Found'))
+    ));
+
+    // Mock RepositoryFiles.create to succeed (creates the file)
+    mockCreateRepositoryFiles.mockImplementationOnce(() => (
+      Promise.resolve({ file_path: 'tokens.json' })
+    ));
+
+    // Mock allRepositoryTrees to return empty tree (no parent directory files)
+    mockGetRepositories.mockImplementationOnce(() => (
+      Promise.resolve([])
+    ));
+
+    mockCreateCommits.mockImplementationOnce(() => (
+      Promise.resolve({ id: 'commit123' })
+    ));
+
+    const changeset = {
+      'tokens.json': '{"test": {"value": "#ff0000", "type": "color"}}',
+    };
+
+    expect(await storageProvider.writeChangeset(changeset, 'Initial commit', 'main')).toEqual(true);
+    expect(mockShowRepositoryFiles).toBeCalledWith(35102363, 'tokens.json', 'main');
+    expect(mockCreateRepositoryFiles).toBeCalledWith(35102363, 'tokens.json', 'main', '{}', 'Initial commit');
+  });
 
   it('should be able to write', async () => {
     mockGetBranches.mockImplementation(() => (

@@ -77,7 +77,7 @@ export class GithubTokenStorage extends GitTokenStorage {
     });
   }
 
-  public async getTreeShaForDirectory(path: string) {
+  public async getTreeShaForDirectory(path: string): Promise<string | null> {
     // @README this is necessary because to figure out the tree SHA we need to fetch the parent directory contents
     // however when pulling from the root directory we can  not do this, but we can take the SHA from the branch
     if (path === '') {
@@ -89,27 +89,31 @@ export class GithubTokenStorage extends GitTokenStorage {
 
     // get the parent directory content to find out the sha
     const parent = path.includes('/') ? path.slice(0, path.lastIndexOf('/')) : '';
-    const parentDirectoryTreeResponse = await this.octokitClient.rest.repos.getContent({
-      owner: this.owner,
-      repo: this.repository,
-      path: parent,
-      ref: this.branch,
-      headers: octokitClientDefaultHeaders,
-    });
+    try {
+      const parentDirectoryTreeResponse = await this.octokitClient.rest.repos.getContent({
+        owner: this.owner,
+        repo: this.repository,
+        path: parent,
+        ref: this.branch,
+        headers: octokitClientDefaultHeaders,
+      });
 
-    if (Array.isArray(parentDirectoryTreeResponse.data)) {
-      const directory = parentDirectoryTreeResponse.data.find((item) => item.path === path);
-      if (!directory) throw new Error(`Unable to find directory, ${path}`);
-      return directory.sha;
+      if (Array.isArray(parentDirectoryTreeResponse.data)) {
+        const directory = parentDirectoryTreeResponse.data.find((item) => item.path === path);
+        if (!directory) return null; // Directory doesn't exist, return null instead of throwing
+        return directory.sha;
+      }
+
+      // @README if the parent directory only contains a single subdirectory
+      // it will not return an array with 1 item - but rather it will return the item itself
+      if (parentDirectoryTreeResponse.data.path === path) {
+        return parentDirectoryTreeResponse.data.sha;
+      }
+
+      return null; // Could not find directory SHA, return null instead of throwing
+    } catch (e) {
+      return null;
     }
-
-    // @README if the parent directory only contains a single subdirectory
-    // it will not return an array with 1 item - but rather it will return the item itself
-    if (parentDirectoryTreeResponse.data.path === path) {
-      return parentDirectoryTreeResponse.data.sha;
-    }
-
-    throw new Error('Could not find directory SHA');
   }
 
   public async fetchBranches() {
@@ -172,6 +176,10 @@ export class GithubTokenStorage extends GitTokenStorage {
       // read entire directory
       if (Array.isArray(response.data)) {
         const directorySha = await this.getTreeShaForDirectory(normalizedPath);
+        if (!directorySha) {
+          // Directory doesn't exist, return empty array
+          return [];
+        }
         const treeResponse = await this.octokitClient.rest.git.getTree({
           owner: this.owner,
           repo: this.repository,
@@ -282,7 +290,17 @@ export class GithubTokenStorage extends GitTokenStorage {
       return [];
     } catch (e) {
       console.error('Error', e);
-      return this.handleError(e, StorageProviderType.GITHUB);
+      // For 404 errors (file/directory not found), return empty array to allow creation
+      // For other errors (auth, network, permissions), return error message
+      if (e && (
+        (e as any).status === 404
+        || (e as any).message?.includes('404')
+        || (e as any).message?.includes('Not Found')
+        || String(e).includes('404')
+      )) {
+        return [];
+      }
+      return this.handleError(e, StorageProviderType.GITHUB); // Show real errors
     }
   }
 
@@ -350,7 +368,7 @@ export class GithubTokenStorage extends GitTokenStorage {
   }
 
   public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch?: boolean): Promise<boolean> {
-    return await this.createOrUpdate(changeset, message, branch, shouldCreateBranch, [], true);
+    return await this.createOrUpdate(changeset, message, branch, shouldCreateBranch ?? false, [], true);
   }
 
   public async getCommitSha(): Promise<string> {
@@ -366,7 +384,7 @@ export class GithubTokenStorage extends GitTokenStorage {
       // read entire directory
       if (Array.isArray(response.data)) {
         const directorySha = await this.getTreeShaForDirectory(normalizedPath);
-        return directorySha;
+        return directorySha || '';
       }
       return response.data.sha;
     } catch (e) {
