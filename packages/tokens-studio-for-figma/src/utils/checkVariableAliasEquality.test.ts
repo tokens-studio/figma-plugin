@@ -29,7 +29,15 @@ describe('checkVariableAliasEquality', () => {
   it('should return false when existingValue is not an alias reference', () => {
     mockIsVariableWithAliasReference.mockReturnValue(false);
 
-    const result = checkVariableAliasEquality({ r: 1, g: 0, b: 0, a: 1 }, '{accent.default}');
+    const result = checkVariableAliasEquality(
+      {
+        r: 1,
+        g: 0,
+        b: 0,
+        a: 1,
+      },
+      '{accent.default}',
+    );
 
     expect(result).toBe(false);
     expect(mockGetVariableById).not.toHaveBeenCalled();

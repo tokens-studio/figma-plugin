@@ -24,7 +24,7 @@ describe('SetValuesOnVariable - Alias Reference Testing', () => {
       resolvedType: 'COLOR',
       setValueForMode: mockSetValueForMode,
       valuesByMode: {
-        '309': { type: 'VARIABLE_ALIAS', id: 'VariableID:referenced:color' },
+        309: { type: 'VARIABLE_ALIAS', id: 'VariableID:referenced:color' },
       },
     } as unknown as Variable,
     {
@@ -34,7 +34,7 @@ describe('SetValuesOnVariable - Alias Reference Testing', () => {
       resolvedType: 'FLOAT',
       setValueForMode: mockSetValueForMode,
       valuesByMode: {
-        '309': { type: 'VARIABLE_ALIAS', id: 'VariableID:referenced:number' },
+        309: { type: 'VARIABLE_ALIAS', id: 'VariableID:referenced:number' },
       },
     } as unknown as Variable,
     {
@@ -44,7 +44,7 @@ describe('SetValuesOnVariable - Alias Reference Testing', () => {
       resolvedType: 'BOOLEAN',
       setValueForMode: mockSetValueForMode,
       valuesByMode: {
-        '309': { type: 'VARIABLE_ALIAS', id: 'VariableID:referenced:boolean' },
+        309: { type: 'VARIABLE_ALIAS', id: 'VariableID:referenced:boolean' },
       },
     } as unknown as Variable,
     {
@@ -54,7 +54,7 @@ describe('SetValuesOnVariable - Alias Reference Testing', () => {
       resolvedType: 'STRING',
       setValueForMode: mockSetValueForMode,
       valuesByMode: {
-        '309': { type: 'VARIABLE_ALIAS', id: 'VariableID:referenced:string' },
+        309: { type: 'VARIABLE_ALIAS', id: 'VariableID:referenced:string' },
       },
     } as unknown as Variable,
   ] as Variable[];
