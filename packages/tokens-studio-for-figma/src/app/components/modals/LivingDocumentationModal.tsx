@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  Button, Stack, Select, Switch, Label, Text,
+  Button, Stack, Select, Switch, Label, Text, ToggleGroup,
 } from '@tokens-studio/ui';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -29,6 +29,14 @@ const StyledCode = styled('code', {
   fontSize: '$xsmall',
 });
 
+const StyledWarning = styled('div', {
+  backgroundColor: '$dangerBg',
+  color: '$dangerFg',
+  padding: '$3',
+  borderRadius: '$small',
+  fontSize: '$small',
+});
+
 type Props = {
   isOpen: boolean;
   onClose: () => void;
@@ -49,12 +57,14 @@ export default function LivingDocumentationModal({
   const [tokenSet, setTokenSet] = React.useState(initialTokenSet || 'All');
   const [startsWith, setStartsWith] = React.useState(initialStartsWith || '');
   const [applyTokens, setApplyTokens] = React.useState(true);
+  const [useUserTemplate, setUseUserTemplate] = React.useState(false);
 
   // Reset values when modal opens with new initial values
   React.useEffect(() => {
     if (isOpen) {
       setTokenSet(initialTokenSet || 'All');
       setStartsWith(initialStartsWith || '');
+      setUseUserTemplate(false);
     }
   }, [isOpen, initialTokenSet, initialStartsWith]);
 
@@ -84,15 +94,26 @@ export default function LivingDocumentationModal({
     setApplyTokens(checked === true);
   }, []);
 
+  const handleTemplateToggle = React.useCallback((value: string) => {
+    const useUser = value === 'own';
+    setUseUserTemplate(useUser);
+  }, []);
+
   const handleGenerate = React.useCallback(() => {
+    // Check if we need user selection but don't have it
+    if (useUserTemplate) {
+      // We'll let the plugin handle this check since we can't access figma.currentPage.selection from UI
+      // The plugin will show appropriate error if no selection
+    }
+
     // Track when user starts creating living documentation with detailed properties
     track('Living Documentation Creation Started', {
       tokenSetChoice: tokenSet === 'All' ? 'ALL' : 'SETS',
       tokenSetCount: tokenSet === 'All' ? allTokenSets.length : 1,
       startsWithFilled: !!startsWith.trim(),
       applyTokensChecked: applyTokens,
-      // Track if we started based on a selection (using their template) or no selection (using our template)
-      hasUserTemplate: false, // This will be determined in the plugin side
+      // Track template choice
+      useUserTemplate,
     });
 
     AsyncMessageChannel.ReactInstance.message({
@@ -101,9 +122,10 @@ export default function LivingDocumentationModal({
       startsWith,
       applyTokens,
       resolvedTokens,
+      useUserTemplate,
     });
     onClose();
-  }, [tokenSet, startsWith, applyTokens, resolvedTokens, onClose, allTokenSets.length]);
+  }, [tokenSet, startsWith, applyTokens, resolvedTokens, useUserTemplate, onClose, allTokenSets.length]);
 
   return (
     <Modal title={t('generateDocumentation')} isOpen={isOpen} close={onClose} size="large">
@@ -133,6 +155,26 @@ export default function LivingDocumentationModal({
             <StyledCode>__tokenValue</StyledCode>
             , etc.
           </Text>
+        </Stack>
+        <Stack direction="column" gap={2}>
+          <Text size="small">Template choice</Text>
+          <ToggleGroup
+            type="single"
+            value={useUserTemplate ? 'own' : 'preset'}
+            onValueChange={handleTemplateToggle}
+          >
+            <ToggleGroup.Item iconOnly={false} value="preset">
+              {t('useTemplate')}
+            </ToggleGroup.Item>
+            <ToggleGroup.Item iconOnly={false} value="own">
+              {t('useOwnTemplate')}
+            </ToggleGroup.Item>
+          </ToggleGroup>
+          {useUserTemplate && (
+            <StyledWarning>
+              {t('templateSelectionWarning')}
+            </StyledWarning>
+          )}
         </Stack>
         <Stack direction="column" gap={2}>
           <label htmlFor="tokenSet">{t('tokenSetRequired')}</label>

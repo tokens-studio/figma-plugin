@@ -191,6 +191,7 @@ export type CreateLivingDocumentationAsyncMessage = AsyncMessage<AsyncMessageTyp
   startsWith: string;
   applyTokens: boolean;
   resolvedTokens: AnyTokenList;
+  useUserTemplate: boolean;
 }>;
 export type CreateLivingDocumentationAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_LIVING_DOCUMENTATION>;
 
