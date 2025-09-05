@@ -1,6 +1,5 @@
 import { isVariableWithAliasReference } from '@/utils/isAliasReference';
 import { convertToFigmaColor } from './figmaTransforms/colors';
-import { checkVariableAliasEquality } from '@/utils/checkVariableAliasEquality';
 
 export function normalizeFigmaColor({
   r, g, b, a,
@@ -24,17 +23,11 @@ function isFigmaColorObject(obj: VariableValue): obj is RGBOrRGBA {
     && (!('a' in obj) || typeof obj.a === 'number');
 }
 
-export default function setColorValuesOnVariable(variable: Variable, mode: string, value: string, tokenName?: string, rawValue?: string) {
+export default function setColorValuesOnVariable(variable: Variable, mode: string, value: string, tokenName?: string) {
   try {
     const { color, opacity } = convertToFigmaColor(value);
     const existingVariableValue = variable.valuesByMode[mode];
     if (!existingVariableValue || !(isFigmaColorObject(existingVariableValue) || isVariableWithAliasReference(existingVariableValue))) return;
-
-    // Check if the alias already points to the correct variable
-    if (checkVariableAliasEquality(existingVariableValue, rawValue)) {
-      // The alias already points to the correct variable, no update needed
-      return;
-    }
 
     const newValue = normalizeFigmaColor({ ...color, a: opacity });
 

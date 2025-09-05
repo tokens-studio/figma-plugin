@@ -7,6 +7,7 @@ import { convertTokenTypeToVariableType } from '@/utils/convertTokenTypeToVariab
 import { checkCanReferenceVariable } from '@/utils/alias/checkCanReferenceVariable';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { transformValue } from './helpers';
+import { checkVariableAliasEquality } from '@/utils/checkVariableAliasEquality';
 
 export type ReferenceVariableType = {
   variable: Variable;
@@ -49,35 +50,44 @@ export default async function setValuesOnVariable(
         }
         variable.description = token.description ?? '';
 
+        // Check if the variable already has the correct alias reference before updating
+        const existingVariableValue = variable.valuesByMode[mode];
+        const rawValue = typeof token.rawValue === 'string' ? token.rawValue : undefined;
+        
+        if (checkVariableAliasEquality(existingVariableValue, rawValue)) {
+          // The alias already points to the correct variable, no update needed
+          return;
+        }
+
         switch (variableType) {
           case 'BOOLEAN':
             if (typeof token.value === 'string' && !token.value.includes('{')) {
               console.log('Setting boolean value on variable', variable.name, variable.valuesByMode[mode], token.value);
-              setBooleanValuesOnVariable(variable, mode, token.value, typeof token.rawValue === 'string' ? token.rawValue : undefined);
+              setBooleanValuesOnVariable(variable, mode, token.value);
             }
             break;
           case 'COLOR':
             if (typeof token.value === 'string' && !token.value.includes('{')) {
-              setColorValuesOnVariable(variable, mode, token.value, token.path, typeof token.rawValue === 'string' ? token.rawValue : undefined);
+              setColorValuesOnVariable(variable, mode, token.value, token.path);
             }
             break;
           case 'FLOAT': {
             const value = String(token.value);
             if (typeof value === 'string' && !value.includes('{')) {
               const transformedValue = transformValue(value, token.type, baseFontSize, true);
-              setNumberValuesOnVariable(variable, mode, Number(transformedValue), typeof token.rawValue === 'string' ? token.rawValue : undefined);
+              setNumberValuesOnVariable(variable, mode, Number(transformedValue));
             }
             break;
           }
           case 'STRING':
             if (typeof token.value === 'string' && !token.value.includes('{')) {
               console.log('Setting string value on variable', variable.name, variable.valuesByMode[mode], token.value);
-              setStringValuesOnVariable(variable, mode, token.value, typeof token.rawValue === 'string' ? token.rawValue : undefined);
+              setStringValuesOnVariable(variable, mode, token.value);
               // Given we cannot determine the combined family of a variable, we cannot use fallback weights from our estimates.
               // This is not an issue because users can set numerical font weights with variables, so we opt-out of the guesswork and just apply the numerical weight.
             } else if (token.type === TokenTypes.FONT_WEIGHTS && Array.isArray(token.value)) {
               console.log('Setting string value on variable', variable.name, variable.valuesByMode[mode], token.value[0]);
-              setStringValuesOnVariable(variable, mode, token.value[0], typeof token.rawValue === 'string' ? token.rawValue : undefined);
+              setStringValuesOnVariable(variable, mode, token.value[0]);
             }
             break;
           default:
