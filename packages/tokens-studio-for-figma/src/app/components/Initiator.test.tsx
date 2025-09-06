@@ -662,6 +662,85 @@ describe('Initiator', () => {
       baseFontSize: '16',
       aliasBaseFontSize: '16',
       applyVariablesStylesOrRawValue: ApplyVariablesStylesOrRawValues.VARIABLES_STYLES,
+      autoApplyThemeOnDrop: false,
     });
+  });
+
+  it('should handle instances created when auto-apply is disabled', () => {
+    const mockStore = createMockStore({
+      settings: {
+        autoApplyThemeOnDrop: false,
+      },
+      tokenState: {
+        tokens: {},
+      },
+      uiState: {},
+    });
+
+    const updateDocumentSpy = jest.spyOn(mockStore.dispatch.tokenState, 'updateDocument');
+
+    render(
+      <Provider store={mockStore}>
+        <Initiator />
+      </Provider>,
+    );
+
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {
+          pluginMessage: {
+            type: 'INSTANCES_CREATED',
+            count: 2,
+          },
+        },
+      }),
+    );
+
+    // The updateDocument function should not be called when auto-apply is disabled
+    expect(updateDocumentSpy).not.toHaveBeenCalled();
+  });
+
+  it('should handle instances created when auto-apply is enabled', () => {
+    const mockStore = createMockStore({
+      settings: {
+        autoApplyThemeOnDrop: true,
+      },
+      tokenState: {
+        tokens: {
+          global: [
+            {
+              name: 'colors.red',
+              type: 'color',
+              value: '#ff0000',
+            },
+          ],
+        },
+      },
+      uiState: {},
+    });
+
+    const updateDocumentSpy = jest.spyOn(mockStore.dispatch.tokenState, 'updateDocument');
+
+    render(
+      <Provider store={mockStore}>
+        <Initiator />
+      </Provider>,
+    );
+
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {
+          pluginMessage: {
+            type: 'INSTANCES_CREATED',
+            count: 2,
+          },
+        },
+      }),
+    );
+
+    // The updateDocument function should be called when auto-apply is enabled
+    expect(updateDocumentSpy).toHaveBeenCalledWith({ shouldUpdateNodes: true });
   });
 });

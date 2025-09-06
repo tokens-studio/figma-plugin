@@ -35,10 +35,12 @@ export const setUi: AsyncMessageChannelHandlers[AsyncMessageTypes.SET_UI] = asyn
     aliasBaseFontSize: msg.aliasBaseFontSize,
     shouldSwapStyles: msg.shouldSwapStyles,
     storeTokenIdInJsonEditor: msg.storeTokenIdInJsonEditor,
+    autoApplyThemeOnDrop: msg.autoApplyThemeOnDrop,
   });
   figma.ui.resize(width, height);
   if (store.inspectDeep !== msg.inspectDeep) {
     store.inspectDeep = msg.inspectDeep;
     sendSelectionChange();
   }
+  store.autoApplyThemeOnDrop = msg.autoApplyThemeOnDrop ?? false;
 };

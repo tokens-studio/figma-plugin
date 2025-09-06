@@ -3,7 +3,7 @@ import { MessageFromPluginTypes } from '@/types/messages';
 import { TokenStore } from '@/types/tokens';
 import { mockUiPostMessage } from '../../../tests/__mocks__/figmaMock';
 import {
-  notifyException, notifySelection, notifySetTokens, trackFromPlugin,
+  notifyException, notifySelection, notifySetTokens, trackFromPlugin, notifyInstancesCreated,
 } from '../notifiers';
 
 describe('notifySelection', () => {
@@ -67,6 +67,22 @@ describe('trackFromPlugin', () => {
       type: MessageFromPluginTypes.TRACK_FROM_PLUGIN,
       title: 'does work',
       opts: { foo: 'bar' },
+    });
+  });
+});
+
+describe('notifyInstancesCreated', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should notify when instances are created', () => {
+    notifyInstancesCreated(3);
+
+    expect(mockUiPostMessage).toBeCalledTimes(1);
+    expect(mockUiPostMessage).toBeCalledWith({
+      type: MessageFromPluginTypes.INSTANCES_CREATED,
+      count: 3,
     });
   });
 });
