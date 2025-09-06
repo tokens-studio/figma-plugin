@@ -1,7 +1,22 @@
-import setNumberValuesOnVariable from './setNumberValuesOnVariable';
+import setNumberValuesOnVariable, { normalizeNumber } from './setNumberValuesOnVariable';
 import { isVariableWithAliasReference } from '@/utils/isAliasReference';
 
 jest.mock('@/utils/isAliasReference');
+
+describe('normalizeNumber', () => {
+  it('should clip numbers to 6 decimal places', () => {
+    expect(normalizeNumber(0.12345678)).toBe(0.123456);
+    expect(normalizeNumber(1.23456789)).toBe(1.234567);
+    expect(normalizeNumber(10)).toBe(10);
+    expect(normalizeNumber(0)).toBe(0);
+  });
+
+  it('should handle clipping vs rounding difference', () => {
+    // Test a case where clipping and rounding would give different results
+    expect(normalizeNumber(0.1234567)).toBe(0.123456); // clips
+    // rounding would give 0.123457
+  });
+});
 
 describe('setNumberValuesOnVariable', () => {
   let mockVariable: Variable;
@@ -29,6 +44,22 @@ describe('setNumberValuesOnVariable', () => {
     (isVariableWithAliasReference as unknown as jest.Mock).mockReturnValue(false);
     setNumberValuesOnVariable(mockVariable, mockMode, 10);
     expect(mockVariable.setValueForMode).not.toHaveBeenCalled();
+  });
+
+  it('should not set value when normalized values are identical', () => {
+    // Set up a scenario where raw values are different but normalized values are the same
+    mockVariable.valuesByMode.light = 0.1234567;
+    (isVariableWithAliasReference as unknown as jest.Mock).mockReturnValue(false);
+    setNumberValuesOnVariable(mockVariable, mockMode, 0.1234569);
+    // Both normalize to 0.123456, so no update should occur
+    expect(mockVariable.setValueForMode).not.toHaveBeenCalled();
+  });
+
+  it('should set value when normalized values are different', () => {
+    mockVariable.valuesByMode.light = 0.123456;
+    (isVariableWithAliasReference as unknown as jest.Mock).mockReturnValue(false);
+    setNumberValuesOnVariable(mockVariable, mockMode, 0.123457);
+    expect(mockVariable.setValueForMode).toHaveBeenCalledWith(mockMode, 0.123457);
   });
 
   it('should handle alias references', () => {

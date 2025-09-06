@@ -12,6 +12,7 @@ const newVariable: Variable = {
   id: 'VariableID:1:0',
   key: 'VariableID:1:0',
   description: '',
+  valuesByMode: {},
 };
 
 describe('updateVariables', () => {
@@ -24,6 +25,7 @@ describe('updateVariables', () => {
     description: '',
     key: 'VariableID:1:toremove',
     variableCollectionId: 'VariableCollectionId:1:0',
+    valuesByMode: {},
   }]);
 
   figma.variables.getLocalVariables = jest.fn().mockReturnValue([{
@@ -35,6 +37,7 @@ describe('updateVariables', () => {
     description: '',
     key: 'VariableID:1:toremove',
     variableCollectionId: 'VariableCollectionId:1:0',
+    valuesByMode: {},
   }]);
 
   figma.variables.getLocalVariableCollectionsAsync = jest.fn().mockResolvedValue([{
@@ -93,10 +96,11 @@ describe('updateVariables', () => {
   it('creates variables for eligible token and ignores invalid token types', async () => {
     const result = await updateVariables({
       collection,
-      mode: 'light',
+      mode: '1:2', // Use the correct mode ID for 'Light' mode
       theme,
       tokens,
       settings,
+      overallConfig: { core: TokenSetStatus.ENABLED },
     });
 
     expect(result.variableIds).toEqual({ 'primary.500': 'VariableID:1:0' });
@@ -119,15 +123,16 @@ describe('updateVariables', () => {
     };
     const result = await updateVariables({
       collection,
-      mode: 'light',
+      mode: '1:2', // Use the correct mode ID for 'Light' mode
       theme,
       tokens: tokensWithReference,
       settings,
+      overallConfig: { core: TokenSetStatus.ENABLED },
     });
     expect(result.referenceVariableCandidate).toEqual([
       {
         variable: newVariable,
-        modeId: 'light',
+        modeId: '1:2', // Use the correct mode ID for 'Light' mode
         referenceVariable: 'primary.500',
       },
     ]);
@@ -136,10 +141,11 @@ describe('updateVariables', () => {
   it('should remove existing variables that were not handled', async () => {
     const result = await updateVariables({
       collection,
-      mode: 'light',
+      mode: '1:2', // Use the correct mode ID for 'Light' mode
       theme,
       tokens,
       settings,
+      overallConfig: { core: TokenSetStatus.ENABLED },
     });
     expect(result.removedVariables).toEqual(['VariableID:1:toremove']);
   });

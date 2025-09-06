@@ -1,6 +1,7 @@
 import { figmaRGBToHex, hexToFigmaRGB, webRGBToFigmaRGB } from '@figma-plugin/helpers';
 import { toHex } from 'color2k';
 import Color from 'colorjs.io';
+import { clipToFourDecimals } from '@/utils/clipToFourDecimals';
 
 type WebRGBA = [number, number, number, number];
 interface RGBA {
@@ -84,13 +85,9 @@ export function hslaToRgba(hslaValues: number[]) {
   return [r, g, b, a];
 }
 
-function roundToTwo(num: number) {
-  return +`${Math.round(Number(`${num}e+2`))}e-2`;
-}
-
 export function convertToFigmaColor(input: string) {
   let color: RGBA;
-  let opacity;
+  let opacity: number;
   if (input.startsWith('rgb')) {
     const rgbValues = input.replace(/^rgba?\(|\s+|\)$/g, '').split(',').map(parseFloat) as WebRGBA;
 
@@ -123,7 +120,7 @@ export function convertToFigmaColor(input: string) {
         g: Math.max(0, Math.min(1, g)),
         b: Math.max(0, Math.min(1, b)),
       };
-      opacity = roundToTwo(a);
+      opacity = Number(a);
     } catch (e) {
       // Fallback to toHex if OKLCH parsing fails
       try {
@@ -133,7 +130,7 @@ export function convertToFigmaColor(input: string) {
         color = {
           r, g, b,
         };
-        opacity = roundToTwo(a);
+        opacity = Number(a);
       } catch (e2) {
         // If all parsing fails, return black as fallback
         color = { r: 0, g: 0, b: 0 };
@@ -147,7 +144,7 @@ export function convertToFigmaColor(input: string) {
     color = {
       r, g, b,
     };
-    opacity = roundToTwo(a);
+    opacity = Number(a);
   }
 
   return {

@@ -8,6 +8,7 @@
     "test": "npx turbo run test",
     "test:watch": "npx turbo run test:watch",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "format:changed": "git diff --name-only --diff-filter=ACMR main...HEAD | grep -E '\\.(ts|tsx|md)$' | xargs -r prettier --write",
     "release": "changeset publish",
     "changeset": "changeset"
   },
