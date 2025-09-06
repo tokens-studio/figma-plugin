@@ -1,19 +1,21 @@
 import { isVariableWithAliasReference } from '@/utils/isAliasReference';
 import { convertToFigmaColor } from './figmaTransforms/colors';
 
-export function normalizeFigmaColor({ r, g, b, a }: { r: number; g: number; b: number; a: number }): {
-  r: number;
-  g: number;
-  b: number;
-  a: number;
-} {
-  const roundToSixDecimals = (num: number) => Math.round(num * 1000000) / 1000000;
+export function normalizeFigmaColor({
+  r, g, b, a,
+}: { r: number; g: number; b: number; a: number }): {
+    r: number;
+    g: number;
+    b: number;
+    a: number;
+  } {
+  const clipToSixDecimals = (num: number) => Math.trunc(num * 1000000) / 1000000;
 
   return {
-    r: roundToSixDecimals(r),
-    g: roundToSixDecimals(g),
-    b: roundToSixDecimals(b),
-    a: roundToSixDecimals(a),
+    r: clipToSixDecimals(r),
+    g: clipToSixDecimals(g),
+    b: clipToSixDecimals(b),
+    a: clipToSixDecimals(a),
   };
 }
 
@@ -22,26 +24,25 @@ type RGBOrRGBA = RGB | RGBA;
 
 function isFigmaColorObject(obj: VariableValue): obj is RGBOrRGBA {
   return (
-    typeof obj === 'object' &&
-    'r' in obj &&
-    'g' in obj &&
-    'b' in obj &&
-    typeof obj.r === 'number' &&
-    typeof obj.g === 'number' &&
-    typeof obj.b === 'number' &&
-    (!('a' in obj) || typeof obj.a === 'number')
+    typeof obj === 'object'
+    && 'r' in obj
+    && 'g' in obj
+    && 'b' in obj
+    && typeof obj.r === 'number'
+    && typeof obj.g === 'number'
+    && typeof obj.b === 'number'
+    && (!('a' in obj) || typeof obj.a === 'number')
   );
 }
 
-export default function setColorValuesOnVariable(variable: Variable, mode: string, value: string, tokenName?: string) {
+export default function setColorValuesOnVariable(variable: Variable, mode: string, value: string) {
   try {
     const { color, opacity } = convertToFigmaColor(value);
     const existingVariableValue = variable.valuesByMode[mode];
     if (
-      !existingVariableValue ||
-      !(isFigmaColorObject(existingVariableValue) || isVariableWithAliasReference(existingVariableValue))
-    )
-      return;
+      !existingVariableValue
+      || !(isFigmaColorObject(existingVariableValue) || isVariableWithAliasReference(existingVariableValue))
+    ) return;
 
     const newValue = normalizeFigmaColor({ ...color, a: opacity });
 
@@ -55,10 +56,10 @@ export default function setColorValuesOnVariable(variable: Variable, mode: strin
       const existingA = 'a' in existingValue ? existingValue.a : 1;
       const newA = 'a' in newValue ? newValue.a : 1;
       if (
-        existingValue.r === newValue.r &&
-        existingValue.g === newValue.g &&
-        existingValue.b === newValue.b &&
-        existingA === newA
+        existingValue.r === newValue.r
+        && existingValue.g === newValue.g
+        && existingValue.b === newValue.b
+        && existingA === newA
       ) {
         // return if values match
         return;

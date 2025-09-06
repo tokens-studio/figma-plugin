@@ -33,9 +33,8 @@ export default async function setValuesOnVariable(
         // If id matches the variableId, or name patches the token path, we can use it to update the variable instead of re-creating.
         // This has the nasty side-effect that if font weight changes from string to number, it will not update the variable given we cannot change type.
         // In that case, we should delete the variable and re-create it.
-        const variable =
-          variablesInFigma.find((v) => (v.key === token.variableId && !v.remote) || v.name === token.path) ||
-          figma.variables.createVariable(token.path, collection, variableType);
+        const variable = variablesInFigma.find((v) => (v.key === token.variableId && !v.remote) || v.name === token.path)
+          || figma.variables.createVariable(token.path, collection, variableType);
 
         if (variable) {
           // First, rename all variables that should be renamed (if the user choose to do so)
@@ -76,7 +75,7 @@ export default async function setValuesOnVariable(
               break;
             case 'COLOR':
               if (typeof token.value === 'string' && !token.value.includes('{')) {
-                setColorValuesOnVariable(variable, mode, token.value, token.path);
+                setColorValuesOnVariable(variable, mode, token.value);
               }
               break;
             case 'FLOAT': {

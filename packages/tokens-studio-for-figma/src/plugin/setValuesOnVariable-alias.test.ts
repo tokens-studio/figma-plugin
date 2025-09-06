@@ -1,4 +1,3 @@
-import { mockCreateVariable } from '../../tests/__mocks__/figmaMock';
 import { SingleToken } from '@/types/tokens';
 import setValuesOnVariable from './setValuesOnVariable';
 import { TokenTypes } from '@/constants/TokenTypes';

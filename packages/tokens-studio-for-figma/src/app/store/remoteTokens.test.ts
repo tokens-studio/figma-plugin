@@ -5,11 +5,11 @@ import { StorageTypeCredentials } from '@/types/StorageType';
 import {
   themesListSelector,
   tokensSelector,
+  remoteDataSelector, lastSyncedStateSelector, storageTypeSelector,
 } from '@/selectors';
 import { notifyToUI } from '@/plugin/notifiers';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { JSONBinTokenStorage } from '@/storage';
-import { remoteDataSelector, lastSyncedStateSelector, storageTypeSelector } from '@/selectors';
 import { tokenFormatSelector } from '@/selectors/tokenFormatSelector';
 
 const mockStartJob = jest.fn();
