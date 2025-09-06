@@ -88,22 +88,10 @@ export default async function setValuesOnVariable(
             }
             case 'STRING':
               if (typeof token.value === 'string' && !token.value.includes('{')) {
-                console.log(
-                  'Setting string value on variable',
-                  variable.name,
-                  variable.valuesByMode[mode],
-                  token.value,
-                );
                 setStringValuesOnVariable(variable, mode, token.value);
                 // Given we cannot determine the combined family of a variable, we cannot use fallback weights from our estimates.
                 // This is not an issue because users can set numerical font weights with variables, so we opt-out of the guesswork and just apply the numerical weight.
               } else if (token.type === TokenTypes.FONT_WEIGHTS && Array.isArray(token.value)) {
-                console.log(
-                  'Setting string value on variable',
-                  variable.name,
-                  variable.valuesByMode[mode],
-                  token.value[0],
-                );
                 setStringValuesOnVariable(variable, mode, token.value[0]);
               }
               break;

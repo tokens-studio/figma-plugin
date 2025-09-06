@@ -1,5 +1,6 @@
 import { isVariableWithAliasReference } from '@/utils/isAliasReference';
 import { convertToFigmaColor } from './figmaTransforms/colors';
+import { clipToFourDecimals } from '@/utils/clipToFourDecimals';
 
 export function normalizeFigmaColor({
   r, g, b, a,
@@ -9,13 +10,11 @@ export function normalizeFigmaColor({
     b: number;
     a: number;
   } {
-  const clipToSixDecimals = (num: number) => Math.trunc(num * 1000000) / 1000000;
-
   return {
-    r: clipToSixDecimals(r),
-    g: clipToSixDecimals(g),
-    b: clipToSixDecimals(b),
-    a: clipToSixDecimals(a),
+    r: clipToFourDecimals(r),
+    g: clipToFourDecimals(g),
+    b: clipToFourDecimals(b),
+    a: clipToFourDecimals(a),
   };
 }
 
@@ -66,15 +65,25 @@ export default function setColorValuesOnVariable(variable: Variable, mode: strin
       }
     }
 
-    console.log(
-      'Setting color value on variable',
-      variable,
-      variable.name,
-      isFigmaColorObject(color),
-      isFigmaColorObject(existingVariableValue),
-      color,
-      existingVariableValue,
-    );
+    if (isFigmaColorObject(existingVariableValue)) {
+      const normalized = normalizeFigmaColor({
+        ...existingVariableValue,
+        a: 'a' in existingVariableValue ? existingVariableValue.a : 1,
+      });
+
+      console.log(
+        'Setting color value on variable',
+        variable,
+        variable.name,
+        isFigmaColorObject(color),
+        isFigmaColorObject(existingVariableValue),
+        existingVariableValue,
+        normalized,
+        newValue,
+        value,
+        opacity,
+      );
+    }
 
     variable.setValueForMode(mode, newValue);
   } catch (e) {
