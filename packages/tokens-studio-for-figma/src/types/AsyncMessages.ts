@@ -64,6 +64,7 @@ export enum AsyncMessageTypes {
   SET_VARIABLE_EXPORT_SETTINGS = 'async/set-variable-export-settings',
   SET_SELECTED_EXPORT_THEMES = 'async/set-selected-export-themes',
   CREATE_LIVING_DOCUMENTATION = 'async/create-living-documentation',
+  VALIDATE_LIVING_DOCUMENTATION_SELECTION = 'async/validate-living-documentation-selection',
   // the below messages are going from plugin to UI
   STARTUP = 'async/startup',
   GET_THEME_INFO = 'async/get-theme-info',
@@ -194,6 +195,14 @@ export type CreateLivingDocumentationAsyncMessage = AsyncMessage<AsyncMessageTyp
   useUserTemplate: boolean;
 }>;
 export type CreateLivingDocumentationAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_LIVING_DOCUMENTATION>;
+
+export type ValidateLivingDocumentationSelectionAsyncMessage = AsyncMessage<AsyncMessageTypes.VALIDATE_LIVING_DOCUMENTATION_SELECTION>;
+export type ValidateLivingDocumentationSelectionAsyncMessageResult = AsyncMessage<AsyncMessageTypes.VALIDATE_LIVING_DOCUMENTATION_SELECTION, {
+  isValid: boolean;
+  selectedCount: number;
+  validLayers: string[];
+  errorMessage?: string;
+}>;
 
 export type CreateStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.CREATE_STYLES, {
   tokens: AnyTokenList;
@@ -413,6 +422,7 @@ export type AsyncMessages =
   | SetUiAsyncMessage
   | CreateAnnotationAsyncMessage
   | CreateLivingDocumentationAsyncMessage
+  | ValidateLivingDocumentationSelectionAsyncMessage
   | UpdateAsyncMessage
   | UpdateCheckForChangesAsyncMessage
   | GetThemeInfoMessage
@@ -465,6 +475,7 @@ export type AsyncMessageResults =
   | SetUiAsyncMessageResult
   | CreateAnnotationAsyncMessageResult
   | CreateLivingDocumentationAsyncMessageResult
+  | ValidateLivingDocumentationSelectionAsyncMessageResult
   | UpdateAsyncMessageResult
   | UpdateCheckForChangesAsyncMessageResult
   | GetThemeInfoMessageResult

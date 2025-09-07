@@ -30,11 +30,28 @@ const StyledCode = styled('code', {
 });
 
 const StyledWarning = styled('div', {
-  backgroundColor: '$dangerBg',
-  color: '$dangerFg',
   padding: '$3',
   borderRadius: '$small',
   fontSize: '$small',
+  variants: {
+    type: {
+      error: {
+        backgroundColor: '$dangerBg',
+        color: '$dangerFg',
+      },
+      success: {
+        backgroundColor: '$successBg',
+        color: '$successFg',
+      },
+      info: {
+        backgroundColor: '$bgSubtle',
+        color: '$fgDefault',
+      },
+    },
+  },
+  defaultVariants: {
+    type: 'error',
+  },
 });
 
 type Props = {
@@ -58,6 +75,35 @@ export default function LivingDocumentationModal({
   const [startsWith, setStartsWith] = React.useState(initialStartsWith || '');
   const [applyTokens, setApplyTokens] = React.useState(true);
   const [useUserTemplate, setUseUserTemplate] = React.useState(false);
+  const [selectionValidation, setSelectionValidation] = React.useState<{
+    isValid: boolean;
+    selectedCount: number;
+    validLayers: string[];
+    errorMessage?: string;
+  } | null>(null);
+
+  // Function to validate current selection
+  const validateSelection = React.useCallback(async () => {
+    if (!useUserTemplate) {
+      setSelectionValidation(null);
+      return;
+    }
+
+    try {
+      const result = await AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.VALIDATE_LIVING_DOCUMENTATION_SELECTION,
+      });
+      setSelectionValidation(result);
+    } catch (error) {
+      console.error('Failed to validate selection:', error);
+      setSelectionValidation({
+        isValid: false,
+        selectedCount: 0,
+        validLayers: [],
+        errorMessage: 'Failed to validate selection.',
+      });
+    }
+  }, [useUserTemplate]);
 
   // Reset values when modal opens with new initial values
   React.useEffect(() => {
@@ -65,8 +111,37 @@ export default function LivingDocumentationModal({
       setTokenSet(initialTokenSet || 'All');
       setStartsWith(initialStartsWith || '');
       setUseUserTemplate(false);
+      setSelectionValidation(null);
     }
   }, [isOpen, initialTokenSet, initialStartsWith]);
+
+  // Validate selection when useUserTemplate changes or modal opens
+  React.useEffect(() => {
+    if (isOpen && useUserTemplate) {
+      validateSelection();
+    }
+  }, [isOpen, useUserTemplate, validateSelection]);
+
+  // Continuously validate selection while useUserTemplate is active
+  React.useEffect(() => {
+    let intervalId: NodeJS.Timeout;
+
+    if (isOpen && useUserTemplate) {
+      // Initial validation
+      validateSelection();
+
+      // Set up polling to check selection changes every 500ms
+      intervalId = setInterval(() => {
+        validateSelection();
+      }, 500);
+    }
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [isOpen, useUserTemplate, validateSelection]);
 
   // Get resolved tokens using the same pattern as other components, including proper theme configuration
   const resolvedTokens = React.useMemo(() => {
@@ -97,6 +172,9 @@ export default function LivingDocumentationModal({
   const handleTemplateToggle = React.useCallback((value: string) => {
     const useUser = value === 'own';
     setUseUserTemplate(useUser);
+    if (!useUser) {
+      setSelectionValidation(null);
+    }
   }, []);
 
   const handleGenerate = React.useCallback(() => {
@@ -171,9 +249,24 @@ export default function LivingDocumentationModal({
             </ToggleGroup.Item>
           </ToggleGroup>
           {useUserTemplate && (
-            <StyledWarning>
-              {t('templateSelectionWarning')}
-            </StyledWarning>
+            <>
+              {selectionValidation === null && (
+                <StyledWarning type="info">
+                  {t('checkingSelection')}
+                </StyledWarning>
+              )}
+              {selectionValidation && !selectionValidation.isValid && (
+                <StyledWarning type="error">
+                  {selectionValidation.errorMessage}
+                </StyledWarning>
+              )}
+              {selectionValidation && selectionValidation.isValid && (
+                <StyledWarning type="success">
+                  {t('validTemplateFrame', { count: selectionValidation.validLayers.length })}
+                  {selectionValidation.validLayers.join(', ')}
+                </StyledWarning>
+              )}
+            </>
           )}
         </Stack>
         <Stack direction="column" gap={2}>
@@ -199,7 +292,14 @@ export default function LivingDocumentationModal({
           <Button variant="secondary" onClick={onClose}>
             {t('cancel')}
           </Button>
-          <Button variant="primary" onClick={handleGenerate} disabled={!tokenSet.trim()}>
+          <Button
+            variant="primary"
+            onClick={handleGenerate}
+            disabled={
+              !tokenSet.trim()
+              || (useUserTemplate && (!selectionValidation || !selectionValidation.isValid))
+            }
+          >
             {t('generate')}
           </Button>
         </Stack>
