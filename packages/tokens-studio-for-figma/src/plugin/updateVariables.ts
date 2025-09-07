@@ -26,7 +26,8 @@ export default async function updateVariables({
   settings,
   filterByTokenSet,
   overallConfig,
-}: CreateVariableTypes) {
+  onProgress,
+}: CreateVariableTypes & { onProgress?: (batchCompleted: number) => void }) {
   const tokensToCreate = generateTokensToCreate({
     theme,
     tokens,
@@ -58,6 +59,7 @@ export default async function updateVariables({
     mode,
     settings.baseFontSize,
     settings.renameExistingStylesAndVariables,
+    onProgress,
   );
   const removedVariables: string[] = [];
 

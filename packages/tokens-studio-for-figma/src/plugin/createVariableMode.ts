@@ -1,8 +1,9 @@
 import { notifyUI } from './notifiers';
+import { truncateModeName } from '@/utils/truncateName';
 
 export default function createVariableMode(collection: VariableCollection, mode: string) {
   try {
-    return collection.addMode(mode);
+    return collection.addMode(truncateModeName(mode));
   } catch (e) {
     if (e instanceof Error) {
       const limit = /Limited to (\d) modes only/.exec(e.message);
