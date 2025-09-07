@@ -325,8 +325,10 @@ export const tokenState = createModel<RootModel>()({
     },
     duplicateToken: (state, data: DuplicateTokenPayload) => {
       const newTokens: TokenStore['values'] = {};
+      const tokenSets = data.tokenSets || [data.parent]; // Fallback to parent if tokenSets is not provided
+
       Object.keys(state.tokens).forEach((tokenSet) => {
-        if (data.tokenSets.includes(tokenSet)) {
+        if (tokenSets.includes(tokenSet)) {
           const existingTokenIndex = state.tokens[tokenSet].findIndex((n) => n.name === data?.newName);
           if (existingTokenIndex < 0) {
             if (tokenSet === data.parent) {
