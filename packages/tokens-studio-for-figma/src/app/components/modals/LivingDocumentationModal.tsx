@@ -1,12 +1,12 @@
 import React from 'react';
 import {
-  Button, Stack, Select, Switch, Label, Text,
+  Button, Stack, Select, Switch, Label, Text, IconButton, TextInput, FormField,
 } from '@tokens-studio/ui';
+import { Asterisk } from 'iconoir-react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { styled } from '@/stitches.config';
 import Modal from '../Modal';
-import Input from '../Input';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import {
@@ -86,9 +86,9 @@ export default function LivingDocumentationModal({
     setApplyTokens(checked === true);
   }, []);
 
-  const handleUseRegexChange = React.useCallback((checked: boolean | string) => {
-    setUseRegex(checked === true);
-  }, []);
+  const handleUseRegexChange = React.useCallback(() => {
+    setUseRegex(!useRegex);
+  }, [useRegex]);
 
   const handleGenerate = React.useCallback(() => {
     // Track when user starts creating living documentation with detailed properties
@@ -156,17 +156,15 @@ export default function LivingDocumentationModal({
           </Select>
         </Stack>
         <Stack direction="column" gap={2}>
-          <Stack direction="row" gap={3} align="center" css={{ width: '100%' }}>
-            <Label htmlFor="use-regex">{t('useRegexPattern')}</Label>
-            <Switch id="use-regex" checked={useRegex} onCheckedChange={handleUseRegexChange} />
-          </Stack>
-          <Input
-            full
-            label={useRegex ? t('nameMatchesPattern') : t('nameStartsWith')}
-            value={startsWith}
-            onChange={handleStartsWithChange}
-            placeholder={useRegex ? 'color\\.(primary|secondary)' : 'color'}
-          />
+          <FormField>
+            <Label>{useRegex ? t('nameMatchesPattern') : t('nameStartsWith')}</Label>
+            <TextInput
+              value={startsWith}
+              onChange={handleStartsWithChange}
+              placeholder={useRegex ? 'color\\.(primary|secondary) (regex active)' : 'color'}
+              trailingAction={<IconButton tooltip={useRegex ? 'Disable regex' : 'Enable regex'} size="small" onClick={handleUseRegexChange} icon={<Asterisk />} variant={useRegex ? 'primary' : 'invisible'} />}
+            />
+          </FormField>
         </Stack>
         <Stack direction="row" gap={3} align="center" css={{ width: '100%' }}>
           <Label htmlFor="apply-tokens">{t('applyTokensToCreatedLayers')}</Label>
