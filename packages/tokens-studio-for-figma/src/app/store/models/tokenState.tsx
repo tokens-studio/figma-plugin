@@ -326,41 +326,45 @@ export const tokenState = createModel<RootModel>()({
     duplicateToken: (state, data: DuplicateTokenPayload) => {
       const newTokens: TokenStore['values'] = {};
       Object.keys(state.tokens).forEach((tokenSet) => {
-        if (tokenSet === data.parent) {
-          const existingTokenIndex = state.tokens[tokenSet].findIndex((n) => n.name === data?.oldName);
-          if (existingTokenIndex > -1) {
-            const existingTokens = [...state.tokens[tokenSet]];
-            existingTokens.splice(existingTokenIndex + 1, 0, {
-              ...omit(state.tokens[tokenSet][existingTokenIndex], 'description', '$extensions'),
-              ...updateTokenPayloadToSingleToken(
+        if (data.tokenSets.includes(tokenSet)) {
+          const existingTokenIndex = state.tokens[tokenSet].findIndex((n) => n.name === data?.newName);
+          if (existingTokenIndex < 0) {
+            if (tokenSet === data.parent) {
+              // For the source set, insert the token after the original
+              const originalTokenIndex = state.tokens[tokenSet].findIndex((n) => n.name === data?.oldName);
+              if (originalTokenIndex > -1) {
+                const existingTokens = [...state.tokens[tokenSet]];
+                existingTokens.splice(originalTokenIndex + 1, 0, {
+                  ...omit(state.tokens[tokenSet][originalTokenIndex], 'description', '$extensions'),
+                  ...updateTokenPayloadToSingleToken(
+                    {
+                      parent: data.parent,
+                      name: data.newName,
+                      type: data.type,
+                      value: data.value,
+                      description: data.description,
+                      oldName: data.oldName,
+                      $extensions: data.$extensions,
+                    } as UpdateTokenPayload,
+                    uuidv4(),
+                  ),
+                } as SingleToken);
+                newTokens[tokenSet] = existingTokens;
+              }
+            } else {
+              // For other sets, just append the token
+              const newToken = updateTokenPayloadToSingleToken(
                 {
-                  parent: data.parent,
                   name: data.newName,
                   type: data.type,
                   value: data.value,
                   description: data.description,
-                  oldName: data.oldName,
                   $extensions: data.$extensions,
                 } as UpdateTokenPayload,
                 uuidv4(),
-              ),
-            } as SingleToken);
-            newTokens[tokenSet] = existingTokens;
-          }
-        } else if (data.tokenSets.includes(tokenSet)) {
-          const existingTokenIndex = state.tokens[tokenSet].findIndex((n) => n.name === data?.newName);
-          if (existingTokenIndex < 0) {
-            const newToken = updateTokenPayloadToSingleToken(
-              {
-                name: data.newName,
-                type: data.type,
-                value: data.value,
-                description: data.description,
-                $extensions: data.$extensions,
-              } as UpdateTokenPayload,
-              uuidv4(),
-            );
-            newTokens[tokenSet] = [...state.tokens[tokenSet], newToken as SingleToken];
+              );
+              newTokens[tokenSet] = [...state.tokens[tokenSet], newToken as SingleToken];
+            }
           }
         }
       });
