@@ -1,7 +1,6 @@
 import { figmaRGBToHex, hexToFigmaRGB, webRGBToFigmaRGB } from '@figma-plugin/helpers';
 import { toHex } from 'color2k';
 import Color from 'colorjs.io';
-import { clipToFourDecimals } from '@/utils/clipToFourDecimals';
 
 type WebRGBA = [number, number, number, number];
 interface RGBA {

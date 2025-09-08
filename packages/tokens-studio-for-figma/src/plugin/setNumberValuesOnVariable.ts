@@ -1,7 +1,12 @@
 import { isVariableWithAliasReference } from '@/utils/isAliasReference';
 
-export function normalizeNumber(num: number): number {
-  return Math.trunc(num * 1000000) / 1000000;
+// Helper function to check if two numbers are approximately equal within a threshold
+function isNumberApproximatelyEqual(
+  num1: number,
+  num2: number,
+  threshold: number = 0.000001,
+): boolean {
+  return Math.abs(num1 - num2) < threshold;
 }
 
 export default function setNumberValuesOnVariable(variable: Variable, mode: string, value: number) {
@@ -15,19 +20,16 @@ export default function setNumberValuesOnVariable(variable: Variable, mode: stri
       || !(typeof existingVariableValue === 'number' || isVariableWithAliasReference(existingVariableValue))
     ) return;
 
-    const newValue = normalizeNumber(value);
-
-    // For direct number values, compare the normalized values
+    // For direct number values, compare using threshold
     if (typeof existingVariableValue === 'number') {
-      const existingValue = normalizeNumber(existingVariableValue);
-      if (existingValue === newValue) {
-        // return if normalized values match
+      if (isNumberApproximatelyEqual(existingVariableValue, value)) {
+        // return if values are approximately equal
         return;
       }
     }
 
-    console.log('Setting number value on variable', variable.name, variable.valuesByMode[mode], newValue);
-    variable.setValueForMode(mode, newValue);
+    console.log('Setting number value on variable', variable.name, variable.valuesByMode[mode], value);
+    variable.setValueForMode(mode, value);
   } catch (e) {
     console.error('Error setting numberVariable on variable', variable.name, e);
   }

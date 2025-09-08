@@ -1,21 +1,18 @@
 import { isVariableWithAliasReference } from '@/utils/isAliasReference';
 import { convertToFigmaColor } from './figmaTransforms/colors';
-import { clipToFourDecimals } from '@/utils/clipToFourDecimals';
 
-export function normalizeFigmaColor({
-  r, g, b, a,
-}: { r: number; g: number; b: number; a: number }): {
-    r: number;
-    g: number;
-    b: number;
-    a: number;
-  } {
-  return {
-    r: clipToFourDecimals(r),
-    g: clipToFourDecimals(g),
-    b: clipToFourDecimals(b),
-    a: clipToFourDecimals(a),
-  };
+// Helper function to check if two colors are approximately equal within a threshold
+function isColorApproximatelyEqual(
+  color1: { r: number; g: number; b: number; a: number },
+  color2: { r: number; g: number; b: number; a: number },
+  threshold: number = 0.0001,
+): boolean {
+  return (
+    Math.abs(color1.r - color2.r) < threshold
+    && Math.abs(color1.g - color2.g) < threshold
+    && Math.abs(color1.b - color2.b) < threshold
+    && Math.abs(color1.a - color2.a) < threshold
+  );
 }
 
 type RGB = { r: number; g: number; b: number };
@@ -43,46 +40,26 @@ export default function setColorValuesOnVariable(variable: Variable, mode: strin
       || !(isFigmaColorObject(existingVariableValue) || isVariableWithAliasReference(existingVariableValue))
     ) return;
 
-    const newValue = normalizeFigmaColor({ ...color, a: opacity });
+    const newValue = { ...color, a: opacity };
 
-    // For direct color values, compare the actual color values
+    // For direct color values, compare the actual color values using threshold
     if (isFigmaColorObject(existingVariableValue)) {
-      const existingValue = normalizeFigmaColor({
+      const existingValue = {
         ...existingVariableValue,
         a: 'a' in existingVariableValue ? existingVariableValue.a : 1,
-      });
+      };
 
-      const existingA = 'a' in existingValue ? existingValue.a : 1;
-      const newA = 'a' in newValue ? newValue.a : 1;
-      if (
-        existingValue.r === newValue.r
-        && existingValue.g === newValue.g
-        && existingValue.b === newValue.b
-        && existingA === newA
-      ) {
-        // return if values match
+      if (isColorApproximatelyEqual(existingValue, newValue)) {
+        // return if values are approximately equal
         return;
       }
     }
 
     if (isFigmaColorObject(existingVariableValue)) {
-      const normalized = normalizeFigmaColor({
+      const existingValue = {
         ...existingVariableValue,
         a: 'a' in existingVariableValue ? existingVariableValue.a : 1,
-      });
-
-      console.log(
-        'Setting color value on variable',
-        variable,
-        variable.name,
-        isFigmaColorObject(color),
-        isFigmaColorObject(existingVariableValue),
-        existingVariableValue,
-        normalized,
-        newValue,
-        value,
-        opacity,
-      );
+      };
     }
 
     variable.setValueForMode(mode, newValue);
