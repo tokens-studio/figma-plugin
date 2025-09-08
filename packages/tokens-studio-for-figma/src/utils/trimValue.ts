@@ -10,13 +10,13 @@ export default function trimValue(value: SingleToken['value'], tokenType?: Token
   if (Array.isArray(value)) {
     return value.map((item) => (
       Object.entries(item).reduce<Record<string, string>>((acc, [key, val]) => {
-        acc[key] = val.toString().trim();
+        acc[key] = String(val).trim();
         return acc;
       }, {})
     )) as SingleToken['value'];
   } if (typeof value === 'object') {
     return Object.entries(value).reduce<Record<string, string>>((acc, [key, val]) => {
-      acc[key] = val.toString().trim();
+      acc[key] = String(val).trim();
       return acc;
     }, {});
   }

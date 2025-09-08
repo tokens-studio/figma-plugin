@@ -1,5 +1,6 @@
 import { TokenTypes } from '@/constants/TokenTypes';
 import { SingleToken } from '@/types/tokens';
+import { TokenColorValue } from '@/types/values';
 import {
   effectStyleMatchesBoxShadowToken,
   paintStyleMatchesColorToken,
@@ -14,7 +15,23 @@ export default function compareStyleValueWithTokenValue(
   try {
     if (style.type === 'PAINT' && token?.type === TokenTypes.COLOR) {
       const { value } = token;
-      return paintStyleMatchesColorToken(style, value);
+      // For multiple colors, compare against first color for now
+      if (Array.isArray(value)) {
+        const firstColor = value[0]?.color;
+        if (firstColor) {
+          return paintStyleMatchesColorToken(style, firstColor);
+        }
+        return false;
+      }
+      // For TokenColorValue object, use its color property
+      if (typeof value === 'object' && value !== null && 'color' in value) {
+        return paintStyleMatchesColorToken(style, value.color);
+      }
+      // For string values (existing behavior)
+      if (typeof value === 'string') {
+        return paintStyleMatchesColorToken(style, value);
+      }
+      return false;
     }
     if (style.type === 'TEXT' && token?.type === TokenTypes.TYPOGRAPHY) {
       const { value } = token;

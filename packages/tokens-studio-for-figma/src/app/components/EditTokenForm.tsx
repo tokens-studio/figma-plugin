@@ -20,6 +20,7 @@ import {
   SingleToken,
   SingleTypographyToken,
 } from '@/types/tokens';
+import { TokenColorValue } from '@/types/values';
 import { checkIfAlias, checkIfContainsAlias, getAliasValue } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
 import {
@@ -220,6 +221,16 @@ function EditTokenForm({ resolvedTokens }: Props) {
       setError(null);
       if (internalEditToken?.type === TokenTypes.BOX_SHADOW) {
         setInternalEditToken((prev) => ({ ...prev, value: shadow } as typeof editToken));
+      }
+    },
+    [internalEditToken],
+  );
+
+  const handleColorValueChange = React.useCallback(
+    (color: TokenColorValue | TokenColorValue[]) => {
+      setError(null);
+      if (internalEditToken?.type === TokenTypes.COLOR) {
+        setInternalEditToken((prev) => ({ ...prev, value: color } as typeof editToken));
       }
     },
     [internalEditToken],
@@ -623,6 +634,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
             resolvedValue={resolvedValue}
             handleColorChange={handleChange}
             handleColorDownShiftInputChange={handleDownShiftInputChange}
+            handleColorValueChange={handleColorValueChange}
             handleColorModifyChange={handleColorModifyChange}
             handleRemoveColorModify={removeColorModify}
             onSubmit={checkAndSubmitTokenValue}

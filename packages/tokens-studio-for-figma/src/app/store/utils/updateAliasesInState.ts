@@ -16,10 +16,10 @@ export function updateAliasesInState(tokens: Record<string, AnyTokenList>, data:
             if (!updatedSets.includes(key)) updatedSets.push(key);
           }
 
-          // Update if token is of type array, e.g. box shadows
+          // Update if token is of type array, e.g. box shadows or multiple colors
           if (Array.isArray(newToken.value)) {
             const newTokenValue = newToken.value.map((t) => Object.entries(t).reduce<Record<string, string | number>>((a, [k, v]) => {
-              a[k] = replaceReferences(v.toString(), data.oldName, data.newName);
+              a[k] = replaceReferences(String(v), data.oldName, data.newName);
               return a;
             }, {}));
 
