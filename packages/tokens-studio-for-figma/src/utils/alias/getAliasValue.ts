@@ -2,7 +2,7 @@ import { getRootReferences, findReferences } from '../findReferences';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { SingleToken } from '@/types/tokens';
-import { TokenBorderValue, TokenBoxshadowValue, TokenTypographyValue } from '@/types/values';
+import { TokenBorderValue, TokenBoxshadowValue, TokenTypographyValue, TokenColorValue } from '@/types/values';
 import { convertToRgb } from '../color';
 import { convertModifiedColorToHex } from '../convertModifiedColorToHex';
 
@@ -19,7 +19,8 @@ function getReturnedValue(token: SingleToken | string | number) {
     && typeof token.value === 'object'
     && (token?.type === TokenTypes.BOX_SHADOW
       || token?.type === TokenTypes.TYPOGRAPHY
-      || token?.type === TokenTypes.BORDER)
+      || token?.type === TokenTypes.BORDER
+      || token?.type === TokenTypes.COLOR)
   ) {
     return token.value;
   }
@@ -30,9 +31,9 @@ function getReturnedValue(token: SingleToken | string | number) {
 }
 
 function replaceAliasWithResolvedReference(
-  token: string | TokenTypographyValue | TokenBoxshadowValue | TokenBoxshadowValue[] | TokenBorderValue | null,
+  token: string | TokenTypographyValue | TokenBoxshadowValue | TokenBoxshadowValue[] | TokenBorderValue | TokenColorValue | TokenColorValue[] | null,
   reference: string,
-  resolvedReference: string | number | TokenBoxshadowValue | TokenBoxshadowValue[] | Record<string, unknown> | null,
+  resolvedReference: string | number | TokenBoxshadowValue | TokenBoxshadowValue[] | TokenColorValue | TokenColorValue[] | Record<string, unknown> | null,
 ) {
   if (typeof resolvedReference === 'object') {
     return resolvedReference;
@@ -50,7 +51,7 @@ export function getAliasValue(
   tokens: SingleToken[] = [],
   isResolved: boolean = true,
   previousCount: number = 0,
-): string | number | TokenTypographyValue | TokenBoxshadowValue | TokenBorderValue | Array<TokenBoxshadowValue> | null {
+): string | number | TokenTypographyValue | TokenBoxshadowValue | TokenBorderValue | Array<TokenBoxshadowValue> | TokenColorValue | Array<TokenColorValue> | null {
   // Big O((n ^ 3) (n = amount of tokens)
   let returnedValue: ReturnType<typeof getReturnedValue> | null = getReturnedValue(token);
   try {

@@ -14,6 +14,7 @@ export function checkIfAlias(token: SingleToken | string, allTokens: SingleToken
       token.type === TokenTypes.TYPOGRAPHY
       || token.type === TokenTypes.BOX_SHADOW
       || token.type === TokenTypes.BORDER
+      || token.type === TokenTypes.COLOR
     ) {
       if (typeof token.value === 'string') {
         aliasToken = Boolean(String(token.value).match(AliasRegex));
