@@ -225,23 +225,23 @@ export default function useTokens() {
   const handleJSONUpdate = useCallback(
     async (newTokens: string) => {
       track('Update JSON');
-      
+
       try {
         // Parse the new tokens to compare with current state
         const parsedTokens = parseJson(newTokens);
         const parsedValues = parseTokenValues({ [activeTokenSet]: parsedTokens });
         const newTokenState = parsedValues[activeTokenSet] || [];
-        
+
         // Get current tokens for the active token set
         const currentTokenState = tokens[activeTokenSet] || [];
-        
+
         // Create comparable token states
         const beforeTokens = { [activeTokenSet]: currentTokenState };
         const afterTokens = { [activeTokenSet]: newTokenState };
-        
+
         // Detect potential token renames
         const detectedRenames = detectTokenRenames(beforeTokens, afterTokens);
-        
+
         if (detectedRenames.length > 0) {
           // Ask user if they want to remap the renamed tokens
           const confirmData = await confirm({
@@ -273,21 +273,21 @@ export default function useTokens() {
               },
             ],
           });
-          
+
           if (confirmData && confirmData.result) {
             // Apply the new JSON data first
             dispatch.tokenState.setJSONData(newTokens);
-            
+
             // If user chose to remap, apply the remapping
             if (confirmData.data && !confirmData.data.includes('skip')) {
               const updateMode = confirmData.data[0] as UpdateMode;
               lastUsedRenameOption = updateMode;
-              
+
               // Apply remapping for each detected rename
               await Promise.all(
-                detectedRenames.map((rename) => 
+                detectedRenames.map((rename) => (
                   handleBulkRemap(rename.newName, rename.oldName, updateMode)
-                )
+                )),
               );
             }
           }
