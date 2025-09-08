@@ -52,6 +52,9 @@ export default async function setValuesOnVariable(
           }
           variable.description = token.description ?? '';
 
+          // Always add the variable to the key map, regardless of whether it needs updating
+          variableKeyMap[token.name] = variable.key;
+
           // Check if the variable already has the correct alias reference before updating
           const existingVariableValue = variable.valuesByMode[mode];
           const rawValue = typeof token.rawValue === 'string' ? token.rawValue : undefined;
@@ -104,7 +107,6 @@ export default async function setValuesOnVariable(
           } else {
             referenceTokenName = token.rawValue!.toString().substring(1);
           }
-          variableKeyMap[token.name] = variable.key;
           if (token && checkCanReferenceVariable(token)) {
             referenceVariableCandidates.push({
               variable,
