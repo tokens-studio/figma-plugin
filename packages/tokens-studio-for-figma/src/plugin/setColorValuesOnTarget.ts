@@ -6,16 +6,33 @@ import { ColorPaintType, tryApplyColorVariableId } from '@/utils/tryApplyColorVa
 import { unbindVariableFromTarget } from './unbindVariableFromTarget';
 import { getReferenceTokensFromGradient } from '@/utils/color';
 import { SingleToken } from '@/types/tokens';
+import { TokenColorValue } from '@/types/values';
 
 function hasModifier(token: SingleToken) {
   return token.$extensions?.['studio.tokens']?.modify;
 }
 
-const applyPaintIfNotEqual = (key, existingPaint, newPaint, target) => {
-  if (!existingPaint || !isPaintEqual(newPaint, existingPaint)) {
-    if (key === 'paints' && 'paints' in target) target.paints = [newPaint];
-    if (key === 'fills' && 'fills' in target) target.fills = [newPaint];
-    if (key === 'strokes' && 'strokes' in target) target.strokes = [newPaint];
+const applyPaintIfNotEqual = (key, existingPaints, newPaints, target) => {
+  // Handle multiple paints
+  if (Array.isArray(newPaints)) {
+    // Check if the existing paints array matches the new paints array
+    const paintsMatch = existingPaints && Array.isArray(existingPaints) && 
+      existingPaints.length === newPaints.length &&
+      existingPaints.every((existingPaint, index) => isPaintEqual(newPaints[index], existingPaint));
+    
+    if (!paintsMatch) {
+      if (key === 'paints' && 'paints' in target) target.paints = newPaints;
+      if (key === 'fills' && 'fills' in target) target.fills = newPaints;
+      if (key === 'strokes' && 'strokes' in target) target.strokes = newPaints;
+    }
+  } else {
+    // Handle single paint (existing behavior)
+    const existingPaint = Array.isArray(existingPaints) ? existingPaints[0] : existingPaints;
+    if (!existingPaint || !isPaintEqual(newPaints, existingPaint)) {
+      if (key === 'paints' && 'paints' in target) target.paints = [newPaints];
+      if (key === 'fills' && 'fills' in target) target.fills = [newPaints];
+      if (key === 'strokes' && 'strokes' in target) target.strokes = [newPaints];
+    }
   }
 };
 
@@ -75,29 +92,64 @@ export default async function setColorValuesOnTarget({
     const resolvedValue = givenValue || defaultTokenValueRetriever.get(token)?.rawValue;
 
     if (typeof resolvedValue === 'undefined') return;
-    let existingPaint: Paint | null = null;
+    let existingPaints: readonly Paint[] | null = null;
     if (key === 'paints' && 'paints' in target) {
-      existingPaint = target.paints[0] ?? null;
+      existingPaints = target.paints ?? null;
     } else if (key === 'fills' && 'fills' in target && target.fills !== figma.mixed) {
-      existingPaint = target.fills[0] ?? null;
+      existingPaints = target.fills ?? null;
     } else if (key === 'strokes' && 'strokes' in target) {
-      existingPaint = target.strokes[0] ?? null;
+      existingPaints = target.strokes ?? null;
     }
 
-    if (resolvedValue.startsWith?.('linear-gradient')) {
-      const fallbackValue = defaultTokenValueRetriever.get(token)?.value;
+    // Check if we have multiple colors to apply
+    const fallbackValue = defaultTokenValueRetriever.get(token)?.value;
+    const valueToProcess = fallbackValue ?? givenValue;
+    
+    // Handle multiple color values
+    if (Array.isArray(valueToProcess)) {
+      const newPaints: Paint[] = [];
+      
+      for (const colorValue of valueToProcess) {
+        const colorString = typeof colorValue === 'string' ? colorValue : colorValue.color;
+        if (colorString?.startsWith?.('linear-gradient')) {
+          const newPaint = await getLinearGradientPaint(colorString, token);
+          newPaints.push(newPaint);
+        } else {
+          const { color, opacity } = convertToFigmaColor(colorString || '');
+          const newPaint: SolidPaint = { color, opacity, type: 'SOLID' };
+          newPaints.push(newPaint);
+        }
+      }
+      
+      if (newPaints.length > 0) {
+        await unbindVariableFromTarget(target, key, newPaints[0]);
+        applyPaintIfNotEqual(key, existingPaints, newPaints, target);
+      }
+      
+      if (description && 'description' in target) {
+        target.description = description;
+      }
+      return Promise.resolve();
+    }
+
+    // Handle single color value (existing logic with modifications)
+    const singleColorValue = typeof valueToProcess === 'object' && valueToProcess !== null && 'color' in valueToProcess 
+      ? valueToProcess.color 
+      : valueToProcess;
+
+    if (singleColorValue?.startsWith?.('linear-gradient')) {
       const newPaint = await getLinearGradientPaint(fallbackValue, token);
-      applyPaintIfNotEqual(key, existingPaint, newPaint, target);
+      applyPaintIfNotEqual(key, existingPaints, newPaint, target);
     } else {
       // If the raw value is a pure reference to another token, we first should try to apply that reference as a variable if it exists.
       let successfullyAppliedVariable = false;
 
-      const containsReferenceVariable = resolvedValue.toString().startsWith('{') && resolvedValue.toString().endsWith('}');
-      const referenceVariableExists = await defaultTokenValueRetriever.getVariableReference(resolvedValue.slice(1, -1));
+      const containsReferenceVariable = singleColorValue?.toString().startsWith('{') && singleColorValue?.toString().endsWith('}');
+      const referenceVariableExists = await defaultTokenValueRetriever.getVariableReference(singleColorValue?.slice(1, -1));
 
       if (containsReferenceVariable && referenceVariableExists && shouldCreateStylesWithVariables && !hasModifier(resolvedToken)) {
         try {
-          successfullyAppliedVariable = await tryApplyColorVariableId(target, resolvedValue.slice(1, -1), ColorPaintType.PAINTS);
+          successfullyAppliedVariable = await tryApplyColorVariableId(target, singleColorValue?.slice(1, -1), ColorPaintType.PAINTS);
         } catch (e) {
           console.error('Error setting bound variable for paint', e);
         }
@@ -106,8 +158,7 @@ export default async function setColorValuesOnTarget({
       // If value contains references but we werent able to apply, likely that reference doesnt exist. It could be that this is a composite token like border
       // Where we pass in the color value from a composite but technically that token doesnt exist in the current set of tokens (but a reference to a variable exists!)
       // So we should see if there is a token that exists for the value we're trying to apply, if not, use the givenValue that we pass on in that case
-      const fallbackValue = defaultTokenValueRetriever.get(token)?.value; // Value on a token if we're given a token
-      const valueToApply = fallbackValue ?? givenValue;
+      const valueToApply = singleColorValue;
 
       if (!successfullyAppliedVariable) {
         let newPaint: SolidPaint | GradientPaint;
@@ -119,7 +170,7 @@ export default async function setColorValuesOnTarget({
         }
 
         await unbindVariableFromTarget(target, key, newPaint);
-        applyPaintIfNotEqual(key, existingPaint, newPaint, target);
+        applyPaintIfNotEqual(key, existingPaints, newPaint, target);
       }
     }
     if (description && 'description' in target) {
