@@ -85,7 +85,7 @@
       "affectedSyncs": "Affected syncs:",
       "instructions": "API Tokens provide better security and will continue to work after App Passwords are discontinued. You can migrate your existing syncs or create new ones with API Tokens.",
       "migrationInProgress": "Migrating from App Password to API Token. Please enter your new API Token.",
-      "learnMore": "Learn how to create API Tokens →",
+      "learnMore": "Read migration guide here →",
       "remindLater": "Remind me later",
       "migrate": "Migrate to API Tokens",
       "appPasswordDeprecated": "Atlassian deprecated App Passwords, migrate to API tokens.",
@@ -96,7 +96,8 @@
       "appPasswordWarning": "App Password migration required",
       "clickToMigrate": "Click to migrate",
       "calloutDescription": "App Passwords are being deprecated by Atlassian. Migrate to API Tokens for better security and continued access.",
-      "switchToMigrationMode": "Migrate"
+      "switchToMigrationMode": "Migrate",
+      "migrationGuide": "Read the migration guide →"
     },
     "tokensstudio": {
       "name": "Name",

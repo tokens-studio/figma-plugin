@@ -103,6 +103,17 @@ export default function BitbucketForm({
             {t('readMoreBitBucket')}
           </Link>
         </Text>
+        {isMigrating && (
+          <Text muted css={{ marginTop: '$2' }}>
+            <Link
+              href="https://docs.tokens.studio/token-storage/remote/sync-git-bitbucket/migration-from-app-passwords-to-api-tokens"
+              target="_blank"
+              rel="noreferrer"
+            >
+              {t('providers.bitbucketMigration.migrationGuide')}
+            </Link>
+          </Text>
+        )}
         <FormField>
           <Label htmlFor="name">{t('name')}</Label>
           <TextInput value={values.name || ''} onChange={onChange} type="text" name="name" id="name" required />

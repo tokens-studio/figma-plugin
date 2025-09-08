@@ -92,7 +92,7 @@ export default function BitbucketMigrationDialog() {
         </Text>
 
         <Link
-          href="https://docs.tokens.studio/token-storage/remote/sync-git-bitbucket?ref=migration"
+          href="https://docs.tokens.studio/token-storage/remote/sync-git-bitbucket/migration-from-app-passwords-to-api-tokens"
           target="_blank"
           rel="noreferrer"
         >
