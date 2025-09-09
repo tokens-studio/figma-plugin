@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
-import compact from 'just-compact';
+
 import { Dispatch } from '@/app/store';
 import { notifyToUI } from '../../../plugin/notifiers';
 import { UrlTokenStorage } from '@/storage/UrlTokenStorage';
@@ -12,9 +12,7 @@ import { ErrorMessages } from '@/constants/ErrorMessages';
 import { activeThemeSelector, usedTokenSetSelector } from '@/selectors';
 import { RemoteResponseData } from '@/types/RemoteResponseData';
 import { applyTokenSetOrder } from '@/utils/tokenset';
-import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 import { categorizeError } from '@/utils/error/categorizeError';
-import { cleanThemesSelectedTokenSets } from '@/utils/cleanThemesSelectedTokenSets';
 
 type UrlCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.URL; }>;
 
@@ -73,10 +71,10 @@ export default function useURL() {
             themes: content.themes,
             metadata: content.metadata,
           });
-          const cleanedThemes = cleanThemesSelectedTokenSets(content.themes, Object.keys(content.tokens));
-
-          const stringifiedRemoteTokens = JSON.stringify(compact([applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder), cleanedThemes, TokenFormat.format]), null, 2);
-          dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
+          dispatch.tokenState.setLastSyncedState({
+            tokens: applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder),
+            themes: content.themes,
+          });
           dispatch.tokenState.setEditProhibited(true);
           return content;
         }

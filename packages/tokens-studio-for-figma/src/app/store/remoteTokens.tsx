@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
 import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
-import compact from 'just-compact';
+
 import { track } from '@/utils/analytics';
 import { useJSONbin } from './providers/jsonbin';
 import useURL from './providers/url';
@@ -24,7 +24,7 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 import { useGenericVersionedStorage } from './providers/generic/versionedStorage';
 import { RemoteResponseData, RemoteResponseStatus } from '@/types/RemoteResponseData';
-import { getFormat, TokenFormat, TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
+import { getFormat, TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { isEqual } from '@/utils/isEqual';
@@ -33,7 +33,6 @@ import usePullDialog from '../hooks/usePullDialog';
 import { Tabs } from '@/constants/Tabs';
 import { useTokensStudio } from './providers/tokens-studio';
 import { notifyToUI } from '@/plugin/notifiers';
-import { cleanThemesSelectedTokenSets } from '@/utils/cleanThemesSelectedTokenSets';
 
 export type PushOverrides = { branch: string; commitMessage: string };
 
@@ -198,15 +197,7 @@ export default function useRemoteTokens() {
           metadata: successData.metadata,
         });
         dispatch.uiState.setHasRemoteChange(false);
-        // Clean up themes to match the format used in comparison (remove disabled token sets)
-        const cleanedThemes = cleanThemesSelectedTokenSets(successData.themes, Object.keys(successData.tokens));
-
-        const stringifiedRemoteTokens = JSON.stringify(
-          compact([successData.tokens, cleanedThemes, TokenFormat.format]),
-          null,
-          2,
-        );
-        dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
+        dispatch.tokenState.setLastSyncedState({ tokens: successData.tokens, themes: successData.themes });
         if (activeTab !== Tabs.LOADING) {
           if (updateLocalTokens) {
             const format = getFormat();
