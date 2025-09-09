@@ -219,4 +219,25 @@ describe('SetValuesOnVariable', () => {
     await setValuesOnVariable(variablesInFigma, tokens, collection, mode, baseFontSize);
     expect(mockCreateVariable).toBeCalledWith('global/fontWeight', collection, 'FLOAT');
   });
+
+  it('should include variables in key map even when they don\'t need updating', async () => {
+    // Mock checkVariableAliasEquality to return true (no update needed)
+    jest.mock('@/utils/checkVariableAliasEquality', () => ({
+      checkVariableAliasEquality: jest.fn(() => true),
+    }));
+
+    const tokens = [{
+      name: 'colors.accent',
+      path: 'colors/accent',
+      value: '{colors.primary}',
+      rawValue: '{colors.primary}',
+      type: TokenTypes.COLOR,
+      variableId: '126',
+    }];
+
+    const result = await setValuesOnVariable(variablesInFigma, tokens, collection, mode, baseFontSize);
+
+    // The variable should be included in the key map even though it doesn't need updating
+    expect(result.variableKeyMap['colors.accent']).toBe('126');
+  });
 });

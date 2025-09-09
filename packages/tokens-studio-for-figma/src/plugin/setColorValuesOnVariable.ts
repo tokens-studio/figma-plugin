@@ -1,5 +1,6 @@
 import { isVariableWithAliasReference } from '@/utils/isAliasReference';
 import { convertToFigmaColor } from './figmaTransforms/colors';
+import { checkVariableAliasEquality } from '@/utils/checkVariableAliasEquality';
 
 // Helper function to check if two colors are approximately equal within a threshold
 function isColorApproximatelyEqual(
@@ -31,7 +32,7 @@ function isFigmaColorObject(obj: VariableValue): obj is RGBOrRGBA {
   );
 }
 
-export default function setColorValuesOnVariable(variable: Variable, mode: string, value: string) {
+export default function setColorValuesOnVariable(variable: Variable, mode: string, value: string, rawValue?: string) {
   try {
     const { color, opacity } = convertToFigmaColor(value);
     const existingVariableValue = variable.valuesByMode[mode];
@@ -42,6 +43,12 @@ export default function setColorValuesOnVariable(variable: Variable, mode: strin
 
     const newValue = { ...color, a: opacity };
 
+    // For alias references, check if they already point to the correct variable
+    if (checkVariableAliasEquality(existingVariableValue, rawValue)) {
+      console.log('Color variable alias already correct:', variable.name);
+      return;
+    }
+
     // For direct color values, compare the actual color values using threshold
     if (isFigmaColorObject(existingVariableValue)) {
       const existingValue = {
@@ -51,17 +58,12 @@ export default function setColorValuesOnVariable(variable: Variable, mode: strin
 
       if (isColorApproximatelyEqual(existingValue, newValue)) {
         // return if values are approximately equal
+        console.log('Color values approximately equal, skipping update:', variable.name);
         return;
       }
     }
 
-    if (isFigmaColorObject(existingVariableValue)) {
-      const existingValue = {
-        ...existingVariableValue,
-        a: 'a' in existingVariableValue ? existingVariableValue.a : 1,
-      };
-    }
-
+    console.log('Setting color value on variable', variable.name, variable.valuesByMode[mode], newValue);
     variable.setValueForMode(mode, newValue);
   } catch (e) {
     console.error('Error setting colorVariable', e);

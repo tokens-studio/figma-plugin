@@ -78,23 +78,47 @@ export default async function setValuesOnVariable(
               break;
             case 'COLOR':
               if (typeof token.value === 'string' && !token.value.includes('{')) {
-                setColorValuesOnVariable(variable, mode, token.value);
+                console.log(
+                  'Setting color value on variable',
+                  variable.name,
+                  variable.valuesByMode[mode],
+                  token.value,
+                );
+                setColorValuesOnVariable(variable, mode, token.value, rawValue);
               }
               break;
             case 'FLOAT': {
               const value = String(token.value);
               if (typeof value === 'string' && !value.includes('{')) {
                 const transformedValue = transformValue(value, token.type, baseFontSize, true);
+                console.log(
+                  'Setting number value on variable',
+                  variable.name,
+                  variable.valuesByMode[mode],
+                  Number(transformedValue),
+                );
                 setNumberValuesOnVariable(variable, mode, Number(transformedValue));
               }
               break;
             }
             case 'STRING':
               if (typeof token.value === 'string' && !token.value.includes('{')) {
+                console.log(
+                  'Setting string value on variable',
+                  variable.name,
+                  variable.valuesByMode[mode],
+                  token.value,
+                );
                 setStringValuesOnVariable(variable, mode, token.value);
                 // Given we cannot determine the combined family of a variable, we cannot use fallback weights from our estimates.
                 // This is not an issue because users can set numerical font weights with variables, so we opt-out of the guesswork and just apply the numerical weight.
               } else if (token.type === TokenTypes.FONT_WEIGHTS && Array.isArray(token.value)) {
+                console.log(
+                  'Setting string value on variable (font weight array)',
+                  variable.name,
+                  variable.valuesByMode[mode],
+                  token.value[0],
+                );
                 setStringValuesOnVariable(variable, mode, token.value[0]);
               }
               break;
