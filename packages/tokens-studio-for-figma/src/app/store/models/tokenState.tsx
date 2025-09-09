@@ -1,6 +1,7 @@
 /* eslint-disable import/prefer-default-export */
 import { compressToUTF16 } from 'lz-string';
 import omit from 'just-omit';
+import compact from 'just-compact';
 import { createModel } from '@rematch/core';
 import extend from 'just-extend';
 import { v4 as uuidv4 } from 'uuid';
@@ -57,6 +58,7 @@ import { CreateSingleTokenData, EditSingleTokenData } from '../useManageTokens';
 import { singleTokensToRawTokenSet } from '@/utils/convert';
 import { checkStorageSize } from '@/utils/checkStorageSize';
 import { compareLastSyncedState } from '@/utils/compareLastSyncedState';
+import { cleanThemesSelectedTokenSets } from '@/utils/cleanThemesSelectedTokenSets';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
@@ -213,10 +215,24 @@ export const tokenState = createModel<RootModel>()({
       ]);
     },
     deleteTokenSet: (state, name: string) => updateTokenSetsInState(state, (setName, tokenSet) => (setName === name ? null : [setName, tokenSet])),
-    setLastSyncedState: (state, data: string) => ({
-      ...state,
-      lastSyncedState: data,
-    }),
+    setLastSyncedState: (state, data: string | { tokens: Record<string, AnyTokenList>; themes: ThemeObjectsList }) => {
+      if (typeof data === 'string') {
+        return {
+          ...state,
+          lastSyncedState: data,
+        };
+      }
+
+      const { tokens, themes } = data;
+      const availableTokenSets = Object.keys(tokens);
+      const cleanedThemes = cleanThemesSelectedTokenSets(themes, availableTokenSets);
+      const stringifiedRemoteTokens = JSON.stringify(compact([tokens, cleanedThemes, TokenFormat.format]), null, 2);
+
+      return {
+        ...state,
+        lastSyncedState: stringifiedRemoteTokens,
+      };
+    },
     setTokenSetOrder: (state, data: string[]) => {
       const newTokens = {};
       data.forEach((set) => {

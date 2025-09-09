@@ -1,7 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import React from 'react';
 import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
-import compact from 'just-compact';
 import { Dispatch } from '@/app/store';
 import useConfirm from '@/app/hooks/useConfirm';
 import usePushDialog from '@/app/hooks/usePushDialog';
@@ -20,10 +19,7 @@ import { ErrorMessages } from '@/constants/ErrorMessages';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { PushOverrides } from '../../remoteTokens';
 import { useIsProUser } from '@/app/hooks/useIsProUser';
-import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 import { categorizeError } from '@/utils/error/categorizeError';
-import { cleanThemesSelectedTokenSets } from '@/utils/cleanThemesSelectedTokenSets';
-
 
 type AdoCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.ADO; }>;
 type AdoFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.ADO; }>;
@@ -94,10 +90,7 @@ export const useADO = () => {
         });
         const branches = await storage.fetchBranches();
         dispatch.branchState.setBranches(branches);
-        const cleanedThemes = cleanThemesSelectedTokenSets(themes, Object.keys(tokens));
-
-        const stringifiedRemoteTokens = JSON.stringify(compact([tokens, cleanedThemes, TokenFormat.format]), null, 2);
-        dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
+        dispatch.tokenState.setLastSyncedState({ tokens, themes });
         pushDialog({ state: 'success' });
 
         return {
@@ -232,10 +225,7 @@ export const useADO = () => {
               themes: content.themes,
               metadata: content.metadata,
             });
-            const cleanedThemes = cleanThemesSelectedTokenSets(content.themes, Object.keys(sortedValues));
-
-            const stringifiedRemoteTokens = JSON.stringify(compact([sortedValues, cleanedThemes, TokenFormat.format]), null, 2);
-            dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
+            dispatch.tokenState.setLastSyncedState({ tokens: sortedValues, themes: content.themes });
             dispatch.tokenState.setCollapsedTokenSets([]);
             notifyToUI('Pulled tokens from ADO');
           }

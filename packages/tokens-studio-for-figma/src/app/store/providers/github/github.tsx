@@ -1,7 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
 import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
-import compact from 'just-compact';
 import { Dispatch } from '@/app/store';
 import useConfirm from '@/app/hooks/useConfirm';
 import usePushDialog from '@/app/hooks/usePushDialog';
@@ -24,8 +23,6 @@ import { applyTokenSetOrder } from '@/utils/tokenset';
 import { PushOverrides } from '../../remoteTokens';
 import { useIsProUser } from '@/app/hooks/useIsProUser';
 import { categorizeError } from '@/utils/error/categorizeError';
-import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
-import { cleanThemesSelectedTokenSets } from '@/utils/cleanThemesSelectedTokenSets';
 
 type GithubCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITHUB; }>;
 type GithubFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITHUB }>;
@@ -115,10 +112,7 @@ export function useGitHub() {
           themes,
           metadata,
         });
-        const cleanedThemes = cleanThemesSelectedTokenSets(themes, Object.keys(tokens));
-
-        const stringifiedRemoteTokens = JSON.stringify(compact([tokens, cleanedThemes, TokenFormat.format]), null, 2);
-        dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
+        dispatch.tokenState.setLastSyncedState({ tokens, themes });
         pushDialog({ state: 'success' });
         return {
           status: 'success',
@@ -268,10 +262,7 @@ export function useGitHub() {
               themes: content.themes,
               metadata: content.metadata,
             });
-            const cleanedThemes = cleanThemesSelectedTokenSets(content.themes, Object.keys(content.tokens));
-
-            const stringifiedRemoteTokens = JSON.stringify(compact([content.tokens, cleanedThemes, TokenFormat.format]), null, 2);
-            dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
+            dispatch.tokenState.setLastSyncedState({ tokens: content.tokens, themes: content.themes });
             dispatch.tokenState.setCollapsedTokenSets([]);
             dispatch.uiState.setApiData({ ...context, ...(commitSha ? { commitSha } : {}) });
             notifyToUI('Pulled tokens from GitHub');

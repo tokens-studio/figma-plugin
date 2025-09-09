@@ -1,7 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import compact from 'just-compact';
 import { Dispatch } from '@/app/store';
 import useConfirm from '@/app/hooks/useConfirm';
 import { notifyToUI } from '@/plugin/notifiers';
@@ -26,8 +25,6 @@ import { PushOverrides } from '../../remoteTokens';
 import { categorizeError } from '@/utils/error/categorizeError';
 import { RemoteTokenStorageMetadata } from '@/storage/RemoteTokenStorage';
 import { applyTokenSetOrder } from '@/utils/tokenset';
-import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
-import { cleanThemesSelectedTokenSets } from '@/utils/cleanThemesSelectedTokenSets';
 
 type TokensStudioCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.TOKENS_STUDIO }>;
 type TokensStudioFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.TOKENS_STUDIO }>;
@@ -137,10 +134,7 @@ export function useTokensStudio() {
             themes,
             metadata,
           });
-          const cleanedThemes = cleanThemesSelectedTokenSets(themes, Object.keys(tokens));
-
-          const stringifiedRemoteTokens = JSON.stringify(compact([tokens, cleanedThemes, TokenFormat.format]), null, 2);
-          dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
+          dispatch.tokenState.setLastSyncedState({ tokens, themes });
           pushDialog({ state: 'success' });
           return {
             status: 'success',
@@ -242,10 +236,7 @@ export function useTokensStudio() {
                 themes: data.themes,
                 metadata: data.metadata,
               });
-              const cleanedThemes = cleanThemesSelectedTokenSets(data.themes, Object.keys(data.tokens));
-
-              const stringifiedRemoteTokens = JSON.stringify(compact([data.tokens, cleanedThemes, TokenFormat.format]), null, 2);
-              dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
+              dispatch.tokenState.setLastSyncedState({ tokens: data.tokens, themes: data.themes });
               dispatch.tokenState.setCollapsedTokenSets([]);
               notifyToUI('Pulled tokens from Tokens Studio');
             }
