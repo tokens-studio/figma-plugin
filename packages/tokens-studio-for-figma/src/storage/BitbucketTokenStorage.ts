@@ -11,6 +11,7 @@ import { ThemeObjectsList } from '@/types';
 import { SystemFilenames } from '@/constants/SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import { retryHttpRequest } from '@/utils/retryWithBackoff';
 
 type CreatedOrUpdatedFileType = {
   owner: string;
@@ -210,14 +211,17 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     let nextPageUrl: string | null = `${url}?pagelen=100`;
 
     while (nextPageUrl) {
+      const currentUrl = nextPageUrl; // TypeScript guard to ensure non-null
       const authHeader = `Basic ${btoa(`${this.username || this.owner}:${this.apiToken}`)}`;
 
-      const response = await fetch(nextPageUrl, {
-        headers: {
-          Authorization: authHeader,
-        },
-        cache: 'no-cache',
-      });
+      const response = await retryHttpRequest(
+        () => fetch(currentUrl, {
+          headers: {
+            Authorization: authHeader,
+          },
+          cache: 'no-cache',
+        }),
+      );
 
       if (!response.ok) {
         throw new Error(`Failed to read from Bitbucket: ${response.statusText}`);
@@ -247,12 +251,14 @@ export class BitbucketTokenStorage extends GitTokenStorage {
   private async fetchJsonFile(url: string): Promise<GitSingleFileObject> {
     const authHeader = `Basic ${btoa(`${this.username || this.owner}:${this.apiToken}`)}`;
 
-    const response = await fetch(url, {
-      headers: {
-        Authorization: authHeader,
-      },
-      cache: 'no-cache',
-    });
+    const response = await retryHttpRequest(
+      () => fetch(url, {
+        headers: {
+          Authorization: authHeader,
+        },
+        cache: 'no-cache',
+      }),
+    );
 
     if (!response.ok) {
       throw new Error(`Failed to read from Bitbucket: ${response.statusText}`);
@@ -306,15 +312,16 @@ export class BitbucketTokenStorage extends GitTokenStorage {
       if (this.flags.multiFileEnabled) {
         const jsonFiles = await this.fetchJsonFilesFromDirectory(url);
 
-        const authHeader = `Basic ${btoa(`${this.username || this.owner}:${this.apiToken}`)}`;
-
+        const authString = `${this.username || this.owner}:${this.apiToken}`;
         const jsonFileContents = await Promise.all(
-          jsonFiles.map((file: any) => fetch(file.links.self.href, {
-            headers: {
-              Authorization: authHeader,
-            },
-            cache: 'no-cache',
-          }).then((rsp) => rsp.text())),
+          jsonFiles.map((file: any) => retryHttpRequest(
+            () => fetch(file.links.self.href, {
+              headers: {
+                Authorization: authString,
+              },
+              cache: 'no-cache',
+            }),
+          ).then((rsp) => rsp.text())),
         );
         // Process the content of each JSON file
         return jsonFileContents.map((fileContent, index) => {
