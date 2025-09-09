@@ -7,20 +7,27 @@ export function updateTokenPayloadToSingleToken(
 ): SingleToken {
   const studioTokensExtension = validateStudioTokensExtensions(payload);
 
-  return {
-    name: payload.name,
-    value: payload.value,
-    type: payload.type,
-    ...(studioTokensExtension ? {
+  let extensions = {};
+  if (studioTokensExtension) {
+    extensions = {
       $extensions: {
         ...payload.$extensions,
         'studio.tokens': {
           ...studioTokensExtension,
         },
       },
-    } : payload.$extensions ? {
+    };
+  } else if (payload.$extensions) {
+    extensions = {
       $extensions: payload.$extensions,
-    } : {}),
+    };
+  }
+
+  return {
+    name: payload.name,
+    value: payload.value,
+    type: payload.type,
+    ...extensions,
     ...(payload.description ? {
       description: payload.description,
     } : {}),

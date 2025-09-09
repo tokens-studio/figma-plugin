@@ -141,4 +141,77 @@ describe('convertToTokenArray', () => {
       { name: 'global.nestGroupWithType.font.big', value: '24px', type: 'dimension' },
     ]);
   });
+
+  it('removes legacy id fields from studio.tokens extensions', () => {
+    const tokensWithIds = {
+      global: {
+        primary: {
+          $value: '#ff0000',
+          $type: 'color',
+          $extensions: {
+            'studio.tokens': {
+              id: 'abc-123-def-456',
+              modify: { type: 'lighten', value: 0.1 },
+            },
+          },
+        },
+        secondary: {
+          $value: '#00ff00',
+          $type: 'color',
+          $extensions: {
+            'studio.tokens': {
+              id: 'def-456-ghi-789',
+            },
+            'other.extension': {
+              someData: 'value',
+            },
+          },
+        },
+        tertiary: {
+          $value: '#0000ff',
+          $type: 'color',
+          $extensions: {
+            'studio.tokens': {
+              modify: { type: 'darken', value: 0.2 },
+            },
+          },
+        },
+      },
+    };
+
+    const result = convertToTokenArray({ tokens: tokensWithIds });
+
+    expect(result).toEqual([
+      {
+        name: 'global.primary',
+        value: '#ff0000',
+        type: 'color',
+        $extensions: {
+          'studio.tokens': {
+            modify: { type: 'lighten', value: 0.1 },
+          },
+        },
+      },
+      {
+        name: 'global.secondary',
+        value: '#00ff00',
+        type: 'color',
+        $extensions: {
+          'other.extension': {
+            someData: 'value',
+          },
+        },
+      },
+      {
+        name: 'global.tertiary',
+        value: '#0000ff',
+        type: 'color',
+        $extensions: {
+          'studio.tokens': {
+            modify: { type: 'darken', value: 0.2 },
+          },
+        },
+      },
+    ]);
+  });
 });

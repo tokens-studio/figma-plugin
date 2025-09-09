@@ -11,8 +11,6 @@ const mockedUpdateTokensOnSources = updateTokensOnSources as jest.MockedFunction
 
 jest.mock('../updateSources', () => jest.fn());
 
-
-
 // Hide errors unless they are expected
 const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
 
@@ -674,11 +672,6 @@ describe('editToken', () => {
         name: 'test',
         type: TokenTypes.COLOR,
         value: '#000000',
-        $extensions: {
-          'studio.tokens': {
-            id: 'mock-uuid',
-          },
-        },
       },
     ];
     expect(tokens.global).toEqual(expectedTokens);
@@ -814,7 +807,6 @@ describe('editToken', () => {
         value: '#000000',
         $extensions: {
           'studio.tokens': {
-            id: 'mock-uuid',
             modify: {
               type: 'lighten',
               value: '0.5',
@@ -917,7 +909,6 @@ describe('editToken', () => {
         type: 'sizing',
         $extensions: {
           'studio.tokens': {
-            id: 'mock-uuid',
             modify: {
               type: 'lighten',
               value: '0.5',
@@ -1030,7 +1021,6 @@ describe('editToken', () => {
         type: 'sizing',
         $extensions: {
           'studio.tokens': {
-            id: 'mock-uuid',
             modify: {
               type: 'lighten',
               value: '0.5',
@@ -1074,11 +1064,6 @@ describe('editToken', () => {
         name: 'primary-copy',
         value: '1',
         type: 'sizing',
-        $extensions: {
-          'studio.tokens': {
-            id: 'mock-uuid',
-          },
-        },
       },
       {
         name: 'alias',
@@ -1664,31 +1649,16 @@ describe('editToken', () => {
     const { tokens } = store.getState().tokenState;
     const expectedTokens = [
       {
-        $extensions: {
-          'studio.tokens': {
-            id: 'mock-uuid',
-          },
-        },
         type: TokenTypes.COLOR,
         value: '#ff0000',
         name: 'red',
       },
       {
-        $extensions: {
-          'studio.tokens': {
-            id: 'mock-uuid',
-          },
-        },
         type: TokenTypes.COLOR,
         value: '#000000',
         name: 'black',
       },
       {
-        $extensions: {
-          'studio.tokens': {
-            id: 'mock-uuid',
-          },
-        },
         type: TokenTypes.BORDER_RADIUS,
         value: '12px',
         name: 'rounded.md',
