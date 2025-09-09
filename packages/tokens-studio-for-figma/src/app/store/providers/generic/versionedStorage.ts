@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
-import compact from 'just-compact';
+
 import { Dispatch } from '@/app/store';
 import { notifyToUI } from '../../../../plugin/notifiers';
 import pjs from '../../../../../package.json';
@@ -26,8 +26,6 @@ import {
 } from '@/types/StorageType';
 import { RemoteResponseData } from '@/types/RemoteResponseData';
 import { ErrorMessages } from '@/constants/ErrorMessages';
-import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
-import { cleanThemesSelectedTokenSets } from '@/utils/cleanThemesSelectedTokenSets';
 
 export async function updateGenericVersionedTokens({
   tokens,
@@ -160,7 +158,7 @@ export function useGenericVersionedStorage() {
       notifyToUI('Something went wrong. See console for details', { error: true });
       return null;
     },
-    [dispatch, themes, tokens],
+    [dispatch, themes, tokens, storeTokenIdInJsonEditor],
   );
 
   // Read tokens from endpoint
@@ -280,14 +278,7 @@ export function useGenericVersionedStorage() {
             tokenSetOrder: Object.keys(content.tokens),
           },
         });
-        const cleanedThemes = cleanThemesSelectedTokenSets(content.themes, Object.keys(content.tokens));
-
-        const stringifiedRemoteTokens = JSON.stringify(
-          compact([content.tokens, cleanedThemes, TokenFormat.format]),
-          null,
-          2,
-        );
-        dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
+        dispatch.tokenState.setLastSyncedState({ tokens: content.tokens, themes: content.themes });
         return content;
       }
 

@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
 import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
-import compact from 'just-compact';
+
 import { Dispatch } from '@/app/store';
 import useConfirm from '@/app/hooks/useConfirm';
 import usePushDialog from '@/app/hooks/usePushDialog';
@@ -20,9 +20,8 @@ import { ErrorMessages } from '@/constants/ErrorMessages';
 import { RemoteResponseData } from '@/types/RemoteResponseData';
 import { PushOverrides } from '../../remoteTokens';
 import { useIsProUser } from '@/app/hooks/useIsProUser';
-import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
+
 import { categorizeError } from '@/utils/error/categorizeError';
-import { cleanThemesSelectedTokenSets } from '@/utils/cleanThemesSelectedTokenSets';
 
 type BitbucketCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.BITBUCKET }>;
 type BitbucketFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.BITBUCKET }>;
@@ -98,10 +97,7 @@ export function useBitbucket() {
           themes,
           metadata,
         });
-        const cleanedThemes = cleanThemesSelectedTokenSets(themes, Object.keys(tokens));
-
-        const stringifiedRemoteTokens = JSON.stringify(compact([tokens, cleanedThemes, TokenFormat.format]), null, 2);
-        dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
+        dispatch.tokenState.setLastSyncedState({ tokens, themes });
         pushDialog({ state: 'success' });
         return {
           status: 'success',
@@ -243,8 +239,7 @@ export function useBitbucket() {
                 themes: content.themes,
                 metadata: content.metadata,
               });
-              const stringifiedRemoteTokens = JSON.stringify(compact([sortedValues, content.themes, TokenFormat.format]), null, 2);
-              dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
+              dispatch.tokenState.setLastSyncedState({ tokens: sortedValues, themes: content.themes });
               dispatch.tokenState.setCollapsedTokenSets([]);
               notifyToUI('Pulled tokens from Bitbucket');
             }
