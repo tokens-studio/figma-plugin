@@ -131,4 +131,78 @@ describe('TokenListing', () => {
     cy.get('[data-testid="tokensetitem-token-disabled-checkbox"]').should('have.attr', 'aria-checked', 'false');
     cy.get('[data-testid="tokensetitem-token-extra-checkbox"]').should('have.attr', 'aria-checked', 'false');
   });
+
+  it('Can search for token sets in theme creation', () => {
+    cy.startup(mockStartupParams);
+    cy.get('[data-testid="button-configure"]').should('be.visible');
+    cy.receiveSetTokens({
+      version: '5',
+      values: {
+        options: [{
+          name: 'sizing.xs',
+          value: 4,
+          type: 'sizing'
+        }],
+        global: [{
+          name: 'sizing.xs',
+          value: 4,
+          type: 'sizing'
+        }],
+      },
+    });
+
+    // Create multiple token sets to search through
+    createTokenSet({ name: 'design-tokens' });
+    createTokenSet({ name: 'color-palette' });
+    createTokenSet({ name: 'spacing-system' });
+    createTokenSet({ name: 'typography-scale' });
+
+    // Open manage themes modal and create new theme
+    cy.get('[data-testid="themeselector-dropdown"]').click();
+    cy.get('[data-testid="themeselector-managethemes"]').click();
+    cy.get('[data-testid="button-manage-themes-modal-new-theme"]').click();
+
+    // Verify search toggle button is visible
+    cy.get('[data-testid="search-input-with-toggle-button"]').should('be.visible');
+
+    // Click search button to activate search
+    cy.get('[data-testid="search-input-with-toggle-button"]').click();
+
+    // Verify search input appears
+    cy.get('[data-testid="search-input-with-toggle-input"]').should('be.visible');
+
+    // Search for 'palette' - should show only color-palette set
+    cy.get('[data-testid="search-input-with-toggle-input"]').type('palette');
+    
+    // Wait a moment for the filtering to apply
+    cy.wait(500);
+    
+    // Verify that only matching token set is visible within the token sets area
+    cy.get('[data-testid="tokensettheme-item--ToggleGroup-content--color-palette--enabled"]').should('exist');
+    cy.get('[data-testid="tokensettheme-item--ToggleGroup-content--design-tokens--enabled"]').should('not.exist');
+    cy.get('[data-testid="tokensettheme-item--ToggleGroup-content--spacing-system--enabled"]').should('not.exist');
+    cy.get('[data-testid="tokensettheme-item--ToggleGroup-content--typography-scale--enabled"]').should('not.exist');
+
+    // Clear search using the clear button
+    cy.get('[data-testid="search-input-with-toggle-clear"]').click();
+
+    // Verify all sets are visible again
+    cy.get('[data-testid="tokensettheme-item--ToggleGroup-content--color-palette--enabled"]').should('exist');
+    cy.get('[data-testid="tokensettheme-item--ToggleGroup-content--design-tokens--enabled"]').should('exist');
+    cy.get('[data-testid="tokensettheme-item--ToggleGroup-content--spacing-system--enabled"]').should('exist');
+    cy.get('[data-testid="tokensettheme-item--ToggleGroup-content--typography-scale--enabled"]').should('exist');
+
+    // Test another search term
+    cy.get('[data-testid="search-input-with-toggle-button"]').click();
+    cy.get('[data-testid="search-input-with-toggle-input"]').type('typography');
+    
+    // Wait for filtering to apply
+    cy.wait(500);
+    
+    // Should show typography-scale only
+    cy.get('[data-testid="tokensettheme-item--ToggleGroup-content--typography-scale--enabled"]').should('exist');
+    cy.get('[data-testid="tokensettheme-item--ToggleGroup-content--color-palette--enabled"]').should('not.exist');
+    cy.get('[data-testid="tokensettheme-item--ToggleGroup-content--design-tokens--enabled"]').should('not.exist');
+    cy.get('[data-testid="tokensettheme-item--ToggleGroup-content--spacing-system--enabled"]').should('not.exist');
+  });
 });

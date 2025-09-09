@@ -17,5 +17,11 @@
   "pushYourLocalChangesToYourSupernovaIoDesignSystem": "Empuje sus cambios locales a su sistema de diseño Supernova.io.",
   "designSystem": "Sistema de diseño",
   "pushYourLocalChangesToYourRepository": "Empuje sus cambios locales a su repositorio.",
-  "commitMessage": "Confirmar mensaje"
+  "commitMessage": "Confirmar mensaje",
+  "couldNotLoadTokens": "No se pudieron cargar los tokens",
+  "failedToParseJSON": "Error al analizar JSON",
+  "credentialError": "Error de credencial",
+  "connectivityError": "Error de conectividad",
+  "genericError": "Ocurrió un error",
+  "retry": "Reintentar"
 }

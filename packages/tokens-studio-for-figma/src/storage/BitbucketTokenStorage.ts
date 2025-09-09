@@ -10,6 +10,7 @@ import { AnyTokenSet } from '@/types/tokens';
 import { ThemeObjectsList } from '@/types';
 import { SystemFilenames } from '@/constants/SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 
 type CreatedOrUpdatedFileType = {
   owner: string;
@@ -321,6 +322,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
           const filePath = path.startsWith(this.path) ? path : `${this.path}/${path}`;
           let name = filePath.substring(this.path.length).replace(/^\/+/, '');
           name = name.replace('.json', '');
+
           const parsed = JSON.parse(fileContent) as GitMultiFileObject;
 
           if (name === SystemFilenames.THEMES) {
@@ -352,7 +354,8 @@ export class BitbucketTokenStorage extends GitTokenStorage {
         errorMessage: ErrorMessages.VALIDATION_ERROR,
       };
     } catch (e) {
-      return [];
+      console.error('Error', e);
+      return this.handleError(e, StorageProviderType.BITBUCKET);
     }
   }
 

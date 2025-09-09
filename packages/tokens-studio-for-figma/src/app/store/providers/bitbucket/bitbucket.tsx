@@ -21,6 +21,7 @@ import { RemoteResponseData } from '@/types/RemoteResponseData';
 import { PushOverrides } from '../../remoteTokens';
 import { useIsProUser } from '@/app/hooks/useIsProUser';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
+import { categorizeError } from '@/utils/error/categorizeError';
 
 type BitbucketCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.BITBUCKET }>;
 type BitbucketFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.BITBUCKET }>;
@@ -114,9 +115,14 @@ export function useBitbucket() {
             errorMessage: ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR,
           };
         }
+        const { message } = categorizeError(e, {
+          provider: StorageProviderType.BITBUCKET,
+          operation: 'push',
+          hasCredentials: true,
+        });
         return {
           status: 'failure',
-          errorMessage: ErrorMessages.BITBUCKET_CREDENTIAL_ERROR,
+          errorMessage: message,
         };
       }
     }
@@ -183,9 +189,14 @@ export function useBitbucket() {
         }
       } catch (e) {
         console.log('Error', e);
+        const { message } = categorizeError(e, {
+          provider: StorageProviderType.BITBUCKET,
+          operation: 'pull',
+          hasCredentials: true,
+        });
         return {
           status: 'failure',
-          errorMessage: ErrorMessages.BITBUCKET_CREDENTIAL_ERROR,
+          errorMessage: message,
         };
       }
       return null;
@@ -256,11 +267,17 @@ export function useBitbucket() {
             errorMessage: ErrorMessages.BITBUCKET_CREDENTIAL_ERROR,
           };
         }
-        notifyToUI(ErrorMessages.BITBUCKET_CREDENTIAL_ERROR, { error: true });
         console.log('Error', e);
+        const { message } = categorizeError(e, {
+          provider: StorageProviderType.BITBUCKET,
+          operation: 'sync',
+          hasCredentials: true,
+        });
+
+        notifyToUI(message, { error: true });
         return {
           status: 'failure',
-          errorMessage: ErrorMessages.BITBUCKET_CREDENTIAL_ERROR,
+          errorMessage: message,
         };
       }
     },
