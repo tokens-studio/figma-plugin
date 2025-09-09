@@ -304,9 +304,12 @@ describe('BitbucketTokenStorage', () => {
   });
 
   it('should be able to write', async () => {
-    mockListBranches.mockImplementationOnce(() =>
+    mockFetch.mockImplementationOnce(() =>
       Promise.resolve({
-        data: { values: [{ name: 'main' }] },
+        ok: true,
+        json: () => Promise.resolve({
+          values: [{ name: 'main' }],
+        }),
       }),
     );
 
@@ -343,29 +346,13 @@ describe('BitbucketTokenStorage', () => {
       },
     ];
 
-    const changes = files.map((file) => ({
-      message: 'Initial commit',
-      files: {
-        [file.path]: JSON.stringify(file.data, null, 2),
-      },
-    }));
-
+    // Mock the createSrcFileCommit method which is what actually gets called
     mockCreateOrUpdateFiles.mockImplementationOnce(() =>
       Promise.resolve({
-        branch: 'main',
-        owner: 'MattOliver',
-        repo: 'figma-tokens-testing',
-        createBranch: false,
-        changes: changes.map((change) => {
-          const changeFiles: { [key: string]: string } = {};
-          if (change.files['$metadata.json']) changeFiles['$metadata.json'] = change.files['$metadata.json'];
-          if (change.files['$themes.json']) changeFiles['$themes.json'] = change.files['$themes.json'];
-          if (change.files['global.json']) changeFiles['global.json'] = change.files['global.json'];
-          return {
-            message: change.message,
-            files: changeFiles,
-          };
-        }),
+        status: 201,
+        data: {
+          hash: 'abc123',
+        },
       }),
     );
 
@@ -385,22 +372,43 @@ describe('BitbucketTokenStorage', () => {
       repo_slug: 'figma-tokens-testing',
       workspace: 'MattOliver',
     });
+
+    // Verify the FormData contains the expected content
+    const callArgs = mockCreateOrUpdateFiles.mock.calls[0][0];
+    // eslint-disable-next-line no-underscore-dangle
+    const formData = callArgs._body;
+
+    expect(formData.append).toHaveBeenCalled();
+
+    // Get the data that was appended to FormData
+    const appendCalls = (formData.append as jest.Mock).mock.calls;
+    const fileContentCall = appendCalls.find((call: any[]) => call[0] === 'data/core.json');
+
+    expect(fileContentCall).toBeDefined();
+    const fileContent = fileContentCall![1];
+
+    expect(fileContent).toContain('"global"'); // Should contain the tokenSet data
+    expect(fileContent).toContain('"$themes"');
+    expect(fileContent).toContain('"$metadata"');
+    expect(fileContent).toContain('#ff0000');
+    expect(fileContent).toContain('Light');
   });
 
   it('should not be able to write a multi file structure when multi file flag is off', async () => {
-    mockCreateOrUpdateFiles.mockImplementationOnce(() =>
+    mockFetch.mockImplementationOnce(() =>
       Promise.resolve({
-        data: {
-          content: {},
-        },
+        ok: true,
+        json: () => Promise.resolve({
+          values: [{ name: 'main' }],
+        }),
       }),
     );
 
     storageProvider.disableMultiFile();
     storageProvider.changePath('data');
 
-    await expect(async () => {
-      await storageProvider.write(
+    await expect(
+      storageProvider.write(
         [
           {
             type: 'tokenSet',
@@ -419,8 +427,8 @@ describe('BitbucketTokenStorage', () => {
           commitMessage: '',
           storeTokenIdInJsonEditor: false,
         },
-      );
-    }).rejects.toThrow(ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR);
+      ),
+    ).rejects.toThrow(ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR);
     expect(mockCreateOrUpdateFiles).not.toHaveBeenCalled();
   });
 
