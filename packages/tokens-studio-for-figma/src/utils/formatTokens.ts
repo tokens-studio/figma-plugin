@@ -2,7 +2,7 @@ import set from 'set-value';
 import { expand } from '@/utils/expand';
 import { AnyTokenList } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
-import removeTokenId from './removeTokenId';
+
 import { convertTokenToFormat } from './convertTokenToFormat';
 import { getGroupTypeName } from './stringifyTokens';
 
@@ -16,7 +16,6 @@ type Options = {
   expandShadow?: boolean;
   expandComposition?: boolean;
   expandBorder?: boolean;
-  storeTokenIdInJsonEditor?: boolean
 };
 
 export default function formatTokens({
@@ -29,13 +28,12 @@ export default function formatTokens({
   expandShadow = false,
   expandComposition = false,
   expandBorder = false,
-  storeTokenIdInJsonEditor = false,
 }: Options) {
   const nestUnderParent = includeAllTokens ? true : includeParent;
   const tokenObj = {};
   tokenSets.forEach((tokenSet) => {
     tokens[tokenSet]?.forEach((token) => {
-      const { name, ...tokenWithoutName } = removeTokenId(token, !storeTokenIdInJsonEditor);
+      const { name, ...tokenWithoutName } = token;
 
       const convertedToFormat = convertTokenToFormat(tokenWithoutName);
       // set type of group level

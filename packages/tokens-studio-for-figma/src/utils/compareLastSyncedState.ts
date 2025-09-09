@@ -3,7 +3,7 @@ import { isEqual } from './isEqual';
 import { tryParseJson } from './tryParseJson';
 import type { ThemeObjectsList } from '@/types';
 import type { AnyTokenList } from '@/types/tokens';
-import removeIdPropertyFromTokens from './removeIdPropertyFromTokens';
+
 import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 
 export type LastSyncedState =
@@ -22,7 +22,7 @@ export function compareLastSyncedState(
     return false;
   }
 
-  const formattedCurrentState = JSON.stringify(compact([removeIdPropertyFromTokens(tokens), themes, format]), null, 2);
+  const formattedCurrentState = JSON.stringify(compact([tokens, themes, format]), null, 2);
 
   return isEqual(
     lastSyncedState,

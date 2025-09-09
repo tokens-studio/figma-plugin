@@ -37,7 +37,7 @@ export class GitSyncOptimizer {
     const filesToDelete: string[] = [];
 
     // Convert tokens to files and filter based on changes
-    const tokenSetObjects = convertTokensToObject({ ...data.tokens }, saveOptions.storeTokenIdInJsonEditor);
+    const tokenSetObjects = convertTokensToObject({ ...data.tokens });
     Object.entries(tokenSetObjects).forEach(([name, tokenSet]) => {
       const hasChanges = changedState.tokens[name];
       if (hasChanges && hasChanges.length > 0) {

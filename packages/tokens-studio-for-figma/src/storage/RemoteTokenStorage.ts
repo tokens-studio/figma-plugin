@@ -85,7 +85,7 @@ export abstract class RemoteTokenStorage<
     // First we'll convert the incoming data into files
     // in this generic implementation we will ignore whether multi file is enabled or not (ie for Github)
     // how these "files" are written is up to the read and write implementation
-    const tokenSetObjects = convertTokensToObject({ ...data.tokens }, saveOptions.storeTokenIdInJsonEditor);
+    const tokenSetObjects = convertTokensToObject({ ...data.tokens });
     Object.entries(tokenSetObjects).forEach(([name, tokenSet]) => {
       files.push({
         type: 'tokenSet',

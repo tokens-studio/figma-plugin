@@ -1,7 +1,7 @@
 import set from 'set-value';
 import { appendTypeToToken } from '@/app/components/createTokenObj';
 import { AnyTokenList } from '@/types/tokens';
-import removeTokenId from './removeTokenId';
+
 import { TokenFormat, TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 import { TokenInJSON } from './convertTokens';
 import { processNumberValue } from './processNumberValue';
@@ -25,12 +25,11 @@ function processTokenValue(value: any, tokenType: string): any {
 export default function stringifyTokens(
   tokens: Record<string, AnyTokenList>,
   activeTokenSet: string,
-  storeTokenIdInJsonEditor?: boolean,
 ): string {
   const tokenObj = {};
   tokens[activeTokenSet]?.forEach((token) => {
     const tokenWithType = appendTypeToToken(token);
-    const { name, ...tokenWithoutName } = removeTokenId(tokenWithType, !storeTokenIdInJsonEditor);
+    const { name, ...tokenWithoutName } = tokenWithType;
     if (tokenWithoutName.inheritTypeLevel) {
       const { inheritTypeLevel, ...tokenWithoutInheritTypeLevel } = tokenWithoutName;
       const tokenInJSON: TokenInJSON = tokenWithoutInheritTypeLevel;

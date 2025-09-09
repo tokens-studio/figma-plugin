@@ -177,29 +177,29 @@ describe('convertTokensToObject', () => {
   describe('when the format is set to legacy', () => {
     it('should convert array-like tokens to a nested object', () => {
       TokenFormat.setFormat(TokenFormatOptions.Legacy);
-      expect(convertTokensToObject(INPUT_TOKENS, true)).toEqual(OUTPUT_LEGACY_FORMAT_OBJECT);
+      expect(convertTokensToObject(INPUT_TOKENS)).toEqual(OUTPUT_LEGACY_FORMAT_OBJECT);
     });
 
     it('should convert array-like tokens with inherited types to a nested object', () => {
       TokenFormat.setFormat(TokenFormatOptions.Legacy);
-      expect(convertTokensToObject(INPUT_TOKENS_WITH_INHERITED_TYPES, true)).toEqual(OUTPUT_LEGACY_FORMAT_OBJECT_WITH_INHERITED_TYPES);
+      expect(convertTokensToObject(INPUT_TOKENS_WITH_INHERITED_TYPES)).toEqual(OUTPUT_LEGACY_FORMAT_OBJECT_WITH_INHERITED_TYPES);
     });
   });
 
   describe('when the format is set to DTCG', () => {
     it('should convert array-like tokens to a nested object', () => {
       TokenFormat.setFormat(TokenFormatOptions.DTCG);
-      expect(convertTokensToObject(INPUT_TOKENS, true)).toEqual(OUTPUT_DTCG_FORMAT_OBJECT);
+      expect(convertTokensToObject(INPUT_TOKENS)).toEqual(OUTPUT_DTCG_FORMAT_OBJECT);
     });
 
     it('should convert array-like tokens with inherited types to a nested object', () => {
       TokenFormat.setFormat(TokenFormatOptions.DTCG);
-      expect(convertTokensToObject(INPUT_TOKENS_WITH_INHERITED_TYPES, true)).toEqual(OUTPUT_DTCG_FORMAT_OBJECT_WITH_INHERITED_TYPES);
+      expect(convertTokensToObject(INPUT_TOKENS_WITH_INHERITED_TYPES)).toEqual(OUTPUT_DTCG_FORMAT_OBJECT_WITH_INHERITED_TYPES);
     });
   });
 
   it('should maintain the output values the same as the input, if there are no format changes', () => {
     TokenFormat.setFormat(TokenFormatOptions.Legacy);
-    expect(convertTokensToObject(output as unknown as Record<string, AnyTokenList>, true)).toEqual(input);
+    expect(convertTokensToObject(output as unknown as Record<string, AnyTokenList>)).toEqual(input);
   });
 });

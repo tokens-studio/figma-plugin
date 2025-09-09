@@ -111,20 +111,19 @@ export default function useTokens() {
         expandShadow,
         expandComposition,
         expandBorder,
-        storeTokenIdInJsonEditor,
       });
     },
     // Adding tokenFormat as a dependency to cause a change when format changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [tokens, activeTokenSet, storeTokenIdInJsonEditor, tokensContext.resolvedTokens, tokenFormat],
+    [tokens, activeTokenSet, tokensContext.resolvedTokens, tokenFormat],
   );
 
   // Returns stringified tokens for the JSON editor
   const getStringTokens = useCallback(
-    () => stringifyTokens(tokens, activeTokenSet, storeTokenIdInJsonEditor),
+    () => stringifyTokens(tokens, activeTokenSet),
     // Adding tokenFormat as a dependency to cause a change when format changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [tokens, activeTokenSet, storeTokenIdInJsonEditor, tokenFormat],
+    [tokens, activeTokenSet, tokenFormat],
   );
 
   // handles updating JSON
