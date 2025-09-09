@@ -141,7 +141,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
         delete newActiveTheme[group];
       }
     });
-    dispatch.tokenState.setThemes(updatedThemes);
+    dispatch.tokenState.replaceThemes(updatedThemes);
   }, [dispatch.tokenState, activeTheme]);
 
   const handleCheckReorder = React.useCallback((
@@ -179,6 +179,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
 
   return (
     <Modal
+      id="manage-themes-modal"
       isOpen
       full
       title={t('themes')}

@@ -1,5 +1,11 @@
 # @tokens-studio/figma-plugin
 
+## 2.7.1
+
+### Patch Changes
+
+- df73b78f6: Fixed an issue that caused themes to be duplicated when reordering in the Manage Themes dialog
+
 ## 2.7.0
 
 ### Minor Changes

@@ -25,6 +25,7 @@ import PullDialog from '../PullDialog';
 import { useFigmaTheme } from '@/hooks/useFigmaTheme';
 import Box from '../Box';
 import { darkThemeMode, lightThemeMode } from '@/stitches.config';
+import BitbucketMigrationDialog from '../BitbucketMigrationDialog';
 
 type Props = StartupMessage & {
   // @README only for unit testing purposes
@@ -43,7 +44,6 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
   const { isDarkTheme } = useFigmaTheme();
   const dispatch = useDispatch<Dispatch>();
   const startupProcess = useStartupProcess(params);
-
   const [showLoadingScreen, setShowLoadingScreen] = useState(true);
 
   const handleCancelLoadingScreen = useCallback(() => {
@@ -107,6 +107,7 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
       <Changelog />
       <SecondScreenSync />
       <AuthModal />
+      <BitbucketMigrationDialog />
     </Box>
   );
 

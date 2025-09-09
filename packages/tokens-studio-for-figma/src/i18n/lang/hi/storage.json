@@ -65,10 +65,11 @@
       "readMore": "Azure DevOps सिंक गाइड पढ़ें।"
     },
     "bitbucket": {
-      "appPassword": "ऐप पासवर्ड",
+      "apiToken": "API टोकन",
       "projectName": "प्रोजेक्ट का नाम (वैकल्पिक)",
       "repository": "रिपॉजिटरी (कार्यक्षेत्र/रेपो)",
-      "username": "बिटबकेट उपयोगकर्ता नाम"
+      "username": "उपयोगकर्ता ईमेल",
+      "usernameAppPassword": "उपयोगकर्ता नाम"
     },
     "tokensstudio": {
       "name": "नाम",
