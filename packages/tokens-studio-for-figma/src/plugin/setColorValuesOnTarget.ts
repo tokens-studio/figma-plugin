@@ -6,7 +6,6 @@ import { ColorPaintType, tryApplyColorVariableId } from '@/utils/tryApplyColorVa
 import { unbindVariableFromTarget } from './unbindVariableFromTarget';
 import { getReferenceTokensFromGradient } from '@/utils/color';
 import { SingleToken } from '@/types/tokens';
-import { TokenColorValue } from '@/types/values';
 
 function hasModifier(token: SingleToken) {
   return token.$extensions?.['studio.tokens']?.modify;
@@ -81,7 +80,7 @@ export default async function setColorValuesOnTarget({
   target: BaseNode | PaintStyle,
   token: string,
   key: 'paints' | 'fills' | 'strokes',
-  givenValue?: string
+  givenValue?: string | string[]
 }) {
   // If we're creating styles we need to check the user's setting. If we're applying on a layer, always try to apply variables.
   const shouldCreateStylesWithVariables = defaultTokenValueRetriever.createStylesWithVariableReferences || !('consumers' in target);
@@ -109,8 +108,7 @@ export default async function setColorValuesOnTarget({
     if (Array.isArray(valueToProcess)) {
       const newPaints: Paint[] = [];
       
-      for (const colorValue of valueToProcess) {
-        const colorString = typeof colorValue === 'string' ? colorValue : colorValue.color;
+      for (const colorString of valueToProcess) {
         if (colorString?.startsWith?.('linear-gradient')) {
           const newPaint = await getLinearGradientPaint(colorString, token);
           newPaints.push(newPaint);
@@ -132,10 +130,8 @@ export default async function setColorValuesOnTarget({
       return Promise.resolve();
     }
 
-    // Handle single color value (existing logic with modifications)
-    const singleColorValue = typeof valueToProcess === 'object' && valueToProcess !== null && 'color' in valueToProcess 
-      ? valueToProcess.color 
-      : valueToProcess;
+    // Handle single color value (existing logic)
+    const singleColorValue = valueToProcess;
 
     if (singleColorValue?.startsWith?.('linear-gradient')) {
       const newPaint = await getLinearGradientPaint(fallbackValue, token);
@@ -165,7 +161,8 @@ export default async function setColorValuesOnTarget({
         if (valueToApply.startsWith?.('linear-gradient')) {
           newPaint = await getLinearGradientPaint(fallbackValue, token);
         } else {
-          const { color, opacity } = convertToFigmaColor(typeof valueToApply === 'string' ? valueToApply : valueToApply?.color || givenValue || '');
+          const fallbackColorValue = Array.isArray(givenValue) ? givenValue[0] : givenValue;
+          const { color, opacity } = convertToFigmaColor(typeof valueToApply === 'string' ? valueToApply : fallbackColorValue || '');
           newPaint = { color, opacity, type: 'SOLID' };
         }
 

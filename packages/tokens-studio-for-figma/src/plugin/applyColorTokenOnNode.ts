@@ -10,9 +10,15 @@ import { MapValuesToTokensResult } from '@/types';
 export async function applyColorTokenOnNode(node: BaseNode, data: NodeTokenRefMap, values: MapValuesToTokensResult) {
   const tokenName = data.fill;
   const tokenValue = values.fill;
+  
+  // Type guard to ensure we're working with color values (string or string[])
+  const isColorValue = (value: any): value is string | string[] => {
+    return typeof value === 'string' || (Array.isArray(value) && value.every(item => typeof item === 'string'));
+  };
+  
   if (
     tokenValue
-    && (typeof tokenValue === 'string' || Array.isArray(tokenValue) || (typeof tokenValue === 'object' && tokenValue !== null))
+    && isColorValue(tokenValue)
     && 'fills' in node
     && tokenName
     && !(await tryApplyColorVariableId(node, tokenName, ColorPaintType.FILLS))
@@ -25,21 +31,11 @@ export async function applyColorTokenOnNode(node: BaseNode, data: NodeTokenRefMa
       const styleIdBackupKey = 'fillStyleId_original';
       const nonLocalStyle = getNonLocalStyle(node, styleIdBackupKey, 'fills');
       if (nonLocalStyle) {
-        // For multiple colors or object values, we need to extract the first color for comparison
+        // For multiple colors, we need to extract the first color for comparison
         let comparisonValue: string | undefined = undefined;
         if (Array.isArray(tokenValue)) {
-          // Handle array of TokenColorValue
-          const firstItem = tokenValue[0];
-          if (typeof firstItem === 'object' && firstItem !== null && 'color' in firstItem && typeof firstItem.color === 'string') {
-            comparisonValue = firstItem.color;
-          } else if (typeof firstItem === 'string') {
-            comparisonValue = firstItem;
-          }
-        } else if (typeof tokenValue === 'object' && tokenValue !== null && 'color' in tokenValue) {
-          // Handle single TokenColorValue object
-          if (typeof tokenValue.color === 'string') {
-            comparisonValue = tokenValue.color;
-          }
+          // Handle array of strings
+          comparisonValue = tokenValue[0];
         } else if (typeof tokenValue === 'string') {
           // Handle string value
           comparisonValue = tokenValue;
@@ -64,7 +60,7 @@ export async function applyColorTokenOnNode(node: BaseNode, data: NodeTokenRefMa
         target: node, 
         token: tokenName, 
         key: 'fills', 
-        givenValue: typeof tokenValue === 'string' ? tokenValue : undefined
+        givenValue: tokenValue
       });
     }
   }

@@ -1,4 +1,3 @@
-import { TokenColorValue } from '@/types/values';
 import { getAliasValue } from '@/utils/alias/getAliasValue';
 import { SingleColorToken } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
@@ -15,41 +14,16 @@ describe('Multiple Color Tokens', () => {
     expect(result).toBe('#ff0000');
   });
 
-  it('should handle single TokenColorValue objects', () => {
-    const singleColorValueToken: SingleColorToken = {
-      name: 'color.primary',
-      type: TokenTypes.COLOR,
-      value: {
-        color: '#ff0000',
-        type: 'solid',
-      },
-    };
-
-    const result = getAliasValue(singleColorValueToken, []);
-    expect(result).toEqual({
-      color: '#ff0000',
-      type: 'solid',
-    });
-  });
-
-  it('should handle multiple color values as arrays', () => {
+  it('should handle multiple color values as string arrays', () => {
     const multipleColorToken: SingleColorToken = {
       name: 'color.gradientColors',
       type: TokenTypes.COLOR,
-      value: [
-        { color: '#ff0000', type: 'solid' },
-        { color: '#00ff00', type: 'solid' },
-        { color: '#0000ff', type: 'solid' },
-      ] as TokenColorValue[],
+      value: ['#ff0000', '#00ff00', '#0000ff'],
     };
 
     const result = getAliasValue(multipleColorToken, []);
     expect(Array.isArray(result)).toBe(true);
-    expect(result).toEqual([
-      { color: '#ff0000', type: 'solid' },
-      { color: '#00ff00', type: 'solid' },
-      { color: '#0000ff', type: 'solid' },
-    ]);
+    expect(result).toEqual(['#ff0000', '#00ff00', '#0000ff']);
   });
 
   it('should resolve color token references correctly', () => {
@@ -86,11 +60,7 @@ describe('Multiple Color Tokens', () => {
     const multipleColorWithReferences: SingleColorToken = {
       name: 'color.gradientColors',
       type: TokenTypes.COLOR,
-      value: [
-        { color: '{color.red}', type: 'solid' },
-        { color: '{color.green}', type: 'solid' },
-        { color: '#0000ff', type: 'solid' },
-      ] as TokenColorValue[],
+      value: ['{color.red}', '{color.green}', '#0000ff'],
     };
 
     const result = getAliasValue(multipleColorWithReferences, baseColors);
@@ -98,5 +68,27 @@ describe('Multiple Color Tokens', () => {
     // Note: The actual alias resolution for individual array items might require additional implementation
     // This test verifies the structure is preserved
     expect(result).toBeDefined();
+  });
+
+  it('should handle mixed color formats in arrays', () => {
+    const mixedColorToken: SingleColorToken = {
+      name: 'color.mixedColors',
+      type: TokenTypes.COLOR,
+      value: [
+        '#ff0000',
+        'rgb(0, 255, 0)',
+        'hsl(240, 100%, 50%)',
+        'linear-gradient(45deg, #ff0000, #ffffff)',
+      ],
+    };
+
+    const result = getAliasValue(mixedColorToken, []);
+    expect(Array.isArray(result)).toBe(true);
+    expect(result).toEqual([
+      '#ff0000',
+      'rgb(0, 255, 0)',
+      'hsl(240, 100%, 50%)',
+      'linear-gradient(45deg, #ff0000, #ffffff)',
+    ]);
   });
 });

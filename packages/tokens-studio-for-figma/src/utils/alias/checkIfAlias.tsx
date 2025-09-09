@@ -18,9 +18,18 @@ export function checkIfAlias(token: SingleToken | string, allTokens: SingleToken
     ) {
       if (typeof token.value === 'string') {
         aliasToken = Boolean(String(token.value).match(AliasRegex));
+      } else if (token.type === TokenTypes.COLOR && Array.isArray(token.value)) {
+        // For color arrays, check each string directly
+        aliasToken = token.value.some((colorValue) => Boolean(String(colorValue).match(AliasRegex)));
       } else {
+        // For other token types with objects (BoxShadow, Typography, Border)
         const arrayValue = Array.isArray(token.value) ? token.value : [token.value];
-        aliasToken = arrayValue.some((value) => Object.values(value).some((singleValue) => Boolean(singleValue?.toString().match(AliasRegex))));
+        aliasToken = arrayValue.some((value) => {
+          if (typeof value === 'object' && value !== null) {
+            return Object.values(value).some((singleValue: any) => Boolean(singleValue?.toString()?.match(AliasRegex)));
+          }
+          return Boolean(String(value).match(AliasRegex));
+        });
       }
     } else if (token.type === TokenTypes.COMPOSITION) {
       return true;

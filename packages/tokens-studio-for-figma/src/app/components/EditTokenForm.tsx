@@ -20,7 +20,6 @@ import {
   SingleToken,
   SingleTypographyToken,
 } from '@/types/tokens';
-import { TokenColorValue } from '@/types/values';
 import { checkIfAlias, checkIfContainsAlias, getAliasValue } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
 import {
@@ -227,7 +226,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
   );
 
   const handleColorValueChange = React.useCallback(
-    (color: TokenColorValue | TokenColorValue[]) => {
+    (color: string | string[]) => {
       setError(null);
       if (internalEditToken?.type === TokenTypes.COLOR) {
         setInternalEditToken((prev) => ({ ...prev, value: color } as typeof editToken));

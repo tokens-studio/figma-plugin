@@ -12,7 +12,6 @@ import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
 import Box from './Box';
 import ResolvedTokenDisplay from './ResolvedTokenDisplay';
 import DownshiftInput from './DownshiftInput';
-import { TokenColorValue } from '@/types/values';
 import { TokenTypes } from '@/constants/TokenTypes';
 import SingleColorInput, { newTokenValue } from './SingleColorInput';
 import { EditTokenObject } from '@/types/tokens';
@@ -29,7 +28,7 @@ export default function MultipleColorInput({
 }: {
   resolvedTokens: ResolveTokenValuesResult[];
   internalEditToken: EditTokenType;
-  handleColorValueChange: (color: TokenColorValue | TokenColorValue[]) => void;
+  handleColorValueChange: (color: string | string[]) => void;
   handleColorAliasValueChange: (property: string, value: string) => void;
   handleDownShiftInputChange: (newInputValue: string) => void;
   onSubmit: () => void
@@ -55,7 +54,7 @@ export default function MultipleColorInput({
   }, [internalEditToken, resolvedTokens]);
 
   const mappedItems = React.useMemo(() => {
-    if (typeof internalEditToken.value === 'string' && selectedToken) return selectedToken.value as TokenColorValue | TokenColorValue[];
+    if (typeof internalEditToken.value === 'string' && selectedToken) return selectedToken.value as string | string[];
     if (typeof internalEditToken.value !== 'string') return internalEditToken.value;
     return undefined;
   }, [internalEditToken.value, selectedToken]);

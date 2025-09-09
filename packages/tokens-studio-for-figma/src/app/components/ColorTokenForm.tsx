@@ -22,7 +22,6 @@ import { convertModifiedColorToHex } from '@/utils/convertModifiedColorToHex';
 import { ColorPickerTrigger } from './ColorPickerTrigger';
 import ProBadge from './ProBadge';
 import { useIsProUser } from '../hooks/useIsProUser';
-import { TokenColorValue } from '@/types/values';
 import MultipleColorInput from './MultipleColorInput';
 
 const defaultValue = '0';
@@ -43,7 +42,7 @@ export default function ColorTokenForm({
   resolvedValue: ReturnType<typeof getAliasValue>
   handleColorChange: (property: string, value: string) => void;
   handleColorDownShiftInputChange: (newInputValue: string) => void;
-  handleColorValueChange?: (color: TokenColorValue | TokenColorValue[]) => void;
+  handleColorValueChange?: (color: string | string[]) => void;
   handleColorModifyChange: (newModify: ColorModifier) => void;
   handleRemoveColorModify: () => void;
   onSubmit: () => void

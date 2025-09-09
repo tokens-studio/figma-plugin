@@ -12,7 +12,6 @@ import {
 import IconMinus from '@/icons/minus.svg';
 import IconGrabber from '@/icons/grabber.svg';
 import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
-import { TokenColorValue } from '@/types/values';
 import ColorPicker from './ColorPicker';
 import DownshiftInput from './DownshiftInput';
 import { TokenTypes } from '@/constants/TokenTypes';
@@ -28,10 +27,7 @@ enum ItemTypes {
   CARD = 'card',
 }
 
-export const newTokenValue: TokenColorValue = {
-  color: '#000000',
-  type: 'solid',
-};
+export const newTokenValue = '#000000';
 
 export default function SingleColorInput({
   value,
@@ -44,11 +40,11 @@ export default function SingleColorInput({
   resolvedTokens,
   onSubmit,
 }: {
-  value?: TokenColorValue | TokenColorValue[]
+  value?: string | string[]
   isMultiple?: boolean;
-  colorItem?: TokenColorValue;
+  colorItem?: string;
   index: number;
-  handleColorValueChange: (color: TokenColorValue | TokenColorValue[]) => void;
+  handleColorValueChange: (color: string | string[]) => void;
   onRemove: (index: number) => void;
   id?: string;
   resolvedTokens: ResolveTokenValuesResult[];
@@ -62,28 +58,20 @@ export default function SingleColorInput({
   const onChange = React.useCallback((property: string, newValue: string) => {
     if (Array.isArray(value)) {
       const values = [...value];
-      values.splice(index, 1, { ...value[index], [property]: newValue });
+      values.splice(index, 1, newValue);
       handleColorValueChange(values);
     } else {
-      handleColorValueChange({
-        ...newTokenValue,
-        ...value,
-        [property]: newValue,
-      });
+      handleColorValueChange(newValue);
     }
   }, [index, value, handleColorValueChange]);
 
   const handleColorDownShiftInputChange = React.useCallback((newInputValue: string) => {
     if (Array.isArray(value)) {
       const values = [...value];
-      values.splice(index, 1, { ...value[index], color: newInputValue });
+      values.splice(index, 1, newInputValue);
       handleColorValueChange(values);
     } else {
-      handleColorValueChange({
-        ...newTokenValue,
-        ...value,
-        color: newInputValue,
-      });
+      handleColorValueChange(newInputValue);
     }
   }, [index, value, handleColorValueChange]);
 
@@ -121,11 +109,11 @@ export default function SingleColorInput({
       }
 
       if (Array.isArray(value)) {
-        const newShadows = [...value];
-        const draggedItem = newShadows[dragIndex];
-        newShadows.splice(dragIndex, 1);
-        newShadows.splice(hoverIndex, 0, draggedItem);
-        handleColorValueChange(newShadows);
+        const newColors = [...value];
+        const draggedItem = newColors[dragIndex];
+        newColors.splice(dragIndex, 1);
+        newColors.splice(hoverIndex, 0, draggedItem);
+        handleColorValueChange(newColors);
       }
 
       item.index = hoverIndex;
@@ -169,14 +157,14 @@ export default function SingleColorInput({
             )}
             <Box css={{ flexGrow: 1 }}>
               <DownshiftInput
-                value={currentValue?.color || ''}
+                value={currentValue || ''}
                 type={TokenTypes.COLOR}
                 resolvedTokens={resolvedTokens}
                 handleChange={onChange}
                 setInputValue={handleColorDownShiftInputChange}
                 placeholder="#000000, hsla(), rgba() or {alias}"
                 prefix={(
-                  <ColorPickerTrigger onClick={handleToggleInputHelper} background={String(currentValue?.color || '')} />
+                  <ColorPickerTrigger onClick={handleToggleInputHelper} background={String(currentValue || '')} />
                 )}
                 suffix
                 onSubmit={onSubmit}
@@ -186,7 +174,7 @@ export default function SingleColorInput({
         </Stack>
       </Box>
       {inputHelperOpen && (
-        <ColorPicker value={currentValue?.color || ''} onChange={handleColorDownShiftInputChange} />
+        <ColorPicker value={currentValue || ''} onChange={handleColorDownShiftInputChange} />
       )}
     </div>
   );
