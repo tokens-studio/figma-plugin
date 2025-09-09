@@ -59,11 +59,18 @@ export default async function setValuesOnVariable(
           const existingVariableValue = variable.valuesByMode[mode];
           const rawValue = typeof token.rawValue === 'string' ? token.rawValue : undefined;
 
-          if (checkVariableAliasEquality(existingVariableValue, rawValue)) {
+          // Check if this token is a reference token
+          const isReferenceToken = rawValue && rawValue.startsWith('{') && rawValue.endsWith('}');
+          
+          // Check alias equality for all tokens (function handles non-reference tokens by returning false)
+          const aliasAlreadyCorrect = checkVariableAliasEquality(existingVariableValue, rawValue);
+          
+          if (isReferenceToken && aliasAlreadyCorrect) {
             // The alias already points to the correct variable, no update needed
             return;
           }
 
+          // Call setter functions for all tokens, except reference tokens that already have correct aliases (handled above)
           switch (variableType) {
             case 'BOOLEAN':
               if (typeof token.value === 'string' && !token.value.includes('{')) {
