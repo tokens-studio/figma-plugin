@@ -203,7 +203,7 @@ describe('tryApplyTypographyCompositeVariable', () => {
     expect(target.letterSpacing).toEqual({ unit: 'PIXELS', value: 8 });
   });
 
-  it('should handle font family variable with font loading and caching', async () => {
+  it('should list available fonts when applying font family variable', async () => {
     target = {
       fontName: {
         family: 'Arial',
@@ -222,16 +222,11 @@ describe('tryApplyTypographyCompositeVariable', () => {
       valuesByMode: { default: 'Roboto' },
     };
 
-    // Mock Figma API methods
     const mockListAvailableFonts = jest.fn().mockResolvedValue([
       { fontName: { family: 'Roboto', style: 'Regular' } },
-      { fontName: { family: 'Roboto', style: 'Bold' } },
     ]);
-    const mockLoadFont = jest.fn().mockResolvedValue(undefined);
-
-    // Update existing figma mock
     figma.listAvailableFontsAsync = mockListAvailableFonts;
-    figma.loadFontAsync = mockLoadFont;
+    figma.loadFontAsync = jest.fn().mockResolvedValue(undefined);
 
     defaultTokenValueRetriever.getVariableReference = jest.fn().mockResolvedValue(familyVariable);
     defaultTokenValueRetriever.applyVariablesStylesOrRawValue = ApplyVariablesStylesOrRawValues.VARIABLES;
@@ -241,8 +236,75 @@ describe('tryApplyTypographyCompositeVariable', () => {
     });
 
     expect(mockListAvailableFonts).toHaveBeenCalled();
-    // 2 fonts loaded from listAvailable + 1 for target.fontName
-    expect(mockLoadFont).toHaveBeenCalledTimes(3);
+  });
+
+  it('should load multiple font styles when applying font family variable', async () => {
+    target = {
+      fontName: {
+        family: 'Arial',
+        style: 'Regular',
+      },
+      setBoundVariable: jest.fn(),
+    } as TextNode | TextStyle;
+    value = {
+      fontFamily: 'Roboto-raw',
+    };
+    resolvedValue = {
+      fontFamily: '{fontFamily.roboto}',
+    };
+
+    const familyVariable = {
+      valuesByMode: { default: 'Roboto' },
+    };
+
+    const mockLoadFont = jest.fn().mockResolvedValue(undefined);
+    figma.listAvailableFontsAsync = jest.fn().mockResolvedValue([
+      { fontName: { family: 'Roboto', style: 'Regular' } },
+      { fontName: { family: 'Roboto', style: 'Bold' } },
+    ]);
+    figma.loadFontAsync = mockLoadFont;
+
+    defaultTokenValueRetriever.getVariableReference = jest.fn().mockResolvedValue(familyVariable);
+    defaultTokenValueRetriever.applyVariablesStylesOrRawValue = ApplyVariablesStylesOrRawValues.VARIABLES;
+
+    await tryApplyTypographyCompositeVariable({
+      target, value, resolvedValue, baseFontSize,
+    });
+
+    // Should load target font (Arial) only, since no font loading is done for variables in this path
+    expect(mockLoadFont).toHaveBeenCalledTimes(1);
+    expect(mockLoadFont).toHaveBeenCalledWith(target.fontName);
+  });
+
+  it('should set bound variable after loading fonts', async () => {
+    target = {
+      fontName: {
+        family: 'Arial',
+        style: 'Regular',
+      },
+      setBoundVariable: jest.fn(),
+    } as TextNode | TextStyle;
+    value = {
+      fontFamily: 'Roboto-raw',
+    };
+    resolvedValue = {
+      fontFamily: '{fontFamily.roboto}',
+    };
+
+    const familyVariable = {
+      valuesByMode: { default: 'Roboto' },
+    };
+
+    figma.listAvailableFontsAsync = jest.fn().mockResolvedValue([]);
+    figma.loadFontAsync = jest.fn().mockResolvedValue(undefined);
+
+    defaultTokenValueRetriever.getVariableReference = jest.fn().mockResolvedValue(familyVariable);
+    defaultTokenValueRetriever.applyVariablesStylesOrRawValue = ApplyVariablesStylesOrRawValues.VARIABLES;
+
+    await tryApplyTypographyCompositeVariable({
+      target, value, resolvedValue, baseFontSize,
+    });
+
     expect(target.setBoundVariable).toHaveBeenCalledWith('fontFamily', familyVariable);
   });
 
@@ -287,7 +349,45 @@ describe('tryApplyTypographyCompositeVariable', () => {
     expect(target1.setBoundVariable).toHaveBeenCalledWith('fontFamily', familyVariable);
   });
 
-  it('should handle font loading error gracefully', async () => {
+  it('should log error when font loading fails', async () => {
+    target = {
+      fontName: {
+        family: 'Arial',
+        style: 'Regular',
+      },
+      setBoundVariable: jest.fn(),
+    } as TextNode | TextStyle;
+    value = {
+      fontFamily: 'Roboto-raw',
+    };
+    resolvedValue = {
+      fontFamily: '{fontFamily.roboto}',
+    };
+
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+
+    figma.listAvailableFontsAsync = jest.fn().mockResolvedValue([]);
+    figma.loadFontAsync = jest.fn().mockImplementation((fontName) => {
+      if (fontName === target.fontName) {
+        return Promise.reject(new Error('Font loading failed'));
+      }
+      return Promise.resolve();
+    });
+
+    defaultTokenValueRetriever.getVariableReference = jest.fn().mockResolvedValue({
+      valuesByMode: { default: 'Roboto' },
+    });
+    defaultTokenValueRetriever.applyVariablesStylesOrRawValue = ApplyVariablesStylesOrRawValues.VARIABLES;
+
+    await tryApplyTypographyCompositeVariable({
+      target, value, resolvedValue, baseFontSize,
+    });
+
+    expect(consoleSpy).toHaveBeenCalledWith('error loading font', expect.any(Error));
+    consoleSpy.mockRestore();
+  });
+
+  it('should continue to set bound variable even when font loading fails', async () => {
     target = {
       fontName: {
         family: 'Arial',
@@ -306,17 +406,10 @@ describe('tryApplyTypographyCompositeVariable', () => {
       valuesByMode: { default: 'Roboto' },
     };
 
-    // Mock console.error to verify it's called
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+    jest.spyOn(console, 'error').mockImplementation();
 
-    // Mock loadFontAsync to fail when loading target.fontName (line 62-64)
     figma.listAvailableFontsAsync = jest.fn().mockResolvedValue([]);
-    figma.loadFontAsync = jest.fn().mockImplementation((fontName) => {
-      if (fontName === target.fontName) {
-        return Promise.reject(new Error('Font loading failed'));
-      }
-      return Promise.resolve();
-    });
+    figma.loadFontAsync = jest.fn().mockRejectedValue(new Error('Font loading failed'));
 
     defaultTokenValueRetriever.getVariableReference = jest.fn().mockResolvedValue(familyVariable);
     defaultTokenValueRetriever.applyVariablesStylesOrRawValue = ApplyVariablesStylesOrRawValues.VARIABLES;
@@ -325,13 +418,10 @@ describe('tryApplyTypographyCompositeVariable', () => {
       target, value, resolvedValue, baseFontSize,
     });
 
-    expect(consoleSpy).toHaveBeenCalledWith('error loading font', expect.any(Error));
     expect(target.setBoundVariable).toHaveBeenCalledWith('fontFamily', familyVariable);
-
-    consoleSpy.mockRestore();
   });
 
-  it('should handle setBoundVariable error gracefully', async () => {
+  it('should log error when setBoundVariable throws exception', async () => {
     target = {
       fontName: {
         family: 'Arial',
@@ -352,7 +442,6 @@ describe('tryApplyTypographyCompositeVariable', () => {
       valuesByMode: { default: 'Roboto' },
     };
 
-    // Mock console.error to verify it's called
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
 
     figma.loadFontAsync = jest.fn().mockResolvedValue(undefined);
@@ -365,11 +454,41 @@ describe('tryApplyTypographyCompositeVariable', () => {
     });
 
     expect(consoleSpy).toHaveBeenCalledWith('unable to apply variable', 'fontFamily', familyVariable, expect.any(Error));
-
     consoleSpy.mockRestore();
   });
 
-  it('should handle general errors in the main try-catch block', async () => {
+  it('should attempt to set bound variable when variable is available', async () => {
+    target = {
+      fontName: {
+        family: 'Arial',
+        style: 'Regular',
+      },
+      setBoundVariable: jest.fn(),
+    } as TextNode | TextStyle;
+    value = {
+      fontFamily: 'Roboto-raw',
+    };
+    resolvedValue = {
+      fontFamily: '{fontFamily.roboto}',
+    };
+
+    const familyVariable = {
+      valuesByMode: { default: 'Roboto' },
+    };
+
+    figma.loadFontAsync = jest.fn().mockResolvedValue(undefined);
+
+    defaultTokenValueRetriever.getVariableReference = jest.fn().mockResolvedValue(familyVariable);
+    defaultTokenValueRetriever.applyVariablesStylesOrRawValue = ApplyVariablesStylesOrRawValues.VARIABLES;
+
+    await tryApplyTypographyCompositeVariable({
+      target, value, resolvedValue, baseFontSize,
+    });
+
+    expect(target.setBoundVariable).toHaveBeenCalledWith('fontFamily', familyVariable);
+  });
+
+  it('should handle Object.entries errors in main processing', async () => {
     target = {
       fontName: {
         family: 'Arial',
@@ -383,13 +502,11 @@ describe('tryApplyTypographyCompositeVariable', () => {
       fontFamily: '{fontFamily.roboto}',
     };
 
-    // Mock console.error to verify it's called
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
 
-    // Mock Object.entries to throw an error to trigger the main catch block
     const originalEntries = Object.entries;
     Object.entries = jest.fn().mockImplementation(() => {
-      throw new Error('Unexpected error');
+      throw new Error('Object.entries failed');
     });
 
     await tryApplyTypographyCompositeVariable({
@@ -398,8 +515,37 @@ describe('tryApplyTypographyCompositeVariable', () => {
 
     expect(consoleSpy).toHaveBeenCalledWith(expect.any(Error));
 
-    // Restore original methods
     Object.entries = originalEntries;
+    consoleSpy.mockRestore();
+  });
+
+  it('should handle unexpected errors during processing', async () => {
+    target = {
+      fontName: {
+        family: 'Arial',
+        style: 'Regular',
+      },
+    } as TextNode | TextStyle;
+    value = {
+      fontFamily: 'Roboto-raw',
+    };
+    resolvedValue = {
+      fontFamily: '{fontFamily.roboto}',
+    };
+
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+
+    // Mock getVariableReference to throw an error to trigger the main catch block
+    defaultTokenValueRetriever.getVariableReference = jest.fn().mockImplementation(() => {
+      throw new Error('Unexpected processing error');
+    });
+
+    await tryApplyTypographyCompositeVariable({
+      target, value, resolvedValue, baseFontSize,
+    });
+
+    expect(consoleSpy).toHaveBeenCalledWith(expect.any(Error));
+
     consoleSpy.mockRestore();
   });
 
@@ -456,5 +602,122 @@ describe('tryApplyTypographyCompositeVariable', () => {
     // Should not call listAvailableFontsAsync for non-string values
     expect(figma.listAvailableFontsAsync).not.toHaveBeenCalled();
     expect(target.setBoundVariable).toHaveBeenCalledWith('fontFamily', familyVariable);
+  });
+
+  it('should handle multiple typography properties simultaneously', async () => {
+    target = {
+      fontName: {
+        family: 'Arial',
+        style: 'Regular',
+      },
+      setBoundVariable: jest.fn(),
+    } as TextNode | TextStyle;
+    value = {
+      fontFamily: 'Inter-raw',
+      fontWeight: 'Bold-raw',
+      fontSize: '16px-raw',
+    };
+    resolvedValue = {
+      fontFamily: '{fontFamily.inter}',
+      fontWeight: '{fontWeight.bold}',
+      fontSize: '{fontSize.base}',
+    };
+
+    const familyVariable = { valuesByMode: { default: 'Inter' } };
+    const weightVariable = { valuesByMode: { default: 'Bold' } };
+    const sizeVariable = { valuesByMode: { default: '16px' } };
+
+    figma.loadFontAsync = jest.fn().mockResolvedValue(undefined);
+
+    defaultTokenValueRetriever.getVariableReference = jest.fn()
+      .mockResolvedValueOnce(familyVariable)
+      .mockResolvedValueOnce(weightVariable)
+      .mockResolvedValueOnce(sizeVariable);
+    defaultTokenValueRetriever.applyVariablesStylesOrRawValue = ApplyVariablesStylesOrRawValues.VARIABLES;
+
+    await tryApplyTypographyCompositeVariable({
+      target, value, resolvedValue, baseFontSize,
+    });
+
+    expect(target.setBoundVariable).toHaveBeenCalledTimes(3);
+    expect(target.setBoundVariable).toHaveBeenCalledWith('fontFamily', familyVariable);
+    expect(target.setBoundVariable).toHaveBeenCalledWith('fontStyle', weightVariable);
+    expect(target.setBoundVariable).toHaveBeenCalledWith('fontSize', sizeVariable);
+  });
+
+  it('should skip undefined value properties', async () => {
+    target = {
+      fontName: {
+        family: 'Arial',
+        style: 'Regular',
+      },
+      setBoundVariable: jest.fn(),
+    } as TextNode | TextStyle;
+    value = {
+      fontFamily: 'Inter',
+      fontWeight: undefined,
+      fontSize: '16px',
+    };
+    resolvedValue = {
+      fontFamily: 'Inter',
+      fontSize: '16px',
+    };
+
+    await tryApplyTypographyCompositeVariable({
+      target, value, resolvedValue, baseFontSize,
+    });
+
+    // fontWeight should be skipped due to undefined value
+    expect(target.fontName).toEqual({ family: 'Inter', style: 'Regular' });
+    expect(target.fontSize).toEqual(16);
+  });
+
+  it('should handle empty resolved values gracefully', async () => {
+    target = {
+      fontName: {
+        family: 'Arial',
+        style: 'Regular',
+      },
+    } as TextNode | TextStyle;
+    value = {
+      fontFamily: 'Inter',
+    };
+    resolvedValue = {}; // Empty resolved values
+
+    await tryApplyTypographyCompositeVariable({
+      target, value, resolvedValue, baseFontSize,
+    });
+
+    expect(target.fontName).toEqual({ family: 'Inter', style: 'Regular' });
+  });
+
+  it('should handle variable reference retrieval failures', async () => {
+    target = {
+      fontName: {
+        family: 'Arial',
+        style: 'Regular',
+      },
+      setBoundVariable: jest.fn(),
+    } as TextNode | TextStyle;
+    value = {
+      fontFamily: 'Inter-raw',
+    };
+    resolvedValue = {
+      fontFamily: '{fontFamily.inter}',
+    };
+
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+
+    defaultTokenValueRetriever.getVariableReference = jest.fn().mockRejectedValue(new Error('Variable not found'));
+    defaultTokenValueRetriever.applyVariablesStylesOrRawValue = ApplyVariablesStylesOrRawValues.VARIABLES;
+
+    await tryApplyTypographyCompositeVariable({
+      target, value, resolvedValue, baseFontSize,
+    });
+
+    // Should not crash and continue processing
+    expect(target.setBoundVariable).not.toHaveBeenCalled();
+
+    consoleSpy.mockRestore();
   });
 });
