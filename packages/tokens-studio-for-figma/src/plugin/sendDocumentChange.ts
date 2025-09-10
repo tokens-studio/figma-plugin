@@ -2,8 +2,6 @@ import { sendSelectionChange } from './sendSelectionChange';
 import { notifyInstancesCreated } from './notifiers';
 
 export async function sendDocumentChange(event: DocumentChangeEvent) {
-  console.log('document change event', event);
-
   // Check if event has documentChanges before processing
   if (!event.documentChanges) {
     return;
@@ -23,7 +21,7 @@ export async function sendDocumentChange(event: DocumentChangeEvent) {
   const instanceVariantChanges = event.documentChanges.filter(
     (change) => change.type === 'PROPERTY_CHANGE'
       && change.origin === 'LOCAL'
-      && change.properties.includes('componentProperties'),
+      && (change.properties.includes('componentProperties') || change.properties.includes('variant')),
   );
 
   if (selfChangedNodeIds.length > 0) {
