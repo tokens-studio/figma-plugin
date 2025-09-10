@@ -67,6 +67,7 @@ describe('setBackgroundBlurOnTarget', () => {
           type: 'BACKGROUND_BLUR',
           visible: true,
           radius: 3,
+          blurType: 'NORMAL',
         },
       ],
     });
@@ -81,6 +82,7 @@ describe('setBackgroundBlurOnTarget', () => {
           type: 'BACKGROUND_BLUR',
           visible: true,
           radius: 3,
+          blurType: 'NORMAL',
         },
       ],
     });
@@ -96,6 +98,7 @@ describe('setBackgroundBlurOnTarget', () => {
           type: 'BACKGROUND_BLUR',
           visible: true,
           radius: 3,
+          blurType: 'NORMAL',
         },
       ],
     });
@@ -111,6 +114,7 @@ describe('setBackgroundBlurOnTarget', () => {
           type: 'BACKGROUND_BLUR',
           visible: true,
           radius: 3,
+          blurType: 'NORMAL',
         },
       ],
     });

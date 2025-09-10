@@ -1,6 +1,20 @@
 import { sendSelectionChange } from './sendSelectionChange';
 import { notifyInstancesCreated } from './notifiers';
 
+function handleInstanceEvents(filteredChanges: DocumentChange[]) {
+  if (filteredChanges.length > 0) {
+    // Check if any of the nodes are instance nodes
+    const instanceNodes = filteredChanges
+      .map((change) => figma.getNodeById(change.id))
+      .filter((node) => node && node.type === 'INSTANCE');
+
+    if (instanceNodes.length > 0) {
+      // Notify UI that instances were affected - UI will decide if it should apply tokens
+      notifyInstancesCreated(instanceNodes.length);
+    }
+  }
+}
+
 export async function sendDocumentChange(event: DocumentChangeEvent) {
   // Check if event has documentChanges before processing
   if (!event.documentChanges) {
@@ -29,27 +43,7 @@ export async function sendDocumentChange(event: DocumentChangeEvent) {
     await sendSelectionChange();
   }
 
-  if (instanceCreations.length > 0) {
-    // Check if any of the created nodes are instance nodes
-    const createdInstanceNodes = instanceCreations
-      .map((change) => figma.getNodeById(change.id))
-      .filter((node) => node && node.type === 'INSTANCE');
-
-    if (createdInstanceNodes.length > 0) {
-      // Notify UI that instances were created - UI will decide if it should apply tokens
-      notifyInstancesCreated(createdInstanceNodes.length);
-    }
-  }
-
-  if (instanceVariantChanges.length > 0) {
-    // Check if any of the changed nodes are instance nodes
-    const changedInstanceNodes = instanceVariantChanges
-      .map((change) => figma.getNodeById(change.id))
-      .filter((node) => node && node.type === 'INSTANCE');
-
-    if (changedInstanceNodes.length > 0) {
-      // Notify UI that instance variants were changed - UI will decide if it should apply tokens
-      notifyInstancesCreated(changedInstanceNodes.length);
-    }
-  }
+  // Handle both instance creation and variant changes using the same logic
+  handleInstanceEvents(instanceCreations);
+  handleInstanceEvents(instanceVariantChanges);
 }
