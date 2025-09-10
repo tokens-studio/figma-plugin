@@ -19,6 +19,13 @@ export async function sendDocumentChange(event: DocumentChangeEvent) {
     (change) => change.type === 'CREATE' && change.origin === 'LOCAL',
   );
 
+  // Look for PROPERTY_CHANGE events on instance nodes where component properties changed
+  const instanceVariantChanges = event.documentChanges.filter(
+    (change) => change.type === 'PROPERTY_CHANGE'
+      && change.origin === 'LOCAL'
+      && change.properties.includes('componentProperties'),
+  );
+
   if (selfChangedNodeIds.length > 0) {
     await sendSelectionChange();
   }
@@ -32,6 +39,18 @@ export async function sendDocumentChange(event: DocumentChangeEvent) {
     if (createdInstanceNodes.length > 0) {
       // Notify UI that instances were created - UI will decide if it should apply tokens
       notifyInstancesCreated(createdInstanceNodes.length);
+    }
+  }
+
+  if (instanceVariantChanges.length > 0) {
+    // Check if any of the changed nodes are instance nodes
+    const changedInstanceNodes = instanceVariantChanges
+      .map((change) => figma.getNodeById(change.id))
+      .filter((node) => node && node.type === 'INSTANCE');
+
+    if (changedInstanceNodes.length > 0) {
+      // Notify UI that instance variants were changed - UI will decide if it should apply tokens
+      notifyInstancesCreated(changedInstanceNodes.length);
     }
   }
 }
