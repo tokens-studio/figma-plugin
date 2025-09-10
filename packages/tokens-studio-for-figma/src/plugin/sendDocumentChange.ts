@@ -21,6 +21,7 @@ export async function sendDocumentChange(event: DocumentChangeEvent) {
   const instanceVariantChanges = event.documentChanges.filter(
     (change) => change.type === 'PROPERTY_CHANGE'
       && change.origin === 'LOCAL'
+      // @ts-ignore variant is a valid property, not sure why it complains
       && (change.properties.includes('componentProperties') || change.properties.includes('variant')),
   );
 

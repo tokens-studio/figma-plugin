@@ -14,6 +14,7 @@ export default function setBackgroundBlurOnTarget(
         type: 'BACKGROUND_BLUR',
         visible: true,
         radius: transformValue(String(token.value), 'backgroundBlur', baseFontSize),
+        blurType: 'NORMAL',
       };
 
       if (existingEffectIndex > -1) {
