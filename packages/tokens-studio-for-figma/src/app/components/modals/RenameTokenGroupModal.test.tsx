@@ -3,7 +3,7 @@ import { Provider } from 'react-redux';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { AnyTokenList } from '@/types/tokens';
 import {
-  createMockStore, render, waitFor,
+  createMockStore, render, waitFor, fireEvent,
 } from '../../../../tests/config/setupTest';
 import RenameTokenGroupModal from './RenameTokenGroupModal';
 
@@ -76,5 +76,31 @@ describe('RenameTokenGroupModal', () => {
     waitFor(async () => {
       expect(getByText('Change')).not.toBeDisabled();
     });
+  });
+
+  it('should connect input to form via form attribute', () => {
+    const newName = 'foo.bar.ss';
+    const oldName = 'otherfoo-copy';
+
+    const { getByRole } = render(
+      <Provider store={store}>
+        <RenameTokenGroupModal
+          isOpen
+          newName={newName}
+          oldName={oldName}
+          type={TokenTypes.COLOR}
+        />
+      </Provider>,
+    );
+
+    const input = getByRole('textbox') as HTMLInputElement;
+    
+    // Check that the input has the form attribute set to connect it to the form
+    expect(input.getAttribute('form')).toBe('renameTokenGroup');
+    
+    // Check that there's a form with the matching id
+    const form = document.getElementById('renameTokenGroup');
+    expect(form).toBeTruthy();
+    expect(form?.tagName).toBe('FORM');
   });
 });
