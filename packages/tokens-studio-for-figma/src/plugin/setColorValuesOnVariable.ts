@@ -55,13 +55,6 @@ export default function setColorValuesOnVariable(variable: Variable, mode: strin
       }
     }
 
-    if (isFigmaColorObject(existingVariableValue)) {
-      const existingValue = {
-        ...existingVariableValue,
-        a: 'a' in existingVariableValue ? existingVariableValue.a : 1,
-      };
-    }
-
     variable.setValueForMode(mode, newValue);
   } catch (e) {
     console.error('Error setting colorVariable', e);
