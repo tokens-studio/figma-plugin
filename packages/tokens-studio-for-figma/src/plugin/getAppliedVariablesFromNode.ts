@@ -33,9 +33,9 @@ export default function getAppliedVariablesFromNode(node: BaseNode): SelectionVa
               variableObject = null;
             }
             localVariables.push({
-              ...variableObject,
               name: variable?.name.split('/').join('.'),
               type: Properties.fill,
+              value: typeof variableObject?.value === 'string' ? variableObject.value : undefined,
             });
           }
         }
@@ -61,9 +61,9 @@ export default function getAppliedVariablesFromNode(node: BaseNode): SelectionVa
               variableObject = null;
             }
             localVariables.push({
-              ...variableObject,
               name: variable?.name.split('/').join('.'),
               type: Properties.borderColor,
+              value: typeof variableObject?.value === 'string' ? variableObject.value : undefined,
             });
           }
         }

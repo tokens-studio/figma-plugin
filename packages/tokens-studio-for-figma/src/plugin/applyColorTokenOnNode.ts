@@ -10,9 +10,15 @@ import { MapValuesToTokensResult } from '@/types';
 export async function applyColorTokenOnNode(node: BaseNode, data: NodeTokenRefMap, values: MapValuesToTokensResult) {
   const tokenName = data.fill;
   const tokenValue = values.fill;
+  
+  // Type guard to ensure we're working with color values (string or string[])
+  const isColorValue = (value: any): value is string | string[] => {
+    return typeof value === 'string' || (Array.isArray(value) && value.every(item => typeof item === 'string'));
+  };
+  
   if (
     tokenValue
-    && typeof tokenValue === 'string'
+    && isColorValue(tokenValue)
     && 'fills' in node
     && tokenName
     && !(await tryApplyColorVariableId(node, tokenName, ColorPaintType.FILLS))
@@ -25,7 +31,17 @@ export async function applyColorTokenOnNode(node: BaseNode, data: NodeTokenRefMa
       const styleIdBackupKey = 'fillStyleId_original';
       const nonLocalStyle = getNonLocalStyle(node, styleIdBackupKey, 'fills');
       if (nonLocalStyle) {
-        if (paintStyleMatchesColorToken(nonLocalStyle, resolvedToken?.value)) {
+        // For multiple colors, we need to extract the first color for comparison
+        let comparisonValue: string | undefined = undefined;
+        if (Array.isArray(tokenValue)) {
+          // Handle array of strings
+          comparisonValue = tokenValue[0];
+        } else if (typeof tokenValue === 'string') {
+          // Handle string value
+          comparisonValue = tokenValue;
+        }
+        
+        if (comparisonValue && paintStyleMatchesColorToken(nonLocalStyle, comparisonValue)) {
           // Non-local style matches - use this and clear style id backup:
           matchingStyleId = nonLocalStyle.id;
           clearStyleIdBackup(node, styleIdBackupKey);
@@ -41,7 +57,10 @@ export async function applyColorTokenOnNode(node: BaseNode, data: NodeTokenRefMa
 
     if (!matchingStyleId || (matchingStyleId && !(await trySetStyleId(node, 'fill', matchingStyleId)))) {
       setColorValuesOnTarget({
-        target: node, token: tokenName, key: 'fills', givenValue: tokenValue,
+        target: node, 
+        token: tokenName, 
+        key: 'fills', 
+        givenValue: tokenValue
       });
     }
   }

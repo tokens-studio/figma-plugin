@@ -225,6 +225,16 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken],
   );
 
+  const handleColorValueChange = React.useCallback(
+    (color: string | string[]) => {
+      setError(null);
+      if (internalEditToken?.type === TokenTypes.COLOR) {
+        setInternalEditToken((prev) => ({ ...prev, value: color } as typeof editToken));
+      }
+    },
+    [internalEditToken],
+  );
+
   const handleCompositionChange = React.useCallback(
     (newTokenValue: NodeTokenRefMap) => {
       if (internalEditToken?.type === TokenTypes.COMPOSITION) {
@@ -623,6 +633,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
             resolvedValue={resolvedValue}
             handleColorChange={handleChange}
             handleColorDownShiftInputChange={handleDownShiftInputChange}
+            handleColorValueChange={handleColorValueChange}
             handleColorModifyChange={handleColorModifyChange}
             handleRemoveColorModify={removeColorModify}
             onSubmit={checkAndSubmitTokenValue}

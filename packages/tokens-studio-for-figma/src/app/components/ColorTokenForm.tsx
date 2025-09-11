@@ -22,6 +22,7 @@ import { convertModifiedColorToHex } from '@/utils/convertModifiedColorToHex';
 import { ColorPickerTrigger } from './ColorPickerTrigger';
 import ProBadge from './ProBadge';
 import { useIsProUser } from '../hooks/useIsProUser';
+import MultipleColorInput from './MultipleColorInput';
 
 const defaultValue = '0';
 
@@ -31,6 +32,7 @@ export default function ColorTokenForm({
   resolvedValue,
   handleColorChange,
   handleColorDownShiftInputChange,
+  handleColorValueChange,
   handleColorModifyChange,
   handleRemoveColorModify,
   onSubmit,
@@ -40,6 +42,7 @@ export default function ColorTokenForm({
   resolvedValue: ReturnType<typeof getAliasValue>
   handleColorChange: (property: string, value: string) => void;
   handleColorDownShiftInputChange: (newInputValue: string) => void;
+  handleColorValueChange?: (color: string | string[]) => void;
   handleColorModifyChange: (newModify: ColorModifier) => void;
   handleRemoveColorModify: () => void;
   onSubmit: () => void
@@ -50,6 +53,26 @@ export default function ColorTokenForm({
   const [inputMixHelperOpen, setInputMixHelperOpen] = React.useState(false);
   const [modifyVisible, setModifyVisible] = React.useState(false);
   const isProUser = useIsProUser();
+
+  // Check if this should be handled as multiple colors
+  const isMultipleColors = useMemo(() => {
+    return Array.isArray(internalEditToken.value) || 
+           (typeof internalEditToken.value === 'object' && internalEditToken.value !== null);
+  }, [internalEditToken.value]);
+
+  // If we have multiple color support and it's multiple colors, use the multiple input
+  if (isMultipleColors && handleColorValueChange) {
+    return (
+      <MultipleColorInput
+        resolvedTokens={resolvedTokens}
+        internalEditToken={internalEditToken}
+        handleColorValueChange={handleColorValueChange}
+        handleColorAliasValueChange={handleColorChange}
+        handleDownShiftInputChange={handleColorDownShiftInputChange}
+        onSubmit={onSubmit}
+      />
+    );
+  }
 
   React.useEffect(() => {
     if (internalEditToken?.$extensions?.['studio.tokens']?.modify) {
@@ -117,7 +140,7 @@ export default function ColorTokenForm({
     setInputMixHelperOpen(!inputMixHelperOpen);
   }, [inputMixHelperOpen]);
 
-  const handleColorValueChange = useCallback((color: string) => {
+  const handleColorPickerValueChange = useCallback((color: string) => {
     handleColorDownShiftInputChange(color);
   }, [handleColorDownShiftInputChange]);
 
@@ -197,7 +220,7 @@ export default function ColorTokenForm({
   return (
     <>
       <DownshiftInput
-        value={internalEditToken.value}
+        value={typeof internalEditToken.value === 'string' ? internalEditToken.value : ''}
         type={TokenTypes.COLOR}
         label={internalEditToken.schema?.property}
         resolvedTokens={resolvedTokens}
@@ -212,7 +235,7 @@ export default function ColorTokenForm({
         onSubmit={onSubmit}
       />
       {inputHelperOpen && (
-        <ColorPicker value={internalEditToken.value} onChange={handleColorValueChange} />
+        <ColorPicker value={typeof internalEditToken.value === 'string' ? internalEditToken.value : ''} onChange={handleColorPickerValueChange} />
       )}
       <Box css={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Box css={{ display: 'flex', gap: '$3', alignItems: 'center' }}>

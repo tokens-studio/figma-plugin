@@ -14,7 +14,19 @@ export default function compareStyleValueWithTokenValue(
   try {
     if (style.type === 'PAINT' && token?.type === TokenTypes.COLOR) {
       const { value } = token;
-      return paintStyleMatchesColorToken(style, value);
+      // For multiple colors, compare against first color for now
+      if (Array.isArray(value)) {
+        const firstColor = value[0];
+        if (firstColor) {
+          return paintStyleMatchesColorToken(style, firstColor);
+        }
+        return false;
+      }
+      // For string values (existing behavior)
+      if (typeof value === 'string') {
+        return paintStyleMatchesColorToken(style, value);
+      }
+      return false;
     }
     if (style.type === 'TEXT' && token?.type === TokenTypes.TYPOGRAPHY) {
       const { value } = token;
