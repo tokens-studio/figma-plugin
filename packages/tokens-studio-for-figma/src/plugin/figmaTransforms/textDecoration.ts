@@ -10,7 +10,11 @@ export function convertTextDecorationToFigma(value: string) {
   }
 }
 
-export function convertFigmaToTextDecoration(value: string) {
+export function convertFigmaToTextDecoration(value: string | null | undefined): string {
+  if (!value || typeof value !== 'string') {
+    return 'none';
+  }
+
   switch (value) {
     case 'UNDERLINE':
       return 'underline';
