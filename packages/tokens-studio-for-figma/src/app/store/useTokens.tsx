@@ -10,7 +10,6 @@ import { track } from '@/utils/analytics';
 import { checkIfAlias, getAliasValue } from '@/utils/alias';
 import {
   activeTokenSetSelector,
-  storeTokenIdInJsonEditorSelector,
   inspectStateSelector,
   settingsStateSelector,
   tokensSelector,
@@ -63,7 +62,6 @@ export default function useTokens() {
   const tokens = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
   const settings = useSelector(settingsStateSelector, isEqual);
-  const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
   const { confirm } = useConfirm<ConfirmResult>();
   const store = useStore<RootState>();
   const tokensContext = useContext(TokensContext);
@@ -111,20 +109,19 @@ export default function useTokens() {
         expandShadow,
         expandComposition,
         expandBorder,
-        storeTokenIdInJsonEditor,
       });
     },
     // Adding tokenFormat as a dependency to cause a change when format changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [tokens, activeTokenSet, storeTokenIdInJsonEditor, tokensContext.resolvedTokens, tokenFormat],
+    [tokens, activeTokenSet, tokensContext.resolvedTokens, tokenFormat],
   );
 
   // Returns stringified tokens for the JSON editor
   const getStringTokens = useCallback(
-    () => stringifyTokens(tokens, activeTokenSet, storeTokenIdInJsonEditor),
+    () => stringifyTokens(tokens, activeTokenSet),
     // Adding tokenFormat as a dependency to cause a change when format changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [tokens, activeTokenSet, storeTokenIdInJsonEditor, tokenFormat],
+    [tokens, activeTokenSet, tokenFormat],
   );
 
   // handles updating JSON

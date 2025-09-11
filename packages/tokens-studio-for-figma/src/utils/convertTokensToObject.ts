@@ -2,18 +2,17 @@ import set from 'set-value';
 import { appendTypeToToken } from '@/app/components/createTokenObj';
 import { AnyTokenList, AnyTokenSet } from '@/types/tokens';
 import { getGroupTypeName } from './stringifyTokens';
-import removeTokenId from './removeTokenId';
+
 import { setTokenKey, FormatSensitiveTokenKeys } from './setTokenKey';
 
-export default function convertTokensToObject(tokens: Record<string, AnyTokenList>, storeTokenIdInJsonEditor: boolean) {
+export default function convertTokensToObject(tokens: Record<string, AnyTokenList>) {
   const tokenObj = Object.entries(tokens).reduce<Record<string, AnyTokenSet<false>>>((acc, [key, val]) => {
     const tokenGroupObj: AnyTokenSet<false> = {};
     val.forEach((token) => {
       const tokenWithType = appendTypeToToken(token);
-      const tokenWithoutId = removeTokenId(tokenWithType, !storeTokenIdInJsonEditor);
 
       // Remove the name key to not include it in the output
-      const { name, ...tokenWithoutName } = tokenWithoutId;
+      const { name, ...tokenWithoutName } = tokenWithType;
 
       // Directly work with tokenWithoutName to preserve order
       if (tokenWithoutName.inheritTypeLevel) {

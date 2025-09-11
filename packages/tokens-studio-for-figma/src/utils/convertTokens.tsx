@@ -10,6 +10,7 @@ import {
 import { TokenGroupInJSON, isTokenGroupWithType } from './is/isTokenGroupWithType';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 import { isSingleTokenInJSON } from './is/isSingleTokenInJson';
+import { cleanupTokenExtensions } from './cleanupTokenExtensions';
 
 // This is a token as it is incoming, so we can't be sure of the values or types
 export type TokenInJSON<T extends TokenTypes = any, V = any> = {
@@ -174,10 +175,12 @@ export default function convertToTokenArray({ tokens }: { tokens: Tokens }) {
   });
 
   // Internally we dont care about $value or value, we always use value, so remove it
+  // Also clean up any legacy id fields from studio.tokens extensions
   return Object.values(result).map((token) => {
-    if ('$value' in token) delete token.$value;
-    if ('$description' in token) delete token.$description;
-    if ('$type' in token) delete token.$type;
-    return token;
+    const cleanedToken = cleanupTokenExtensions(token);
+    if ('$value' in cleanedToken) delete cleanedToken.$value;
+    if ('$description' in cleanedToken) delete cleanedToken.$description;
+    if ('$type' in cleanedToken) delete cleanedToken.$type;
+    return cleanedToken;
   });
 }

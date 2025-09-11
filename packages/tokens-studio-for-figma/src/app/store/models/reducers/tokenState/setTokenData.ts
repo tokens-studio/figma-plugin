@@ -3,7 +3,7 @@ import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import type { SetTokenDataPayload } from '@/types/payloads';
 import parseTokenValues from '@/utils/parseTokenValues';
 import type { TokenState } from '../../tokenState';
-import removeIdPropertyFromTokens from '@/utils/removeIdPropertyFromTokens';
+
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 import { TokenStore } from '@/types/tokens';
 import { checkStorageSize } from '@/utils/checkStorageSize';
@@ -33,7 +33,7 @@ export function setTokenData(state: TokenState, payload: SetTokenDataPayload): T
     }
   });
 
-  const tokenValues = Array.isArray(payload.values) ? payload.values : removeIdPropertyFromTokens(payload.values);
+  const tokenValues = Array.isArray(payload.values) ? payload.values : payload.values;
 
   // When the remote data has changed, we will update the last synced state
   const lastSyncedState = payload.hasChangedRemote ? JSON.stringify(compact([tokenValues, payload.themes, TokenFormat.format]), null, 2) : state.lastSyncedState;
