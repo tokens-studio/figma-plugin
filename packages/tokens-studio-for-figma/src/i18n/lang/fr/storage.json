@@ -65,19 +65,16 @@
       "readMore": "Lisez le guide de synchronisation Azure DevOps."
     },
     "bitbucket": {
-      "appPassword": "Mot de passe de l'application",
+      "apiToken": "Jeton API",
       "projectName": "Nom du projet (facultatif)",
       "repository": "Dépôt (espace de travail/dépôt)",
-      "username": "Nom d'utilisateur Bitbucket"
+      "username": "Email utilisateur",
+      "usernameAppPassword": "Nom d'utilisateur"
     },
     "tokensstudio": {
       "name": "Name",
       "apikey": "API key",
       "urn": "Connection URN",
-      "descriptionFirstPart": "Tokens Studio dispose d'une plate-forme Web autonome pour la création dynamique et la gestion des décisions de conception, actuellement en version bêta !",
-      "signupText": "Inscrivez-vous pour un accès bêta ici.",
-      "descriptionSecondPart": "Si vous utilisez déjà la plateforme Studio et avez besoin d'aide pour configurer la synchronisation, lisez le",
-      "tokensStudioSyncGuide": "Guide de synchronisation de Tokens Studio ici.",
       "pat": "Jeton d'accès personnel",
       "id": "ID de connexion",
       "selectOrgLabel": "Choisir l'organisation",
@@ -107,7 +104,20 @@
   "gitLabExplained": "Connectez votre référentiel de code Gitlab à Tokens Studio pour le stockage de jetons à distance avec contrôle de version et synchronisation bidirectionnelle contrôlée dans le plugin.",
   "gitHubExplained": "Connectez votre référentiel de code GitHub à Tokens Studio pour le stockage de jetons à distance avec contrôle de version et synchronisation bidirectionnelle contrôlée dans le plugin.",
   "bitBucketExplained": "Connectez votre référentiel de code Bitbucket à Tokens Studio pour le stockage de jetons à distance avec contrôle de version et synchronisation bidirectionnelle contrôlée dans le plugin.",
-  "nameHelpText": "Ce surnom apparaît sur la page des paramètres du plugin pour vous aider à identifier ce fournisseur de synchronisation dans votre liste.",
+  "nameHelpText": "Nom comment il apparaîtra sur la page des paramètres",
+  "tokensStudioForm": {
+    "heading": "Les systèmes de design ne s'arrêtent pas aux outils de design. Nous non plus.",
+    "description": "Les tokens de design sont puissants, mais seulement s'ils sont structurés. La plupart des systèmes s'arrêtent aux valeurs de style. Nous allons plus loin : conditions, héritage, thèmes multi-marques et sorties prêtes pour les développeurs.",
+    "description2": "Avec Tokens Studio, les tokens de design deviennent un langage partagé. Et utilisé à travers les outils, plateformes et équipes.",
+    "learnMore": "En savoir plus",
+    "migrationGuide": "guide de migration",
+    "startFreeTrial": "Commencer l'essai gratuit",
+    "studioBaseUrl": "URL de base Studio (facultatif)",
+    "baseUrlTooltip": "Si vous devez vous connecter à une instance personnalisée",
+    "validatingBaseUrl": "Validation de l'URL de base...",
+    "chooseOrganization": "Choisir une organisation",
+    "chooseProject": "Choisir un projet"
+  },
   "readMoreBitBucket": "Lisez le guide de synchronisation Bitbucket.",
   "readMoreGitHub": "Lisez le guide de synchronisation GitHub.",
   "readMoreGitLab": "Lisez le guide de synchronisation GitLab.",

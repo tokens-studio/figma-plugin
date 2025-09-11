@@ -47,7 +47,7 @@ const LocalStorageItem = () => {
   const isActive = storageType.provider === StorageProviderType.LOCAL;
 
   return (
-    <StyledStorageItem active={isActive}>
+    <StyledStorageItem active={isActive} style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
       <Box
         css={{
           alignItems: 'center',

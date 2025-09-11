@@ -9,6 +9,8 @@ import {
 import { notifyToUI } from '@/plugin/notifiers';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { JSONBinTokenStorage } from '@/storage';
+import { remoteDataSelector, lastSyncedStateSelector, storageTypeSelector } from '@/selectors';
+import { tokenFormatSelector } from '@/selectors/tokenFormatSelector';
 
 const mockStartJob = jest.fn();
 const mockRetrieve = jest.fn();
@@ -34,6 +36,7 @@ const mockPushDialog = jest.fn();
 const mockClosePushDialog = jest.fn();
 const mockShowPullDialog = jest.fn();
 const mockClosePullDialog = jest.fn();
+const mockShowPullDialogError = jest.fn();
 const mockCreateBranch = jest.fn();
 const mockSave = jest.fn();
 const mockSetCollapsedTokenSets = jest.fn();
@@ -43,6 +46,8 @@ const mockGetCommitSha = jest.fn();
 const mockGetLatestCommitDate = jest.fn();
 const mockSetRemoteData = jest.fn();
 const mockSetHasRemoteChange = jest.fn();
+const mockUpdateCheckForChanges = jest.fn();
+const mockSetLastError = jest.fn();
 
 // Hide log calls unless they are expected
 jest.spyOn(console, 'log').mockImplementation(() => { });
@@ -69,6 +74,18 @@ const mockSelector = (selector: Selector) => {
           },
         },
       ];
+    case remoteDataSelector:
+      return {
+        tokens: {},
+        themes: [],
+        metadata: null,
+      };
+    case lastSyncedStateSelector:
+      return JSON.stringify([{ global: [] }, []], null, 2);
+    case storageTypeSelector:
+      return { provider: 'local' };
+    case tokenFormatSelector:
+      return 'legacy';
     default:
       return {};
   }
@@ -85,6 +102,7 @@ jest.mock('react-redux', () => ({
       setStorage: mockSetStorage,
       setShowConfirm: mockSetShowConfirm,
       setHasRemoteChange: mockSetHasRemoteChange,
+      setLastError: mockSetLastError,
     },
     tokenState: {
       setLastSyncedState: mockSetLastSyncedState,
@@ -95,6 +113,7 @@ jest.mock('react-redux', () => ({
       resetChangedState: mockResetChangedState,
       setRemoteData: mockSetRemoteData,
       setTokenFormat: mockSetTokenFormat,
+      updateCheckForChanges: mockUpdateCheckForChanges,
     },
     branchState: {
       setBranches: mockSetBranches,
@@ -211,6 +230,7 @@ jest.mock('../hooks/usePullDialog', () => ({
   default: () => ({
     showPullDialog: mockShowPullDialog,
     closePullDialog: mockClosePullDialog,
+    showPullDialogError: mockShowPullDialogError,
   }),
 }));
 jest.mock('../../plugin/notifiers', (() => ({
@@ -276,7 +296,8 @@ const contextMap = {
   url: urlContext,
 };
 
-const errorMessageMap = {
+// Use ErrorMessages constants for provider-specific credential errors
+const credentialErrorMap = {
   GitHub: ErrorMessages.GITHUB_CREDENTIAL_ERROR,
   GitLab: ErrorMessages.GITLAB_CREDENTIAL_ERROR,
   Bitbucket: ErrorMessages.BITBUCKET_CREDENTIAL_ERROR,
@@ -411,11 +432,11 @@ describe('remoteTokens', () => {
     it(`Pull tokens from ${context.provider}, should return credential error message when fetching a data throws an error`, async () => {
       await result.current.pullTokens({ context: context as StorageTypeCredentials });
       mockRetrieve.mockImplementation(() => {
-        throw new Error('Error');
+        throw new Error('401 Unauthorized');
       });
       expect(await result.current.pullTokens({ context: context as StorageTypeCredentials })).toEqual({
         status: 'failure',
-        errorMessage: errorMessageMap[contextName as keyof typeof errorMessageMap],
+        errorMessage: credentialErrorMap[contextName as keyof typeof credentialErrorMap],
       });
     });
   });
@@ -593,11 +614,11 @@ describe('remoteTokens', () => {
         Promise.resolve(['main'])
       ));
       mockRetrieve.mockImplementation(() => {
-        throw new Error('Error');
+        throw new Error('401 Unauthorized');
       });
       await waitFor(() => { result.current.restoreStoredProvider(context as StorageTypeCredentials); });
       expect(notifyToUI).toBeCalledTimes(1);
-      expect(notifyToUI).toBeCalledWith(errorMessageMap[contextName as keyof typeof errorMessageMap], { error: true });
+      expect(notifyToUI).toBeCalledWith(credentialErrorMap[contextName as keyof typeof credentialErrorMap], { error: true });
     });
   });
 
@@ -765,7 +786,7 @@ describe('remoteTokens', () => {
         expect(mockClosePushDialog).toBeCalledTimes(1);
         expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
           status: 'failure',
-          errorMessage: (context === adoContext || context === gitLabContext) ? ErrorMessages.GENERAL_CONNECTION_ERROR : errorMessageMap[contextName as keyof typeof errorMessageMap],
+          errorMessage: (context === adoContext || context === gitLabContext) ? ErrorMessages.GENERAL_CONNECTION_ERROR : credentialErrorMap[contextName as keyof typeof credentialErrorMap],
         });
       });
     }

@@ -70,6 +70,7 @@ StorageProviderType.BITBUCKET,
   branch: string; // this is the base branch
   filePath: string; // this is the path to the token file or files (depends on multifile support)
   baseUrl?: string; // this is the base API url. This is important for self hosted environments
+  apiToken?: string; // this is the new API Token for authentication (preferred over app password)
 }
 >;
 
@@ -154,7 +155,7 @@ export type StorageTypeFormValues<Incomplete extends boolean = false> =
   Incomplete,
   Omit<StorageTypeCredential<GitLabStorageType>, 'provider'>
   >)
-  | ({ new?: boolean; provider: StorageProviderType.BITBUCKET } & OptionalPartial<
+  | ({ new?: boolean; migrating?: boolean; provider: StorageProviderType.BITBUCKET } & OptionalPartial<
   Incomplete,
   Omit<StorageTypeCredential<BitbucketStorageType>, 'provider'>
   >)

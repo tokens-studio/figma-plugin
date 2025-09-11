@@ -31,6 +31,29 @@ For anything related to the Figma sandbox environment or using the global `figma
 2. Start development: `yarn start` (watches for changes)
 3. Build for production: `yarn build`
 
+## 🚨 MANDATORY: Changeset Requirements
+
+**CRITICAL: Every PR and code change must include a changeset - no exceptions.**
+
+**Before making ANY code changes:**
+
+1. **Run `yarn changeset` immediately after making code changes**
+2. **Always select "patch" as the version bump** (maintainers will upgrade to minor/major if needed)
+3. **Write a clear, user-facing description of what changed**
+4. **Commit the generated changeset file with your changes**
+
+**This is not optional - it is required for all code modifications.**
+
+Example changeset format:
+
+```
+---
+"@tokens-studio/figma-plugin": patch
+---
+
+Brief description of the changes made
+```
+
 ## Build System
 
 ### Core Build Commands
@@ -153,19 +176,6 @@ SENTRY_REPLAY_SAMPLING=0
 - Build failures - Check your Node version and dependencies
 - Test failures - Check for environment variables and mocks
 
-## Changeset Requirements
-
-**IMPORTANT: Every PR must include a changeset to describe the changes made.**
-
-Before making any code changes or when completing a PR:
-
-1. **Always run `yarn changeset` to create a changeset file**
-2. Choose the appropriate version bump (patch, minor, major) based on the changes
-3. Write a clear, user-facing description of what changed
-4. Commit the generated changeset file along with your changes
-
-This is mandatory for all code changes and helps maintain proper version management and release notes.
-
 ## Code Patterns to Follow
 
 1. Use functional React components with hooks
@@ -177,3 +187,5 @@ This is mandatory for all code changes and helps maintain proper version managem
 7. **Always create a changeset (see Changeset Requirements section above)**
 8. For UI components, use @tokens-studio/ui components that we use across the codebase instead of creating from scratch
 9. For UI work, use tokens from @tokens-studio/tokens, found in node_modules/@tokens-studio/tokens/dist/css/dark.css and node_modules/@tokens-studio/tokens/dist/css/core.css instead of using raw hex values.
+
+
