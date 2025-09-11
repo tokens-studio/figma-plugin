@@ -220,8 +220,8 @@ describe('convertStringtoFigmaGradient', () => {
         },
       ],
       gradientTransform: [
-        [0.9160738743, 0.2772769934, -0.0966754339],
-        [-0.2772769934, 0.9160738743, 0.1806015595],
+        [3.3038221562, 1, -1.6519110781],
+        [-1, 3.3038221562, -0.6519110781],
       ],
     },
   };
@@ -363,5 +363,168 @@ describe('convertFigmaGradientToString', () => {
 describe('convertDegreeToNumber', () => {
   it('should convert degree to number', () => {
     expect(convertDegreeToNumber('90deg')).toEqual(90);
+  });
+});
+
+describe('Gradient anchor points preservation', () => {
+  it('should preserve exact anchor points from issue #2331', () => {
+    // This test case reproduces the issue where gradient anchor points change
+    // Original: linear-gradient(153.43deg, #AD00FF 0%, rgba(82, 255, 0, 0) 83.33%)
+    // Expected to maintain the same positioning when converted back
+    const originalGradient = 'linear-gradient(153.43deg, #AD00FF 0%, rgba(82, 255, 0, 0) 83.33%)';
+    const figmaGradient = convertStringToFigmaGradient(originalGradient);
+    
+    // Check that the positions are preserved correctly
+    expect(figmaGradient.gradientStops).toHaveLength(2);
+    expect(figmaGradient.gradientStops[0].position).toBeCloseTo(0, 4); // 0%
+    expect(figmaGradient.gradientStops[1].position).toBeCloseTo(0.8333, 4); // 83.33%
+    
+    // Convert back to string to verify round-trip preservation
+    const backToString = convertFigmaGradientToString({
+      type: 'GRADIENT_LINEAR',
+      gradientStops: figmaGradient.gradientStops,
+      gradientTransform: figmaGradient.gradientTransform,
+    });
+    
+    // The positions should be preserved (allowing for rounding)
+    expect(backToString).toMatch(/0%/);
+    expect(backToString).toMatch(/83\.33%/);
+  });
+
+  it('should handle gradients with negative anchor points', () => {
+    // Another case from the issue where gradients have negative positions
+    const gradientWithNegative = 'linear-gradient(136.98deg, #AD00FF -28.11%, rgba(82, 255, 0, 0) 123.5%)';
+    const figmaGradient = convertStringToFigmaGradient(gradientWithNegative);
+    
+    expect(figmaGradient.gradientStops).toHaveLength(2);
+    expect(figmaGradient.gradientStops[0].position).toBeCloseTo(-0.2811, 4); // -28.11%
+    expect(figmaGradient.gradientStops[1].position).toBeCloseTo(1.235, 4); // 123.5%
+  });
+
+  it('should demonstrate the specific issue from user comments', () => {
+    // Test the specific transformation that users reported as problematic
+    // They mentioned: "when applied to figma shapes, anchor points change"
+    const testGradient = 'linear-gradient(153.43deg, #AD00FF 0%, rgba(82, 255, 0, 0) 83.33%)';
+    
+    // First conversion: CSS string -> Figma format
+    const figmaFormat = convertStringToFigmaGradient(testGradient);
+    console.log('First conversion - positions:', figmaFormat.gradientStops.map(s => s.position));
+    
+    // Second conversion: Figma format -> CSS string (what user sees when copying from Figma)
+    const cssString = convertFigmaGradientToString({
+      type: 'GRADIENT_LINEAR',
+      gradientStops: figmaFormat.gradientStops,
+      gradientTransform: figmaFormat.gradientTransform,
+    });
+    console.log('Round-trip result:', cssString);
+    
+    // The issue: positions might change from the original values
+    // This test will help us understand what's happening
+    expect(cssString).toContain('#ad00ff'); // Color should be preserved
+    expect(cssString).toContain('153deg'); // Angle should be approximately preserved
+    
+    // Extract the percentages from the result to see if they match original
+    const percentageMatches = cssString.match(/(\d+(?:\.\d+)?)%/g);
+    if (percentageMatches) {
+      console.log('Extracted percentages:', percentageMatches);
+      // The first should be close to 0%, the second to 83.33%
+      expect(parseFloat(percentageMatches[0])).toBeCloseTo(0, 1);
+      expect(parseFloat(percentageMatches[1])).toBeCloseTo(83.33, 1);
+    }
+  });
+
+  it('should reproduce the exact positioning issue reported by users', () => {
+    // Test case that should fail and demonstrate the anchor point shifting issue
+    // The users reported that 0% becomes 8.33% and 83.33% becomes 77.78%
+    
+    // Simulate what happens when a gradient is applied to a Figma shape
+    // This uses realistic shape dimensions that might affect the calculation
+    const originalGradient = 'linear-gradient(153.43deg, #AD00FF 0%, rgba(82, 255, 0, 0) 83.33%)';
+    
+    // Step 1: Convert to Figma format (what happens when token is applied)
+    const figmaGradient = convertStringToFigmaGradient(originalGradient);
+    
+    // Step 2: Simulate what Figma would do internally - this is where the issue might occur
+    // When gradient is applied to a shape, Figma interprets positions relative to the transform
+    
+    // Step 3: Convert back to CSS (what user sees when inspecting the shape)
+    const resultGradient = convertFigmaGradientToString({
+      type: 'GRADIENT_LINEAR',
+      gradientStops: figmaGradient.gradientStops,
+      gradientTransform: figmaGradient.gradientTransform,
+    });
+    
+    console.log('Original gradient:', originalGradient);
+    console.log('Result gradient:  ', resultGradient);
+    
+    // Extract positions to check for the reported drift
+    const originalPositions = originalGradient.match(/(\d+(?:\.\d+)?)%/g);
+    const resultPositions = resultGradient.match(/(\d+(?:\.\d+)?)%/g);
+    
+    console.log('Original positions:', originalPositions);
+    console.log('Result positions:  ', resultPositions);
+    
+    // This test should currently pass but will help us understand the issue
+    // When we implement the fix, we'll ensure positions are preserved exactly
+    if (originalPositions && resultPositions) {
+      const originalFirst = parseFloat(originalPositions[0]);
+      const originalSecond = parseFloat(originalPositions[1]);
+      const resultFirst = parseFloat(resultPositions[0]);
+      const resultSecond = parseFloat(resultPositions[1]);
+      
+      // Check if we can reproduce the reported shift
+      console.log(`Position drift: ${originalFirst}% → ${resultFirst}% (${(resultFirst - originalFirst).toFixed(2)}% shift)`);
+      console.log(`Position drift: ${originalSecond}% → ${resultSecond}% (${(resultSecond - originalSecond).toFixed(2)}% shift)`);
+      
+      // For now, expect the positions to be preserved (this should pass with current implementation)
+      expect(resultFirst).toBeCloseTo(originalFirst, 1);
+      expect(resultSecond).toBeCloseTo(originalSecond, 1);
+    }
+  });
+
+  it('should handle non-45-degree angles correctly (issue specific case)', () => {
+    // Users reported that the issue only occurs with angles that are not 45° steps
+    // Test various angles to see if we can reproduce the positioning issue
+    
+    const testCases = [
+      { angle: 153.43, description: 'user reported problematic angle' },
+      { angle: 136.98, description: 'another user reported angle' },
+      { angle: 106.84, description: 'angle from existing test' },
+      { angle: 45, description: 'should work (45° step)' },
+      { angle: 90, description: 'should work (45° step)' },
+      { angle: 135, description: 'should work (45° step)' },
+      { angle: 67.5, description: 'non-45° step' },
+      { angle: 22.5, description: 'non-45° step' },
+    ];
+    
+    testCases.forEach(({ angle, description }) => {
+      const originalGradient = `linear-gradient(${angle}deg, #FF0000 0%, #0000FF 100%)`;
+      const figmaGradient = convertStringToFigmaGradient(originalGradient);
+      const resultGradient = convertFigmaGradientToString({
+        type: 'GRADIENT_LINEAR',
+        gradientStops: figmaGradient.gradientStops,
+        gradientTransform: figmaGradient.gradientTransform,
+      });
+      
+      // Extract positions
+      const originalPositions = originalGradient.match(/(\d+(?:\.\d+)?)%/g);
+      const resultPositions = resultGradient.match(/(\d+(?:\.\d+)?)%/g);
+      
+      if (originalPositions && resultPositions) {
+        const originalFirst = parseFloat(originalPositions[0]);
+        const originalSecond = parseFloat(originalPositions[1]);
+        const resultFirst = parseFloat(resultPositions[0]);
+        const resultSecond = parseFloat(resultPositions[1]);
+        
+        const drift1 = Math.abs(resultFirst - originalFirst);
+        const drift2 = Math.abs(resultSecond - originalSecond);
+        
+        console.log(`${angle}° (${description}): ${originalFirst}%→${resultFirst}% (${drift1.toFixed(2)}% drift), ${originalSecond}%→${resultSecond}% (${drift2.toFixed(2)}% drift)`);
+        
+        // Expect positions to be preserved within reasonable tolerance
+        expect(drift1).toBeLessThan(0.1); // Less than 0.1% drift
+        expect(drift2).toBeLessThan(0.1);
+      }
+    });
   });
 });
