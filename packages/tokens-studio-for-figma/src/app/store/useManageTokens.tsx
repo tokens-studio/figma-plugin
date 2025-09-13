@@ -31,7 +31,7 @@ export type EditSingleTokenData = {
       id?: string;
       modify?: ColorModifier
     }
-  }
+  };
 };
 
 export type CreateSingleTokenData = {
@@ -47,7 +47,7 @@ export type CreateSingleTokenData = {
       id?: string;
       modify?: ColorModifier
     }
-  }
+  };
 };
 
 type Choice = { key: string; label: string; enabled?: boolean, unique?: boolean };

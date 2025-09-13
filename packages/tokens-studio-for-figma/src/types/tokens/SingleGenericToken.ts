@@ -19,8 +19,15 @@ export type SingleGenericToken<T extends TokenTypes, V = string, Named extends b
       modify?: ColorModifier;
       urn?: string;
     },
+    'com.figma'?: {
+      hiddenFromPublishing?: boolean;
+      scopes?: import('../FigmaVariableTypes').VariableScope[];
+      codeSyntax?: {
+        [K in import('../FigmaVariableTypes').CodeSyntaxPlatform]?: string;
+      };
+    },
     id?: string;
-  }
+  };
 } & (Named extends true ? {
   name: string;
 } : {

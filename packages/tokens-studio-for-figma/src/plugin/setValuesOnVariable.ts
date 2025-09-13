@@ -7,6 +7,7 @@ import { convertTokenTypeToVariableType } from '@/utils/convertTokenTypeToVariab
 import { checkCanReferenceVariable } from '@/utils/alias/checkCanReferenceVariable';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { transformValue } from './helpers';
+import { CodeSyntaxPlatform, getFigmaExtensions, mapCodeSyntaxPlatformToFigma } from '@/types/FigmaVariableTypes';
 
 export type ReferenceVariableType = {
   variable: Variable;
@@ -47,6 +48,30 @@ export default async function setValuesOnVariable(
           // variable = figma.variables.createVariable(t.path, collection.id, variableType);
         }
         variable.description = token.description ?? '';
+        
+        // Apply Figma variable properties if available
+        const figmaExtensions = getFigmaExtensions(token);
+        if (figmaExtensions) {
+          // Set variable scopes
+          if (figmaExtensions.scopes && figmaExtensions.scopes.length > 0) {
+            variable.scopes = figmaExtensions.scopes;
+          }
+          
+          // Set hidden from publishing
+          if (figmaExtensions.hiddenFromPublishing !== undefined) {
+            variable.hiddenFromPublishing = figmaExtensions.hiddenFromPublishing;
+          }
+          
+          // Set code syntax for different platforms
+          if (figmaExtensions.codeSyntax) {
+            Object.entries(figmaExtensions.codeSyntax).forEach(([platform, syntax]) => {
+              if (syntax) {
+                const figmaPlatform = mapCodeSyntaxPlatformToFigma(platform as CodeSyntaxPlatform);
+                variable.setVariableCodeSyntax(figmaPlatform, syntax);
+              }
+            });
+          }
+        }
 
         switch (variableType) {
           case 'BOOLEAN':

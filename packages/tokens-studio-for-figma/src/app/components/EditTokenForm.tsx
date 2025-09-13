@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import {
-  Button, Heading, Textarea, Label, Stack,
+  Button, Heading, Textarea, Label, Stack, Checkbox,
 } from '@tokens-studio/ui';
 import { track } from '@/utils/analytics';
 import { Dispatch } from '../store';
@@ -43,6 +43,9 @@ import { ColorModifier } from '@/types/Modifier';
 import { MultiSelectDropdown } from './MultiSelectDropdown';
 import { tokenTypesToCreateVariable } from '@/constants/VariableTypes';
 import { ModalOptions } from '@/constants/ModalOptions';
+import VariableScopesInput from './VariableScopesInput';
+import CodeSyntaxInput from './CodeSyntaxInput';
+import { VariableScope, CodeSyntaxPlatform, getFigmaExtensions, setFigmaExtensions } from '@/types/FigmaVariableTypes';
 
 let lastUsedRenameOption: UpdateMode = UpdateMode.SELECTION;
 let lastUsedRenameStyles = false;
@@ -364,6 +367,62 @@ function EditTokenForm({ resolvedTokens }: Props) {
           ...internalEditToken,
           description: value,
         });
+      }
+    },
+    [internalEditToken],
+  );
+
+  // Figma Variable Properties handlers
+  const handleScopesChange = React.useCallback(
+    (scopes: VariableScope[]) => {
+      if (internalEditToken) {
+        const figmaExtensions = getFigmaExtensions(internalEditToken) || {};
+        const updated = { ...internalEditToken };
+        setFigmaExtensions(updated, {
+          ...figmaExtensions,
+          scopes,
+        });
+        setInternalEditToken(updated);
+      }
+    },
+    [internalEditToken],
+  );
+
+  const handleCodeSyntaxChange = React.useCallback(
+    (platform: CodeSyntaxPlatform, value: string) => {
+      if (internalEditToken) {
+        const figmaExtensions = getFigmaExtensions(internalEditToken) || {};
+        const currentCodeSyntax = figmaExtensions.codeSyntax || {};
+        const newCodeSyntax = { ...currentCodeSyntax };
+        
+        if (value.trim()) {
+          newCodeSyntax[platform] = value;
+        } else {
+          delete newCodeSyntax[platform];
+        }
+
+        const updated = { ...internalEditToken };
+        setFigmaExtensions(updated, {
+          ...figmaExtensions,
+          codeSyntax: newCodeSyntax,
+        });
+        setInternalEditToken(updated);
+      }
+    },
+    [internalEditToken],
+  );
+
+  const handleHiddenFromPublishingChange = React.useCallback(
+    (checked: boolean | string) => {
+      if (internalEditToken) {
+        const hiddenFromPublishing = checked === true;
+        const figmaExtensions = getFigmaExtensions(internalEditToken) || {};
+        const updated = { ...internalEditToken };
+        setFigmaExtensions(updated, {
+          ...figmaExtensions,
+          hiddenFromPublishing,
+        });
+        setInternalEditToken(updated);
       }
     },
     [internalEditToken],
@@ -713,6 +772,31 @@ function EditTokenForm({ resolvedTokens }: Props) {
             />
           </Box>
         )}
+        
+        {/* Figma Variable Properties - only show for tokens that can become variables */}
+        {tokenTypesToCreateVariable.includes(internalEditToken.type) && (
+          <>
+            <Stack direction="column" gap={3}>
+              <Heading size="small">Figma Variable Properties</Heading>
+              <Checkbox
+                checked={getFigmaExtensions(internalEditToken)?.hiddenFromPublishing || false}
+                onCheckedChange={handleHiddenFromPublishingChange}
+                id="hiddenFromPublishing"
+              >
+                Hidden from publishing
+              </Checkbox>
+            </Stack>
+            <VariableScopesInput
+              selectedScopes={getFigmaExtensions(internalEditToken)?.scopes || []}
+              onScopesChange={handleScopesChange}
+            />
+            <CodeSyntaxInput
+              codeSyntax={getFigmaExtensions(internalEditToken)?.codeSyntax || {}}
+              onCodeSyntaxChange={handleCodeSyntaxChange}
+            />
+          </>
+        )}
+        
         <Stack direction="row" justify="end" gap={3}>
           <Button variant="secondary" type="button" onClick={handleReset}>
             {t('cancel')}
