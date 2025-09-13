@@ -240,6 +240,18 @@ export default function BitbucketForm({
             {t('filePathCaption')}
           </Text>
         </FormField>
+        <FormField>
+          <Label htmlFor="baseUrl">{t('baseUrl')}</Label>
+          <TextInput
+            name="baseUrl"
+            id="baseUrl"
+            value={values.baseUrl || ''}
+            placeholder="https://bitbucket.yourcompany.com"
+            onChange={onChange}
+            type="text"
+          />
+          <Text muted>{t('baseUrlHelpText')}</Text>
+        </FormField>
 
         <Stack direction="row" justify="end" gap={4}>
           <Button variant="secondary" onClick={onCancel}>
