@@ -84,6 +84,10 @@ export function hslaToRgba(hslaValues: number[]) {
   return [r, g, b, a];
 }
 
+function roundToTwo(num: number) {
+  return +`${Math.round(Number(`${num}e+2`))}e-2`;
+}
+
 export function convertToFigmaColor(input: string) {
   let color: RGBA;
   let opacity: number;
@@ -94,9 +98,11 @@ export function convertToFigmaColor(input: string) {
       r, g, b, a = 1,
     } = webRGBToFigmaRGB(rgbValues);
     color = {
-      r, g, b,
+      r,
+      g,
+      b,
     };
-    opacity = Number(a);
+    opacity = roundToTwo(a);
   } else if (input.startsWith('hsl')) {
     const hslValues = input.replace(/^hsla?\(|\s+|%|\)$/g, '').split(',').map(parseFloat);
     const rgbValues: any = hslaToRgba(hslValues);
@@ -104,9 +110,11 @@ export function convertToFigmaColor(input: string) {
       r, g, b, a = 1,
     } = webRGBToFigmaRGB(rgbValues);
     color = {
-      r, g, b,
+      r,
+      g,
+      b,
     };
-    opacity = Number(a);
+    opacity = roundToTwo(a);
   } else if (input.startsWith('oklch')) {
     try {
       const oklchColor = new Color(input);
@@ -119,7 +127,7 @@ export function convertToFigmaColor(input: string) {
         g: Math.max(0, Math.min(1, g)),
         b: Math.max(0, Math.min(1, b)),
       };
-      opacity = Number(a);
+      opacity = roundToTwo(a);
     } catch (e) {
       // Fallback to toHex if OKLCH parsing fails
       try {
@@ -127,9 +135,11 @@ export function convertToFigmaColor(input: string) {
           r, g, b, a = 1,
         }: RGBA = hexToFigmaRGB(toHex(input));
         color = {
-          r, g, b,
+          r,
+          g,
+          b,
         };
-        opacity = Number(a);
+        opacity = roundToTwo(a);
       } catch (e2) {
         // If all parsing fails, return black as fallback
         color = { r: 0, g: 0, b: 0 };
@@ -141,9 +151,11 @@ export function convertToFigmaColor(input: string) {
       r, g, b, a = 1,
     }: RGBA = hexToFigmaRGB(toHex(input));
     color = {
-      r, g, b,
+      r,
+      g,
+      b,
     };
-    opacity = Number(a);
+    opacity = roundToTwo(a);
   }
 
   return {

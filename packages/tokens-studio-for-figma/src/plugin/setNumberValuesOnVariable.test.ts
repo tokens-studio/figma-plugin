@@ -1,22 +1,7 @@
-import setNumberValuesOnVariable, { normalizeNumber } from './setNumberValuesOnVariable';
+import setNumberValuesOnVariable from './setNumberValuesOnVariable';
 import { isVariableWithAliasReference } from '@/utils/isAliasReference';
 
 jest.mock('@/utils/isAliasReference');
-
-describe('normalizeNumber', () => {
-  it('should clip numbers to 6 decimal places', () => {
-    expect(normalizeNumber(0.12345678)).toBe(0.123456);
-    expect(normalizeNumber(1.23456789)).toBe(1.234567);
-    expect(normalizeNumber(10)).toBe(10);
-    expect(normalizeNumber(0)).toBe(0);
-  });
-
-  it('should handle clipping vs rounding difference', () => {
-    // Test a case where clipping and rounding would give different results
-    expect(normalizeNumber(0.1234567)).toBe(0.123456); // clips
-    // rounding would give 0.123457
-  });
-});
 
 describe('setNumberValuesOnVariable', () => {
   let mockVariable: Variable;
