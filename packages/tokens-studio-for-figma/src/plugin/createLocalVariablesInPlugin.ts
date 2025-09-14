@@ -15,6 +15,7 @@ import { getVariablesWithoutZombies } from './getVariablesWithoutZombies';
 import { getOverallConfig } from '@/utils/tokenHelpers';
 import { generateTokensToCreate } from './generateTokensToCreate';
 import checkIfTokenCanCreateVariable from '@/utils/checkIfTokenCanCreateVariable';
+import { ProgressTracker } from './ProgressTracker';
 
 export type LocalVariableInfo = {
   collectionId: string;
@@ -50,49 +51,45 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
     const collections = await createNecessaryVariableCollections(themeInfo.themes, selectedThemes);
 
     // Calculate total number of variables for progress tracking
-    // We need to count tokens that will actually be processed (per theme, since themes process sequentially)
     const totalVariableTokens = selectedThemeObjects.reduce((total, theme) => {
-      console.log(`Processing theme "${theme.name}"`);
       const themeTokens = generateTokensToCreate({ theme, tokens, overallConfig });
-      console.log(`Theme "${theme.name}" has ${themeTokens.length} tokens`);
       const variableTokenCount = themeTokens.filter((token) => checkIfTokenCanCreateVariable(token, settings)).length;
-      console.log(`Theme "${theme.name}" has ${variableTokenCount} variable tokens`);
       return total + variableTokenCount;
     }, 0);
 
-    // Start unified progress tracking for all variables
+    // Create a single global progress tracker for all variable creation
+    let globalProgressTracker: ProgressTracker | null = null;
     if (totalVariableTokens > 10) {
+      // First, ensure any previous job is completed to avoid UI counter accumulation
+      postToUI({
+        type: MessageFromPluginTypes.COMPLETE_JOB,
+        name: BackgroundJobs.UI_CREATEVARIABLES,
+      });
+
+      // Small delay to ensure UI processes the completion
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      globalProgressTracker = new ProgressTracker(BackgroundJobs.UI_CREATEVARIABLES);
       postToUI({
         type: MessageFromPluginTypes.START_JOB,
         job: {
           name: BackgroundJobs.UI_CREATEVARIABLES,
-          timePerTask: 100, // Estimate 100ms per variable token
+          timePerTask: 10, // More realistic 10ms per variable token
           totalTasks: totalVariableTokens,
           completedTasks: 0,
         },
       });
     }
 
-    let completedTasks = 0;
-    const reportProgress = totalVariableTokens > 10 ? (batchCompleted: number) => {
-      console.log(`Variable progress: ${completedTasks} / ${totalVariableTokens} (batch of ${batchCompleted} completed)`);
-      completedTasks += batchCompleted;
-      postToUI({
-        type: MessageFromPluginTypes.COMPLETE_JOB_TASKS,
-        name: BackgroundJobs.UI_CREATEVARIABLES,
-        count: completedTasks,
-        timePerTask: 100,
-      });
-    } : undefined;
-
-    // Process themes sequentially to avoid memory pressure and ensure accurate progress reporting
+    // Process themes sequentially
     for (const theme of selectedThemeObjects) {
       const { collection, modeId } = findCollectionAndModeIdForTheme(theme.group ?? theme.name, theme.name, collections);
 
       if (collection && modeId) {
         const allVariableObj = await updateVariables({
-          collection, mode: modeId, theme, tokens, settings, overallConfig, onProgress: reportProgress,
+          collection, mode: modeId, theme, tokens, settings, overallConfig, progressTracker: globalProgressTracker,
         });
+
         figmaVariablesAfterCreate += allVariableObj.removedVariables.length;
         if (Object.keys(allVariableObj.variableIds).length > 0) {
           allVariableCollectionIds[theme.id] = {
@@ -111,7 +108,7 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
     // Update variables to use references instead of raw values
     updatedVariables = await updateVariablesToReference(existingVariables, referenceVariableCandidates);
 
-    // Complete progress tracking
+    // Complete progress tracking like NodeManager
     if (totalVariableTokens > 10) {
       postToUI({
         type: MessageFromPluginTypes.COMPLETE_JOB,

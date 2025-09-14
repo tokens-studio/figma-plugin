@@ -8,9 +8,9 @@ export function truncateName(name: string, maxLength: number = 40): string {
   if (name.length <= maxLength) {
     return name;
   }
-  
+
   // Truncate and add ellipsis, ensuring we don't exceed maxLength
-  return name.substring(0, maxLength - 3) + '...';
+  return `${name.substring(0, maxLength - 3)}...`;
 }
 
 /**
@@ -21,7 +21,7 @@ export function truncateModeName(name: string): string {
 }
 
 /**
- * Truncates collection names specifically (255 character limit)  
+ * Truncates collection names specifically (255 character limit)
  */
 export function truncateCollectionName(name: string): string {
   return truncateName(name, 255);

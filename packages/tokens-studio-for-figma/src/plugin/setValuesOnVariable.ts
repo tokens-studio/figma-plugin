@@ -7,9 +7,8 @@ import { convertTokenTypeToVariableType } from '@/utils/convertTokenTypeToVariab
 import { checkCanReferenceVariable } from '@/utils/alias/checkCanReferenceVariable';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { transformValue } from './helpers';
-import { defaultWorker } from './Worker';
+import { variableWorker } from './Worker';
 import { ProgressTracker } from './ProgressTracker';
-import { BackgroundJobs } from '@/constants/BackgroundJobs';
 
 export type ReferenceVariableType = {
   variable: Variable;
@@ -24,26 +23,32 @@ export default async function setValuesOnVariable(
   mode: string,
   baseFontSize: string,
   shouldRename = false,
-  onProgress?: (completed: number) => void,
+  progressTracker?: ProgressTracker | null,
 ) {
   const variableKeyMap: Record<string, string> = {};
   const referenceVariableCandidates: ReferenceVariableType[] = [];
   const renamedVariableKeys: string[] = [];
-  
-  // Use ProgressTracker for proper UI timing like NodeManager
-  const tracker = new ProgressTracker(BackgroundJobs.UI_CREATEVARIABLES, false);
+
+  // Use the passed-in global progress tracker to avoid double counting
   const promises: Set<Promise<void>> = new Set();
-  
+
   try {
-    // Process tokens using defaultWorker.schedule() like NodeManager for proper UI timing
-    tokens.forEach((token, index) => {
-      promises.add(defaultWorker.schedule(async () => {
+    // Process tokens using variableWorker with higher batch size for better performance
+    tokens.forEach((token) => {
+      promises.add(variableWorker.schedule(async () => {
+        let isCreated = false;
+
         try {
           const variableType = convertTokenTypeToVariableType(token.type, token.value);
           // If id matches the variableId, or name patches the token path, we can use it to update the variable instead of re-creating.
           // This has the nasty side-effect that if font weight changes from string to number, it will not update the variable given we cannot change type.
           // In that case, we should delete the variable and re-create it.
-          const variable = variablesInFigma.find((v) => (v.key === token.variableId && !v.remote) || v.name === token.path) || figma.variables.createVariable(token.path, collection, variableType);
+          let variable = variablesInFigma.find((v) => (v.key === token.variableId && !v.remote) || v.name === token.path);
+
+          if (!variable) {
+            variable = figma.variables.createVariable(token.path, collection, variableType);
+            isCreated = true;
+          }
 
           if (variable) {
             // First, rename all variables that should be renamed (if the user choose to do so)
@@ -109,15 +114,19 @@ export default async function setValuesOnVariable(
         } catch (e) {
           console.error('Error processing variable token:', e);
         } finally {
-          tracker.next();
-          tracker.reportIfNecessary();
-          if (onProgress) {
-            onProgress(1); // Report 1 token processed
+          processedCount += 1;
+          if (isCreated) createdCount += 1;
+          else updatedCount += 1;
+
+          // Use global progress tracker if available
+          if (progressTracker) {
+            progressTracker.next();
+            progressTracker.reportIfNecessary();
           }
         }
       }));
     });
-    
+
     await Promise.all(promises);
   } catch (e) {
     console.error('Setting values on variable failed', e);
