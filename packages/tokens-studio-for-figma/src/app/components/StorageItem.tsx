@@ -16,13 +16,15 @@ import { getProviderIcon } from '@/utils/getProviderIcon';
 import useStorage from '../store/useStorage';
 import { Dispatch } from '../store';
 import { TokenFormatBadge } from './TokenFormatBadge';
+import { isUsingAppPassword } from '@/utils/bitbucketMigration';
 
 type Props = {
   item: StorageTypeCredentials;
   onEdit: () => void;
+  onMigrate?: () => void;
 };
 
-const StorageItem = ({ item, onEdit }: Props) => {
+const StorageItem = ({ item, onEdit, onMigrate }: Props) => {
   const [hasErrored, setHasErrored] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState<string>();
   const storageType = useSelector(storageTypeSelector);
@@ -34,6 +36,11 @@ const StorageItem = ({ item, onEdit }: Props) => {
   const dispatch = useDispatch<Dispatch>();
 
   const { t } = useTranslation(['storage']);
+
+  // Check if this is a Bitbucket item using app password
+  const isBitbucketWithAppPassword = React.useMemo(() => (
+    item.provider === StorageProviderType.BITBUCKET && isUsingAppPassword(item as any)
+  ), [item]);
 
   const askUserIfDelete = React.useCallback(async () => {
     const shouldDelete = await confirm({
@@ -67,54 +74,58 @@ const StorageItem = ({ item, onEdit }: Props) => {
   }, [item, restoreStoredProvider]);
 
   return (
-    <StyledStorageItem data-testid={`storageitem-${provider}-${id}`} key={`${provider}-${id}`} active={isActive()}>
-      <Stack
-        direction="column"
-        gap={1}
-        css={{
-          flexGrow: '1',
-          overflow: 'hidden',
-        }}
+    <StyledStorageItem data-testid={`storageitem-${provider}-${id}`} key={`${provider}-${id}`} active={isActive()} hasError={isBitbucketWithAppPassword}>
+      <div style={{
+        display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-between', alignItems: 'center',
+      }}
       >
         <Stack
-          direction="row"
-          gap={3}
+          direction="column"
+          gap={1}
           css={{
             flexGrow: '1',
             overflow: 'hidden',
-            maxWidth: 'stretch',
           }}
         >
-          <Box css={{ color: '$fgDefault' }}>{getProviderIcon(provider)}</Box>
-          <Stack direction="column" gap={0} css={{ overflow: 'hidden' }}>
-            <Box
-              css={{
-                textOverflow: 'ellipsis',
-                overflow: 'hidden',
-                whiteSpace: 'nowrap',
-                fontSize: '$small',
-                fontWeight: '$sansBold',
-              }}
-            >
-              {name}
-            </Box>
-            <Box
-              css={{
-                whiteSpace: 'nowrap',
-                textOverflow: 'ellipsis',
-                overflow: 'hidden',
-                color: '$fgMuted',
-                fontSize: '$xsmall',
-                maxWidth: '100%',
-              }}
-            >
-              {id}
-              {' '}
-              {branch && ` (${branch})`}
-            </Box>
+          <Stack
+            direction="row"
+            gap={3}
+            css={{
+              flexGrow: '1',
+              overflow: 'hidden',
+              maxWidth: 'stretch',
+            }}
+          >
+            <Box css={{ color: '$fgDefault' }}>{getProviderIcon(provider)}</Box>
+            <Stack direction="column" gap={0} css={{ overflow: 'hidden' }}>
+              <Box
+                css={{
+                  textOverflow: 'ellipsis',
+                  overflow: 'hidden',
+                  whiteSpace: 'nowrap',
+                  fontSize: '$small',
+                  fontWeight: '$sansBold',
+                }}
+              >
+                {name}
+              </Box>
+              <Box
+                css={{
+                  whiteSpace: 'nowrap',
+                  textOverflow: 'ellipsis',
+                  overflow: 'hidden',
+                  color: '$fgMuted',
+                  fontSize: '$xsmall',
+                  maxWidth: '100%',
+                }}
+              >
+                {id}
+                {' '}
+                {branch && ` (${branch})`}
+              </Box>
+            </Stack>
           </Stack>
-        </Stack>
-        {hasErrored && isActive() && (
+          {hasErrored && isActive() && (
           <Box
             css={{
               display: 'flex',
@@ -128,37 +139,85 @@ const StorageItem = ({ item, onEdit }: Props) => {
             <ExclamationTriangleIcon />
             {errorMessage}
           </Box>
-        )}
-      </Stack>
-      <Box css={{ marginRight: '$1' }}>
-        {isActive() ? (
-          <Stack gap={2} align="center">
-            {storageType.provider !== StorageProviderType.TOKENS_STUDIO && (
+          )}
+        </Stack>
+        <Box css={{ marginRight: '$1' }}>
+          {isActive() ? (
+            <Stack gap={2} align="center">
+              {storageType.provider !== StorageProviderType.TOKENS_STUDIO && (
               <TokenFormatBadge extended />
-            )}
-            <Badge>{t('active')}</Badge>
-          </Stack>
-        ) : (
-          <Button data-testid="button-storage-item-apply" variant="secondary" size="small" onClick={handleRestore}>
-            {t('apply')}
+              )}
+              <Badge>{t('active')}</Badge>
+            </Stack>
+          ) : (
+            <Button data-testid="button-storage-item-apply" variant="secondary" size="small" onClick={handleRestore}>
+              {t('apply')}
+            </Button>
+          )}
+        </Box>
+        <DropdownMenu>
+          <DropdownMenu.Trigger asChild data-testid="storage-item-tools-dropdown">
+            <IconButton icon={<DotsVerticalIcon />} variant="invisible" size="small" />
+          </DropdownMenu.Trigger>
+          <DropdownMenu.Portal>
+            <DropdownMenu.Content>
+              <DropdownMenu.Item textValue={t('edit')} onSelect={onEdit}>
+                {t('edit')}
+              </DropdownMenu.Item>
+              <DropdownMenu.Item textValue={t('delete')} onSelect={handleDelete} css={{ color: '$dangerFg' }}>
+                {t('delete')}
+              </DropdownMenu.Item>
+            </DropdownMenu.Content>
+          </DropdownMenu.Portal>
+        </DropdownMenu>
+      </div>
+      {isBitbucketWithAppPassword && (
+        <Box
+          css={{
+            display: 'flex',
+            alignItems: 'center',
+            width: '100%',
+            justifyContent: 'space-between',
+            gap: '$2',
+            marginTop: '$1',
+            padding: '$1 $2',
+            backgroundColor: '$bgWarning',
+            borderRadius: '$small',
+            border: '1px solid $borderWarning',
+          }}
+        >
+          <Box
+            css={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '$2',
+            }}
+          >
+            <ExclamationTriangleIcon
+              style={{
+                color: 'var(--colors-dangerFg',
+              }}
+            />
+            <Box
+              css={{
+                fontSize: '$xsmall',
+                color: '$dangerFg',
+                fontWeight: '$sansMedium',
+              }}
+            >
+              {t('providers.bitbucketMigration.appPasswordWarning')}
+            </Box>
+          </Box>
+          {onMigrate && (
+          <Button
+            size="small"
+            onClick={onMigrate}
+          >
+            {t('providers.bitbucketMigration.migrate')}
           </Button>
-        )}
-      </Box>
-      <DropdownMenu>
-        <DropdownMenu.Trigger asChild data-testid="storage-item-tools-dropdown">
-          <IconButton icon={<DotsVerticalIcon />} variant="invisible" size="small" />
-        </DropdownMenu.Trigger>
-        <DropdownMenu.Portal>
-          <DropdownMenu.Content>
-            <DropdownMenu.Item textValue={t('edit')} onSelect={onEdit}>
-              {t('edit')}
-            </DropdownMenu.Item>
-            <DropdownMenu.Item textValue={t('delete')} onSelect={handleDelete} css={{ color: '$dangerFg' }}>
-              {t('delete')}
-            </DropdownMenu.Item>
-          </DropdownMenu.Content>
-        </DropdownMenu.Portal>
-      </DropdownMenu>
+          )}
+        </Box>
+      )}
     </StyledStorageItem>
   );
 };
