@@ -65,10 +65,11 @@
       "readMore": "Lees de Azure DevOps-synchronisatiehandleiding."
     },
     "bitbucket": {
-      "appPassword": "App-wachtwoord",
+      "apiToken": "API-token",
       "projectName": "Projectnaam (optioneel)",
       "repository": "Repository (werkruimte/repository)",
-      "username": "Bitbucket-gebruikersnaam"
+      "username": "Gebruiker e-mail",
+      "usernameAppPassword": "Gebruikersnaam"
     },
     "tokensstudio": {
       "name": "Name",
