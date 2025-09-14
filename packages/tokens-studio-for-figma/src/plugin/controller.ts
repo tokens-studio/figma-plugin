@@ -86,7 +86,7 @@ figma.on('selectionchange', () => {
   sendSelectionChange();
 });
 
-figma.on('documentchange', async (event: DocumentChangeEvent) => {
+figma.on('documentchange', (event: DocumentChangeEvent) => {
   sendDocumentChange(event);
 });
 
