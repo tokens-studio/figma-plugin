@@ -1,7 +1,7 @@
 import React, { ChangeEvent, useCallback, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  Box, Button, Label, Stack, TextInput, Link, Text,
+  Button, Label, Stack, TextInput, Link, Text,
 } from '@tokens-studio/ui';
 import { ChevronLeftIcon } from '@radix-ui/react-icons';
 import { useAuth } from '@/context/AuthContext';
@@ -9,6 +9,7 @@ import { secondScreenSelector } from '@/selectors/secondScreenSelector';
 import Modal from '../Modal';
 import { Dispatch } from '@/app/store';
 import { usedEmailSelector } from '@/selectors/usedEmailSelector';
+import styles from './AuthModal.module.css';
 
 enum AuthModes {
   LOGIN = 'login',
@@ -75,16 +76,16 @@ export default function AuthModal() {
         </Button>
         {mode === AuthModes.LOGIN && (
           <>
-            <Box css={{ display: 'flex', gap: '$3', alignItems: 'center' }}>
+            <div className={styles.ctaContainer}>
               <Text>Do not have an account ?</Text>
               <Button size="small" onClick={onCtaClick}>
                 Sign up here
               </Button>
 
-            </Box>
-            <Box css={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            </div>
+            <div className={styles.forgotPasswordContainer}>
               <Link target="_blank" href={`${process.env.SECOND_SCREEN_APP_URL}/password-recovery`} rel="noreferrer">Forgot password ?</Link>
-            </Box>
+            </div>
           </>
         )}
         {mode === AuthModes.SIGNUP && (

@@ -1,10 +1,11 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box, Stack, Text } from '@tokens-studio/ui';
+import { Stack, Text } from '@tokens-studio/ui';
 import ChangeStateListingHeading from './ChangeStateListingHeading';
 import ChangedTokenItem from './ChangedTokenItem';
 import { StyledDiff } from './StyledDiff';
 import { useChangedState } from '@/hooks/useChangedState';
+import styles from './ChangedStateList.module.css';
 
 function ChangedStateList({ type }: { type: 'push' | 'pull' }) {
   const { changedPullState, changedPushState } = useChangedState();
@@ -34,14 +35,14 @@ function ChangedStateList({ type }: { type: 'push' | 'pull' }) {
   return (
     <Stack direction="column" gap={1} css={{ padding: '$4', width: '100%' }}>
       {Object.entries(changedState.tokens).length > 0 && Object.entries(changedState.tokens)?.map(([tokenSet, tokenList]) => (
-        <Box key={tokenSet} css={{ maxWidth: '100%' }}>
+        <div key={tokenSet} className={styles.tokenSetWrapper}>
           <ChangeStateListingHeading count={tokenList.length} onCollapse={handleSetIntCollapsed} set={tokenSet} label={tokenSet} isCollapsed={collapsedChangedStateList.includes(tokenSet)} />
           {!collapsedChangedStateList.includes(tokenSet) && tokenList && (
             tokenList.map((token) => (
               <ChangedTokenItem key={token.name} token={token} />
             ))
           )}
-        </Box>
+        </div>
       ))}
       {
         changedState.themes.length > 0 && (

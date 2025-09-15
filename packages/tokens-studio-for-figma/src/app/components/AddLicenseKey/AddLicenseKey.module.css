@@ -1,0 +1,7 @@
+.inputContainer {
+  flex-grow: 1;
+}
+
+.errorContainer {
+  padding-top: var(--space-2, 8px);
+}

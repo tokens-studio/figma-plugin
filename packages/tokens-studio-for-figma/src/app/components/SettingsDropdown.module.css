@@ -1,0 +1,4 @@
+.description {
+  color: var(--colors-fg-muted);
+  font-size: var(--font-sizes-xxsmall, 10px);
+}
