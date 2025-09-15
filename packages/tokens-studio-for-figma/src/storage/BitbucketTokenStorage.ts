@@ -214,7 +214,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
       const currentUrl = nextPageUrl; // TypeScript guard to ensure non-null
       const authHeader = `Basic ${btoa(`${this.username || this.owner}:${this.apiToken}`)}`;
 
-      const response = await retryHttpRequest(
+      const response = await retryHttpRequest<Response>(
         () => fetch(currentUrl, {
           headers: {
             Authorization: authHeader,
@@ -251,7 +251,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
   private async fetchJsonFile(url: string): Promise<GitSingleFileObject> {
     const authHeader = `Basic ${btoa(`${this.username || this.owner}:${this.apiToken}`)}`;
 
-    const response = await retryHttpRequest(
+    const response = await retryHttpRequest<Response>(
       () => fetch(url, {
         headers: {
           Authorization: authHeader,
@@ -313,48 +313,67 @@ export class BitbucketTokenStorage extends GitTokenStorage {
         const jsonFiles = await this.fetchJsonFilesFromDirectory(url);
 
         const authString = `${this.username || this.owner}:${this.apiToken}`;
-        const jsonFileContents = await Promise.all(
-          jsonFiles.map((file: any) => retryHttpRequest(
-            () => fetch(file.links.self.href, {
-              headers: {
-                Authorization: authString,
-              },
-              cache: 'no-cache',
-            }),
-          ).then((rsp) => rsp.text())),
+        const jsonFileContents = await Promise.allSettled(
+          jsonFiles.map((file: any) => {
+            // Construct URL using branch name instead of commit hash from file.links.self.href
+            const fileUrl = `https://api.bitbucket.org/2.0/repositories/${this.owner}/${this.repository}/src/${this.branch}/${file.path}`;
+            return retryHttpRequest<Response>(
+              () => fetch(fileUrl, {
+                headers: {
+                  Authorization: `Basic ${btoa(authString)}`,
+                },
+                cache: 'no-cache',
+              }),
+            ).then((rsp) => {
+              if (!rsp.ok) {
+                throw new Error(`Failed to read file ${file.path}: ${rsp.status} ${rsp.statusText}`);
+              }
+              return rsp.text();
+            });
+          }),
         );
-        // Process the content of each JSON file
-        return jsonFileContents.map((fileContent, index) => {
-          const { path } = jsonFiles[index];
-          const filePath = path.startsWith(this.path) ? path : `${this.path}/${path}`;
-          let name = filePath.substring(this.path.length).replace(/^\/+/, '');
-          name = name.replace('.json', '');
+        // Process the content of each JSON file, filtering out failed requests
+        const successfulFiles: RemoteTokenStorageFile[] = [];
+        jsonFileContents.forEach((result, index) => {
+          if (result.status === 'fulfilled') {
+            const fileContent = result.value;
+            const { path } = jsonFiles[index];
+            const filePath = path.startsWith(this.path) ? path : `${this.path}/${path}`;
+            let name = filePath.substring(this.path.length).replace(/^\/+/, '');
+            name = name.replace('.json', '');
 
-          const parsed = JSON.parse(fileContent) as GitMultiFileObject;
+            try {
+              const parsed = JSON.parse(fileContent) as GitMultiFileObject;
 
-          if (name === SystemFilenames.THEMES) {
-            return {
-              path: filePath,
-              type: 'themes',
-              data: parsed as ThemeObjectsList,
-            };
+              if (name === SystemFilenames.THEMES) {
+                successfulFiles.push({
+                  path: filePath,
+                  type: 'themes',
+                  data: parsed as ThemeObjectsList,
+                });
+              } else if (name === SystemFilenames.METADATA) {
+                successfulFiles.push({
+                  path: filePath,
+                  type: 'metadata',
+                  data: parsed as RemoteTokenStorageMetadata,
+                });
+              } else {
+                successfulFiles.push({
+                  path: filePath,
+                  name,
+                  type: 'tokenSet',
+                  data: parsed as AnyTokenSet<false>,
+                });
+              }
+            } catch (parseError) {
+              console.warn(`Failed to parse JSON file ${path}:`, parseError);
+            }
+          } else {
+            console.warn(`Failed to fetch file ${jsonFiles[index].path}:`, result.reason);
           }
-
-          if (name === SystemFilenames.METADATA) {
-            return {
-              path: filePath,
-              type: 'metadata',
-              data: parsed as RemoteTokenStorageMetadata,
-            };
-          }
-
-          return {
-            path: filePath,
-            name,
-            type: 'tokenSet',
-            data: parsed as AnyTokenSet<false>,
-          };
         });
+
+        return successfulFiles;
       }
 
       return {

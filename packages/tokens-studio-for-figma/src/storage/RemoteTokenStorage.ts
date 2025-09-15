@@ -149,7 +149,7 @@ export abstract class RemoteTokenStorage<
     }
     return {
       status: 'failure',
-      ...files,
+      errorMessage: files.errorMessage,
     };
   }
 }
