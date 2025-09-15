@@ -1,0 +1,48 @@
+.container {
+  padding: var(--space-4, 16px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3, 12px);
+}
+
+.headerContainer {
+  display: inline-flex;
+  padding-inline: var(--space-4, 16px);
+  row-gap: var(--space-3, 12px);
+  justify-content: space-between;
+}
+
+.selectAllContainer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3, 12px);
+  font-size: var(--font-sizes-small);
+  flex-basis: 80px;
+  flex-shrink: 0;
+}
+
+.actionsContainer {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-3, 12px);
+}
+
+.bodyContainer {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  padding: var(--space-4, 16px);
+}
+
+.resultsContainer {
+  height: 100%;
+  min-height: 200px;
+}
+
+.checkboxList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1, 4px);
+}

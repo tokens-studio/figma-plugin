@@ -1,5 +1,5 @@
 import {
-  Box, Button, Link, Stack,
+  Button, Link, Stack,
 } from '@tokens-studio/ui';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -16,6 +16,7 @@ import w3cConvertImage from '@/app/assets/hints/w3cformat.png';
 import legacyConvertImage from '@/app/assets/hints/legacyformat.png';
 import { storageTypeSelector } from '@/selectors';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import styles from './ConvertToDTCGModal.module.css';
 
 export function ConvertToDTCGModal() {
   const dispatch = useDispatch<Dispatch>();
@@ -52,10 +53,14 @@ export function ConvertToDTCGModal() {
   return (
     <Modal title={isDTCG ? t('w3cformatmodaltitle') : t('w3cconverttitle')} isOpen={showConvertTokenFormatModal} close={handleClose} showClose>
       <Stack direction="column" align="start" gap={4} css={{ color: '$fgMuted', fontSize: '$xsmall' }}>
-        <Box as="img" src={isDTCG ? legacyConvertImage : w3cConvertImage} css={{ borderRadius: '$small' }} />
-        <Box>
+        <img 
+          src={isDTCG ? legacyConvertImage : w3cConvertImage} 
+          className={styles.convertImage} 
+          alt="Convert format"
+        />
+        <div className={styles.descriptionText}>
           {isDTCG ? t('w3cformatmodaldescription') : t('legacyformatmodaldescription')}
-        </Box>
+        </div>
         <Stack gap={4} align="center">
           <Button variant="primary" onClick={handleConvert} disabled={hasRemoteChanges}>
             {isDTCG ? t('converttolegacy') : t('converttow3c')}

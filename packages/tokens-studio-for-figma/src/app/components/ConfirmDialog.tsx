@@ -1,9 +1,10 @@
 import React from 'react';
 import {
-  Button, Box, Text, Checkbox, Label, TextInput, Stack,
+  Button, Text, Checkbox, Label, TextInput, Stack,
 } from '@tokens-studio/ui';
 import useConfirm from '../hooks/useConfirm';
 import Modal from './Modal';
+import styles from './ConfirmDialog.module.css';
 
 const ChoiceCheckbox: React.FC<React.PropsWithChildren<React.PropsWithChildren<{
   checked?: boolean
@@ -107,8 +108,8 @@ function ConfirmDialog() {
             {confirmState?.choices?.length ? (
               <Stack direction="column" align="start" gap={2}>
                 {confirmState.choices.map((choice) => (
-                  <Box
-                    css={{ display: 'flex', alignItems: 'center', flexDirection: 'row' }}
+                  <div
+                    className={styles.choiceContainer}
                     key={choice.key}
                   >
                     <ChoiceCheckbox
@@ -119,7 +120,7 @@ function ConfirmDialog() {
                     <Label css={{ paddingLeft: '$3' }} htmlFor={choice.key}>
                       {choice.label}
                     </Label>
-                  </Box>
+                  </div>
                 ))}
               </Stack>
             ) : null}
