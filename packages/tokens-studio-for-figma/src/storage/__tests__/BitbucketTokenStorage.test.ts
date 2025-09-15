@@ -455,7 +455,6 @@ describe('BitbucketTokenStorage', () => {
       }),
     );
 
-    // Mock individual file fetches - one succeeds, one fails with 404
     mockFetch
       .mockImplementationOnce(() =>
         Promise.resolve({

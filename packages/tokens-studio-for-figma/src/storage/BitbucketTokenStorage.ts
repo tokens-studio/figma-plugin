@@ -315,7 +315,6 @@ export class BitbucketTokenStorage extends GitTokenStorage {
         const authString = `${this.username || this.owner}:${this.apiToken}`;
         const jsonFileContents = await Promise.allSettled(
           jsonFiles.map((file: any) => {
-            // Construct URL using branch name instead of commit hash from file.links.self.href
             const fileUrl = `https://api.bitbucket.org/2.0/repositories/${this.owner}/${this.repository}/src/${this.branch}/${file.path}`;
             return retryHttpRequest<Response>(
               () => fetch(fileUrl, {
