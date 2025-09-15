@@ -2,7 +2,7 @@ import React from 'react';
 import get from 'just-safe-get';
 import { useSelector } from 'react-redux';
 import {
-  Box, Button, Spinner, Stack, Text,
+  Button, Spinner, Stack, Text,
 } from '@tokens-studio/ui';
 import { useDelayedFlag } from '@/hooks';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
@@ -10,6 +10,7 @@ import { backgroundJobsSelector, windowSizeSelector } from '@/selectors';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { formatNumber } from '@/utils/formatNumber';
+import styles from './LoadingBar.module.css';
 // TODO : i18n needs some refactoring
 export const backgroundJobTitles = {
   [BackgroundJobs.NODEMANAGER_FINDNODESWITHDATA]: 'Finding nodes...',
@@ -68,7 +69,7 @@ export default function LoadingBar() {
   const message = get(backgroundJobTitles, backgroundJobs[backgroundJobs.length - 1]?.name ?? '', '');
 
   return (
-    <Box css={{ position: 'fixed', width: '100%', zIndex: 20 }} data-testid="loadingBar">
+    <div className={styles.loadingBarContainer} data-testid="loadingBar">
       <Stack
         direction="row"
         align="center"
@@ -97,6 +98,6 @@ export default function LoadingBar() {
           </Stack>
         )}
       </Stack>
-    </Box>
+    </div>
   );
 }
