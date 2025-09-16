@@ -265,6 +265,16 @@ export class GitlabTokenStorage extends GitTokenStorage {
       };
     } catch (err) {
       console.error(err);
+      // For 404 errors (file/directory not found), return empty array to allow creation
+      if (err && (
+        (err as any).status === 404
+        || (err as any).response?.status === 404
+        || (err as any).message?.includes('404')
+        || (err as any).message?.includes('Not Found')
+        || String(err).includes('404')
+      )) {
+        return [];
+      }
       return this.handleError(err, StorageProviderType.GITLAB);
     }
   }

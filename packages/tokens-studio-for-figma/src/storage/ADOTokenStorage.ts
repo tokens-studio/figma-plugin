@@ -375,8 +375,18 @@ export class ADOTokenStorage extends GitTokenStorage {
       };
     } catch (e) {
       console.log(e);
+      // For 404 errors (file/directory not found), return empty array to allow creation
+      if (e && (
+        (e as any).status === 404
+        || (e as any).response?.status === 404
+        || (e as any).message?.includes('404')
+        || (e as any).message?.includes('Not Found')
+        || String(e).includes('404')
+      )) {
+        return [];
+      }
+      return this.handleError(e, StorageProviderType.ADO);
     }
-    return [];
   }
 
   private async postPushes({
