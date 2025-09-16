@@ -362,13 +362,14 @@ export class BitbucketTokenStorage extends GitTokenStorage {
       };
     } catch (e) {
       console.error('Error', e);
-      // For 404 errors (file/directory not found), return empty array to allow creation
+      // For specific Bitbucket 404 errors (file/directory not found), return empty array to allow creation
       if (e && (
         (e as any).status === 404
         || (e as any).response?.status === 404
-        || (e as any).message?.includes('404')
-        || (e as any).message?.includes('Not Found')
-        || String(e).includes('404')
+      ) && (
+        (e as any).message?.includes('Not Found')
+        || (e as any).response?.data?.message?.includes('Not Found')
+        || String(e).includes('Not Found')
       )) {
         return [];
       }
