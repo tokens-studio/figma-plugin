@@ -108,7 +108,7 @@ describe('swapFigmaModes', () => {
 
     expect(consoleSpy).toHaveBeenCalledWith(
       expect.stringContaining('Failed to set variable mode for node'),
-      expect.any(Error)
+      expect.any(Error),
     );
 
     consoleSpy.mockRestore();
