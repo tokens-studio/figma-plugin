@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/react';
 import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { MessageFromPluginTypes, PostToUIMessage } from '@/types/messages';
 import useRemoteTokens from '../store/remoteTokens';
 import { Dispatch } from '../store';
@@ -13,6 +13,7 @@ import { hasTokenValues } from '@/utils/hasTokenValues';
 import { track } from '@/utils/analytics';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageChannelPreview } from '@/AsyncMessageChannelPreview';
+import { autoApplyThemeOnDropSelector } from '@/selectors';
 
 // @README this component is not the "Initiator" anymore - as it is named
 // but solely acts as the interface between the plugin and the UI
@@ -35,6 +36,7 @@ export function Initiator() {
   const dispatch = useDispatch<Dispatch>();
   const { pullTokens, fetchBranches } = useRemoteTokens();
   const { setStorageType } = useStorage();
+  const autoApplyThemeOnDrop = useSelector(autoApplyThemeOnDropSelector);
 
   useEffect(() => {
     const onMessageEvent = async (event: {
@@ -130,6 +132,14 @@ export function Initiator() {
             break;
           }
 
+          case MessageFromPluginTypes.RENAME_COLLECTIONS_AND_MODES: {
+            const { renamedCollections } = pluginMessage;
+            if (renamedCollections && renamedCollections.length > 0) {
+              dispatch.tokenState.setRenamedCollections(renamedCollections);
+            }
+            break;
+          }
+
           case MessageFromPluginTypes.SHOW_EMPTY_GROUPS: {
             dispatch.uiState.toggleShowEmptyGroups(pluginMessage.showEmptyGroups);
             break;
@@ -160,6 +170,14 @@ export function Initiator() {
               count: pluginMessage.count,
               timePerTask: pluginMessage.timePerTask,
             });
+            break;
+          }
+          case MessageFromPluginTypes.INSTANCES_CREATED: {
+            // Only apply tokens if the setting is enabled
+            if (autoApplyThemeOnDrop) {
+              // Trigger the updateDocument action to apply tokens to the selection
+              dispatch.tokenState.updateDocument({ shouldUpdateNodes: true });
+            }
             break;
           }
           default:

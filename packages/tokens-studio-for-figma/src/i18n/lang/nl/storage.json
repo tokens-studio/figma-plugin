@@ -65,19 +65,16 @@
       "readMore": "Lees de Azure DevOps-synchronisatiehandleiding."
     },
     "bitbucket": {
-      "appPassword": "App-wachtwoord",
+      "apiToken": "API-token",
       "projectName": "Projectnaam (optioneel)",
       "repository": "Repository (werkruimte/repository)",
-      "username": "Bitbucket-gebruikersnaam"
+      "username": "Gebruiker e-mail",
+      "usernameAppPassword": "Gebruikersnaam"
     },
     "tokensstudio": {
       "name": "Name",
       "apikey": "API key",
       "urn": "Connection URN",
-      "descriptionFirstPart": "Tokens Studio heeft een zelfstandig webgebaseerd platform voor dynamische creatie en beheer van ontwerpbeslissingen, momenteel in bèta!",
-      "signupText": "Meld u hier aan voor bètatoegang.",
-      "descriptionSecondPart": "Als u het Studio-platform al gebruikt en hulp nodig heeft bij het instellen van de synchronisatie, lees dan de",
-      "tokensStudioSyncGuide": "Tokens Studio Sync-handleiding hier.",
       "pat": "Persoonlijk toegangstoken",
       "id": "Verbindings-ID",
       "selectOrgLabel": "Kies organisatie",
@@ -107,7 +104,20 @@
   "gitLabExplained": "Verbind uw Gitlab-coderepository met Tokens Studio voor externe tokenopslag met versiebeheer en tweerichtingssynchronisatie geregeld binnen de plug-in.",
   "gitHubExplained": "Verbind uw GitHub-coderepository met Tokens Studio voor externe tokenopslag met versiebeheer en tweerichtingssynchronisatie geregeld binnen de plug-in.",
   "bitBucketExplained": "Verbind uw Bitbucket-coderepository met Tokens Studio voor externe tokenopslag met versiebeheer en tweerichtingssynchronisatie geregeld binnen de plug-in.",
-  "nameHelpText": "Deze bijnaam verschijnt op de pagina met plug-ininstellingen om deze synchronisatieprovider uit uw lijst te helpen identificeren.",
+  "nameHelpText": "Naam hoe het zal verschijnen op de instellingenpagina",
+  "tokensStudioForm": {
+    "heading": "Designsystemen stoppen niet bij designtools. Wij ook niet.",
+    "description": "Designtokens zijn krachtig, maar alleen als ze gestructureerd zijn. De meeste systemen stoppen bij stijlwaarden. Wij gaan verder: voorwaarden, overerving, multi-brand theming en ontwikkelaarsklare outputs.",
+    "description2": "Met Tokens Studio worden designtokens een gedeelde taal. En gebruikt in tools, platforms en teams.",
+    "learnMore": "Meer informatie",
+    "migrationGuide": "migratiegids",
+    "startFreeTrial": "Start gratis proefperiode",
+    "studioBaseUrl": "Studio basis-URL (optioneel)",
+    "baseUrlTooltip": "Als u verbinding moet maken met een aangepaste instantie",
+    "validatingBaseUrl": "Basis-URL valideren...",
+    "chooseOrganization": "Kies een organisatie",
+    "chooseProject": "Kies een project"
+  },
   "readMoreBitBucket": "Lees de Bitbucket-synchronisatiehandleiding.",
   "readMoreGitHub": "Lees de GitHub-synchronisatiehandleiding.",
   "readMoreGitLab": "Lees de GitLab-synchronisatiegids.",

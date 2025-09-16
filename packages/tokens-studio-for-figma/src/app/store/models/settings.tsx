@@ -53,6 +53,7 @@ export interface SettingsState {
   createStylesWithVariableReferences?: boolean;
   renameExistingStylesAndVariables?: boolean;
   removeStylesAndVariablesWithoutConnection?: boolean;
+  autoApplyThemeOnDrop?: boolean;
 }
 
 const setUI = (state: SettingsState) => {
@@ -81,6 +82,7 @@ export const settings = createModel<RootModel>()({
     renameExistingStylesAndVariables: false,
     removeStylesAndVariablesWithoutConnection: false,
     createStylesWithVariableReferences: false,
+    autoApplyThemeOnDrop: false,
     inspectDeep: false,
     shouldSwapStyles: false,
     shouldUpdateStyles: false,
@@ -219,6 +221,12 @@ export const settings = createModel<RootModel>()({
         storeTokenIdInJsonEditor: payload,
       };
     },
+    setAutoApplyThemeOnDrop(state, payload: boolean) {
+      return {
+        ...state,
+        autoApplyThemeOnDrop: payload,
+      };
+    },
   },
   effects: () => ({
     setLanguage: (payload: string, rootState) => {
@@ -273,6 +281,9 @@ export const settings = createModel<RootModel>()({
       setUI(rootState.settings);
     },
     setStoreTokenIdInJsonEditorSelector: (payload, rootState) => {
+      setUI(rootState.settings);
+    },
+    setAutoApplyThemeOnDrop: (payload: boolean, rootState) => {
       setUI(rootState.settings);
     },
     ...Object.fromEntries(

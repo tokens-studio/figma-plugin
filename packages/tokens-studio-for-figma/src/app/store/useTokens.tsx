@@ -35,7 +35,6 @@ import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { defaultTokenResolver } from '@/utils/TokenResolver';
 import { getFormat } from '@/plugin/TokenFormatStoreClass';
 import { ExportTokenSet } from '@/types/ExportTokenSet';
-import { useIsProUser } from '../hooks/useIsProUser';
 
 type ConfirmResult = ('textStyles' | 'colorStyles' | 'effectStyles' | string)[] | string;
 
@@ -69,7 +68,6 @@ export default function useTokens() {
   const store = useStore<RootState>();
   const tokensContext = useContext(TokensContext);
   const shouldConfirm = useMemo(() => updateMode === UpdateMode.DOCUMENT, [updateMode]);
-  const proUser = useIsProUser();
   const VALID_TOKEN_TYPES = [
     TokenTypes.DIMENSION,
     TokenTypes.BORDER_RADIUS,
@@ -189,30 +187,6 @@ export default function useTokens() {
     }
   }, [confirm]);
 
-  const pullVariables = useCallback(async () => {
-    const userDecision = await confirm({
-      text: 'Import variables',
-      description: 'Sets will be created for each variable mode.',
-      choices: [
-        { key: 'useDimensions', label: 'Convert numbers to dimensions', enabled: false },
-        { key: 'useRem', label: 'Use rem for dimension values', enabled: false },
-      ],
-      confirmAction: 'Import',
-    });
-
-    if (userDecision) {
-      AsyncMessageChannel.ReactInstance.message({
-        type: AsyncMessageTypes.PULL_VARIABLES,
-        options: {
-          useDimensions: userDecision.data.includes('useDimensions'),
-          useRem: userDecision.data.includes('useRem'),
-        },
-        themes,
-        proUser,
-      });
-    }
-  }, [confirm, themes, proUser]);
-
   const removeTokensByValue = useCallback((data: RemoveTokensByValueData) => {
     track('removeTokensByValue', { count: data.length });
 
@@ -240,7 +214,7 @@ export default function useTokens() {
   );
 
   const handleBulkRemap = useCallback(
-    async (newName: string, oldName: string, bulkUpdateMode = UpdateMode.SELECTION) => {
+    async (newName: string, oldName: string, bulkUpdateMode = UpdateMode.SELECTION, useRegex = false) => {
       track('bulkRemapToken', { fromInspect: true });
 
       wrapTransaction({ name: 'bulkRemapToken' }, async () => AsyncMessageChannel.ReactInstance.message({
@@ -248,6 +222,7 @@ export default function useTokens() {
         oldName,
         newName,
         updateMode: bulkUpdateMode,
+        useRegex,
       }));
     },
     [],
@@ -779,7 +754,6 @@ export default function useTokens() {
       createStylesFromSelectedTokenSets,
       createStylesFromSelectedThemes,
       pullStyles,
-      pullVariables,
       remapToken,
       remapTokensInGroup,
       removeTokensByValue,
@@ -805,7 +779,6 @@ export default function useTokens() {
       createStylesFromSelectedTokenSets,
       createStylesFromSelectedThemes,
       pullStyles,
-      pullVariables,
       remapToken,
       remapTokensInGroup,
       removeTokensByValue,

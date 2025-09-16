@@ -29,7 +29,7 @@ describe('TokenBottomBar', () => {
       </Provider>,
     );
 
-    const toolsButton = await result.findByLabelText('tools');
+    const toolsButton = await result.findByLabelText('load_export');
     await userEvent.click(toolsButton);
     const loadButton = await result.findByText('loadFromFileOrPreset');
     await userEvent.click(loadButton, { pointerEventsCheck: 0 });
@@ -131,7 +131,7 @@ describe('TokenBottomBar', () => {
       </Provider>,
     );
 
-    const toolsButton = await result.findByLabelText('tools');
+    const toolsButton = await result.findByLabelText('load_export');
     await userEvent.click(toolsButton);
     const resolveDuplicateModalButton = await result.findByTestId('resolve-duplicate-modal-open-button');
     await userEvent.click(resolveDuplicateModalButton, { pointerEventsCheck: 0 });
@@ -153,7 +153,7 @@ describe('TokenBottomBar', () => {
       </Provider>,
     );
 
-    const toolsButton = await result.findByLabelText('tools');
+    const toolsButton = await result.findByLabelText('load_export');
     await userEvent.click(toolsButton);
     const exportButton = await result.findByText('exportToFile');
     await userEvent.click(exportButton, { pointerEventsCheck: 0 });

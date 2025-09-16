@@ -1,5 +1,40 @@
 # @tokens-studio/figma-plugin
 
+## 2.8.0
+
+### Minor Changes
+
+- b3495e70b: Atlassian is deprecating Bitbucket's App Passwords. As we were using this, we now offer the option to enter an API token instead. Existing App password setups will still work until June 9th, 2026. We added a migration warning, any new Bitbucket sync providers will need to use API tokens. Existing ones can still use App passwords, but we recommend switching over. Read more: https://docs.tokens.studio/token-storage/remote/sync-git-bitbucket
+
+### Patch Changes
+
+- b497582dd: Add the ability to retry fetching tokens while pulling tokens from sync providers
+
+## 2.7.1
+
+### Patch Changes
+
+- df73b78f6: Fixed an issue that caused themes to be duplicated when reordering in the Manage Themes dialog
+
+## 2.7.0
+
+### Minor Changes
+
+- 6fe053493: When importing variables you now have the option to selectively import collections. Simply de-select the collections or modes you dont want to import, or toggle all.
+- f308155a9: Add optimisations to Github sync where only the token sets or themes which are updated are pushed instead of pushing all the files when syncing with Github
+
+### Patch Changes
+
+- 7275dbe45: Fix to display border radius and border width tokens as tokens in the Inspect Panel in the plugin, instead of variables.Only native variables applied from Figma will be displayed as variables.
+- 4a9bdfb51: Fix issue of border width not applying as variable in Figma for non-rectangular shapes like ellipses, ovals or text nodes.
+- 705979206: Display Number tokens without literals as an integer in json format of tokes in line with DTCG specs.
+- b6b510dbc: Add search functionality to Manage Themes dialog making it easier for you to find the sets that you want your themes to use.
+- 1713750a2: Fix missing pull confirmation dialog when switching to Tokens Studio sync provider. Users are now prompted before their local tokens are overwritten when syncing with Tokens Studio, providing the same protection against accidental token overwrites that other sync providers already have.
+- f639cfe49: Improve handling of renamed Figma variable collections and modes. The plugin now updates existing themes and token sets to match the renamed collections and modes, instead of creating new ones earlier.
+- ef2df3387: Enhance error messages while syncing tokens to display pertinent issues occuring to the users
+- d2af08885: When applying documentation tokens for values of composite tokens (typography, shadows, etc), we now properly format those, instead of displaying a JSON string.
+- ca73e4b7b: Reimplemented the branch switcher and added a Search that allows you to find and create specific branches easily.
+
 ## 2.6.2
 
 ### Patch Changes

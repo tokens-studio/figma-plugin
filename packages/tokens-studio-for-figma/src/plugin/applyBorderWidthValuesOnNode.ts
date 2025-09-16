@@ -16,15 +16,32 @@ export async function applyBorderWidthValuesOnNode(
     && typeof values.borderWidth !== 'undefined'
     && typeof data.borderWidth !== 'undefined'
     && isPrimitiveValue(values.borderWidth)
-    // Have to set it individually as Figma does the same, hence the strokeWeight would never be set
-    && !(
-      (await tryApplyVariableId(node, 'strokeTopWeight', data.borderWidth))
-      && (await tryApplyVariableId(node, 'strokeRightWeight', data.borderWidth))
-      && (await tryApplyVariableId(node, 'strokeBottomWeight', data.borderWidth))
-      && (await tryApplyVariableId(node, 'strokeLeftWeight', data.borderWidth))
-    )
   ) {
-    node.strokeWeight = transformValue(String(values.borderWidth), 'borderWidth', baseFontSize);
+    // Check if node has individual stroke weight properties (like RECTANGLE, FRAME)
+    const hasIndividualStrokeWeights = 'strokeTopWeight' in node
+      && 'strokeRightWeight' in node
+      && 'strokeBottomWeight' in node
+      && 'strokeLeftWeight' in node;
+
+    let variableApplied = false;
+
+    if (hasIndividualStrokeWeights) {
+      // For nodes with individual stroke weight properties, try to apply to all four sides
+      // Have to set it individually as Figma does the same, hence the strokeWeight would never be set
+      variableApplied = (
+        (await tryApplyVariableId(node, 'strokeTopWeight', data.borderWidth))
+        && (await tryApplyVariableId(node, 'strokeRightWeight', data.borderWidth))
+        && (await tryApplyVariableId(node, 'strokeBottomWeight', data.borderWidth))
+        && (await tryApplyVariableId(node, 'strokeLeftWeight', data.borderWidth))
+      );
+    } else {
+      // For nodes without individual stroke weight properties (like ELLIPSE), apply to strokeWeight directly
+      variableApplied = await tryApplyVariableId(node, 'strokeWeight', data.borderWidth);
+    }
+
+    if (!variableApplied) {
+      node.strokeWeight = transformValue(String(values.borderWidth), 'borderWidth', baseFontSize);
+    }
   }
 
   if (
