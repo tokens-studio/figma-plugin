@@ -442,9 +442,12 @@ export const tokenState = createModel<RootModel>()({
             if (oldValue) {
               const normalizedOldValueDescription = oldValue.description ?? '';
               const normalizedTokenDescription = token.description ?? '';
+              const normalizedOldValueExtensions = oldValue.$extensions ?? {};
+              const normalizedTokenExtensions = token.$extensions ?? {};
               if (
                 isEqual(oldValue.value, token.value)
                 && isEqual(normalizedOldValueDescription, normalizedTokenDescription)
+                && isEqual(normalizedOldValueExtensions, normalizedTokenExtensions)
               ) {
                 existingTokens.push(token);
               } else {
