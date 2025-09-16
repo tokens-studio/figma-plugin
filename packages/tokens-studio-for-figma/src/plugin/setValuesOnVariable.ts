@@ -67,12 +67,6 @@ export default async function setValuesOnVariable(
           switch (variableType) {
             case 'BOOLEAN':
               if (typeof token.value === 'string' && !token.value.includes('{')) {
-                console.log(
-                  'Setting boolean value on variable',
-                  variable.name,
-                  variable.valuesByMode[mode],
-                  token.value,
-                );
                 setBooleanValuesOnVariable(variable, mode, token.value);
               }
               break;
