@@ -26,12 +26,13 @@ export function convertFigmaGradientToString(paint: GradientPaint) {
       return `radial-gradient(${gradientStopsString})`;
 
     case 'GRADIENT_LINEAR':
-    default:
+    default: {
       // Linear gradients (existing logic)
       const { start, end } = extractLinearGradientParamsFromTransform(1, 1, gradientTransform);
       const angleInRad = Math.atan2(end[1] - start[1], end[0] - start[0]);
       const angleInDeg = Math.round((angleInRad * 180) / Math.PI);
       return `linear-gradient(${angleInDeg + 90}deg, ${gradientStopsString})`;
+    }
   }
 }
 
@@ -71,30 +72,6 @@ function parseGradientParts(innerContent: string): string[] {
     parts.push(current.trim());
   }
   return parts;
-}
-
-// if node type check is needed due to bugs caused by obscure node types, use (value: string/*, node?: BaseNode | PaintStyle) and convertStringToFigmaGradient(value, target)
-export function convertStringToFigmaGradient(value: string): {
-  gradientStops: ColorStop[];
-  gradientTransform: Transform;
-  type?: 'GRADIENT_LINEAR' | 'GRADIENT_RADIAL' | 'GRADIENT_ANGULAR';
-} {
-  // Detect gradient type from the CSS function name
-  const gradientType = value.substring(0, value.indexOf('('));
-  const innerContent = value.substring(value.indexOf('(') + 1, value.lastIndexOf(')'));
-  const parts = parseGradientParts(innerContent);
-
-  switch (gradientType) {
-    case 'linear-gradient':
-      return convertLinearGradient(parts);
-    case 'radial-gradient':
-      return convertRadialGradient(parts);
-    case 'conic-gradient':
-      return convertConicGradient(parts);
-    default:
-      // Fallback to linear gradient for backward compatibility
-      return convertLinearGradient(parts);
-  }
 }
 
 function convertLinearGradient(parts: string[]): {
@@ -302,4 +279,28 @@ function convertConicGradient(parts: string[]): {
     gradientStops,
     gradientTransform,
   };
+}
+
+// if node type check is needed due to bugs caused by obscure node types, use (value: string/*, node?: BaseNode | PaintStyle) and convertStringToFigmaGradient(value, target)
+export function convertStringToFigmaGradient(value: string): {
+  gradientStops: ColorStop[];
+  gradientTransform: Transform;
+  type?: 'GRADIENT_LINEAR' | 'GRADIENT_RADIAL' | 'GRADIENT_ANGULAR';
+} {
+  // Detect gradient type from the CSS function name
+  const gradientType = value.substring(0, value.indexOf('('));
+  const innerContent = value.substring(value.indexOf('(') + 1, value.lastIndexOf(')'));
+  const parts = parseGradientParts(innerContent);
+
+  switch (gradientType) {
+    case 'linear-gradient':
+      return convertLinearGradient(parts);
+    case 'radial-gradient':
+      return convertRadialGradient(parts);
+    case 'conic-gradient':
+      return convertConicGradient(parts);
+    default:
+      // Fallback to linear gradient for backward compatibility
+      return convertLinearGradient(parts);
+  }
 }
