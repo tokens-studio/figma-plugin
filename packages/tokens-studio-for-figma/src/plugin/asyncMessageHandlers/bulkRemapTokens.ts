@@ -36,7 +36,7 @@ export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK
             // When regex mode is enabled, check if the pattern is wrapped in /pattern/flags format
             const regexTest = oldName.match(regexPattern);
             const pattern = regexTest ? new RegExp(regexTest[1], regexTest[2]) : new RegExp(oldName, 'g');
-            
+
             if (pattern.test(value)) {
               const newValue = value.replace(pattern, newName);
               const jsonValue = JSON.stringify(newValue);

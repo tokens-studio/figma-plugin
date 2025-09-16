@@ -399,6 +399,7 @@ describe('useToken test', () => {
       oldName: 'old.padding-start',
       newName: 'new.padding-start',
       updateMode: UpdateMode.SELECTION,
+      useRegex: false,
     });
   });
 
@@ -705,6 +706,7 @@ describe('useToken test', () => {
         oldName: 'oldName',
         newName: 'newName',
         updateMode: UpdateMode.SELECTION,
+        useRegex: false,
       });
     });
 

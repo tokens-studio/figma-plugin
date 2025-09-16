@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  Button, Checkbox, FormField, IconButton, Switch, TextInput,
+  Button, Checkbox, FormField, IconButton, TextInput,
 } from '@tokens-studio/ui';
 import { Asterisk } from 'iconoir-react';
 import Modal from '../Modal';
