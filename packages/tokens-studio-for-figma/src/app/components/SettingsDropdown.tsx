@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Box, DropdownMenu, IconButton } from '@tokens-studio/ui';
 import { Check, Settings } from 'iconoir-react';
 import { Dispatch } from '../store';
-import { settingsStateSelector, localApiStateSelector } from '@/selectors';
+import { settingsStateSelector, localApiStateSelector, autoApplyThemeOnDropSelector } from '@/selectors';
 import { isEqual } from '@/utils/isEqual';
 
 import { StorageProviderType } from '@/constants/StorageProviderType';
@@ -16,9 +16,10 @@ export default function SettingsDropdown() {
   const {
     updateRemote, updateOnChange, shouldSwapStyles, shouldUpdateStyles,
   } = useSelector(settingsStateSelector, isEqual);
+  const autoApplyThemeOnDrop = useSelector(autoApplyThemeOnDropSelector);
 
   const {
-    setUpdateOnChange, setUpdateRemote, setShouldSwapStyles, setShouldUpdateStyles,
+    setUpdateOnChange, setUpdateRemote, setShouldSwapStyles, setShouldUpdateStyles, setAutoApplyThemeOnDrop,
   } = useDispatch<Dispatch>().settings;
 
   const handleUpdateOnChange = React.useCallback(() => {
@@ -36,6 +37,10 @@ export default function SettingsDropdown() {
   const handleShouldUpdateStyles = React.useCallback(() => {
     setShouldUpdateStyles(!shouldUpdateStyles);
   }, [shouldUpdateStyles, setShouldUpdateStyles]);
+
+  const handleAutoApplyThemeOnDrop = React.useCallback(() => {
+    setAutoApplyThemeOnDrop(!autoApplyThemeOnDrop);
+  }, [autoApplyThemeOnDrop, setAutoApplyThemeOnDrop]);
 
   return (
     <DropdownMenu>
@@ -97,6 +102,19 @@ export default function SettingsDropdown() {
             {t('update.shouldUpdateStyles.title')}
             <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>
               {t('update.shouldUpdateStyles.description')}
+            </Box>
+          </DropdownMenu.CheckboxItem>
+          <DropdownMenu.CheckboxItem
+            data-testid="auto-apply-theme-on-drop"
+            checked={autoApplyThemeOnDrop}
+            onCheckedChange={handleAutoApplyThemeOnDrop}
+          >
+            <DropdownMenu.ItemIndicator>
+              <Check />
+            </DropdownMenu.ItemIndicator>
+            {t('update.autoApplyThemeOnDrop.title')}
+            <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>
+              {t('update.autoApplyThemeOnDrop.description')}
             </Box>
           </DropdownMenu.CheckboxItem>
         </DropdownMenu.Content>
