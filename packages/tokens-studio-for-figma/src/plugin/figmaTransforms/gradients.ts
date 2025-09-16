@@ -6,6 +6,45 @@ export function convertDegreeToNumber(degreeString: string): number {
   return parseFloat(degreeString.split('deg').join(''));
 }
 
+// Helper function to parse color stops from gradient parts
+function parseColorStops(parts: string[]): ColorStop[] {
+  return parts.map((stop, i, arr) => {
+    // Separate color from position by finding the last space outside parentheses
+    let colorPart = stop;
+    let positionPart = '';
+    let parenDepth = 0;
+    let lastSpaceIndex = -1;
+
+    for (let j = 0; j < stop.length; j += 1) {
+      const char = stop[j];
+      if (char === '(') {
+        parenDepth += 1;
+      } else if (char === ')') {
+        parenDepth -= 1;
+      } else if (char === ' ' && parenDepth === 0) {
+        lastSpaceIndex = j;
+      }
+    }
+
+    if (lastSpaceIndex > -1) {
+      const potentialPosition = stop.substring(lastSpaceIndex + 1);
+      // Check if this looks like a percentage or numeric position
+      if (potentialPosition.includes('%') || /^\d+(\.\d+)?$/.test(potentialPosition)) {
+        colorPart = stop.substring(0, lastSpaceIndex);
+        positionPart = potentialPosition;
+      }
+    }
+
+    const { color, opacity } = convertToFigmaColor(colorPart);
+    const gradientColor = color;
+    gradientColor.a = opacity;
+    return {
+      color: gradientColor,
+      position: positionPart ? parseFloat(positionPart) / 100 : i / (arr.length - 1),
+    };
+  }) as ColorStop[];
+}
+
 export function convertFigmaGradientToString(paint: GradientPaint) {
   const { gradientTransform, gradientStops, type } = paint;
   const gradientStopsString = gradientStops
@@ -165,45 +204,6 @@ function convertLinearGradient(parts: string[]): {
     gradientStops,
     gradientTransform: [gradientTransformMatrix[0], gradientTransformMatrix[1]] as Transform,
   };
-}
-
-// Helper function to parse color stops from gradient parts
-function parseColorStops(parts: string[]): ColorStop[] {
-  return parts.map((stop, i, arr) => {
-    // Separate color from position by finding the last space outside parentheses
-    let colorPart = stop;
-    let positionPart = '';
-    let parenDepth = 0;
-    let lastSpaceIndex = -1;
-
-    for (let j = 0; j < stop.length; j += 1) {
-      const char = stop[j];
-      if (char === '(') {
-        parenDepth += 1;
-      } else if (char === ')') {
-        parenDepth -= 1;
-      } else if (char === ' ' && parenDepth === 0) {
-        lastSpaceIndex = j;
-      }
-    }
-
-    if (lastSpaceIndex > -1) {
-      const potentialPosition = stop.substring(lastSpaceIndex + 1);
-      // Check if this looks like a percentage or numeric position
-      if (potentialPosition.includes('%') || /^\d+(\.\d+)?$/.test(potentialPosition)) {
-        colorPart = stop.substring(0, lastSpaceIndex);
-        positionPart = potentialPosition;
-      }
-    }
-
-    const { color, opacity } = convertToFigmaColor(colorPart);
-    const gradientColor = color;
-    gradientColor.a = opacity;
-    return {
-      color: gradientColor,
-      position: positionPart ? parseFloat(positionPart) / 100 : i / (arr.length - 1),
-    };
-  }) as ColorStop[];
 }
 
 function convertRadialGradient(parts: string[]): {
