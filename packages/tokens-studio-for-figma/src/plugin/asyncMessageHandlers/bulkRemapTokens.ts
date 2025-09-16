@@ -42,13 +42,11 @@ export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK
               const jsonValue = JSON.stringify(newValue);
               node.setSharedPluginData(namespace, key, jsonValue);
             }
-          } else {
+          } else if (value.includes(oldName)) {
             // When regex mode is disabled, use simple string replacement
-            if (value.includes(oldName)) {
-              const newValue = value.split(oldName).join(newName);
-              const jsonValue = JSON.stringify(newValue);
-              node.setSharedPluginData(namespace, key, jsonValue);
-            }
+            const newValue = value.split(oldName).join(newName);
+            const jsonValue = JSON.stringify(newValue);
+            node.setSharedPluginData(namespace, key, jsonValue);
           }
         });
         tracker.next();
