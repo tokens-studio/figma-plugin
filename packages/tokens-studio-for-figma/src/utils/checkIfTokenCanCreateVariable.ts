@@ -4,12 +4,6 @@ import { numberMatchesPercentage } from '@/plugin/figmaTransforms/numberMatchesP
 import { SettingsState } from '@/app/store/models/settings';
 
 export default function checkIfTokenCanCreateVariable(token: ResolveTokenValuesResult, settings: SettingsState): boolean {
-  // Only create variables for tokens that have explicitly defined scopes (opt-in behavior)
-  const figmaExtensions = token.$extensions?.['com.figma'];
-  if (!figmaExtensions?.scopes || !Array.isArray(figmaExtensions.scopes) || figmaExtensions.scopes.length === 0) {
-    return false;
-  }
-
   if (
     (token.type === TokenTypes.COLOR && settings.variablesColor)
     || (ExportNumberVariablesTokenTypes.includes(token.type) && settings.variablesNumber)
@@ -23,8 +17,8 @@ export default function checkIfTokenCanCreateVariable(token: ResolveTokenValuesR
       return token.value.split(' ').length === 1;
     }
     // Ignore gradient colors (all types: linear, radial, conic)
-    if (token.type === TokenTypes.COLOR && typeof token.value === 'string' && 
-        (token.value.startsWith('linear-gradient') || token.value.startsWith('radial-gradient') || token.value.startsWith('conic-gradient'))) {
+    if (token.type === TokenTypes.COLOR && typeof token.value === 'string'
+        && (token.value.startsWith('linear-gradient') || token.value.startsWith('radial-gradient') || token.value.startsWith('conic-gradient'))) {
       return false;
     }
     // Ignore AUTO values on lineHeight

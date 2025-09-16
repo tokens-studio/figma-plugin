@@ -42,7 +42,6 @@ export default async function setValuesOnVariable(
 
           // First, rename all variables that should be renamed (if the user choose to do so)
           if (variable.name !== token.path && shouldRename) {
-            console.log('Renaming variable', variable.name, token.path);
             renamedVariableKeys.push(variable.key);
             variable.name = token.path;
           }
