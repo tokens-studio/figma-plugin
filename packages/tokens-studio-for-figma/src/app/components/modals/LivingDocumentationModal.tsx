@@ -1,12 +1,12 @@
 import React from 'react';
 import {
-  Button, Stack, Select, Switch, Label, Text,
+  Button, Stack, Select, Switch, Label, Text, IconButton, TextInput, FormField,
 } from '@tokens-studio/ui';
+import { Asterisk } from 'iconoir-react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { styled } from '@/stitches.config';
 import Modal from '../Modal';
-import Input from '../Input';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import {
@@ -49,12 +49,14 @@ export default function LivingDocumentationModal({
   const [tokenSet, setTokenSet] = React.useState(initialTokenSet || 'All');
   const [startsWith, setStartsWith] = React.useState(initialStartsWith || '');
   const [applyTokens, setApplyTokens] = React.useState(true);
+  const [useRegex, setUseRegex] = React.useState(false);
 
   // Reset values when modal opens with new initial values
   React.useEffect(() => {
     if (isOpen) {
       setTokenSet(initialTokenSet || 'All');
       setStartsWith(initialStartsWith || '');
+      setUseRegex(false); // Reset regex mode when modal opens
     }
   }, [isOpen, initialTokenSet, initialStartsWith]);
 
@@ -84,6 +86,10 @@ export default function LivingDocumentationModal({
     setApplyTokens(checked === true);
   }, []);
 
+  const handleUseRegexChange = React.useCallback(() => {
+    setUseRegex(!useRegex);
+  }, [useRegex]);
+
   const handleGenerate = React.useCallback(() => {
     // Track when user starts creating living documentation with detailed properties
     track('Living Documentation Creation Started', {
@@ -101,9 +107,10 @@ export default function LivingDocumentationModal({
       startsWith,
       applyTokens,
       resolvedTokens,
+      useRegex,
     });
     onClose();
-  }, [tokenSet, startsWith, applyTokens, resolvedTokens, onClose, allTokenSets.length]);
+  }, [tokenSet, startsWith, applyTokens, resolvedTokens, onClose, allTokenSets.length, useRegex]);
 
   return (
     <Modal title={t('generateDocumentation')} isOpen={isOpen} close={onClose} size="large">
@@ -148,7 +155,17 @@ export default function LivingDocumentationModal({
             </Select.Content>
           </Select>
         </Stack>
-        <Input full label={t('nameStartsWith')} value={startsWith} onChange={handleStartsWithChange} />
+        <Stack direction="column" gap={2}>
+          <FormField>
+            <Label>{useRegex ? t('nameMatchesPattern') : t('nameStartsWith')}</Label>
+            <TextInput
+              value={startsWith}
+              onChange={handleStartsWithChange}
+              placeholder={useRegex ? 'color\\.(primary|secondary) (regex active)' : 'color'}
+              trailingAction={<IconButton tooltip={useRegex ? 'Disable regex' : 'Enable regex'} size="small" onClick={handleUseRegexChange} icon={<Asterisk />} variant={useRegex ? 'primary' : 'invisible'} />}
+            />
+          </FormField>
+        </Stack>
         <Stack direction="row" gap={3} align="center" css={{ width: '100%' }}>
           <Label htmlFor="apply-tokens">{t('applyTokensToCreatedLayers')}</Label>
           <Switch id="apply-tokens" checked={applyTokens} onCheckedChange={handleApplyTokensChange} />
