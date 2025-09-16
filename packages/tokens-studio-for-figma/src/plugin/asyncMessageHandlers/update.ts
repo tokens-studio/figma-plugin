@@ -4,6 +4,7 @@ import { updateLocalTokensData } from '@/utils/figma';
 import { updateNodes } from '../updateNodes';
 import { NodeManagerNode, defaultNodeManager } from '../NodeManager';
 import { swapStyles } from './swapStyles';
+import { swapFigmaModes } from './swapFigmaModes';
 import { getThemeReferences } from './getThemeReferences';
 import { defaultTokenValueRetriever } from '../TokenValueRetriever';
 import { TokenFormatOptions } from '../TokenFormatStoreClass';
@@ -55,6 +56,11 @@ export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = asy
     const shouldApplyStyles = msg.settings.applyVariablesStylesOrRawValue === ApplyVariablesStylesOrRawValues.VARIABLES_STYLES;
     if (msg.activeTheme && msg.themes && msg.settings.shouldSwapStyles && shouldApplyStyles) {
       await swapStyles(msg.activeTheme, msg.themes, msg.settings.updateMode);
+    }
+
+    // Switch Figma's native theme mode when themes are switched
+    if (msg.activeTheme && msg.themes) {
+      await swapFigmaModes(msg.activeTheme, msg.themes, msg.settings.updateMode);
     }
   }
 

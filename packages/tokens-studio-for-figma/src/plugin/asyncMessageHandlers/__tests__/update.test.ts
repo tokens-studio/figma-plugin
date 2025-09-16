@@ -10,6 +10,7 @@ import {
 } from '@/figmaStorage';
 import * as NodeManager from '../../NodeManager';
 import * as swapStyles from '../swapStyles';
+import * as swapFigmaModes from '../swapFigmaModes';
 import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
 import { ApplyVariablesStylesOrRawValues } from '@/constants/ApplyVariablesStyleOrder';
 import { StorageProviderType } from '@/constants/StorageProviderType';
@@ -22,6 +23,7 @@ describe('update', () => {
   const UpdatedAtPropertyWriteSpy = jest.spyOn(UpdatedAtProperty, 'write');
   const ActiveThemePropertyWriteSpy = jest.spyOn(ActiveThemeProperty, 'write');
   const mockSwapStyles = jest.spyOn(swapStyles, 'swapStyles');
+  const mockSwapFigmaModes = jest.spyOn(swapFigmaModes, 'swapFigmaModes');
 
   const mockUpdateMessage: UpdateAsyncMessage = {
     type: AsyncMessageTypes.UPDATE,
@@ -33,6 +35,8 @@ describe('update', () => {
         id: 'light',
         name: 'Light',
         selectedTokenSets: {},
+        $figmaCollectionId: 'collection-123',
+        $figmaModeId: 'mode-456',
       },
     ],
     tokenValues: {
@@ -93,6 +97,7 @@ describe('update', () => {
     expect(UpdatedAtPropertyWriteSpy).toBeCalledWith(mockUpdateMessage.updatedAt);
     expect(ActiveThemePropertyWriteSpy).toBeCalledWith(mockUpdateMessage.activeTheme);
     expect(mockSwapStyles).toBeCalledWith(mockUpdateMessage.activeTheme, mockUpdateMessage.themes, mockUpdateMessage.settings.updateMode);
+    expect(mockSwapFigmaModes).toBeCalledWith(mockUpdateMessage.activeTheme, mockUpdateMessage.themes, mockUpdateMessage.settings.updateMode);
 
     runAfter.forEach((fn) => fn());
   });
