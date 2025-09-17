@@ -1,0 +1,13 @@
+{
+  "wentWrong": "Something went wrong!",
+  "reset": "If this keeps happening, you need to reset your tokens.",
+  "restart": "Restart the plugin and try again.",
+  "readHow": "Read how",
+  "tokenNamesMustBeUnique": "Token names must be unique",
+  "mustNotUseNameOfAnotherGroup": "Must not use name of another group",
+  "cantCreateGroupThatSharesNameWithExistingToken": "Can't create a group that shares a name with an existing token",
+  "valueMustIncludePxOrRem": "Value must include either px or rem",
+  "tokenNamesCantStartWithDollar": "Can't start with a dollar ($) sign",
+  "tokenNamesCantContainCurlyBraces": "Can't contain braces '{}'",
+  "tokenNamesCantContainEmptyGroups": "Token names cannot contain empty groups"
+}

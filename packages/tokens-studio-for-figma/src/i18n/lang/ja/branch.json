@@ -1,0 +1,13 @@
+{
+  "ifYouCreate": "If you create or switch your branch without pushing your local changes to your repository, the changes will be lost.",
+  "discardChanges": "Discard changes",
+  "cancel": "Cancel",
+  "createNewBranch": "Create new branch from",
+  "currentChanges": "Current changes",
+  "unSavedChanges": "You have unsaved changes",
+  "createNew": "Create new",
+  "search": "Search...",
+  "noBranchesFound": "No branches found",
+  "branchingProFeature": "Branching is a feature of the Pro subscription",
+  "upgradeToPro": "Upgrade to Pro to create and switch branches"
+}
