@@ -1,7 +1,6 @@
-import { Box } from '@tokens-studio/ui';
 import { styled } from '@stitches/react';
 
-export const StyledCard = styled(Box, {
+export const StyledCard = styled('div', {
   borderRadius: '$medium',
   border: '1px solid $colors$borderSubtle',
   padding: '$4',

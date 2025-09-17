@@ -1,7 +1,6 @@
-import { Box } from '@tokens-studio/ui';
 import { styled } from '@/stitches.config';
 
-export const StyledNameInputBox = styled(Box, {
+export const StyledNameInputBox = styled('div', {
   padding: '0 $4',
   borderBottomColor: '$borderSubtle',
   borderBottomWidth: '1px',

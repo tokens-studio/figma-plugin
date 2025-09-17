@@ -2,11 +2,12 @@ import React, {
   PropsWithChildren, ReactNode, useCallback, useState,
 } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { Box, IconButton, Stack } from '@tokens-studio/ui';
+import { IconButton, Stack } from '@tokens-studio/ui';
 import type { StitchesCSS } from '@/types';
 import { StyledContainer } from './StyledContainer';
 import { IconChevronDown, IconChevronRight } from '@/icons';
 import { Flex } from '../Flex';
+import styles from './Accordion.module.css';
 
 type Props = PropsWithChildren<{
   label: ReactNode
@@ -29,11 +30,7 @@ export function Accordion({
 
   return (
     <StyledContainer css={css}>
-      <Box css={{
-        gridColumn: '1',
-        gridRow: '1',
-      }}
-      >
+      <div className={styles.iconButtonContainer}>
         <IconButton
           data-testid="accordion-toggle"
           size="small"
@@ -42,7 +39,7 @@ export function Accordion({
           disabled={disabled}
           onClick={handleToggle}
         />
-      </Box>
+      </div>
       <Stack css={{
         gridRow: '1',
         gridColumn: '2',
@@ -51,7 +48,7 @@ export function Accordion({
         minHeight: '100%',
       }}
       >
-        <Box>{label}</Box>
+        <div className={styles.labelContainer}>{label}</div>
         <Flex css={{ height: 0, alignItems: 'center' }}>
           {extra}
         </Flex>
@@ -73,9 +70,12 @@ export function Accordion({
             exit={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
           >
-            <Box css={{ paddingTop: '$4', maxHeight: height || 'inherit', overflowY: 'scroll' }}>
+            <div 
+              className={styles.contentContainer}
+              style={{ maxHeight: height || 'inherit' }}
+            >
               {children}
-            </Box>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

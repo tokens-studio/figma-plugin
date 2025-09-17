@@ -1,12 +1,12 @@
-import { Box } from '@tokens-studio/ui';
 import React from 'react';
 import { StyledDirtyStateBadge } from './StyledDirtyStateBadge';
+import styles from './DirtyStateBadgeWrapper.module.css';
 
 export function DirtyStateBadgeWrapper({ badge, children }: { badge: boolean, children: React.ReactNode }) {
   return (
-    <Box css={{ position: 'relative' }}>
+    <div className={styles.wrapper}>
       {badge && <StyledDirtyStateBadge />}
       {children}
-    </Box>
+    </div>
   );
 }

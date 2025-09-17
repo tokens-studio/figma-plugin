@@ -2,7 +2,7 @@ import React, { useCallback, useMemo } from 'react';
 import Downshift from 'downshift';
 import { useSelector, useDispatch } from 'react-redux';
 import {
-  Box, Stack, Tooltip, Text, IconButton,
+  Stack, Tooltip, Text, IconButton,
 } from '@tokens-studio/ui';
 import * as Popover from '@radix-ui/react-popover';
 import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
@@ -23,6 +23,7 @@ import {
   StyledList, StyledItem, StyledItemColor, StyledItemColorDiv, StyledItemName, StyledItemValue, StyledPart,
 } from './StyledDownshiftInput';
 import fuzzySearch from '@/utils/fuzzySearch';
+import styles from './DownshiftInput.module.css';
 import MentionsInput from './MentionInput';
 import getResolvedText from '@/utils/getResolvedTextValue';
 import { getColorSwatchStyle } from '@/utils/color/getColorSwatchStyle';
@@ -196,7 +197,7 @@ export const DownshiftInput: React.FunctionComponent<React.PropsWithChildren<Rea
             {label && !inlineLabel ? <Text size="small" bold>{label}</Text> : null}
             {error ? <ErrorValidation>{error}</ErrorValidation> : null}
           </Stack>
-          <Box css={{ display: 'flex', position: 'relative', width: '100%' }} className="input">
+          <div className={styles.inputContainer}>
             {!!inlineLabel && !prefix && (
               <Tooltip label={name}><StyledPrefix isText css={{ height: 'auto' }}>{label}</StyledPrefix></Tooltip>
             )}
@@ -233,30 +234,18 @@ export const DownshiftInput: React.FunctionComponent<React.PropsWithChildren<Rea
               />
               <Popover.Portal>
                 <Popover.Content side="bottom" align="end" sideOffset={4} style={{ pointerEvents: 'all', width: 'var(--radix-popover-trigger-width)' }}>
-                  <Box
-                    css={{
-                      backgroundColor: '$bgCanvas',
-                      border: '1px solid',
-                      borderColor: '$borderSubtle',
-                      borderRadius: '$medium',
-                      boxShadow: '$contextMenu',
-                    }}
-                  >
-                    <Box
-                      css={{
-                        display: 'flex', flexDirection: 'column', gap: '$3', padding: '$3', borderBottom: '1px solid $borderSubtle',
-                      }}
-                    >
+                  <div className={styles.popoverContainer}>
+                    <div className={styles.headerContainer}>
                       {
                         externalSearchField && (
-                          <Box css={{ display: 'flex', gap: '$3' }}>
+                          <div className={styles.searchFieldContainer}>
                             <StyledButton isFocused={currentSearchField === 'Tokens'} onClick={handleChangeSearchField}>
                               Tokens
                             </StyledButton>
                             <StyledButton isFocused={currentSearchField !== 'Tokens'} onClick={handleChangeSearchField}>
                               {externalSearchField}
                             </StyledButton>
-                          </Box>
+                          </div>
                         )
                       }
                       <StyledDownshiftInput
@@ -266,7 +255,7 @@ export const DownshiftInput: React.FunctionComponent<React.PropsWithChildren<Rea
                         getInputProps={getInputProps}
                         data-testid="downshift-search-input"
                       />
-                    </Box>
+                    </div>
                     {
                       currentSearchField === 'Tokens' && filteredTokenItems.length > 0 && (
                       <StyledList className="content scroll-container" height={Math.min(downShiftContainerHeight, 30 * filteredTokenItems.length)} width="100%" itemCount={filteredTokenItems.length} itemSize={30}>
@@ -350,17 +339,17 @@ export const DownshiftInput: React.FunctionComponent<React.PropsWithChildren<Rea
                     }
                     {
                       ((currentSearchField !== 'Tokens' && filteredValues.length === 0) || (currentSearchField === 'Tokens' && filteredTokenItems.length === 0)) && (
-                      <Box css={{ padding: '$3', color: '$fgMuted', fontSize: '$small' }}>
+                      <div className={styles.noSuggestions}>
                         No suggestions found
-                      </Box>
+                      </div>
                       )
                     }
-                  </Box>
+                  </div>
                 </Popover.Content>
               </Popover.Portal>
             </Popover.Root>
             )}
-          </Box>
+          </div>
         </div>
       )}
     </Downshift>

@@ -1,0 +1,19 @@
+.container {
+  display: flex;
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: 0;
+  align-items: center;
+  gap: var(--space-2, 8px);
+  position: relative;
+}
+
+.searchIcon {
+  position: absolute;
+  left: var(--space-2, 8px);
+}
+
+.clearButton {
+  position: absolute;
+  right: var(--space-2, 8px);
+}

@@ -1,0 +1,14 @@
+.iconButtonContainer {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.labelContainer {
+  /* This will be a div since it just contains content */
+}
+
+.contentContainer {
+  padding-top: var(--space-4, 16px);
+  max-height: inherit;
+  overflow-y: scroll;
+}

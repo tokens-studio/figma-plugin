@@ -1,0 +1,5 @@
+.loadingBarContainer {
+  position: fixed;
+  width: 100%;
+  z-index: 20;
+}

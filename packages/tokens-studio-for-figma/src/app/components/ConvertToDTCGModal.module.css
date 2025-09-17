@@ -1,0 +1,7 @@
+.convertImage {
+  border-radius: var(--radii-small, 4px);
+}
+
+.descriptionText {
+  /* Text content wrapper */
+}

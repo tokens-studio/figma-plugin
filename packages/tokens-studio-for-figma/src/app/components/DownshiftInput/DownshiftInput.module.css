@@ -1,0 +1,31 @@
+.inputContainer {
+  display: flex;
+  position: relative;
+  width: 100%;
+}
+
+.popoverContainer {
+  background-color: var(--colors-bg-canvas);
+  border: 1px solid var(--colors-border-subtle);
+  border-radius: var(--radii-medium, 6px);
+  box-shadow: var(--shadows-context-menu);
+}
+
+.headerContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3, 12px);
+  padding: var(--space-3, 12px);
+  border-bottom: 1px solid var(--colors-border-subtle);
+}
+
+.searchFieldContainer {
+  display: flex;
+  gap: var(--space-3, 12px);
+}
+
+.noSuggestions {
+  padding: var(--space-3, 12px);
+  color: var(--colors-fg-muted);
+  font-size: var(--font-sizes-small);
+}

@@ -1,0 +1,11 @@
+.callout {
+  background-color: var(--colors-danger-bg);
+  border: 1px solid var(--colors-danger-border);
+  padding: var(--space-5, 20px);
+  border-radius: var(--radii-small, 4px);
+}
+
+.iconContainer {
+  color: var(--colors-danger-fg);
+  margin-top: var(--space-3, 12px);
+}
