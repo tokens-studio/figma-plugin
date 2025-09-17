@@ -18,10 +18,10 @@
   "designSystem": "デザインシステム",
   "pushYourLocalChangesToYourRepository": "ローカルの変更をリポジトリにプッシュします。",
   "commitMessage": "コミットメッセージ",
-  "couldNotLoadTokens": "Could not load tokens",
-  "failedToParseJSON": "Failed to parse JSON",
-  "credentialError": "Credential error",
-  "connectivityError": "Connectivity error",
-  "genericError": "An error occurred",
-  "retry": "Retry"
+  "couldNotLoadTokens": "トークンを読み込めませんでした",
+  "failedToParseJSON": "JSONの解析に失敗しました",
+  "credentialError": "認証エラー",
+  "connectivityError": "接続エラー",
+  "genericError": "エラーが発生しました",
+  "retry": "再試行"
 }
