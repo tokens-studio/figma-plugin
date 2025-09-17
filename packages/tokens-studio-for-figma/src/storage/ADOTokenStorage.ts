@@ -12,6 +12,7 @@ import { SystemFilenames } from '@/constants/SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { AnyTokenSet } from '@/types/tokens';
 import { retryHttpRequest } from '@/utils/retryWithBackoff';
+import { isMissingFileError } from './utils/handleMissingFileError';
 
 const apiVersion = 'api-version=7.0';
 
@@ -376,14 +377,7 @@ export class ADOTokenStorage extends GitTokenStorage {
     } catch (e) {
       console.log(e);
       // For specific ADO 404 errors (file/directory not found), return empty array to allow creation
-      if (e && (
-        (e as any).status === 404
-        || (e as any).response?.status === 404
-      ) && (
-        (e as any).message?.includes('Not Found')
-        || (e as any).response?.data?.message?.includes('Not Found')
-        || String(e).includes('Not Found')
-      )) {
+      if (isMissingFileError(e)) {
         return [];
       }
       return this.handleError(e, StorageProviderType.ADO);

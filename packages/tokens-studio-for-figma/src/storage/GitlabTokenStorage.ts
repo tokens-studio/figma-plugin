@@ -12,6 +12,7 @@ import { SystemFilenames } from '@/constants/SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { retryWithBackoff } from '@/utils/retryWithBackoff';
+import { isMissingFileError } from './utils/handleMissingFileError';
 
 enum GitLabAccessLevel {
   NoAccess = 0,
@@ -266,14 +267,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
     } catch (err) {
       console.error(err);
       // For specific GitLab 404 errors (file/directory not found), return empty array to allow creation
-      if (err && (
-        (err as any).status === 404
-        || (err as any).response?.status === 404
-      ) && (
-        (err as any).message?.includes('Not Found')
-        || (err as any).response?.data?.message?.includes('Not Found')
-        || String(err).includes('Not Found')
-      )) {
+      if (isMissingFileError(err)) {
         return [];
       }
       return this.handleError(err, StorageProviderType.GITLAB);
