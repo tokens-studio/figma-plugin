@@ -378,8 +378,12 @@ describe('radial and conic gradients', () => {
     const result = convertStringToFigmaGradient('radial-gradient(#ff0000, #0000ff)');
     expect(result.type).toEqual('GRADIENT_RADIAL');
     expect(result.gradientStops).toHaveLength(2);
-    expect(result.gradientStops[0].color).toEqual({ r: 1, g: 0, b: 0, a: 1 });
-    expect(result.gradientStops[1].color).toEqual({ r: 0, g: 0, b: 1, a: 1 });
+    expect(result.gradientStops[0].color).toEqual({
+      r: 1, g: 0, b: 0, a: 1,
+    });
+    expect(result.gradientStops[1].color).toEqual({
+      r: 0, g: 0, b: 1, a: 1,
+    });
     expect(result.gradientTransform).toEqual([[1, 0, 0], [0, 1, 0]]);
   });
 
@@ -387,8 +391,12 @@ describe('radial and conic gradients', () => {
     const result = convertStringToFigmaGradient('conic-gradient(#ff0000, #0000ff)');
     expect(result.type).toEqual('GRADIENT_ANGULAR');
     expect(result.gradientStops).toHaveLength(2);
-    expect(result.gradientStops[0].color).toEqual({ r: 1, g: 0, b: 0, a: 1 });
-    expect(result.gradientStops[1].color).toEqual({ r: 0, g: 0, b: 1, a: 1 });
+    expect(result.gradientStops[0].color).toEqual({
+      r: 1, g: 0, b: 0, a: 1,
+    });
+    expect(result.gradientStops[1].color).toEqual({
+      r: 0, g: 0, b: 1, a: 1,
+    });
   });
 
   it('should convert conic gradient with from angle', () => {
@@ -429,8 +437,18 @@ describe('convertFigmaGradientToString with gradient types', () => {
     const paint: GradientPaint = {
       type: 'GRADIENT_RADIAL',
       gradientStops: [
-        { color: { r: 1, g: 0, b: 0, a: 1 }, position: 0 },
-        { color: { r: 0, g: 0, b: 1, a: 1 }, position: 1 },
+        {
+          color: {
+            r: 1, g: 0, b: 0, a: 1,
+          },
+          position: 0,
+        },
+        {
+          color: {
+            r: 0, g: 0, b: 1, a: 1,
+          },
+          position: 1,
+        },
       ],
       gradientTransform: [[1, 0, 0], [0, 1, 0]],
     };
@@ -442,8 +460,18 @@ describe('convertFigmaGradientToString with gradient types', () => {
     const paint: GradientPaint = {
       type: 'GRADIENT_ANGULAR',
       gradientStops: [
-        { color: { r: 1, g: 0, b: 0, a: 1 }, position: 0 },
-        { color: { r: 0, g: 0, b: 1, a: 1 }, position: 1 },
+        {
+          color: {
+            r: 1, g: 0, b: 0, a: 1,
+          },
+          position: 0,
+        },
+        {
+          color: {
+            r: 0, g: 0, b: 1, a: 1,
+          },
+          position: 1,
+        },
       ],
       gradientTransform: [[1, 0, 0], [0, 1, 0]],
     };
@@ -455,8 +483,18 @@ describe('convertFigmaGradientToString with gradient types', () => {
     const paint: GradientPaint = {
       type: 'GRADIENT_DIAMOND',
       gradientStops: [
-        { color: { r: 1, g: 0, b: 0, a: 1 }, position: 0 },
-        { color: { r: 0, g: 0, b: 1, a: 1 }, position: 1 },
+        {
+          color: {
+            r: 1, g: 0, b: 0, a: 1,
+          },
+          position: 0,
+        },
+        {
+          color: {
+            r: 0, g: 0, b: 1, a: 1,
+          },
+          position: 1,
+        },
       ],
       gradientTransform: [[1, 0, 0], [0, 1, 0]],
     };
