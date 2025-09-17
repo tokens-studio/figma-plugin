@@ -12,7 +12,7 @@ import { defaultWorker } from '../Worker';
 export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK_REMAP_TOKENS] = async (msg) => {
   // Big O(n * m) + Big O(updatePluginData) + Big O(sendSelectionChange): (n = amount of nodes, m = amount of tokens in the node)
   try {
-    const { oldName, newName } = msg;
+    const { oldName, newName, useRegex } = msg;
     const allWithData = await defaultNodeManager.findBaseNodesWithData({ updateMode: msg.updateMode });
     const namespace = SharedPluginDataNamespaces.TOKENS;
     postToUI({
@@ -32,11 +32,19 @@ export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK
     allWithData.forEach(({ node, tokens }) => {
       promises.add(defaultWorker.schedule(async () => {
         Object.entries(tokens).forEach(([key, value]) => {
-          const regexTest = oldName.match(regexPattern);
-          // If the pattern passed is a regex, use it, otherwise use the old name with a global flag
-          const pattern = regexTest ? new RegExp(regexTest[1], regexTest[2]) : new RegExp(oldName, 'g');
-          if (pattern.test(value)) {
-            const newValue = value.replace(pattern, newName);
+          if (useRegex) {
+            // When regex mode is enabled, check if the pattern is wrapped in /pattern/flags format
+            const regexTest = oldName.match(regexPattern);
+            const pattern = regexTest ? new RegExp(regexTest[1], regexTest[2]) : new RegExp(oldName, 'g');
+
+            if (pattern.test(value)) {
+              const newValue = value.replace(pattern, newName);
+              const jsonValue = JSON.stringify(newValue);
+              node.setSharedPluginData(namespace, key, jsonValue);
+            }
+          } else if (value.includes(oldName)) {
+            // When regex mode is disabled, use simple string replacement
+            const newValue = value.split(oldName).join(newName);
             const jsonValue = JSON.stringify(newValue);
             node.setSharedPluginData(namespace, key, jsonValue);
           }

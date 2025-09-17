@@ -90,7 +90,7 @@ function roundToTwo(num: number) {
 
 export function convertToFigmaColor(input: string) {
   let color: RGBA;
-  let opacity;
+  let opacity: number;
   if (input.startsWith('rgb')) {
     const rgbValues = input.replace(/^rgba?\(|\s+|\)$/g, '').split(',').map(parseFloat) as WebRGBA;
 
@@ -98,9 +98,11 @@ export function convertToFigmaColor(input: string) {
       r, g, b, a = 1,
     } = webRGBToFigmaRGB(rgbValues);
     color = {
-      r, g, b,
+      r,
+      g,
+      b,
     };
-    opacity = Number(a);
+    opacity = roundToTwo(a);
   } else if (input.startsWith('hsl')) {
     const hslValues = input.replace(/^hsla?\(|\s+|%|\)$/g, '').split(',').map(parseFloat);
     const rgbValues: any = hslaToRgba(hslValues);
@@ -108,9 +110,11 @@ export function convertToFigmaColor(input: string) {
       r, g, b, a = 1,
     } = webRGBToFigmaRGB(rgbValues);
     color = {
-      r, g, b,
+      r,
+      g,
+      b,
     };
-    opacity = Number(a);
+    opacity = roundToTwo(a);
   } else if (input.startsWith('oklch')) {
     try {
       const oklchColor = new Color(input);
@@ -131,7 +135,9 @@ export function convertToFigmaColor(input: string) {
           r, g, b, a = 1,
         }: RGBA = hexToFigmaRGB(toHex(input));
         color = {
-          r, g, b,
+          r,
+          g,
+          b,
         };
         opacity = roundToTwo(a);
       } catch (e2) {
@@ -145,7 +151,9 @@ export function convertToFigmaColor(input: string) {
       r, g, b, a = 1,
     }: RGBA = hexToFigmaRGB(toHex(input));
     color = {
-      r, g, b,
+      r,
+      g,
+      b,
     };
     opacity = roundToTwo(a);
   }

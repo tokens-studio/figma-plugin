@@ -11,12 +11,30 @@ export function filterAndGroupTokens(
   resolvedTokens: AnyTokenList,
   tokenSet: string,
   startsWith: string,
+  useRegex?: boolean,
 ): Record<string, any[]> {
   let tokensBySet: Record<string, any[]> = {};
 
+  // Helper function to test if a token name matches the pattern
+  const matchesPattern = (tokenName: string): boolean => {
+    if (!startsWith) return true; // Empty pattern matches all
+
+    if (useRegex) {
+      try {
+        const regex = new RegExp(startsWith);
+        return regex.test(tokenName);
+      } catch (e) {
+        // If regex is invalid, fall back to startsWith
+        return tokenName.startsWith(startsWith);
+      }
+    } else {
+      return tokenName.startsWith(startsWith);
+    }
+  };
+
   if (tokenSet === 'All') {
     // Group all matching tokens by their set
-    const filteredTokens = resolvedTokens.filter((t) => t.name.startsWith(startsWith));
+    const filteredTokens = resolvedTokens.filter((t) => matchesPattern(t.name));
     tokensBySet = filteredTokens.reduce(
       (acc, token) => {
         const setName = token.internal__Parent || 'Default';
@@ -29,7 +47,7 @@ export function filterAndGroupTokens(
   } else {
     // Use only tokens from the specified set
     const filteredTokens = resolvedTokens.filter(
-      (t) => t.name.startsWith(startsWith) && (t.internal__Parent === tokenSet || !t.internal__Parent),
+      (t) => matchesPattern(t.name) && (t.internal__Parent === tokenSet || !t.internal__Parent),
     );
     if (filteredTokens.length > 0) {
       tokensBySet[tokenSet] = filteredTokens;
