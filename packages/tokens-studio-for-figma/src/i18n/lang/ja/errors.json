@@ -1,13 +1,13 @@
 {
-  "wentWrong": "Something went wrong!",
-  "reset": "If this keeps happening, you need to reset your tokens.",
-  "restart": "Restart the plugin and try again.",
-  "readHow": "Read how",
-  "tokenNamesMustBeUnique": "Token names must be unique",
-  "mustNotUseNameOfAnotherGroup": "Must not use name of another group",
-  "cantCreateGroupThatSharesNameWithExistingToken": "Can't create a group that shares a name with an existing token",
-  "valueMustIncludePxOrRem": "Value must include either px or rem",
-  "tokenNamesCantStartWithDollar": "Can't start with a dollar ($) sign",
-  "tokenNamesCantContainCurlyBraces": "Can't contain braces '{}'",
-  "tokenNamesCantContainEmptyGroups": "Token names cannot contain empty groups"
+  "wentWrong": "何かが間違っています！",
+  "reset": "これが続く場合は、トークンをリセットする必要があります。",
+  "restart": "プラグインを再起動してもう一度お試しください。",
+  "readHow": "方法を読む",
+  "tokenNamesMustBeUnique": "トークン名は一意である必要があります",
+  "mustNotUseNameOfAnotherGroup": "他のグループ名を使用してはいけません",
+  "cantCreateGroupThatSharesNameWithExistingToken": "既存のトークンと同じ名前のグループは作成できません",
+  "valueMustIncludePxOrRem": "値にはpxまたはremを含める必要があります",
+  "tokenNamesCantStartWithDollar": "ドル記号（$）で始めることはできません",
+  "tokenNamesCantContainCurlyBraces": "中括弧「{}」を含めることはできません",
+  "tokenNamesCantContainEmptyGroups": "トークン名に空のグループを含めることはできません"
 }
