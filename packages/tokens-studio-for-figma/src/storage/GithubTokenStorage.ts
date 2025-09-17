@@ -14,6 +14,7 @@ import { ErrorMessages } from '@/constants/ErrorMessages';
 import { GitSyncOptimizer, ChangedState } from './GitSyncOptimizer';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { retryWithBackoff } from '@/utils/retryWithBackoff';
+import { isMissingFileError } from './utils/handleMissingFileError';
 
 type ExtendedOctokitClient = Omit<Octokit, 'repos'> & {
   repos: Octokit['repos'] & {
@@ -304,6 +305,10 @@ export class GithubTokenStorage extends GitTokenStorage {
       return [];
     } catch (e) {
       console.error('Error', e);
+      // For specific GitHub 404 errors (file/directory not found), return empty array to allow creation
+      if (isMissingFileError(e)) {
+        return [];
+      }
       return this.handleError(e, StorageProviderType.GITHUB);
     }
   }

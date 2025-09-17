@@ -11,6 +11,7 @@ import { ThemeObjectsList } from '@/types';
 import { SystemFilenames } from '@/constants/SystemFilenames';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { retryHttpRequest } from '@/utils/retryWithBackoff';
+import { isMissingFileError } from './utils/handleMissingFileError';
 
 type CreatedOrUpdatedFileType = {
   owner: string;
@@ -377,6 +378,10 @@ export class BitbucketTokenStorage extends GitTokenStorage {
       }
     } catch (e) {
       console.error('Error', e);
+      // For specific Bitbucket 404 errors (file/directory not found), return empty array to allow creation
+      if (isMissingFileError(e)) {
+        return [];
+      }
       return this.handleError(e, StorageProviderType.BITBUCKET);
     }
   }

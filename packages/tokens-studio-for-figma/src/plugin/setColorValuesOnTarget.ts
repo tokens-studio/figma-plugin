@@ -19,11 +19,17 @@ const applyPaintIfNotEqual = (key, existingPaint, newPaint, target) => {
   }
 };
 
-const getLinearGradientPaint = async (fallbackValue, token) => {
+// Helper function to check if a value is any type of gradient
+const isGradient = (value: string): boolean => value?.startsWith?.('linear-gradient')
+  || value?.startsWith?.('radial-gradient')
+  || value?.startsWith?.('conic-gradient');
+
+const getGradientPaint = async (fallbackValue, token) => {
   const gradientString = typeof fallbackValue === 'object' && fallbackValue.fill
     ? fallbackValue.fill
     : fallbackValue;
-  const { gradientStops, gradientTransform } = convertStringToFigmaGradient(gradientString);
+  const gradientResult = convertStringToFigmaGradient(gradientString);
+  const { gradientStops, gradientTransform, type } = gradientResult;
 
   const rawValue = defaultTokenValueRetriever.get(token)?.rawValue;
   let gradientStopsWithReferences = gradientStops;
@@ -51,7 +57,7 @@ const getLinearGradientPaint = async (fallbackValue, token) => {
     }
   }
   const newPaint: GradientPaint = {
-    type: 'GRADIENT_LINEAR',
+    type: type || 'GRADIENT_LINEAR',
     gradientTransform,
     gradientStops: gradientStopsWithReferences,
   };
@@ -84,9 +90,9 @@ export default async function setColorValuesOnTarget({
       existingPaint = target.strokes[0] ?? null;
     }
 
-    if (resolvedValue.startsWith?.('linear-gradient')) {
+    if (isGradient(resolvedValue)) {
       const fallbackValue = defaultTokenValueRetriever.get(token)?.value;
-      const newPaint = await getLinearGradientPaint(fallbackValue, token);
+      const newPaint = await getGradientPaint(fallbackValue, token);
       applyPaintIfNotEqual(key, existingPaint, newPaint, target);
     } else {
       // If the raw value is a pure reference to another token, we first should try to apply that reference as a variable if it exists.
@@ -111,8 +117,8 @@ export default async function setColorValuesOnTarget({
 
       if (!successfullyAppliedVariable) {
         let newPaint: SolidPaint | GradientPaint;
-        if (valueToApply.startsWith?.('linear-gradient')) {
-          newPaint = await getLinearGradientPaint(fallbackValue, token);
+        if (isGradient(valueToApply)) {
+          newPaint = await getGradientPaint(fallbackValue, token);
         } else {
           const { color, opacity } = convertToFigmaColor(typeof valueToApply === 'string' ? valueToApply : valueToApply?.color || givenValue || '');
           newPaint = { color, opacity, type: 'SOLID' };
