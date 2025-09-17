@@ -65,6 +65,7 @@ const Navbar: React.FC<React.PropsWithChildren<React.PropsWithChildren<unknown>>
         <Stack gap={0} direction="row" align="center" justify="start">
           <TabButton name={Tabs.TOKENS} activeTab={activeTab} label={t('tokens')} onSwitch={handleSwitch} />
           <TabButton name={Tabs.INSPECTOR} activeTab={activeTab} label={t('inspect')} onSwitch={handleSwitch} />
+          <TabButton name={Tabs.SUBSCRIPTION} activeTab={activeTab} label={t('subscription')} onSwitch={handleSwitch} />
           <TabButton name={Tabs.SETTINGS} activeTab={activeTab} label={t('settings')} onSwitch={handleSwitch} />
         </Stack>
         <NavbarUndoButton />
