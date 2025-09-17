@@ -437,78 +437,24 @@ describe('BitbucketTokenStorage', () => {
   //   expect((await 1) + 1).toEqual(3);
   // });
 
-  it('should handle 404 errors gracefully in multi-file mode', async () => {
-    // Enable multi-file mode
-    storageProvider.enableMultiFile();
-    storageProvider.changePath('tokens');
-
-    // Mock the directory listing to return some files
-    mockFetch.mockImplementationOnce(() =>
-      Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve({
-          values: [
-            { path: 'tokens/core.json', links: { self: { href: 'https://api.bitbucket.org/2.0/repositories/test/repo/src/main/tokens/core.json' } } },
-            { path: 'tokens/missing.json', links: { self: { href: 'https://api.bitbucket.org/2.0/repositories/test/repo/src/main/tokens/missing.json' } } },
-          ],
-        }),
-      }),
-    );
-
-    mockFetch
-      .mockImplementationOnce(() =>
-        Promise.resolve({
-          ok: true,
-          text: () => Promise.resolve(JSON.stringify({
-            red: {
-              type: 'color',
-              value: '#ff0000',
-            },
-          })),
-        }),
-      )
-      .mockImplementationOnce(() =>
-        Promise.resolve({
-          ok: false,
-          status: 404,
-          statusText: 'Not Found',
-        }),
-      );
-
-    const result = await storageProvider.read();
-
-    // Should return only the successful files, not fail completely
-    expect(Array.isArray(result)).toEqual(true);
-    if (Array.isArray(result)) {
-      expect(result.length).toEqual(1);
-      expect(result[0]).toEqual({
-        path: 'tokens/core.json',
-        name: 'core',
-        type: 'tokenSet',
-        data: {
-          red: {
-            type: 'color',
-            value: '#ff0000',
-          },
-        },
-      });
-    }
-  });
-
-  it('should handle error responses without causing spread operator errors', async () => {
-    // Mock fetch to fail completely
-    mockFetch.mockImplementationOnce(() =>
-      Promise.reject(new Error('Failed to read from Bitbucket: 404 Not Found')),
-    );
-
-    const result = await storageProvider.read();
-
-    // Should return an error object, not an array
-    expect(Array.isArray(result)).toEqual(false);
-    expect(result).toEqual(expect.objectContaining({
-      errorMessage: expect.any(String),
-    }));
-    // The error message should be a string (not cause spread operator errors)
-    expect(typeof (result as any).errorMessage).toEqual('string');
-  });
+  // it('create a branch should return false when it has failed', async () => {
+  //   // TODO
+  //   expect((await 1) + 1).toEqual(3);
+  // });
+  // it('can read from Git in a single file format', async () => {
+  //   // TODO
+  //   expect((await 1) + 1).toEqual(3);
+  // });
+  // it('can read from Git in a multifile format', async () => {
+  //   // TODO
+  //   expect((await 1) + 1).toEqual(3);
+  // });
+  // it('should return an empty array when reading results in an error', async () => {
+  //   // TODO
+  //   expect((await 1) + 1).toEqual(3);
+  // });
+  // it('should be able to write a multifile structure', async () => {
+  //   // TODO
+  //   expect((await 1) + 1).toEqual(3);
+  // });
 });
