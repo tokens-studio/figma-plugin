@@ -62,19 +62,19 @@ export async function createTokenTemplate(tokenType: TokenTypes): Promise<FrameN
       textNode.name = '__typography';
       textNode.fontName = { family: 'Inter', style: 'Regular' };
       textNode.fontSize = 16; // Default size for preview
-      textNode.characters = 'aA';
+      textNode.characters = 'Aa';
       textNode.fills = [{ type: 'SOLID', color: { r: 0, g: 0, b: 0 } }];
       frame.appendChild(textNode);
       break;
     }
 
     case TokenTypes.FONT_SIZES: {
-      // For font sizes, use "aA" characters with the actual font size
+      // For font sizes, use "Aa" characters with the actual font size
       const textNode = figma.createText();
       textNode.name = '__fontSizes';
       textNode.fontName = { family: 'Inter', style: 'Regular' };
       textNode.fontSize = 16; // Default size for preview
-      textNode.characters = 'aA';
+      textNode.characters = 'Aa';
       textNode.fills = [{ type: 'SOLID', color: { r: 0, g: 0, b: 0 } }];
       frame.appendChild(textNode);
       break;
