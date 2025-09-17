@@ -278,15 +278,15 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
       );
 
       const obj = {
-        fontFamily: `{${foundFamily?.name}}`,
-        fontWeight: `{${foundFontWeight?.name}}`,
-        lineHeight: `{${foundLineHeight?.name}}`,
-        fontSize: `{${foundFontSize?.name}}`,
-        letterSpacing: `{${foundLetterSpacing?.name}}`,
-        paragraphSpacing: `{${foundParagraphSpacing?.name}}`,
-        paragraphIndent: `{${foundParagraphIndent?.name}}`,
-        textCase: `{${foundTextCase?.name}}`,
-        textDecoration: `{${foundTextDecoration?.name}}`,
+        fontFamily: foundFamily?.name ? `{${foundFamily.name}}` : style.fontName.family,
+        fontWeight: foundFontWeight?.name ? `{${foundFontWeight.name}}` : style.fontName.style,
+        lineHeight: foundLineHeight?.name ? `{${foundLineHeight.name}}` : convertFigmaToLineHeight(style.lineHeight).toString(),
+        fontSize: foundFontSize?.name ? `{${foundFontSize.name}}` : style.fontSize.toString(),
+        letterSpacing: foundLetterSpacing?.name ? `{${foundLetterSpacing.name}}` : convertFigmaToLetterSpacing(style.letterSpacing).toString(),
+        paragraphSpacing: foundParagraphSpacing?.name ? `{${foundParagraphSpacing.name}}` : style.paragraphSpacing.toString(),
+        paragraphIndent: foundParagraphIndent?.name ? `{${foundParagraphIndent.name}}` : `${style.paragraphIndent.toString()}px`,
+        textCase: foundTextCase?.name ? `{${foundTextCase.name}}` : convertFigmaToTextCase(style.textCase),
+        textDecoration: foundTextDecoration?.name ? `{${foundTextDecoration.name}}` : convertFigmaToTextDecoration(style.textDecoration),
       };
 
       const normalizedName = style.name

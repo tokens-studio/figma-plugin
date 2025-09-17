@@ -212,6 +212,116 @@ describe('pullStyles', () => {
     });
   });
 
+  it('pulls text styles with bound variables but no matching tokens', async () => {
+    figma.getLocalTextStyles.mockReturnValue([
+      {
+        name: 'heading/h1/bold',
+        id: '456',
+        description: 'text style with variables but no tokens',
+        fontSize: 32,
+        boundVariables: {
+          fontSize: { id: 'fontSize-var-id-1' },
+          lineHeight: { id: 'lineHeight-var-id-1' },
+          letterSpacing: { id: 'letterSpacing-var-id-1' },
+          paragraphSpacing: { id: 'paragraphSpacing-var-id-1' },
+          fontFamily: { id: 'fontFamily-var-id-1' },
+          fontStyle: { id: 'fontStyle-var-id-1' },
+        },
+        fontName: { family: 'Roboto', style: 'Bold' },
+        lineHeight: { unit: 'PIXELS', value: 40 },
+        paragraphSpacing: 12,
+        paragraphIndent: 0,
+        letterSpacing: { unit: 'PERCENT', value: 2 },
+        textCase: 'ORIGINAL',
+        textDecoration: 'NONE',
+      },
+    ]);
+
+    // Variables exist in Figma but no matching tokens in token store
+    figma.variables.getLocalVariables.mockReturnValue([
+      {
+        id: 'fontSize-var-id-1',
+        name: 'Typography/heading/fontSize/1',
+        value: '32',
+      },
+      {
+        id: 'lineHeight-var-id-1',
+        name: 'Typography/heading/lineHeight/1',
+        value: '40',
+      },
+      {
+        id: 'letterSpacing-var-id-1',
+        name: 'Typography/heading/letterSpacing/1',
+        value: '2%',
+      },
+      {
+        id: 'paragraphSpacing-var-id-1',
+        name: 'Typography/heading/paragraphSpacing/1',
+        value: '12',
+      },
+      {
+        id: 'fontFamily-var-id-1',
+        name: 'Typography/heading/fontFamily/1',
+        value: 'Roboto',
+      },
+      {
+        id: 'fontStyle-var-id-1',
+        name: 'Typography/heading/fontStyle/1',
+        value: 'Bold',
+      },
+    ]);
+
+    await pullStyles({ textStyles: true });
+
+    expect(notifyStyleValuesSpy).toHaveBeenCalledWith({
+      typography: [
+        {
+          name: 'heading.h1.bold',
+          type: 'typography',
+          value: {
+            fontFamily: 'Roboto', // Should use raw value when no token found
+            fontWeight: 'Bold', // Should use raw value when no token found
+            fontSize: '32', // Should use raw value when no token found
+            lineHeight: '40', // Should use raw value when no token found
+            letterSpacing: '2%', // Should use raw value when no token found
+            paragraphSpacing: '12', // Should use raw value when no token found
+            paragraphIndent: '0px', // Raw value
+            textCase: 'none', // Raw value
+            textDecoration: 'none', // Raw value
+          },
+          description: 'text style with variables but no tokens',
+        },
+      ],
+      fontFamilies: [
+        { name: 'fontFamilies.roboto', type: 'fontFamilies', value: 'Roboto' },
+      ],
+      fontWeights: [
+        { name: 'fontWeights.roboto-0', type: 'fontWeights', value: 'Bold' },
+      ],
+      fontSizes: [
+        { name: 'fontSize.0', type: 'fontSizes', value: '32' },
+      ],
+      letterSpacing: [
+        { name: 'letterSpacing.0', type: 'letterSpacing', value: '2%' },
+      ],
+      lineHeights: [
+        { name: 'lineHeights.0', type: 'lineHeights', value: '40' },
+      ],
+      paragraphSpacing: [
+        { name: 'paragraphSpacing.0', type: 'paragraphSpacing', value: '12' },
+      ],
+      paragraphIndent: [
+        { name: 'paragraphIndent.0', type: 'dimension', value: '0px' },
+      ],
+      textCase: [
+        { name: 'textCase.none', type: 'textCase', value: 'none' },
+      ],
+      textDecoration: [
+        { name: 'textDecoration.none', type: 'textDecoration', value: 'none' },
+      ],
+    });
+  });
+
   it('pulls shadow styles', async () => {
     figma.getLocalEffectStyles.mockReturnValue([
       {
