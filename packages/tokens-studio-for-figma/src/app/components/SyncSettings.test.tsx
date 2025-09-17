@@ -19,7 +19,17 @@ jest.mock('../hooks/useConfirm', () => ({
   }),
 }));
 
+jest.mock('@/utils/analytics', () => ({
+  track: jest.fn(),
+}));
+
+const { track } = jest.requireMock('@/utils/analytics');
+
 describe('ConfirmDialog', () => {
+  beforeEach(() => {
+    track.mockClear();
+  });
+
   const defaultStore = {
     uiState: {
       localApiState: {
@@ -175,5 +185,24 @@ describe('ConfirmDialog', () => {
 
     // The test is that the total number of BETA badges should be exactly 1 (BitBucket only)
     expect(betaBadges.length).toBe(1);
+  });
+
+  it('should track when sync provider dialog is opened', async () => {
+    const mockStore = createMockStore(defaultStore);
+    const result = render(
+      <Provider store={mockStore}>
+        <SyncSettings />
+      </Provider>,
+    );
+
+    await act(async () => {
+      const trigger = await result.getByTestId('add-storage-item-button');
+      trigger?.focus();
+      await userEvent.keyboard('[Enter]');
+    });
+
+    expect(track).toHaveBeenCalledWith('Create Sync Provider Dialog Opened', {
+      source: 'sync-settings',
+    });
   });
 });
