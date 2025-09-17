@@ -16,19 +16,19 @@
   "selectLayer": "適用されたトークンを確認するにはレイヤーを選択してください",
   "addAnnotation": "注釈として追加",
   "moreThan1Layer": {
-    "title": "More than 1 layer selected",
-    "description": "Select only 1 layer to see applied tokens"
+    "title": "1つ以上のレイヤーが選択されています",
+    "description": "適用されたトークンを確認するには1つのレイヤーのみを選択してください"
   },
-  "selectedLayerContainsNoTokens": "Selected layer contains no tokens",
-  "selectALayerToSeeAppliedTokens": "Select a layer to see applied tokens",
-  "tokenNotFound": "Token not found",
-  "appliedStyle": "Applied style",
-  "appliedVariable": "Applied variable",
-  "changeToAnotherToken": "Change to another token",
-  "chooseANewTokenForValue": "Choose a new value for {{value}}",
-  "chooseANewToken": "Choose a new token",
-  "cancel": "Cancel",
-  "remap": "Remap",
-  "showBrokenReferences": "Show broken references",
-  "showResolvedReferences": "Show resolved references"
+  "selectedLayerContainsNoTokens": "選択されたレイヤーにはトークンが含まれていません",
+  "selectALayerToSeeAppliedTokens": "適用されたトークンを確認するにはレイヤーを選択してください",
+  "tokenNotFound": "トークンが見つかりません",
+  "appliedStyle": "適用されたスタイル",
+  "appliedVariable": "適用された変数",
+  "changeToAnotherToken": "別のトークンに変更",
+  "chooseANewTokenForValue": "{{value}}の新しい値を選択",
+  "chooseANewToken": "新しいトークンを選択",
+  "cancel": "キャンセル",
+  "remap": "再マップ",
+  "showBrokenReferences": "壊れた参照を表示",
+  "showResolvedReferences": "解決された参照を表示"
 }

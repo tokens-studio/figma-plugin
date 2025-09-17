@@ -1,17 +1,17 @@
 {
-"modalTitle": "Export to Figma",
-"buttonLabel": "Styles and Variables",
-"optionsModalTitle": "Export to Figma: Options",
+"modalTitle": "Figmaにエクスポート",
+"buttonLabel": "スタイルと変数",
+"optionsModalTitle": "Figmaにエクスポート: オプション",
 "actions": {
-  "export": "Export to Figma",
-  "import": "Import from Figma",
-  "options": "Options",
-  "cancel": "Cancel",
-  "confirm": "Confirm",
-  "createThemes": "Create Themes",
-  "getPRO": "Get PRO",
-  "manageThemes": "Manage Themes",
-  "changeSets": "Change Sets"
+  "export": "Figmaにエクスポート",
+  "import": "Figmaからインポート",
+  "options": "オプション",
+  "cancel": "キャンセル",
+  "confirm": "確認",
+  "createThemes": "テーマを作成",
+  "getPRO": "PROを取得",
+  "manageThemes": "テーマを管理",
+  "changeSets": "セットを変更"
 },
 "docs": {
   "exportToFigmaOptions": "Export to Figma: Options",
