@@ -9,7 +9,6 @@ import { GitMultiFileObject, GitSingleFileObject, GitTokenStorage } from './GitT
 import { AnyTokenSet } from '@/types/tokens';
 import { ThemeObjectsList } from '@/types';
 import { SystemFilenames } from '@/constants/SystemFilenames';
-import { ErrorMessages } from '@/constants/ErrorMessages';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { retryHttpRequest } from '@/utils/retryWithBackoff';
 
@@ -308,8 +307,8 @@ export class BitbucketTokenStorage extends GitTokenStorage {
         ];
       }
 
-      // Multi file when it is enabled
-      if (this.flags.multiFileEnabled) {
+      // Multi file (directory path)
+      {
         const jsonFiles = await this.fetchJsonFilesFromDirectory(url);
 
         const authString = `${this.username || this.owner}:${this.apiToken}`;
@@ -331,53 +330,51 @@ export class BitbucketTokenStorage extends GitTokenStorage {
             });
           }),
         );
-        // Process the content of each JSON file, filtering out failed requests
-        const successfulFiles: RemoteTokenStorageFile[] = [];
-        jsonFileContents.forEach((result, index) => {
-          if (result.status === 'fulfilled') {
-            const fileContent = result.value;
-            const { path } = jsonFiles[index];
-            const filePath = path.startsWith(this.path) ? path : `${this.path}/${path}`;
-            let name = filePath.substring(this.path.length).replace(/^\/+/, '');
-            name = name.replace('.json', '');
+        // Process the content of each JSON file
+        return jsonFileContents.map((result, index) => {
+          const { path } = jsonFiles[index];
+          const filePath = path.startsWith(this.path) ? path : `${this.path}/${path}`;
+          let name = filePath.substring(this.path.length).replace(/^\/+/, '');
+          name = name.replace('.json', '');
 
-            try {
-              const parsed = JSON.parse(fileContent) as GitMultiFileObject;
-
-              if (name === SystemFilenames.THEMES) {
-                successfulFiles.push({
-                  path: filePath,
-                  type: 'themes',
-                  data: parsed as ThemeObjectsList,
-                });
-              } else if (name === SystemFilenames.METADATA) {
-                successfulFiles.push({
-                  path: filePath,
-                  type: 'metadata',
-                  data: parsed as RemoteTokenStorageMetadata,
-                });
-              } else {
-                successfulFiles.push({
-                  path: filePath,
-                  name,
-                  type: 'tokenSet',
-                  data: parsed as AnyTokenSet<false>,
-                });
-              }
-            } catch (parseError) {
-              console.warn(`Failed to parse JSON file ${path}:`, parseError);
+          try {
+            let fileContent: string;
+            if (result.status === 'fulfilled') {
+              fileContent = result.value;
+            } else {
+              throw new Error(`Failed to fetch file ${path}`);
             }
-          } else {
-            console.warn(`Failed to fetch file ${jsonFiles[index].path}:`, result.reason);
+
+            const parsed = JSON.parse(fileContent) as GitMultiFileObject;
+
+            if (name === SystemFilenames.THEMES) {
+              return {
+                path: filePath,
+                type: 'themes',
+                data: parsed as ThemeObjectsList,
+              };
+            }
+
+            if (name === SystemFilenames.METADATA) {
+              return {
+                path: filePath,
+                type: 'metadata',
+                data: parsed as RemoteTokenStorageMetadata,
+              };
+            }
+
+            return {
+              path: filePath,
+              name,
+              type: 'tokenSet',
+              data: parsed as AnyTokenSet<false>,
+            };
+          } catch (parseError) {
+            console.error(`[Bitbucket Sync] Failed to parse JSON file '${path}': ${parseError instanceof Error ? parseError.message : parseError}`);
+            throw parseError;
           }
         });
-
-        return successfulFiles;
       }
-
-      return {
-        errorMessage: ErrorMessages.VALIDATION_ERROR,
-      };
     } catch (e) {
       console.error('Error', e);
       return this.handleError(e, StorageProviderType.BITBUCKET);
