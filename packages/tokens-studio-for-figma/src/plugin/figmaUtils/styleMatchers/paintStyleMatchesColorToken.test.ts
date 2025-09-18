@@ -1,7 +1,6 @@
 import { paintStyleMatchesColorToken } from './paintStyleMatchesColorToken';
 
 describe('paintStyleMatchesColorToken', () => {
-  // tslint:disable-next-line: no-empty
   const noop: () => void = () => {};
   const dummyFunc: <T>() => T = <T>() => (undefined as unknown) as T;
   const dummyFigmaPaintStyle: PaintStyle = {
