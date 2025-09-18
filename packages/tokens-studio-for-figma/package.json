@@ -6,7 +6,6 @@
   "private": true,
   "scripts": {
     "bundle": "ts-node ./scripts/bundle.ts",
-    "watch-transform": "webpack --mode=development --watch --config webpack-transform.config.js",
     "build": "cross-env NODE_ENV=production webpack --mode=production",
     "build:dev": "cross-env NODE_ENV=development webpack --mode=development",
     "build:preview": "cross-env NODE_ENV=development webpack --mode=development --PREVIEW_ENV=browser",
@@ -16,7 +15,6 @@
     "preview:plugin": "webpack --mode=development --PREVIEW_ENV=figma",
     "preview:browser": "webpack-dev-server --mode=development --PREVIEW_ENV=browser",
     "preview": "cross-env WEBSOCKETS_PORT=9001 run-p \"preview:*\"",
-    "build-transform": "webpack --mode=production --config webpack-transform.config.js",
     "benchmark:build": "webpack --config webpack-benchmark.config.js",
     "benchmark:run": "node benchmark/index.mjs",
     "benchmark:run:update": "node benchmark/index.mjs --update",
