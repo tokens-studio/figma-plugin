@@ -9,8 +9,9 @@ import { GitMultiFileObject, GitSingleFileObject, GitTokenStorage } from './GitT
 import { AnyTokenSet } from '@/types/tokens';
 import { ThemeObjectsList } from '@/types';
 import { SystemFilenames } from '@/constants/SystemFilenames';
-import { ErrorMessages } from '@/constants/ErrorMessages';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import { retryHttpRequest } from '@/utils/retryWithBackoff';
+import { isMissingFileError } from './utils/handleMissingFileError';
 
 type CreatedOrUpdatedFileType = {
   owner: string;
@@ -28,17 +29,23 @@ type FetchJsonResult = any[] | Record<string, any>;
 export class BitbucketTokenStorage extends GitTokenStorage {
   private bitbucketClient;
 
-  constructor(secret: string, owner: string, repository: string, baseUrl?: string, username?: string) {
+  private apiToken?: string;
+
+  constructor(secret: string, owner: string, repository: string, baseUrl?: string, username?: string, apiToken?: string) {
     super(secret, owner, repository, baseUrl, username);
+    this.apiToken = apiToken || secret; // Use apiToken if provided, otherwise fall back to secret for backward compatibility
     this.flags = {
       multiFileEnabled: false,
     };
 
+    // For API tokens, Bitbucket expects Atlassian account email as username and the token as password
+    const authConfig = {
+      username: this.username || this.owner, // This should be the Atlassian account email for API tokens
+      password: this.apiToken,
+    };
+
     this.bitbucketClient = new Bitbucket({
-      auth: {
-        username: this.username || this.owner, // technically username is required, but we'll use owner as a fallback
-        password: this.secret,
-      },
+      auth: authConfig,
       baseUrl: this.baseUrl || undefined,
     });
   }
@@ -46,17 +53,38 @@ export class BitbucketTokenStorage extends GitTokenStorage {
   // https://bitbucketjs.netlify.app/#api-repositories-repositories_listBranches OR
   // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-refs/#api-repositories-workspace-repo-slug-refs-get
   public async fetchBranches(): Promise<string[]> {
-    const branches = await this.bitbucketClient.repositories.listBranches({
-      workspace: this.owner,
-      repo_slug: this.repository,
-    });
+    try {
+      // Use direct HTTP call for API token authentication
+      const authString = `${this.username || this.owner}:${this.apiToken}`;
+      const authHeader = `Basic ${btoa(authString)}`;
 
-    if (!branches || !branches.data) {
-      return ['No data'];
+      const response = await fetch(`https://api.bitbucket.org/2.0/repositories/${this.owner}/${this.repository}/refs/branches`, {
+        headers: {
+          Authorization: authHeader,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        // Re-throw authentication errors instead of catching them
+        if (response.status === 401) {
+          throw new Error('BITBUCKET_UNAUTHORIZED');
+        }
+        throw new Error(`Failed to fetch branches: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      if (!data.values) {
+        return [];
+      }
+      return data.values.map((branch: any) => branch.name) as string[];
+    } catch (error) {
+      // Re-throw authentication errors and other specific errors
+      if (error instanceof Error && error.message === 'BITBUCKET_UNAUTHORIZED') {
+        throw error;
+      }
+      throw new Error('Error fetching branches');
     }
-    // README we'll have to account for paginated branches somehow, this only returns
-    // the first 10 branches which is fine for now
-    return branches.data!.values!.map((branch) => branch.name) as string[];
   }
 
   /**
@@ -107,7 +135,6 @@ export class BitbucketTokenStorage extends GitTokenStorage {
 
       return newBranch.status === 201;
     } catch (err) {
-      console.error(err);
       return false;
     }
   }
@@ -116,15 +143,52 @@ export class BitbucketTokenStorage extends GitTokenStorage {
   // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/?utm_source=%2Fbitbucket%2Fapi%2F2%2Freference%2Fresource%2Fuser&utm_medium=302#api-user-get
   // this would be best: https://developer.atlassian.com/cloud/bitbucket/rest/api-group-repositories/#api-repositories-workspace-repo-slug-permissions-config-users-selected-user-id-get
   public async canWrite(): Promise<boolean> {
-    const currentUser = await this.bitbucketClient.users.getAuthedUser({});
-    if (!currentUser.data.account_id) return false;
     try {
-      const { data } = await this.bitbucketClient.repositories.listPermissions({});
-      const permission = data.values?.[0]?.permission;
+      // Use direct HTTP call for API token authentication
+      const authString = `${this.username || this.owner}:${this.apiToken}`;
+      const authHeader = `Basic ${btoa(authString)}`;
 
-      const canWrite = !!(permission === 'admin' || 'write');
-      return !!canWrite;
+      // First get current user
+      const userResponse = await fetch('https://api.bitbucket.org/2.0/user', {
+        headers: {
+          Authorization: authHeader,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!userResponse.ok) {
+        // Throw authentication errors instead of returning false
+        if (userResponse.status === 401) {
+          throw new Error('BITBUCKET_UNAUTHORIZED');
+        }
+        return false;
+      }
+
+      const userData = await userResponse.json();
+      if (!userData.account_id) return false;
+
+      // Check repository permissions
+      const permResponse = await fetch(`https://api.bitbucket.org/2.0/repositories/${this.owner}/${this.repository}`, {
+        headers: {
+          Authorization: authHeader,
+        },
+      });
+
+      if (!permResponse.ok) {
+        if (permResponse.status === 401) {
+          throw new Error('BITBUCKET_UNAUTHORIZED');
+        }
+        return false;
+      }
+
+      // If we can access the repository, assume we have write access
+      // (API tokens are typically created with specific permissions)
+      return true;
     } catch (e) {
+      // Re-throw authentication errors
+      if (e instanceof Error && e.message === 'BITBUCKET_UNAUTHORIZED') {
+        throw e;
+      }
       return false;
     }
   }
@@ -147,12 +211,17 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     let nextPageUrl: string | null = `${url}?pagelen=100`;
 
     while (nextPageUrl) {
-      const response = await fetch(nextPageUrl, {
-        headers: {
-          Authorization: `Basic ${btoa(`${this.username}:${this.secret}`)}`,
-        },
-        cache: 'no-cache',
-      });
+      const currentUrl = nextPageUrl; // TypeScript guard to ensure non-null
+      const authHeader = `Basic ${btoa(`${this.username || this.owner}:${this.apiToken}`)}`;
+
+      const response = await retryHttpRequest<Response>(
+        () => fetch(currentUrl, {
+          headers: {
+            Authorization: authHeader,
+          },
+          cache: 'no-cache',
+        }),
+      );
 
       if (!response.ok) {
         throw new Error(`Failed to read from Bitbucket: ${response.statusText}`);
@@ -180,12 +249,16 @@ export class BitbucketTokenStorage extends GitTokenStorage {
   }
 
   private async fetchJsonFile(url: string): Promise<GitSingleFileObject> {
-    const response = await fetch(url, {
-      headers: {
-        Authorization: `Basic ${btoa(`${this.username}:${this.secret}`)}`,
-      },
-      cache: 'no-cache',
-    });
+    const authHeader = `Basic ${btoa(`${this.username || this.owner}:${this.apiToken}`)}`;
+
+    const response = await retryHttpRequest<Response>(
+      () => fetch(url, {
+        headers: {
+          Authorization: authHeader,
+        },
+        cache: 'no-cache',
+      }),
+    );
 
     if (!response.ok) {
       throw new Error(`Failed to read from Bitbucket: ${response.statusText}`);
@@ -235,57 +308,80 @@ export class BitbucketTokenStorage extends GitTokenStorage {
         ];
       }
 
-      // Multi file when it is enabled
-      if (this.flags.multiFileEnabled) {
+      // Multi file (directory path)
+      {
         const jsonFiles = await this.fetchJsonFilesFromDirectory(url);
 
-        const jsonFileContents = await Promise.all(
-          jsonFiles.map((file: any) => fetch(file.links.self.href, {
-            headers: {
-              Authorization: `Basic ${btoa(`${this.username}:${this.secret}`)}`,
-            },
-            cache: 'no-cache',
-          }).then((rsp) => rsp.text())),
+        const authString = `${this.username || this.owner}:${this.apiToken}`;
+        const jsonFileContents = await Promise.allSettled(
+          jsonFiles.map((file: any) => {
+            const fileUrl = `https://api.bitbucket.org/2.0/repositories/${this.owner}/${this.repository}/src/${this.branch}/${file.path}`;
+            return retryHttpRequest<Response>(
+              () => fetch(fileUrl, {
+                headers: {
+                  Authorization: `Basic ${btoa(authString)}`,
+                },
+                cache: 'no-cache',
+              }),
+            ).then((rsp) => {
+              if (!rsp.ok) {
+                throw new Error(`Failed to read file ${file.path}: ${rsp.status} ${rsp.statusText}`);
+              }
+              return rsp.text();
+            });
+          }),
         );
         // Process the content of each JSON file
-        return jsonFileContents.map((fileContent, index) => {
+        return jsonFileContents.map((result, index) => {
           const { path } = jsonFiles[index];
           const filePath = path.startsWith(this.path) ? path : `${this.path}/${path}`;
           let name = filePath.substring(this.path.length).replace(/^\/+/, '');
           name = name.replace('.json', '');
 
-          const parsed = JSON.parse(fileContent) as GitMultiFileObject;
+          try {
+            let fileContent: string;
+            if (result.status === 'fulfilled') {
+              fileContent = result.value;
+            } else {
+              throw new Error(`Failed to fetch file ${path}`);
+            }
 
-          if (name === SystemFilenames.THEMES) {
+            const parsed = JSON.parse(fileContent) as GitMultiFileObject;
+
+            if (name === SystemFilenames.THEMES) {
+              return {
+                path: filePath,
+                type: 'themes',
+                data: parsed as ThemeObjectsList,
+              };
+            }
+
+            if (name === SystemFilenames.METADATA) {
+              return {
+                path: filePath,
+                type: 'metadata',
+                data: parsed as RemoteTokenStorageMetadata,
+              };
+            }
+
             return {
               path: filePath,
-              type: 'themes',
-              data: parsed as ThemeObjectsList,
+              name,
+              type: 'tokenSet',
+              data: parsed as AnyTokenSet<false>,
             };
+          } catch (parseError) {
+            console.error(`[Bitbucket Sync] Failed to parse JSON file '${path}': ${parseError instanceof Error ? parseError.message : parseError}`);
+            throw parseError;
           }
-
-          if (name === SystemFilenames.METADATA) {
-            return {
-              path: filePath,
-              type: 'metadata',
-              data: parsed as RemoteTokenStorageMetadata,
-            };
-          }
-
-          return {
-            path: filePath,
-            name,
-            type: 'tokenSet',
-            data: parsed as AnyTokenSet<false>,
-          };
         });
       }
-
-      return {
-        errorMessage: ErrorMessages.VALIDATION_ERROR,
-      };
     } catch (e) {
       console.error('Error', e);
+      // For specific Bitbucket 404 errors (file/directory not found), return empty array to allow creation
+      if (isMissingFileError(e)) {
+        return [];
+      }
       return this.handleError(e, StorageProviderType.BITBUCKET);
     }
   }

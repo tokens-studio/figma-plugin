@@ -16,8 +16,9 @@ export default function checkIfTokenCanCreateVariable(token: ResolveTokenValuesR
     if ((token.type === TokenTypes.BORDER_RADIUS || token.type === TokenTypes.SPACING) && typeof token.value === 'string') {
       return token.value.split(' ').length === 1;
     }
-    // Ignore gradient colors
-    if (token.type === TokenTypes.COLOR && typeof token.value === 'string' && token.value.startsWith('linear-gradient')) {
+    // Ignore gradient colors (all types: linear, radial, conic)
+    if (token.type === TokenTypes.COLOR && typeof token.value === 'string'
+        && (token.value.startsWith('linear-gradient') || token.value.startsWith('radial-gradient') || token.value.startsWith('conic-gradient'))) {
       return false;
     }
     // Ignore AUTO values on lineHeight

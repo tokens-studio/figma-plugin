@@ -10,6 +10,7 @@ export default function setBackgroundBlurOnTarget(
     if ('effects' in target) {
       const existingEffectIndex = target.effects.findIndex((effect) => effect.type === 'BACKGROUND_BLUR');
       let newEffects = [...target.effects];
+      // @ts-ignore TODO: Update typings
       const blurEffect: BlurEffect = {
         type: 'BACKGROUND_BLUR',
         visible: true,

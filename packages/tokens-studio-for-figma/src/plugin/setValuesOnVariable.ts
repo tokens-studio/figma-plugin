@@ -9,6 +9,7 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { transformValue } from './helpers';
 import { variableWorker } from './Worker';
 import { ProgressTracker } from './ProgressTracker';
+import { checkVariableAliasEquality } from '@/utils/checkVariableAliasEquality';
 
 export type ReferenceVariableType = {
   variable: Variable;
@@ -18,7 +19,7 @@ export type ReferenceVariableType = {
 
 export default async function setValuesOnVariable(
   variablesInFigma: Variable[],
-  tokens: SingleToken<true, { path: string, variableId: string }>[],
+  tokens: SingleToken<true, { path: string; variableId: string }>[],
   collection: VariableCollection,
   mode: string,
   baseFontSize: string,
@@ -36,8 +37,6 @@ export default async function setValuesOnVariable(
     // Process tokens using variableWorker with higher batch size for better performance
     tokens.forEach((token) => {
       promises.add(variableWorker.schedule(async () => {
-        let isCreated = false;
-
         try {
           const variableType = convertTokenTypeToVariableType(token.type, token.value);
           // If id matches the variableId, or name patches the token path, we can use it to update the variable instead of re-creating.
@@ -47,7 +46,6 @@ export default async function setValuesOnVariable(
 
           if (!variable) {
             variable = figma.variables.createVariable(token.path, collection, variableType);
-            isCreated = true;
           }
 
           if (variable) {
@@ -64,6 +62,18 @@ export default async function setValuesOnVariable(
               // variable = figma.variables.createVariable(t.path, collection.id, variableType);
             }
             variable.description = token.description ?? '';
+
+            // Always add the variable to the key map, regardless of whether it needs updating
+            variableKeyMap[token.name] = variable.key;
+
+            // Check if the variable already has the correct alias reference before updating
+            const existingVariableValue = variable.valuesByMode[mode];
+            const rawValue = typeof token.rawValue === 'string' ? token.rawValue : undefined;
+
+            if (checkVariableAliasEquality(existingVariableValue, rawValue)) {
+              // The alias already points to the correct variable, no update needed
+              return;
+            }
 
             switch (variableType) {
               case 'BOOLEAN':
@@ -102,7 +112,6 @@ export default async function setValuesOnVariable(
             } else {
               referenceTokenName = token.rawValue!.toString().substring(1);
             }
-            variableKeyMap[token.name] = variable.key;
             if (token && checkCanReferenceVariable(token)) {
               referenceVariableCandidates.push({
                 variable,
@@ -114,10 +123,6 @@ export default async function setValuesOnVariable(
         } catch (e) {
           console.error('Error processing variable token:', e);
         } finally {
-          processedCount += 1;
-          if (isCreated) createdCount += 1;
-          else updatedCount += 1;
-
           // Use global progress tracker if available
           if (progressTracker) {
             progressTracker.next();
