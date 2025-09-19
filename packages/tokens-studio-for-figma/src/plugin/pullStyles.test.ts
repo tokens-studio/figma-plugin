@@ -1,9 +1,22 @@
 import pullStyles from './pullStyles';
 
 import * as notifiers from './notifiers';
+import { getTokenData } from './node';
+
+// Mock getTokenData
+jest.mock('./node', () => ({
+  getTokenData: jest.fn(),
+}));
 
 describe('pullStyles', () => {
   const notifyStyleValuesSpy = jest.spyOn(notifiers, 'notifyStyleValues');
+
+  beforeEach(() => {
+    // Reset mocks
+    jest.clearAllMocks();
+    // Default mock return value for getTokenData
+    (getTokenData as jest.Mock).mockResolvedValue({ values: {} });
+  });
 
   it('pulls color styles', async () => {
     figma.getLocalPaintStyles.mockReturnValue([
@@ -102,10 +115,10 @@ describe('pullStyles', () => {
           value: {
             fontFamily: '{fontFamilies.inter}',
             fontWeight: '{fontWeights.inter-0}',
-            fontSize: '{fontSize.0}',
+            fontSize: '{fontsizes.0}',
             lineHeight: '{lineHeights.0}',
-            letterSpacing: '{letterSpacing.0}',
-            paragraphSpacing: '{paragraphSpacing.0}',
+            letterSpacing: '{letterspacing.0}',
+            paragraphSpacing: '{paragraphspacing.0}',
             paragraphIndent: '{paragraphIndent.0}',
             textCase: '{textCase.none}',
             textDecoration: '{textDecoration.none}',
@@ -120,16 +133,16 @@ describe('pullStyles', () => {
         { name: 'fontWeights.inter-0', type: 'fontWeights', value: 'Bold' },
       ],
       fontSizes: [
-        { name: 'fontSize.0', type: 'fontSizes', value: '24.8' },
+        { name: 'fontsizes.0', type: 'fontSizes', value: '24.8' },
       ],
       letterSpacing: [
-        { name: 'letterSpacing.0', type: 'letterSpacing', value: '0%' },
+        { name: 'letterspacing.0', type: 'letterSpacing', value: '0%' },
       ],
       lineHeights: [
         { name: 'lineHeights.0', type: 'lineHeights', value: 'AUTO' },
       ],
       paragraphSpacing: [
-        { name: 'paragraphSpacing.0', type: 'paragraphSpacing', value: '0' },
+        { name: 'paragraphspacing.0', type: 'paragraphSpacing', value: '0' },
       ],
       paragraphIndent: [
         { name: 'paragraphIndent.0', type: 'dimension', value: '0px' },
@@ -171,10 +184,10 @@ describe('pullStyles', () => {
           value: {
             fontFamily: '{fontFamilies.inter}',
             fontWeight: '{fontWeights.inter-0}',
-            fontSize: '{fontSize.0}',
+            fontSize: '{fontsizes.0}',
             lineHeight: '{lineHeights.0}',
-            letterSpacing: '{letterSpacing.0}',
-            paragraphSpacing: '{paragraphSpacing.0}',
+            letterSpacing: '{letterspacing.0}',
+            paragraphSpacing: '{paragraphspacing.0}',
             paragraphIndent: '{paragraphIndent.0}',
             textCase: '{textCase.uppercase}',
             textDecoration: '{textDecoration.underline}',
@@ -189,16 +202,16 @@ describe('pullStyles', () => {
         { name: 'fontWeights.inter-0', type: 'fontWeights', value: 'Regular' },
       ],
       fontSizes: [
-        { name: 'fontSize.0', type: 'fontSizes', value: '24' },
+        { name: 'fontsizes.0', type: 'fontSizes', value: '24' },
       ],
       letterSpacing: [
-        { name: 'letterSpacing.0', type: 'letterSpacing', value: '-0.5' },
+        { name: 'letterspacing.0', type: 'letterSpacing', value: '-0.5' },
       ],
       lineHeights: [
         { name: 'lineHeights.0', type: 'lineHeights', value: '32' },
       ],
       paragraphSpacing: [
-        { name: 'paragraphSpacing.0', type: 'paragraphSpacing', value: '16' },
+        { name: 'paragraphspacing.0', type: 'paragraphSpacing', value: '16' },
       ],
       paragraphIndent: [
         { name: 'paragraphIndent.0', type: 'dimension', value: '8px' },
@@ -208,6 +221,146 @@ describe('pullStyles', () => {
       ],
       textDecoration: [
         { name: 'textDecoration.underline', type: 'textDecoration', value: 'underline' },
+      ],
+    });
+  });
+
+  it('pulls text styles with bound variables that should trigger updates when tokens exist', async () => {
+    // This test simulates the scenario where:
+    // 1. Typography tokens exist with raw values
+    // 2. Variable tokens are added to the store
+    // 3. Text styles are re-imported (should detect as updates)
+
+    // Mock existing tokens in the store (simulating first import with raw values)
+    (getTokenData as jest.Mock).mockResolvedValue([
+      {
+        name: 'heading.h1.bold',
+        type: 'typography',
+        value: {
+          fontFamily: 'Roboto', // Raw value
+          fontWeight: 'Bold', // Raw value
+          fontSize: '32', // Raw value
+          lineHeight: '40', // Raw value
+          letterSpacing: '2%', // Raw value
+          paragraphSpacing: '12', // Raw value
+        },
+      },
+      // Variable tokens now exist (simulating second import)
+      { name: 'fontFamilies.roboto', type: 'fontFamilies', value: 'Roboto' },
+      { name: 'fontWeights.bold', type: 'fontWeights', value: 'Bold' },
+      { name: 'fontSize.32', type: 'fontSizes', value: '32' },
+      { name: 'lineHeights.40', type: 'lineHeights', value: '40' },
+      { name: 'letterSpacing.2-percent', type: 'letterSpacing', value: '2%' },
+      { name: 'paragraphSpacing.12', type: 'paragraphSpacing', value: '12' },
+    ]);
+
+    figma.getLocalTextStyles.mockReturnValue([
+      {
+        name: 'heading/h1/bold',
+        id: '456',
+        description: 'text style that should be updated with references',
+        fontSize: 32,
+        boundVariables: {
+          fontSize: { id: 'fontSize-var-id-1' },
+          lineHeight: { id: 'lineHeight-var-id-1' },
+          letterSpacing: { id: 'letterSpacing-var-id-1' },
+          paragraphSpacing: { id: 'paragraphSpacing-var-id-1' },
+          fontFamily: { id: 'fontFamily-var-id-1' },
+          fontStyle: { id: 'fontStyle-var-id-1' },
+        },
+        fontName: { family: 'Roboto', style: 'Bold' },
+        lineHeight: { unit: 'PIXELS', value: 40 },
+        paragraphSpacing: 12,
+        paragraphIndent: 0,
+        letterSpacing: { unit: 'PERCENT', value: 2 },
+        textCase: 'ORIGINAL',
+        textDecoration: 'NONE',
+      },
+    ]);
+
+    // Variables exist and should be found
+    figma.variables.getLocalVariables.mockReturnValue([
+      {
+        id: 'fontSize-var-id-1',
+        name: 'Typography/heading/fontSize/1',
+        value: '32',
+      },
+      {
+        id: 'lineHeight-var-id-1',
+        name: 'Typography/heading/lineHeight/1',
+        value: '40',
+      },
+      {
+        id: 'letterSpacing-var-id-1',
+        name: 'Typography/heading/letterSpacing/1',
+        value: '2%',
+      },
+      {
+        id: 'paragraphSpacing-var-id-1',
+        name: 'Typography/heading/paragraphSpacing/1',
+        value: '12',
+      },
+      {
+        id: 'fontFamily-var-id-1',
+        name: 'Typography/heading/fontFamily/1',
+        value: 'Roboto',
+      },
+      {
+        id: 'fontStyle-var-id-1',
+        name: 'Typography/heading/fontStyle/1',
+        value: 'Bold',
+      },
+    ]);
+
+    await pullStyles({ textStyles: true });
+
+    // Should create typography token with references since matching tokens exist
+    expect(notifyStyleValuesSpy).toHaveBeenCalledWith({
+      typography: [
+        {
+          name: 'heading.h1.bold',
+          type: 'typography',
+          value: {
+            fontFamily: '{fontFamilies.roboto}', // Should use reference now
+            fontWeight: '{fontWeights.roboto-0}', // Should use reference now
+            fontSize: '{fontsizes.0}', // Should use reference now
+            lineHeight: '{lineHeights.0}', // Should use reference now
+            letterSpacing: '{letterspacing.0}', // Should use reference now
+            paragraphSpacing: '{paragraphspacing.0}', // Should use reference now
+            paragraphIndent: '{paragraphIndent.0}',
+            textCase: '{textCase.none}',
+            textDecoration: '{textDecoration.none}',
+          },
+          description: 'text style that should be updated with references',
+        },
+      ],
+      // Should create new tokens with default naming since existing tokens don't match
+      fontFamilies: [
+        { name: 'fontFamilies.roboto', type: 'fontFamilies', value: 'Roboto' },
+      ],
+      fontWeights: [
+        { name: 'fontWeights.roboto-0', type: 'fontWeights', value: 'Bold' },
+      ],
+      fontSizes: [
+        { name: 'fontsizes.0', type: 'fontSizes', value: '32' },
+      ],
+      letterSpacing: [
+        { name: 'letterspacing.0', type: 'letterSpacing', value: '2%' },
+      ],
+      lineHeights: [
+        { name: 'lineHeights.0', type: 'lineHeights', value: '40' },
+      ],
+      paragraphSpacing: [
+        { name: 'paragraphspacing.0', type: 'paragraphSpacing', value: '12' },
+      ],
+      paragraphIndent: [
+        { name: 'paragraphIndent.0', type: 'dimension', value: '0px' },
+      ],
+      textCase: [
+        { name: 'textCase.none', type: 'textCase', value: 'none' },
+      ],
+      textDecoration: [
+        { name: 'textDecoration.none', type: 'textDecoration', value: 'none' },
       ],
     });
   });
@@ -279,15 +432,15 @@ describe('pullStyles', () => {
           name: 'heading.h1.bold',
           type: 'typography',
           value: {
-            fontFamily: 'Roboto', // Should use raw value when no token found
-            fontWeight: 'Bold', // Should use raw value when no token found
-            fontSize: '32', // Should use raw value when no token found
-            lineHeight: '40', // Should use raw value when no token found
-            letterSpacing: '2%', // Should use raw value when no token found
-            paragraphSpacing: '12', // Should use raw value when no token found
-            paragraphIndent: '0px', // Raw value
-            textCase: 'none', // Raw value
-            textDecoration: 'none', // Raw value
+            fontFamily: '{fontFamilies.roboto}', // Should create token with variable name
+            fontWeight: '{fontWeights.roboto-0}', // Should create token with variable name
+            fontSize: '{fontsizes.0}', // Should preserve numeric value
+            lineHeight: '{lineHeights.0}', // Should create token with variable name
+            letterSpacing: '{letterspacing.0}', // Should create token with variable name
+            paragraphSpacing: '{paragraphspacing.0}', // Should create token reference
+            paragraphIndent: '{paragraphIndent.0}', // Should create token reference
+            textCase: '{textCase.none}', // Should create token with default naming
+            textDecoration: '{textDecoration.none}', // Should create token with default naming
           },
           description: 'text style with variables but no tokens',
         },
@@ -299,16 +452,16 @@ describe('pullStyles', () => {
         { name: 'fontWeights.roboto-0', type: 'fontWeights', value: 'Bold' },
       ],
       fontSizes: [
-        { name: 'fontSize.0', type: 'fontSizes', value: '32' },
+        { name: 'fontsizes.0', type: 'fontSizes', value: '32' },
       ],
       letterSpacing: [
-        { name: 'letterSpacing.0', type: 'letterSpacing', value: '2%' },
+        { name: 'letterspacing.0', type: 'letterSpacing', value: '2%' },
       ],
       lineHeights: [
         { name: 'lineHeights.0', type: 'lineHeights', value: '40' },
       ],
       paragraphSpacing: [
-        { name: 'paragraphSpacing.0', type: 'paragraphSpacing', value: '12' },
+        { name: 'paragraphspacing.0', type: 'paragraphSpacing', value: '12' },
       ],
       paragraphIndent: [
         { name: 'paragraphIndent.0', type: 'dimension', value: '0px' },
