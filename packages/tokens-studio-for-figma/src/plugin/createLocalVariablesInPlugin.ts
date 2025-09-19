@@ -5,12 +5,17 @@ import { SettingsState } from '@/app/store/models/settings';
 import updateVariables from './updateVariables';
 import { ReferenceVariableType } from './setValuesOnVariable';
 import updateVariablesToReference from './updateVariablesToReference';
-import { notifyUI } from './notifiers';
+import { notifyUI, postToUI } from './notifiers';
+import { MessageFromPluginTypes } from '@/types/messages';
+import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { mergeVariableReferencesWithLocalVariables } from './mergeVariableReferences';
 import { findCollectionAndModeIdForTheme } from './findCollectionAndModeIdForTheme';
 import { createNecessaryVariableCollections } from './createNecessaryVariableCollections';
 import { getVariablesWithoutZombies } from './getVariablesWithoutZombies';
 import { getOverallConfig } from '@/utils/tokenHelpers';
+import { generateTokensToCreate } from './generateTokensToCreate';
+import checkIfTokenCanCreateVariable from '@/utils/checkIfTokenCanCreateVariable';
+import { ProgressTracker } from './ProgressTracker';
 
 export type LocalVariableInfo = {
   collectionId: string;
@@ -45,30 +50,71 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
     const overallConfig = getOverallConfig(themeInfo.themes, selectedThemes);
     const collections = await createNecessaryVariableCollections(themeInfo.themes, selectedThemes);
 
-    await Promise.all(selectedThemeObjects.map(async (theme) => {
+    // Calculate total number of variables for progress tracking
+    const totalVariableTokens = selectedThemeObjects.reduce((total, theme) => {
+      const themeTokens = generateTokensToCreate({ theme, tokens, overallConfig });
+      const variableTokenCount = themeTokens.filter((token) => checkIfTokenCanCreateVariable(token, settings)).length;
+      return total + variableTokenCount;
+    }, 0);
+
+    // Create a single global progress tracker for all variable creation
+    let globalProgressTracker: ProgressTracker | null = null;
+    if (totalVariableTokens > 10) {
+      // First, ensure any previous job is completed to avoid UI counter accumulation
+      postToUI({
+        type: MessageFromPluginTypes.COMPLETE_JOB,
+        name: BackgroundJobs.UI_CREATEVARIABLES,
+      });
+
+      // Small delay to ensure UI processes the completion
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      globalProgressTracker = new ProgressTracker(BackgroundJobs.UI_CREATEVARIABLES);
+      postToUI({
+        type: MessageFromPluginTypes.START_JOB,
+        job: {
+          name: BackgroundJobs.UI_CREATEVARIABLES,
+          timePerTask: 10, // More realistic 10ms per variable token
+          totalTasks: totalVariableTokens,
+          completedTasks: 0,
+        },
+      });
+    }
+
+    // Process themes sequentially
+    for (const theme of selectedThemeObjects) {
       const { collection, modeId } = findCollectionAndModeIdForTheme(theme.group ?? theme.name, theme.name, collections);
 
-      if (!collection || !modeId) return;
+      if (collection && modeId) {
+        const allVariableObj = await updateVariables({
+          collection, mode: modeId, theme, tokens, settings, overallConfig, progressTracker: globalProgressTracker,
+        });
 
-      const allVariableObj = await updateVariables({
-        collection, mode: modeId, theme, tokens, settings, overallConfig,
-      });
-      figmaVariablesAfterCreate += allVariableObj.removedVariables.length;
-      if (Object.keys(allVariableObj.variableIds).length > 0) {
-        allVariableCollectionIds[theme.id] = {
-          collectionId: collection.id,
-          modeId,
-          variableIds: allVariableObj.variableIds,
-        };
-        referenceVariableCandidates = referenceVariableCandidates.concat(allVariableObj.referenceVariableCandidate);
+        figmaVariablesAfterCreate += allVariableObj.removedVariables.length;
+        if (Object.keys(allVariableObj.variableIds).length > 0) {
+          allVariableCollectionIds[theme.id] = {
+            collectionId: collection.id,
+            modeId,
+            variableIds: allVariableObj.variableIds,
+          };
+          referenceVariableCandidates = referenceVariableCandidates.concat(allVariableObj.referenceVariableCandidate);
+        }
+        updatedVariableCollections.push(collection);
       }
-      updatedVariableCollections.push(collection);
-    }));
+    }
     // Gather references that we should use. Merge current theme references with the ones from all themes as well as local variables
     const existingVariables = await mergeVariableReferencesWithLocalVariables(selectedThemeObjects, themeInfo.themes);
 
     // Update variables to use references instead of raw values
     updatedVariables = await updateVariablesToReference(existingVariables, referenceVariableCandidates);
+
+    // Complete progress tracking like NodeManager
+    if (totalVariableTokens > 10) {
+      postToUI({
+        type: MessageFromPluginTypes.COMPLETE_JOB,
+        name: BackgroundJobs.UI_CREATEVARIABLES,
+      });
+    }
   }
 
   figmaVariablesAfterCreate += (await getVariablesWithoutZombies())?.length ?? 0;
