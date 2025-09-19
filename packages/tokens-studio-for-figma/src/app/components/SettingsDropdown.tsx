@@ -8,6 +8,7 @@ import { settingsStateSelector, localApiStateSelector, autoApplyThemeOnDropSelec
 import { isEqual } from '@/utils/isEqual';
 
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import { track } from '@/utils/analytics';
 
 export default function SettingsDropdown() {
   const localApiState = useSelector(localApiStateSelector);
@@ -39,7 +40,9 @@ export default function SettingsDropdown() {
   }, [shouldUpdateStyles, setShouldUpdateStyles]);
 
   const handleAutoApplyThemeOnDrop = React.useCallback(() => {
-    setAutoApplyThemeOnDrop(!autoApplyThemeOnDrop);
+    const newValue = !autoApplyThemeOnDrop;
+    track('autoApplyThemeOnDrop', { value: newValue });
+    setAutoApplyThemeOnDrop(newValue);
   }, [autoApplyThemeOnDrop, setAutoApplyThemeOnDrop]);
 
   return (
