@@ -6,6 +6,7 @@ import { Check, Settings } from 'iconoir-react';
 import { Dispatch } from '../store';
 import { settingsStateSelector, localApiStateSelector, autoApplyThemeOnDropSelector } from '@/selectors';
 import { isEqual } from '@/utils/isEqual';
+import { track } from '@/utils/analytics';
 
 import { StorageProviderType } from '@/constants/StorageProviderType';
 
@@ -39,7 +40,9 @@ export default function SettingsDropdown() {
   }, [shouldUpdateStyles, setShouldUpdateStyles]);
 
   const handleAutoApplyThemeOnDrop = React.useCallback(() => {
-    setAutoApplyThemeOnDrop(!autoApplyThemeOnDrop);
+    const newValue = !autoApplyThemeOnDrop;
+    track('autoApplyThemeOnDrop', { value: newValue });
+    setAutoApplyThemeOnDrop(newValue);
   }, [autoApplyThemeOnDrop, setAutoApplyThemeOnDrop]);
 
   return (
