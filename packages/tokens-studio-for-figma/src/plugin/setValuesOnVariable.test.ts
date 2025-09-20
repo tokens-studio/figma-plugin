@@ -219,4 +219,138 @@ describe('SetValuesOnVariable', () => {
     await setValuesOnVariable(variablesInFigma, tokens, collection, mode, baseFontSize);
     expect(mockCreateVariable).toBeCalledWith('global/fontWeight', collection, 'FLOAT');
   });
+
+  it('should apply variable scopes when token has figma extensions', async () => {
+    const mockSetScopes = jest.fn();
+    const testVariable = {
+      id: 'VariableID:309:scopes',
+      key: 'scopes-test',
+      name: 'colors/primary',
+      setValueForMode: mockSetValueForMode,
+      valuesByMode: { 309: { r: 0, g: 0, b: 1, a: 1 } },
+      set scopes(value) { mockSetScopes(value); },
+    } as unknown as Variable;
+
+    const tokens = [{
+      name: 'colors.primary',
+      path: 'colors/primary',
+      value: '#0000ff',
+      rawValue: '#0000ff',
+      type: TokenTypes.COLOR,
+      variableId: 'scopes-test',
+      $extensions: {
+        'com.figma': {
+          scopes: ['ALL_FILLS', 'TEXT_FILL'],
+        },
+      },
+    }];
+
+    variablesInFigma.push(testVariable);
+    await setValuesOnVariable(variablesInFigma, tokens, collection, mode, baseFontSize);
+    expect(mockSetScopes).toBeCalledWith(['ALL_FILLS', 'TEXT_FILL']);
+  });
+
+  it('should apply variable code syntax when token has figma extensions', async () => {
+    const mockSetVariableCodeSyntax = jest.fn();
+    const testVariable = {
+      id: 'VariableID:309:syntax',
+      key: 'syntax-test',
+      name: 'colors/secondary',
+      setValueForMode: mockSetValueForMode,
+      valuesByMode: { 309: { r: 1, g: 0, b: 0, a: 1 } },
+      setVariableCodeSyntax: mockSetVariableCodeSyntax,
+    } as unknown as Variable;
+
+    const tokens = [{
+      name: 'colors.secondary',
+      path: 'colors/secondary',
+      value: '#ff0000',
+      rawValue: '#ff0000',
+      type: TokenTypes.COLOR,
+      variableId: 'syntax-test',
+      $extensions: {
+        'com.figma': {
+          codeSyntax: {
+            Web: '--color-secondary',
+            Android: 'color_secondary',
+            iOS: 'ColorSecondary',
+          },
+        },
+      },
+    }];
+
+    variablesInFigma.push(testVariable);
+    await setValuesOnVariable(variablesInFigma, tokens, collection, mode, baseFontSize);
+    expect(mockSetVariableCodeSyntax).toBeCalledWith('WEB', '--color-secondary');
+    expect(mockSetVariableCodeSyntax).toBeCalledWith('ANDROID', 'color_secondary');
+    expect(mockSetVariableCodeSyntax).toBeCalledWith('iOS', 'ColorSecondary');
+  });
+
+  it('should apply hiddenFromPublishing when token has figma extensions', async () => {
+    const testVariable = {
+      id: 'VariableID:309:hidden',
+      key: 'hidden-test',
+      name: 'colors/hidden',
+      setValueForMode: mockSetValueForMode,
+      valuesByMode: { 309: { r: 0, g: 1, b: 0, a: 1 } },
+      hiddenFromPublishing: false,
+    } as unknown as Variable;
+
+    const tokens = [{
+      name: 'colors.hidden',
+      path: 'colors/hidden',
+      value: '#00ff00',
+      rawValue: '#00ff00',
+      type: TokenTypes.COLOR,
+      variableId: 'hidden-test',
+      $extensions: {
+        'com.figma': {
+          hiddenFromPublishing: true,
+        },
+      },
+    }];
+
+    variablesInFigma.push(testVariable);
+    await setValuesOnVariable(variablesInFigma, tokens, collection, mode, baseFontSize);
+    expect(testVariable.hiddenFromPublishing).toBe(true);
+  });
+
+  it('should apply all figma extensions together', async () => {
+    const mockSetScopes = jest.fn();
+    const mockSetVariableCodeSyntax = jest.fn();
+    const testVariable = {
+      id: 'VariableID:309:combined',
+      key: 'combined-test',
+      name: 'spacing/medium',
+      setValueForMode: mockSetValueForMode,
+      valuesByMode: { 309: 16 },
+      set scopes(value) { mockSetScopes(value); },
+      setVariableCodeSyntax: mockSetVariableCodeSyntax,
+      hiddenFromPublishing: false,
+    } as unknown as Variable;
+
+    const tokens = [{
+      name: 'spacing.medium',
+      path: 'spacing/medium',
+      value: '16',
+      rawValue: '16',
+      type: TokenTypes.SPACING,
+      variableId: 'combined-test',
+      $extensions: {
+        'com.figma': {
+          scopes: ['GAP', 'WIDTH_HEIGHT'],
+          codeSyntax: {
+            Web: '--spacing-medium',
+          },
+          hiddenFromPublishing: true,
+        },
+      },
+    }];
+
+    variablesInFigma.push(testVariable);
+    await setValuesOnVariable(variablesInFigma, tokens, collection, mode, baseFontSize);
+    expect(mockSetScopes).toBeCalledWith(['GAP', 'WIDTH_HEIGHT']);
+    expect(mockSetVariableCodeSyntax).toBeCalledWith('WEB', '--spacing-medium');
+    expect(testVariable.hiddenFromPublishing).toBe(true);
+  });
 });

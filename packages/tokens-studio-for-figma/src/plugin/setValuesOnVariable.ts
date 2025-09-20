@@ -88,6 +88,15 @@ export default async function setValuesOnVariable(
             }
           }
 
+          // Set hiddenFromPublishing if defined in token extensions
+          if (figmaExtensions?.hiddenFromPublishing !== undefined) {
+            try {
+              variable.hiddenFromPublishing = figmaExtensions.hiddenFromPublishing;
+            } catch (e) {
+              console.error('Failed to set hiddenFromPublishing:', e);
+            }
+          }
+
           // Check if the variable already has the correct alias reference before updating
           const existingVariableValue = variable.valuesByMode[mode];
           const rawValue = typeof token.rawValue === 'string' ? token.rawValue : undefined;

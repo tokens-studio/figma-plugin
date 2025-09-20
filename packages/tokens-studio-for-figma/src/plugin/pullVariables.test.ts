@@ -9,6 +9,7 @@ jest.mock('./getVariablesWithoutZombies', () => ({
       remote: false,
       resolvedType: 'COLOR',
       variableCollectionId: 'coll1',
+      hiddenFromPublishing: false, // Default value
       valuesByMode: {
         '1:0': {
           r: 1, g: 1, b: 1, a: 1,
@@ -25,10 +26,29 @@ jest.mock('./getVariablesWithoutZombies', () => ({
       },
     },
     {
+      name: 'ColorWithExtensions',
+      remote: false,
+      resolvedType: 'COLOR',
+      variableCollectionId: 'coll1',
+      scopes: ['ALL_FILLS', 'TEXT_FILL'],
+      hiddenFromPublishing: true,
+      codeSyntax: {
+        WEB: '--color-primary',
+        ANDROID: 'color_primary',
+        iOS: 'ColorPrimary',
+      },
+      valuesByMode: {
+        '1:0': {
+          r: 0, g: 0, b: 1, a: 1,
+        },
+      },
+    },
+    {
       name: 'Number1',
       remote: false,
       resolvedType: 'FLOAT',
       variableCollectionId: 'coll1',
+      hiddenFromPublishing: false,
       valuesByMode: {
         '1:0': 24,
         '1:1': 24,
@@ -41,6 +61,7 @@ jest.mock('./getVariablesWithoutZombies', () => ({
       remote: false,
       resolvedType: 'FLOAT',
       variableCollectionId: 'coll1',
+      hiddenFromPublishing: false,
       valuesByMode: {
         '1:0': 16,
         '1:1': 16,
@@ -53,6 +74,7 @@ jest.mock('./getVariablesWithoutZombies', () => ({
       remote: false,
       resolvedType: 'FLOAT',
       variableCollectionId: 'coll1',
+      hiddenFromPublishing: false,
       valuesByMode: {
         '1:0': 24.8,
         '1:1': 24.8,
@@ -65,6 +87,7 @@ jest.mock('./getVariablesWithoutZombies', () => ({
       remote: false,
       resolvedType: 'STRING',
       variableCollectionId: 'coll1',
+      hiddenFromPublishing: false,
       valuesByMode: {
         '1:0': 'Hello',
         '1:1': 'Hello',
@@ -77,6 +100,7 @@ jest.mock('./getVariablesWithoutZombies', () => ({
       remote: false,
       resolvedType: 'BOOLEAN',
       variableCollectionId: 'coll1',
+      hiddenFromPublishing: false,
       valuesByMode: {
         '1:0': true,
         '1:1': true,
@@ -977,5 +1001,36 @@ describe('pullStyles', () => {
         ['Old Collection/Old Mode', 'Collection 1/Default'],
       ]),
     );
+  });
+
+  it('pulls variables with figma extensions (scopes, codeSyntax, hiddenFromPublishing)', async () => {
+    await pullVariables({ useDimensions: false, useRem: false }, [], false);
+
+    // Verify that the ColorWithExtensions variable has the expected extensions
+    const actualCall = notifyStyleValuesSpy.mock.calls[0][0];
+    
+    // Find the color token with extensions
+    const colorWithExtensions = actualCall.colors?.find(
+      (c) => c.name === 'ColorWithExtensions' && c.parent === 'Collection 1/Default'
+    );
+
+    expect(colorWithExtensions).toBeDefined();
+    expect(colorWithExtensions).toEqual({
+      name: 'ColorWithExtensions',
+      parent: 'Collection 1/Default',
+      type: 'color',
+      value: '#0000ff',
+      $extensions: {
+        'com.figma': {
+          scopes: ['ALL_FILLS', 'TEXT_FILL'],
+          codeSyntax: {
+            Web: '--color-primary',
+            Android: 'color_primary',
+            iOS: 'ColorPrimary',
+          },
+          hiddenFromPublishing: true,
+        },
+      },
+    });
   });
 });
