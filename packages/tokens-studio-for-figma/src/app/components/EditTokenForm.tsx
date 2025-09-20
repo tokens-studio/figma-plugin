@@ -352,6 +352,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     const newValue = { ...internalEditToken.$extensions?.['com.figma'] };
     delete newValue?.scopes;
     delete newValue?.codeSyntax;
+    delete newValue?.hiddenFromPublishing;
     setInternalEditToken({
       ...internalEditToken,
       $extensions: {
@@ -362,7 +363,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
   }, [internalEditToken]);
 
   const handleFigmaVariableChange = React.useCallback(
-    (scopes: string[], codeSyntax: Partial<Record<string, string>>) => {
+    (scopes: string[], codeSyntax: Partial<Record<string, string>>, hiddenFromPublishing?: boolean) => {
       setInternalEditToken({
         ...internalEditToken,
         $extensions: {
@@ -371,6 +372,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
             ...internalEditToken.$extensions?.['com.figma'],
             scopes: scopes.length > 0 ? scopes : undefined,
             codeSyntax: Object.keys(codeSyntax).length > 0 ? codeSyntax : undefined,
+            hiddenFromPublishing,
           },
         } as SingleToken['$extensions'],
       });

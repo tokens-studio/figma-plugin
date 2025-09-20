@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import {
-  IconButton, Heading, Checkbox, Text, Stack, Label,
+  IconButton, Heading, Checkbox, Text, Stack, Label, Select,
 } from '@tokens-studio/ui';
 import IconPlus from '@/icons/plus.svg';
 import IconMinus from '@/icons/minus.svg';
@@ -12,6 +12,7 @@ import { TokenTypes } from '@/constants/TokenTypes';
 
 type VariableScope = 'ALL_SCOPES' | 'TEXT_CONTENT' | 'CORNER_RADIUS' | 'WIDTH_HEIGHT' | 'GAP' | 'OPACITY' | 'STROKE_FLOAT' | 'EFFECT_FLOAT' | 'FONT_WEIGHT' | 'FONT_SIZE' | 'LINE_HEIGHT' | 'LETTER_SPACING' | 'PARAGRAPH_SPACING' | 'PARAGRAPH_INDENT' | 'ALL_FILLS' | 'FRAME_FILL' | 'SHAPE_FILL' | 'TEXT_FILL' | 'STROKE_COLOR' | 'EFFECT_COLOR' | 'FONT_FAMILY' | 'FONT_STYLE';
 type CodeSyntaxPlatform = 'Web' | 'Android' | 'iOS';
+type HiddenFromPublishingOption = 'inherit' | 'show' | 'hide';
 
 const variableScopeOptions: { value: VariableScope; label: string }[] = [
   { value: 'ALL_SCOPES', label: 'Show in all supported properties' },
@@ -97,13 +98,19 @@ const codeSyntaxPlatformOptions: { value: CodeSyntaxPlatform; label: string }[] 
   { value: 'iOS', label: 'iOS' },
 ];
 
+const hiddenFromPublishingOptions: { value: HiddenFromPublishingOption; label: string }[] = [
+  { value: 'inherit', label: 'Inherit from collection' },
+  { value: 'show', label: 'Show in publishing' },
+  { value: 'hide', label: 'Hide from publishing' },
+];
+
 export default function FigmaVariableForm({
   internalEditToken,
   handleFigmaVariableChange,
   handleRemoveFigmaVariable,
 }: {
   internalEditToken: EditTokenObject;
-  handleFigmaVariableChange: (scopes: VariableScope[], codeSyntax: Partial<Record<CodeSyntaxPlatform, string>>) => void;
+  handleFigmaVariableChange: (scopes: VariableScope[], codeSyntax: Partial<Record<CodeSyntaxPlatform, string>>, hiddenFromPublishing?: boolean) => void;
   handleRemoveFigmaVariable: () => void;
 }) {
   const [figmaVariableVisible, setFigmaVariableVisible] = React.useState(false);
@@ -111,6 +118,12 @@ export default function FigmaVariableForm({
   const currentScopes = useMemo(() => internalEditToken?.$extensions?.['com.figma']?.scopes as VariableScope[] || [], [internalEditToken]);
 
   const currentCodeSyntax = useMemo(() => internalEditToken?.$extensions?.['com.figma']?.codeSyntax as Partial<Record<CodeSyntaxPlatform, string>> || {}, [internalEditToken]);
+
+  const currentHiddenFromPublishing = useMemo(() => {
+    const hiddenValue = internalEditToken?.$extensions?.['com.figma']?.hiddenFromPublishing;
+    if (hiddenValue === undefined) return 'inherit';
+    return hiddenValue ? 'hide' : 'show';
+  }, [internalEditToken]);
 
   const shouldShowFigmaVariableSection = useMemo(() => tokenTypesToCreateVariable.includes(internalEditToken.type), [internalEditToken.type]);
 
@@ -121,14 +134,18 @@ export default function FigmaVariableForm({
   }, [internalEditToken.type]);
 
   React.useEffect(() => {
-    if (internalEditToken?.$extensions?.['com.figma']?.scopes || internalEditToken?.$extensions?.['com.figma']?.codeSyntax) {
+    if (
+      internalEditToken?.$extensions?.['com.figma']?.scopes 
+      || internalEditToken?.$extensions?.['com.figma']?.codeSyntax
+      || internalEditToken?.$extensions?.['com.figma']?.hiddenFromPublishing !== undefined
+    ) {
       setFigmaVariableVisible(true);
     }
   }, [internalEditToken]);
 
   const addFigmaVariable = useCallback(() => {
     setFigmaVariableVisible(true);
-    handleFigmaVariableChange([], {});
+    handleFigmaVariableChange([], {}, undefined);
   }, [handleFigmaVariableChange]);
 
   const removeFigmaVariable = useCallback(() => {
@@ -151,8 +168,9 @@ export default function FigmaVariableForm({
       newScopes = currentScopes.filter((s) => s !== scope);
     }
 
-    handleFigmaVariableChange(newScopes, currentCodeSyntax);
-  }, [currentScopes, currentCodeSyntax, handleFigmaVariableChange]);
+    const hiddenValue = currentHiddenFromPublishing === 'inherit' ? undefined : currentHiddenFromPublishing === 'hide';
+    handleFigmaVariableChange(newScopes, currentCodeSyntax, hiddenValue);
+  }, [currentScopes, currentCodeSyntax, currentHiddenFromPublishing, handleFigmaVariableChange]);
 
   const handleCodeSyntaxPlatformChange = useCallback((platform: CodeSyntaxPlatform, checked: boolean) => {
     const newCodeSyntax = { ...currentCodeSyntax };
@@ -161,13 +179,20 @@ export default function FigmaVariableForm({
     } else {
       delete newCodeSyntax[platform];
     }
-    handleFigmaVariableChange(currentScopes, newCodeSyntax);
-  }, [currentScopes, currentCodeSyntax, handleFigmaVariableChange]);
+    const hiddenValue = currentHiddenFromPublishing === 'inherit' ? undefined : currentHiddenFromPublishing === 'hide';
+    handleFigmaVariableChange(currentScopes, newCodeSyntax, hiddenValue);
+  }, [currentScopes, currentCodeSyntax, currentHiddenFromPublishing, handleFigmaVariableChange]);
 
   const handleCodeSyntaxValueChange = useCallback((platform: CodeSyntaxPlatform, value: string) => {
     const newCodeSyntax = { ...currentCodeSyntax };
     newCodeSyntax[platform] = value;
-    handleFigmaVariableChange(currentScopes, newCodeSyntax);
+    const hiddenValue = currentHiddenFromPublishing === 'inherit' ? undefined : currentHiddenFromPublishing === 'hide';
+    handleFigmaVariableChange(currentScopes, newCodeSyntax, hiddenValue);
+  }, [currentScopes, currentCodeSyntax, currentHiddenFromPublishing, handleFigmaVariableChange]);
+
+  const handleHiddenFromPublishingChange = useCallback((option: HiddenFromPublishingOption) => {
+    const hiddenValue = option === 'inherit' ? undefined : option === 'hide';
+    handleFigmaVariableChange(currentScopes, currentCodeSyntax, hiddenValue);
   }, [currentScopes, currentCodeSyntax, handleFigmaVariableChange]);
 
   const handleScopeCheckedChange = useCallback((scope: VariableScope) => (checked: boolean | string) => {
@@ -277,6 +302,23 @@ export default function FigmaVariableForm({
                   </Box>
                 ))}
               </Stack>
+            </Box>
+
+            <Box>
+              <Text muted size="small" css={{ marginBottom: '$2' }}>
+                Publishing
+              </Text>
+              <Select
+                value={currentHiddenFromPublishing}
+                onValueChange={handleHiddenFromPublishingChange}
+                css={{ width: '100%' }}
+              >
+                {hiddenFromPublishingOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </Select>
             </Box>
           </Stack>
         )

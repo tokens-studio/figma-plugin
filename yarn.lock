@@ -2499,7 +2499,7 @@
     lodash "^4.17.15"
     matrix-inverse "^1.0.1"
 
-"@figma/plugin-typings@^1.117.0":
+"@figma/plugin-typings@^1.96.0":
   version "1.117.0"
   resolved "https://registry.yarnpkg.com/@figma/plugin-typings/-/plugin-typings-1.117.0.tgz#a565cb40fb4c5e2bbd797c8c240719042c941158"
   integrity sha512-EDirBOeOcS90SQ5SwrJyTiL6iJxG/81U9nzJJkBqdWRHGMfFWAOydbAlcRylgETKwIKRlflL92nNSt+WmnweKA==

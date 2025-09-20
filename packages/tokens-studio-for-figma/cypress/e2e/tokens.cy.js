@@ -571,4 +571,127 @@ describe('TokenListing', () => {
       ]
     })
   });
+
+  it('can configure figma variable extensions for a color token', () => {
+    cy.startup(mockStartupParams);
+    cy.receiveSetTokens({
+      version: '5',
+      values: {
+        global: [{
+          name: 'colors.primary',
+          value: '#0000ff',
+          type: 'color'
+        }],
+      },
+    });
+
+    // Click on an existing color token to edit it
+    cy.get('[data-testid="colors.primary"]').click();
+    
+    // Add Figma variable configuration
+    cy.get('[data-testid="button-add-figma-variable"]').should('be.visible');
+    cy.get('[data-testid="button-add-figma-variable"]').click();
+
+    // Test variable scopes
+    cy.get('[id="scope-ALL_FILLS"]').should('be.visible');
+    cy.get('[id="scope-ALL_FILLS"]').check();
+    cy.get('[id="scope-TEXT_FILL"]').check();
+
+    // Test code syntax
+    cy.get('[id="syntax-Web"]').check();
+    cy.get('input[placeholder="Web syntax (e.g., --token-name)"]').type('--color-primary');
+
+    cy.get('[id="syntax-Android"]').check();
+    cy.get('input[placeholder="Android syntax (e.g., --token-name)"]').type('color_primary');
+
+    // Test publishing settings
+    cy.get('select').should('be.visible');
+    cy.get('select').select('hide');
+
+    // Save the token
+    cy.get('[data-testid="button-save-token"]').click();
+
+    // Verify the token has been updated with extensions
+    cy.get('@postMessage').should('be.called');
+  });
+
+  it('can remove figma variable extensions', () => {
+    cy.startup(mockStartupParams);
+    cy.receiveSetTokens({
+      version: '5',
+      values: {
+        global: [{
+          name: 'colors.secondary',
+          value: '#ff0000',
+          type: 'color',
+          $extensions: {
+            'com.figma': {
+              scopes: ['ALL_FILLS'],
+              codeSyntax: { Web: '--color-secondary' },
+              hiddenFromPublishing: true
+            }
+          }
+        }],
+      },
+    });
+
+    // Click on token with existing Figma extensions
+    cy.get('[data-testid="colors.secondary"]').click();
+    
+    // Verify Figma section is visible with data
+    cy.get('[data-testid="button-remove-figma-variable"]').should('be.visible');
+    cy.get('[id="scope-ALL_FILLS"]').should('be.checked');
+    cy.get('[id="syntax-Web"]').should('be.checked');
+    cy.get('input[value="--color-secondary"]').should('exist');
+
+    // Remove Figma variable configuration
+    cy.get('[data-testid="button-remove-figma-variable"]').click();
+
+    // Verify sections are hidden
+    cy.get('[data-testid="button-add-figma-variable"]').should('be.visible');
+    cy.get('[id="scope-ALL_FILLS"]').should('not.exist');
+
+    // Save the token
+    cy.get('[data-testid="button-save-token"]').click();
+
+    cy.get('@postMessage').should('be.called');
+  });
+
+  it('shows only relevant scopes for different token types', () => {
+    cy.startup(mockStartupParams);
+    cy.receiveSetTokens({
+      version: '5',
+      values: {
+        global: [
+          { name: 'colors.test', value: '#ff0000', type: 'color' },
+          { name: 'spacing.test', value: '16px', type: 'spacing' },
+          { name: 'fontSizes.test', value: '16px', type: 'fontSizes' }
+        ],
+      },
+    });
+
+    // Test color token scopes
+    cy.get('[data-testid="colors.test"]').click();
+    cy.get('[data-testid="button-add-figma-variable"]').click();
+    cy.get('[id="scope-ALL_FILLS"]').should('be.visible');
+    cy.get('[id="scope-TEXT_FILL"]').should('be.visible');
+    cy.get('[id="scope-CORNER_RADIUS"]').should('not.exist'); // Should not show for color
+    cy.get('[data-testid="button-cancel-edit-token"]').click();
+
+    // Test spacing token scopes
+    cy.get('[data-testid="spacing.test"]').click();
+    cy.get('[data-testid="button-add-figma-variable"]').click();
+    cy.get('[id="scope-GAP"]').should('be.visible');
+    cy.get('[id="scope-WIDTH_HEIGHT"]').should('be.visible');
+    cy.get('[id="scope-ALL_FILLS"]').should('not.exist'); // Should not show for spacing
+    cy.get('[data-testid="button-cancel-edit-token"]').click();
+
+    // Test font size token scopes
+    cy.get('[data-testid="fontSizes.test"]').click();
+    cy.get('[data-testid="button-add-figma-variable"]').click();
+    cy.get('[id="scope-FONT_SIZE"]').should('be.visible');
+    cy.get('[id="scope-ALL_SCOPES"]').should('be.visible');
+    cy.get('[id="scope-GAP"]').should('not.exist'); // Should not show for font size
+    cy.get('[data-testid="button-cancel-edit-token"]').click();
+  });
 });

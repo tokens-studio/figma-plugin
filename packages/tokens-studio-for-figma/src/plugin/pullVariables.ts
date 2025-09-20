@@ -74,6 +74,15 @@ export default async function pullVariables(options: PullVariablesOptions, theme
       // Ignore errors accessing codeSyntax - it might not be available
     }
 
+    // Add hiddenFromPublishing if it's explicitly set (not default)
+    try {
+      if (variable.hiddenFromPublishing === true) { // Only include if explicitly true
+        extensions.hiddenFromPublishing = variable.hiddenFromPublishing;
+      }
+    } catch (e) {
+      // Ignore errors accessing hiddenFromPublishing - it might not be available
+    }
+
     return Object.keys(extensions).length > 0 ? { 'com.figma': extensions } : undefined;
   };
 
