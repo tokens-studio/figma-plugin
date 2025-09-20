@@ -303,6 +303,98 @@ describe('BitbucketTokenStorage', () => {
     expect(result).toBe(false);
   });
 
+  it('should try to create a branch with slash in name', async () => {
+    const result = await storageProvider.createBranch('feature/new-feature').catch(() => false);
+
+    // Assert
+    expect(mockCreateBranch).toHaveBeenCalledWith({
+      workspace: 'MattOliver',
+      _body: {
+        name: 'feature/new-feature',
+        target: {
+          hash: 'simpleHash',
+        },
+      },
+      repo_slug: 'figma-tokens-testing',
+    });
+    expect(result).toBe(true);
+  });
+
+  it('should use commit SHA for branch names with slashes when reading files', async () => {
+    // Set up a branch with slash in name
+    storageProvider.selectBranch('feature/new-feature');
+    storageProvider.changePath('global.json');
+
+    // Mock the branch info API call to return a commit SHA
+    mockFetch
+      .mockImplementationOnce(() => Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({
+          target: { hash: 'abc123commitsha' },
+        }),
+      }))
+      // Mock the file content API call
+      .mockImplementationOnce((url) => {
+        // Verify that the commit SHA is used instead of the encoded branch name
+        expect(url).toContain('abc123commitsha');
+        expect(url).not.toContain('feature%2Fnew-feature');
+        expect(url).not.toContain('feature/new-feature');
+
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({
+            $themes: [],
+            global: { red: { name: 'red', type: 'color', value: '#ff0000' } },
+          }),
+        });
+      });
+
+    await storageProvider.read();
+
+    // Verify both API calls were made
+    expect(mockFetch).toHaveBeenCalledTimes(2);
+    // First call should be to get branch info
+    expect(mockFetch).toHaveBeenNthCalledWith(1,
+      expect.stringContaining('refs/branches/feature%2Fnew-feature'),
+      expect.any(Object),
+    );
+    // Second call should use the commit SHA
+    expect(mockFetch).toHaveBeenNthCalledWith(2,
+      expect.stringContaining('abc123commitsha'),
+      expect.any(Object),
+    );
+  });
+
+  it('should use encoded branch name for branches without slashes when reading files', async () => {
+    // Set up a branch without slash in name
+    storageProvider.selectBranch('main');
+    storageProvider.changePath('global.json');
+
+    // Mock the file content API call - should only be called once
+    mockFetch.mockImplementationOnce((url) => {
+      // Verify that the encoded branch name is used directly
+      expect(url).toContain('main');
+      expect(url).not.toContain('refs/branches');
+
+      return Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({
+          $themes: [],
+          global: { red: { name: 'red', type: 'color', value: '#ff0000' } },
+        }),
+      });
+    });
+
+    await storageProvider.read();
+
+    // Verify only one API call was made (no branch info call needed)
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining('/src/main/'),
+      expect.any(Object),
+    );
+  });
+
   it('should be able to write', async () => {
     mockFetch.mockImplementationOnce(() =>
       Promise.resolve({
