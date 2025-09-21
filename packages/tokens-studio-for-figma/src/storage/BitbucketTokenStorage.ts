@@ -50,6 +50,18 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     });
   }
 
+  private getFileApiUrl(path: string, owner?: string, repo?: string, branch?: string): string {
+    const ownerName = owner || this.owner;
+    const repoName = repo || this.repository;
+    const branchName = branch || this.branch;
+
+    if (this.baseUrl) {
+      return `${this.baseUrl.replace(/\/$/, '')}/2.0/repositories/${ownerName}/${repoName}/src/${branchName}/${path}`;
+    }
+    // Default Bitbucket Cloud format
+    return `https://api.bitbucket.org/2.0/repositories/${ownerName}/${repoName}/src/${branchName}/${path}`;
+  }
+
   // https://bitbucketjs.netlify.app/#api-repositories-repositories_listBranches OR
   // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-refs/#api-repositories-workspace-repo-slug-refs-get
   public async fetchBranches(): Promise<string[]> {
@@ -273,7 +285,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     const normalizedPath = compact(this.path.split('/')).join('/');
 
     try {
-      const url = `https://api.bitbucket.org/2.0/repositories/${this.owner}/${this.repository}/src/${this.branch}/${normalizedPath}`;
+      const url = this.getFileApiUrl(normalizedPath);
 
       // Single file
       if (this.path.endsWith('.json')) {
@@ -429,7 +441,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
 
     if (!normalizedPath.endsWith('.json') && this.flags.multiFileEnabled) {
       try {
-        const url = `https://api.bitbucket.org/2.0/repositories/${owner}/${repo}/src/${branch}/${normalizedPath}`;
+        const url = this.getFileApiUrl(normalizedPath, owner, repo, branch);
         const existingFiles = await this.fetchJsonFilesFromDirectory(url);
 
         const existingTokenSets: Record<string, boolean> = {};
