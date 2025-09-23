@@ -351,14 +351,11 @@ describe('BitbucketTokenStorage', () => {
 
     await storageProvider.read();
 
-    // Verify both API calls were made
     expect(mockFetch).toHaveBeenCalledTimes(2);
-    // First call should be to get branch info
     expect(mockFetch).toHaveBeenNthCalledWith(1,
       expect.stringContaining('refs/branches/feature%2Fnew-feature'),
       expect.any(Object),
     );
-    // Second call should use the commit SHA
     expect(mockFetch).toHaveBeenNthCalledWith(2,
       expect.stringContaining('abc123commitsha'),
       expect.any(Object),
@@ -366,13 +363,10 @@ describe('BitbucketTokenStorage', () => {
   });
 
   it('should use encoded branch name for branches without slashes when reading files', async () => {
-    // Set up a branch without slash in name
     storageProvider.selectBranch('main');
     storageProvider.changePath('global.json');
 
-    // Mock the file content API call - should only be called once
     mockFetch.mockImplementationOnce((url) => {
-      // Verify that the encoded branch name is used directly
       expect(url).toContain('main');
       expect(url).not.toContain('refs/branches');
 
@@ -387,7 +381,6 @@ describe('BitbucketTokenStorage', () => {
 
     await storageProvider.read();
 
-    // Verify only one API call was made (no branch info call needed)
     expect(mockFetch).toHaveBeenCalledTimes(1);
     expect(mockFetch).toHaveBeenCalledWith(
       expect.stringContaining('/src/main/'),

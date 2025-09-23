@@ -292,7 +292,6 @@ export class BitbucketTokenStorage extends GitTokenStorage {
       const data = await response.json();
       return data.target.hash;
     } catch (error) {
-      // Fallback to using the branch name if we can't get the SHA
       console.warn(`Could not get commit SHA for branch ${branchName}, falling back to branch name:`, error);
       return branchName;
     }
@@ -308,7 +307,6 @@ export class BitbucketTokenStorage extends GitTokenStorage {
         : encodeURIComponent(this.branch);
       const url = `https://api.bitbucket.org/2.0/repositories/${this.owner}/${this.repository}/src/${branchRef}/${normalizedPath}`;
 
-      // Single file
       if (this.path.endsWith('.json')) {
         const jsonFile = await this.fetchJsonFile(url);
 
@@ -364,7 +362,6 @@ export class BitbucketTokenStorage extends GitTokenStorage {
             });
           }),
         );
-        // Process the content of each JSON file
         return jsonFileContents.map((result, index) => {
           const { path } = jsonFiles[index];
           const filePath = path.startsWith(this.path) ? path : `${this.path}/${path}`;
@@ -462,7 +459,6 @@ export class BitbucketTokenStorage extends GitTokenStorage {
 
     if (!normalizedPath.endsWith('.json') && this.flags.multiFileEnabled) {
       try {
-        // For branches with slashes, use commit SHA instead of branch name due to Bitbucket API limitations
         const branchRef = branch.includes('/')
           ? await this.getBranchCommitSha(branch)
           : encodeURIComponent(branch);
