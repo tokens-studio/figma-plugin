@@ -425,10 +425,105 @@ describe('radial and conic gradients', () => {
     expect(result.gradientStops).toHaveLength(2);
   });
 
+  it('should handle radial gradient with at position', () => {
+    const result = convertStringToFigmaGradient('radial-gradient(ellipse at top, #ff0000, #0000ff)');
+    expect(result.type).toEqual('GRADIENT_RADIAL');
+    expect(result.gradientStops).toHaveLength(2);
+    expect(result.gradientStops[0].color).toEqual({
+      r: 1, g: 0, b: 0, a: 1,
+    });
+    expect(result.gradientStops[1].color).toEqual({
+      r: 0, g: 0, b: 1, a: 1,
+    });
+    // "at top" should position at (0.5, 0)
+    expect(result.gradientTransform).toEqual([[1, 0, 0], [0, 1, -0.5]]);
+  });
+
+  it('should handle radial gradient with percentage position', () => {
+    const result = convertStringToFigmaGradient('radial-gradient(ellipse at 10%, #333333, #333333 50%, #eeeeee 75%, #333333 75%)');
+    expect(result.type).toEqual('GRADIENT_RADIAL');
+    expect(result.gradientStops).toHaveLength(4);
+    // "at 10%" should position at (0.1, 0.5) - 10% horizontally, center vertically
+    expect(result.gradientTransform).toEqual([[1, 0, -0.4], [0, 1, 0]]);
+  });
+
+  it('should handle radial gradient with left position', () => {
+    const result = convertStringToFigmaGradient('radial-gradient(circle at left, #ff0000, #0000ff)');
+    expect(result.type).toEqual('GRADIENT_RADIAL');
+    // "at left" should position at (0, 0.5)
+    expect(result.gradientTransform).toEqual([[1, 0, -0.5], [0, 1, 0]]);
+  });
+
+  it('should handle radial gradient with right bottom position', () => {
+    const result = convertStringToFigmaGradient('radial-gradient(circle at right bottom, #ff0000, #0000ff)');
+    expect(result.type).toEqual('GRADIENT_RADIAL');
+    // "at right bottom" should position at (1, 1)
+    expect(result.gradientTransform).toEqual([[1, 0, 0.5], [0, 1, 0.5]]);
+  });
+
+  it('should handle radial gradient with percentage coordinates', () => {
+    const result = convertStringToFigmaGradient('radial-gradient(circle at 25% 75%, #ff0000, #0000ff)');
+    expect(result.type).toEqual('GRADIENT_RADIAL');
+    // "at 25% 75%" should position at (0.25, 0.75)
+    expect(result.gradientTransform).toEqual([[1, 0, -0.25], [0, 1, 0.25]]);
+  });
+
   it('should handle conic gradient with at position', () => {
-    const result = convertStringToFigmaGradient('conic-gradient(from 45deg at 50% 50%, #ff0000, #0000ff)');
+    const result = convertStringToFigmaGradient('conic-gradient(from 45deg at top left, #ff0000, #0000ff)');
     expect(result.type).toEqual('GRADIENT_ANGULAR');
     expect(result.gradientStops).toHaveLength(2);
+    // Should handle both rotation and position
+    expect(result.gradientTransform[0]).toHaveLength(3);
+    expect(result.gradientTransform[1]).toHaveLength(3);
+  });
+
+  it('should handle conic gradient with percentage position', () => {
+    const result = convertStringToFigmaGradient('conic-gradient(at 25% 25%, #ff0000, #0000ff)');
+    expect(result.type).toEqual('GRADIENT_ANGULAR');
+    expect(result.gradientStops).toHaveLength(2);
+    // "at 25% 25%" should position at (0.25, 0.25)
+    // With no rotation (angle=0), transform should be identity with offset
+    expect(result.gradientTransform[0][0]).toBeCloseTo(1);
+    expect(result.gradientTransform[0][1]).toBeCloseTo(0);
+    expect(result.gradientTransform[0][2]).toBeCloseTo(-0.25);
+    expect(result.gradientTransform[1][0]).toBeCloseTo(0);
+    expect(result.gradientTransform[1][1]).toBeCloseTo(1);
+    expect(result.gradientTransform[1][2]).toBeCloseTo(-0.25);
+  });
+
+  it('should handle conic gradient with only at position (no from angle)', () => {
+    const result = convertStringToFigmaGradient('conic-gradient(at bottom, #ff0000, #0000ff)');
+    expect(result.type).toEqual('GRADIENT_ANGULAR');
+    // "at bottom" should position at (0.5, 1) with no rotation
+    expect(result.gradientTransform[0][0]).toBeCloseTo(1);
+    expect(result.gradientTransform[0][1]).toBeCloseTo(0);
+    expect(result.gradientTransform[0][2]).toBeCloseTo(0);
+    expect(result.gradientTransform[1][0]).toBeCloseTo(0);
+    expect(result.gradientTransform[1][1]).toBeCloseTo(1);
+    expect(result.gradientTransform[1][2]).toBeCloseTo(0.5);
+  });
+
+  it('should handle the issue examples correctly', () => {
+    // Test: radial-gradient(ellipse at top, #ff0000, #0000ff)
+    const example1 = convertStringToFigmaGradient('radial-gradient(ellipse at top, #ff0000, #0000ff)');
+    expect(example1.type).toEqual('GRADIENT_RADIAL');
+    expect(example1.gradientStops).toHaveLength(2);
+    expect(example1.gradientStops[0].color).toEqual({ r: 1, g: 0, b: 0, a: 1 });
+    expect(example1.gradientStops[1].color).toEqual({ r: 0, g: 0, b: 1, a: 1 });
+    // "at top" should position at (0.5, 0)
+    expect(example1.gradientTransform).toEqual([[1, 0, 0], [0, 1, -0.5]]);
+    
+    // Test: radial-gradient(ellipse at 10%, #333333, #333333 50%, #eeeeee 75%, #333333 75%)
+    const example2 = convertStringToFigmaGradient('radial-gradient(ellipse at 10%, #333333, #333333 50%, #eeeeee 75%, #333333 75%)');
+    expect(example2.type).toEqual('GRADIENT_RADIAL');
+    expect(example2.gradientStops).toHaveLength(4);
+    // "at 10%" should position at (0.1, 0.5)
+    expect(example2.gradientTransform).toEqual([[1, 0, -0.4], [0, 1, 0]]);
+    // Check color stops have correct positions
+    expect(example2.gradientStops[0].position).toEqual(0);
+    expect(example2.gradientStops[1].position).toEqual(0.5);
+    expect(example2.gradientStops[2].position).toEqual(0.75);
+    expect(example2.gradientStops[3].position).toEqual(0.75);
   });
 });
 
