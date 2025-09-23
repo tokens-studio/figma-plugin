@@ -508,11 +508,15 @@ describe('radial and conic gradients', () => {
     const example1 = convertStringToFigmaGradient('radial-gradient(ellipse at top, #ff0000, #0000ff)');
     expect(example1.type).toEqual('GRADIENT_RADIAL');
     expect(example1.gradientStops).toHaveLength(2);
-    expect(example1.gradientStops[0].color).toEqual({ r: 1, g: 0, b: 0, a: 1 });
-    expect(example1.gradientStops[1].color).toEqual({ r: 0, g: 0, b: 1, a: 1 });
+    expect(example1.gradientStops[0].color).toEqual({
+      r: 1, g: 0, b: 0, a: 1,
+    });
+    expect(example1.gradientStops[1].color).toEqual({
+      r: 0, g: 0, b: 1, a: 1,
+    });
     // "at top" should position at (0.5, 0)
     expect(example1.gradientTransform).toEqual([[1, 0, 0], [0, 1, -0.5]]);
-    
+
     // Test: radial-gradient(ellipse at 10%, #333333, #333333 50%, #eeeeee 75%, #333333 75%)
     const example2 = convertStringToFigmaGradient('radial-gradient(ellipse at 10%, #333333, #333333 50%, #eeeeee 75%, #333333 75%)');
     expect(example2.type).toEqual('GRADIENT_RADIAL');

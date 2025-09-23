@@ -11,10 +11,10 @@ function parsePosition(positionStr: string): { x: number; y: number } {
   // Default to center
   let x = 0.5;
   let y = 0.5;
-  
+
   // Handle keywords and percentages
   const keywords = positionStr.toLowerCase().trim().split(/\s+/);
-  
+
   // If we have exactly one keyword, apply logic based on what it is
   if (keywords.length === 1) {
     const keyword = keywords[0];
@@ -47,7 +47,7 @@ function parsePosition(positionStr: string): { x: number; y: number } {
     }
   } else if (keywords.length >= 2) {
     // Handle two or more values
-    for (let i = 0; i < keywords.length; i++) {
+    for (let i = 0; i < keywords.length; i += 1) {
       const keyword = keywords[i];
       switch (keyword) {
         case 'left':
@@ -82,7 +82,7 @@ function parsePosition(positionStr: string): { x: number; y: number } {
       }
     }
   }
-  
+
   return { x, y };
 }
 
@@ -292,21 +292,21 @@ function convertRadialGradient(parts: string[]): {
   type: 'GRADIENT_RADIAL';
 } {
   // Parse radial gradient syntax: radial-gradient([shape size] [at position], color-stops)
-  
+
   let colorStopsStart = 0;
   let position = { x: 0.5, y: 0.5 }; // Default to center
-  
+
   // Look for position syntax in the first part
   if (parts.length > 0 && !parts[0].includes('#') && !parts[0].includes('rgb') && !parts[0].includes('hsl')) {
     const firstPart = parts[0];
-    
+
     // Check for "at position" syntax
     const atIndex = firstPart.indexOf(' at ');
     if (atIndex !== -1) {
       const positionPart = firstPart.substring(atIndex + 4); // Skip " at "
       position = parsePosition(positionPart);
     }
-    
+
     colorStopsStart = 1;
   }
 
@@ -333,7 +333,7 @@ function convertConicGradient(parts: string[]): {
   type: 'GRADIENT_ANGULAR';
 } {
   // Parse conic gradient syntax: conic-gradient([from angle] [at position], color-stops)
-  
+
   let colorStopsStart = 0;
   let startAngle = 0;
   let position = { x: 0.5, y: 0.5 }; // Default to center
@@ -341,7 +341,7 @@ function convertConicGradient(parts: string[]): {
   // Check if first part specifies angle or position
   if (parts.length > 0 && (parts[0].includes('from') || parts[0].includes('at'))) {
     const firstPart = parts[0];
-    
+
     // Extract angle from "from Xdeg" syntax
     if (firstPart.includes('from') && firstPart.includes('deg')) {
       const angleMatch = firstPart.match(/from\s+(\d+(?:\.\d+)?)deg/);
@@ -349,7 +349,7 @@ function convertConicGradient(parts: string[]): {
         startAngle = parseFloat(angleMatch[1]);
       }
     }
-    
+
     // Extract position from "at position" syntax
     const atIndex = firstPart.indexOf(' at ');
     if (atIndex !== -1) {
@@ -360,7 +360,7 @@ function convertConicGradient(parts: string[]): {
       const positionPart = firstPart.substring(3); // Skip "at "
       position = parsePosition(positionPart);
     }
-    
+
     colorStopsStart = 1;
   }
 
