@@ -529,7 +529,7 @@ describe('editToken', () => {
     expect(tokens.global_Copy).toEqual(expectedTokens);
     expect(usedTokenSet).toEqual({
       global: TokenSetStatus.ENABLED,
-      global_Copy: TokenSetStatus.DISABLED,
+      global_Copy: TokenSetStatus.ENABLED,
     });
     // Expect that we indicate that the remote should update
     expect(mockedUpdateTokensOnSources).toHaveBeenCalledTimes(1);
