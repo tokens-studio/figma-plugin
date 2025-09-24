@@ -2,6 +2,7 @@ export * from './setPrefixStylesWithThemeName';
 export * from './setStyleTypography';
 export * from './setStylesColor';
 export * from './setStylesEffect';
+export * from './setStylesGradient';
 export * from './setVariablesBoolean';
 export * from './setVariablesColor';
 export * from './setVariablesNumber';
