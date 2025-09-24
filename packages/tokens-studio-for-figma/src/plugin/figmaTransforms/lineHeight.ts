@@ -25,10 +25,14 @@ export function convertLineHeightToFigma(inputValue: string, baseFontSize: strin
   return lineHeight;
 }
 
-export function convertFigmaToLineHeight(inputValue: LineHeight): string | number {
-  if (inputValue.unit === 'PIXELS') {
+export function convertFigmaToLineHeight(inputValue: LineHeight | null | undefined): string | number {
+  if (!inputValue || typeof inputValue !== 'object') {
+    return 'AUTO';
+  }
+
+  if (inputValue.unit === 'PIXELS' && typeof inputValue.value === 'number') {
     return +inputValue.value.toFixed(2);
-  } if (inputValue.unit === 'PERCENT') {
+  } if (inputValue.unit === 'PERCENT' && typeof inputValue.value === 'number') {
     return `${+inputValue.value.toFixed(2)}%`;
   }
   return 'AUTO';
