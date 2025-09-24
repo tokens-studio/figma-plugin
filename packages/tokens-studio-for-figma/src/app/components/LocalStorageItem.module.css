@@ -1,0 +1,29 @@
+.mainContainer {
+  align-items: center;
+  flex-direction: row;
+  flex-grow: 1;
+  display: flex;
+  overflow: hidden;
+  gap: var(--space-3, 12px);
+}
+
+.iconContainer {
+  /* Icon wrapper */
+}
+
+.contentContainer {
+  /* Content wrapper */
+}
+
+.titleText {
+  font-size: var(--font-sizes-small);
+  font-weight: var(--font-weights-sans-bold);
+}
+
+.actionsContainer {
+  margin-right: var(--space-2, 8px);
+  min-height: var(--sizes-control-small);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+}

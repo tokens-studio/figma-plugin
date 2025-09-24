@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useLDClient } from 'launchdarkly-react-client-sdk';
 import { useTranslation } from 'react-i18next';
 import {
-  Button, Heading, TextInput, Box, Stack, IconButton,
+  Button, Heading, TextInput, Stack, IconButton,
 } from '@tokens-studio/ui';
 import { EyeClosedIcon, EyeOpenIcon } from '@radix-ui/react-icons';
 import { licenseKeySelector } from '@/selectors/licenseKeySelector';
@@ -21,6 +21,7 @@ import { licenseDetailsSelector } from '@/selectors';
 import { ldUserFactory } from '@/utils/ldUserFactory';
 import { ErrorMessage } from '../ErrorMessage';
 import { addLicenseKey } from '@/utils/addLicenseKey';
+import styles from './AddLicenseKey.module.css';
 
 export default function AddLicenseKey() {
   const dispatch = useDispatch<Dispatch>();
@@ -125,7 +126,7 @@ export default function AddLicenseKey() {
           width: '100%',
         }}
       >
-        <Box css={{ flexGrow: 1 }}>
+        <div className={styles.inputContainer}>
           <TextInput
             type={isMasked ? 'password' : 'text'}
             trailingAction={(
@@ -143,11 +144,11 @@ export default function AddLicenseKey() {
             validationStatus={licenseKeyError ? 'error' : undefined}
           />
           {licenseKeyError && (
-            <Box css={{ paddingTop: '$2' }}>
+            <div className={styles.errorContainer}>
               <ErrorMessage>{licenseKeyError}</ErrorMessage>
-            </Box>
+            </div>
           )}
-        </Box>
+        </div>
         {addLicenseKeyButton}
         {removeLicenseKeyButton}
       </Stack>

@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useUIDSeed } from 'react-uid';
 import {
-  Box, Text, Button,
+  Text, Button,
   IconButton,
   TextInput,
 } from '@tokens-studio/ui';
@@ -16,6 +16,7 @@ import { useChangedState } from '@/hooks/useChangedState';
 import UpgradeToProModal from './UpgradeToProModal';
 import branchingImage from '@/app/assets/hints/branchselector.png';
 import { track } from '@/utils/analytics';
+import styles from './BranchSelectorPopover.module.css';
 
 type PopoverMode = 'switch' | 'create';
 
@@ -231,32 +232,8 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
                     sideOffset={4}
                     style={{ width: 'auto' }}
                   >
-                    <Box
-                      css={{
-                        backgroundColor: '$bgCanvas',
-                        border: '1px solid',
-                        borderColor: '$borderSubtle',
-                        borderRadius: '$medium',
-                        boxShadow: '$contextMenu',
-                        minHeight: '300px',
-                        maxHeight: '90vh',
-                        overflow: 'hidden',
-                        width: 'auto',
-                        minWidth: '200px',
-                        maxWidth: '80vw',
-                        position: 'relative',
-                        display: 'flex',
-                        flexDirection: 'column',
-                      }}
-                    >
-                      <Box
-                        css={{
-                          padding: '$3 $4',
-                          paddingBottom: 0,
-                          background: 'var(--colors-bgCanvas)',
-                          position: 'sticky',
-                          zIndex: 10,
-                          top: 0,
+                    <div className={styles.popoverContainer}>
+                      <div className={styles.headerContainer}>
                           display: 'flex',
                           alignItems: 'center',
                           gap: '$1',
@@ -288,21 +265,9 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
                           icon={<PlusIcon />}
                         />
                         )}
-                      </Box>
+                      </div>
 
-                      <Box
-                        css={{
-                          padding: '$3',
-                          borderBottom: '1px solid $borderSubtle',
-                          background: 'var(--colors-bgCanvas)',
-                          position: 'sticky',
-                          zIndex: 10,
-                          top: 0,
-                          display: 'flex',
-                          gap: '$2',
-                          alignItems: 'center',
-                        }}
-                      >
+                      <div className={styles.searchContainer}>
                         <TextInput
                           ref={searchInputRef}
                           {...getInputProps()}
@@ -319,53 +284,40 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
                             fontFamily: '$mono',
                           }}
                         />
-                      </Box>
+                      </div>
 
-                      <Box css={{ maxHeight: '50vh', overflow: 'auto', padding: '$2' }}>
+                      <div className={styles.contentContainer}>
                         {/* Items List */}
                         {items.length > 0 && items.map((item, index) => {
                           const itemProps = getItemProps({ item, index });
 
                           return (
-                            <Box
+                            <div
                               key={seed(index)}
                               {...itemProps}
                               data-testid={`popover-item-${item.id}`}
-                              css={{
-                                padding: '$3',
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                fontFamily: '$mono',
-                                borderRadius: '$medium',
-                                gap: '$2',
-                                backgroundColor: highlightedIndex === index ? 'var(--colors-bgDefault)' : 'transparent',
-                                '&:hover': { backgroundColor: 'var(--colors-bgDefault)' },
-                              }}
+                              className={`${styles.itemContainer} ${highlightedIndex === index ? styles.itemContainerHighlighted : ''}`}
                             >
                               {item.isSelected && (
-                              <Box css={{
-                                width: '16px', height: '16px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              }}
-                              >
+                              <div className={styles.selectedIcon}>
                                 ✓
-                              </Box>
+                              </div>
                               )}
-                              {!item.isSelected && <Box css={{ width: '16px', flexShrink: 0 }} />}
+                              {!item.isSelected && <div className={styles.spacer} />}
                               <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{item.label}</span>
-                            </Box>
+                            </div>
                           );
                         })}
 
                         {/* Empty State */}
                         {items.length === 0 && searchValue && (
-                        <Box css={{ padding: '12px', textAlign: 'center', color: 'var(--colors-fgMuted)' }}>
+                        <div className={styles.emptyState}>
                           {t('noBranchesFound')}
-                        </Box>
+                        </div>
                         )}
 
-                      </Box>
-                    </Box>
+                      </div>
+                    </div>
                   </Popover.Content>
                 </Popover.Portal>
               </Popover.Root>

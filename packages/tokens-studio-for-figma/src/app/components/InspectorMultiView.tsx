@@ -2,7 +2,7 @@ import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import {
-  Box, Checkbox, Label, Stack, Button, EmptyState,
+  Checkbox, Label, Stack, Button, EmptyState,
 } from '@tokens-studio/ui';
 import { Dispatch } from '../store';
 import useTokens from '../store/useTokens';
@@ -17,6 +17,7 @@ import { NodeInfo } from '@/types/NodeInfo';
 import { StyleIdBackupKeys } from '@/constants/StyleIdBackupKeys';
 import OnboardingExplainer from './OnboardingExplainer';
 import BulkRemapModal from './modals/BulkRemapModal';
+import styles from './InspectorMultiView.module.css';
 
 export default function InspectorMultiView({ resolvedTokens, tokenToSearch }: { resolvedTokens: SingleToken[], tokenToSearch: string }) {
   const { t } = useTranslation(['inspect']);
@@ -108,14 +109,8 @@ export default function InspectorMultiView({ resolvedTokens, tokenToSearch }: { 
   return (
     <>
       {uiState.selectionValues.length > 0 && (
-        <Box css={{
-          display: 'inline-flex', paddingInline: '$4', rowGap: '$3', justifyContent: 'space-between',
-        }}
-        >
-          <Box css={{
-            display: 'flex', alignItems: 'center', gap: '$3', fontSize: '$small', flexBasis: '80px', flexShrink: 0,
-          }}
-          >
+        <div className={styles.headerContainer}>
+          <div className={styles.selectAllContainer}>
             <Checkbox
               checked={inspectState.selectedTokens.length === uiState.selectionValues.length}
               id="selectAll"
@@ -124,11 +119,8 @@ export default function InspectorMultiView({ resolvedTokens, tokenToSearch }: { 
             <Label htmlFor="selectAll" css={{ fontSize: '$small', fontWeight: '$sansBold', whiteSpace: 'nowrap' }}>
               {t('selectAll')}
             </Label>
-          </Box>
-          <Box css={{
-            display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-end', gap: '$3',
-          }}
-          >
+          </div>
+          <div className={styles.actionsContainer}>
             <Button size="small" onClick={handleShowBulkRemap} variant="secondary">
               {t('bulkRemap')}
             </Button>
@@ -138,19 +130,16 @@ export default function InspectorMultiView({ resolvedTokens, tokenToSearch }: { 
             <Button size="small" onClick={removeTokens} disabled={inspectState.selectedTokens.length === 0} variant="danger">
               {t('removeSelected')}
             </Button>
-          </Box>
-        </Box>
+          </div>
+        </div>
       )}
-      <Box
-        css={{
-          display: 'flex', flexDirection: 'column', flexGrow: 1, padding: '$4',
-        }}
-        className="content scroll-container"
+      <div
+        className={`${styles.bodyContainer} content scroll-container`}
       >
         {uiState.selectionValues.length > 0 ? (
-          <Box css={{ display: 'flex', flexDirection: 'column', gap: '$1' }}>
+          <div className={styles.checkboxList}>
             {Object.entries(groupedSelectionValues).map((group) => <InspectorTokenGroup key={`inspect-group-${group[0]}`} group={group as [Properties, SelectionGroup[]]} resolvedTokens={resolvedTokens} />)}
-          </Box>
+          </div>
         ) : (
           <Stack direction="column" gap={4} css={{ padding: '$5', margin: 'auto' }}>
             <EmptyState title={uiState.selectedLayers > 0 ? t('noTokensFound') : t('noLayersSelected')} description={uiState.selectedLayers > 0 ? t('noLayersWithTokens') : t('selectLayer')} />
@@ -160,7 +149,7 @@ export default function InspectorMultiView({ resolvedTokens, tokenToSearch }: { 
             )}
           </Stack>
         )}
-      </Box>
+      </div>
       {bulkRemapModalVisible && (
         <BulkRemapModal
           isOpen={bulkRemapModalVisible}
