@@ -1,6 +1,7 @@
 import { StorageType } from '../StorageType';
 import { ThemeObjectsList } from '../ThemeObjectsList';
 import { UsedTokenSetsMap } from '../UsedTokenSetsMap';
+import { GroupMetadataMap } from '../GroupMetadata';
 import { AnyTokenList } from './AnyTokenList';
 
 export type TokenStore = {
@@ -13,4 +14,5 @@ export type TokenStore = {
   activeTheme: Record<string, string>;
   themes: ThemeObjectsList;
   storageType?: StorageType;
+  groupMetadata?: GroupMetadataMap; // New addition for group descriptions
 };
