@@ -65,6 +65,7 @@ export enum AsyncMessageTypes {
   SET_SELECTED_EXPORT_THEMES = 'async/set-selected-export-themes',
   CREATE_LIVING_DOCUMENTATION = 'async/create-living-documentation',
   PREVIEW_VARIABLE_SYNC = 'async/preview-variable-sync',
+  APPLY_VARIABLE_CHANGES = 'async/apply-variable-changes',
   // the below messages are going from plugin to UI
   STARTUP = 'async/startup',
   GET_THEME_INFO = 'async/get-theme-info',
@@ -215,6 +216,13 @@ export type VariableChangePreview = {
   variableId?: string;
   collectionName?: string;
   mode?: string;
+  // Additional token information needed for creation
+  tokenData?: {
+    value: any;
+    rawValue?: any;
+    type: string;
+    parent?: string;
+  };
 };
 
 export type PreviewVariableSyncAsyncMessageResult = AsyncMessage<AsyncMessageTypes.PREVIEW_VARIABLE_SYNC, {
@@ -224,6 +232,19 @@ export type PreviewVariableSyncAsyncMessageResult = AsyncMessage<AsyncMessageTyp
     toUpdate: number;
     toDelete: number;
   };
+}>;
+
+export type ApplyVariableChangesAsyncMessage = AsyncMessage<AsyncMessageTypes.APPLY_VARIABLE_CHANGES, {
+  changes: VariableChangePreview[];
+  tokens: Record<string, AnyTokenList>;
+  settings: SettingsState;
+  selectedThemes?: string[];
+  selectedSets?: ExportTokenSet[];
+}>;
+
+export type ApplyVariableChangesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.APPLY_VARIABLE_CHANGES, {
+  variableIds: Record<string, string>;
+  totalVariables: number;
 }>;
 
 export type CreateStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.CREATE_STYLES, {
@@ -445,6 +466,7 @@ export type AsyncMessages =
   | CreateAnnotationAsyncMessage
   | CreateLivingDocumentationAsyncMessage
   | PreviewVariableSyncAsyncMessage
+  | ApplyVariableChangesAsyncMessage
   | UpdateAsyncMessage
   | UpdateCheckForChangesAsyncMessage
   | GetThemeInfoMessage
@@ -498,6 +520,7 @@ export type AsyncMessageResults =
   | CreateAnnotationAsyncMessageResult
   | CreateLivingDocumentationAsyncMessageResult
   | PreviewVariableSyncAsyncMessageResult
+  | ApplyVariableChangesAsyncMessageResult
   | UpdateAsyncMessageResult
   | UpdateCheckForChangesAsyncMessageResult
   | GetThemeInfoMessageResult

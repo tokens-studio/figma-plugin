@@ -45,4 +45,5 @@ export * from './removeStylesWithoutConnection';
 export * from './setVariableExportSettings';
 export * from './setSelectedExportThemes';
 export * from './previewVariableSync';
+export * from './applyVariableChanges';
 export * from '../livingDocumentation';

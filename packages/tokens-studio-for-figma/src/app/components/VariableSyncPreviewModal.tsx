@@ -305,21 +305,21 @@ const VariableSyncPreviewModal: React.FC<VariableSyncPreviewProps> = ({
   return (
     <Modal
       size="large"
-      title="Variable Sync Preview"
+      title={t('preview.title')}
       showClose
       isOpen={isOpen}
       close={onClose}
       footer={(
         <Stack direction="row" gap={4} justify="between">
           <Button variant="secondary" onClick={onClose} icon={<ChevronLeftIcon />}>
-            Cancel
+            {t('preview.actions.cancel')}
           </Button>
           <Button 
             variant="primary" 
             onClick={handleConfirm}
             disabled={selectedCount === 0 || loading}
           >
-            Apply Changes ({selectedCount})
+            {t('preview.actions.applyChanges')} ({selectedCount})
           </Button>
         </Stack>
       )}

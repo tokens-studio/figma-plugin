@@ -22,6 +22,8 @@ import { Dispatch } from '@/app/store';
 import VariableSyncPreviewModal from '../VariableSyncPreviewModal';
 import { VariableChangePreview } from '@/types/AsyncMessages';
 import { settingsStateSelector, tokensSelector } from '@/selectors';
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { AsyncMessageTypes } from '@/types/AsyncMessages';
 
 export default function ManageStylesAndVariables({ showModal, setShowModal }: { showModal: boolean, setShowModal: (show: boolean) => void }) {
   const { t } = useTranslation(['manageStylesAndVariables']);
@@ -86,15 +88,29 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
     setShowVariablePreview(false);
     setShowModal(false);
     
-    // TODO: Apply only selected changes instead of all
+    // Apply only the selected variable changes
+    if (selectedChanges.length > 0) {
+      try {
+        await AsyncMessageChannel.ReactInstance.message({
+          type: AsyncMessageTypes.APPLY_VARIABLE_CHANGES,
+          changes: selectedChanges,
+          tokens,
+          settings,
+          selectedThemes: activeTab === 'useThemes' ? selectedThemes : undefined,
+          selectedSets: activeTab === 'useSets' ? selectedSets : undefined,
+        });
+      } catch (error) {
+        console.error('Failed to apply variable changes:', error);
+      }
+    }
+    
+    // Still create styles using existing methods
     if (activeTab === 'useSets') {
-      await createVariablesFromSets(selectedSets);
       await createStylesFromSelectedTokenSets(selectedSets);
     } else if (activeTab === 'useThemes') {
-      await createVariablesFromThemes(selectedThemes);
       await createStylesFromSelectedThemes(selectedThemes);
     }
-  }, [activeTab, selectedSets, selectedThemes, createVariablesFromSets, createStylesFromSelectedTokenSets, createVariablesFromThemes, createStylesFromSelectedThemes]);
+  }, [activeTab, selectedSets, selectedThemes, tokens, settings, createStylesFromSelectedTokenSets, createStylesFromSelectedThemes]);
 
   const handleExportToFigma = React.useCallback(async () => {
     // Check if we should show variable preview

@@ -10,6 +10,7 @@ import checkIfTokenCanCreateVariable from '@/utils/checkIfTokenCanCreateVariable
 import { getOverallConfig } from '@/utils/tokenHelpers';
 import { convertTokenTypeToVariableType } from '@/utils/convertTokenTypeToVariableType';
 import { transformValue } from './helpers';
+import { TokenSetStatus } from '@/constants/TokenSetStatus';
 
 export type PreviewVariableSyncParams = {
   tokens: Record<string, AnyTokenList>;
@@ -84,6 +85,12 @@ export default async function previewVariableSync({
               variableId: existingVariable.id,
               collectionName: getCollectionName(existingVariable),
               mode: theme.name,
+              tokenData: {
+                value: token.value,
+                rawValue: token.rawValue,
+                type: token.type,
+                parent: token.internal__Parent,
+              },
             });
           }
         } else {
@@ -97,6 +104,12 @@ export default async function previewVariableSync({
             description: token.description,
             collectionName: theme.group ?? theme.name,
             mode: theme.name,
+            tokenData: {
+              value: token.value,
+              rawValue: token.rawValue,
+              type: token.type,
+              parent: token.internal__Parent,
+            },
           });
         }
       }
@@ -105,13 +118,14 @@ export default async function previewVariableSync({
 
   // Handle token sets (without modes)
   if (selectedSets && selectedSets.length > 0) {
-    // Similar logic for sets, but simpler since no modes are involved
-    for (const tokenSet of selectedSets) {
+    const enabledSets = selectedSets.filter(set => set.status === TokenSetStatus.ENABLED);
+    
+    for (const tokenSet of enabledSets) {
       const setTokens = tokens[tokenSet.set] || [];
       const tokensToCreate = setTokens.filter((token) => checkIfTokenCanCreateVariable(token, settings));
       
       for (const token of tokensToCreate) {
-        const mappedToken = mapTokensToVariableInfo(token, { name: 'Default', selectedTokenSets: {} } as any, settings);
+        const mappedToken = mapTokensToVariableInfo(token, { name: 'Default', selectedTokenSets: { [tokenSet.set]: TokenSetStatus.ENABLED } } as any, settings);
         const existingVariable = existingVariablesByName[mappedToken.path];
 
         if (existingVariable) {
@@ -131,6 +145,12 @@ export default async function previewVariableSync({
               description: mappedToken.description,
               variableId: existingVariable.id,
               collectionName: getCollectionName(existingVariable),
+              tokenData: {
+                value: token.value,
+                rawValue: token.rawValue,
+                type: token.type,
+                parent: token.internal__Parent,
+              },
             });
           }
         } else {
@@ -141,6 +161,12 @@ export default async function previewVariableSync({
             tokenType: mappedToken.type,
             newValue: getFormattedTokenValue(mappedToken, settings),
             description: mappedToken.description,
+            tokenData: {
+              value: token.value,
+              rawValue: token.rawValue,
+              type: token.type,
+              parent: token.internal__Parent,
+            },
           });
         }
       }
