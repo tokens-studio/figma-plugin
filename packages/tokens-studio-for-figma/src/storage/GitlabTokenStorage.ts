@@ -2,10 +2,12 @@ import { Gitlab } from '@gitbeaker/rest';
 import compact from 'just-compact';
 import type { CommitAction } from '@gitbeaker/rest';
 import IsJSONString from '@/utils/isJSONString';
+import { GitMultiFileObject, GitSingleFileObject, GitTokenStorage } from './GitTokenStorage';
 import {
-  GitMultiFileObject, GitSingleFileObject, GitTokenStorage,
-} from './GitTokenStorage';
-import { RemoteTokenstorageErrorMessage, RemoteTokenStorageFile, RemoteTokenStorageMetadata } from './RemoteTokenStorage';
+  RemoteTokenstorageErrorMessage,
+  RemoteTokenStorageFile,
+  RemoteTokenStorageMetadata,
+} from './RemoteTokenStorage';
 import { AnyTokenSet } from '@/types/tokens';
 import { ThemeObjectsList } from '@/types';
 import { SystemFilenames } from '@/constants/SystemFilenames';
@@ -57,13 +59,11 @@ export class GitlabTokenStorage extends GitTokenStorage {
   }
 
   public async assignProjectId() {
-    const projects = await retryWithBackoff(
-      () => this.gitlabClient.Projects.all({
-        membership: true,
-        search: this.repository,
-        simple: true,
-      }),
-    );
+    const projects = await retryWithBackoff(() => this.gitlabClient.Projects.all({
+      membership: true,
+      search: this.repository,
+      simple: true,
+    }));
     if (projects) {
       const project = projects.filter((p) => p.path_with_namespace === this.repoPathWithNamespace)[0];
       if (project) {
@@ -80,22 +80,14 @@ export class GitlabTokenStorage extends GitTokenStorage {
 
   public async fetchBranches() {
     if (!this.projectId) throw new Error('Project ID not assigned');
-    const branches = await retryWithBackoff(
-      () => this.gitlabClient.Branches.all(this.projectId!),
-    );
+    const branches = await retryWithBackoff(() => this.gitlabClient.Branches.all(this.projectId!));
     return branches.map((branch) => branch.name);
   }
 
   public async createBranch(branch: string, source?: string) {
     if (!this.projectId) throw new Error('Project ID not assigned');
     try {
-      const response = await retryWithBackoff(
-        () => this.gitlabClient.Branches.create(
-          this.projectId!,
-          branch,
-          `heads/${source || this.branch}`,
-        ),
-      );
+      const response = await retryWithBackoff(() => this.gitlabClient.Branches.create(this.projectId!, branch, `heads/${source || this.branch}`));
       return !!response.name;
     } catch (err) {
       console.error(err);
@@ -147,12 +139,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
 
     if (gitkeepDeletions.length > 0) {
       try {
-        await this.gitlabClient.Commits.create(
-          this.projectId!,
-          branch,
-          message,
-          gitkeepDeletions,
-        );
+        await this.gitlabClient.Commits.create(this.projectId!, branch, message, gitkeepDeletions);
       } catch (e) {
         console.error('Failed to delete .gitkeep files:', e);
       }
@@ -176,60 +163,58 @@ export class GitlabTokenStorage extends GitTokenStorage {
           },
         );
 
-        const jsonFiles = trees.filter((file) => (
-          file.path.endsWith('.json')
-        )).sort((a, b) => (
-          (a.path && b.path) ? a.path.localeCompare(b.path) : 0
-        ));
+        const jsonFiles = trees
+          .filter((file) => file.path.endsWith('.json'))
+          .sort((a, b) => (a.path && b.path ? a.path.localeCompare(b.path) : 0));
 
-        const jsonFileContents = await Promise.all(jsonFiles.map((treeItem) => (
-          retryWithBackoff(
+        const jsonFileContents = await Promise.all(
+          jsonFiles.map((treeItem) => retryWithBackoff(
             () => this.gitlabClient.RepositoryFiles.showRaw(this.projectId!, treeItem.path, this.branch),
             {
               maxRetries: 3,
               initialDelayMs: 100,
             },
-          )
-        )));
+          )),
+        );
 
-        return compact(jsonFileContents.map<RemoteTokenStorageFile | null>((fileContent, index) => {
-          const { path } = jsonFiles[index];
-          if (typeof fileContent === 'string' && IsJSONString(fileContent)) {
-            const name = path.replace('.json', '').replace(this.path, '').replace(/^\//, '').replace(/\/$/, '');
+        return compact(
+          jsonFileContents.map<RemoteTokenStorageFile | null>((fileContent, index) => {
+            const { path } = jsonFiles[index];
+            if (typeof fileContent === 'string' && IsJSONString(fileContent)) {
+              const name = path.replace('.json', '').replace(this.path, '').replace(/^\//, '').replace(/\/$/, '');
 
-            const parsed = JSON.parse(fileContent) as GitMultiFileObject;
+              const parsed = JSON.parse(fileContent) as GitMultiFileObject;
 
-            if (name === SystemFilenames.THEMES) {
+              if (name === SystemFilenames.THEMES) {
+                return {
+                  path,
+                  type: 'themes',
+                  data: parsed as ThemeObjectsList,
+                };
+              }
+
+              if (name === SystemFilenames.METADATA) {
+                return {
+                  path,
+                  type: 'metadata',
+                  data: parsed as RemoteTokenStorageMetadata,
+                };
+              }
+
               return {
                 path,
-                type: 'themes',
-                data: parsed as ThemeObjectsList,
+                name,
+                type: 'tokenSet',
+                data: parsed as AnyTokenSet<false>,
               };
             }
 
-            if (name === SystemFilenames.METADATA) {
-              return {
-                path,
-                type: 'metadata',
-                data: parsed as RemoteTokenStorageMetadata,
-              };
-            }
-
-            return {
-              path,
-              name,
-              type: 'tokenSet',
-              data: parsed as AnyTokenSet<false>,
-            };
-          }
-
-          return null;
-        }));
+            return null;
+          }),
+        );
       }
 
-      const data = await retryWithBackoff(
-        () => this.gitlabClient.RepositoryFiles.showRaw(this.projectId!, this.path, this.branch),
-      );
+      const data = await retryWithBackoff(() => this.gitlabClient.RepositoryFiles.showRaw(this.projectId!, this.path, this.branch));
       const stringData = typeof data === 'string' ? data : await data.text();
 
       if (IsJSONString(stringData)) {
@@ -241,16 +226,21 @@ export class GitlabTokenStorage extends GitTokenStorage {
               path: `${this.path}/${SystemFilenames.THEMES}.json`,
               data: parsed.$themes ?? [],
             },
-            ...(parsed.$metadata ? [
-              {
-                type: 'metadata' as const,
-                path: this.path,
-                data: parsed.$metadata,
-              },
-            ] : []),
-            ...(Object.entries(parsed).filter(([key]) => (
-              !Object.values<string>(SystemFilenames).includes(key)
-            )) as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile>(([name, tokenSet]) => ({
+            ...(parsed.$metadata
+              ? [
+                {
+                  type: 'metadata' as const,
+                  path: this.path,
+                  data: parsed.$metadata,
+                },
+              ]
+              : []),
+            ...(
+              Object.entries(parsed).filter(([key]) => !Object.values<string>(SystemFilenames).includes(key)) as [
+                string,
+                AnyTokenSet<false>,
+              ][]
+            ).map<RemoteTokenStorageFile>(([name, tokenSet]) => ({
               name,
               type: 'tokenSet',
               path: `${this.path}/${name}.json`,
@@ -274,7 +264,12 @@ export class GitlabTokenStorage extends GitTokenStorage {
     }
   }
 
-  public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch?: boolean): Promise<boolean> {
+  public async writeChangeset(
+    changeset: Record<string, string>,
+    message: string,
+    branch: string,
+    shouldCreateBranch?: boolean,
+  ): Promise<boolean> {
     if (!this.projectId) throw new Error('Missing Project ID');
 
     const branches = await this.fetchBranches();
@@ -301,13 +296,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
     try {
       // Only create .gitkeep if the directory is completely empty/non-existent
       if (tree.length === 0) {
-        await this.gitlabClient.RepositoryFiles.create(
-          this.projectId,
-          pathToCreate,
-          branch,
-          '{}',
-          message,
-        );
+        await this.gitlabClient.RepositoryFiles.create(this.projectId, pathToCreate, branch, '{}', message);
       }
     } catch (e) {
       console.error('Error checking directory:', e);
@@ -319,13 +308,9 @@ export class GitlabTokenStorage extends GitTokenStorage {
     });
 
     // Add delete actions for files that no longer exist in changeset
-    const jsonFiles = tree
-      .filter((file) => file.path.endsWith('.json'))
-      .map((file) => file.path);
+    const jsonFiles = tree.filter((file) => file.path.endsWith('.json')).map((file) => file.path);
 
-    const filesToDelete = jsonFiles.filter(
-      (jsonFile) => !Object.keys(changeset).some((item) => item === jsonFile),
-    );
+    const filesToDelete = jsonFiles.filter((jsonFile) => !Object.keys(changeset).some((item) => item === jsonFile));
 
     if (filesToDelete.length > 0 && !this.path.endsWith('.json')) {
       gitlabActions = gitlabActions.concat(
@@ -337,16 +322,12 @@ export class GitlabTokenStorage extends GitTokenStorage {
     }
 
     try {
-      await retryWithBackoff(
-        () => this.gitlabClient.Commits.create(
-          this.projectId!,
-          branch,
-          message,
-          gitlabActions,
-        ),
-      );
+      await retryWithBackoff(() => this.gitlabClient.Commits.create(this.projectId!, branch, message, gitlabActions));
     } catch (e: any) {
-      if (e.cause.description && String(e.cause.description).includes(ErrorMessages.GITLAB_PUSH_TO_PROTECTED_BRANCH_ERROR)) {
+      if (
+        e.cause.description
+        && String(e.cause.description).includes(ErrorMessages.GITLAB_PUSH_TO_PROTECTED_BRANCH_ERROR)
+      ) {
         throw new Error(ErrorMessages.GITLAB_PUSH_TO_PROTECTED_BRANCH_ERROR);
       }
       throw new Error(e);
@@ -374,11 +355,9 @@ export class GitlabTokenStorage extends GitTokenStorage {
             initialDelayMs: 100,
           },
         );
-        const jsonFiles = trees.filter((file) => (
-          file.path.endsWith('.json')
-        )).sort((a, b) => (
-          (a.path && b.path) ? a.path.localeCompare(b.path) : 0
-        ));
+        const jsonFiles = trees
+          .filter((file) => file.path.endsWith('.json'))
+          .sort((a, b) => (a.path && b.path ? a.path.localeCompare(b.path) : 0));
 
         const file = await retryWithBackoff(
           () => this.gitlabClient.RepositoryFiles.show(this.projectId!, jsonFiles[0].path, this.branch),
@@ -397,12 +376,8 @@ export class GitlabTokenStorage extends GitTokenStorage {
         const committedDate = new Date(commit.committed_date?.toString() ?? '');
         return committedDate ?? null;
       }
-      const file = await retryWithBackoff(
-        () => this.gitlabClient.RepositoryFiles.show(this.projectId!, this.path, this.branch),
-      );
-      const commit = await retryWithBackoff(
-        () => this.gitlabClient.Commits.show(this.projectId!, file.commit_id.toString()),
-      );
+      const file = await retryWithBackoff(() => this.gitlabClient.RepositoryFiles.show(this.projectId!, this.path, this.branch));
+      const commit = await retryWithBackoff(() => this.gitlabClient.Commits.show(this.projectId!, file.commit_id.toString()));
       const committedDate = new Date(commit.committed_date?.toString() ?? '');
       return committedDate ?? null;
     } catch (e) {

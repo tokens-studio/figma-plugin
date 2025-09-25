@@ -38,9 +38,10 @@ const StorageItem = ({ item, onEdit, onMigrate }: Props) => {
   const { t } = useTranslation(['storage']);
 
   // Check if this is a Bitbucket item using app password
-  const isBitbucketWithAppPassword = React.useMemo(() => (
-    item.provider === StorageProviderType.BITBUCKET && isUsingAppPassword(item as any)
-  ), [item]);
+  const isBitbucketWithAppPassword = React.useMemo(
+    () => item.provider === StorageProviderType.BITBUCKET && isUsingAppPassword(item as any),
+    [item],
+  );
 
   const askUserIfDelete = React.useCallback(async () => {
     const shouldDelete = await confirm({
@@ -74,10 +75,20 @@ const StorageItem = ({ item, onEdit, onMigrate }: Props) => {
   }, [item, restoreStoredProvider]);
 
   return (
-    <StyledStorageItem data-testid={`storageitem-${provider}-${id}`} key={`${provider}-${id}`} active={isActive()} hasError={isBitbucketWithAppPassword}>
-      <div style={{
-        display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-between', alignItems: 'center',
-      }}
+    <StyledStorageItem
+      data-testid={`storageitem-${provider}-${id}`}
+      key={`${provider}-${id}`}
+      active={isActive()}
+      hasError={isBitbucketWithAppPassword}
+    >
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          width: '100%',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
       >
         <Stack
           direction="column"
@@ -126,27 +137,25 @@ const StorageItem = ({ item, onEdit, onMigrate }: Props) => {
             </Stack>
           </Stack>
           {hasErrored && isActive() && (
-          <Box
-            css={{
-              display: 'flex',
-              flexDirection: 'row',
-              color: '$dangerFg',
-              gap: '$3',
-              marginTop: '$3',
-            }}
-            data-testid="error-message"
-          >
-            <ExclamationTriangleIcon />
-            {errorMessage}
-          </Box>
+            <Box
+              css={{
+                display: 'flex',
+                flexDirection: 'row',
+                color: '$dangerFg',
+                gap: '$3',
+                marginTop: '$3',
+              }}
+              data-testid="error-message"
+            >
+              <ExclamationTriangleIcon />
+              {errorMessage}
+            </Box>
           )}
         </Stack>
         <Box css={{ marginRight: '$1' }}>
           {isActive() ? (
             <Stack gap={2} align="center">
-              {storageType.provider !== StorageProviderType.TOKENS_STUDIO && (
-              <TokenFormatBadge extended />
-              )}
+              {storageType.provider !== StorageProviderType.TOKENS_STUDIO && <TokenFormatBadge extended />}
               <Badge>{t('active')}</Badge>
             </Stack>
           ) : (
@@ -209,12 +218,9 @@ const StorageItem = ({ item, onEdit, onMigrate }: Props) => {
             </Box>
           </Box>
           {onMigrate && (
-          <Button
-            size="small"
-            onClick={onMigrate}
-          >
-            {t('providers.bitbucketMigration.migrate')}
-          </Button>
+            <Button size="small" onClick={onMigrate}>
+              {t('providers.bitbucketMigration.migrate')}
+            </Button>
           )}
         </Box>
       )}

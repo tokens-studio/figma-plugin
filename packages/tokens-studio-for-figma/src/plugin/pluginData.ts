@@ -14,7 +14,11 @@ import getAppliedVariablesFromNode from './getAppliedVariablesFromNode';
 
 export function transformPluginDataToSelectionValues(pluginData: NodeManagerNode[]): SelectionGroup[] {
   const selectionValues = pluginData.reduce<SelectionGroup[]>((acc, curr) => {
-    const { tokens, id, node: { name, type } } = curr;
+    const {
+      tokens,
+      id,
+      node: { name, type },
+    } = curr;
     // First we add plugin tokens
     Object.entries(tokens).forEach(([key, value]) => {
       const existing = acc.find((item) => item.type === key && item.value === value);
@@ -24,7 +28,11 @@ export function transformPluginDataToSelectionValues(pluginData: NodeManagerNode
         const category = get(Properties, key) as Properties | TokenTypes;
 
         acc.push({
-          value, type: key, category, nodes: [{ id, name, type }], appliedType: 'token',
+          value,
+          type: key,
+          category,
+          nodes: [{ id, name, type }],
+          appliedType: 'token',
         });
       }
     });
@@ -33,7 +41,9 @@ export function transformPluginDataToSelectionValues(pluginData: NodeManagerNode
     const localVariables = getAppliedVariablesFromNode(curr.node);
     localVariables.forEach((variable) => {
       // Check if the token has been applied. If the token has been applied then we don't add variable.
-      const isTokenApplied = acc.find((item) => item.type === variable.type && item.nodes.find((node) => isEqual(node, { id, name, type })));
+      const isTokenApplied = acc.find(
+        (item) => item.type === variable.type && item.nodes.find((node) => isEqual(node, { id, name, type })),
+      );
       if (!isTokenApplied) {
         const category = get(Properties, variable.type) as Properties | TokenTypes;
         acc.push({
@@ -51,7 +61,9 @@ export function transformPluginDataToSelectionValues(pluginData: NodeManagerNode
     const localStyles = getAppliedStylesFromNode(curr.node);
     localStyles.forEach((style) => {
       // Check if the token or variable has been applied. If the token has been applied then we don't add style.
-      const isTokenApplied = acc.find((item) => item.type === style.type && item.nodes.find((node) => isEqual(node, { id, name, type })));
+      const isTokenApplied = acc.find(
+        (item) => item.type === style.type && item.nodes.find((node) => isEqual(node, { id, name, type })),
+      );
       if (!isTokenApplied) {
         const category = get(Properties, style.type) as Properties | TokenTypes;
         acc.push({
@@ -94,12 +106,18 @@ export function transformPluginDataToMainNodeSelectionValues(pluginData: NodeMan
 }
 
 export type SelectionContent = {
-  selectionValues?: SelectionGroup[]
-  mainNodeSelectionValues: SelectionValue[]
-  selectedNodes: number
+  selectionValues?: SelectionGroup[];
+  mainNodeSelectionValues: SelectionValue[];
+  selectedNodes: number;
 };
 
-export async function sendPluginValues({ nodes, shouldSendSelectionValues }: { nodes: readonly NodeManagerNode[], shouldSendSelectionValues: boolean }): Promise<SelectionContent> {
+export async function sendPluginValues({
+  nodes,
+  shouldSendSelectionValues,
+}: {
+  nodes: readonly NodeManagerNode[];
+  shouldSendSelectionValues: boolean;
+}): Promise<SelectionContent> {
   // Big O(n ^ 2 * m) (n = amount of nodes, m = amount of applied tokens in the node)
   let mainNodeSelectionValues: SelectionValue[] = [];
   let selectionValues;
@@ -114,27 +132,39 @@ export async function sendPluginValues({ nodes, shouldSendSelectionValues }: { n
   return { selectionValues, mainNodeSelectionValues, selectedNodes };
 }
 
-export async function removePluginData({ nodes, key, shouldRemoveValues = true }: { nodes: readonly (BaseNode | SceneNode)[], key?: Properties, shouldRemoveValues?: boolean }) {
-  return Promise.all(nodes.map(async (node) => {
-    if (key) {
-      tokensSharedDataHandler.set(node, key, '');
-      if (shouldRemoveValues) {
-        removeValuesFromNode(node, key);
-      }
-    } else {
-      Object.values(Properties).forEach((prop) => {
-        tokensSharedDataHandler.set(node, prop, '');
+export async function removePluginData({
+  nodes,
+  key,
+  shouldRemoveValues = true,
+}: {
+  nodes: readonly (BaseNode | SceneNode)[];
+  key?: Properties;
+  shouldRemoveValues?: boolean;
+}) {
+  return Promise.all(
+    nodes.map(async (node) => {
+      if (key) {
+        tokensSharedDataHandler.set(node, key, '');
         if (shouldRemoveValues) {
-          removeValuesFromNode(node, prop);
+          removeValuesFromNode(node, key);
         }
-      });
-    }
-  }));
+      } else {
+        Object.values(Properties).forEach((prop) => {
+          tokensSharedDataHandler.set(node, prop, '');
+          if (shouldRemoveValues) {
+            removeValuesFromNode(node, prop);
+          }
+        });
+      }
+    }),
+  );
 }
 
-export async function setNonePluginData({ nodes, key }: { nodes: readonly (BaseNode | SceneNode)[], key: Properties }) {
-  return Promise.all(nodes.map(async (node) => {
-    tokensSharedDataHandler.set(node, key, 'none');
-    removeValuesFromNode(node, key);
-  }));
+export async function setNonePluginData({ nodes, key }: { nodes: readonly (BaseNode | SceneNode)[]; key: Properties }) {
+  return Promise.all(
+    nodes.map(async (node) => {
+      tokensSharedDataHandler.set(node, key, 'none');
+      removeValuesFromNode(node, key);
+    }),
+  );
 }

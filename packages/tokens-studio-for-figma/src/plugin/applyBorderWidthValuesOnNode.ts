@@ -28,12 +28,10 @@ export async function applyBorderWidthValuesOnNode(
     if (hasIndividualStrokeWeights) {
       // For nodes with individual stroke weight properties, try to apply to all four sides
       // Have to set it individually as Figma does the same, hence the strokeWeight would never be set
-      variableApplied = (
-        (await tryApplyVariableId(node, 'strokeTopWeight', data.borderWidth))
+      variableApplied = (await tryApplyVariableId(node, 'strokeTopWeight', data.borderWidth))
         && (await tryApplyVariableId(node, 'strokeRightWeight', data.borderWidth))
         && (await tryApplyVariableId(node, 'strokeBottomWeight', data.borderWidth))
-        && (await tryApplyVariableId(node, 'strokeLeftWeight', data.borderWidth))
-      );
+        && (await tryApplyVariableId(node, 'strokeLeftWeight', data.borderWidth));
     } else {
       // For nodes without individual stroke weight properties (like ELLIPSE), apply to strokeWeight directly
       variableApplied = await tryApplyVariableId(node, 'strokeWeight', data.borderWidth);

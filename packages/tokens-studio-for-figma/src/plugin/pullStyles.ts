@@ -54,7 +54,12 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
               b,
               a,
             });
-          } else if (paint.type === 'GRADIENT_LINEAR' || paint.type === 'GRADIENT_RADIAL' || paint.type === 'GRADIENT_ANGULAR' || paint.type === 'GRADIENT_DIAMOND') {
+          } else if (
+            paint.type === 'GRADIENT_LINEAR'
+            || paint.type === 'GRADIENT_RADIAL'
+            || paint.type === 'GRADIENT_ANGULAR'
+            || paint.type === 'GRADIENT_DIAMOND'
+          ) {
             styleObject.value = convertFigmaGradientToString(paint);
           } else {
             styleObject = null;
@@ -126,8 +131,9 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
     ));
 
     fontWeights = uniqueFontCombinations.map((font, idx) => {
-      const matchingStyle = figmaTextStyles.find((style) => style.fontName.family === font.family
- && style.fontName.style === font.style);
+      const matchingStyle = figmaTextStyles.find(
+        (style) => style.fontName.family === font.family && style.fontName.style === font.style,
+      );
 
       if (!matchingStyle) {
         return {
@@ -216,12 +222,7 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
 
     typography = figmaTextStyles.map((style) => {
       const foundFamily = fontFamilies.find(
-        findBoundVariable(
-          style,
-          'fontFamily',
-          localVariables,
-          (el) => el.value === style.fontName.family,
-        ),
+        findBoundVariable(style, 'fontFamily', localVariables, (el) => el.value === style.fontName.family),
       );
 
       const foundFontWeight = fontWeights.find(
@@ -242,12 +243,7 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
         ),
       );
       const foundFontSize = fontSizes.find(
-        findBoundVariable(
-          style,
-          'fontSize',
-          localVariables,
-          (el) => el.value === style.fontSize.toString(),
-        ),
+        findBoundVariable(style, 'fontSize', localVariables, (el) => el.value === style.fontSize.toString()),
       );
       const foundLetterSpacing = letterSpacing.find(
         findBoundVariable(
@@ -362,14 +358,14 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
     paragraphIndent,
   };
 
- type ResultObject = Record<string, StyleToCreateToken[]>;
+  type ResultObject = Record<string, StyleToCreateToken[]>;
 
- const returnedObject = Object.entries(stylesObject).reduce<ResultObject>((acc, [key, value]) => {
-   if (value.length > 0) {
-     acc[key] = value;
-   }
-   return acc;
- }, {});
+  const returnedObject = Object.entries(stylesObject).reduce<ResultObject>((acc, [key, value]) => {
+    if (value.length > 0) {
+      acc[key] = value;
+    }
+    return acc;
+  }, {});
 
- notifyStyleValues(returnedObject);
+  notifyStyleValues(returnedObject);
 }

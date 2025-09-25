@@ -513,11 +513,7 @@ describe('useToken test', () => {
       });
 
       const { result: newResult } = renderHook(() => useTokens(), {
-        wrapper: ({ children }) => (
-          <Provider store={newMockStore}>
-            {children}
-          </Provider>
-        ),
+        wrapper: ({ children }) => <Provider store={newMockStore}>{children}</Provider>,
       });
 
       const tokensToCreate = [
@@ -616,11 +612,7 @@ describe('useToken test', () => {
       });
 
       const { result: newResult } = renderHook(() => useTokens(), {
-        wrapper: ({ children }) => (
-          <Provider store={newMockStore}>
-            {children}
-          </Provider>
-        ),
+        wrapper: ({ children }) => <Provider store={newMockStore}>{children}</Provider>,
       });
 
       const selectedSets: ExportTokenSet[] = [

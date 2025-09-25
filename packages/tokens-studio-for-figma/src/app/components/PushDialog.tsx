@@ -150,7 +150,12 @@ function PushDialog() {
           )}
         >
           <Stack direction="column" align="start">
-            <ToggleGroup type="single" value={activeTab} onValueChange={handleToggleValueChange} css={{ marginLeft: '$3', marginTop: '$3' }}>
+            <ToggleGroup
+              type="single"
+              value={activeTab}
+              onValueChange={handleToggleValueChange}
+              css={{ marginLeft: '$3', marginTop: '$3' }}
+            >
               <ToggleGroup.Item iconOnly={false} value={PushDialogTabs.COMMIT}>
                 {t('commit')}
               </ToggleGroup.Item>

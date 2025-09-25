@@ -9,9 +9,11 @@ describe('goToNode', () => {
 
     goToNode('id');
 
-    expect(figma.currentPage.selection).toEqual([{
-      type: 'RECTANGLE',
-    }]);
+    expect(figma.currentPage.selection).toEqual([
+      {
+        type: 'RECTANGLE',
+      },
+    ]);
     expect(mockScrollAndZoomIntoView).toBeCalledTimes(1);
 
     figma.currentPage.selection = [];

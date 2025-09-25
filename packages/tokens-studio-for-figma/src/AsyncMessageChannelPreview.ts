@@ -27,7 +27,9 @@ type IncomingMessageEvent<Message = unknown> = {
 export type AsyncMessageChannelHandlers = {
   [K in AsyncMessageTypes]: (
     incoming: AsyncMessagesMap[K],
-  ) => Promise<IsTypeOnlyObject<AsyncMessageResultsMap[K]> extends true ? void : Omit<AsyncMessageResultsMap[K], 'type'>>;
+  ) => Promise<
+  IsTypeOnlyObject<AsyncMessageResultsMap[K]> extends true ? void : Omit<AsyncMessageResultsMap[K], 'type'>
+  >;
 };
 
 export const WEBSOCKET_SERVER_URL = 'ws://localhost:9001/ws';

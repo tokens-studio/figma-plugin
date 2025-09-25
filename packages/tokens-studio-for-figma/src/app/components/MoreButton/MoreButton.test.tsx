@@ -24,13 +24,7 @@ const token: SingleToken = {
 
 describe('MoreButton', () => {
   it('displays menu items', async () => {
-    const { getByText } = render(
-      <MoreButton
-        type={TokenTypes.SPACING}
-        showForm={mockShowForm}
-        token={token}
-      />,
-    );
+    const { getByText } = render(<MoreButton type={TokenTypes.SPACING} showForm={mockShowForm} token={token} />);
     expect(getByText(token.name)).toBeInTheDocument();
     await fireEvent.contextMenu(getByText(token.name));
     expect(getByText('Gap')).toBeInTheDocument();
@@ -38,13 +32,7 @@ describe('MoreButton', () => {
   });
 
   it('should show form on edit', async () => {
-    const { getByText } = render(
-      <MoreButton
-        type={TokenTypes.SPACING}
-        showForm={mockShowForm}
-        token={token}
-      />,
-    );
+    const { getByText } = render(<MoreButton type={TokenTypes.SPACING} showForm={mockShowForm} token={token} />);
     await fireEvent.contextMenu(getByText(token.name));
     expect(getByText('Edit Token')).toBeInTheDocument();
     await fireEvent.click(getByText('Edit Token'));
@@ -52,27 +40,19 @@ describe('MoreButton', () => {
   });
 
   it('should show form on duplicate', async () => {
-    const { getByText } = render(
-      <MoreButton
-        type={TokenTypes.SPACING}
-        showForm={mockShowForm}
-        token={token}
-      />,
-    );
+    const { getByText } = render(<MoreButton type={TokenTypes.SPACING} showForm={mockShowForm} token={token} />);
     await fireEvent.contextMenu(getByText(token.name));
     expect(getByText('Duplicate Token')).toBeInTheDocument();
     await fireEvent.click(getByText('Duplicate Token'));
-    expect(mockShowForm).toHaveBeenCalledWith({ name: `${token.name}-copy`, token, status: EditTokenFormStatus.DUPLICATE });
+    expect(mockShowForm).toHaveBeenCalledWith({
+      name: `${token.name}-copy`,
+      token,
+      status: EditTokenFormStatus.DUPLICATE,
+    });
   });
 
   it('should call delete on delete', async () => {
-    const { getByText } = render(
-      <MoreButton
-        type={TokenTypes.SPACING}
-        showForm={mockShowForm}
-        token={token}
-      />,
-    );
+    const { getByText } = render(<MoreButton type={TokenTypes.SPACING} showForm={mockShowForm} token={token} />);
     await fireEvent.contextMenu(getByText(token.name));
     expect(getByText('Delete Token')).toBeInTheDocument();
     await fireEvent.click(getByText('Delete Token'));
@@ -80,17 +60,14 @@ describe('MoreButton', () => {
   });
 
   it('should apply when clicking', async () => {
-    const { getByText } = render(
-      <MoreButton
-        type={TokenTypes.SPACING}
-        showForm={mockShowForm}
-        token={token}
-      />,
-    );
+    const { getByText } = render(<MoreButton type={TokenTypes.SPACING} showForm={mockShowForm} token={token} />);
     await fireEvent.click(getByText(token.name));
-    expect(mockSetNodeData).toHaveBeenCalledWith({
-      itemSpacing: token.name,
-    }, []);
+    expect(mockSetNodeData).toHaveBeenCalledWith(
+      {
+        itemSpacing: token.name,
+      },
+      [],
+    );
   });
 
   it('should clear when clicking', async () => {
@@ -104,17 +81,16 @@ describe('MoreButton', () => {
 
     const result = render(
       <Provider store={mockStore}>
-        <MoreButton
-          type={TokenTypes.SPACING}
-          showForm={mockShowForm}
-          token={token}
-        />
+        <MoreButton type={TokenTypes.SPACING} showForm={mockShowForm} token={token} />
       </Provider>,
     );
     await fireEvent.click(result.getByText(token.name));
-    expect(mockSetNodeData).toHaveBeenCalledWith({
-      itemSpacing: 'delete',
-    }, []);
+    expect(mockSetNodeData).toHaveBeenCalledWith(
+      {
+        itemSpacing: 'delete',
+      },
+      [],
+    );
   });
 
   it('should clear when using context menu', async () => {
@@ -128,11 +104,7 @@ describe('MoreButton', () => {
 
     const result = render(
       <Provider store={mockStore}>
-        <MoreButton
-          type={TokenTypes.SPACING}
-          showForm={mockShowForm}
-          token={token}
-        />
+        <MoreButton type={TokenTypes.SPACING} showForm={mockShowForm} token={token} />
       </Provider>,
     );
     await fireEvent.contextMenu(result.getByText(token.name));
@@ -151,25 +123,24 @@ describe('MoreButton', () => {
 
     const result = render(
       <Provider store={mockStore}>
-        <MoreButton
-          type={TokenTypes.SPACING}
-          showForm={mockShowForm}
-          token={token}
-        />
+        <MoreButton type={TokenTypes.SPACING} showForm={mockShowForm} token={token} />
       </Provider>,
     );
     await fireEvent.contextMenu(result.getByText(token.name));
     await fireEvent.click(result.getByText('All'));
-    expect(mockSetNodeData).toHaveBeenCalledWith({
-      counterAxisSpacing: 'delete',
-      horizontalPadding: 'delete',
-      verticalPadding: 'delete',
-      spacing: token.name,
-      paddingLeft: 'delete',
-      paddingTop: 'delete',
-      paddingRight: 'delete',
-      paddingBottom: 'delete',
-    }, []);
+    expect(mockSetNodeData).toHaveBeenCalledWith(
+      {
+        counterAxisSpacing: 'delete',
+        horizontalPadding: 'delete',
+        verticalPadding: 'delete',
+        spacing: token.name,
+        paddingLeft: 'delete',
+        paddingTop: 'delete',
+        paddingRight: 'delete',
+        paddingBottom: 'delete',
+      },
+      [],
+    );
   });
 
   it('gap property should not be applied when spacing token has multi value', async () => {
@@ -188,11 +159,7 @@ describe('MoreButton', () => {
 
     const result = render(
       <Provider store={mockStore}>
-        <MoreButton
-          type={TokenTypes.SPACING}
-          showForm={mockShowForm}
-          token={multiSpacingToken}
-        />
+        <MoreButton type={TokenTypes.SPACING} showForm={mockShowForm} token={multiSpacingToken} />
       </Provider>,
     );
     await fireEvent.contextMenu(result.getByText(multiSpacingToken.name));
@@ -207,11 +174,7 @@ describe('MoreButton', () => {
       type: TokenTypes.DIMENSION,
     };
     const { getByText } = render(
-      <MoreButton
-        type={TokenTypes.DIMENSION}
-        showForm={mockShowForm}
-        token={dimensionToken}
-      />,
+      <MoreButton type={TokenTypes.DIMENSION} showForm={mockShowForm} token={dimensionToken} />,
     );
     expect(getByText(dimensionToken.name)).toBeInTheDocument();
     await fireEvent.contextMenu(getByText(dimensionToken.name));
@@ -222,13 +185,7 @@ describe('MoreButton', () => {
   });
 
   it('cmd + click should lead to editForm', async () => {
-    const { getByText } = render(
-      <MoreButton
-        type={TokenTypes.SPACING}
-        showForm={mockShowForm}
-        token={token}
-      />,
-    );
+    const { getByText } = render(<MoreButton type={TokenTypes.SPACING} showForm={mockShowForm} token={token} />);
     expect(getByText(token.name)).toBeInTheDocument();
     await fireEvent.click(getByText(token.name), {
       ctrlKey: true,

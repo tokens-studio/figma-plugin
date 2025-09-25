@@ -11,10 +11,10 @@ import { Dispatch } from '@/app/store';
 import { activeThemeSelector } from '@/selectors';
 
 type Props = {
-  theme: ThemeObject
-  isActive: boolean
-  groupName: string
-  onOpen: (theme: ThemeObject) => void
+  theme: ThemeObject;
+  isActive: boolean;
+  groupName: string;
+  onOpen: (theme: ThemeObject) => void;
 };
 
 const StyledCountLabel = styled('span', {
@@ -40,24 +40,22 @@ const StyledCountLabel = styled('span', {
 });
 
 export const SingleThemeEntry: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
-  theme, isActive, groupName, onOpen,
+  theme,
+  isActive,
+  groupName,
+  onOpen,
 }) => {
   const activeTheme = useSelector(activeThemeSelector);
   const dispatch = useDispatch<Dispatch>();
 
-  const tokenSetCount = useMemo(() => (
-    Object.entries(theme.selectedTokenSets)
-      .filter(([, status]) => status !== TokenSetStatus.DISABLED)
-      .length
-  ), [theme]);
+  const tokenSetCount = useMemo(
+    () => Object.entries(theme.selectedTokenSets).filter(([, status]) => status !== TokenSetStatus.DISABLED).length,
+    [theme],
+  );
 
-  const stylesCount = useMemo(() => (
-    Object.values(theme.$figmaStyleReferences ?? {}).length
-  ), [theme]);
+  const stylesCount = useMemo(() => Object.values(theme.$figmaStyleReferences ?? {}).length, [theme]);
 
-  const variablesCount = useMemo(() => (
-    Object.values(theme.$figmaVariableReferences ?? {}).length
-  ), [theme]);
+  const variablesCount = useMemo(() => Object.values(theme.$figmaVariableReferences ?? {}).length, [theme]);
 
   const handleOpenClick = useCallback(() => {
     onOpen(theme);
@@ -86,7 +84,6 @@ export const SingleThemeEntry: React.FC<React.PropsWithChildren<React.PropsWithC
         flex: 1,
       }}
     >
-
       <Switch checked={isActive} onCheckedChange={handleToggle} />
       <Label>
         {' '}
@@ -100,20 +97,22 @@ export const SingleThemeEntry: React.FC<React.PropsWithChildren<React.PropsWithC
             {' '}
             {tokenSetCount === 1 ? 'set' : 'sets'}
           </StyledCountLabel>
-        ) : <StyledCountLabel variant="danger">No sets defined</StyledCountLabel>}
+        ) : (
+          <StyledCountLabel variant="danger">No sets defined</StyledCountLabel>
+        )}
         {stylesCount > 0 && (
-        <StyledCountLabel>
-          {stylesCount}
-          {' '}
-          {stylesCount === 1 ? 'style' : 'styles'}
-        </StyledCountLabel>
+          <StyledCountLabel>
+            {stylesCount}
+            {' '}
+            {stylesCount === 1 ? 'style' : 'styles'}
+          </StyledCountLabel>
         )}
         {variablesCount > 0 && (
-        <StyledCountLabel>
-          {variablesCount}
-          {' '}
-          {variablesCount === 1 ? 'variable' : 'variables'}
-        </StyledCountLabel>
+          <StyledCountLabel>
+            {variablesCount}
+            {' '}
+            {variablesCount === 1 ? 'variable' : 'variables'}
+          </StyledCountLabel>
         )}
       </Stack>
 
@@ -124,7 +123,6 @@ export const SingleThemeEntry: React.FC<React.PropsWithChildren<React.PropsWithC
         size="small"
         variant="invisible"
       />
-
     </Box>
   );
 };

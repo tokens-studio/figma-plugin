@@ -1,29 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Button,
-  Stack,
-  Text,
-  Heading,
-  Link,
+  Button, Stack, Text, Heading, Link,
 } from '@tokens-studio/ui';
 import Modal from './Modal';
 import { useBitbucketMigration } from '@/app/hooks/useBitbucketMigration';
 
 export default function BitbucketMigrationDialog() {
   const {
-    showDialog,
-    appPasswordCredentials,
-    closeDialog,
-    handleMigrate,
-    checkAndShowMigrationDialog,
+    showDialog, appPasswordCredentials, closeDialog, handleMigrate, checkAndShowMigrationDialog,
   } = useBitbucketMigration();
   const { t } = useTranslation(['storage']);
   const [hasMigrationBeenChecked, setHasMigrationBeenChecked] = useState(false);
 
-  const createMigrateHandler = React.useCallback((credential: any) => () => {
-    handleMigrate(credential);
-  }, [handleMigrate]);
+  const createMigrateHandler = React.useCallback(
+    (credential: any) => () => {
+      handleMigrate(credential);
+    },
+    [handleMigrate],
+  );
 
   // Check for migration dialog once on mount (simulating startup completion)
   useEffect(() => {
@@ -42,13 +37,9 @@ export default function BitbucketMigrationDialog() {
   return (
     <Modal isOpen={showDialog} close={closeDialog} title="">
       <Stack direction="column" gap={4} css={{ padding: '$4' }}>
-        <Heading size="medium">
-          {t('providers.bitbucketMigration.title')}
-        </Heading>
+        <Heading size="medium">{t('providers.bitbucketMigration.title')}</Heading>
 
-        <Text>
-          {t('providers.bitbucketMigration.description', { count: appPasswordCredentials.length })}
-        </Text>
+        <Text>{t('providers.bitbucketMigration.description', { count: appPasswordCredentials.length })}</Text>
 
         <Stack direction="column" gap={2}>
           <Text size="small" muted>
@@ -76,11 +67,7 @@ export default function BitbucketMigrationDialog() {
                   {credential.branch}
                 </Text>
               </Stack>
-              <Button
-                variant="secondary"
-                size="small"
-                onClick={createMigrateHandler(credential)}
-              >
+              <Button variant="secondary" size="small" onClick={createMigrateHandler(credential)}>
                 {t('providers.bitbucketMigration.migrate')}
               </Button>
             </Stack>

@@ -68,7 +68,6 @@ export default function SecondScreen() {
   return (
     <Box className="content scroll-container">
       <Stack direction="column" gap={4} css={{ padding: '$3 0' }}>
-
         <Stack direction="column" gap={2} css={{ padding: '0 $4' }} justify="between" align="start">
           <Heading>
             Second Screen
@@ -77,81 +76,87 @@ export default function SecondScreen() {
           </Heading>
           <StyledP>
             {t('secondScreenExplainer')}
-            <StyledReadMoreLink href="https://docs.tokens.studio/sync/second-screen" target="_blank" rel="noreferrer">{t('readMore', { ns: 'general' })}</StyledReadMoreLink>
+            <StyledReadMoreLink href="https://docs.tokens.studio/sync/second-screen" target="_blank" rel="noreferrer">
+              {t('readMore', { ns: 'general' })}
+            </StyledReadMoreLink>
           </StyledP>
         </Stack>
-        {
-          user ? (
-            <>
-              <Stack direction="column" gap={2} css={{ padding: '0 $4' }}>
-                <Stack
-                  gap={4}
-                  direction="row"
-                  align="center"
-                  justify="between"
-                  css={{
-                    backgroundColor: '$bgSubtle',
-                    borderColor: statusColor,
-                    borderWidth: '1px',
-                    padding: '$3 $5',
-                    fontSize: '$xsmall',
-                    borderRadius: '6px',
-                    color: statusColor,
-                    marginBottom: '$3',
-                    width: '100%',
-                    height: '4rem',
-                  }}
-                >
-                  <Stack
-                    direction="column"
-                    gap={1}
-                  >
-                    <Stack direction="row" align="center" gap={3} css={{ fontWeight: '$sansBold' }}>
-                      {isEnabled && user ? <Link1Icon /> : <LinkBreak1Icon />}
-                      {isEnabled && user ? t('connected') : t('notConnected')}
-                    </Stack>
-                    <Box>
-                      {isEnabled && user ? t('liveSyncActive') : t('liveSyncInactive')}
-                    </Box>
-
-                  </Stack>
-
-                  <Switch disabled={user === null} id="syncswitch" checked={isEnabled && !!user} onCheckedChange={onSyncClick} />
-                </Stack>
-                <Box>
-                  <Button disabled={user == null} variant="secondary" size="small" icon={<ExternalLinkIcon />} onClick={handleOpenSecondScreen}>
-                    {t('openSecondScreen')}
-                  </Button>
-                </Box>
-              </Stack>
-
-              <Divider />
-
-              <Stack direction="column" align="start" gap={3} css={{ padding: '0 $4' }}>
-
-                <Button variant="secondary" size="small" icon={<ExitIcon />} onClick={handleLogout}>
-                  {t('signOut')}
-                </Button>
-                <Box css={{
-                  fontWeight: '$sansRegular', fontSize: '$xsmall', overflow: 'hidden', textOverflow: 'ellipsis',
+        {user ? (
+          <>
+            <Stack direction="column" gap={2} css={{ padding: '0 $4' }}>
+              <Stack
+                gap={4}
+                direction="row"
+                align="center"
+                justify="between"
+                css={{
+                  backgroundColor: '$bgSubtle',
+                  borderColor: statusColor,
+                  borderWidth: '1px',
+                  padding: '$3 $5',
+                  fontSize: '$xsmall',
+                  borderRadius: '6px',
+                  color: statusColor,
+                  marginBottom: '$3',
+                  width: '100%',
+                  height: '4rem',
                 }}
-                >
-                  {t('signedInAs')}
-                  {' '}
-                  {user.email}
-                </Box>
+              >
+                <Stack direction="column" gap={1}>
+                  <Stack direction="row" align="center" gap={3} css={{ fontWeight: '$sansBold' }}>
+                    {isEnabled && user ? <Link1Icon /> : <LinkBreak1Icon />}
+                    {isEnabled && user ? t('connected') : t('notConnected')}
+                  </Stack>
+                  <Box>{isEnabled && user ? t('liveSyncActive') : t('liveSyncInactive')}</Box>
+                </Stack>
+
+                <Switch
+                  disabled={user === null}
+                  id="syncswitch"
+                  checked={isEnabled && !!user}
+                  onCheckedChange={onSyncClick}
+                />
               </Stack>
-            </>
-
-          ) : (
-            <Stack direction="column" align="start" gap={2} css={{ padding: '0 $4' }}>
-              <Button variant="primary" icon={<EnterIcon />} onClick={onSyncClick}>
-                {t('signInToContinue')}
-              </Button>
+              <Box>
+                <Button
+                  disabled={user == null}
+                  variant="secondary"
+                  size="small"
+                  icon={<ExternalLinkIcon />}
+                  onClick={handleOpenSecondScreen}
+                >
+                  {t('openSecondScreen')}
+                </Button>
+              </Box>
             </Stack>
-          )
-        }
 
+            <Divider />
+
+            <Stack direction="column" align="start" gap={3} css={{ padding: '0 $4' }}>
+              <Button variant="secondary" size="small" icon={<ExitIcon />} onClick={handleLogout}>
+                {t('signOut')}
+              </Button>
+              <Box
+                css={{
+                  fontWeight: '$sansRegular',
+                  fontSize: '$xsmall',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                {t('signedInAs')}
+                {' '}
+                {user.email}
+              </Box>
+            </Stack>
+          </>
+        ) : (
+          <Stack direction="column" align="start" gap={2} css={{ padding: '0 $4' }}>
+            <Button variant="primary" icon={<EnterIcon />} onClick={onSyncClick}>
+              {t('signInToContinue')}
+            </Button>
+          </Stack>
+        )}
       </Stack>
     </Box>
   );

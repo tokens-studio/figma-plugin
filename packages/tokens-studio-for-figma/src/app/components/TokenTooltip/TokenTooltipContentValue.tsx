@@ -6,7 +6,10 @@ import { SingleToken } from '@/types/tokens';
 import { SingleShadowValueDisplay } from './SingleShadowValueDisplay';
 import { TokensContext } from '@/context';
 import {
-  isSingleBoxShadowToken, isSingleTypographyToken, isSingleCompositionToken, isSingleBorderToken,
+  isSingleBoxShadowToken,
+  isSingleTypographyToken,
+  isSingleCompositionToken,
+  isSingleBorderToken,
 } from '@/utils/is';
 import { SingleTypographyValueDisplay } from './SingleTypographyValueDisplay';
 import { TokenBorderValue, TokenBoxshadowValue, TokenTypographyValue } from '@/types/values';
@@ -24,16 +27,17 @@ type Props = {
 };
 
 // Returns token value in display format
-export const TokenTooltipContentValue: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({ token, ignoreResolvedValue }) => {
+export const TokenTooltipContentValue: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
+  token,
+  ignoreResolvedValue,
+}) => {
   const seed = useUIDSeed();
   const tokensContext = React.useContext(TokensContext);
   const { getTokenValue } = useTokens();
-  const resolvedValue = React.useMemo(() => (ignoreResolvedValue ? undefined : getTokenValue(token.name, tokensContext.resolvedTokens)?.value), [
-    token,
-    getTokenValue,
-    tokensContext.resolvedTokens,
-    ignoreResolvedValue,
-  ]);
+  const resolvedValue = React.useMemo(
+    () => (ignoreResolvedValue ? undefined : getTokenValue(token.name, tokensContext.resolvedTokens)?.value),
+    [token, getTokenValue, tokensContext.resolvedTokens, ignoreResolvedValue],
+  );
 
   if (isSingleTypographyToken(token, true)) {
     return (
@@ -58,7 +62,9 @@ export const TokenTooltipContentValue: React.FC<React.PropsWithChildren<React.Pr
             property={property}
             value={value}
             // @TODO strengthen the type checking here
-            resolvedValue={ignoreResolvedValue ? false : get(resolvedValue as SingleToken, property) as CompositionTokenValue}
+            resolvedValue={
+              ignoreResolvedValue ? false : (get(resolvedValue as SingleToken, property) as CompositionTokenValue)
+            }
           />
         ))}
       </Stack>
@@ -69,15 +75,11 @@ export const TokenTooltipContentValue: React.FC<React.PropsWithChildren<React.Pr
     if (Array.isArray(resolvedValue)) {
       return (
         <Stack direction="column" align="start" gap={3} wrap>
-          {typeof token.value === 'string' ? (
-            <TooltipProperty
-              value={token.value}
-            />
-          ) : null}
+          {typeof token.value === 'string' ? <TooltipProperty value={token.value} /> : null}
           {resolvedValue.map((t, index) => (
             <SingleShadowValueDisplay
               key={seed(t)}
-              value={Array.isArray(token.value) ? token.value[index] as TokenBoxshadowValue : undefined}
+              value={Array.isArray(token.value) ? (token.value[index] as TokenBoxshadowValue) : undefined}
               resolvedValue={t as TokenBoxshadowValue}
             />
           ))}
@@ -87,11 +89,7 @@ export const TokenTooltipContentValue: React.FC<React.PropsWithChildren<React.Pr
 
     return (
       <div>
-        {typeof token.value === 'string' ? (
-          <TooltipProperty
-            value={token.value}
-          />
-        ) : null}
+        {typeof token.value === 'string' ? <TooltipProperty value={token.value} /> : null}
         <SingleShadowValueDisplay
           // @TODO strengthen type checking here
           value={token.value as TokenBoxshadowValue}

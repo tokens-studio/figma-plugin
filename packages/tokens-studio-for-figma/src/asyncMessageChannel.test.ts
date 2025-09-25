@@ -1,9 +1,7 @@
 import { AsyncMessageChannel } from './AsyncMessageChannel';
 import { AsyncMessageChannelPreview } from './AsyncMessageChannelPreview';
 import { INTERNAL_THEMES_NO_GROUP } from './constants/InternalTokenGroup';
-import {
-  AsyncMessageTypes, GetThemeInfoMessageResult,
-} from './types/AsyncMessages';
+import { AsyncMessageTypes, GetThemeInfoMessageResult } from './types/AsyncMessages';
 
 describe('Testing the mock functionality of the AsyncMessageChannel', () => {
   it('should be able to communicate between UI and plugin', async () => {
@@ -75,9 +73,11 @@ describe('Testing the mock functionality of the AsyncMessageChannel', () => {
     AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.GET_THEME_INFO, getThemeInfoHandler);
 
     runAfter.push(AsyncMessageChannel.ReactInstance.connect());
-    expect(AsyncMessageChannel.ReactInstance.message({
-      type: AsyncMessageTypes.GET_THEME_INFO,
-    })).rejects.toEqual(new Error('error'));
+    expect(
+      AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.GET_THEME_INFO,
+      }),
+    ).rejects.toEqual(new Error('error'));
 
     runAfter.forEach((fn) => fn?.());
   });

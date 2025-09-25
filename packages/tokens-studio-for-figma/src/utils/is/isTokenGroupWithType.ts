@@ -18,7 +18,10 @@ export function isTokenGroupWithType(token: Tokens): token is TokenGroupInJSON {
     token
     && typeof token === 'object'
     // There is no value key defined (which means it's a group) / or there is a value key defined and it's content is an object containing a value key (only relevant for the old format)
-    && (!(TokenFormat.tokenValueKey in token) || (TokenFormat.tokenValueKey in token && typeof token[TokenFormat.tokenValueKey] === 'object' && TokenFormat.tokenValueKey in token[TokenFormat.tokenValueKey]!))
+    && (!(TokenFormat.tokenValueKey in token)
+      || (TokenFormat.tokenValueKey in token
+        && typeof token[TokenFormat.tokenValueKey] === 'object'
+        && TokenFormat.tokenValueKey in token[TokenFormat.tokenValueKey]!))
     && TokenFormat.tokenTypeKey in token
     && typeof token[TokenFormat.tokenTypeKey] === 'string'
   );

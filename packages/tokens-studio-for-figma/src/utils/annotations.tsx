@@ -14,10 +14,15 @@ const TITLE_COLOR = { r: 1, g: 1, b: 1 };
 const PROP_COLOR = { r: 0.9, g: 0.9, b: 0.9 };
 const VALUE_COLOR = { r: 1, g: 0.839, b: 0.078 };
 
-function getParentSelection(sel: SceneNode, distance: number, direction: Direction, position = { x: 0, y: 0, width: 0 }): {
-  distance: number;
-  position: { x: number; y: number; width: number; }
-} {
+function getParentSelection(
+  sel: SceneNode,
+  distance: number,
+  direction: Direction,
+  position = { x: 0, y: 0, width: 0 },
+): {
+    distance: number;
+    position: { x: number; y: number; width: number };
+  } {
   if (position.width === 0) position.width = sel.width - DIST; // save original width
 
   if ('parent' in sel && sel.parent) {
@@ -80,10 +85,7 @@ function calcPosition(selection: SceneNode, anno: FrameNode, direction: Directio
   return { x, y, distance };
 }
 
-function createProperties(
-  anno: FrameNode,
-  tokens: SelectionValue & { annoTitle: string },
-) {
+function createProperties(anno: FrameNode, tokens: SelectionValue & { annoTitle: string }) {
   Object.entries(tokens)
     .filter(([key]) => !StyleIdBackupKeys.includes(key))
     .forEach(([key, value]) => {

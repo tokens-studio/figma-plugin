@@ -79,7 +79,14 @@ describe('BitbucketTokenStorage', () => {
     );
 
     // Reset the Bitbucket mock and create a new instance of BitbucketTokenStorage
-    storageProvider = new BitbucketTokenStorage('', 'MattOliver', 'figma-tokens-testing', '', 'test@example.com', 'mock-api-token');
+    storageProvider = new BitbucketTokenStorage(
+      '',
+      'MattOliver',
+      'figma-tokens-testing',
+      '',
+      'test@example.com',
+      'mock-api-token',
+    );
     storageProvider.selectBranch('main');
     storageProvider.disableMultiFile();
   });
@@ -94,15 +101,12 @@ describe('BitbucketTokenStorage', () => {
 
     await expect(storageProvider.canWrite()).rejects.toThrow('BITBUCKET_UNAUTHORIZED');
 
-    expect(mockFetch).toHaveBeenCalledWith(
-      'https://api.bitbucket.org/2.0/user',
-      {
-        headers: {
-          Authorization: `Basic ${btoa('test@example.com:mock-api-token')}`,
-          'Content-Type': 'application/json',
-        },
+    expect(mockFetch).toHaveBeenCalledWith('https://api.bitbucket.org/2.0/user', {
+      headers: {
+        Authorization: `Basic ${btoa('test@example.com:mock-api-token')}`,
+        'Content-Type': 'application/json',
       },
-    );
+    });
   });
 
   it('canWrite should return true if authenticated and has repository access', async () => {
@@ -110,10 +114,11 @@ describe('BitbucketTokenStorage', () => {
     mockFetch.mockImplementationOnce(() =>
       Promise.resolve({
         ok: true,
-        json: () => Promise.resolve({
-          account_id: 'test-account-id',
-          username: 'testuser',
-        }),
+        json: () =>
+          Promise.resolve({
+            account_id: 'test-account-id',
+            username: 'testuser',
+          }),
       }),
     );
 
@@ -121,26 +126,25 @@ describe('BitbucketTokenStorage', () => {
     mockFetch.mockImplementationOnce(() =>
       Promise.resolve({
         ok: true,
-        json: () => Promise.resolve({
-          name: 'figma-tokens-testing',
-          full_name: 'MattOliver/figma-tokens-testing',
-        }),
+        json: () =>
+          Promise.resolve({
+            name: 'figma-tokens-testing',
+            full_name: 'MattOliver/figma-tokens-testing',
+          }),
       }),
     );
 
     expect(await storageProvider.canWrite()).toBe(true);
 
     expect(mockFetch).toHaveBeenCalledTimes(2);
-    expect(mockFetch).toHaveBeenNthCalledWith(1,
-      'https://api.bitbucket.org/2.0/user',
-      {
-        headers: {
-          Authorization: `Basic ${btoa('test@example.com:mock-api-token')}`,
-          'Content-Type': 'application/json',
-        },
+    expect(mockFetch).toHaveBeenNthCalledWith(1, 'https://api.bitbucket.org/2.0/user', {
+      headers: {
+        Authorization: `Basic ${btoa('test@example.com:mock-api-token')}`,
+        'Content-Type': 'application/json',
       },
-    );
-    expect(mockFetch).toHaveBeenNthCalledWith(2,
+    });
+    expect(mockFetch).toHaveBeenNthCalledWith(
+      2,
       `https://api.bitbucket.org/2.0/repositories/${storageProvider.owner}/${storageProvider.repository}`,
       {
         headers: {
@@ -155,10 +159,11 @@ describe('BitbucketTokenStorage', () => {
     mockFetch.mockImplementationOnce(() =>
       Promise.resolve({
         ok: true,
-        json: () => Promise.resolve({
-          account_id: '123',
-          username: 'testuser',
-        }),
+        json: () =>
+          Promise.resolve({
+            account_id: '123',
+            username: 'testuser',
+          }),
       }),
     );
 
@@ -166,10 +171,11 @@ describe('BitbucketTokenStorage', () => {
     mockFetch.mockImplementationOnce(() =>
       Promise.resolve({
         ok: true,
-        json: () => Promise.resolve({
-          name: 'figma-tokens-testing',
-          full_name: 'MattOliver/figma-tokens-testing',
-        }),
+        json: () =>
+          Promise.resolve({
+            name: 'figma-tokens-testing',
+            full_name: 'MattOliver/figma-tokens-testing',
+          }),
       }),
     );
 
@@ -187,21 +193,28 @@ describe('BitbucketTokenStorage', () => {
     storageProvider.changePath('global.json');
 
     mockFetch
-      .mockImplementationOnce(() => Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve({
-          $themes: [],
-          global: { red: { name: 'red', type: 'color', value: '#ff0000' } },
+      .mockImplementationOnce(() =>
+        Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve({
+              $themes: [],
+              global: { red: { name: 'red', type: 'color', value: '#ff0000' } },
+            }),
         }),
-      }))
-      .mockImplementationOnce(() => Promise.resolve({
-        ok: true,
-        text: () => Promise.resolve(JSON.stringify({ $themes: [] })),
-      }))
-      .mockImplementationOnce(() => Promise.resolve({
-        ok: true,
-        text: () => Promise.resolve(JSON.stringify({ red: { name: 'red', type: 'color', value: '#ff0000' } })),
-      }));
+      )
+      .mockImplementationOnce(() =>
+        Promise.resolve({
+          ok: true,
+          text: () => Promise.resolve(JSON.stringify({ $themes: [] })),
+        }),
+      )
+      .mockImplementationOnce(() =>
+        Promise.resolve({
+          ok: true,
+          text: () => Promise.resolve(JSON.stringify({ red: { name: 'red', type: 'color', value: '#ff0000' } })),
+        }),
+      );
 
     const result = await storageProvider.read();
 
@@ -244,9 +257,10 @@ describe('BitbucketTokenStorage', () => {
         return Promise.resolve({
           ok: true,
           status: 200,
-          json: () => Promise.resolve({
-            values: [{ name: 'main' }, { name: 'different-branch' }],
-          }),
+          json: () =>
+            Promise.resolve({
+              values: [{ name: 'main' }, { name: 'different-branch' }],
+            }),
         });
       }
       // Default fallback for other calls
@@ -327,12 +341,15 @@ describe('BitbucketTokenStorage', () => {
 
     // Mock the branch info API call to return a commit SHA
     mockFetch
-      .mockImplementationOnce(() => Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve({
-          target: { hash: 'abc123commitsha' },
+      .mockImplementationOnce(() =>
+        Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve({
+              target: { hash: 'abc123commitsha' },
+            }),
         }),
-      }))
+      )
       // Mock the file content API call
       .mockImplementationOnce((url) => {
         // Verify that the commit SHA is used instead of the encoded branch name
@@ -342,24 +359,23 @@ describe('BitbucketTokenStorage', () => {
 
         return Promise.resolve({
           ok: true,
-          json: () => Promise.resolve({
-            $themes: [],
-            global: { red: { name: 'red', type: 'color', value: '#ff0000' } },
-          }),
+          json: () =>
+            Promise.resolve({
+              $themes: [],
+              global: { red: { name: 'red', type: 'color', value: '#ff0000' } },
+            }),
         });
       });
 
     await storageProvider.read();
 
     expect(mockFetch).toHaveBeenCalledTimes(2);
-    expect(mockFetch).toHaveBeenNthCalledWith(1,
+    expect(mockFetch).toHaveBeenNthCalledWith(
+      1,
       expect.stringContaining('refs/branches/feature%2Fnew-feature'),
       expect.any(Object),
     );
-    expect(mockFetch).toHaveBeenNthCalledWith(2,
-      expect.stringContaining('abc123commitsha'),
-      expect.any(Object),
-    );
+    expect(mockFetch).toHaveBeenNthCalledWith(2, expect.stringContaining('abc123commitsha'), expect.any(Object));
   });
 
   it('should use encoded branch name for branches without slashes when reading files', async () => {
@@ -372,29 +388,28 @@ describe('BitbucketTokenStorage', () => {
 
       return Promise.resolve({
         ok: true,
-        json: () => Promise.resolve({
-          $themes: [],
-          global: { red: { name: 'red', type: 'color', value: '#ff0000' } },
-        }),
+        json: () =>
+          Promise.resolve({
+            $themes: [],
+            global: { red: { name: 'red', type: 'color', value: '#ff0000' } },
+          }),
       });
     });
 
     await storageProvider.read();
 
     expect(mockFetch).toHaveBeenCalledTimes(1);
-    expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining('/src/main/'),
-      expect.any(Object),
-    );
+    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('/src/main/'), expect.any(Object));
   });
 
   it('should be able to write', async () => {
     mockFetch.mockImplementationOnce(() =>
       Promise.resolve({
         ok: true,
-        json: () => Promise.resolve({
-          values: [{ name: 'main' }],
-        }),
+        json: () =>
+          Promise.resolve({
+            values: [{ name: 'main' }],
+          }),
       }),
     );
 
@@ -483,9 +498,10 @@ describe('BitbucketTokenStorage', () => {
     mockFetch.mockImplementationOnce(() =>
       Promise.resolve({
         ok: true,
-        json: () => Promise.resolve({
-          values: [{ name: 'main' }],
-        }),
+        json: () =>
+          Promise.resolve({
+            values: [{ name: 'main' }],
+          }),
       }),
     );
 

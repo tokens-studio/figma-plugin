@@ -35,27 +35,31 @@ describe('Initiator', () => {
         data: {
           pluginMessage: {
             type: 'selection',
-            selectionValues: [{
-              category: 'sizing',
-              type: 'sizing',
-              value: 'sizing.xs',
-            },
-            {
-              category: 'opacity',
-              type: 'opacity',
-              value: 'opacity.50',
-            },
-            {
-              category: 'fontSizes',
-              type: 'fontSizes',
-              value: 'font-size.12',
-            }],
+            selectionValues: [
+              {
+                category: 'sizing',
+                type: 'sizing',
+                value: 'sizing.xs',
+              },
+              {
+                category: 'opacity',
+                type: 'opacity',
+                value: 'opacity.50',
+              },
+              {
+                category: 'fontSizes',
+                type: 'fontSizes',
+                value: 'font-size.12',
+              },
+            ],
             selectedNodes: 1,
-            mainNodeSelectionValues: [{
-              sizing: 'sizing.xs',
-              opacity: 'opacity.50',
-              fontSizes: 'font-size.12',
-            }],
+            mainNodeSelectionValues: [
+              {
+                sizing: 'sizing.xs',
+                opacity: 'opacity.50',
+                fontSizes: 'font-size.12',
+              },
+            ],
           },
         },
       }),
@@ -65,21 +69,23 @@ describe('Initiator', () => {
       opacity: 'opacity.50',
       fontSizes: 'font-size.12',
     });
-    expect(mockStore.getState().uiState.selectionValues).toEqual([{
-      category: 'sizing',
-      type: 'sizing',
-      value: 'sizing.xs',
-    },
-    {
-      category: 'opacity',
-      type: 'opacity',
-      value: 'opacity.50',
-    },
-    {
-      category: 'fontSizes',
-      type: 'fontSizes',
-      value: 'font-size.12',
-    }]);
+    expect(mockStore.getState().uiState.selectionValues).toEqual([
+      {
+        category: 'sizing',
+        type: 'sizing',
+        value: 'sizing.xs',
+      },
+      {
+        category: 'opacity',
+        type: 'opacity',
+        value: 'opacity.50',
+      },
+      {
+        category: 'fontSizes',
+        type: 'fontSizes',
+        value: 'font-size.12',
+      },
+    ]);
     result.unmount();
   });
 
@@ -98,12 +104,15 @@ describe('Initiator', () => {
         data: {
           pluginMessage: {
             type: 'selection',
-            mainNodeSelectionValues: [{
-              sizing: 'sizing.xs',
-            }, {
-              opacity: 'opacity.50',
-              fontSizes: 'font-size.12',
-            }],
+            mainNodeSelectionValues: [
+              {
+                sizing: 'sizing.xs',
+              },
+              {
+                opacity: 'opacity.50',
+                fontSizes: 'font-size.12',
+              },
+            ],
           },
         },
       }),
@@ -448,9 +457,7 @@ describe('Initiator', () => {
     );
 
     const state = mockStore.getState();
-    expect(state.uiState.backgroundJobs).toEqual([
-      { name: 'job' },
-    ]);
+    expect(state.uiState.backgroundJobs).toEqual([{ name: 'job' }]);
   });
 
   it('should be able to complete a background job', () => {
@@ -548,11 +555,13 @@ describe('Initiator', () => {
   it('should be able to add complete job tasks', () => {
     const mockStore = createMockStore({
       uiState: {
-        backgroundJobs: [{
-          name: 'job',
-          completedTasks: 0,
-          totalTasks: 10,
-        }],
+        backgroundJobs: [
+          {
+            name: 'job',
+            completedTasks: 0,
+            totalTasks: 10,
+          },
+        ],
       },
     });
     render(

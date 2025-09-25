@@ -99,9 +99,7 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
       <ConfirmDialog />
       <ImportedTokensDialog />
       <PushDialog />
-      {
-        !showLoadingScreen && <PullDialog />
-      }
+      {!showLoadingScreen && <PullDialog />}
       <WindowResizer />
       <OnboardingFlow />
       <Changelog />

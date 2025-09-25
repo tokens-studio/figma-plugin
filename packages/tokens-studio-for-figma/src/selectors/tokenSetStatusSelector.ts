@@ -6,7 +6,5 @@ import type { RootState } from '@/app/store';
 export const tokenSetStatusSelector = createSelector(
   usedTokenSetSelector,
   (state: RootState, tokenSet: string) => tokenSet,
-  (usedTokenSets, tokenSet) => (
-    usedTokenSets?.[tokenSet] ?? TokenSetStatus.DISABLED
-  ),
+  (usedTokenSets, tokenSet) => usedTokenSets?.[tokenSet] ?? TokenSetStatus.DISABLED,
 );

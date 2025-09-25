@@ -13,7 +13,7 @@ export const attachLocalStylesToTheme: AsyncMessageChannelHandlers[AsyncMessageT
   const {
     theme, tokens, category, settings,
   } = msg;
-  const figmaStyleReferences = { ...theme.$figmaStyleReferences ?? {} };
+  const figmaStyleReferences = { ...(theme.$figmaStyleReferences ?? {}) };
   const ignoreFirstPartForStyles = settings?.ignoreFirstPartForStyles;
   const prefixStylesWithThemeName = settings?.prefixStylesWithThemeName;
 
@@ -37,9 +37,7 @@ export const attachLocalStylesToTheme: AsyncMessageChannelHandlers[AsyncMessageT
       category === 'typography' ? TokenTypes.TYPOGRAPHY : null,
       category === 'effects' ? TokenTypes.BOX_SHADOW : null,
     ]);
-  tokensToCreateStylesFor = tokensToCreateStylesFor.filter((token) => (
-    enabledTokenTypes.includes(token.type)
-  ));
+  tokensToCreateStylesFor = tokensToCreateStylesFor.filter((token) => enabledTokenTypes.includes(token.type));
 
   // step 3 find and attach local styles
   const prefix = prefixStylesWithThemeName ? theme.name : null;

@@ -93,11 +93,7 @@ function PullDialog() {
         >
           <Stack direction="column" gap={4} css={{ padding: '$4' }}>
             {lastError && (
-              <Callout
-                id="pull-dialog-error"
-                heading={getErrorHeading()}
-                description={lastError.message}
-              />
+              <Callout id="pull-dialog-error" heading={getErrorHeading()} description={lastError.message} />
             )}
           </Stack>
         </Modal>

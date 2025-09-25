@@ -19,7 +19,14 @@ export function useStorageSizeWarning() {
           br: <br />,
           // text coming from i18n
           // eslint-disable-next-line jsx-a11y/control-has-associated-label, jsx-a11y/anchor-has-content
-          firstLink: <a style={{ textDecoration: 'underline', color: 'var(--colors-fgAccent)' }} href="https://docs.tokens.studio/token-storage/local/figma-data-limit" target="_blank" rel="noreferrer" />,
+          firstLink: (
+            <a
+              style={{ textDecoration: 'underline', color: 'var(--colors-fgAccent)' }}
+              href="https://docs.tokens.studio/token-storage/local/figma-data-limit"
+              target="_blank"
+              rel="noreferrer"
+            />
+          ),
         }}
       />
     );

@@ -239,7 +239,11 @@ export function useTokensStudio() {
                 themes: data.themes,
                 metadata: data.metadata,
               });
-              const stringifiedRemoteTokens = JSON.stringify(compact([data.tokens, data.themes, TokenFormat.format]), null, 2);
+              const stringifiedRemoteTokens = JSON.stringify(
+                compact([data.tokens, data.themes, TokenFormat.format]),
+                null,
+                2,
+              );
               dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
               dispatch.tokenState.setCollapsedTokenSets([]);
               notifyToUI('Pulled tokens from Tokens Studio');

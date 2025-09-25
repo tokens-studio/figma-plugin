@@ -39,11 +39,11 @@ export type Tokens =
   | Partial<Record<string, Partial<Record<TokenTypes, Record<string, TokenInJSON>>>>>
   | TokenGroupInJSON;
 
-  type OptionalDTCGKeys = {
-    $type?: TokenTypes;
-    $value?: SingleToken['value'];
-    $description?: string;
-  };
+type OptionalDTCGKeys = {
+  $type?: TokenTypes;
+  $value?: SingleToken['value'];
+  $description?: string;
+};
 
 // @TODO fix typings
 function checkForTokens({
@@ -70,7 +70,7 @@ function checkForTokens({
   inheritType?: string;
   groupLevel?: number;
   currentTypeLevel?: number;
-}): [(SingleToken & SingleToken & OptionalDTCGKeys)[], SingleToken & OptionalDTCGKeys | undefined] {
+}): [(SingleToken & SingleToken & OptionalDTCGKeys)[], (SingleToken & OptionalDTCGKeys) | undefined] {
   let returnValue:
   | Pick<SingleToken<false>, 'name' | 'value' | 'type' | 'description' | 'inheritTypeLevel'>
   | {

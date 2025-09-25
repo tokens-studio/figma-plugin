@@ -479,9 +479,15 @@ export default function useTokens() {
 
             Object.assign(allStyleIds, createStylesResult.styleIds);
 
-            dispatch.tokenState.assignStyleIdsToCurrentTheme({ styleIds: createStylesResult.styleIds, tokens: tokensToCreate, selectedThemes });
+            dispatch.tokenState.assignStyleIdsToCurrentTheme({
+              styleIds: createStylesResult.styleIds,
+              tokens: tokensToCreate,
+              selectedThemes,
+            });
           } else {
-            notifyToUI(`No styles created for theme: ${selectedTheme.name}. Make sure some sets are enabled.`, { error: true });
+            notifyToUI(`No styles created for theme: ${selectedTheme.name}. Make sure some sets are enabled.`, {
+              error: true,
+            });
           }
         }
       }
@@ -501,10 +507,9 @@ export default function useTokens() {
       });
       // Remove styles that aren't in the theme or in the exposed token object
       if (settings.removeStylesAndVariablesWithoutConnection) {
-        const uniqueMergedStyleIds: string[] = Array.from(new Set([
-          ...Object.values(allExistingStyleReferences).flat(),
-          ...Object.values(allStyleIds).flat(),
-        ]));
+        const uniqueMergedStyleIds: string[] = Array.from(
+          new Set([...Object.values(allExistingStyleReferences).flat(), ...Object.values(allStyleIds).flat()]),
+        );
         const { countOfRemovedStyles } = await AsyncMessageChannel.ReactInstance.message({
           type: AsyncMessageTypes.REMOVE_STYLES_WITHOUT_CONNECTION,
           usedStyleIds: uniqueMergedStyleIds,
@@ -571,27 +576,30 @@ export default function useTokens() {
   );
 
   const filterMultiValueTokens = useCallback(() => {
-    const tempTokens = Object.entries(tokens).reduce((tempTokens, [tokenSetKey, tokenList]) => {
-      const filteredTokenList = tokenList.reduce((acc, tokenItem) => {
-        const resolvedValue = getAliasValue(tokenItem, tokensContext.resolvedTokens) || '';
-        // If extension data exists, it is likely that the token is a complex token containing color modifier data, etc
-        // in which case we collapse the value as it cannot be used as a variable
-        if ((tokenItem.$extensions || {})['studio.tokens'] && typeof resolvedValue === 'string') {
-          // We don't want to change the actual value as this could cause unintended side effects
-          tokenItem = { ...tokenItem };
-          tokenItem.value = resolvedValue;
-        }
-        if (typeof tokenItem.value === 'string' && VALID_TOKEN_TYPES.includes(tokenItem.type)) {
-          if (resolvedValue.toString().trim().includes(' ')) {
-            return acc;
+    const tempTokens = Object.entries(tokens).reduce(
+      (tempTokens, [tokenSetKey, tokenList]) => {
+        const filteredTokenList = tokenList.reduce((acc, tokenItem) => {
+          const resolvedValue = getAliasValue(tokenItem, tokensContext.resolvedTokens) || '';
+          // If extension data exists, it is likely that the token is a complex token containing color modifier data, etc
+          // in which case we collapse the value as it cannot be used as a variable
+          if ((tokenItem.$extensions || {})['studio.tokens'] && typeof resolvedValue === 'string') {
+            // We don't want to change the actual value as this could cause unintended side effects
+            tokenItem = { ...tokenItem };
+            tokenItem.value = resolvedValue;
           }
-        }
-        acc.push(tokenItem);
-        return acc;
-      }, [] as AnyTokenList);
-      tempTokens[tokenSetKey] = filteredTokenList;
-      return tempTokens;
-    }, {} as Record<string, AnyTokenList>);
+          if (typeof tokenItem.value === 'string' && VALID_TOKEN_TYPES.includes(tokenItem.type)) {
+            if (resolvedValue.toString().trim().includes(' ')) {
+              return acc;
+            }
+          }
+          acc.push(tokenItem);
+          return acc;
+        }, [] as AnyTokenList);
+        tempTokens[tokenSetKey] = filteredTokenList;
+        return tempTokens;
+      },
+      {} as Record<string, AnyTokenList>,
+    );
 
     return tempTokens;
   }, [tokens]);

@@ -45,30 +45,33 @@ export default function BitbucketForm({
     (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
 
-      const zodSchema = zod.object({
-        provider: zod.string(),
-        name: zod.string(),
-        username: zod.string(),
-        id: zod.string(),
-        branch: zod.string(),
-        filePath: zod.string(),
-        baseUrl: zod.string().optional(),
-        secret: zod.string().optional(),
-        apiToken: zod.string().optional(),
-        internalId: zod.string().optional(),
-      }).refine((data) => {
-        // For new syncs or migration, require API token
-        if (isNewSync) {
-          return data.apiToken && data.apiToken.trim() !== '';
-        }
-        // For existing syncs, require either secret (app password) or API token
-        return (data.secret && data.secret.trim() !== '') || (data.apiToken && data.apiToken.trim() !== '');
-      }, {
-        message: isNewSync
-          ? 'API Token is required for new syncs'
-          : 'Either App Password or API Token is required',
-        path: ['apiToken'],
-      });
+      const zodSchema = zod
+        .object({
+          provider: zod.string(),
+          name: zod.string(),
+          username: zod.string(),
+          id: zod.string(),
+          branch: zod.string(),
+          filePath: zod.string(),
+          baseUrl: zod.string().optional(),
+          secret: zod.string().optional(),
+          apiToken: zod.string().optional(),
+          internalId: zod.string().optional(),
+        })
+        .refine(
+          (data) => {
+            // For new syncs or migration, require API token
+            if (isNewSync) {
+              return data.apiToken && data.apiToken.trim() !== '';
+            }
+            // For existing syncs, require either secret (app password) or API token
+            return (data.secret && data.secret.trim() !== '') || (data.apiToken && data.apiToken.trim() !== '');
+          },
+          {
+            message: isNewSync ? 'API Token is required for new syncs' : 'Either App Password or API Token is required',
+            path: ['apiToken'],
+          },
+        );
 
       const validationResult = zodSchema.safeParse(values);
       if (validationResult.success) {
@@ -117,7 +120,9 @@ export default function BitbucketForm({
         <FormField>
           <Label htmlFor="name">{t('name')}</Label>
           <TextInput value={values.name || ''} onChange={onChange} type="text" name="name" id="name" required />
-          <Text muted size="xsmall">{t('nameHelpText')}</Text>
+          <Text muted size="xsmall">
+            {t('nameHelpText')}
+          </Text>
         </FormField>
         <FormField>
           <Label htmlFor="username">
@@ -175,11 +180,7 @@ export default function BitbucketForm({
                   {t('providers.bitbucketMigration.appPasswordDeprecated')}
                 </Text>
               </Stack>
-              <Button
-                variant="secondary"
-                size="small"
-                onClick={handleMigrationMode}
-              >
+              <Button variant="secondary" size="small" onClick={handleMigrationMode}>
                 {t('providers.bitbucketMigration.switchToMigrationMode')}
               </Button>
             </Stack>
@@ -249,7 +250,10 @@ export default function BitbucketForm({
             variant="primary"
             type="submit"
             disabled={
-              !values.name || (isNewSync && !values.apiToken) || (isEditingAppPasswordSync && !values.secret) || (!isEditingAppPasswordSync && !isNewSync && !values.apiToken)
+              !values.name
+              || (isNewSync && !values.apiToken)
+              || (isEditingAppPasswordSync && !values.secret)
+              || (!isEditingAppPasswordSync && !isNewSync && !values.apiToken)
             }
           >
             {t('save')}

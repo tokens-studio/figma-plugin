@@ -40,9 +40,7 @@ export function pullTokensFactory(
     const storageType = storageTypeSelector(state);
 
     if (isRemoteStorage) {
-      const matchingSet = params.localApiProviders?.find((provider) => (
-        isSameCredentials(provider, storageType)
-      ));
+      const matchingSet = params.localApiProviders?.find((provider) => isSameCredentials(provider, storageType));
 
       if (matchingSet) {
         // found API credentials
@@ -117,14 +115,11 @@ export function pullTokensFactory(
         }
       } else {
         // no API credentials available for storage type
-        const { type, message, header } = categorizeError(
-          new Error('No credentials configured'),
-          {
-            provider: params.storageType.provider,
-            operation: 'pull',
-            hasCredentials: false,
-          },
-        );
+        const { type, message, header } = categorizeError(new Error('No credentials configured'), {
+          provider: params.storageType.provider,
+          operation: 'pull',
+          hasCredentials: false,
+        });
         dispatch.uiState.setLastError({ type, message, header });
         dispatch.uiState.setActiveTab(Tabs.START);
       }
@@ -152,8 +147,7 @@ export function pullTokensFactory(
       StorageProviderType.TOKENS_STUDIO,
     ].includes(storageType.provider);
 
-    const hasLocalData = params.localTokenData
-                         && Object.values(params.localTokenData?.values ?? {}).some((value) => value.length > 0);
+    const hasLocalData = params.localTokenData && Object.values(params.localTokenData?.values ?? {}).some((value) => value.length > 0);
 
     // Check if storage is remote and local data is empty
     if (isRemoteStorage && !hasLocalData) {
@@ -162,13 +156,7 @@ export function pullTokensFactory(
     } else if (params.localTokenData) {
       const checkForChanges = params.localTokenData.checkForChanges ?? false;
 
-      if (
-        !checkForChanges
-        || (
-          isRemoteStorage
-          && checkForChanges && (!await askUserIfRecoverLocalChanges())
-        )
-      ) {
+      if (!checkForChanges || (isRemoteStorage && checkForChanges && !(await askUserIfRecoverLocalChanges()))) {
         // get API credentials
         await getApiCredentials(true, isRemoteStorage);
       } else {

@@ -30,15 +30,21 @@ export const SearchInputWithToggle: React.FC<SearchInputWithToggleProps> = ({
     onToggleSearch();
   }, [onSearchTermChange, onToggleSearch]);
 
-  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    onSearchTermChange(e.target.value);
-  }, [onSearchTermChange]);
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      onSearchTermChange(e.target.value);
+    },
+    [onSearchTermChange],
+  );
 
-  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      onToggleSearch();
-    }
-  }, [onToggleSearch]);
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter') {
+        onToggleSearch();
+      }
+    },
+    [onToggleSearch],
+  );
 
   useEffect(() => {
     if (autofocus && isSearchActive && inputRef.current) {

@@ -23,19 +23,25 @@ export default function EditStorageItemModal({
   const { addNewProviderItem } = useRemoteTokens();
   const [errorMessage, setErrorMessage] = React.useState<string>();
 
-  const handleChange = React.useCallback((e: Eventlike) => {
-    setFormFields({ ...formFields, [e.target.name]: e.target.value });
-  }, [formFields]);
+  const handleChange = React.useCallback(
+    (e: Eventlike) => {
+      setFormFields({ ...formFields, [e.target.name]: e.target.value });
+    },
+    [formFields],
+  );
 
-  const handleSubmit = React.useCallback(async (values: StorageTypeFormValues<false>) => {
-    const response = await addNewProviderItem(values);
-    if (response.status === 'success') {
-      onSuccess();
-    } else {
-      setHasErrored(true);
-      setErrorMessage(response?.errorMessage);
-    }
-  }, [addNewProviderItem, onSuccess]);
+  const handleSubmit = React.useCallback(
+    async (values: StorageTypeFormValues<false>) => {
+      const response = await addNewProviderItem(values);
+      if (response.status === 'success') {
+        onSuccess();
+      } else {
+        setHasErrored(true);
+        setErrorMessage(response?.errorMessage);
+      }
+    },
+    [addNewProviderItem, onSuccess],
+  );
 
   return (
     <Modal title={t('editCredentials') as string} id="modal-edit-storage-item" isOpen={isOpen} close={onClose}>

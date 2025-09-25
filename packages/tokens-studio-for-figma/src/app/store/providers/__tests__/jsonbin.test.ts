@@ -5,26 +5,22 @@ import { updateJSONBinTokens } from '../jsonbin';
 import pjs from '@/../package.json';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { createMockStore } from '@/../tests/config/setupTest';
-import {
-  StorageProviderType,
-} from '@/constants/StorageProviderType';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 import { notifyToUI } from '@/plugin/notifiers';
 
 const mockRetrieve = jest.fn();
 const mockSave = jest.fn();
 
 jest.mock('@/storage/JSONBinTokenStorage', () => ({
-  JSONBinTokenStorage: jest.fn().mockImplementation(() => (
-    {
-      retrieve: mockRetrieve,
-      save: mockSave,
-    }
-  )),
+  JSONBinTokenStorage: jest.fn().mockImplementation(() => ({
+    retrieve: mockRetrieve,
+    save: mockSave,
+  })),
 }));
 
-jest.mock('@/plugin/notifiers', (() => ({
+jest.mock('@/plugin/notifiers', () => ({
   notifyToUI: jest.fn(),
-})));
+}));
 
 describe('jsonbin', () => {
   beforeEach(() => {
@@ -66,9 +62,16 @@ describe('jsonbin', () => {
       },
     }));
     mockSave.mockImplementationOnce(() => Promise.resolve(true));
-    expect(await updateJSONBinTokens({
-      tokens: tokens as Record<string, SingleToken[]>, themes: themes as ThemeObjectsList, context: context as Partial<StorageTypeCredentials>, updatedAt, oldUpdatedAt, dispatch: mockStore.dispatch,
-    })).toEqual({
+    expect(
+      await updateJSONBinTokens({
+        tokens: tokens as Record<string, SingleToken[]>,
+        themes: themes as ThemeObjectsList,
+        context: context as Partial<StorageTypeCredentials>,
+        updatedAt,
+        oldUpdatedAt,
+        dispatch: mockStore.dispatch,
+      }),
+    ).toEqual({
       tokens: {
         global: [
           {
@@ -107,12 +110,26 @@ describe('jsonbin', () => {
     }));
     mockSave.mockImplementation(() => Promise.resolve(true));
     await updateJSONBinTokens({
-      tokens: tokens as Record<string, SingleToken[]>, themes: themes as ThemeObjectsList, context, updatedAt, oldUpdatedAt, dispatch: mockStore.dispatch,
+      tokens: tokens as Record<string, SingleToken[]>,
+      themes: themes as ThemeObjectsList,
+      context,
+      updatedAt,
+      oldUpdatedAt,
+      dispatch: mockStore.dispatch,
     });
-    expect(await updateJSONBinTokens({
-      tokens: tokens as Record<string, SingleToken[]>, themes: themes as ThemeObjectsList, context, updatedAt, oldUpdatedAt, dispatch: mockStore.dispatch,
-    })).toEqual(null);
-    expect(notifyToUI).toHaveBeenCalledWith('Error updating tokens as remote is newer, please update first', { error: true });
+    expect(
+      await updateJSONBinTokens({
+        tokens: tokens as Record<string, SingleToken[]>,
+        themes: themes as ThemeObjectsList,
+        context,
+        updatedAt,
+        oldUpdatedAt,
+        dispatch: mockStore.dispatch,
+      }),
+    ).toEqual(null);
+    expect(notifyToUI).toHaveBeenCalledWith('Error updating tokens as remote is newer, please update first', {
+      error: true,
+    });
     expect(mockSave).not.toBeCalled();
   });
 
@@ -125,9 +142,16 @@ describe('jsonbin', () => {
       status: 'failure',
       errorMessage: ErrorMessages.GENERAL_CONNECTION_ERROR,
     }));
-    expect(await updateJSONBinTokens({
-      tokens: tokens as Record<string, SingleToken[]>, themes: themes as ThemeObjectsList, context, updatedAt, oldUpdatedAt, dispatch: mockStore.dispatch,
-    })).toEqual({
+    expect(
+      await updateJSONBinTokens({
+        tokens: tokens as Record<string, SingleToken[]>,
+        themes: themes as ThemeObjectsList,
+        context,
+        updatedAt,
+        oldUpdatedAt,
+        dispatch: mockStore.dispatch,
+      }),
+    ).toEqual({
       status: 'failure',
       errorMessage: ErrorMessages.GENERAL_CONNECTION_ERROR,
     });

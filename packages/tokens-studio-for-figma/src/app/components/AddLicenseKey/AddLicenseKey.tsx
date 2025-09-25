@@ -1,7 +1,5 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import React, {
-  useCallback, useEffect, useState,
-} from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLDClient } from 'launchdarkly-react-client-sdk';
 import { useTranslation } from 'react-i18next';

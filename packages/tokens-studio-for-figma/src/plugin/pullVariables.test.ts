@@ -11,16 +11,28 @@ jest.mock('./getVariablesWithoutZombies', () => ({
       variableCollectionId: 'coll1',
       valuesByMode: {
         '1:0': {
-          r: 1, g: 1, b: 1, a: 1,
+          r: 1,
+          g: 1,
+          b: 1,
+          a: 1,
         },
         '1:1': {
-          r: 0, g: 0, b: 0, a: 1,
+          r: 0,
+          g: 0,
+          b: 0,
+          a: 1,
         },
         '1:2': {
-          r: 1, g: 0, b: 0, a: 1,
+          r: 1,
+          g: 0,
+          b: 0,
+          a: 1,
         },
         '1:3': {
-          r: 0.729411780834198, g: 0.8549019694328308, b: 0.3333333432674408, a: 1,
+          r: 0.729411780834198,
+          g: 0.8549019694328308,
+          b: 0.3333333432674408,
+          a: 1,
         },
       },
     },
@@ -144,637 +156,649 @@ describe('pullStyles', () => {
   it('pulls variables without no dimension options', async () => {
     await pullVariables({ useDimensions: false, useRem: false }, [], false);
 
-    expect(notifyStyleValuesSpy).toHaveBeenCalledWith({
-      colors: [
-        {
-          name: 'Color',
-          parent: 'Collection 1/Default',
-          type: 'color',
-          value: '#ffffff',
-        },
-        {
-          name: 'Color',
-          parent: 'Collection 1/Dark',
-          type: 'color',
-          value: '#000000',
-        },
-        {
-          name: 'Color',
-          parent: 'Collection 1/Light',
-          type: 'color',
-          value: '#ff0000',
-        },
-        {
-          name: 'Color',
-          parent: 'Collection 1/Custom',
-          type: 'color',
-          value: '#bada55',
-        },
-      ],
-      numbers: [
-        {
-          name: 'Number1',
-          parent: 'Collection 1/Default',
-          type: 'number',
-          value: 24,
-        },
-        {
-          name: 'Number1',
-          parent: 'Collection 1/Dark',
-          type: 'number',
-          value: 24,
-        },
-        {
-          name: 'Number1',
-          parent: 'Collection 1/Light',
-          type: 'number',
-          value: 24,
-        },
-        {
-          name: 'Number1',
-          parent: 'Collection 1/Custom',
-          type: 'number',
-          value: 24,
-        },
-        {
-          name: 'Number2',
-          parent: 'Collection 1/Default',
-          type: 'number',
-          value: 16,
-        },
-        {
-          name: 'Number2',
-          parent: 'Collection 1/Dark',
-          type: 'number',
-          value: 16,
-        },
-        {
-          name: 'Number2',
-          parent: 'Collection 1/Light',
-          type: 'number',
-          value: 16,
-        },
-        {
-          name: 'Number2',
-          parent: 'Collection 1/Custom',
-          type: 'number',
-          value: 16,
-        },
-        {
-          name: 'Number3',
-          parent: 'Collection 1/Default',
-          type: 'number',
-          value: 24.8,
-        },
-        {
-          name: 'Number3',
-          parent: 'Collection 1/Dark',
-          type: 'number',
-          value: 24.8,
-        },
-        {
-          name: 'Number3',
-          parent: 'Collection 1/Light',
-          type: 'number',
-          value: 24.8,
-        },
-        {
-          name: 'Number3',
-          parent: 'Collection 1/Custom',
-          type: 'number',
-          value: 24.8,
-        },
-      ],
-      booleans: [
-        {
-          name: 'Boolean',
-          parent: 'Collection 1/Default',
-          type: 'boolean',
-          value: 'true',
-        },
-        {
-          name: 'Boolean',
-          parent: 'Collection 1/Dark',
-          type: 'boolean',
-          value: 'true',
-        },
-        {
-          name: 'Boolean',
-          parent: 'Collection 1/Light',
-          type: 'boolean',
-          value: 'true',
-        },
-        {
-          name: 'Boolean',
-          parent: 'Collection 1/Custom',
-          type: 'boolean',
-          value: 'true',
-        },
-      ],
-      strings: [
-        {
-          name: 'String',
-          parent: 'Collection 1/Default',
-          type: 'text',
-          value: 'Hello',
-        },
-        {
-          name: 'String',
-          parent: 'Collection 1/Dark',
-          type: 'text',
-          value: 'Hello',
-        },
-        {
-          name: 'String',
-          parent: 'Collection 1/Light',
-          type: 'text',
-          value: 'Hello',
-        },
-        {
-          name: 'String',
-          parent: 'Collection 1/Custom',
-          type: 'text',
-          value: 'Hello',
-        },
-      ],
-    }, []);
+    expect(notifyStyleValuesSpy).toHaveBeenCalledWith(
+      {
+        colors: [
+          {
+            name: 'Color',
+            parent: 'Collection 1/Default',
+            type: 'color',
+            value: '#ffffff',
+          },
+          {
+            name: 'Color',
+            parent: 'Collection 1/Dark',
+            type: 'color',
+            value: '#000000',
+          },
+          {
+            name: 'Color',
+            parent: 'Collection 1/Light',
+            type: 'color',
+            value: '#ff0000',
+          },
+          {
+            name: 'Color',
+            parent: 'Collection 1/Custom',
+            type: 'color',
+            value: '#bada55',
+          },
+        ],
+        numbers: [
+          {
+            name: 'Number1',
+            parent: 'Collection 1/Default',
+            type: 'number',
+            value: 24,
+          },
+          {
+            name: 'Number1',
+            parent: 'Collection 1/Dark',
+            type: 'number',
+            value: 24,
+          },
+          {
+            name: 'Number1',
+            parent: 'Collection 1/Light',
+            type: 'number',
+            value: 24,
+          },
+          {
+            name: 'Number1',
+            parent: 'Collection 1/Custom',
+            type: 'number',
+            value: 24,
+          },
+          {
+            name: 'Number2',
+            parent: 'Collection 1/Default',
+            type: 'number',
+            value: 16,
+          },
+          {
+            name: 'Number2',
+            parent: 'Collection 1/Dark',
+            type: 'number',
+            value: 16,
+          },
+          {
+            name: 'Number2',
+            parent: 'Collection 1/Light',
+            type: 'number',
+            value: 16,
+          },
+          {
+            name: 'Number2',
+            parent: 'Collection 1/Custom',
+            type: 'number',
+            value: 16,
+          },
+          {
+            name: 'Number3',
+            parent: 'Collection 1/Default',
+            type: 'number',
+            value: 24.8,
+          },
+          {
+            name: 'Number3',
+            parent: 'Collection 1/Dark',
+            type: 'number',
+            value: 24.8,
+          },
+          {
+            name: 'Number3',
+            parent: 'Collection 1/Light',
+            type: 'number',
+            value: 24.8,
+          },
+          {
+            name: 'Number3',
+            parent: 'Collection 1/Custom',
+            type: 'number',
+            value: 24.8,
+          },
+        ],
+        booleans: [
+          {
+            name: 'Boolean',
+            parent: 'Collection 1/Default',
+            type: 'boolean',
+            value: 'true',
+          },
+          {
+            name: 'Boolean',
+            parent: 'Collection 1/Dark',
+            type: 'boolean',
+            value: 'true',
+          },
+          {
+            name: 'Boolean',
+            parent: 'Collection 1/Light',
+            type: 'boolean',
+            value: 'true',
+          },
+          {
+            name: 'Boolean',
+            parent: 'Collection 1/Custom',
+            type: 'boolean',
+            value: 'true',
+          },
+        ],
+        strings: [
+          {
+            name: 'String',
+            parent: 'Collection 1/Default',
+            type: 'text',
+            value: 'Hello',
+          },
+          {
+            name: 'String',
+            parent: 'Collection 1/Dark',
+            type: 'text',
+            value: 'Hello',
+          },
+          {
+            name: 'String',
+            parent: 'Collection 1/Light',
+            type: 'text',
+            value: 'Hello',
+          },
+          {
+            name: 'String',
+            parent: 'Collection 1/Custom',
+            type: 'text',
+            value: 'Hello',
+          },
+        ],
+      },
+      [],
+    );
   });
 
   it('pulls variables with Convert numbers to dimensions option', async () => {
     await pullVariables({ useDimensions: 'true', useRem: false }, [], false);
 
-    expect(notifyStyleValuesSpy).toHaveBeenCalledWith({
-      colors: [
-        {
-          name: 'Color',
-          parent: 'Collection 1/Default',
-          type: 'color',
-          value: '#ffffff',
-        },
-        {
-          name: 'Color',
-          parent: 'Collection 1/Dark',
-          type: 'color',
-          value: '#000000',
-        },
-        {
-          name: 'Color',
-          parent: 'Collection 1/Light',
-          type: 'color',
-          value: '#ff0000',
-        },
-        {
-          name: 'Color',
-          parent: 'Collection 1/Custom',
-          type: 'color',
-          value: '#bada55',
-        },
-      ],
-      dimensions: [
-        {
-          name: 'Number1',
-          parent: 'Collection 1/Default',
-          type: 'dimension',
-          value: '24px',
-        },
-        {
-          name: 'Number1',
-          parent: 'Collection 1/Dark',
-          type: 'dimension',
-          value: '24px',
-        },
-        {
-          name: 'Number1',
-          parent: 'Collection 1/Light',
-          type: 'dimension',
-          value: '24px',
-        },
-        {
-          name: 'Number1',
-          parent: 'Collection 1/Custom',
-          type: 'dimension',
-          value: '24px',
-        },
-        {
-          name: 'Number2',
-          parent: 'Collection 1/Default',
-          type: 'dimension',
-          value: '16px',
-        },
-        {
-          name: 'Number2',
-          parent: 'Collection 1/Dark',
-          type: 'dimension',
-          value: '16px',
-        },
-        {
-          name: 'Number2',
-          parent: 'Collection 1/Light',
-          type: 'dimension',
-          value: '16px',
-        },
-        {
-          name: 'Number2',
-          parent: 'Collection 1/Custom',
-          type: 'dimension',
-          value: '16px',
-        },
-        {
-          name: 'Number3',
-          parent: 'Collection 1/Default',
-          type: 'dimension',
-          value: '24.8px',
-        },
-        {
-          name: 'Number3',
-          parent: 'Collection 1/Dark',
-          type: 'dimension',
-          value: '24.8px',
-        },
-        {
-          name: 'Number3',
-          parent: 'Collection 1/Light',
-          type: 'dimension',
-          value: '24.8px',
-        },
-        {
-          name: 'Number3',
-          parent: 'Collection 1/Custom',
-          type: 'dimension',
-          value: '24.8px',
-        },
-      ],
-      booleans: [
-        {
-          name: 'Boolean',
-          parent: 'Collection 1/Default',
-          type: 'boolean',
-          value: 'true',
-        },
-        {
-          name: 'Boolean',
-          parent: 'Collection 1/Dark',
-          type: 'boolean',
-          value: 'true',
-        },
-        {
-          name: 'Boolean',
-          parent: 'Collection 1/Light',
-          type: 'boolean',
-          value: 'true',
-        },
-        {
-          name: 'Boolean',
-          parent: 'Collection 1/Custom',
-          type: 'boolean',
-          value: 'true',
-        },
-      ],
-      strings: [
-        {
-          name: 'String',
-          parent: 'Collection 1/Default',
-          type: 'text',
-          value: 'Hello',
-        },
-        {
-          name: 'String',
-          parent: 'Collection 1/Dark',
-          type: 'text',
-          value: 'Hello',
-        },
-        {
-          name: 'String',
-          parent: 'Collection 1/Light',
-          type: 'text',
-          value: 'Hello',
-        },
-        {
-          name: 'String',
-          parent: 'Collection 1/Custom',
-          type: 'text',
-          value: 'Hello',
-        },
-      ],
-    }, []);
+    expect(notifyStyleValuesSpy).toHaveBeenCalledWith(
+      {
+        colors: [
+          {
+            name: 'Color',
+            parent: 'Collection 1/Default',
+            type: 'color',
+            value: '#ffffff',
+          },
+          {
+            name: 'Color',
+            parent: 'Collection 1/Dark',
+            type: 'color',
+            value: '#000000',
+          },
+          {
+            name: 'Color',
+            parent: 'Collection 1/Light',
+            type: 'color',
+            value: '#ff0000',
+          },
+          {
+            name: 'Color',
+            parent: 'Collection 1/Custom',
+            type: 'color',
+            value: '#bada55',
+          },
+        ],
+        dimensions: [
+          {
+            name: 'Number1',
+            parent: 'Collection 1/Default',
+            type: 'dimension',
+            value: '24px',
+          },
+          {
+            name: 'Number1',
+            parent: 'Collection 1/Dark',
+            type: 'dimension',
+            value: '24px',
+          },
+          {
+            name: 'Number1',
+            parent: 'Collection 1/Light',
+            type: 'dimension',
+            value: '24px',
+          },
+          {
+            name: 'Number1',
+            parent: 'Collection 1/Custom',
+            type: 'dimension',
+            value: '24px',
+          },
+          {
+            name: 'Number2',
+            parent: 'Collection 1/Default',
+            type: 'dimension',
+            value: '16px',
+          },
+          {
+            name: 'Number2',
+            parent: 'Collection 1/Dark',
+            type: 'dimension',
+            value: '16px',
+          },
+          {
+            name: 'Number2',
+            parent: 'Collection 1/Light',
+            type: 'dimension',
+            value: '16px',
+          },
+          {
+            name: 'Number2',
+            parent: 'Collection 1/Custom',
+            type: 'dimension',
+            value: '16px',
+          },
+          {
+            name: 'Number3',
+            parent: 'Collection 1/Default',
+            type: 'dimension',
+            value: '24.8px',
+          },
+          {
+            name: 'Number3',
+            parent: 'Collection 1/Dark',
+            type: 'dimension',
+            value: '24.8px',
+          },
+          {
+            name: 'Number3',
+            parent: 'Collection 1/Light',
+            type: 'dimension',
+            value: '24.8px',
+          },
+          {
+            name: 'Number3',
+            parent: 'Collection 1/Custom',
+            type: 'dimension',
+            value: '24.8px',
+          },
+        ],
+        booleans: [
+          {
+            name: 'Boolean',
+            parent: 'Collection 1/Default',
+            type: 'boolean',
+            value: 'true',
+          },
+          {
+            name: 'Boolean',
+            parent: 'Collection 1/Dark',
+            type: 'boolean',
+            value: 'true',
+          },
+          {
+            name: 'Boolean',
+            parent: 'Collection 1/Light',
+            type: 'boolean',
+            value: 'true',
+          },
+          {
+            name: 'Boolean',
+            parent: 'Collection 1/Custom',
+            type: 'boolean',
+            value: 'true',
+          },
+        ],
+        strings: [
+          {
+            name: 'String',
+            parent: 'Collection 1/Default',
+            type: 'text',
+            value: 'Hello',
+          },
+          {
+            name: 'String',
+            parent: 'Collection 1/Dark',
+            type: 'text',
+            value: 'Hello',
+          },
+          {
+            name: 'String',
+            parent: 'Collection 1/Light',
+            type: 'text',
+            value: 'Hello',
+          },
+          {
+            name: 'String',
+            parent: 'Collection 1/Custom',
+            type: 'text',
+            value: 'Hello',
+          },
+        ],
+      },
+      [],
+    );
   });
 
   it('pulls variables with Use rem for dimension values option', async () => {
     await pullVariables({ useDimensions: false, useRem: true }, [], false);
 
-    expect(notifyStyleValuesSpy).toHaveBeenCalledWith({
-      colors: [
-        {
-          name: 'Color',
-          parent: 'Collection 1/Default',
-          type: 'color',
-          value: '#ffffff',
-        },
-        {
-          name: 'Color',
-          parent: 'Collection 1/Dark',
-          type: 'color',
-          value: '#000000',
-        },
-        {
-          name: 'Color',
-          parent: 'Collection 1/Light',
-          type: 'color',
-          value: '#ff0000',
-        },
-        {
-          name: 'Color',
-          parent: 'Collection 1/Custom',
-          type: 'color',
-          value: '#bada55',
-        },
-      ],
-      dimensions: [
-        {
-          name: 'Number1',
-          parent: 'Collection 1/Default',
-          type: 'dimension',
-          value: '1.5rem',
-        },
-        {
-          name: 'Number1',
-          parent: 'Collection 1/Dark',
-          type: 'dimension',
-          value: '1.5rem',
-        },
-        {
-          name: 'Number1',
-          parent: 'Collection 1/Light',
-          type: 'dimension',
-          value: '1.5rem',
-        },
-        {
-          name: 'Number1',
-          parent: 'Collection 1/Custom',
-          type: 'dimension',
-          value: '1.5rem',
-        },
-        {
-          name: 'Number2',
-          parent: 'Collection 1/Default',
-          type: 'dimension',
-          value: '1rem',
-        },
-        {
-          name: 'Number2',
-          parent: 'Collection 1/Dark',
-          type: 'dimension',
-          value: '1rem',
-        },
-        {
-          name: 'Number2',
-          parent: 'Collection 1/Light',
-          type: 'dimension',
-          value: '1rem',
-        },
-        {
-          name: 'Number2',
-          parent: 'Collection 1/Custom',
-          type: 'dimension',
-          value: '1rem',
-        },
-        {
-          name: 'Number3',
-          parent: 'Collection 1/Default',
-          type: 'dimension',
-          value: '1.55rem',
-        },
-        {
-          name: 'Number3',
-          parent: 'Collection 1/Dark',
-          type: 'dimension',
-          value: '1.55rem',
-        },
-        {
-          name: 'Number3',
-          parent: 'Collection 1/Light',
-          type: 'dimension',
-          value: '1.55rem',
-        },
-        {
-          name: 'Number3',
-          parent: 'Collection 1/Custom',
-          type: 'dimension',
-          value: '1.55rem',
-        },
-      ],
-      booleans: [
-        {
-          name: 'Boolean',
-          parent: 'Collection 1/Default',
-          type: 'boolean',
-          value: 'true',
-        },
-        {
-          name: 'Boolean',
-          parent: 'Collection 1/Dark',
-          type: 'boolean',
-          value: 'true',
-        },
-        {
-          name: 'Boolean',
-          parent: 'Collection 1/Light',
-          type: 'boolean',
-          value: 'true',
-        },
-        {
-          name: 'Boolean',
-          parent: 'Collection 1/Custom',
-          type: 'boolean',
-          value: 'true',
-        },
-      ],
-      strings: [
-        {
-          name: 'String',
-          parent: 'Collection 1/Default',
-          type: 'text',
-          value: 'Hello',
-        },
-        {
-          name: 'String',
-          parent: 'Collection 1/Dark',
-          type: 'text',
-          value: 'Hello',
-        },
-        {
-          name: 'String',
-          parent: 'Collection 1/Light',
-          type: 'text',
-          value: 'Hello',
-        },
-        {
-          name: 'String',
-          parent: 'Collection 1/Custom',
-          type: 'text',
-          value: 'Hello',
-        },
-      ],
-    }, []);
+    expect(notifyStyleValuesSpy).toHaveBeenCalledWith(
+      {
+        colors: [
+          {
+            name: 'Color',
+            parent: 'Collection 1/Default',
+            type: 'color',
+            value: '#ffffff',
+          },
+          {
+            name: 'Color',
+            parent: 'Collection 1/Dark',
+            type: 'color',
+            value: '#000000',
+          },
+          {
+            name: 'Color',
+            parent: 'Collection 1/Light',
+            type: 'color',
+            value: '#ff0000',
+          },
+          {
+            name: 'Color',
+            parent: 'Collection 1/Custom',
+            type: 'color',
+            value: '#bada55',
+          },
+        ],
+        dimensions: [
+          {
+            name: 'Number1',
+            parent: 'Collection 1/Default',
+            type: 'dimension',
+            value: '1.5rem',
+          },
+          {
+            name: 'Number1',
+            parent: 'Collection 1/Dark',
+            type: 'dimension',
+            value: '1.5rem',
+          },
+          {
+            name: 'Number1',
+            parent: 'Collection 1/Light',
+            type: 'dimension',
+            value: '1.5rem',
+          },
+          {
+            name: 'Number1',
+            parent: 'Collection 1/Custom',
+            type: 'dimension',
+            value: '1.5rem',
+          },
+          {
+            name: 'Number2',
+            parent: 'Collection 1/Default',
+            type: 'dimension',
+            value: '1rem',
+          },
+          {
+            name: 'Number2',
+            parent: 'Collection 1/Dark',
+            type: 'dimension',
+            value: '1rem',
+          },
+          {
+            name: 'Number2',
+            parent: 'Collection 1/Light',
+            type: 'dimension',
+            value: '1rem',
+          },
+          {
+            name: 'Number2',
+            parent: 'Collection 1/Custom',
+            type: 'dimension',
+            value: '1rem',
+          },
+          {
+            name: 'Number3',
+            parent: 'Collection 1/Default',
+            type: 'dimension',
+            value: '1.55rem',
+          },
+          {
+            name: 'Number3',
+            parent: 'Collection 1/Dark',
+            type: 'dimension',
+            value: '1.55rem',
+          },
+          {
+            name: 'Number3',
+            parent: 'Collection 1/Light',
+            type: 'dimension',
+            value: '1.55rem',
+          },
+          {
+            name: 'Number3',
+            parent: 'Collection 1/Custom',
+            type: 'dimension',
+            value: '1.55rem',
+          },
+        ],
+        booleans: [
+          {
+            name: 'Boolean',
+            parent: 'Collection 1/Default',
+            type: 'boolean',
+            value: 'true',
+          },
+          {
+            name: 'Boolean',
+            parent: 'Collection 1/Dark',
+            type: 'boolean',
+            value: 'true',
+          },
+          {
+            name: 'Boolean',
+            parent: 'Collection 1/Light',
+            type: 'boolean',
+            value: 'true',
+          },
+          {
+            name: 'Boolean',
+            parent: 'Collection 1/Custom',
+            type: 'boolean',
+            value: 'true',
+          },
+        ],
+        strings: [
+          {
+            name: 'String',
+            parent: 'Collection 1/Default',
+            type: 'text',
+            value: 'Hello',
+          },
+          {
+            name: 'String',
+            parent: 'Collection 1/Dark',
+            type: 'text',
+            value: 'Hello',
+          },
+          {
+            name: 'String',
+            parent: 'Collection 1/Light',
+            type: 'text',
+            value: 'Hello',
+          },
+          {
+            name: 'String',
+            parent: 'Collection 1/Custom',
+            type: 'text',
+            value: 'Hello',
+          },
+        ],
+      },
+      [],
+    );
   });
 
   it('pulls variables with dimensions in rem if both options are selected', async () => {
     await pullVariables({ useDimensions: true, useRem: true }, [], false);
 
-    expect(notifyStyleValuesSpy).toHaveBeenCalledWith({
-      colors: [
-        {
-          name: 'Color',
-          parent: 'Collection 1/Default',
-          type: 'color',
-          value: '#ffffff',
-        },
-        {
-          name: 'Color',
-          parent: 'Collection 1/Dark',
-          type: 'color',
-          value: '#000000',
-        },
-        {
-          name: 'Color',
-          parent: 'Collection 1/Light',
-          type: 'color',
-          value: '#ff0000',
-        },
-        {
-          name: 'Color',
-          parent: 'Collection 1/Custom',
-          type: 'color',
-          value: '#bada55',
-        },
-      ],
-      dimensions: [
-        {
-          name: 'Number1',
-          parent: 'Collection 1/Default',
-          type: 'dimension',
-          value: '1.5rem',
-        },
-        {
-          name: 'Number1',
-          parent: 'Collection 1/Dark',
-          type: 'dimension',
-          value: '1.5rem',
-        },
-        {
-          name: 'Number1',
-          parent: 'Collection 1/Light',
-          type: 'dimension',
-          value: '1.5rem',
-        },
-        {
-          name: 'Number1',
-          parent: 'Collection 1/Custom',
-          type: 'dimension',
-          value: '1.5rem',
-        },
-        {
-          name: 'Number2',
-          parent: 'Collection 1/Default',
-          type: 'dimension',
-          value: '1rem',
-        },
-        {
-          name: 'Number2',
-          parent: 'Collection 1/Dark',
-          type: 'dimension',
-          value: '1rem',
-        },
-        {
-          name: 'Number2',
-          parent: 'Collection 1/Light',
-          type: 'dimension',
-          value: '1rem',
-        },
-        {
-          name: 'Number2',
-          parent: 'Collection 1/Custom',
-          type: 'dimension',
-          value: '1rem',
-        },
-        {
-          name: 'Number3',
-          parent: 'Collection 1/Default',
-          type: 'dimension',
-          value: '1.55rem',
-        },
-        {
-          name: 'Number3',
-          parent: 'Collection 1/Dark',
-          type: 'dimension',
-          value: '1.55rem',
-        },
-        {
-          name: 'Number3',
-          parent: 'Collection 1/Light',
-          type: 'dimension',
-          value: '1.55rem',
-        },
-        {
-          name: 'Number3',
-          parent: 'Collection 1/Custom',
-          type: 'dimension',
-          value: '1.55rem',
-        },
-      ],
-      booleans: [
-        {
-          name: 'Boolean',
-          parent: 'Collection 1/Default',
-          type: 'boolean',
-          value: 'true',
-        },
-        {
-          name: 'Boolean',
-          parent: 'Collection 1/Dark',
-          type: 'boolean',
-          value: 'true',
-        },
-        {
-          name: 'Boolean',
-          parent: 'Collection 1/Light',
-          type: 'boolean',
-          value: 'true',
-        },
-        {
-          name: 'Boolean',
-          parent: 'Collection 1/Custom',
-          type: 'boolean',
-          value: 'true',
-        },
-      ],
-      strings: [
-        {
-          name: 'String',
-          parent: 'Collection 1/Default',
-          type: 'text',
-          value: 'Hello',
-        },
-        {
-          name: 'String',
-          parent: 'Collection 1/Dark',
-          type: 'text',
-          value: 'Hello',
-        },
-        {
-          name: 'String',
-          parent: 'Collection 1/Light',
-          type: 'text',
-          value: 'Hello',
-        },
-        {
-          name: 'String',
-          parent: 'Collection 1/Custom',
-          type: 'text',
-          value: 'Hello',
-        },
-      ],
-    }, []);
+    expect(notifyStyleValuesSpy).toHaveBeenCalledWith(
+      {
+        colors: [
+          {
+            name: 'Color',
+            parent: 'Collection 1/Default',
+            type: 'color',
+            value: '#ffffff',
+          },
+          {
+            name: 'Color',
+            parent: 'Collection 1/Dark',
+            type: 'color',
+            value: '#000000',
+          },
+          {
+            name: 'Color',
+            parent: 'Collection 1/Light',
+            type: 'color',
+            value: '#ff0000',
+          },
+          {
+            name: 'Color',
+            parent: 'Collection 1/Custom',
+            type: 'color',
+            value: '#bada55',
+          },
+        ],
+        dimensions: [
+          {
+            name: 'Number1',
+            parent: 'Collection 1/Default',
+            type: 'dimension',
+            value: '1.5rem',
+          },
+          {
+            name: 'Number1',
+            parent: 'Collection 1/Dark',
+            type: 'dimension',
+            value: '1.5rem',
+          },
+          {
+            name: 'Number1',
+            parent: 'Collection 1/Light',
+            type: 'dimension',
+            value: '1.5rem',
+          },
+          {
+            name: 'Number1',
+            parent: 'Collection 1/Custom',
+            type: 'dimension',
+            value: '1.5rem',
+          },
+          {
+            name: 'Number2',
+            parent: 'Collection 1/Default',
+            type: 'dimension',
+            value: '1rem',
+          },
+          {
+            name: 'Number2',
+            parent: 'Collection 1/Dark',
+            type: 'dimension',
+            value: '1rem',
+          },
+          {
+            name: 'Number2',
+            parent: 'Collection 1/Light',
+            type: 'dimension',
+            value: '1rem',
+          },
+          {
+            name: 'Number2',
+            parent: 'Collection 1/Custom',
+            type: 'dimension',
+            value: '1rem',
+          },
+          {
+            name: 'Number3',
+            parent: 'Collection 1/Default',
+            type: 'dimension',
+            value: '1.55rem',
+          },
+          {
+            name: 'Number3',
+            parent: 'Collection 1/Dark',
+            type: 'dimension',
+            value: '1.55rem',
+          },
+          {
+            name: 'Number3',
+            parent: 'Collection 1/Light',
+            type: 'dimension',
+            value: '1.55rem',
+          },
+          {
+            name: 'Number3',
+            parent: 'Collection 1/Custom',
+            type: 'dimension',
+            value: '1.55rem',
+          },
+        ],
+        booleans: [
+          {
+            name: 'Boolean',
+            parent: 'Collection 1/Default',
+            type: 'boolean',
+            value: 'true',
+          },
+          {
+            name: 'Boolean',
+            parent: 'Collection 1/Dark',
+            type: 'boolean',
+            value: 'true',
+          },
+          {
+            name: 'Boolean',
+            parent: 'Collection 1/Light',
+            type: 'boolean',
+            value: 'true',
+          },
+          {
+            name: 'Boolean',
+            parent: 'Collection 1/Custom',
+            type: 'boolean',
+            value: 'true',
+          },
+        ],
+        strings: [
+          {
+            name: 'String',
+            parent: 'Collection 1/Default',
+            type: 'text',
+            value: 'Hello',
+          },
+          {
+            name: 'String',
+            parent: 'Collection 1/Dark',
+            type: 'text',
+            value: 'Hello',
+          },
+          {
+            name: 'String',
+            parent: 'Collection 1/Light',
+            type: 'text',
+            value: 'Hello',
+          },
+          {
+            name: 'String',
+            parent: 'Collection 1/Custom',
+            type: 'text',
+            value: 'Hello',
+          },
+        ],
+      },
+      [],
+    );
   });
 
   it('creates theme options for pro users', async () => {
@@ -806,11 +830,15 @@ describe('pullStyles', () => {
       },
     };
 
-    await pullVariables({
-      useDimensions: false,
-      useRem: false,
-      selectedCollections,
-    }, [], false);
+    await pullVariables(
+      {
+        useDimensions: false,
+        useRem: false,
+        selectedCollections,
+      },
+      [],
+      false,
+    );
 
     const expectedCall = expect.objectContaining({
       colors: expect.arrayContaining([
@@ -859,11 +887,15 @@ describe('pullStyles', () => {
       },
     };
 
-    await pullVariables({
-      useDimensions: false,
-      useRem: false,
-      selectedCollections,
-    }, [], false);
+    await pullVariables(
+      {
+        useDimensions: false,
+        useRem: false,
+        selectedCollections,
+      },
+      [],
+      false,
+    );
 
     expect(notifyStyleValuesSpy).toHaveBeenCalledWith({}, []);
   });
@@ -890,18 +922,14 @@ describe('pullStyles', () => {
     global.figma.variables.getVariableCollectionByIdAsync = jest.fn().mockResolvedValueOnce({
       id: 'VariableID:1:0',
       name: 'Collection 1', // New name
-      modes: [
-        { name: 'Default', modeId: '1:0' },
-      ],
+      modes: [{ name: 'Default', modeId: '1:0' }],
     });
 
     await pullVariables({ useDimensions: false, useRem: false }, [], true);
 
     // Check if notifyRenamedCollections was called with the old and new collection names
     expect(notifyRenamedCollectionsSpy).toHaveBeenCalledWith(
-      expect.arrayContaining([
-        ['Old Collection/Default', 'Collection 1/Default'],
-      ]),
+      expect.arrayContaining([['Old Collection/Default', 'Collection 1/Default']]),
     );
   });
 
@@ -936,9 +964,7 @@ describe('pullStyles', () => {
 
     // Check if notifyRenamedCollections was called with the old and new mode names
     expect(notifyRenamedCollectionsSpy).toHaveBeenCalledWith(
-      expect.arrayContaining([
-        ['Collection 1/Old Mode', 'Collection 1/Default'],
-      ]),
+      expect.arrayContaining([['Collection 1/Old Mode', 'Collection 1/Default']]),
     );
   });
 
@@ -973,9 +999,7 @@ describe('pullStyles', () => {
 
     // Check if notifyRenamedCollections was called with the old and new names
     expect(notifyRenamedCollectionsSpy).toHaveBeenCalledWith(
-      expect.arrayContaining([
-        ['Old Collection/Old Mode', 'Collection 1/Default'],
-      ]),
+      expect.arrayContaining([['Old Collection/Old Mode', 'Collection 1/Default']]),
     );
   });
 });

@@ -33,19 +33,13 @@ jest.mock('../store/remoteTokens', () => ({
 
 describe('StorageItem', () => {
   it('should render storageItem', async () => {
-    const result = render(
-      <StorageItem item={gitProvider} onEdit={onEdit} />,
-    );
+    const result = render(<StorageItem item={gitProvider} onEdit={onEdit} />);
     expect(result.queryByText('apply')).toBeInTheDocument();
   });
 
   it('should be able delete storageItem', async () => {
-    mockConfirm.mockImplementationOnce(() => (
-      Promise.resolve(true)
-    ));
-    const result = render(
-      <StorageItem item={gitProvider} onEdit={onEdit} />,
-    );
+    mockConfirm.mockImplementationOnce(() => Promise.resolve(true));
+    const result = render(<StorageItem item={gitProvider} onEdit={onEdit} />);
     await act(async () => {
       const trigger = await result.findByTestId('storage-item-tools-dropdown');
       trigger.focus();
@@ -60,14 +54,10 @@ describe('StorageItem', () => {
   });
 
   it('should be able restore storageItem', async () => {
-    mockRestoreStoredProvider.mockImplementationOnce(() => (
-      Promise.resolve({
-        status: 'success',
-      })
-    ));
-    const result = render(
-      <StorageItem item={gitProvider} onEdit={onEdit} />,
-    );
+    mockRestoreStoredProvider.mockImplementationOnce(() => Promise.resolve({
+      status: 'success',
+    }));
+    const result = render(<StorageItem item={gitProvider} onEdit={onEdit} />);
     await result.queryByText('apply')?.click();
     expect(mockRestoreStoredProvider).toBeCalledTimes(1);
   });

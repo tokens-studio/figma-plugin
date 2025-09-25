@@ -24,9 +24,10 @@ export default function TokenButtonContent({
   const displayType = useSelector(displayTypeSelector);
   const { getTokenValue } = useTokens();
 
-  const displayValue = useMemo(() => (
-    getTokenValue(token.name, tokensContext.resolvedTokens)?.value
-  ), [token, tokensContext.resolvedTokens, getTokenValue]);
+  const displayValue = useMemo(
+    () => getTokenValue(token.name, tokensContext.resolvedTokens)?.value,
+    [token, tokensContext.resolvedTokens, getTokenValue],
+  );
 
   const showValue = React.useMemo(() => {
     let show = true;
@@ -45,10 +46,13 @@ export default function TokenButtonContent({
     return (token.name ?? '').split('.').slice(-visibleDepth).join('.');
   }, [token.name]);
 
-  const handleButtonClick = React.useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-    onClick(event);
-  }, [onClick]);
+  const handleButtonClick = React.useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.preventDefault();
+      onClick(event);
+    },
+    [onClick],
+  );
 
   const cssOverrides = React.useMemo(() => {
     switch (type) {
@@ -71,7 +75,15 @@ export default function TokenButtonContent({
 
   return (
     <TokenTooltip token={token}>
-      <StyledTokenButton tokenType={type as TokenTypes.COLOR} displayType={type === TokenTypes.COLOR ? displayType : 'GRID'} active={active} disabled={uiDisabled} type="button" onClick={handleButtonClick} css={cssOverrides}>
+      <StyledTokenButton
+        tokenType={type as TokenTypes.COLOR}
+        displayType={type === TokenTypes.COLOR ? displayType : 'GRID'}
+        active={active}
+        disabled={uiDisabled}
+        type="button"
+        onClick={handleButtonClick}
+        css={cssOverrides}
+      >
         <BrokenReferenceIndicator token={token} />
         <StyledTokenButtonText>{showValue && <span>{visibleName}</span>}</StyledTokenButtonText>
       </StyledTokenButton>

@@ -3,7 +3,12 @@ import { StyleIdMap, StyleThemeMap } from '@/types/StyleIdMap';
 const memo: StyleIdMap = {};
 
 // Gets the sibling style for a given style considering the new theme
-export async function getNewStyleId(styleId: string, styleIds: StyleIdMap, styleMap: StyleThemeMap, activeThemes: string[]) {
+export async function getNewStyleId(
+  styleId: string,
+  styleIds: StyleIdMap,
+  styleMap: StyleThemeMap,
+  activeThemes: string[],
+) {
   if (!styleId) {
     return null;
   }
@@ -40,7 +45,8 @@ export async function getNewStyleId(styleId: string, styleIds: StyleIdMap, style
       const styleKeyMatch = newStyleToFetch.match(/^S:([a-zA-Z0-9_-]+),/);
       if (styleKeyMatch) {
         actualStyleId = await new Promise<string>((resolve) => {
-          figma.importStyleByKeyAsync(styleKeyMatch[1])
+          figma
+            .importStyleByKeyAsync(styleKeyMatch[1])
             .then((style) => resolve(style.id))
             .catch(() => resolve(newStyleToFetch));
         });

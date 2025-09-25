@@ -22,9 +22,11 @@ type ExtendedTreeItem = TreeItem & {
   onDuplicate: (tokenSet: string) => void;
   saveScrollPositionSet: (tokenSet: string) => void;
 };
-type TreeRenderFunction = (props: React.PropsWithChildren<{
-  item: ExtendedTreeItem
-}>) => React.ReactNode;
+type TreeRenderFunction = (
+  props: React.PropsWithChildren<{
+    item: ExtendedTreeItem;
+  }>,
+) => React.ReactNode;
 
 export function TokenSetListItemContent({ item }: Parameters<TreeRenderFunction>[0]) {
   const { confirm } = useConfirm();
@@ -38,41 +40,57 @@ export function TokenSetListItemContent({ item }: Parameters<TreeRenderFunction>
 
   const { t } = useTranslation(['tokens']);
 
-  const handleClick = useCallback(async (set: TreeItem) => {
-    if (set.isLeaf) {
-      if (hasUnsavedChanges) {
-        const userChoice = await confirm({ text: t('youHaveUnsavedChanges'), description: t('changesWillBeDiscarded') });
-        if (userChoice) {
+  const handleClick = useCallback(
+    async (set: TreeItem) => {
+      if (set.isLeaf) {
+        if (hasUnsavedChanges) {
+          const userChoice = await confirm({
+            text: t('youHaveUnsavedChanges'),
+            description: t('changesWillBeDiscarded'),
+          });
+          if (userChoice) {
+            dispatch.tokenState.setActiveTokenSet(set.path);
+            item.saveScrollPositionSet(activeTokenSet);
+          }
+        } else {
           dispatch.tokenState.setActiveTokenSet(set.path);
           item.saveScrollPositionSet(activeTokenSet);
         }
-      } else {
-        dispatch.tokenState.setActiveTokenSet(set.path);
-        item.saveScrollPositionSet(activeTokenSet);
       }
-    }
-  }, [confirm, dispatch, hasUnsavedChanges, item, activeTokenSet]);
+    },
+    [confirm, dispatch, hasUnsavedChanges, item, activeTokenSet],
+  );
 
-  const handleCheckedChange = useCallback((checked: boolean, treeItem: TreeItem) => {
-    dispatch.tokenState.toggleUsedTokenSet(treeItem.path);
-  }, [dispatch]);
+  const handleCheckedChange = useCallback(
+    (checked: boolean, treeItem: TreeItem) => {
+      dispatch.tokenState.toggleUsedTokenSet(treeItem.path);
+    },
+    [dispatch],
+  );
 
-  const handleTreatAsSource = useCallback((tokenSetPath: string) => {
-    dispatch.tokenState.toggleTreatAsSource(tokenSetPath);
-  }, [dispatch]);
+  const handleTreatAsSource = useCallback(
+    (tokenSetPath: string) => {
+      dispatch.tokenState.toggleTreatAsSource(tokenSetPath);
+    },
+    [dispatch],
+  );
 
-  const handleDragStart = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
-    dragContext.controls?.start(event);
-  }, [dragContext.controls]);
+  const handleDragStart = useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      dragContext.controls?.start(event);
+    },
+    [dragContext.controls],
+  );
 
   return (
     <TokenSetItem
       key={item.key}
       isActive={activeTokenSet === item.path}
       onClick={handleClick}
-      isChecked={usedTokenSet?.[item.path] === TokenSetStatus.ENABLED || (
-        usedTokenSet?.[item.path] === TokenSetStatus.SOURCE ? 'indeterminate' : false
-      )}
+      isChecked={
+        usedTokenSet?.[item.path] === TokenSetStatus.ENABLED
+        || (usedTokenSet?.[item.path] === TokenSetStatus.SOURCE ? 'indeterminate' : false)
+      }
       item={item}
       onCheck={handleCheckedChange}
       canEdit={!editProhibited}

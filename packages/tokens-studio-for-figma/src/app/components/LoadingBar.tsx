@@ -34,26 +34,23 @@ export default function LoadingBar() {
   const windowSize = useSelector(windowSizeSelector);
 
   const hasInfiniteJobs = React.useMemo(() => backgroundJobs.some((job) => job.isInfinite), [backgroundJobs]);
-  const expectedWaitTime = React.useMemo(() => backgroundJobs.reduce((time, job) => (
-    time + (job.totalTasks ? (
-      (job.totalTasks - (job.completedTasks ?? 0)) * (job.timePerTask ?? 0)
-    ) : 0)
-  ), 0), [backgroundJobs]);
-  const expectedWaitTimeInSeconds = React.useMemo(() => (
-    Math.round(expectedWaitTime / 1000)
-  ), [expectedWaitTime]);
-  const shouldShow = useDelayedFlag(
-    !(
-      (!backgroundJobs.length || expectedWaitTime < 100)
-      && !hasInfiniteJobs
+  const expectedWaitTime = React.useMemo(
+    () => backgroundJobs.reduce(
+      (time, job) => time + (job.totalTasks ? (job.totalTasks - (job.completedTasks ?? 0)) * (job.timePerTask ?? 0) : 0),
+      0,
     ),
+    [backgroundJobs],
   );
-  const completedTasks = React.useMemo(() => backgroundJobs.reduce((total, job) => (
-    total + (job.completedTasks ?? 0)
-  ), 0), [backgroundJobs]);
-  const totalTasks = React.useMemo(() => backgroundJobs.reduce((total, job) => (
-    total + (job.totalTasks ?? 0)
-  ), 0), [backgroundJobs]);
+  const expectedWaitTimeInSeconds = React.useMemo(() => Math.round(expectedWaitTime / 1000), [expectedWaitTime]);
+  const shouldShow = useDelayedFlag(!((!backgroundJobs.length || expectedWaitTime < 100) && !hasInfiniteJobs));
+  const completedTasks = React.useMemo(
+    () => backgroundJobs.reduce((total, job) => total + (job.completedTasks ?? 0), 0),
+    [backgroundJobs],
+  );
+  const totalTasks = React.useMemo(
+    () => backgroundJobs.reduce((total, job) => total + (job.totalTasks ?? 0), 0),
+    [backgroundJobs],
+  );
 
   const handleCancel = React.useCallback(() => {
     AsyncMessageChannel.ReactInstance.message({
@@ -74,7 +71,10 @@ export default function LoadingBar() {
         align="center"
         gap={2}
         css={{
-          backgroundColor: !windowSize?.isMinimized ? '$bgSubtle' : 'unset', padding: '$2', borderRadius: '$small', margin: '$2',
+          backgroundColor: !windowSize?.isMinimized ? '$bgSubtle' : 'unset',
+          padding: '$2',
+          borderRadius: '$small',
+          margin: '$2',
         }}
       >
         <Spinner />
@@ -82,17 +82,15 @@ export default function LoadingBar() {
           <Stack direction="row" align="center" justify="between" css={{ flexGrow: 1 }}>
             <Text size="xsmall" bold>
               {message || 'Hold on, updating...'}
-              {completedTasks > 0 && totalTasks > 0 && (
-                ` ${formatNumber(completedTasks)}/${formatNumber(totalTasks)}`
-              )}
+              {completedTasks > 0 && totalTasks > 0 && ` ${formatNumber(completedTasks)}/${formatNumber(totalTasks)}`}
             </Text>
             <Stack direction="row" align="center" gap={1}>
               <Text size="xsmall" muted>
-                {expectedWaitTimeInSeconds >= 1 && (
-                  `${expectedWaitTimeInSeconds}s`
-                )}
+                {expectedWaitTimeInSeconds >= 1 && `${expectedWaitTimeInSeconds}s`}
               </Text>
-              <Button variant="invisible" size="small" onClick={handleCancel}>Cancel</Button>
+              <Button variant="invisible" size="small" onClick={handleCancel}>
+                Cancel
+              </Button>
             </Stack>
           </Stack>
         )}

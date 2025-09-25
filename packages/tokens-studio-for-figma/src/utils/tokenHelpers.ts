@@ -12,21 +12,24 @@ true,
 >;
 
 export function getOverallConfig(themes: ThemeObject[], selectedThemes: string[]) {
-  return selectedThemes.reduce((acc, themeId) => {
-    const currentTheme = themes.find((theme) => theme.id === themeId);
-    if (!currentTheme) return acc;
+  return selectedThemes.reduce(
+    (acc, themeId) => {
+      const currentTheme = themes.find((theme) => theme.id === themeId);
+      if (!currentTheme) return acc;
 
-    Object.entries(currentTheme.selectedTokenSets).forEach(([tokenSet, status]) => {
-      // If the set is enabled, set it. Meaning, it should always win.
-      if (status === TokenSetStatus.ENABLED) {
-        acc[tokenSet] = status;
-        // If the set is source, only set it to source if it wasnt set to enabled.
-      } else if (status === TokenSetStatus.SOURCE && acc[tokenSet] !== TokenSetStatus.ENABLED) {
-        acc[tokenSet] = status;
-      }
-    });
-    return acc;
-  }, {} as Record<string, TokenSetStatus>);
+      Object.entries(currentTheme.selectedTokenSets).forEach(([tokenSet, status]) => {
+        // If the set is enabled, set it. Meaning, it should always win.
+        if (status === TokenSetStatus.ENABLED) {
+          acc[tokenSet] = status;
+          // If the set is source, only set it to source if it wasnt set to enabled.
+        } else if (status === TokenSetStatus.SOURCE && acc[tokenSet] !== TokenSetStatus.ENABLED) {
+          acc[tokenSet] = status;
+        }
+      });
+      return acc;
+    },
+    {} as Record<string, TokenSetStatus>,
+  );
 }
 
 export function getEnabledTokenSets(usedSets: UsedTokenSetsMap = {}) {

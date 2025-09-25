@@ -14,26 +14,19 @@ import * as pullTokensFactoryModule from '../startupProcessSteps/pullTokensFacto
 const savePluginDataFactorySpy = jest.spyOn(savePluginDataFactoryModule, 'savePluginDataFactory');
 const addLicenseFactorySpy = jest.spyOn(addLicenseFactoryModule, 'addLicenseFactory');
 const getLdFlagsFactorySpy = jest.spyOn(getLdFlagsFactorySpyModule, 'getLdFlagsFactory');
-const saveStorageInformationFactorySpy = jest.spyOn(saveStorageInformationFactoryModule, 'saveStorageInformationFactory');
+const saveStorageInformationFactorySpy = jest.spyOn(
+  saveStorageInformationFactoryModule,
+  'saveStorageInformationFactory',
+);
 const pullTokensFactorySpy = jest.spyOn(pullTokensFactoryModule, 'pullTokensFactory');
 
 describe('AppContainer', () => {
   beforeAll(() => {
-    savePluginDataFactorySpy.mockImplementation(() => (
-      () => Promise.resolve()
-    ));
-    addLicenseFactorySpy.mockImplementation(() => (
-      () => Promise.resolve()
-    ));
-    getLdFlagsFactorySpy.mockImplementation(() => (
-      () => Promise.resolve()
-    ));
-    saveStorageInformationFactorySpy.mockImplementation(() => (
-      () => Promise.resolve()
-    ));
-    pullTokensFactorySpy.mockImplementation(() => (
-      () => Promise.resolve()
-    ));
+    savePluginDataFactorySpy.mockImplementation(() => () => Promise.resolve());
+    addLicenseFactorySpy.mockImplementation(() => () => Promise.resolve());
+    getLdFlagsFactorySpy.mockImplementation(() => () => Promise.resolve());
+    saveStorageInformationFactorySpy.mockImplementation(() => () => Promise.resolve());
+    pullTokensFactorySpy.mockImplementation(() => () => Promise.resolve());
   });
 
   afterAll(() => {

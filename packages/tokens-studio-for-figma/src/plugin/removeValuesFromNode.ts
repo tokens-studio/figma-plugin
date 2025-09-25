@@ -3,7 +3,10 @@ import { resetNodeRotation } from '@/plugin/rotateNode';
 
 function removeStrokeIfEmptySides(node) {
   const sides = {
-    left: node.strokeLeftWeight, right: node.strokeRightWeight, top: node.strokeTopWeight, bottom: node.strokeBottomWeight,
+    left: node.strokeLeftWeight,
+    right: node.strokeRightWeight,
+    top: node.strokeTopWeight,
+    bottom: node.strokeBottomWeight,
   };
 
   if (!Object.values(sides).some((value) => value > 0)) {

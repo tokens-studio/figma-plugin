@@ -31,7 +31,14 @@ export class BitbucketTokenStorage extends GitTokenStorage {
 
   private apiToken?: string;
 
-  constructor(secret: string, owner: string, repository: string, baseUrl?: string, username?: string, apiToken?: string) {
+  constructor(
+    secret: string,
+    owner: string,
+    repository: string,
+    baseUrl?: string,
+    username?: string,
+    apiToken?: string,
+  ) {
     super(secret, owner, repository, baseUrl, username);
     this.apiToken = apiToken || secret; // Use apiToken if provided, otherwise fall back to secret for backward compatibility
     this.flags = {
@@ -58,12 +65,15 @@ export class BitbucketTokenStorage extends GitTokenStorage {
       const authString = `${this.username || this.owner}:${this.apiToken}`;
       const authHeader = `Basic ${btoa(authString)}`;
 
-      const response = await fetch(`https://api.bitbucket.org/2.0/repositories/${this.owner}/${this.repository}/refs/branches`, {
-        headers: {
-          Authorization: authHeader,
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `https://api.bitbucket.org/2.0/repositories/${this.owner}/${this.repository}/refs/branches`,
+        {
+          headers: {
+            Authorization: authHeader,
+            'Content-Type': 'application/json',
+          },
         },
-      });
+      );
 
       if (!response.ok) {
         // Re-throw authentication errors instead of catching them
@@ -214,14 +224,12 @@ export class BitbucketTokenStorage extends GitTokenStorage {
       const currentUrl = nextPageUrl; // TypeScript guard to ensure non-null
       const authHeader = `Basic ${btoa(`${this.username || this.owner}:${this.apiToken}`)}`;
 
-      const response = await retryHttpRequest<Response>(
-        () => fetch(currentUrl, {
-          headers: {
-            Authorization: authHeader,
-          },
-          cache: 'no-cache',
-        }),
-      );
+      const response = await retryHttpRequest<Response>(() => fetch(currentUrl, {
+        headers: {
+          Authorization: authHeader,
+        },
+        cache: 'no-cache',
+      }));
 
       if (!response.ok) {
         throw new Error(`Failed to read from Bitbucket: ${response.statusText}`);
@@ -251,14 +259,12 @@ export class BitbucketTokenStorage extends GitTokenStorage {
   private async fetchJsonFile(url: string): Promise<GitSingleFileObject> {
     const authHeader = `Basic ${btoa(`${this.username || this.owner}:${this.apiToken}`)}`;
 
-    const response = await retryHttpRequest<Response>(
-      () => fetch(url, {
-        headers: {
-          Authorization: authHeader,
-        },
-        cache: 'no-cache',
-      }),
-    );
+    const response = await retryHttpRequest<Response>(() => fetch(url, {
+      headers: {
+        Authorization: authHeader,
+      },
+      cache: 'no-cache',
+    }));
 
     if (!response.ok) {
       throw new Error(`Failed to read from Bitbucket: ${response.statusText}`);
@@ -278,12 +284,17 @@ export class BitbucketTokenStorage extends GitTokenStorage {
       const authString = `${this.username || this.owner}:${this.apiToken}`;
       const authHeader = `Basic ${btoa(authString)}`;
 
-      const response = await fetch(`https://api.bitbucket.org/2.0/repositories/${this.owner}/${this.repository}/refs/branches/${encodeURIComponent(branchName)}`, {
-        headers: {
-          Authorization: authHeader,
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `https://api.bitbucket.org/2.0/repositories/${this.owner}/${this.repository}/refs/branches/${encodeURIComponent(
+          branchName,
+        )}`,
+        {
+          headers: {
+            Authorization: authHeader,
+            'Content-Type': 'application/json',
+          },
         },
-      });
+      );
 
       if (!response.ok) {
         throw new Error(`Failed to get branch info: ${response.status} ${response.statusText}`);
@@ -347,14 +358,12 @@ export class BitbucketTokenStorage extends GitTokenStorage {
         const jsonFileContents = await Promise.allSettled(
           jsonFiles.map((file: any) => {
             const fileUrl = `https://api.bitbucket.org/2.0/repositories/${this.owner}/${this.repository}/src/${branchRef}/${file.path}`;
-            return retryHttpRequest<Response>(
-              () => fetch(fileUrl, {
-                headers: {
-                  Authorization: `Basic ${btoa(authString)}`,
-                },
-                cache: 'no-cache',
-              }),
-            ).then((rsp) => {
+            return retryHttpRequest<Response>(() => fetch(fileUrl, {
+              headers: {
+                Authorization: `Basic ${btoa(authString)}`,
+              },
+              cache: 'no-cache',
+            })).then((rsp) => {
               if (!rsp.ok) {
                 throw new Error(`Failed to read file ${file.path}: ${rsp.status} ${rsp.statusText}`);
               }
@@ -401,7 +410,11 @@ export class BitbucketTokenStorage extends GitTokenStorage {
               data: parsed as AnyTokenSet<false>,
             };
           } catch (parseError) {
-            console.error(`[Bitbucket Sync] Failed to parse JSON file '${path}': ${parseError instanceof Error ? parseError.message : parseError}`);
+            console.error(
+              `[Bitbucket Sync] Failed to parse JSON file '${path}': ${
+                parseError instanceof Error ? parseError.message : parseError
+              }`,
+            );
             throw parseError;
           }
         });
@@ -459,9 +472,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
 
     if (!normalizedPath.endsWith('.json') && this.flags.multiFileEnabled) {
       try {
-        const branchRef = branch.includes('/')
-          ? await this.getBranchCommitSha(branch)
-          : encodeURIComponent(branch);
+        const branchRef = branch.includes('/') ? await this.getBranchCommitSha(branch) : encodeURIComponent(branch);
         const url = `https://api.bitbucket.org/2.0/repositories/${owner}/${repo}/src/${branchRef}/${normalizedPath}`;
         const existingFiles = await this.fetchJsonFilesFromDirectory(url);
 

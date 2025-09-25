@@ -11,9 +11,7 @@ type Props = {
   node: BaseNode;
 };
 
-export async function setBorderColorValuesOnTarget({
-  data, value, node,
-}: Props) {
+export async function setBorderColorValuesOnTarget({ data, value, node }: Props) {
   if ('strokes' in node) {
     if (!(await tryApplyColorVariableId(node, data, ColorPaintType.STROKES))) {
       const resolvedToken = defaultTokenValueRetriever.get(data);
@@ -39,7 +37,10 @@ export async function setBorderColorValuesOnTarget({
 
       if (!matchingStyleId || (matchingStyleId && !(await trySetStyleId(node, 'stroke', matchingStyleId)))) {
         setColorValuesOnTarget({
-          target: node, token: data, key: 'strokes', givenValue: value,
+          target: node,
+          token: data,
+          key: 'strokes',
+          givenValue: value,
         });
       }
     }

@@ -10,7 +10,12 @@ interface RGBA {
   a?: number;
 }
 
-export function RGBAToHexA(red: number | string, green: number | string, blue: number | string, alpha: number | string) {
+export function RGBAToHexA(
+  red: number | string,
+  green: number | string,
+  blue: number | string,
+  alpha: number | string,
+) {
   const r = parseInt(String(red), 10);
   const g = parseInt(String(green), 10);
   const b = parseInt(String(blue), 10);
@@ -92,7 +97,10 @@ export function convertToFigmaColor(input: string) {
   let color: RGBA;
   let opacity: number;
   if (input.startsWith('rgb')) {
-    const rgbValues = input.replace(/^rgba?\(|\s+|\)$/g, '').split(',').map(parseFloat) as WebRGBA;
+    const rgbValues = input
+      .replace(/^rgba?\(|\s+|\)$/g, '')
+      .split(',')
+      .map(parseFloat) as WebRGBA;
 
     const {
       r, g, b, a = 1,
@@ -104,7 +112,10 @@ export function convertToFigmaColor(input: string) {
     };
     opacity = roundToTwo(a);
   } else if (input.startsWith('hsl')) {
-    const hslValues = input.replace(/^hsla?\(|\s+|%|\)$/g, '').split(',').map(parseFloat);
+    const hslValues = input
+      .replace(/^hsla?\(|\s+|%|\)$/g, '')
+      .split(',')
+      .map(parseFloat);
     const rgbValues: any = hslaToRgba(hslValues);
     const {
       r, g, b, a = 1,

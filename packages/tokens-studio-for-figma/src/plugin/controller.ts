@@ -47,7 +47,10 @@ AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CANCEL_OPERATION, as
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_SHOW_EMPTY_GROUPS, asyncHandlers.setShowEmptyGroups);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_UI, asyncHandlers.setUi);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CREATE_ANNOTATION, asyncHandlers.createAnnotation);
-AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CREATE_LIVING_DOCUMENTATION, asyncHandlers.createLivingDocumentation);
+AsyncMessageChannel.PluginInstance.handle(
+  AsyncMessageTypes.CREATE_LIVING_DOCUMENTATION,
+  asyncHandlers.createLivingDocumentation,
+);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CREATE_STYLES, asyncHandlers.createStyles);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RENAME_STYLES, asyncHandlers.renameStyles);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.REMOVE_STYLES, asyncHandlers.removeStyles);
@@ -61,11 +64,20 @@ AsyncMessageChannel.PluginInstance.handle(
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RESOLVE_STYLE_INFO, asyncHandlers.resolveStyleInfo);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_NONE_VALUES_ON_NODE, asyncHandlers.setNoneValuesOnNode);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.GET_FIGMA_FONTS, asyncHandlers.getFigmaFonts);
-AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.GET_AVAILABLE_VARIABLE_COLLECTIONS, asyncHandlers.getAvailableVariableCollections);
-AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.REMOVE_STYLES_WITHOUT_CONNECTION, asyncHandlers.removeStylesWithoutConnection);
+AsyncMessageChannel.PluginInstance.handle(
+  AsyncMessageTypes.GET_AVAILABLE_VARIABLE_COLLECTIONS,
+  asyncHandlers.getAvailableVariableCollections,
+);
+AsyncMessageChannel.PluginInstance.handle(
+  AsyncMessageTypes.REMOVE_STYLES_WITHOUT_CONNECTION,
+  asyncHandlers.removeStylesWithoutConnection,
+);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_AUTH_DATA, asyncHandlers.setAuthData);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CREATE_LOCAL_VARIABLES, asyncHandlers.createLocalVariables);
-AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CREATE_LOCAL_VARIABLES_WITHOUT_MODES, asyncHandlers.createLocalVariablesWithoutModes);
+AsyncMessageChannel.PluginInstance.handle(
+  AsyncMessageTypes.CREATE_LOCAL_VARIABLES_WITHOUT_MODES,
+  asyncHandlers.createLocalVariablesWithoutModes,
+);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RESOLVE_VARIABLE_INFO, asyncHandlers.resolveVariableInfo);
 AsyncMessageChannel.PluginInstance.handle(
   AsyncMessageTypes.ATTACH_LOCAL_VARIABLES_TO_THEME,
@@ -74,9 +86,18 @@ AsyncMessageChannel.PluginInstance.handle(
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RENAME_VARIABLES, asyncHandlers.renameVariables);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.UPDATE_VARIABLES, asyncHandlers.updateVariables);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_USED_EMAIL, asyncHandlers.setUsedEmail);
-AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.PREVIEW_REQUEST_STARTUP, asyncHandlers.previewRequestStartup);
-AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_VARIABLE_EXPORT_SETTINGS, asyncHandlers.setVariableExportSettings);
-AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_SELECTED_EXPORT_THEMES, asyncHandlers.setSelectedExportThemes);
+AsyncMessageChannel.PluginInstance.handle(
+  AsyncMessageTypes.PREVIEW_REQUEST_STARTUP,
+  asyncHandlers.previewRequestStartup,
+);
+AsyncMessageChannel.PluginInstance.handle(
+  AsyncMessageTypes.SET_VARIABLE_EXPORT_SETTINGS,
+  asyncHandlers.setVariableExportSettings,
+);
+AsyncMessageChannel.PluginInstance.handle(
+  AsyncMessageTypes.SET_SELECTED_EXPORT_THEMES,
+  asyncHandlers.setSelectedExportThemes,
+);
 
 figma.on('close', () => {
   defaultWorker.stop();

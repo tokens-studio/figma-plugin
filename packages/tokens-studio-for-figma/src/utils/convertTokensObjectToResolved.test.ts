@@ -21,6 +21,8 @@ describe('convertTokensObjectToResolved', () => {
       },
     };
 
-    expect(() => convertTokensObjectToResolved(tokens, [], [], { throwErrorWhenNotResolved: true })).toThrowError('ERROR: failed to resolve token "colors.background"');
+    expect(() => convertTokensObjectToResolved(tokens, [], [], { throwErrorWhenNotResolved: true })).toThrowError(
+      'ERROR: failed to resolve token "colors.background"',
+    );
   });
 });

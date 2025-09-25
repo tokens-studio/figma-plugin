@@ -32,7 +32,6 @@ export default function TokenNodes({ nodes }: { nodes: NodeInfo[] }) {
       sideOffset={4}
       className={`content content-dark ${nodes.length > VISIBLE_VIEWPORT_NODES ? 'scroll-container' : null}`}
     >
-
       {nodes.map(({ id, name, type }) => (
         <TokenNode key={id} id={id} name={name} type={type} />
       ))}
@@ -40,10 +39,7 @@ export default function TokenNodes({ nodes }: { nodes: NodeInfo[] }) {
   );
 
   return (
-    <Stack
-      align="center"
-      gap={1}
-    >
+    <Stack align="center" gap={1}>
       <DropdownMenu>
         <Box
           css={{

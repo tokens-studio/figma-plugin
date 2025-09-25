@@ -14,9 +14,7 @@ describe('getAvailableVariableCollections', () => {
       {
         id: 'collection2',
         name: 'Collection 2',
-        modes: [
-          { modeId: 'mode3', name: 'Default' },
-        ],
+        modes: [{ modeId: 'mode3', name: 'Default' }],
       },
     ];
 

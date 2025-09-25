@@ -7,10 +7,14 @@ import { UpdateMode } from '@/constants/UpdateMode';
 export async function sendSelectionChange(): Promise<SelectionContent | null> {
   // Big O (sendPluginValues)
   const nodes = store.inspectDeep && store.shouldSendSelectionValues
-    ? (
-      await defaultNodeManager.findBaseNodesWithData({ updateMode: UpdateMode.SELECTION, nodesWithoutPluginData: true })
-    )
-    : await defaultNodeManager.findBaseNodesWithData({ nodes: figma.currentPage.selection, nodesWithoutPluginData: false });
+    ? await defaultNodeManager.findBaseNodesWithData({
+      updateMode: UpdateMode.SELECTION,
+      nodesWithoutPluginData: true,
+    })
+    : await defaultNodeManager.findBaseNodesWithData({
+      nodes: figma.currentPage.selection,
+      nodesWithoutPluginData: false,
+    });
   const currentSelectionLength = figma.currentPage.selection.length;
 
   if (!currentSelectionLength) {

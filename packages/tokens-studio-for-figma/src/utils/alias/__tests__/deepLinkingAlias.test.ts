@@ -80,7 +80,9 @@ describe('deepLinkingAlias', () => {
 
   inputTokens.forEach((token) => {
     it(`alias ${token.name}`, () => {
-      expect(getAliasValue({ value: token.input } as SingleToken, allTokens as unknown as SingleToken[])).toEqual(token.value);
+      expect(getAliasValue({ value: token.input } as SingleToken, allTokens as unknown as SingleToken[])).toEqual(
+        token.value,
+      );
     });
   });
 });

@@ -12,7 +12,7 @@ export function convertTokenToFormat(token, isExpanded = false) {
     });
     return returnedToken;
   }
-  if ((typeof value === 'undefined')) return token;
+  if (typeof value === 'undefined') return token;
   const returnValue = {
     ...remainingTokenValues,
     ...(value ? { [TokenFormat.tokenValueKey]: value } : {}),

@@ -69,7 +69,11 @@ export default function SupernovaForm({
       <Stack direction="column" gap={5}>
         <Text muted>{t('providers.supernova.description')}</Text>
         <Text muted css={{ marginTop: '$2' }}>
-          <Link href="https://docs.tokens.studio/token-storage/remote/sync-cloud-supernova?ref=addprovider" target="_blank" rel="noreferrer">
+          <Link
+            href="https://docs.tokens.studio/token-storage/remote/sync-cloud-supernova?ref=addprovider"
+            target="_blank"
+            rel="noreferrer"
+          >
             {t('providers.supernova.readMore')}
           </Link>
         </Text>

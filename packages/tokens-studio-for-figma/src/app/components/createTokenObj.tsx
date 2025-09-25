@@ -4,9 +4,14 @@ import tokenTypes from '../../config/tokenType.defs.json';
 import { DeepKeyTokenMap, SingleToken, TokenTypeSchema } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
 
-type CreateTokensObjectResult = Partial<Record<TokenTypes, {
-  values: DeepKeyTokenMap
-}>>;
+type CreateTokensObjectResult = Partial<
+Record<
+TokenTypes,
+{
+  values: DeepKeyTokenMap;
+}
+>
+>;
 
 export function transformName(name: string): TokenTypes {
   switch (name) {
@@ -52,7 +57,7 @@ export function transformName(name: string): TokenTypes {
   }
 }
 
-export function appendTypeToToken(token: Omit<SingleToken, 'type'> & { type?: TokenTypes; }): SingleToken {
+export function appendTypeToToken(token: Omit<SingleToken, 'type'> & { type?: TokenTypes }): SingleToken {
   const typeToSet = token.type ? token.type : transformName(token.name.split('.').slice(0, 1).toString());
   return {
     ...token,
@@ -61,10 +66,10 @@ export function appendTypeToToken(token: Omit<SingleToken, 'type'> & { type?: To
 }
 
 // Creates a tokens object so that tokens are displayed in groups in the UI.
-export function createTokensObject(tokens: (Omit<SingleToken, 'type'> & { type?: TokenTypes; })[], tokenFilter = '') {
+export function createTokensObject(tokens: (Omit<SingleToken, 'type'> & { type?: TokenTypes })[], tokenFilter = '') {
   if (tokens.length > 0) {
     const obj = tokens.reduce<CreateTokensObjectResult>((acc, cur) => {
-      let hasSubstring:boolean = false;
+      let hasSubstring: boolean = false;
       try {
         hasSubstring = cur.name?.toLowerCase().search(tokenFilter?.toLowerCase()) >= 0;
       } catch {
@@ -91,10 +96,7 @@ export function createTokensObject(tokens: (Omit<SingleToken, 'type'> & { type?:
 // Takes an array of tokens, transforms them into
 // an object and merges that with values we require for the UI
 export function mappedTokens(tokens: SingleToken[], tokenFilter: string) {
-  const tokenObj = extend(true, {}, tokenTypes) as Record<
-  TokenTypes,
-  TokenTypeSchema & { values: DeepKeyTokenMap }
-  >;
+  const tokenObj = extend(true, {}, tokenTypes) as Record<TokenTypes, TokenTypeSchema & { values: DeepKeyTokenMap }>;
   const tokenObjects = createTokensObject(tokens, tokenFilter);
 
   Object.entries(tokenObjects).forEach(([key, group]) => {

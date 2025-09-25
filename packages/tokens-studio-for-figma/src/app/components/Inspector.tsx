@@ -14,11 +14,7 @@ import { Dispatch } from '../store';
 import Label from './Label';
 import { mergeTokenGroups } from '@/utils/tokenHelpers';
 import { track } from '@/utils/analytics';
-import {
-  inspectDeepSelector,
-  tokensSelector,
-  usedTokenSetSelector,
-} from '@/selectors';
+import { inspectDeepSelector, tokensSelector, usedTokenSetSelector } from '@/selectors';
 import InspectSearchOptionDropdown from './InspectSearchOptionDropdown';
 import Stack from './Stack';
 import { defaultTokenResolver } from '@/utils/TokenResolver';
@@ -32,9 +28,10 @@ function Inspector() {
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const inspectDeep = useSelector(inspectDeepSelector);
   // TODO: Put this into state in a performant way
-  const resolvedTokens = React.useMemo(() => (
-    defaultTokenResolver.setTokens(mergeTokenGroups(tokens, usedTokenSet))
-  ), [tokens, usedTokenSet]);
+  const resolvedTokens = React.useMemo(
+    () => defaultTokenResolver.setTokens(mergeTokenGroups(tokens, usedTokenSet)),
+    [tokens, usedTokenSet],
+  );
 
   const handleSetInspectView = React.useCallback((view: 'multi' | 'debug') => {
     if (view) {
@@ -45,9 +42,12 @@ function Inspector() {
 
   function renderInspectView() {
     switch (inspectView) {
-      case 'debug': return <InspectorDebugView resolvedTokens={resolvedTokens} />;
-      case 'multi': return <InspectorMultiView resolvedTokens={resolvedTokens} tokenToSearch={searchInputValue} />;
-      default: return null;
+      case 'debug':
+        return <InspectorDebugView resolvedTokens={resolvedTokens} />;
+      case 'multi':
+        return <InspectorMultiView resolvedTokens={resolvedTokens} tokenToSearch={searchInputValue} />;
+      default:
+        return null;
     }
   }
 
@@ -55,16 +55,32 @@ function Inspector() {
     setSearchInputValue(event.target.value);
   }, []);
 
-  const handleSetInspectDeep = React.useCallback(() => dispatch.settings.setInspectDeep(!inspectDeep), [dispatch, inspectDeep]);
+  const handleSetInspectDeep = React.useCallback(
+    () => dispatch.settings.setInspectDeep(!inspectDeep),
+    [dispatch, inspectDeep],
+  );
 
   return (
-    <Box css={{
-      gap: '$2', flexGrow: 1, display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden',
-    }}
-    >
-      <Box css={{
-        display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: '$2', padding: '$2', borderBottom: '1px solid $borderMuted',
+    <Box
+      css={{
+        gap: '$2',
+        flexGrow: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        overflow: 'hidden',
       }}
+    >
+      <Box
+        css={{
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: '$2',
+          padding: '$2',
+          borderBottom: '1px solid $borderMuted',
+        }}
       >
         <Box
           css={{
@@ -84,16 +100,15 @@ function Inspector() {
         </Box>
         <Stack direction="row" align="center" gap={2}>
           <Stack direction="row" align="center">
-            <Checkbox
-              checked={inspectDeep}
-              id="inspectDeep"
-              onCheckedChange={handleSetInspectDeep}
-            />
+            <Checkbox checked={inspectDeep} id="inspectDeep" onCheckedChange={handleSetInspectDeep} />
             <Tooltip label={t('scansSelected') as string} side="bottom">
               <Label htmlFor="inspectDeep">
-                <Box css={{
-                  fontWeight: '$sansBold', fontSize: '$xsmall', padding: '$2',
-                }}
+                <Box
+                  css={{
+                    fontWeight: '$sansBold',
+                    fontSize: '$xsmall',
+                    padding: '$2',
+                  }}
                 >
                   {t('deepInspect')}
                 </Box>
@@ -101,12 +116,7 @@ function Inspector() {
             </Tooltip>
           </Stack>
           <InspectSearchOptionDropdown />
-          <ToggleGroup
-            size="small"
-            type="single"
-            value={inspectView}
-            onValueChange={handleSetInspectView}
-          >
+          <ToggleGroup size="small" type="single" value={inspectView} onValueChange={handleSetInspectView}>
             {/* Disabling tooltip for now due to https://github.com/radix-ui/primitives/issues/602
             <ToggleGroup.Item value="multi" tooltip={t('inspectLayers') as string} tooltipSide="bottom"> */}
             <ToggleGroup.Item value="multi">

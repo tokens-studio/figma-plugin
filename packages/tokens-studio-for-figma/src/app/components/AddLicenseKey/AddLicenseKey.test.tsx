@@ -18,7 +18,7 @@ import * as notifiers from '@/plugin/notifiers';
 import { addLicenseKey } from '@/utils/addLicenseKey';
 
 // Hide log calls unless they are expected. This is mainly related to react-modal
-jest.spyOn(console, 'error').mockImplementation(() => { });
+jest.spyOn(console, 'error').mockImplementation(() => {});
 
 jest.mock('launchdarkly-react-client-sdk', () => ({
   LDProvider: (props: React.PropsWithChildren<unknown>) => props.children,
@@ -160,12 +160,16 @@ describe('Add license key', () => {
       </Provider>,
     );
 
-    await addLicenseKey(mockStore.dispatch, {
-      key: LICENSE_FOR_VALID_RESPONSE,
-      source: AddLicenseSource.UI,
-    }, {
-      userId: '123',
-    });
+    await addLicenseKey(
+      mockStore.dispatch,
+      {
+        key: LICENSE_FOR_VALID_RESPONSE,
+        source: AddLicenseSource.UI,
+      },
+      {
+        userId: '123',
+      },
+    );
 
     const removeKeyButton = await result.findByRole('button', {
       name: 'removeLicenseKey',
@@ -188,12 +192,16 @@ describe('Add license key', () => {
       </Provider>,
     );
 
-    await addLicenseKey(mockStore.dispatch, {
-      key: LICENSE_FOR_VALID_RESPONSE,
-      source: AddLicenseSource.UI,
-    }, {
-      userId: '123',
-    });
+    await addLicenseKey(
+      mockStore.dispatch,
+      {
+        key: LICENSE_FOR_VALID_RESPONSE,
+        source: AddLicenseSource.UI,
+      },
+      {
+        userId: '123',
+      },
+    );
 
     const removeKeyButton = await result.findByRole('button', {
       name: 'removeLicenseKey',
@@ -225,12 +233,16 @@ describe('Add license key', () => {
       </Provider>,
     );
 
-    await addLicenseKey(mockStore.dispatch, {
-      key: LICENSE_FOR_DETACH_ERROR_RESPONSE,
-      source: AddLicenseSource.UI,
-    }, {
-      userId: '123',
-    });
+    await addLicenseKey(
+      mockStore.dispatch,
+      {
+        key: LICENSE_FOR_DETACH_ERROR_RESPONSE,
+        source: AddLicenseSource.UI,
+      },
+      {
+        userId: '123',
+      },
+    );
 
     const removeKeyButton = await result.getByRole('button', {
       name: 'removeLicenseKey',
@@ -245,7 +257,9 @@ describe('Add license key', () => {
 
     await waitFor(() => {
       notifyToUISpy.mockReturnValueOnce();
-      expect(notifyToUISpy).toBeCalledWith('Error removing license, please contact support@tokens.studio', { error: true });
+      expect(notifyToUISpy).toBeCalledWith('Error removing license, please contact support@tokens.studio', {
+        error: true,
+      });
     });
   });
 
@@ -259,12 +273,16 @@ describe('Add license key', () => {
       </Provider>,
     );
 
-    await addLicenseKey(mockStore.dispatch, {
-      key: LICENSE_FOR_ERROR_RESPONSE,
-      source: AddLicenseSource.UI,
-    }, {
-      userId: '123',
-    });
+    await addLicenseKey(
+      mockStore.dispatch,
+      {
+        key: LICENSE_FOR_ERROR_RESPONSE,
+        source: AddLicenseSource.UI,
+      },
+      {
+        userId: '123',
+      },
+    );
 
     await act(async () => {
       const removeKeyButton = await result.getByRole('button', {

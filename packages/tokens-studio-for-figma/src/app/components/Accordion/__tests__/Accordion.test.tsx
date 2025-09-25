@@ -10,7 +10,9 @@ describe('Accordion', () => {
         <Accordion
           label="Header"
           extra={(
-            <button type="button" data-testid="accordion-extra">Click me</button>
+            <button type="button" data-testid="accordion-extra">
+              Click me
+            </button>
           )}
         >
           Lorem ipsum

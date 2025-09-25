@@ -79,14 +79,7 @@ describe('pullTokensFactory', () => {
       },
     } as unknown as StartupMessage;
 
-    const fn = pullTokensFactory(
-      mockStore,
-      mockStore.dispatch,
-      {},
-      mockParams,
-      mockUseConfirm,
-      mockUseRemoteTokens,
-    );
+    const fn = pullTokensFactory(mockStore, mockStore.dispatch, {}, mockParams, mockUseConfirm, mockUseRemoteTokens);
 
     await fn();
     const state = mockStore.getState();
@@ -106,19 +99,11 @@ describe('pullTokensFactory', () => {
 
     const mockParams = {
       localTokenData: {
-        values: {
-        },
+        values: {},
       },
     } as unknown as StartupMessage;
 
-    const fn = pullTokensFactory(
-      mockStore,
-      mockStore.dispatch,
-      {},
-      mockParams,
-      mockUseConfirm,
-      mockUseRemoteTokens,
-    );
+    const fn = pullTokensFactory(mockStore, mockStore.dispatch, {}, mockParams, mockUseConfirm, mockUseRemoteTokens);
 
     await fn();
     const state = mockStore.getState();
@@ -136,22 +121,12 @@ describe('pullTokensFactory', () => {
     const mockParams = {
       localTokenData: {
         checkForChanges: false,
-        values: {
-        },
+        values: {},
       },
-      localApiProviders: [
-        { ...mockStorageType, secret: 'secret' },
-      ],
+      localApiProviders: [{ ...mockStorageType, secret: 'secret' }],
     } as unknown as StartupMessage;
 
-    const fn = pullTokensFactory(
-      mockStore,
-      mockStore.dispatch,
-      {},
-      mockParams,
-      mockUseConfirm,
-      mockUseRemoteTokens,
-    );
+    const fn = pullTokensFactory(mockStore, mockStore.dispatch, {}, mockParams, mockUseConfirm, mockUseRemoteTokens);
 
     mockFetchBranches.mockResolvedValueOnce(['main']);
     mockPullTokens.mockResolvedValueOnce({
@@ -187,22 +162,12 @@ describe('pullTokensFactory', () => {
     const mockParams = {
       localTokenData: {
         checkForChanges: false,
-        values: {
-        },
+        values: {},
       },
-      localApiProviders: [
-        { ...mockStorageType, secret: 'secret' },
-      ],
+      localApiProviders: [{ ...mockStorageType, secret: 'secret' }],
     } as unknown as StartupMessage;
 
-    const fn = pullTokensFactory(
-      mockStore,
-      mockStore.dispatch,
-      {},
-      mockParams,
-      mockUseConfirm,
-      mockUseRemoteTokens,
-    );
+    const fn = pullTokensFactory(mockStore, mockStore.dispatch, {}, mockParams, mockUseConfirm, mockUseRemoteTokens);
 
     mockFetchBranches.mockResolvedValueOnce(['main']);
     mockPullTokens.mockResolvedValueOnce({
@@ -249,22 +214,12 @@ describe('pullTokensFactory', () => {
     const mockParams = {
       localTokenData: {
         checkForChanges: false,
-        values: {
-        },
+        values: {},
       },
-      localApiProviders: [
-        { ...mockStorageType, secret: 'secret' },
-      ],
+      localApiProviders: [{ ...mockStorageType, secret: 'secret' }],
     } as unknown as StartupMessage;
 
-    const fn = pullTokensFactory(
-      mockStore,
-      mockStore.dispatch,
-      {},
-      mockParams,
-      mockUseConfirm,
-      mockUseRemoteTokens,
-    );
+    const fn = pullTokensFactory(mockStore, mockStore.dispatch, {}, mockParams, mockUseConfirm, mockUseRemoteTokens);
 
     mockFetchBranches.mockResolvedValueOnce(['main']);
     mockPullTokens.mockResolvedValueOnce(null);
@@ -303,21 +258,12 @@ describe('pullTokensFactory', () => {
           ],
         },
       },
-      localApiProviders: [
-        { ...mockStorageType, secret: 'secret' },
-      ],
+      localApiProviders: [{ ...mockStorageType, secret: 'secret' }],
     } as unknown as StartupMessage;
 
     mockConfirm.mockResolvedValueOnce(true);
 
-    const fn = pullTokensFactory(
-      mockStore,
-      mockStore.dispatch,
-      {},
-      mockParams,
-      mockUseConfirm,
-      mockUseRemoteTokens,
-    );
+    const fn = pullTokensFactory(mockStore, mockStore.dispatch, {}, mockParams, mockUseConfirm, mockUseRemoteTokens);
 
     mockFetchBranches.mockResolvedValueOnce(['main']);
 
@@ -332,22 +278,14 @@ describe('pullTokensFactory', () => {
 
   it('should go to start tab if the localTokenData is missing somehow', async () => {
     const mockStore = createMockStore({
-      uiState: {
-      },
+      uiState: {},
     });
 
     const mockParams = {
       localTokenData: null,
     } as unknown as StartupMessage;
 
-    const fn = pullTokensFactory(
-      mockStore,
-      mockStore.dispatch,
-      {},
-      mockParams,
-      mockUseConfirm,
-      mockUseRemoteTokens,
-    );
+    const fn = pullTokensFactory(mockStore, mockStore.dispatch, {}, mockParams, mockUseConfirm, mockUseRemoteTokens);
 
     await fn();
     const state = mockStore.getState();
@@ -367,19 +305,10 @@ describe('pullTokensFactory', () => {
         checkForChanges: false,
         values: {},
       },
-      localApiProviders: [
-        { ...mockStorageType, secret: 'secret' },
-      ],
+      localApiProviders: [{ ...mockStorageType, secret: 'secret' }],
     } as unknown as StartupMessage;
 
-    const fn = pullTokensFactory(
-      mockStore,
-      mockStore.dispatch,
-      {},
-      mockParams,
-      mockUseConfirm,
-      mockUseRemoteTokens,
-    );
+    const fn = pullTokensFactory(mockStore, mockStore.dispatch, {}, mockParams, mockUseConfirm, mockUseRemoteTokens);
 
     mockFetchBranches.mockResolvedValueOnce(['main']);
     mockPullTokens.mockRejectedValueOnce(new Error('error'));

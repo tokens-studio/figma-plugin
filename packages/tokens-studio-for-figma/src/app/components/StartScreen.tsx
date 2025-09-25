@@ -130,7 +130,10 @@ function StartScreen() {
               {t('guides')}
             </Heading>
             <Stack direction="column" gap={3}>
-              <HelpfulLink href="https://docs.tokens.studio/get-started/install-figma-plugin?ref=startscreen" target="_blank">
+              <HelpfulLink
+                href="https://docs.tokens.studio/get-started/install-figma-plugin?ref=startscreen"
+                target="_blank"
+              >
                 <BookmarkIcon />
                 {t('gettingStarted')}
               </HelpfulLink>
@@ -153,20 +156,29 @@ function StartScreen() {
                 onClick: onSetSyncClick,
                 text: t('enterCredentials'),
               }}
-              secondaryAction={matchingProvider ? {
-                onClick: () => {
-                  dispatch.uiState.setLastError(null);
-                  restoreStoredProvider(matchingProvider);
-                },
-                text: t('retry'),
-              } : undefined}
+              secondaryAction={
+                matchingProvider
+                  ? {
+                    onClick: () => {
+                      dispatch.uiState.setLastError(null);
+                      restoreStoredProvider(matchingProvider);
+                    },
+                    text: t('retry'),
+                  }
+                  : undefined
+              }
             />
           ) : (
             <Stack direction="row" gap={2}>
               <Button data-testid="button-configure" size="small" variant="primary" onClick={onSetEmptyTokens}>
                 {t('newEmptyFile')}
               </Button>
-              <Button data-testid="button-configure-preset" size="small" variant="invisible" onClick={onSetDefaultTokens}>
+              <Button
+                data-testid="button-configure-preset"
+                size="small"
+                variant="invisible"
+                onClick={onSetDefaultTokens}
+              >
                 {t('loadExample')}
               </Button>
             </Stack>

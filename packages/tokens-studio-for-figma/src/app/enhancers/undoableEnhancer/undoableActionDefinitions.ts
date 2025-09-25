@@ -5,7 +5,11 @@ import { SingleToken } from '@/types/tokens';
 import { UpdateTokenPayload } from '@/types/payloads';
 
 // @TODO improve dispatch typing
-type Effect<S = any, A extends AnyAction<true> = AnyAction<true>> = (dispatch: Dispatch<AnyAction<true>>, action: A, snapshot: S) => void;
+type Effect<S = any, A extends AnyAction<true> = AnyAction<true>> = (
+  dispatch: Dispatch<AnyAction<true>>,
+  action: A,
+  snapshot: S,
+) => void;
 type UndoableActionDefinition<S = any, A extends AnyAction<true> = AnyAction<true>> = {
   type: A['type'];
   undo: Effect<S, A>;
@@ -16,11 +20,7 @@ type UndoableActionDefinition<S = any, A extends AnyAction<true> = AnyAction<tru
 export const undoableActionDefinitions = [
   {
     type: 'tokenState/deleteToken',
-    getStateSnapshot: ({ payload }, state) => (
-      state?.tokenState.tokens[payload.parent].find((token) => (
-        token.name === payload.path
-      )) ?? null
-    ),
+    getStateSnapshot: ({ payload }, state) => state?.tokenState.tokens[payload.parent].find((token) => token.name === payload.path) ?? null,
     redo: (dispatch, action) => {
       dispatch({
         type: 'tokenState/deleteToken',
@@ -44,9 +44,12 @@ export const undoableActionDefinitions = [
         });
       }
     },
-  } as UndoableActionDefinition<SingleToken | null, AnyAction<true> & {
-    type: 'tokenState/deleteToken'
-  }>,
+  } as UndoableActionDefinition<
+  SingleToken | null,
+  AnyAction<true> & {
+    type: 'tokenState/deleteToken';
+  }
+  >,
   {
     type: 'tokenState/createToken',
     getStateSnapshot: () => null,
@@ -64,9 +67,12 @@ export const undoableActionDefinitions = [
         meta: { silent: true },
       });
     },
-  } as UndoableActionDefinition<null, AnyAction<true> & {
-    type: 'tokenState/createToken'
-  }>,
+  } as UndoableActionDefinition<
+  null,
+  AnyAction<true> & {
+    type: 'tokenState/createToken';
+  }
+  >,
   {
     type: 'tokenState/duplicateToken',
     getStateSnapshot: () => null,
@@ -84,7 +90,10 @@ export const undoableActionDefinitions = [
         meta: { silent: true },
       });
     },
-  } as UndoableActionDefinition<null, AnyAction<true> & {
-    type: 'tokenState/duplicateToken'
-  }>,
+  } as UndoableActionDefinition<
+  null,
+  AnyAction<true> & {
+    type: 'tokenState/duplicateToken';
+  }
+  >,
 ] as UndoableActionDefinition[];

@@ -3,7 +3,7 @@ import { IconButton, Stack } from '@tokens-studio/ui';
 import React from 'react';
 import Modal from './Modal';
 
-export function ExplainerModal({ title, children, ...props }: { title: string, children: React.ReactNode }) {
+export function ExplainerModal({ title, children, ...props }: { title: string; children: React.ReactNode }) {
   const [open, setOpen] = React.useState(false);
   const handleClose = React.useCallback(() => setOpen(false), []);
   const handleOpen = React.useCallback(() => setOpen(true), []);

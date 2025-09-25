@@ -14,9 +14,7 @@ import { undoableEnhancer } from '@/app/enhancers/undoableEnhancer';
 
 export const AllTheProviders: FC = ({ children }) => (
   <Provider store={store}>
-    <TooltipProvider>
-      {children}
-    </TooltipProvider>
+    <TooltipProvider>{children}</TooltipProvider>
   </Provider>
 );
 
@@ -26,7 +24,7 @@ const resetStore = () => {
 
 export const createMockStore = (
   initialState: Partial<{
-    [K in keyof RootState]: Partial<RootState[K]>
+    [K in keyof RootState]: Partial<RootState[K]>;
   }>,
 ) => {
   const storeModels = { ...models };
@@ -74,7 +72,7 @@ afterAll(() => {
   server.close();
 });
 
-dotenv.config({ });
+dotenv.config({});
 
 export * from '@testing-library/react';
 

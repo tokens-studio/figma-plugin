@@ -1,9 +1,7 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import userEvent from '@testing-library/user-event';
-import {
-  createMockStore, render, waitFor,
-} from '../../../tests/config/setupTest';
+import { createMockStore, render, waitFor } from '../../../tests/config/setupTest';
 import ApplySelector from './ApplySelector';
 
 const mockHandleUpdate = jest.fn();

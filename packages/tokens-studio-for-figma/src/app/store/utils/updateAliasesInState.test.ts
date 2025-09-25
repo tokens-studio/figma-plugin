@@ -19,9 +19,12 @@ describe('updateAliasesInState', () => {
         },
         {
           name: 'alias3',
-          value: [{
-            x: '{oldValue}', y: '{oldValue.foo.bar}',
-          }],
+          value: [
+            {
+              x: '{oldValue}',
+              y: '{oldValue.foo.bar}',
+            },
+          ],
         },
       ],
     };
@@ -48,9 +51,12 @@ describe('updateAliasesInState', () => {
         },
         {
           name: 'alias3',
-          value: [{
-            x: '{newValue}', y: '{oldValue.foo.bar}',
-          }],
+          value: [
+            {
+              x: '{newValue}',
+              y: '{oldValue.foo.bar}',
+            },
+          ],
         },
       ],
     };

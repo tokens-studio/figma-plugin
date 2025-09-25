@@ -29,9 +29,9 @@ export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = asy
     });
   }
   if (msg.tokens) {
-    const {
-      figmaVariableReferences, figmaStyleReferences, stylePathPrefix,
-    } = await getThemeReferences(msg.settings.prefixStylesWithThemeName);
+    const { figmaVariableReferences, figmaStyleReferences, stylePathPrefix } = await getThemeReferences(
+      msg.settings.prefixStylesWithThemeName,
+    );
     defaultTokenValueRetriever.initiate({
       tokens: msg.tokens,
       variableReferences: figmaVariableReferences,

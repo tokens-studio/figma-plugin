@@ -3,7 +3,7 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import type { VariableCollectionInfo } from '@/types/VariableCollectionSelection';
 
 export const getAvailableVariableCollections: AsyncMessageChannelHandlers[AsyncMessageTypes.GET_AVAILABLE_VARIABLE_COLLECTIONS] = async (): Promise<{
-  collections: VariableCollectionInfo[]
+  collections: VariableCollectionInfo[];
 }> => {
   try {
     const allCollections = await figma.variables.getLocalVariableCollectionsAsync();

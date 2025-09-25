@@ -41,11 +41,7 @@ describe('mapTokensToStyleInfo', () => {
       value: '#ff0000',
     };
 
-    const result = mapTokensToStyleInfo(
-      { global: [colorToken] },
-      { 'light/colors/red': 'S:1234' },
-      (name) => convertTokenNameToPath(name, 'light', 0),
-    );
+    const result = mapTokensToStyleInfo({ global: [colorToken] }, { 'light/colors/red': 'S:1234' }, (name) => convertTokenNameToPath(name, 'light', 0));
 
     expect(result).toEqual({
       'colors.red': {

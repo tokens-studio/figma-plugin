@@ -12,21 +12,16 @@ export function isMissingFileError(error: any): boolean {
     return false;
   }
 
-  const is404 = (
-    (error as any).status === 404
-    || (error as any).response?.status === 404
-  );
+  const is404 = (error as any).status === 404 || (error as any).response?.status === 404;
 
   if (!is404) {
     return false;
   }
 
   // Check if it has specific "Not Found" messages that indicate a missing file
-  const hasNotFoundMessage = (
-    (error as any).message?.includes('Not Found')
+  const hasNotFoundMessage = (error as any).message?.includes('Not Found')
     || (error as any).response?.data?.message?.includes('Not Found')
-    || String(error).includes('Not Found')
-  );
+    || String(error).includes('Not Found');
 
   return hasNotFoundMessage;
 }

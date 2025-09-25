@@ -8,10 +8,12 @@ export function isSingleTokenValueObject(token: SingleTokenValueObject | any): t
     token
     && typeof token === 'object'
     && TokenFormat.tokenValueKey in token
-    && (
-      typeof token[TokenFormat.tokenValueKey] !== 'undefined'
-      && token[TokenFormat.tokenValueKey] !== null
-      && !(typeof token[TokenFormat.tokenValueKey] === 'object' && (token && TokenFormat.tokenValueKey in token[TokenFormat.tokenValueKey]))
+    && typeof token[TokenFormat.tokenValueKey] !== 'undefined'
+    && token[TokenFormat.tokenValueKey] !== null
+    && !(
+      typeof token[TokenFormat.tokenValueKey] === 'object'
+      && token
+      && TokenFormat.tokenValueKey in token[TokenFormat.tokenValueKey]
     )
   );
 }

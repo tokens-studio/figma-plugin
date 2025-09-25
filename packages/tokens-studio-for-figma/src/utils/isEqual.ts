@@ -83,13 +83,7 @@ function compareObjects(value1: any, value2: any) {
   for (let i = 0; i < len; i += 1) {
     const key1 = keys1[i];
 
-    if (
-      !(
-        value2.hasOwnProperty(key1)
-        && key1 === keys2[i]
-        && isEqual(value1[key1], value2[key1])
-      )
-    ) {
+    if (!(value2.hasOwnProperty(key1) && key1 === keys2[i] && isEqual(value1[key1], value2[key1]))) {
       return false;
     }
   }

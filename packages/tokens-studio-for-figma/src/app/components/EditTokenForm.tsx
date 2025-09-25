@@ -23,7 +23,10 @@ import {
 import { checkIfAlias, checkIfContainsAlias, getAliasValue } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
 import {
-  activeTokenSetSelector, editTokenSelector, themesListSelector, tokensSelector,
+  activeTokenSetSelector,
+  editTokenSelector,
+  themesListSelector,
+  tokensSelector,
   showEditFormSelector,
 } from '@/selectors';
 import { TokenTypes } from '@/constants/TokenTypes';
@@ -138,7 +141,10 @@ function EditTokenForm({ resolvedTokens }: Props) {
 
   const hasPriorTokenName = React.useMemo(() => {
     const tokensWithSameParent = resolvedTokens.filter((t) => t.internal__Parent === activeTokenSet);
-    if (internalEditToken.status && [EditTokenFormStatus.CREATE, EditTokenFormStatus.DUPLICATE].includes(internalEditToken.status)) {
+    if (
+      internalEditToken.status
+      && [EditTokenFormStatus.CREATE, EditTokenFormStatus.DUPLICATE].includes(internalEditToken.status)
+    ) {
       // If we are creating a new token, disallow naming it as a prefix of an existing token
       return tokensWithSameParent.find((t) => internalEditToken.name?.startsWith(`${t.name}.`));
     }
@@ -158,9 +164,11 @@ function EditTokenForm({ resolvedTokens }: Props) {
 
   const hasEmptyGroups = React.useMemo(() => {
     if (internalEditToken?.name) {
-      return internalEditToken.name.includes('..')
+      return (
+        internalEditToken.name.includes('..')
         || internalEditToken.name.startsWith('.')
-        || internalEditToken.name.endsWith('.');
+        || internalEditToken.name.endsWith('.')
+      );
     }
     return false;
   }, [internalEditToken]);
@@ -219,7 +227,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     (shadow: SingleBoxShadowToken['value']) => {
       setError(null);
       if (internalEditToken?.type === TokenTypes.BOX_SHADOW) {
-        setInternalEditToken((prev) => ({ ...prev, value: shadow } as typeof editToken));
+        setInternalEditToken((prev) => ({ ...prev, value: shadow }) as typeof editToken);
       }
     },
     [internalEditToken],
@@ -228,7 +236,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const handleCompositionChange = React.useCallback(
     (newTokenValue: NodeTokenRefMap) => {
       if (internalEditToken?.type === TokenTypes.COMPOSITION) {
-        setInternalEditToken((prev) => ({ ...prev, value: newTokenValue } as EditTokenObject));
+        setInternalEditToken((prev) => ({ ...prev, value: newTokenValue }) as EditTokenObject);
       }
     },
     [internalEditToken],
@@ -526,10 +534,13 @@ function EditTokenForm({ resolvedTokens }: Props) {
     }
   }, [dispatch, isValid, internalEditToken, submitTokenValue, isValidDimensionToken]);
 
-  const handleFormSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    checkAndSubmitTokenValue();
-  }, [checkAndSubmitTokenValue]);
+  const handleFormSubmit = React.useCallback(
+    (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      checkAndSubmitTokenValue();
+    },
+    [checkAndSubmitTokenValue],
+  );
 
   // Only register the shortcut when this form is actually being used
   const showEditForm = useSelector(showEditFormSelector);
@@ -633,7 +644,9 @@ function EditTokenForm({ resolvedTokens }: Props) {
         return (
           <div>
             <DownshiftInput
-              value={typeof internalEditToken.value === 'number' ? String(internalEditToken.value) : internalEditToken.value}
+              value={
+                typeof internalEditToken.value === 'number' ? String(internalEditToken.value) : internalEditToken.value
+              }
               type={internalEditToken.type}
               label={internalEditToken.schema?.property}
               resolvedTokens={resolvedTokens}

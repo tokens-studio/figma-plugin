@@ -7,7 +7,11 @@ import pjs from '../../../../package.json';
 import useStorage from '../useStorage';
 import { compareUpdatedAt } from '@/utils/date';
 import {
-  activeThemeSelector, storeTokenIdInJsonEditorSelector, themesListSelector, tokensSelector, usedTokenSetSelector,
+  activeThemeSelector,
+  storeTokenIdInJsonEditorSelector,
+  themesListSelector,
+  tokensSelector,
+  usedTokenSetSelector,
 } from '@/selectors';
 import { UpdateRemoteFunctionPayload } from '@/types/UpdateRemoteFunction';
 import { JSONBinTokenStorage } from '@/storage';
@@ -22,7 +26,12 @@ import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 import { categorizeError } from '@/utils/error/categorizeError';
 
 export async function updateJSONBinTokens({
-  tokens, themes, context, updatedAt, oldUpdatedAt = null, storeTokenIdInJsonEditor,
+  tokens,
+  themes,
+  context,
+  updatedAt,
+  oldUpdatedAt = null,
+  storeTokenIdInJsonEditor,
 }: UpdateRemoteFunctionPayload) {
   const { id, secret } = context;
   try {
@@ -82,170 +91,191 @@ export function useJSONbin() {
   const usedTokenSets = useSelector(usedTokenSetSelector);
   const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
 
-  const createNewJSONBin = useCallback(async (context: Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.JSONBIN }>) => {
-    const { secret, name, internalId } = context;
-    const updatedAt = new Date().toISOString();
-    try {
-      const result = await JSONBinTokenStorage.create(name, updatedAt, secret);
+  const createNewJSONBin = useCallback(
+    async (context: Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.JSONBIN }>) => {
+      const { secret, name, internalId } = context;
+      const updatedAt = new Date().toISOString();
+      try {
+        const result = await JSONBinTokenStorage.create(name, updatedAt, secret);
 
-      if (result) {
-        await updateJSONBinTokens({
-          tokens,
-          context: {
-            id: result.metadata.id,
-            secret,
-          },
-          themes,
-          updatedAt,
-          storeTokenIdInJsonEditor,
-          dispatch,
-        });
+        if (result) {
+          await updateJSONBinTokens({
+            tokens,
+            context: {
+              id: result.metadata.id,
+              secret,
+            },
+            themes,
+            updatedAt,
+            storeTokenIdInJsonEditor,
+            dispatch,
+          });
+          AsyncMessageChannel.ReactInstance.message({
+            type: AsyncMessageTypes.CREDENTIALS,
+            credential: {
+              provider: StorageProviderType.JSONBIN,
+              id: result.metadata.id,
+              internalId,
+              name,
+              secret,
+            },
+          });
+          dispatch.uiState.setProjectURL('https://jsonbin.io/app/bins');
+
+          return result.metadata.id;
+        }
+      } catch (e) {
+        notifyToUI('Something went wrong. See console for details', { error: true });
+        console.error(e);
+      }
+      return null;
+    },
+    [dispatch, themes, tokens],
+  );
+
+  // Read tokens from JSONBin
+  const pullTokensFromJSONBin = useCallback(
+    async (
+      context: Extract<StorageTypeCredentials, { provider: StorageProviderType.JSONBIN }>,
+    ): Promise<RemoteResponseData | null> => {
+      const {
+        id, secret, name, internalId,
+      } = context;
+      if (!id || !secret) {
+        return {
+          status: 'failure',
+          errorMessage: ErrorMessages.ID_NON_EXIST_ERROR,
+        };
+      }
+      try {
+        const storage = new JSONBinTokenStorage(id, secret);
+        const data = await storage.retrieve();
+        dispatch.uiState.setProjectURL('https://jsonbin.io/app/bins');
+
         AsyncMessageChannel.ReactInstance.message({
           type: AsyncMessageTypes.CREDENTIALS,
           credential: {
-            provider: StorageProviderType.JSONBIN,
-            id: result.metadata.id,
+            id,
             internalId,
             name,
             secret,
+            provider: StorageProviderType.JSONBIN,
           },
         });
-        dispatch.uiState.setProjectURL('https://jsonbin.io/app/bins');
-
-        return result.metadata.id;
-      }
-    } catch (e) {
-      notifyToUI('Something went wrong. See console for details', { error: true });
-      console.error(e);
-    }
-    return null;
-  }, [dispatch, themes, tokens]);
-
-  // Read tokens from JSONBin
-  const pullTokensFromJSONBin = useCallback(async (context: Extract<StorageTypeCredentials, { provider: StorageProviderType.JSONBIN }>): Promise<RemoteResponseData | null> => {
-    const {
-      id, secret, name, internalId,
-    } = context;
-    if (!id || !secret) {
-      return {
-        status: 'failure',
-        errorMessage: ErrorMessages.ID_NON_EXIST_ERROR,
-      };
-    }
-    try {
-      const storage = new JSONBinTokenStorage(id, secret);
-      const data = await storage.retrieve();
-      dispatch.uiState.setProjectURL('https://jsonbin.io/app/bins');
-
-      AsyncMessageChannel.ReactInstance.message({
-        type: AsyncMessageTypes.CREDENTIALS,
-        credential: {
-          id,
-          internalId,
-          name,
-          secret,
+        if (data?.status === 'failure') {
+          return {
+            status: 'failure',
+            errorMessage: data.errorMessage,
+          };
+        }
+        if (data?.metadata && data?.tokens) {
+          dispatch.tokenState.setEditProhibited(false);
+          return {
+            ...data,
+            metadata: {
+              tokenSetOrder: Object.keys(data.tokens),
+            },
+          };
+        }
+        notifyToUI('No tokens stored on remote', { error: true });
+        return null;
+      } catch (e) {
+        console.log('Error:', e);
+        const { message } = categorizeError(e, {
           provider: StorageProviderType.JSONBIN,
-        },
-      });
-      if (data?.status === 'failure') {
+          operation: 'pull',
+          hasCredentials: true,
+        });
+
+        notifyToUI(message, { error: true });
         return {
           status: 'failure',
-          errorMessage: data.errorMessage,
+          errorMessage: message,
         };
       }
-      if (data?.metadata && data?.tokens) {
-        dispatch.tokenState.setEditProhibited(false);
-        return {
-          ...data,
-          metadata: {
-            tokenSetOrder: Object.keys(data.tokens),
-          },
-        };
-      }
-      notifyToUI('No tokens stored on remote', { error: true });
-      return null;
-    } catch (e) {
-      console.log('Error:', e);
-      const { message } = categorizeError(e, {
-        provider: StorageProviderType.JSONBIN,
-        operation: 'pull',
-        hasCredentials: true,
-      });
+    },
+    [dispatch],
+  );
 
-      notifyToUI(message, { error: true });
-      return {
-        status: 'failure',
-        errorMessage: message,
-      };
-    }
-  }, [dispatch]);
-
-  const addJSONBinCredentials = useCallback(async (context: Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.JSONBIN }>): Promise<RemoteResponseData | null> => {
-    const {
-      provider, id, name, secret, internalId,
-    } = context;
-    if (!id || !secret) {
-      return {
-        status: 'failure',
-        errorMessage: ErrorMessages.ID_NON_EXIST_ERROR,
-      };
-    }
-
-    const content = await pullTokensFromJSONBin({
-      provider,
-      id,
-      name,
-      secret,
-      internalId,
-    });
-    if (content?.status === 'failure') {
-      return {
-        status: 'failure',
-        errorMessage: content.errorMessage,
-      };
-    }
-    if (content) {
-      dispatch.uiState.setApiData({
+  const addJSONBinCredentials = useCallback(
+    async (
+      context: Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.JSONBIN }>,
+    ): Promise<RemoteResponseData | null> => {
+      const {
         provider, id, name, secret, internalId,
-      });
-      setStorageType({
-        provider: {
-          provider, id, name, internalId,
-        },
-        shouldSetInDocument: true,
-      });
-      dispatch.tokenState.setTokenData({
-        values: applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder),
-        themes: content.themes,
-        usedTokenSet: usedTokenSets,
-        activeTheme,
-        hasChangedRemote: true,
-      });
-      dispatch.tokenState.setRemoteData({
-        tokens: applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder),
-        themes: content.themes,
-        metadata: { tokenSetOrder: Object.keys(tokens) },
-      });
-      const stringifiedRemoteTokens = JSON.stringify(compact([applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder), content.themes, TokenFormat.format]), null, 2);
-      dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
-      return content;
-    }
-    return content;
-  }, [
-    dispatch,
-    pullTokensFromJSONBin,
-    setStorageType,
-    activeTheme,
-    usedTokenSets,
-  ]);
+      } = context;
+      if (!id || !secret) {
+        return {
+          status: 'failure',
+          errorMessage: ErrorMessages.ID_NON_EXIST_ERROR,
+        };
+      }
 
-  return useMemo(() => ({
-    addJSONBinCredentials,
-    pullTokensFromJSONBin,
-    createNewJSONBin,
-  }), [
-    addJSONBinCredentials,
-    pullTokensFromJSONBin,
-    createNewJSONBin,
-  ]);
+      const content = await pullTokensFromJSONBin({
+        provider,
+        id,
+        name,
+        secret,
+        internalId,
+      });
+      if (content?.status === 'failure') {
+        return {
+          status: 'failure',
+          errorMessage: content.errorMessage,
+        };
+      }
+      if (content) {
+        dispatch.uiState.setApiData({
+          provider,
+          id,
+          name,
+          secret,
+          internalId,
+        });
+        setStorageType({
+          provider: {
+            provider,
+            id,
+            name,
+            internalId,
+          },
+          shouldSetInDocument: true,
+        });
+        dispatch.tokenState.setTokenData({
+          values: applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder),
+          themes: content.themes,
+          usedTokenSet: usedTokenSets,
+          activeTheme,
+          hasChangedRemote: true,
+        });
+        dispatch.tokenState.setRemoteData({
+          tokens: applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder),
+          themes: content.themes,
+          metadata: { tokenSetOrder: Object.keys(tokens) },
+        });
+        const stringifiedRemoteTokens = JSON.stringify(
+          compact([
+            applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder),
+            content.themes,
+            TokenFormat.format,
+          ]),
+          null,
+          2,
+        );
+        dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
+        return content;
+      }
+      return content;
+    },
+    [dispatch, pullTokensFromJSONBin, setStorageType, activeTheme, usedTokenSets],
+  );
+
+  return useMemo(
+    () => ({
+      addJSONBinCredentials,
+      pullTokensFromJSONBin,
+      createNewJSONBin,
+    }),
+    [addJSONBinCredentials, pullTokensFromJSONBin, createNewJSONBin],
+  );
 }

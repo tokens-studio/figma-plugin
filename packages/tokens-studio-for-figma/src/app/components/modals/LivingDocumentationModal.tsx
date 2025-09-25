@@ -133,7 +133,6 @@ export default function LivingDocumentationModal({
             {' '}
             <StyledCode>__tokenName</StyledCode>
             ,
-            {' '}
             <StyledCode>__value</StyledCode>
             ,
             {' '}
@@ -162,7 +161,15 @@ export default function LivingDocumentationModal({
               value={startsWith}
               onChange={handleStartsWithChange}
               placeholder={useRegex ? 'color\\.(primary|secondary) (regex active)' : 'color'}
-              trailingAction={<IconButton tooltip={useRegex ? 'Disable regex' : 'Enable regex'} size="small" onClick={handleUseRegexChange} icon={<Asterisk />} variant={useRegex ? 'primary' : 'invisible'} />}
+              trailingAction={(
+                <IconButton
+                  tooltip={useRegex ? 'Disable regex' : 'Enable regex'}
+                  size="small"
+                  onClick={handleUseRegexChange}
+                  icon={<Asterisk />}
+                  variant={useRegex ? 'primary' : 'invisible'}
+                />
+              )}
             />
           </FormField>
         </Stack>

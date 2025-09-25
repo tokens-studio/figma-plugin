@@ -14,15 +14,19 @@ import { createNecessaryVariableCollections } from './createNecessaryVariableCol
 import { getVariablesWithoutZombies } from './getVariablesWithoutZombies';
 
 /**
-* This function is used to create variables based on token sets, without the use of themes
-* - We first create a "theme container" storing the selected token sets to get closer to theme logic
-* - It then creates the necessary variable collections and modes or returns existing ones
-* - It then checks if the selected themes generated any collections. It could be a user is in a Free plan and we were unable to create more than 1 mode. If mode wasnt created, we skip the theme.
-* - Then goes on to update variables for each theme
-* - There's another step that we perform where we check if any variables need to be using references to other variables. This is a second step, as we need to have all variables created first before we can reference them.
-* - TODO: Likely a good idea to merge this with createLocalVariablesInPlugin to reduce duplication
-* */
-export default async function createLocalVariablesWithoutModesInPlugin(tokens: Record<string, AnyTokenList>, settings: SettingsState, selectedSets: ExportTokenSet[]) {
+ * This function is used to create variables based on token sets, without the use of themes
+ * - We first create a "theme container" storing the selected token sets to get closer to theme logic
+ * - It then creates the necessary variable collections and modes or returns existing ones
+ * - It then checks if the selected themes generated any collections. It could be a user is in a Free plan and we were unable to create more than 1 mode. If mode wasnt created, we skip the theme.
+ * - Then goes on to update variables for each theme
+ * - There's another step that we perform where we check if any variables need to be using references to other variables. This is a second step, as we need to have all variables created first before we can reference them.
+ * - TODO: Likely a good idea to merge this with createLocalVariablesInPlugin to reduce duplication
+ * */
+export default async function createLocalVariablesWithoutModesInPlugin(
+  tokens: Record<string, AnyTokenList>,
+  settings: SettingsState,
+  selectedSets: ExportTokenSet[],
+) {
   // Big O (n * m * x): (n: amount of themes, m: amount of variableCollections, x: amount of modes)
   const allVariableCollectionIds: Record<string, LocalVariableInfo> = {};
   let referenceVariableCandidates: ReferenceVariableType[] = [];
@@ -57,27 +61,35 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
 
     const collections = await createNecessaryVariableCollections(themesToCreateCollections, selectedSetIds);
 
-    await Promise.all(selectedSets.map(async (set: ExportTokenSet, index) => {
-      if (set.status === TokenSetStatus.ENABLED) {
-        const { collection, modeId } = findCollectionAndModeIdForTheme(set.set, set.set, collections);
+    await Promise.all(
+      selectedSets.map(async (set: ExportTokenSet, index) => {
+        if (set.status === TokenSetStatus.ENABLED) {
+          const { collection, modeId } = findCollectionAndModeIdForTheme(set.set, set.set, collections);
 
-        if (!collection || !modeId) return;
+          if (!collection || !modeId) return;
 
-        const allVariableObj = await updateVariables({
-          collection, mode: modeId, theme: { id: '123', name: set.set, selectedTokenSets: { [set.set]: set.status } }, overallConfig, tokens, settings, filterByTokenSet: set.set,
-        });
-        figmaVariablesAfterCreate += allVariableObj.removedVariables.length;
-        if (Object.keys(allVariableObj.variableIds).length > 0) {
-          allVariableCollectionIds[index] = {
-            collectionId: collection.id,
-            modeId,
-            variableIds: allVariableObj.variableIds,
-          };
-          referenceVariableCandidates = referenceVariableCandidates.concat(allVariableObj.referenceVariableCandidate);
+          const allVariableObj = await updateVariables({
+            collection,
+            mode: modeId,
+            theme: { id: '123', name: set.set, selectedTokenSets: { [set.set]: set.status } },
+            overallConfig,
+            tokens,
+            settings,
+            filterByTokenSet: set.set,
+          });
+          figmaVariablesAfterCreate += allVariableObj.removedVariables.length;
+          if (Object.keys(allVariableObj.variableIds).length > 0) {
+            allVariableCollectionIds[index] = {
+              collectionId: collection.id,
+              modeId,
+              variableIds: allVariableObj.variableIds,
+            };
+            referenceVariableCandidates = referenceVariableCandidates.concat(allVariableObj.referenceVariableCandidate);
+          }
+          updatedVariableCollections.push(collection);
         }
-        updatedVariableCollections.push(collection);
-      }
-    }));
+      }),
+    );
     const existingVariables = await mergeVariableReferencesWithLocalVariables();
     updatedVariables = await updateVariablesToReference(existingVariables, referenceVariableCandidates);
   }
@@ -88,7 +100,11 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
   if (figmaVariablesAfterCreate === figmaVariablesBeforeCreate) {
     notifyUI('No variables were created');
   } else {
-    notifyUI(`${figmaVariableCollectionsAfterCreate - figmaVariableCollectionsBeforeCreate} collections and ${figmaVariablesAfterCreate - figmaVariablesBeforeCreate} variables created`);
+    notifyUI(
+      `${figmaVariableCollectionsAfterCreate - figmaVariableCollectionsBeforeCreate} collections and ${
+        figmaVariablesAfterCreate - figmaVariablesBeforeCreate
+      } variables created`,
+    );
   }
   return {
     allVariableCollectionIds,

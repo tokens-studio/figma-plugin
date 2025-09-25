@@ -3,7 +3,11 @@ import { SingleToken } from '@/types/tokens';
 import { TokenBoxshadowValue, TokenTypographyValue } from '@/types/values';
 import { TransformerOptions } from './types';
 
-function getSimpleValue(resolvedValue: SingleToken['value'], rawValue: SingleToken['value'], options: TransformerOptions) {
+function getSimpleValue(
+  resolvedValue: SingleToken['value'],
+  rawValue: SingleToken['value'],
+  options: TransformerOptions,
+) {
   let value = resolvedValue;
   /*
    * ***************************************************************************
@@ -38,11 +42,7 @@ function getSimpleValue(resolvedValue: SingleToken['value'], rawValue: SingleTok
   return value as string; // TODO: remove `as string` when SingleGenericToken supports value as `string|number`
 }
 
-function getComplexValue<T extends SingleToken['value']>(
-  resolvedValue: T,
-  rawValue: T,
-  options: TransformerOptions,
-) {
+function getComplexValue<T extends SingleToken['value']>(resolvedValue: T, rawValue: T, options: TransformerOptions) {
   type IndexedValueType = Record<string, string | number>;
   if (typeof resolvedValue === 'object') {
     return Object.entries(resolvedValue).reduce((acc, [key, val]) => {
@@ -60,7 +60,12 @@ export function getValueWithReferences(token: SingleToken, options: TransformerO
     return token.value;
   }
 
-  if (token.type === TokenTypes.TYPOGRAPHY || token.type === TokenTypes.BOX_SHADOW || token.type === TokenTypes.COMPOSITION || token.type === TokenTypes.BORDER) {
+  if (
+    token.type === TokenTypes.TYPOGRAPHY
+    || token.type === TokenTypes.BOX_SHADOW
+    || token.type === TokenTypes.COMPOSITION
+    || token.type === TokenTypes.BORDER
+  ) {
     if (Array.isArray(token.value)) {
       const rawValue = token.rawValue as TokenBoxshadowValue[];
       return token.value.map((shadow, index) => getComplexValue(shadow, rawValue[index], options));

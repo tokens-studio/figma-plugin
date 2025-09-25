@@ -10,10 +10,10 @@ import PushDialogSupernovaConfirm from './PushDialogSupernovaConfirm';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 
 type Props = {
-  commitMessage: string,
-  branch: string,
-  handleCommitMessageChange: (val: string) => void,
-  handleBranchChange: (event: React.ChangeEvent<HTMLInputElement>) => void
+  commitMessage: string;
+  branch: string;
+  handleCommitMessageChange: (val: string) => void;
+  handleBranchChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
 function PushSettingForm({
@@ -21,18 +21,28 @@ function PushSettingForm({
 }: Props) {
   const localApiState = useSelector(localApiStateSelector);
 
-  const handleMessageChange = useCallback((value: string) => {
-    handleCommitMessageChange(value);
-  }, [handleCommitMessageChange]);
+  const handleMessageChange = useCallback(
+    (value: string) => {
+      handleCommitMessageChange(value);
+    },
+    [handleCommitMessageChange],
+  );
 
   const { t } = useTranslation(['sync']);
 
-  return localApiState.provider === StorageProviderType.SUPERNOVA ? <PushDialogSupernovaConfirm designSystemUrl={localApiState.designSystemUrl} /> : (
+  return localApiState.provider === StorageProviderType.SUPERNOVA ? (
+    <PushDialogSupernovaConfirm designSystemUrl={localApiState.designSystemUrl} />
+  ) : (
     <Stack direction="column" gap={3} css={{ padding: '$4', width: '100%' }}>
       <Text size="small">{t('pushYourLocalChangesToYourRepository')}</Text>
-      <Box css={{
-        padding: '$2', fontFamily: '$mono', color: '$fgMuted', background: '$bgSubtle', borderRadius: '$medium',
-      }}
+      <Box
+        css={{
+          padding: '$2',
+          fontFamily: '$mono',
+          color: '$fgMuted',
+          background: '$bgSubtle',
+          borderRadius: '$medium',
+        }}
       >
         {'id' in localApiState ? localApiState.id : null}
       </Box>
@@ -46,14 +56,7 @@ function PushSettingForm({
       />
       <FormField>
         <Label htmlFor="branch">{t('branch')}</Label>
-        <TextInput
-          value={branch}
-          onChange={handleBranchChange}
-          type="text"
-          name="branch"
-          id="branch"
-          required
-        />
+        <TextInput value={branch} onChange={handleBranchChange} type="text" name="branch" id="branch" required />
       </FormField>
     </Stack>
   );

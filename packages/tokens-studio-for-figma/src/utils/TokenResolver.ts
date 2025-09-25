@@ -68,14 +68,19 @@ class TokenResolver {
     const allZerosRegex = /^00+$/;
     const leadingZerosRegex = /^0+[1-9]\d*$/;
 
-    return (regex.test(str) && !numericRegex.test(str)) || (allZerosRegex.test(str) || leadingZerosRegex.test(str));
+    return (regex.test(str) && !numericRegex.test(str)) || allZerosRegex.test(str) || leadingZerosRegex.test(str);
   }
 
   // When we resolve references, we also need to calculate the value of the token, meaning color and math transformations
-  private calculateTokenValue(token: SingleToken, resolvedReferences: Set<string> = new Set()): SingleToken['value'] | undefined {
+  private calculateTokenValue(
+    token: SingleToken,
+    resolvedReferences: Set<string> = new Set(),
+  ): SingleToken['value'] | undefined {
     // Calculations only happen on strings.
     if (typeof token.value === 'string') {
-      const couldBeNumberValue = !this.isExponentialAndZero(token.value) ? checkAndEvaluateMath(token.value) : token.value;
+      const couldBeNumberValue = !this.isExponentialAndZero(token.value)
+        ? checkAndEvaluateMath(token.value)
+        : token.value;
 
       // if it's a number, we don't need to do anything else and can return it
       if (typeof couldBeNumberValue === 'number') {
@@ -91,14 +96,30 @@ class TokenResolver {
           // As we support references in color modifiers, we need to resolve them.
           return convertModifiedColorToHex(rgbColor, {
             ...token.$extensions?.['studio.tokens']?.modify,
-            value: String(this.resolveReferences({ value: token?.$extensions?.['studio.tokens']?.modify?.value } as SingleToken, resolvedReferences)?.value),
-            color: String(this.resolveReferences({ value: token?.$extensions?.['studio.tokens']?.modify?.color } as SingleToken, resolvedReferences)?.value) ?? undefined,
+            value: String(
+              this.resolveReferences(
+                { value: token?.$extensions?.['studio.tokens']?.modify?.value } as SingleToken,
+                resolvedReferences,
+              )?.value,
+            ),
+            color:
+              String(
+                this.resolveReferences(
+                  { value: token?.$extensions?.['studio.tokens']?.modify?.color } as SingleToken,
+                  resolvedReferences,
+                )?.value,
+              ) ?? undefined,
           });
         }
 
         return convertModifiedColorToHex(rgbColor, {
           ...token.$extensions?.['studio.tokens']?.modify,
-          value: String(this.resolveReferences({ value: token?.$extensions?.['studio.tokens']?.modify?.value } as SingleToken, resolvedReferences)?.value),
+          value: String(
+            this.resolveReferences(
+              { value: token?.$extensions?.['studio.tokens']?.modify?.value } as SingleToken,
+              resolvedReferences,
+            )?.value,
+          ),
         });
       }
       // If we don't have a color modifier, we can just return the color
@@ -157,7 +178,10 @@ class TokenResolver {
           const nestedToken = this.tokenMap.get(nestedTokenName);
 
           if (nestedToken && nestedToken.value) {
-            const resolvedNestedToken = this.resolveReferences({ ...nestedToken, name: nestedTokenName } as SingleToken, new Set(resolvedReferences));
+            const resolvedNestedToken = this.resolveReferences(
+              { ...nestedToken, name: nestedTokenName } as SingleToken,
+              new Set(resolvedReferences),
+            );
 
             if (typeof resolvedNestedToken.value === 'string' || typeof resolvedNestedToken.value === 'number') {
               resolvedPath = resolvedPath.replace(match[0], String(resolvedNestedToken.value));
@@ -178,14 +202,20 @@ class TokenResolver {
 
         if (foundToken) {
           // For composite tokens that are being referenced, we need to store the value of the found token so that we have something between raw value of a string and the final resolved token
-          if (typeof token.value === 'string' && (typeof foundToken.value === 'object' || Array.isArray(foundToken.value))) {
+          if (
+            typeof token.value === 'string'
+            && (typeof foundToken.value === 'object' || Array.isArray(foundToken.value))
+          ) {
             resolvedValueWithReferences = foundToken.value;
           }
           // We add the already resolved references to the new set, so we can check for circular references
           const newResolvedReferences = new Set(resolvedReferences);
           newResolvedReferences.add(resolvedPath);
           // We initiate a new resolveReferences call, as we need to resolve the references of the reference
-          const resolvedTokenValue = this.resolveReferences({ ...foundToken, name: resolvedPath } as SingleToken, newResolvedReferences);
+          const resolvedTokenValue = this.resolveReferences(
+            { ...foundToken, name: resolvedPath } as SingleToken,
+            newResolvedReferences,
+          );
           if (resolvedTokenValue.resolvedValueWithReferences) {
             resolvedValueWithReferences = resolvedTokenValue.resolvedValueWithReferences;
           }
@@ -193,12 +223,18 @@ class TokenResolver {
           // We weren't able to resolve the reference, so we return the token as is, but mark it as failed to resolve
           if (resolvedTokenValue.value === undefined) {
             return {
-              ...token, value: token.value, rawValue: token.value, failedToResolve: true,
+              ...token,
+              value: token.value,
+              rawValue: token.value,
+              failedToResolve: true,
             } as ResolveTokenValuesResult;
           }
 
           // We replace the reference with the resolved value if needed
-          if (typeof finalValue === 'string' && (typeof resolvedTokenValue.value === 'string' || typeof resolvedTokenValue.value === 'number')) {
+          if (
+            typeof finalValue === 'string'
+            && (typeof resolvedTokenValue.value === 'string' || typeof resolvedTokenValue.value === 'number')
+          ) {
             finalValue = finalValue.replace(reference, String(resolvedTokenValue.value));
           } else if (resolvedTokenValue.value !== undefined) {
             finalValue = resolvedTokenValue.value;
@@ -208,17 +244,25 @@ class TokenResolver {
           const tokenValueWithoutProperty = this.tokenMap.get(tokenNameWithoutLastPart)?.value;
           if (tokenValueWithoutProperty && tokenValueWithoutProperty.hasOwnProperty(propertyName)) {
             const propertyTokenValue = (tokenValueWithoutProperty as Record<string, unknown>)[propertyName];
-            const parsedValue = this.calculateTokenValue({ value: propertyTokenValue } as SingleToken, resolvedReferences);
+            const parsedValue = this.calculateTokenValue(
+              { value: propertyTokenValue } as SingleToken,
+              resolvedReferences,
+            );
 
             if (parsedValue === undefined) {
               finalValue = token.value;
             } else {
-              finalValue = (typeof finalValue === 'string' && (typeof parsedValue === 'string' || typeof parsedValue === 'number')) ? finalValue.replace(reference, String(parsedValue)) : parsedValue;
+              finalValue = typeof finalValue === 'string' && (typeof parsedValue === 'string' || typeof parsedValue === 'number')
+                ? finalValue.replace(reference, String(parsedValue))
+                : parsedValue;
             }
           } else {
             // Otherwise, we return the token as is, but mark it as failed to resolve
             return {
-              ...token, value: token.value, rawValue: token.value, failedToResolve: true,
+              ...token,
+              value: token.value,
+              rawValue: token.value,
+              failedToResolve: true,
             } as ResolveTokenValuesResult;
           }
         }
@@ -245,7 +289,11 @@ class TokenResolver {
         // Also, if the originating reference is a string but the resolved value is a composite, we need to add the specific value of the composite token
         // This is needed for cases like border tokens referencing other border tokens where we want to return the raw value of the border color so we can assign styles or variables.
         resolvedToken = {
-          ...token, value: finalValue, rawValue: token.value, ...(hasFailingReferences ? { failedToResolve: true } : {}), ...(typeof resolvedValueWithReferences !== 'undefined' ? { resolvedValueWithReferences } : {}),
+          ...token,
+          value: finalValue,
+          rawValue: token.value,
+          ...(hasFailingReferences ? { failedToResolve: true } : {}),
+          ...(typeof resolvedValueWithReferences !== 'undefined' ? { resolvedValueWithReferences } : {}),
         } as ResolveTokenValuesResult;
       }
 
@@ -275,7 +323,10 @@ class TokenResolver {
 
       // We bring back the resolved array into the token object, and set failedToResolve on the token if needed
       const resolvedToken = {
-        ...token, value: resolvedArray, rawValue: token.value, ...(failedToResolve ? { failedToResolve } : {}),
+        ...token,
+        value: resolvedArray,
+        rawValue: token.value,
+        ...(failedToResolve ? { failedToResolve } : {}),
       } as ResolveTokenValuesResult;
       // We save back to cache
       if (typeof memoKey === 'string') {
@@ -295,7 +346,10 @@ class TokenResolver {
       for (const key of Object.keys(token.value)) {
         if (Object.prototype.hasOwnProperty.call(token.value, key)) {
           const propertyTokenValue = (token.value as Record<string, unknown>)[key];
-          const resolvedValue = this.resolveReferences({ value: propertyTokenValue } as SingleToken, resolvedReferences);
+          const resolvedValue = this.resolveReferences(
+            { value: propertyTokenValue } as SingleToken,
+            resolvedReferences,
+          );
 
           if (resolvedValue.failedToResolve) {
             failedToResolve = true;
@@ -308,7 +362,11 @@ class TokenResolver {
         }
       }
 
-      const resolvedToken = { ...token, value: resolvedObject, ...(failedToResolve ? { failedToResolve } : {}) } as ResolveTokenValuesResult;
+      const resolvedToken = {
+        ...token,
+        value: resolvedObject,
+        ...(failedToResolve ? { failedToResolve } : {}),
+      } as ResolveTokenValuesResult;
       // If we have a value, we set it back to cache
       if (typeof memoKey === 'string') {
         this.memo.set(memoKey, resolvedToken);

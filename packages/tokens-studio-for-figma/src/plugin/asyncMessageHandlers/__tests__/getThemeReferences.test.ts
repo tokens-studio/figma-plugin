@@ -72,16 +72,18 @@ describe('getThemeReferences', () => {
       },
     ];
     jest.spyOn(figma.variables, 'getLocalVariablesAsync').mockResolvedValue(localVariables);
-    jest.spyOn(figma.variables, 'getLocalVariableCollectionsAsync').mockResolvedValue([{
-      id: 'VariableCollectionId:1:0',
-      name: 'Collection 1',
-      remote: false,
-      modes: [
-        { name: 'Default', modeId: '1:0' },
-        { name: 'Dark', modeId: '1:1' },
-        { name: 'Light', modeId: '1:2' },
-      ],
-    } as VariableCollection]);
+    jest.spyOn(figma.variables, 'getLocalVariableCollectionsAsync').mockResolvedValue([
+      {
+        id: 'VariableCollectionId:1:0',
+        name: 'Collection 1',
+        remote: false,
+        modes: [
+          { name: 'Default', modeId: '1:0' },
+          { name: 'Dark', modeId: '1:1' },
+          { name: 'Light', modeId: '1:2' },
+        ],
+      } as VariableCollection,
+    ]);
     jest.spyOn(figma, 'getLocalPaintStyles').mockReturnValue(localPaintStyles);
 
     const result = await getThemeReferences();
@@ -107,16 +109,18 @@ describe('getThemeReferences', () => {
       },
     ];
     jest.spyOn(figma.variables, 'getLocalVariablesAsync').mockResolvedValue(localVariables);
-    jest.spyOn(figma.variables, 'getLocalVariableCollectionsAsync').mockResolvedValue([{
-      id: 'VariableCollectionId:1:0',
-      name: 'Collection 1',
-      remote: false,
-      modes: [
-        { name: 'Default', modeId: '1:0' },
-        { name: 'Dark', modeId: '1:1' },
-        { name: 'Light', modeId: '1:2' },
-      ],
-    } as VariableCollection]);
+    jest.spyOn(figma.variables, 'getLocalVariableCollectionsAsync').mockResolvedValue([
+      {
+        id: 'VariableCollectionId:1:0',
+        name: 'Collection 1',
+        remote: false,
+        modes: [
+          { name: 'Default', modeId: '1:0' },
+          { name: 'Dark', modeId: '1:1' },
+          { name: 'Light', modeId: '1:2' },
+        ],
+      } as VariableCollection,
+    ]);
 
     const result = await getThemeReferences();
 
@@ -125,9 +129,7 @@ describe('getThemeReferences', () => {
         ['token2', 'style1'],
         ['local.style2', 'style2'],
       ]),
-      figmaVariableReferences: new Map([
-        ['token1', 'variable1'],
-      ]),
+      figmaVariableReferences: new Map([['token1', 'variable1']]),
     });
   });
 });

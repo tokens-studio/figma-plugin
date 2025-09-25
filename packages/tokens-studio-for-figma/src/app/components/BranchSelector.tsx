@@ -25,9 +25,7 @@ import { useChangedState } from '@/hooks/useChangedState';
 
 export default function BranchSelector() {
   const { confirm } = useConfirm();
-  const {
-    pullTokens, pushTokens,
-  } = useRemoteTokens();
+  const { pullTokens, pushTokens } = useRemoteTokens();
   const dispatch = useDispatch<Dispatch>();
   const { setStorageType } = useStorage();
   const { hasChanges } = useChangedState();
@@ -98,7 +96,10 @@ export default function BranchSelector() {
         dispatch.uiState.setApiData({ ...apiData, branch });
         dispatch.uiState.setLocalApiState({ ...localApiState, branch });
         await pullTokens({
-          context: { ...apiData, branch }, usedTokenSet, activeTheme, updateLocalTokens: true,
+          context: { ...apiData, branch },
+          usedTokenSet,
+          activeTheme,
+          updateLocalTokens: true,
         });
         AsyncMessageChannel.ReactInstance.message({
           type: AsyncMessageTypes.CREDENTIALS,

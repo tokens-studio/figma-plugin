@@ -5,6 +5,12 @@ import { TokenBoxshadowValue, TokenTypographyValue, TokenBorderValue } from './v
 export type CompositionTokenProperty = keyof typeof Properties;
 
 export type CompositionTokenValue = Partial<
-Record<TokenTypes, string | number | TokenTypographyValue | TokenBoxshadowValue | TokenBorderValue | Array<TokenBoxshadowValue>>
-& Record<Properties, string | number | TokenTypographyValue | TokenBoxshadowValue | TokenBorderValue | Array<TokenBoxshadowValue>>
+Record<
+TokenTypes,
+string | number | TokenTypographyValue | TokenBoxshadowValue | TokenBorderValue | Array<TokenBoxshadowValue>
+> &
+Record<
+Properties,
+string | number | TokenTypographyValue | TokenBoxshadowValue | TokenBorderValue | Array<TokenBoxshadowValue>
+>
 >;

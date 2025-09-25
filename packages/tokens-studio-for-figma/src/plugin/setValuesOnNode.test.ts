@@ -7,15 +7,18 @@ describe('setValuesOnNode', () => {
   let frameNodeMock: FrameNode;
   beforeEach(() => {
     defaultTokenValueRetriever.initiate({
-      tokens: [{
-        name: 'border-radius.3',
-        value: '10px',
-        type: TokenTypes.BORDER_RADIUS,
-      }, {
-        name: 'spacing.10',
-        value: '10px',
-        type: TokenTypes.SPACING,
-      }],
+      tokens: [
+        {
+          name: 'border-radius.3',
+          value: '10px',
+          type: TokenTypes.BORDER_RADIUS,
+        },
+        {
+          name: 'spacing.10',
+          value: '10px',
+          type: TokenTypes.SPACING,
+        },
+      ],
     });
     textNodeMock = {
       cornerRadius: 3,

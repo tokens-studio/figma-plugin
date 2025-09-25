@@ -1,6 +1,4 @@
-import React, {
-  useCallback, useContext,
-} from 'react';
+import React, { useCallback, useContext } from 'react';
 import { useSelector } from 'react-redux';
 import { useUIDSeed } from 'react-uid';
 import { activeTokenSetReadOnlySelector, editProhibitedSelector } from '@/selectors';
@@ -22,7 +20,7 @@ type Props = React.PropsWithChildren<{
   onRemove: (property: string) => void;
   setOrderObj: (newOrderObj: NodeTokenRefMap) => void;
   setError: (newError: boolean) => void;
-  onSubmit: () => void
+  onSubmit: () => void;
 }>;
 
 export function SingleCompositionTokenContent({
@@ -43,17 +41,15 @@ export function SingleCompositionTokenContent({
   const activeTokenSetReadOnly = useSelector(activeTokenSetReadOnlySelector);
   const seed = useUIDSeed();
 
-  const handleDragStart = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
-    dragContext.controls?.start(event);
-  }, [dragContext.controls]);
+  const handleDragStart = useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      dragContext.controls?.start(event);
+    },
+    [dragContext.controls],
+  );
 
   return (
-    <StyledDragButton
-      grabberVisible
-      type="button"
-      style={{ cursor: 'inherit' }}
-      css={{ padding: '$1 0 $1 $1' }}
-    >
+    <StyledDragButton grabberVisible type="button" style={{ cursor: 'inherit' }} css={{ padding: '$1 0 $1 $1' }}>
       <DragGrabber<string>
         item={property}
         canReorder={!editProhibited && !activeTokenSetReadOnly}

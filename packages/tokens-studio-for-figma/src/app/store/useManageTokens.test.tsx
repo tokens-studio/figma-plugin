@@ -53,24 +53,27 @@ describe('useManageTokens', () => {
               ],
             },
             activeTokenSet: 'global',
-            themes: [{
-              id: 'light',
-              name: 'Light',
-              selectedTokenSets: {},
-              $figmaStyleReferences: {
-                'colors.brand.primary': 'S:1234',
-                'colors.red': 'S:1235',
-                'colors.blue': 'S:1236',
+            themes: [
+              {
+                id: 'light',
+                name: 'Light',
+                selectedTokenSets: {},
+                $figmaStyleReferences: {
+                  'colors.brand.primary': 'S:1234',
+                  'colors.red': 'S:1235',
+                  'colors.blue': 'S:1236',
+                },
               },
-            }, {
-              id: 'dark',
-              name: 'Dark',
-              selectedTokenSets: {},
-              $figmaStyleReferences: {
-                'colors.brand.primary': 'S:2345',
-                'colors.red': 'S:2346',
+              {
+                id: 'dark',
+                name: 'Dark',
+                selectedTokenSets: {},
+                $figmaStyleReferences: {
+                  'colors.brand.primary': 'S:2345',
+                  'colors.red': 'S:2346',
+                },
               },
-            }],
+            ],
           },
         },
       },
@@ -113,7 +116,7 @@ describe('useManageTokens', () => {
     expect(result.current.duplicateSingleToken(tokenToDuplicate)).toBeTruthy();
   });
 
-  it('can\'t delete a token when user doesn\'t agree', async () => {
+  it("can't delete a token when user doesn't agree", async () => {
     const tokenToDelete = {
       parent: 'global',
       path: 'size.new',
@@ -217,7 +220,7 @@ describe('useManageTokens', () => {
     expect(mockRemoveStylesFromTokens).toBeCalledTimes(1);
   });
 
-  it('doesn\'t remove styles from any theme when the user doesn\'t select option', async () => {
+  it("doesn't remove styles from any theme when the user doesn't select option", async () => {
     const tokenToDelete = {
       path: 'color.red',
       parent: 'global',
@@ -230,7 +233,7 @@ describe('useManageTokens', () => {
     expect(mockRemoveStylesFromTokens).toBeCalledTimes(0);
   });
 
-  it('doesn\'t remove styles from themes when the token is not style token', async () => {
+  it("doesn't remove styles from themes when the token is not style token", async () => {
     const tokenToDelete = {
       path: 'size.regular',
       parent: 'global',

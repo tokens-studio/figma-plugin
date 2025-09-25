@@ -11,14 +11,16 @@ describe('getValueWithReferences', () => {
         lineHeight: '1.5',
       },
     } as unknown as SingleToken;
-    expect(getValueWithReferences(token, {
-      expandTypography: true,
-      expandShadow: true,
-      expandComposition: false,
-      expandBorder: true,
-      preserveRawValue: false,
-      resolveReferences: false,
-    })).toEqual({
+    expect(
+      getValueWithReferences(token, {
+        expandTypography: true,
+        expandShadow: true,
+        expandComposition: false,
+        expandBorder: true,
+        preserveRawValue: false,
+        resolveReferences: false,
+      }),
+    ).toEqual({
       fontSize: '16px',
       lineHeight: '1.5',
     });
@@ -36,14 +38,16 @@ describe('getValueWithReferences', () => {
         lineHeight: '1.5',
       },
     } as unknown as SingleToken;
-    expect(getValueWithReferences(token, {
-      expandTypography: true,
-      expandShadow: true,
-      expandComposition: false,
-      expandBorder: true,
-      preserveRawValue: false,
-      resolveReferences: false,
-    })).toEqual({
+    expect(
+      getValueWithReferences(token, {
+        expandTypography: true,
+        expandShadow: true,
+        expandComposition: false,
+        expandBorder: true,
+        preserveRawValue: false,
+        resolveReferences: false,
+      }),
+    ).toEqual({
       fontSize: '16px',
       lineHeight: '1.5',
     });
@@ -71,14 +75,16 @@ describe('getValueWithReferences', () => {
         },
       ],
     } as unknown as SingleToken;
-    expect(getValueWithReferences(token, {
-      expandTypography: true,
-      expandShadow: true,
-      expandComposition: false,
-      expandBorder: true,
-      preserveRawValue: false,
-      resolveReferences: false,
-    })).toEqual([
+    expect(
+      getValueWithReferences(token, {
+        expandTypography: true,
+        expandShadow: true,
+        expandComposition: false,
+        expandBorder: true,
+        preserveRawValue: false,
+        resolveReferences: false,
+      }),
+    ).toEqual([
       {
         fontSize: '16px',
         lineHeight: '1.5',

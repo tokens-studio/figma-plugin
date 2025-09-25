@@ -59,7 +59,10 @@ export default function Footer() {
   }, [checkRemoteChange]);
 
   const onPushButtonClicked = React.useCallback(() => pushTokens(), [pushTokens]);
-  const onPullButtonClicked = React.useCallback(() => pullTokens({ usedTokenSet, activeTheme }), [pullTokens, usedTokenSet, activeTheme]);
+  const onPullButtonClicked = React.useCallback(
+    () => pullTokens({ usedTokenSet, activeTheme }),
+    [pullTokens, usedTokenSet, activeTheme],
+  );
   const handlePullTokens = useCallback(() => {
     pullTokens({ usedTokenSet, activeTheme, updateLocalTokens: true });
   }, [pullTokens, usedTokenSet, activeTheme]);
@@ -81,16 +84,12 @@ export default function Footer() {
     >
       <Stack direction="row" align="center" gap={2} css={{ overflow: 'hidden' }}>
         {storageType.provider === StorageProviderType.LOCAL && (tokensSize > 100 || themesSize > 100) && (
-          <Button
-            icon={<WarningTriangleSolid />}
-            size="small"
-            variant="invisible"
-            onClick={handleBadgeClick}
-          >
+          <Button icon={<WarningTriangleSolid />} size="small" variant="invisible" onClick={handleBadgeClick}>
             {`${tokensSize > 100 ? tokensSize : themesSize} KB`}
           </Button>
         )}
-        {((isGitProvider(localApiState) && localApiState.branch) || storageType.provider === StorageProviderType.SUPERNOVA) && (
+        {((isGitProvider(localApiState) && localApiState.branch)
+          || storageType.provider === StorageProviderType.SUPERNOVA) && (
           <>
             <BranchSelector />
             <TokenFormatBadge />
@@ -128,36 +127,47 @@ export default function Footer() {
           </>
         )}
         {storageType.provider !== StorageProviderType.LOCAL
-          && storageType.provider !== StorageProviderType.GITHUB
-          && storageType.provider !== StorageProviderType.GITLAB
-          && storageType.provider !== StorageProviderType.ADO
-          && storageType.provider !== StorageProviderType.BITBUCKET
-          && storageType.provider !== StorageProviderType.SUPERNOVA
-          ? (
-            <Stack align="center" direction="row" gap={2}>
-              {storageType.provider === StorageProviderType.JSONBIN && (
-                <Tooltip label={t('goTo', {
+        && storageType.provider !== StorageProviderType.GITHUB
+        && storageType.provider !== StorageProviderType.GITLAB
+        && storageType.provider !== StorageProviderType.ADO
+        && storageType.provider !== StorageProviderType.BITBUCKET
+        && storageType.provider !== StorageProviderType.SUPERNOVA ? (
+          <Stack align="center" direction="row" gap={2}>
+            {storageType.provider === StorageProviderType.JSONBIN && (
+              <Tooltip
+                label={
+                  t('goTo', {
+                    provider: transformProviderName(storageType.provider),
+                  }) as string
+                }
+              >
+                <IconButton icon={<IconLibrary />} href={projectURL} />
+              </Tooltip>
+            )}
+            <IconButton
+              tooltip={
+                t('pullFrom', {
                   provider: transformProviderName(storageType.provider),
-                }) as string}
-                >
-                  <IconButton icon={<IconLibrary />} href={projectURL} />
-                </Tooltip>
-              )}
-              <IconButton
-                tooltip={t('pullFrom', {
-                  provider: transformProviderName(storageType.provider),
-                }) as string}
-                onClick={handlePullTokens}
-                variant="invisible"
-                size="small"
-                icon={<RefreshIcon />}
-              />
-            </Stack>
+                }) as string
+              }
+              onClick={handlePullTokens}
+              variant="invisible"
+              size="small"
+              icon={<RefreshIcon />}
+            />
+          </Stack>
           ) : null}
       </Stack>
       <Stack direction="row" gap={4} align="center">
         <Box css={{ color: '$fgMuted', fontSize: '$xsmall', flexShrink: 0 }}>
-          <a href="https://tokens.studio/changelog" target="_blank" rel="noreferrer" style={{ whiteSpace: 'nowrap' }}>{`V ${pjs.version}`}</a>
+          <a
+            href="https://tokens.studio/changelog"
+            target="_blank"
+            rel="noreferrer"
+            style={{ whiteSpace: 'nowrap' }}
+          >
+            {`V ${pjs.version}`}
+          </a>
         </Box>
         <Stack direction="row" gap={1}>
           <ProBadge campaign="footer" />

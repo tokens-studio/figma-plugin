@@ -201,11 +201,7 @@ export default function TokensStudioForm({
             <br />
             {t('tokensStudioForm.description2')}
             <br />
-            <Link
-              href="https://tokens.studio/studio"
-              target="_blank"
-              rel="noreferrer"
-            >
+            <Link href="https://tokens.studio/studio" target="_blank" rel="noreferrer">
               {t('tokensStudioForm.learnMore')}
             </Link>
             {' '}
@@ -221,7 +217,9 @@ export default function TokensStudioForm({
             .
           </Box>
           <Stack direction="row" gap={3}>
-            <Button variant="primary" onClick={handleStartTrial}>{t('tokensStudioForm.startFreeTrial')}</Button>
+            <Button variant="primary" onClick={handleStartTrial}>
+              {t('tokensStudioForm.startFreeTrial')}
+            </Button>
           </Stack>
         </Stack>
         <FormField>

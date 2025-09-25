@@ -17,7 +17,11 @@ import {
 import OnboardingExplainer from './OnboardingExplainer';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 
-export default function TokenSetSelector({ saveScrollPositionSet }: { saveScrollPositionSet: (tokenSet: string) => void }) {
+export default function TokenSetSelector({
+  saveScrollPositionSet,
+}: {
+  saveScrollPositionSet: (tokenSet: string) => void;
+}) {
   const { t } = useTranslation(['tokens']);
 
   const onboardingData = {
@@ -52,25 +56,34 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
     setShowNewTokenSetFields(false);
   }, [tokens]);
 
-  const handleNewTokenSetSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    track('Created token set', { name: newTokenSetName });
-    dispatch.tokenState.addTokenSet(newTokenSetName.trim());
-    dispatch.tokenState.setActiveTokenSet(newTokenSetName.trim());
-    handleNewTokenSetNameChange('');
-  }, [dispatch, newTokenSetName]);
+  const handleNewTokenSetSubmit = React.useCallback(
+    (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      track('Created token set', { name: newTokenSetName });
+      dispatch.tokenState.addTokenSet(newTokenSetName.trim());
+      dispatch.tokenState.setActiveTokenSet(newTokenSetName.trim());
+      handleNewTokenSetNameChange('');
+    },
+    [dispatch, newTokenSetName],
+  );
 
-  const handleDeleteTokenSet = React.useCallback(async (tokenSet: string) => {
-    track('Deleted token set');
+  const handleDeleteTokenSet = React.useCallback(
+    async (tokenSet: string) => {
+      track('Deleted token set');
 
-    const userConfirmation = await confirm({
-      text: t('sets.delete', { tokenSet }) as string,
-      description: storageType.provider === StorageProviderType.TOKENS_STUDIO ? t('sets.deleteConfirmationStudio') : t('sets.deleteConfirmation'),
-    });
-    if (userConfirmation) {
-      dispatch.tokenState.deleteTokenSet(tokenSet);
-    }
-  }, [confirm, dispatch, t, storageType]);
+      const userConfirmation = await confirm({
+        text: t('sets.delete', { tokenSet }) as string,
+        description:
+          storageType.provider === StorageProviderType.TOKENS_STUDIO
+            ? t('sets.deleteConfirmationStudio')
+            : t('sets.deleteConfirmation'),
+      });
+      if (userConfirmation) {
+        dispatch.tokenState.deleteTokenSet(tokenSet);
+      }
+    },
+    [confirm, dispatch, t, storageType],
+  );
 
   const handleRenameTokenSet = React.useCallback((tokenSet: string) => {
     track('Renamed token set');
@@ -88,32 +101,41 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
     setShowRenameTokenSetFields(true);
   }, []);
 
-  const handleRenameTokenSetSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (isDuplicate) {
-      track('Duplicate token set', { name: newTokenSetName });
-      dispatch.tokenState.duplicateTokenSet(newTokenSetName, oldTokenSetName);
-    } else if (tokens.hasOwnProperty(oldTokenSetName)) {
-      dispatch.tokenState.renameTokenSet({ oldName: oldTokenSetName, newName: newTokenSetName.trim() });
-    } else {
-      dispatch.tokenState.renameTokenSetFolder({ oldName: oldTokenSetName, newName: newTokenSetName.trim() });
-    }
-    setOldTokenSetName('');
-    handleNewTokenSetNameChange('');
-    setShowRenameTokenSetFields(false);
-  }, [dispatch, newTokenSetName, oldTokenSetName, isDuplicate, tokens]);
+  const handleRenameTokenSetSubmit = React.useCallback(
+    (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      if (isDuplicate) {
+        track('Duplicate token set', { name: newTokenSetName });
+        dispatch.tokenState.duplicateTokenSet(newTokenSetName, oldTokenSetName);
+      } else if (tokens.hasOwnProperty(oldTokenSetName)) {
+        dispatch.tokenState.renameTokenSet({ oldName: oldTokenSetName, newName: newTokenSetName.trim() });
+      } else {
+        dispatch.tokenState.renameTokenSetFolder({ oldName: oldTokenSetName, newName: newTokenSetName.trim() });
+      }
+      setOldTokenSetName('');
+      handleNewTokenSetNameChange('');
+      setShowRenameTokenSetFields(false);
+    },
+    [dispatch, newTokenSetName, oldTokenSetName, isDuplicate, tokens],
+  );
 
-  const handleReorder = useCallback((values: string[]) => {
-    dispatch.tokenState.setTokenSetOrder(values);
-  }, [dispatch]);
+  const handleReorder = useCallback(
+    (values: string[]) => {
+      dispatch.tokenState.setTokenSetOrder(values);
+    },
+    [dispatch],
+  );
 
   const closeOnboarding = useCallback(() => {
     dispatch.uiState.setOnboardingExplainerSets(false);
   }, [dispatch]);
 
-  const handleDelete = useCallback((set: string) => {
-    handleDeleteTokenSet(set);
-  }, [handleDeleteTokenSet]);
+  const handleDelete = useCallback(
+    (set: string) => {
+      handleDeleteTokenSet(set);
+    },
+    [handleDeleteTokenSet],
+  );
 
   const handleCloseRenameModal = useCallback(() => {
     setShowRenameTokenSetFields(false);
@@ -132,9 +154,12 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
     setShowNewTokenSetFields(true);
   }, []);
 
-  const handleResize = useCallback((e, direction, ref, d) => {
-    dispatch.uiState.setSidebarWidth(uiState.sidebarWidth + d.width);
-  }, [uiState, dispatch.uiState]);
+  const handleResize = useCallback(
+    (e, direction, ref, d) => {
+      dispatch.uiState.setSidebarWidth(uiState.sidebarWidth + d.width);
+    },
+    [uiState, dispatch.uiState],
+  );
 
   return (
     <Resizable
@@ -190,9 +215,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
                   {t('cancel')}
                 </Button>
                 <Button type="submit" variant="primary" disabled={!newTokenSetName}>
-                  {
-                  isDuplicate ? t('save') : t('change')
-                }
+                  {isDuplicate ? t('save') : t('change')}
                 </Button>
               </Stack>
             </Stack>
@@ -244,7 +267,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
           </Button>
         </Stack>
         {uiState.onboardingExplainerSets && (
-        <OnboardingExplainer data={onboardingData} closeOnboarding={closeOnboarding} />
+          <OnboardingExplainer data={onboardingData} closeOnboarding={closeOnboarding} />
         )}
       </Box>
     </Resizable>

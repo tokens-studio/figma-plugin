@@ -32,9 +32,7 @@ const RemConfiguration = () => {
   const toggleModalVisible = React.useCallback(() => setModalVisible((prev) => !prev), []);
 
   const resolvedTokens = React.useMemo(
-    () => defaultTokenResolver.setTokens(
-      mergeTokenGroups(tokens, usedTokenSet, {}, activeTokenSet),
-    ),
+    () => defaultTokenResolver.setTokens(mergeTokenGroups(tokens, usedTokenSet, {}, activeTokenSet)),
     [tokens, usedTokenSet, activeTokenSet],
   );
 
@@ -106,7 +104,10 @@ const RemConfiguration = () => {
               {isBrokenLink && (
                 <IconBrokenLink
                   style={{
-                    color: 'var(--colors-dangerFg)', width: 'var(--sizes-6)', height: 'var(--sizes-6)', marginLeft: '3px',
+                    color: 'var(--colors-dangerFg)',
+                    width: 'var(--sizes-6)',
+                    height: 'var(--sizes-6)',
+                    marginLeft: '3px',
                   }}
                 />
               )}

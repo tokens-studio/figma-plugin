@@ -9,10 +9,7 @@ import { track } from '@/utils/analytics';
 import SyncSettings from '../SyncSettings';
 import { LanguageSelector } from '../LanguageSelector';
 import { Dispatch } from '../../store';
-import {
-  storeTokenIdInJsonEditorSelector,
-  uiStateSelector,
-} from '@/selectors';
+import { storeTokenIdInJsonEditorSelector, uiStateSelector } from '@/selectors';
 import AddLicenseKey from '../AddLicenseKey/AddLicenseKey';
 import { Divider } from '../Divider';
 import OnboardingExplainer from '../OnboardingExplainer';
@@ -137,7 +134,6 @@ function Settings() {
               width: '100%',
             }}
           >
-
             {idStorage && (
               <Stack direction="row" gap={3} align="center" css={{ width: '100%' }}>
                 <Label htmlFor="storeTokenIdInJsonEditor">{t('storeTokenId')}</Label>
@@ -166,10 +162,11 @@ function Settings() {
                 <Stack direction="row" gap={2} align="center">
                   <Label htmlFor="enableDebugging">{t('enableSessionRecording')}</Label>
                   <ExplainerModal title={t('enableSessionRecording')}>
-                    <Box css={{
-                      color: '$fgMuted',
-                      fontSize: '$xsmall',
-                    }}
+                    <Box
+                      css={{
+                        color: '$fgMuted',
+                        fontSize: '$xsmall',
+                      }}
                     >
                       {t('sessionRecordingDescription')}
                       {' '}
@@ -177,7 +174,9 @@ function Settings() {
                       {' '}
                       {t('forMoreInformationPleaseSeeOur')}
                       {' '}
-                      <Link href="https://tokens.studio/privacy" target="_blank" rel="noreferrer">{t('privacyPolicy')}</Link>
+                      <Link href="https://tokens.studio/privacy" target="_blank" rel="noreferrer">
+                        {t('privacyPolicy')}
+                      </Link>
                     </Box>
                   </ExplainerModal>
                 </Stack>
@@ -198,11 +197,11 @@ function Settings() {
                 }}
               >
                 {debugSession && (
-                <Text>
-                  {t('yourCurrentSessionIdIs')}
-                  {' '}
-                  <b>{debugSession}</b>
-                </Text>
+                  <Text>
+                    {t('yourCurrentSessionIdIs')}
+                    {' '}
+                    <b>{debugSession}</b>
+                  </Text>
                 )}
               </Box>
             </Stack>

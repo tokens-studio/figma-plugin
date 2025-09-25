@@ -43,11 +43,11 @@ export default function TypographyInput({
   handleTypographyValueDownShiftInputChange: (newInputValue: string, property: string) => void;
   handleDownShiftInputChange: (newInputValue: string) => void;
   setTypographyValue: (newTypographyValue: SingleTypographyToken['value']) => void;
-  onSubmit: () => void
+  onSubmit: () => void;
 }) {
   const { t } = useTranslation(['tokens']);
   const seed = useUIDSeed();
-  const isAliasMode = (internalEditToken.value && typeof internalEditToken.value === 'string');
+  const isAliasMode = internalEditToken.value && typeof internalEditToken.value === 'string';
   const [mode, setMode] = useState(isAliasMode ? 'alias' : 'input');
   const [alias, setAlias] = useState('');
   const selectedFontFamily = useMemo(() => {
@@ -71,7 +71,7 @@ export default function TypographyInput({
     if (mode === 'alias' && typeof internalEditToken.value === 'string') {
       setTypographyValue(selectedToken?.rawValue ?? {});
     }
-    setMode((mode === 'input') ? 'alias' : 'input');
+    setMode(mode === 'input' ? 'alias' : 'input');
     setAlias('');
   }, [mode, selectedToken, internalEditToken, setTypographyValue]);
 
@@ -79,25 +79,23 @@ export default function TypographyInput({
     <Stack direction="column" gap={2}>
       <Stack direction="row" gap={2} justify="between" align="center">
         <Heading>{t('types.Typography')}</Heading>
-        {
-          mode === 'input' ? (
-            <IconButton
-              tooltip={t('referenceMode')}
-              data-testid="mode-change-button"
-              onClick={handleMode}
-              icon={<TokensIcon />}
-            />
-          ) : (
-            <IconButton
-              tooltip={t('inputMode')}
-              data-testid="mode-change-button"
-              onClick={handleMode}
-              icon={<LinkBreak2Icon />}
-            />
-          )
-        }
+        {mode === 'input' ? (
+          <IconButton
+            tooltip={t('referenceMode')}
+            data-testid="mode-change-button"
+            onClick={handleMode}
+            icon={<TokensIcon />}
+          />
+        ) : (
+          <IconButton
+            tooltip={t('inputMode')}
+            data-testid="mode-change-button"
+            onClick={handleMode}
+            icon={<LinkBreak2Icon />}
+          />
+        )}
       </Stack>
-      {(mode === 'input' && internalEditToken.schema.schemas.value.type === 'object') ? (
+      {mode === 'input' && internalEditToken.schema.schemas.value.type === 'object' ? (
         <Stack gap={2} direction="column">
           {Object.entries(internalEditToken.schema.schemas.value.properties ?? {}).map(([key], keyIndex) => (
             <SingleTypographyDownShiftInput
@@ -129,11 +127,10 @@ export default function TypographyInput({
             onSubmit={onSubmit}
           />
 
-          {isAliasMode && typeof internalEditToken.value === 'string' && checkIfContainsAlias(internalEditToken.value) && (
-            <ResolvedTokenDisplay
-              alias={alias}
-              selectedToken={selectedToken}
-            />
+          {isAliasMode
+            && typeof internalEditToken.value === 'string'
+            && checkIfContainsAlias(internalEditToken.value) && (
+              <ResolvedTokenDisplay alias={alias} selectedToken={selectedToken} />
           )}
         </Stack>
       )}

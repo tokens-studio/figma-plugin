@@ -13,15 +13,19 @@ describe('JSONBinTokenStorage', () => {
       mode: 'cors',
       cache: 'no-cache',
       credentials: 'same-origin',
-      body: JSON.stringify({
-        values: {
-          options: {},
+      body: JSON.stringify(
+        {
+          values: {
+            options: {},
+          },
+          $metadata: {
+            version: pjs.version,
+            updatedAt,
+          },
         },
-        $metadata: {
-          version: pjs.version,
-          updatedAt,
-        },
-      }, null, 2),
+        null,
+        2,
+      ),
       headers: new Headers([
         ['Content-Type', 'application/json'],
         ['X-Master-Key', 'secret'],
@@ -41,34 +45,32 @@ describe('JSONBinTokenStorage', () => {
   });
 
   it('can read JSONBin data (root version and updatedAt)', async () => {
-    mockFetch.mockImplementationOnce(() => (
-      Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve({
-          record: {
-            version: '1',
-            updatedAt: '2022-06-15T10:00:00.000Z',
-            values: {
-              global: {
-                colors: {
-                  red: {
-                    type: TokenTypes.COLOR,
-                    value: '#ff0000',
-                  },
+    mockFetch.mockImplementationOnce(() => Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve({
+        record: {
+          version: '1',
+          updatedAt: '2022-06-15T10:00:00.000Z',
+          values: {
+            global: {
+              colors: {
+                red: {
+                  type: TokenTypes.COLOR,
+                  value: '#ff0000',
                 },
               },
             },
-            $themes: [
-              {
-                id: 'light',
-                name: 'Light',
-                selectedTokenSets: {},
-              },
-            ],
           },
-        }),
-      })
-    ));
+          $themes: [
+            {
+              id: 'light',
+              name: 'Light',
+              selectedTokenSets: {},
+            },
+          ],
+        },
+      }),
+    }));
 
     const storage = new JSONBinTokenStorage('jsonbinid', 'secret');
     const result = await storage.read();
@@ -107,36 +109,34 @@ describe('JSONBinTokenStorage', () => {
   });
 
   it('can read JSONBin data (metadata version and updatedAt)', async () => {
-    mockFetch.mockImplementationOnce(() => (
-      Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve({
-          record: {
-            $metadata: {
-              version: '1',
-              updatedAt: '2022-06-15T10:00:00.000Z',
-            },
-            values: {
-              global: {
-                colors: {
-                  red: {
-                    type: TokenTypes.COLOR,
-                    value: '#ff0000',
-                  },
+    mockFetch.mockImplementationOnce(() => Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve({
+        record: {
+          $metadata: {
+            version: '1',
+            updatedAt: '2022-06-15T10:00:00.000Z',
+          },
+          values: {
+            global: {
+              colors: {
+                red: {
+                  type: TokenTypes.COLOR,
+                  value: '#ff0000',
                 },
               },
             },
-            $themes: [
-              {
-                id: 'light',
-                name: 'Light',
-                selectedTokenSets: {},
-              },
-            ],
           },
-        }),
-      })
-    ));
+          $themes: [
+            {
+              id: 'light',
+              name: 'Light',
+              selectedTokenSets: {},
+            },
+          ],
+        },
+      }),
+    }));
 
     const storage = new JSONBinTokenStorage('jsonbinid', 'secret');
     const result = await storage.read();
@@ -178,32 +178,30 @@ describe('JSONBinTokenStorage', () => {
     jest.useFakeTimers('modern');
     jest.setSystemTime(Date.UTC(2022, 5, 15, 10, 0, 0));
 
-    mockFetch.mockImplementationOnce(() => (
-      Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve({
-          record: {
-            values: {
-              global: {
-                colors: {
-                  red: {
-                    type: TokenTypes.COLOR,
-                    value: '#ff0000',
-                  },
+    mockFetch.mockImplementationOnce(() => Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve({
+        record: {
+          values: {
+            global: {
+              colors: {
+                red: {
+                  type: TokenTypes.COLOR,
+                  value: '#ff0000',
                 },
               },
             },
-            $themes: [
-              {
-                id: 'light',
-                name: 'Light',
-                selectedTokenSets: {},
-              },
-            ],
           },
-        }),
-      })
-    ));
+          $themes: [
+            {
+              id: 'light',
+              name: 'Light',
+              selectedTokenSets: {},
+            },
+          ],
+        },
+      }),
+    }));
 
     const storage = new JSONBinTokenStorage('jsonbinid', 'secret');
     const result = await storage.read();
@@ -447,12 +445,10 @@ describe('JSONBinTokenStorage', () => {
   });
 
   it('should return validation error when the content(s) are invalid', async () => {
-    mockFetch.mockImplementationOnce(() => (
-      Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve(''),
-      })
-    ));
+    mockFetch.mockImplementationOnce(() => Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve(''),
+    }));
 
     const storage = new JSONBinTokenStorage('jsonbinid', 'secret');
     expect(await storage.read()).toEqual({

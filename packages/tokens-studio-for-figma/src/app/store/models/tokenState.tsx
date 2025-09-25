@@ -178,7 +178,10 @@ export const tokenState = createModel<RootModel>()({
         themes: [
           ...(newThemes.length === 0 && updatedThemes.length === 0 ? data : []),
           ...state.themes.map((existingTheme) => {
-            const updateTheme = updatedThemes.find((importedTheme) => importedTheme.$figmaCollectionId === existingTheme.$figmaCollectionId && importedTheme.$figmaModeId === existingTheme.$figmaModeId);
+            const updateTheme = updatedThemes.find(
+              (importedTheme) => importedTheme.$figmaCollectionId === existingTheme.$figmaCollectionId
+                && importedTheme.$figmaModeId === existingTheme.$figmaModeId,
+            );
             return updateTheme ? { ...existingTheme, ...updateTheme } : existingTheme;
           }),
           ...newThemes,
@@ -390,7 +393,8 @@ export const tokenState = createModel<RootModel>()({
       const tokenMap = new Map();
       Object.values(state.tokens).forEach((tokenSet) => {
         tokenSet.forEach((token) => {
-          if (!tokenMap.has(token.name)) { // Only store first occurrence
+          if (!tokenMap.has(token.name)) {
+            // Only store first occurrence
             tokenMap.set(token.name, token);
           }
         });
@@ -679,14 +683,15 @@ export const tokenState = createModel<RootModel>()({
 
       themes.forEach((theme) => {
         // Use figmaCollectionId and figmaModeId to identify themes, not just figmaCollectionId
-        const existingTheme = state.themes.find((t) => t.$figmaCollectionId === theme.$figmaCollectionId
-          && t.$figmaModeId === theme.$figmaModeId);
+        const existingTheme = state.themes.find(
+          (t) => t.$figmaCollectionId === theme.$figmaCollectionId && t.$figmaModeId === theme.$figmaModeId,
+        );
 
         if (existingTheme) {
           // Check if anything has changed that requires an update
           const needsUpdate = !isEqual(existingTheme.selectedTokenSets, theme.selectedTokenSets)
-                              || !isEqual(existingTheme.name, theme.name)
-                              || !isEqual(existingTheme.group, theme.group);
+            || !isEqual(existingTheme.name, theme.name)
+            || !isEqual(existingTheme.group, theme.group);
 
           if (needsUpdate) {
             updatedThemes.push({
@@ -1103,8 +1108,7 @@ export const tokenState = createModel<RootModel>()({
       // If using Tokens Studio storage, update remote data
       if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO) {
         for (const [oldName, newName] of renamedCollections) {
-          if (oldName in rootState.tokenState.tokens
-              || Object.keys(updatedTokens).some((key) => key === newName)) {
+          if (oldName in rootState.tokenState.tokens || Object.keys(updatedTokens).some((key) => key === newName)) {
             updateTokenSetInTokensStudio({
               rootState,
               data: { oldName, newName },

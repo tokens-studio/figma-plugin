@@ -20,19 +20,22 @@ import mapThemeToVariableInfo from '@/utils/mapThemeToVariableInfo';
 import { wrapTransaction } from '@/profiling/transaction';
 
 type Props = {
-  id: string
+  id: string;
 };
 
 export const ThemeVariableManagement: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({ id }) => {
-  const theme = useSelector(useCallback((state: RootState) => (
-    themeByIdSelector(state, id)
-  ), [id]));
+  const theme = useSelector(useCallback((state: RootState) => themeByIdSelector(state, id), [id]));
   const tokens = useSelector(tokensSelector);
-  const isAttachingLocalVariables = useSelector(useCallback((state: RootState) => (
-    isWaitingForBackgroundJobSelector(state, BackgroundJobs.UI_ATTACHING_LOCAL_VARIABLES)
-  ), []));
+  const isAttachingLocalVariables = useSelector(
+    useCallback(
+      (state: RootState) => isWaitingForBackgroundJobSelector(state, BackgroundJobs.UI_ATTACHING_LOCAL_VARIABLES),
+      [],
+    ),
+  );
   const [selectedVariables, setSelectedVariables] = useState<string[]>([]);
-  const [resolvedVariableInfo, setResolvedVariableInfo] = useState<Record<string, VariableInfo>>(mapThemeToVariableInfo(theme));
+  const [resolvedVariableInfo, setResolvedVariableInfo] = useState<Record<string, VariableInfo>>(
+    mapThemeToVariableInfo(theme),
+  );
   const dispatch = useDispatch<Dispatch>();
   const variableEntries = useMemo(() => Object.entries(resolvedVariableInfo), [resolvedVariableInfo]);
 
@@ -42,17 +45,24 @@ export const ThemeVariableManagement: React.FC<React.PropsWithChildren<React.Pro
       AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.RESOLVE_VARIABLE_INFO,
         variableIds: allVariableIds,
-      }).then(({ resolvedValues }) => {
-        const nextResolvedVariableInfo = Object.fromEntries(Object.entries(theme?.$figmaVariableReferences ?? {}).map(([tokenName, variableId]) => [tokenName, {
-          id: variableId,
-          name: resolvedValues[variableId]?.name,
-          isResolved: !!resolvedValues[variableId]?.key,
-        }]));
-        setResolvedVariableInfo(nextResolvedVariableInfo);
-      }).catch((err) => {
-        console.error(err);
-        Sentry.captureException(err);
-      });
+      })
+        .then(({ resolvedValues }) => {
+          const nextResolvedVariableInfo = Object.fromEntries(
+            Object.entries(theme?.$figmaVariableReferences ?? {}).map(([tokenName, variableId]) => [
+              tokenName,
+              {
+                id: variableId,
+                name: resolvedValues[variableId]?.name,
+                isResolved: !!resolvedValues[variableId]?.key,
+              },
+            ]),
+          );
+          setResolvedVariableInfo(nextResolvedVariableInfo);
+        })
+        .catch((err) => {
+          console.error(err);
+          Sentry.captureException(err);
+        });
     } else {
       setResolvedVariableInfo({});
     }
@@ -60,9 +70,7 @@ export const ThemeVariableManagement: React.FC<React.PropsWithChildren<React.Pro
 
   const handleSelectAll = React.useCallback(() => {
     setSelectedVariables(
-      selectedVariables.length === variableEntries.length
-        ? []
-        : variableEntries.map(([token]) => token),
+      selectedVariables.length === variableEntries.length ? [] : variableEntries.map(([token]) => token),
     );
   }, [selectedVariables, variableEntries]);
 
@@ -76,23 +84,29 @@ export const ThemeVariableManagement: React.FC<React.PropsWithChildren<React.Pro
     }
   }, [theme, dispatch.tokenState, selectedVariables]);
 
-  const handleToggleSelectedVariable = useCallback((token: string) => {
-    setSelectedVariables(
-      selectedVariables.includes(token)
-        ? selectedVariables.filter((style) => style !== token)
-        : [...selectedVariables, token],
-    );
-  }, [selectedVariables]);
+  const handleToggleSelectedVariable = useCallback(
+    (token: string) => {
+      setSelectedVariables(
+        selectedVariables.includes(token)
+          ? selectedVariables.filter((style) => style !== token)
+          : [...selectedVariables, token],
+      );
+    },
+    [selectedVariables],
+  );
 
-  const handleDisconnectVariable = useCallback((token: string) => {
-    if (theme) {
-      track('Disconnect variable', { token });
-      dispatch.tokenState.disconnectVariableFromTheme({
-        id: theme.id,
-        key: token,
-      });
-    }
-  }, [theme, dispatch.tokenState]);
+  const handleDisconnectVariable = useCallback(
+    (token: string) => {
+      if (theme) {
+        track('Disconnect variable', { token });
+        dispatch.tokenState.disconnectVariableFromTheme({
+          id: theme.id,
+          key: token,
+        });
+      }
+    },
+    [theme, dispatch.tokenState],
+  );
 
   const handleAttachLocalVariables = useCallback(async () => {
     if (theme) {
@@ -100,11 +114,14 @@ export const ThemeVariableManagement: React.FC<React.PropsWithChildren<React.Pro
         name: BackgroundJobs.UI_ATTACHING_LOCAL_VARIABLES,
         isInfinite: true,
       });
-      const result = await wrapTransaction({ name: 'attachVariables' }, async () => await AsyncMessageChannel.ReactInstance.message({
-        type: AsyncMessageTypes.ATTACH_LOCAL_VARIABLES_TO_THEME,
-        tokens,
-        theme,
-      }));
+      const result = await wrapTransaction(
+        { name: 'attachVariables' },
+        async () => await AsyncMessageChannel.ReactInstance.message({
+          type: AsyncMessageTypes.ATTACH_LOCAL_VARIABLES_TO_THEME,
+          tokens,
+          theme,
+        }),
+      );
       if (result.variableInfo) {
         track('Attach variables to theme', {
           count: Object.values(result.variableInfo.variableIds).length,
@@ -123,53 +140,64 @@ export const ThemeVariableManagement: React.FC<React.PropsWithChildren<React.Pro
       disabled={variableEntries.length === 0}
       label={(
         <Stack direction="row" gap={2} align="center">
-          <Heading size="medium">
-            Variables
-          </Heading>
+          <Heading size="medium">Variables</Heading>
           {variableEntries.length > 0 ? <Count count={variableEntries.length} /> : null}
         </Stack>
       )}
       extra={(
-        <Button
-          size="small"
-          disabled={isAttachingLocalVariables}
-          onClick={handleAttachLocalVariables}
-        >
+        <Button size="small" disabled={isAttachingLocalVariables} onClick={handleAttachLocalVariables}>
           Attach local variables
         </Button>
       )}
       isOpenByDefault={false}
     >
-      {
-        variableEntries.length > 0 && (
-          <Box css={{
-            display: 'flex', alignItems: 'center', gap: '$3', justifyContent: 'space-between', paddingInline: '$1', paddingTop: '$2',
+      {variableEntries.length > 0 && (
+        <Box
+          css={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '$3',
+            justifyContent: 'space-between',
+            paddingInline: '$1',
+            paddingTop: '$2',
           }}
-          >
-            <Box css={{
-              display: 'flex', alignItems: 'center', gap: '$3', fontSize: '$small',
+        >
+          <Box
+            css={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '$3',
+              fontSize: '$small',
             }}
-            >
-              <Checkbox
-                checked={selectedVariables.length === variableEntries.length}
-                id="detachSelected"
-                onCheckedChange={handleSelectAll}
-              />
-              <Label htmlFor="detachSelected" css={{ fontSize: '$small', fontWeight: '$sansBold' }}>
-                Select all
-              </Label>
-            </Box>
-            <Box css={{ display: 'flex', flexDirection: 'row', gap: '$1' }}>
-              <Button onClick={handleDisconnectSelectedVariables} disabled={selectedVariables.length === 0} variant="danger" size="small">
-                Detach selected
-              </Button>
-            </Box>
+          >
+            <Checkbox
+              checked={selectedVariables.length === variableEntries.length}
+              id="detachSelected"
+              onCheckedChange={handleSelectAll}
+            />
+            <Label htmlFor="detachSelected" css={{ fontSize: '$small', fontWeight: '$sansBold' }}>
+              Select all
+            </Label>
           </Box>
-        )
-      }
-      <Box css={{
-        display: 'grid', gap: '$2', gridTemplateColumns: 'minmax(0, 1fr)', padding: '$1',
-      }}
+          <Box css={{ display: 'flex', flexDirection: 'row', gap: '$1' }}>
+            <Button
+              onClick={handleDisconnectSelectedVariables}
+              disabled={selectedVariables.length === 0}
+              variant="danger"
+              size="small"
+            >
+              Detach selected
+            </Button>
+          </Box>
+        </Box>
+      )}
+      <Box
+        css={{
+          display: 'grid',
+          gap: '$2',
+          gridTemplateColumns: 'minmax(0, 1fr)',
+          padding: '$1',
+        }}
       >
         {variableEntries.map(([token, variableInfo]) => (
           <ThemeVariableManagementEntry

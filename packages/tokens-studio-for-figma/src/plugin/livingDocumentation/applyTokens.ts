@@ -8,10 +8,7 @@ import { updateNodes } from '../updateNodes';
 import { AnyTokenList } from '@/types/tokens';
 import { notifyException } from '../notifiers';
 
-export async function applyTokensToDocumentation(
-  container: FrameNode,
-  resolvedTokens: AnyTokenList,
-): Promise<void> {
+export async function applyTokensToDocumentation(container: FrameNode, resolvedTokens: AnyTokenList): Promise<void> {
   try {
     // Get current UI settings for token application
     const uiSettings = await UiSettingsProperty.read(figma.root);
@@ -30,7 +27,7 @@ export async function applyTokensToDocumentation(
       ignoreFirstPartForStyles: uiSettings?.ignoreFirstPartForStyles ?? false,
       createStylesWithVariableReferences: uiSettings?.createStylesWithVariableReferences ?? false,
       applyVariablesStylesOrRawValue:
-          uiSettings?.applyVariablesStylesOrRawValue || ApplyVariablesStylesOrRawValues.RAW_VALUES,
+        uiSettings?.applyVariablesStylesOrRawValue || ApplyVariablesStylesOrRawValues.RAW_VALUES,
     });
 
     // Select the container to apply tokens to all child nodes

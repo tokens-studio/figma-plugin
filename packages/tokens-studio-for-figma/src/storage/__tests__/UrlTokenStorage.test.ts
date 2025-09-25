@@ -10,12 +10,12 @@ describe('Test URLTokenStorage', () => {
   });
 
   it('should return validation error when the content(s) are invalid', async () => {
-    global.fetch = jest.fn(() => (
-      Promise.resolve({
+    global.fetch = jest.fn(
+      () => Promise.resolve({
         ok: true,
         json: () => Promise.resolve(''),
-      }) as Promise<Response>
-    ));
+      }) as Promise<Response>,
+    );
 
     const result = await urlTokenStorage.read();
     expect(result).toEqual({
@@ -24,8 +24,8 @@ describe('Test URLTokenStorage', () => {
   });
 
   it('should return themes and token sets', async () => {
-    global.fetch = jest.fn(() => (
-      Promise.resolve({
+    global.fetch = jest.fn(
+      () => Promise.resolve({
         ok: true,
         json: () => Promise.resolve({
           values: {
@@ -46,21 +46,23 @@ describe('Test URLTokenStorage', () => {
               },
             },
           },
-          $themes: [{
-            id: 'light',
-            name: 'Light',
-            group: 'Theme',
-            selectedTokenSets: {
-              global: TokenSetStatus.SOURCE,
-              light: TokenSetStatus.ENABLED,
+          $themes: [
+            {
+              id: 'light',
+              name: 'Light',
+              group: 'Theme',
+              selectedTokenSets: {
+                global: TokenSetStatus.SOURCE,
+                light: TokenSetStatus.ENABLED,
+              },
             },
-          }],
+          ],
           $metadata: {
             tokenSetOrder: ['light', 'global'],
           },
         }),
-      }) as Promise<Response>
-    ));
+      }) as Promise<Response>,
+    );
 
     const result = await urlTokenStorage.read();
 
@@ -115,8 +117,8 @@ describe('Test URLTokenStorage', () => {
       },
     ]);
 
-    global.fetch = jest.fn(() => (
-      Promise.resolve({
+    global.fetch = jest.fn(
+      () => Promise.resolve({
         ok: true,
         json: () => Promise.resolve({
           values: {
@@ -138,8 +140,8 @@ describe('Test URLTokenStorage', () => {
             },
           },
         }),
-      }) as Promise<Response>
-    ));
+      }) as Promise<Response>,
+    );
 
     const result2 = await urlTokenStorage.read();
 
@@ -184,20 +186,20 @@ describe('Test URLTokenStorage', () => {
   });
 
   it('should return empty array when fetching data fail', async () => {
-    global.fetch = jest.fn(() => (
-      Promise.resolve({
+    global.fetch = jest.fn(
+      () => Promise.resolve({
         ok: false,
         json: () => Promise.resolve(''),
-      }) as Promise<Response>
-    ));
+      }) as Promise<Response>,
+    );
 
     const result = await urlTokenStorage.read();
     expect(result).toEqual([]);
   });
 
   it('should support a mixed schema', async () => {
-    global.fetch = jest.fn(() => (
-      Promise.resolve({
+    global.fetch = jest.fn(
+      () => Promise.resolve({
         ok: true,
         json: () => Promise.resolve({
           global: {
@@ -216,20 +218,22 @@ describe('Test URLTokenStorage', () => {
               },
             },
           },
-          $themes: [{
-            id: 'light',
-            name: 'Light',
-            selectedTokenSets: {
-              global: TokenSetStatus.SOURCE,
-              light: TokenSetStatus.ENABLED,
+          $themes: [
+            {
+              id: 'light',
+              name: 'Light',
+              selectedTokenSets: {
+                global: TokenSetStatus.SOURCE,
+                light: TokenSetStatus.ENABLED,
+              },
             },
-          }],
+          ],
           $metadata: {
             tokenSetOrder: ['light', 'global'],
           },
         }),
-      }) as Promise<Response>
-    ));
+      }) as Promise<Response>,
+    );
 
     const result = await urlTokenStorage.read();
 

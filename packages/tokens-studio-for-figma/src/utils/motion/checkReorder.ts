@@ -28,16 +28,14 @@ export function checkReorder<T>(
   }
   const nextItem = order[nextIndex];
 
-  if (
-    !nextItem
-  ) return order;
+  if (!nextItem) return order;
 
   const item = order[index];
   const originalNextLayout = nextItem.layout;
   const nextItemCenter = mix(originalNextLayout.min, originalNextLayout.max, 0.5);
   if (
     (nextOffset === 1 && item.layout.max + offset > nextItemCenter)
-          || (nextOffset === -1 && item.layout.min + offset < nextItemCenter)
+    || (nextOffset === -1 && item.layout.min + offset < nextItemCenter)
   ) {
     return moveItem(order, index, nextIndex);
   }

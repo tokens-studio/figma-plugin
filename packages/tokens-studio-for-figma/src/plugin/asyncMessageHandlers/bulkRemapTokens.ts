@@ -30,28 +30,30 @@ export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK
     const regexPattern = /^\/(.*)\/([gimsuy]*)$/;
 
     allWithData.forEach(({ node, tokens }) => {
-      promises.add(defaultWorker.schedule(async () => {
-        Object.entries(tokens).forEach(([key, value]) => {
-          if (useRegex) {
-            // When regex mode is enabled, check if the pattern is wrapped in /pattern/flags format
-            const regexTest = oldName.match(regexPattern);
-            const pattern = regexTest ? new RegExp(regexTest[1], regexTest[2]) : new RegExp(oldName, 'g');
+      promises.add(
+        defaultWorker.schedule(async () => {
+          Object.entries(tokens).forEach(([key, value]) => {
+            if (useRegex) {
+              // When regex mode is enabled, check if the pattern is wrapped in /pattern/flags format
+              const regexTest = oldName.match(regexPattern);
+              const pattern = regexTest ? new RegExp(regexTest[1], regexTest[2]) : new RegExp(oldName, 'g');
 
-            if (pattern.test(value)) {
-              const newValue = value.replace(pattern, newName);
+              if (pattern.test(value)) {
+                const newValue = value.replace(pattern, newName);
+                const jsonValue = JSON.stringify(newValue);
+                node.setSharedPluginData(namespace, key, jsonValue);
+              }
+            } else if (value.includes(oldName)) {
+              // When regex mode is disabled, use simple string replacement
+              const newValue = value.split(oldName).join(newName);
               const jsonValue = JSON.stringify(newValue);
               node.setSharedPluginData(namespace, key, jsonValue);
             }
-          } else if (value.includes(oldName)) {
-            // When regex mode is disabled, use simple string replacement
-            const newValue = value.split(oldName).join(newName);
-            const jsonValue = JSON.stringify(newValue);
-            node.setSharedPluginData(namespace, key, jsonValue);
-          }
-        });
-        tracker.next();
-        tracker.reportIfNecessary();
-      }));
+          });
+          tracker.next();
+          tracker.reportIfNecessary();
+        }),
+      );
     });
 
     await Promise.all(promises);

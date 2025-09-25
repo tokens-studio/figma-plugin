@@ -16,7 +16,7 @@ type Options = {
   expandShadow?: boolean;
   expandComposition?: boolean;
   expandBorder?: boolean;
-  storeTokenIdInJsonEditor?: boolean
+  storeTokenIdInJsonEditor?: boolean;
 };
 
 export default function formatTokens({

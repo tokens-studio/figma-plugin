@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect } from 'react';
 import {
-  Box,
-  Button, Stack, Text,
+  Box, Button, Stack, Text,
 } from '@tokens-studio/ui';
 import Modal from './Modal';
 import { track } from '@/utils/analytics';
@@ -40,7 +39,9 @@ export default function UpgradeToProModal({
       source: 'upgrade-modal',
     });
 
-    const link = `https://tokens.studio/pro?ref=figma-plugin&utm_source=figma-plugin&utm_medium=upgrade-modal&utm_campaign=${encodeURIComponent(feature)}`;
+    const link = `https://tokens.studio/pro?ref=figma-plugin&utm_source=figma-plugin&utm_medium=upgrade-modal&utm_campaign=${encodeURIComponent(
+      feature,
+    )}`;
     window.open(link, '_blank');
     onClose();
   }, [onClose, feature]);
@@ -51,21 +52,20 @@ export default function UpgradeToProModal({
     <Modal title={modalTitle} isOpen={isOpen} close={onClose} size="large">
       <Stack direction="column" gap={4}>
         {image && (
-          <Box css={{
-            display: 'flex',
-            justifyContent: 'center',
-            marginBottom: '$1',
-            borderRadius: '$small',
-            overflow: 'hidden',
-            border: '1px solid $borderSubtle',
-          }}
+          <Box
+            css={{
+              display: 'flex',
+              justifyContent: 'center',
+              marginBottom: '$1',
+              borderRadius: '$small',
+              overflow: 'hidden',
+              border: '1px solid $borderSubtle',
+            }}
           >
             <img src={image} alt="Upgrade to Pro" />
           </Box>
         )}
-        <Text size="small">
-          {description}
-        </Text>
+        <Text size="small">{description}</Text>
         <Stack direction="row" justify="end" gap={3}>
           <Button variant="secondary" onClick={onClose}>
             Cancel

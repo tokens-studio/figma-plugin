@@ -43,14 +43,16 @@ describe('removeStylesFromPlugin', () => {
     activeTheme: {
       [INTERNAL_THEMES_NO_GROUP]: 'light',
     },
-    themes: [{
-      id: 'light',
-      name: 'Light',
-      selectedTokenSets: {
-        global: TokenSetStatus.ENABLED,
+    themes: [
+      {
+        id: 'light',
+        name: 'Light',
+        selectedTokenSets: {
+          global: TokenSetStatus.ENABLED,
+        },
+        $figmaStyleReferences: {},
       },
-      $figmaStyleReferences: {},
-    }],
+    ],
   });
 
   runAfter.push(AsyncMessageChannel.ReactInstance.connect());

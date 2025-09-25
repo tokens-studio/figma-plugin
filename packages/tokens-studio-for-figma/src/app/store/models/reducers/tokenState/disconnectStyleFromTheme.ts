@@ -1,8 +1,8 @@
 import type { TokenState } from '../../tokenState';
 
 type Payload = {
-  id: string
-  key: string | string[]
+  id: string;
+  key: string | string[];
 };
 
 export function disconnectStyleFromTheme(state: TokenState, data: Payload): TokenState {
@@ -12,7 +12,7 @@ export function disconnectStyleFromTheme(state: TokenState, data: Payload): Toke
     themeObjectIndex === -1
     || !state.themes[themeObjectIndex].$figmaStyleReferences
     || (typeof data.key === 'string' && !(data.key in state.themes[themeObjectIndex].$figmaStyleReferences!))
-    || (Array.isArray(data.key) && !data.key.some((key) => (key in state.themes[themeObjectIndex].$figmaStyleReferences!)))
+    || (Array.isArray(data.key) && !data.key.some((key) => key in state.themes[themeObjectIndex].$figmaStyleReferences!))
   ) return state;
 
   const updatedThemes = [...state.themes];

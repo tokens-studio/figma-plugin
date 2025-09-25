@@ -3,7 +3,11 @@ import { MessageFromPluginTypes } from '@/types/messages';
 import { TokenStore } from '@/types/tokens';
 import { mockUiPostMessage } from '../../../tests/__mocks__/figmaMock';
 import {
-  notifyException, notifySelection, notifySetTokens, trackFromPlugin, notifyInstancesCreated,
+  notifyException,
+  notifySelection,
+  notifySetTokens,
+  trackFromPlugin,
+  notifyInstancesCreated,
 } from '../notifiers';
 
 describe('notifySelection', () => {

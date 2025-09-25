@@ -19,7 +19,15 @@ import useTokens from '../store/useTokens';
 import AttentionIcon from '@/icons/attention.svg';
 import { TokensContext } from '@/context';
 import {
-  activeTokenSetSelector, aliasBaseFontSizeSelector, manageThemesModalOpenSelector, scrollPositionSetSelector, showEditFormSelector, tokenFilterSelector, tokensSelector, tokenTypeSelector, usedTokenSetSelector,
+  activeTokenSetSelector,
+  aliasBaseFontSizeSelector,
+  manageThemesModalOpenSelector,
+  scrollPositionSetSelector,
+  showEditFormSelector,
+  tokenFilterSelector,
+  tokensSelector,
+  tokenTypeSelector,
+  usedTokenSetSelector,
 } from '@/selectors';
 import { ThemeSelector } from './ThemeSelector';
 import { ManageThemesModal } from './ManageThemesModal';
@@ -119,10 +127,13 @@ function Tokens({ isActive }: { isActive: boolean }) {
 
   const [error, setError] = React.useState<string | null>(null);
 
-  const handleChangeJSON = React.useCallback((val: string) => {
-    setError(null);
-    dispatch.tokenState.setStringTokens(val);
-  }, [dispatch.tokenState]);
+  const handleChangeJSON = React.useCallback(
+    (val: string) => {
+      setError(null);
+      dispatch.tokenState.setStringTokens(val);
+    },
+    [dispatch.tokenState],
+  );
 
   const memoizedTokens = React.useMemo(() => {
     if (tokens[activeTokenSet]) {
@@ -151,16 +162,22 @@ function Tokens({ isActive }: { isActive: boolean }) {
 
   const [activeTokensTabToggleState, setActiveTokensTabToggleState] = React.useState<'list' | 'json'>(activeTokensTab);
 
-  const handleSetTokensTab = React.useCallback((tab: 'list' | 'json') => {
-    if (tab === 'list' || tab === 'json') {
-      setActiveTokensTabToggleState(tab);
-      dispatch.uiState.setActiveTokensTab(tab);
-    }
-  }, [dispatch.uiState]);
+  const handleSetTokensTab = React.useCallback(
+    (tab: 'list' | 'json') => {
+      if (tab === 'list' || tab === 'json') {
+        setActiveTokensTabToggleState(tab);
+        dispatch.uiState.setActiveTokensTab(tab);
+      }
+    },
+    [dispatch.uiState],
+  );
 
-  const tokensContextValue = React.useMemo(() => ({
-    resolvedTokens,
-  }), [resolvedTokens]);
+  const tokensContextValue = React.useMemo(
+    () => ({
+      resolvedTokens,
+    }),
+    [resolvedTokens],
+  );
 
   React.useEffect(() => {
     // @README these dependencies aren't exhaustive
@@ -184,11 +201,14 @@ function Tokens({ isActive }: { isActive: boolean }) {
     dispatch.settings.setBaseFontSize(String(newBaseFontSize));
   }, [resolvedTokens, aliasBaseFontSize]);
 
-  const saveScrollPositionSet = React.useCallback((tokenSet: string) => {
-    if (tokenDiv.current) {
-      dispatch.uiState.setScrollPositionSet({ ...scrollPositionSet, [tokenSet]: tokenDiv.current?.scrollTop });
-    }
-  }, [dispatch, scrollPositionSet]);
+  const saveScrollPositionSet = React.useCallback(
+    (tokenSet: string) => {
+      if (tokenDiv.current) {
+        dispatch.uiState.setScrollPositionSet({ ...scrollPositionSet, [tokenSet]: tokenDiv.current?.scrollTop });
+      }
+    },
+    [dispatch, scrollPositionSet],
+  );
 
   if (!isActive) return null;
 
@@ -258,9 +278,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
             overflow: 'hidden',
           }}
         >
-          {tokenSetsVisible && (
-            <TokenSetSelector saveScrollPositionSet={saveScrollPositionSet} />
-          )}
+          {tokenSetsVisible && <TokenSetSelector saveScrollPositionSet={saveScrollPositionSet} />}
           <Box
             css={{
               flexGrow: 1,
@@ -273,10 +291,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
             {activeTokensTab === 'json' ? (
               <Box css={{ position: 'relative', height: '100%' }}>
                 <JSONEditor stringTokens={stringTokens} handleChange={handleChangeJSON} />
-                <StatusToast
-                  open={Boolean(error)}
-                  error={error}
-                />
+                <StatusToast open={Boolean(error)} error={error} />
               </Box>
             ) : (
               <Box ref={tokenDiv} css={{ width: '100%', paddingBottom: '$6' }} className="content scroll-container">

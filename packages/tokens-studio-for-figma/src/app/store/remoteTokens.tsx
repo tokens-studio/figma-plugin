@@ -256,12 +256,15 @@ export default function useRemoteTokens() {
             const remoteThemes: ThemeObject[] = remoteData.themes || [];
             // remove those active themes that are no longer present in remoteThemes
             const filteredThemes = activeTheme
-              ? Object.keys(activeTheme).reduce((acc, key) => {
-                if (remoteThemes.find((theme) => theme.id === activeTheme[key])) {
-                  acc[key] = activeTheme[key];
-                }
-                return acc;
-              }, {} as Record<string, string>)
+              ? Object.keys(activeTheme).reduce(
+                (acc, key) => {
+                  if (remoteThemes.find((theme) => theme.id === activeTheme[key])) {
+                    acc[key] = activeTheme[key];
+                  }
+                  return acc;
+                },
+                {} as Record<string, string>,
+              )
               : {};
 
             if (updateLocalTokens || shouldOverride) {

@@ -7,11 +7,13 @@ export function useIsGitMultiFileEnabled() {
   const api = useSelector(apiSelector);
 
   return useMemo(
-    () => Boolean((api?.provider === StorageProviderType.GITHUB
-            || api?.provider === StorageProviderType.GITLAB
-            || api?.provider === StorageProviderType.ADO
-            || api?.provider === StorageProviderType.BITBUCKET)
-          && !api?.filePath?.endsWith('.json')),
+    () => Boolean(
+      (api?.provider === StorageProviderType.GITHUB
+          || api?.provider === StorageProviderType.GITLAB
+          || api?.provider === StorageProviderType.ADO
+          || api?.provider === StorageProviderType.BITBUCKET)
+          && !api?.filePath?.endsWith('.json'),
+    ),
     [api],
   );
 }

@@ -109,7 +109,9 @@ describe('StartScreen Error Handling', () => {
     );
 
     // Should show the centralized connectivity error message
-    expect(screen.getByText(/Unable to connect to GitHub. Please check your internet connection or try again later./)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Unable to connect to GitHub. Please check your internet connection or try again later./),
+    ).toBeInTheDocument();
   });
 
   it('should show specific error message when lastError type is other', () => {

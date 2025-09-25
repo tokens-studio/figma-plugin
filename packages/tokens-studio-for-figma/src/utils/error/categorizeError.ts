@@ -9,11 +9,14 @@ import { ErrorCategory } from '@/types/ErrorCategory';
  * @param context - Optional context about the provider or operation for more specific error messages
  * @returns Object with error type, message, and optional header for display
  */
-export function categorizeError(error: any, context?: {
-  provider?: StorageProviderType;
-  operation?: string;
-  hasCredentials?: boolean;
-}): {
+export function categorizeError(
+  error: any,
+  context?: {
+    provider?: StorageProviderType;
+    operation?: string;
+    hasCredentials?: boolean;
+  },
+): {
     type: ErrorCategory;
     message: string;
     header?: string;
@@ -160,9 +163,7 @@ export function categorizeError(error: any, context?: {
   }
 
   // For other errors, return the original message
-  const header = context?.provider
-    ? `Could not load tokens from ${transformProviderName(context.provider)}`
-    : 'Error';
+  const header = context?.provider ? `Could not load tokens from ${transformProviderName(context.provider)}` : 'Error';
 
   return {
     type: 'other',

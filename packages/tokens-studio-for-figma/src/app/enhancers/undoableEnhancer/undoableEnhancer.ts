@@ -14,7 +14,7 @@ export const undoableEnhancer = ((next: StoreCreator) => (reducer: AppReducer, p
   const undoableEnhancerReducer: AppReducer = (state, action) => {
     const undoableAction = undoableActionDefinitions.find((def) => def.type === action.type);
     if (!('meta' in action && action.meta?.silent) && undoableAction) {
-      type ActionType = Parameters<typeof undoableAction['getStateSnapshot']>[0];
+      type ActionType = Parameters<(typeof undoableAction)['getStateSnapshot']>[0];
       const snapshot = undoableAction.getStateSnapshot(action as ActionType, state);
       UndoableEnhancerState.push({ action, snapshot });
     }
@@ -30,9 +30,7 @@ export const undoableEnhancer = ((next: StoreCreator) => (reducer: AppReducer, p
       : UndoableEnhancerState.actionsHistory.length - nextIndex - 1;
     const actionToPerform = UndoableEnhancerState.actionsHistory[actionIndex];
     if (actionToPerform) {
-      const actionDefinition = undoableActionDefinitions.find((def) => (
-        def.type === actionToPerform.action.type
-      ));
+      const actionDefinition = undoableActionDefinitions.find((def) => def.type === actionToPerform.action.type);
       if (actionDefinition) {
         const handler = didUndo ? actionDefinition.undo : actionDefinition.redo;
         handler(store.dispatch, actionToPerform.action, actionToPerform.snapshot);

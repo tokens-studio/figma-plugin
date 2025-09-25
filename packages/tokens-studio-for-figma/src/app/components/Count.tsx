@@ -1,7 +1,7 @@
 import React from 'react';
 import Box from './Box';
 
-export function Count({ count }: { count: number; }) {
+export function Count({ count }: { count: number }) {
   return (
     <Box
       css={{
@@ -12,7 +12,6 @@ export function Count({ count }: { count: number; }) {
       }}
     >
       {count}
-
     </Box>
   );
 }

@@ -19,10 +19,7 @@ export async function applySizingValuesOnNode(
     && typeof values.sizing !== 'undefined'
     && typeof data.sizing !== 'undefined'
     && isPrimitiveValue(values.sizing)
-    && !(
-      (await tryApplyVariableId(node, 'width', data.sizing))
-      && (await tryApplyVariableId(node, 'height', data.sizing))
-    )
+    && !((await tryApplyVariableId(node, 'width', data.sizing)) && (await tryApplyVariableId(node, 'height', data.sizing)))
   ) {
     const size = transformValue(String(values.sizing), 'sizing', baseFontSize);
     node.resize(size, size);

@@ -20,12 +20,20 @@ export function isPaintEqual(paint1?: Paint, paint2?: Paint) {
       }
 
       // Handle all gradient types (linear, radial, angular, diamond)
-      if ((paint1.type === 'GRADIENT_LINEAR' || paint1.type === 'GRADIENT_RADIAL' || paint1.type === 'GRADIENT_ANGULAR' || paint1.type === 'GRADIENT_DIAMOND')
-          && (paint2.type === 'GRADIENT_LINEAR' || paint2.type === 'GRADIENT_RADIAL' || paint2.type === 'GRADIENT_ANGULAR' || paint2.type === 'GRADIENT_DIAMOND')) {
+      if (
+        (paint1.type === 'GRADIENT_LINEAR'
+          || paint1.type === 'GRADIENT_RADIAL'
+          || paint1.type === 'GRADIENT_ANGULAR'
+          || paint1.type === 'GRADIENT_DIAMOND')
+        && (paint2.type === 'GRADIENT_LINEAR'
+          || paint2.type === 'GRADIENT_RADIAL'
+          || paint2.type === 'GRADIENT_ANGULAR'
+          || paint2.type === 'GRADIENT_DIAMOND')
+      ) {
         return (
           paint1.gradientStops.length === paint2.gradientStops.length
-          && paint1.gradientStops.every((stop, index) => (
-            stop.position === paint2.gradientStops[index].position
+          && paint1.gradientStops.every(
+            (stop, index) => stop.position === paint2.gradientStops[index].position
             // Comparison using rgba doesn't work as Figma has a rounding issue,
             // that doesn't produce same RGB floats as the existing color
             // See this issue: https://forum.figma.com/t/figmas-rgb-color-values-seems-to-have-a-rounding-error/23540
@@ -36,14 +44,10 @@ export function isPaintEqual(paint1?: Paint, paint2?: Paint) {
             // && stop.color.a === paint2.gradientStops[index].color.a
 
               // Compare using hex instead for now:
-              && convertFigmaColorToHex(stop.color) === convertFigmaColorToHex(paint2.gradientStops[index].color)
-          ))
-          && paint1.gradientTransform[0].every((value, index) => (
-            value === paint2.gradientTransform[0][index]
-          ))
-          && paint1.gradientTransform[1].every((value, index) => (
-            value === paint2.gradientTransform[1][index]
-          ))
+              && convertFigmaColorToHex(stop.color) === convertFigmaColorToHex(paint2.gradientStops[index].color),
+          )
+          && paint1.gradientTransform[0].every((value, index) => value === paint2.gradientTransform[0][index])
+          && paint1.gradientTransform[1].every((value, index) => value === paint2.gradientTransform[1][index])
         );
       }
     }
