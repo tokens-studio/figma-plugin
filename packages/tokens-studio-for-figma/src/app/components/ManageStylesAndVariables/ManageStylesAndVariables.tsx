@@ -19,6 +19,9 @@ import { allTokenSetsSelector, themesListSelector } from '@/selectors';
 import { ExportTokenSet } from '@/types/ExportTokenSet';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { Dispatch } from '@/app/store';
+import VariableSyncPreviewModal from '../VariableSyncPreviewModal';
+import { VariableChangePreview } from '@/types/AsyncMessages';
+import { settingsStateSelector, tokensSelector } from '@/selectors';
 
 export default function ManageStylesAndVariables({ showModal, setShowModal }: { showModal: boolean, setShowModal: (show: boolean) => void }) {
   const { t } = useTranslation(['manageStylesAndVariables']);
@@ -27,9 +30,12 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
 
   const [showOptions, setShowOptions] = React.useState(true);
   const [activeTab, setActiveTab] = React.useState<'useThemes' | 'useSets'>(isProUser ? 'useThemes' : 'useSets');
+  const [showVariablePreview, setShowVariablePreview] = React.useState(false);
 
   const allSets = useSelector(allTokenSetsSelector);
   const themes = useSelector(themesListSelector);
+  const tokens = useSelector(tokensSelector);
+  const settings = useSelector(settingsStateSelector);
   const dispatch = useDispatch<Dispatch>();
   const savedSelectedThemes = useSelector((state: any) => state.uiState.selectedExportThemes) || [];
 
@@ -72,8 +78,15 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
     setShowOptions(false);
   }, []);
 
-  const handleExportToFigma = React.useCallback(async () => {
+  const handleShowVariablePreview = React.useCallback(() => {
+    setShowVariablePreview(true);
+  }, []);
+
+  const handleVariablePreviewConfirm = React.useCallback(async (selectedChanges: VariableChangePreview[]) => {
+    setShowVariablePreview(false);
     setShowModal(false);
+    
+    // TODO: Apply only selected changes instead of all
     if (activeTab === 'useSets') {
       await createVariablesFromSets(selectedSets);
       await createStylesFromSelectedTokenSets(selectedSets);
@@ -81,7 +94,27 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
       await createVariablesFromThemes(selectedThemes);
       await createStylesFromSelectedThemes(selectedThemes);
     }
-  }, [setShowModal, activeTab, selectedThemes, selectedSets, createVariablesFromSets, createStylesFromSelectedTokenSets, createVariablesFromThemes, createStylesFromSelectedThemes]);
+  }, [activeTab, selectedSets, selectedThemes, createVariablesFromSets, createStylesFromSelectedTokenSets, createVariablesFromThemes, createStylesFromSelectedThemes]);
+
+  const handleExportToFigma = React.useCallback(async () => {
+    // Check if we should show variable preview
+    const shouldCreateVariables = (settings.variablesBoolean
+        || settings.variablesColor
+        || settings.variablesNumber
+        || settings.variablesString);
+    
+    if (shouldCreateVariables) {
+      handleShowVariablePreview();
+    } else {
+      // Just create styles without variables
+      setShowModal(false);
+      if (activeTab === 'useSets') {
+        await createStylesFromSelectedTokenSets(selectedSets);
+      } else if (activeTab === 'useThemes') {
+        await createStylesFromSelectedThemes(selectedThemes);
+      }
+    }
+  }, [settings, activeTab, selectedSets, selectedThemes, createStylesFromSelectedTokenSets, createStylesFromSelectedThemes, handleShowVariablePreview]);
   const canExportToFigma = activeTab === 'useSets' ? selectedSets.length > 0 : selectedThemes.length > 0;
 
   const handleTabChange = React.useCallback((tab: 'useThemes' | 'useSets') => {
@@ -106,7 +139,7 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
         size="fullscreen"
         title={t('modalTitle')}
         showClose
-        isOpen={showModal}
+        isOpen={showModal && !showVariablePreview}
         close={handleClose}
         onInteractOutside={onInteractOutside}
         footer={(
@@ -140,7 +173,18 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
           <ExportSetsTab selectedSets={selectedSets} setSelectedSets={setSelectedSets} />
         </Tabs>
       </Modal>
-      <OptionsModal isOpen={showModal && showOptions} title={t('optionsModalTitle')} closeAction={handleCancelOptions} />
+      
+      <VariableSyncPreviewModal
+        isOpen={showVariablePreview}
+        onClose={() => setShowVariablePreview(false)}
+        onConfirm={handleVariablePreviewConfirm}
+        tokens={tokens}
+        settings={settings}
+        selectedThemes={activeTab === 'useThemes' ? selectedThemes : undefined}
+        selectedSets={activeTab === 'useSets' ? selectedSets : undefined}
+      />
+      
+      <OptionsModal isOpen={showModal && showOptions && !showVariablePreview} title={t('optionsModalTitle')} closeAction={handleCancelOptions} />
     </>
   );
 }
