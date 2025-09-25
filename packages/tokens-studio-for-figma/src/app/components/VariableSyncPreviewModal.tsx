@@ -200,7 +200,7 @@ const VariableSyncPreviewModal: React.FC<VariableSyncPreviewProps> = ({
                 )}
                 {change.mode && (
                   <Text css={{ fontSize: '$xsmall', color: '$textSubtle' }}>
-                    Mode: {change.mode}
+                    {t('preview.details.mode')}: {change.mode}
                   </Text>
                 )}
               </Stack>
@@ -216,10 +216,10 @@ const VariableSyncPreviewModal: React.FC<VariableSyncPreviewProps> = ({
             {change.type === 'update' && (
               <Stack direction="column" gap={1}>
                 <Text css={{ fontSize: '$xsmall', color: '$textSubtle' }}>
-                  Current: <span style={{ fontFamily: 'monospace' }}>{change.currentValue}</span>
+                  {t('preview.details.current')}: <span style={{ fontFamily: 'monospace' }}>{change.currentValue}</span>
                 </Text>
                 <Text css={{ fontSize: '$xsmall', color: '$textSubtle' }}>
-                  New: <span style={{ fontFamily: 'monospace' }}>{change.newValue}</span>
+                  {t('preview.details.new')}: <span style={{ fontFamily: 'monospace' }}>{change.newValue}</span>
                 </Text>
               </Stack>
             )}
@@ -227,14 +227,14 @@ const VariableSyncPreviewModal: React.FC<VariableSyncPreviewProps> = ({
             {/* Show new value for creates */}
             {change.type === 'create' && (
               <Text css={{ fontSize: '$xsmall', color: '$textSubtle' }}>
-                Value: <span style={{ fontFamily: 'monospace' }}>{change.newValue}</span>
+                {t('preview.details.value')}: <span style={{ fontFamily: 'monospace' }}>{change.newValue}</span>
               </Text>
             )}
 
             {/* Show current value for deletes */}
             {change.type === 'delete' && (
               <Text css={{ fontSize: '$xsmall', color: '$dangerFg' }}>
-                Current: <span style={{ fontFamily: 'monospace' }}>{change.currentValue}</span>
+                {t('preview.details.current')}: <span style={{ fontFamily: 'monospace' }}>{change.currentValue}</span>
               </Text>
             )}
           </Stack>
@@ -254,7 +254,7 @@ const VariableSyncPreviewModal: React.FC<VariableSyncPreviewProps> = ({
       return (
         <Box css={{ padding: '$6', textAlign: 'center' }}>
           <Text css={{ color: '$textSubtle' }}>
-            No variables to {type}
+            {t(`preview.empty.${type}` as const)}
           </Text>
         </Box>
       );
@@ -269,7 +269,7 @@ const VariableSyncPreviewModal: React.FC<VariableSyncPreviewProps> = ({
               onCheckedChange={() => handleCategoryToggle(type)}
             />
             <Text css={{ fontWeight: '$sansBold' }}>
-              {type === 'create' ? 'Create all' : type === 'update' ? 'Update all' : 'Delete all'}
+              {t(`preview.categories.${type}All` as const)}
             </Text>
             <Text css={{ color: '$textSubtle' }}>
               ({selectedCount}/{filteredChanges.length} selected)
@@ -284,7 +284,7 @@ const VariableSyncPreviewModal: React.FC<VariableSyncPreviewProps> = ({
             {filteredChanges.every((_, index) => {
               const originalIndex = changes.findIndex(c => c === filteredChanges[index]);
               return selectedChanges.has(`${type}-${originalIndex}`);
-            }) ? 'Deselect All' : 'Select All'}
+            }) ? t('preview.actions.deselectAll') : t('preview.actions.selectAll')}
           </Button>
         </Stack>
         
@@ -326,20 +326,20 @@ const VariableSyncPreviewModal: React.FC<VariableSyncPreviewProps> = ({
     >
       {loading ? (
         <Box css={{ padding: '$6', textAlign: 'center' }}>
-          <Text>Analyzing variable changes...</Text>
+          <Text>{t('preview.loading')}</Text>
         </Box>
       ) : (
         <Stack direction="column" gap={4}>
           <Box css={{ padding: '$4', backgroundColor: '$bgSubtle', borderRadius: '$small' }}>
             <Stack direction="row" gap={6}>
               <Text css={{ fontSize: '$small' }}>
-                <strong>{summary.toCreate}</strong> to create
+                <strong>{summary.toCreate}</strong> {t('preview.summary.toCreate')}
               </Text>
               <Text css={{ fontSize: '$small' }}>
-                <strong>{summary.toUpdate}</strong> to update
+                <strong>{summary.toUpdate}</strong> {t('preview.summary.toUpdate')}
               </Text>
               <Text css={{ fontSize: '$small' }}>
-                <strong>{summary.toDelete}</strong> to delete
+                <strong>{summary.toDelete}</strong> {t('preview.summary.toDelete')}
               </Text>
             </Stack>
           </Box>
@@ -347,13 +347,13 @@ const VariableSyncPreviewModal: React.FC<VariableSyncPreviewProps> = ({
           <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)}>
             <Tabs.List>
               <Tabs.Trigger value="create" disabled={summary.toCreate === 0}>
-                To Create ({summary.toCreate})
+                {t('preview.tabs.create')} ({summary.toCreate})
               </Tabs.Trigger>
               <Tabs.Trigger value="update" disabled={summary.toUpdate === 0}>
-                To Update ({summary.toUpdate})
+                {t('preview.tabs.update')} ({summary.toUpdate})
               </Tabs.Trigger>
               <Tabs.Trigger value="delete" disabled={summary.toDelete === 0}>
-                To Delete ({summary.toDelete})
+                {t('preview.tabs.delete')} ({summary.toDelete})
               </Tabs.Trigger>
             </Tabs.List>
             
