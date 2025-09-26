@@ -140,7 +140,7 @@ export default function useManageTokens() {
 
     const userConfirmation = await confirm({
       text: 'Delete token?',
-      description: 'Are you sure you want to delete this token?',
+      description: `Are you sure you want to delete the token "${data.path}"?`,
       choices,
       confirmAction: 'Delete',
       variant: 'danger',
