@@ -7,7 +7,7 @@ import { notifyUI } from './notifiers';
 import { ThemeObject, UsedTokenSetsMap } from '@/types';
 import { ExportTokenSet } from '@/types/ExportTokenSet';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
-import { mergeVariableReferencesWithLocalVariables } from './mergeVariableReferences';
+
 import { LocalVariableInfo } from './createLocalVariablesInPlugin';
 import { findCollectionAndModeIdForTheme } from './findCollectionAndModeIdForTheme';
 import { createNecessaryVariableCollections } from './createNecessaryVariableCollections';
@@ -78,8 +78,33 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
         updatedVariableCollections.push(collection);
       }
     }));
-    const existingVariables = await mergeVariableReferencesWithLocalVariables();
-    updatedVariables = await updateVariablesToReference(existingVariables, referenceVariableCandidates);
+    // Build a comprehensive variable map that includes all variables from all collections
+    // This is crucial for cross-collection references when not using theme groups
+    const allVariables = new Map<string, string>();
+
+    // Add all local variables (existing ones)
+    const localVariables = await getVariablesWithoutZombies();
+    localVariables.forEach((variable) => {
+      const normalizedName = variable.name.split('/').join('.');
+      allVariables.set(normalizedName, variable.key);
+    });
+
+    // Add variables from all collections we just processed
+    updatedVariableCollections.forEach((collection) => {
+      const variablesInCollection = figma.variables
+        .getLocalVariables()
+        .filter((v) => v.variableCollectionId === collection.id);
+
+      variablesInCollection.forEach((variable) => {
+        const normalizedName = variable.name.split('/').join('.');
+        // Only add if not already present (existing variables take precedence)
+        if (!allVariables.has(normalizedName)) {
+          allVariables.set(normalizedName, variable.key);
+        }
+      });
+    });
+
+    updatedVariables = await updateVariablesToReference(allVariables, referenceVariableCandidates);
   }
 
   figmaVariablesAfterCreate += (await getVariablesWithoutZombies())?.length ?? 0;
