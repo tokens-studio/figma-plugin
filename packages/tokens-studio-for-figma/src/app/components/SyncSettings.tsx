@@ -69,6 +69,15 @@ const SyncSettings = () => {
 
   const [open, setOpen] = React.useState(false);
 
+  // Track when user opens the create new sync provider dialog
+  React.useEffect(() => {
+    if (open) {
+      track('Create Sync Provider Dialog Opened', {
+        source: 'sync-settings',
+      });
+    }
+  }, [open]);
+
   const { fetchBranches } = useRemoteTokens();
 
   const [editStorageItemModalVisible, setShowEditStorageModalVisible] = React.useState(Boolean(localApiState.new));

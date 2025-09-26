@@ -166,27 +166,8 @@ export default async function updateTokensOnSources({
     ? defaultTokenResolver.setTokens(mergeTokenGroups(tokens, usedTokenSet))
     : null;
 
-  let tokensSize;
-  let themesSize;
-
-  if (mergedTokens) {
-    try {
-      tokensSize = (compressedTokens.length / 1024) * 2; // UTF-16 uses 2 bytes per character
-      themesSize = (compressedThemes.length / 1024) * 2;
-
-      track('tokens_size', {
-        size: tokensSize,
-        storageProvider: storageType.provider,
-      });
-
-      track('themes_size', {
-        size: themesSize,
-        storageProvider: storageType.provider,
-      });
-    } catch (error) {
-      console.error('Failed to track tokens and themes size:', error);
-    }
-  }
+  const tokensSize = (compressedTokens.length / 1024) * 2; // UTF-16 uses 2 bytes per character
+  const themesSize = (compressedThemes.length / 1024) * 2;
 
   const transaction = startTransaction({
     op: 'transaction',
