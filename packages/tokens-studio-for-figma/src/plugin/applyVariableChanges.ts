@@ -46,8 +46,14 @@ export default async function applyVariableChanges({
       type: AsyncMessageTypes.GET_THEME_INFO,
     });
     
-    const selectedThemeObjects = themeInfo.themes.filter((theme) => selectedThemes.includes(theme.id));
+    // Create necessary collections first (same as original logic)
     collections = await createNecessaryVariableCollections(themeInfo.themes, selectedThemes);
+  } else if (selectedSets && selectedSets.length > 0) {
+    // For token sets, we still need a default collection
+    const existingCollections = figma.variables.getLocalVariableCollections();
+    const defaultCollection = existingCollections.find(c => c.name === 'Default') 
+      || figma.variables.createVariableCollection('Default');
+    collections = [defaultCollection];
   }
 
   // Get existing variables for updates and deletes
@@ -126,29 +132,29 @@ async function handleCreateVariable(
   let collection: VariableCollection;
   let modeId: string;
 
-  if (change.collectionName && themeInfo) {
-    // Find the theme that matches this change
-    const theme = themeInfo.themes.find((t: any) => 
-      (t.group ?? t.name) === change.collectionName || t.name === change.mode
-    );
+  if (change.collectionName && change.mode && themeInfo) {
+    // Use the collection name and mode name from the change to find the right collection
+    const result = findCollectionAndModeIdForTheme(change.collectionName, change.mode, collections);
+    collection = result.collection;
+    modeId = result.modeId;
     
-    if (theme) {
-      const result = findCollectionAndModeIdForTheme(theme.group ?? theme.name, theme.name, collections);
-      collection = result.collection;
-      modeId = result.modeId;
-    } else {
-      // Fallback: use default collection
-      collection = collections[0] || figma.variables.createVariableCollection('Default');
-      modeId = collection.defaultModeId;
+    // If we still don't have a collection, try to find by theme
+    if (!collection || !modeId) {
+      const theme = themeInfo.themes.find((t: any) => t.name === change.mode);
+      if (theme) {
+        const themeResult = findCollectionAndModeIdForTheme(theme.group ?? theme.name, theme.name, collections);
+        collection = themeResult.collection;
+        modeId = themeResult.modeId;
+      }
     }
   } else {
-    // For token sets without themes, use default collection
-    collection = collections[0] || figma.variables.createVariableCollection('Default');
-    modeId = collection.defaultModeId;
+    // For token sets without themes, use first available collection
+    collection = collections[0];
+    modeId = collection?.defaultModeId;
   }
 
   if (!collection || !modeId) {
-    console.warn(`Could not determine collection/mode for: ${change.path}`);
+    console.warn(`Could not determine collection/mode for: ${change.path} (collectionName: ${change.collectionName}, mode: ${change.mode})`);
     return;
   }
 

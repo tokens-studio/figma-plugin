@@ -161,6 +161,7 @@ export default async function previewVariableSync({
             tokenType: mappedToken.type,
             newValue: getFormattedTokenValue(mappedToken, settings),
             description: mappedToken.description,
+            collectionName: 'Default', // Token sets use default collection
             tokenData: {
               value: token.value,
               rawValue: token.rawValue,
