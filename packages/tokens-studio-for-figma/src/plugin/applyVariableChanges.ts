@@ -68,30 +68,43 @@ export default async function applyVariableChanges({
   }, {});
 
   // Process each change
+  console.log('🔧 [DEBUG] Starting to process', changes.length, 'changes');
   for (const change of changes) {
+    console.log('🔧 [DEBUG] Processing change:', {
+      type: change.type,
+      name: change.name,
+      path: change.path,
+      tokenType: change.tokenType,
+    });
+    
     try {
       if (change.type === 'delete' && change.variableId) {
+        console.log('🔧 [DEBUG] Processing DELETE change');
         // Handle deletion
         const variable = variablesById[change.variableId];
         if (variable) {
           variable.remove();
           totalVariables++;
+          console.log('✅ [DEBUG] Variable deleted:', variable.name);
         }
       } else if (change.type === 'create') {
+        console.log('🔧 [DEBUG] Processing CREATE change');
         // Handle creation
         await handleCreateVariable(change, tokens, settings, themeInfo, collections, variableIds);
         totalVariables++;
       } else if (change.type === 'update' && change.variableId) {
+        console.log('🔧 [DEBUG] Processing UPDATE change');
         // Handle update
         const variable = variablesById[change.variableId];
         if (variable) {
           await handleUpdateVariable(variable, change, tokens, settings, themeInfo);
           variableIds[change.name] = variable.id;
           totalVariables++;
+          console.log('✅ [DEBUG] Variable updated:', variable.name);
         }
       }
     } catch (error) {
-      console.error(`Error processing change for ${change.name}:`, error);
+      console.error(`❌ [DEBUG] Error processing change for ${change.name}:`, error);
     }
   }
 
@@ -112,9 +125,19 @@ async function handleCreateVariable(
   collections: VariableCollection[],
   variableIds: Record<string, string>
 ): Promise<void> {
+  console.log('🔧 [DEBUG] handleCreateVariable - Starting creation for:', {
+    changeName: change.name,
+    changePath: change.path,
+    changeType: change.type,
+    collectionName: change.collectionName,
+    mode: change.mode,
+    newValue: change.newValue,
+    tokenData: change.tokenData,
+  });
+
   // Use token data from the change instead of searching
   if (!change.tokenData) {
-    console.warn(`Token data missing for path: ${change.path}`);
+    console.warn(`❌ [DEBUG] Token data missing for path: ${change.path}`);
     return;
   }
   
@@ -127,6 +150,8 @@ async function handleCreateVariable(
     description: change.description,
     internal__Parent: change.tokenData.parent,
   };
+
+  console.log('🔧 [DEBUG] Constructed token object:', token);
 
   // Determine collection and mode
   let collection: VariableCollection;
@@ -154,21 +179,39 @@ async function handleCreateVariable(
   }
 
   if (!collection || !modeId) {
-    console.warn(`Could not determine collection/mode for: ${change.path} (collectionName: ${change.collectionName}, mode: ${change.mode})`);
+    console.warn(`❌ [DEBUG] Could not determine collection/mode for: ${change.path} (collectionName: ${change.collectionName}, mode: ${change.mode})`);
+    console.log('🔧 [DEBUG] Available collections:', collections.map(c => ({ name: c.name, modes: c.modes.map(m => m.name) })));
     return;
   }
 
+  console.log('✅ [DEBUG] Found collection and mode:', {
+    collectionName: collection.name,
+    collectionId: collection.id,
+    modeId,
+    modeName: collection.modes.find(m => m.modeId === modeId)?.name,
+  });
+
   // Create variable
   const variableType = convertTokenTypeToVariableType(token.type as any, token.value);
+  console.log('🔧 [DEBUG] Creating variable with type:', variableType, 'from token type:', token.type, 'and value:', token.value);
+  
   const variable = figma.variables.createVariable(change.path, collection, variableType);
+  console.log('✅ [DEBUG] Variable created:', {
+    id: variable.id,
+    name: variable.name,
+    type: variable.resolvedType,
+  });
   
   if (change.description) {
     variable.description = change.description;
+    console.log('🔧 [DEBUG] Set description:', change.description);
   }
 
   // Set value
+  console.log('🔧 [DEBUG] About to set variable value with:', { modeId, token, settings: !!settings });
   await setVariableValue(variable, modeId, token, settings);
   
+  console.log('✅ [DEBUG] Variable creation completed for:', change.path);
   variableIds[change.name] = variable.id;
 }
 
@@ -224,8 +267,18 @@ async function setVariableValue(
   token: any,
   settings: SettingsState
 ): Promise<void> {
+  console.log('🔧 [DEBUG] setVariableValue called with:', {
+    variableName: variable.name,
+    variableType: variable.resolvedType,
+    modeId,
+    tokenValue: token.value,
+    tokenRawValue: token.rawValue,
+    tokenType: token.type,
+  });
+
   // Handle references
   if (checkCanReferenceVariable(token)) {
+    console.log('🔧 [DEBUG] Token is a reference, processing...');
     let referenceTokenName: string = '';
     if (token.rawValue && token.rawValue.toString().startsWith('{')) {
       referenceTokenName = token.rawValue.toString().slice(1, token.rawValue.toString().length - 1);
@@ -233,47 +286,72 @@ async function setVariableValue(
       referenceTokenName = token.rawValue!.toString().substring(1);
     }
     
+    console.log('🔧 [DEBUG] Looking for reference variable:', referenceTokenName);
+    
     // Find reference variable
     const referenceVariable = figma.variables.getLocalVariables()
       .find(v => v.name === referenceTokenName.split('.').join('/'));
     
     if (referenceVariable) {
+      console.log('✅ [DEBUG] Found reference variable, setting alias');
       variable.setValueForMode(modeId, {
         type: 'VARIABLE_ALIAS',
         id: referenceVariable.id,
       });
       return;
+    } else {
+      console.warn('❌ [DEBUG] Reference variable not found:', referenceTokenName);
     }
   }
 
   // Set direct value based on type
+  console.log('🔧 [DEBUG] Setting direct value for variable type:', variable.resolvedType);
+  
   switch (variable.resolvedType) {
     case 'BOOLEAN':
+      console.log('🔧 [DEBUG] Processing BOOLEAN variable');
       if (typeof token.value === 'string' && !token.value.includes('{')) {
+        console.log('🔧 [DEBUG] Setting boolean value:', token.value);
         setBooleanValuesOnVariable(variable, modeId, token.value);
+      } else {
+        console.warn('❌ [DEBUG] Boolean value invalid or is reference:', token.value);
       }
       break;
     case 'COLOR':
+      console.log('🔧 [DEBUG] Processing COLOR variable');
       if (typeof token.value === 'string' && !token.value.includes('{')) {
+        console.log('🔧 [DEBUG] Setting color value:', token.value);
         setColorValuesOnVariable(variable, modeId, token.value);
+      } else {
+        console.warn('❌ [DEBUG] Color value invalid or is reference:', token.value);
       }
       break;
     case 'FLOAT': {
+      console.log('🔧 [DEBUG] Processing FLOAT variable');
       const value = String(token.value);
       if (typeof value === 'string' && !value.includes('{')) {
         const transformedValue = transformValue(value, token.type, settings.baseFontSize, true);
+        console.log('🔧 [DEBUG] Setting number value:', value, '->', transformedValue);
         setNumberValuesOnVariable(variable, modeId, Number(transformedValue));
+      } else {
+        console.warn('❌ [DEBUG] Number value invalid or is reference:', value);
       }
       break;
     }
     case 'STRING':
+      console.log('🔧 [DEBUG] Processing STRING variable');
       if (typeof token.value === 'string' && !token.value.includes('{')) {
+        console.log('🔧 [DEBUG] Setting string value:', token.value);
         setStringValuesOnVariable(variable, modeId, token.value);
+      } else {
+        console.warn('❌ [DEBUG] String value invalid or is reference:', token.value);
       }
       break;
     default:
-      console.warn(`Unsupported variable type: ${variable.resolvedType}`);
+      console.warn(`❌ [DEBUG] Unsupported variable type: ${variable.resolvedType}`);
       break;
   }
+  
+  console.log('✅ [DEBUG] setVariableValue completed for:', variable.name);
 }
 

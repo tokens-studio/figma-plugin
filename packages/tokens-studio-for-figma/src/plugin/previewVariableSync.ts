@@ -61,17 +61,34 @@ export default async function previewVariableSync({
         .map((token) => mapTokensToVariableInfo(token, theme, settings));
 
       for (const token of variablesToCreate) {
+        console.log('🔍 [DEBUG] Processing token for variable creation:', {
+          name: token.name,
+          path: token.path,
+          type: token.type,
+          value: token.value,
+          rawValue: token.rawValue,
+          description: token.description,
+        });
+
         const existingVariable = existingVariables.find((v) => 
           (v.key === token.variableId && !v.remote) || v.name === token.path
         );
 
         if (existingVariable) {
           handledVariableKeys.add(existingVariable.key);
+          console.log('🔍 [DEBUG] Found existing variable:', existingVariable.name);
           
           // Check if this is an update
           const variableType = convertTokenTypeToVariableType(token.type, token.value);
           const currentValue = getCurrentVariableValue(existingVariable, theme.$figmaModeId);
           const newValue = getFormattedTokenValue(token, settings);
+          
+          console.log('🔍 [DEBUG] Update check:', {
+            variableType,
+            currentValue,
+            newValue,
+            shouldUpdate: shouldUpdateVariable(existingVariable, token, theme.$figmaModeId, settings),
+          });
           
           if (shouldUpdateVariable(existingVariable, token, theme.$figmaModeId, settings)) {
             changes.push({
@@ -94,6 +111,7 @@ export default async function previewVariableSync({
             });
           }
         } else {
+          console.log('🔍 [DEBUG] Creating new variable change preview');
           // This is a new variable
           changes.push({
             type: 'create',
@@ -220,16 +238,27 @@ function getCurrentVariableValue(variable: Variable, modeId?: string): string {
 }
 
 function getFormattedTokenValue(token: any, settings: SettingsState): string {
+  console.log('🔍 [DEBUG] getFormattedTokenValue called with:', {
+    tokenValue: token.value,
+    tokenRawValue: token.rawValue,
+    tokenType: token.type,
+  });
+
   if (typeof token.rawValue === 'string' && token.rawValue.startsWith('{')) {
-    return `{${token.rawValue.slice(1, -1)}}`;
+    const result = `{${token.rawValue.slice(1, -1)}}`;
+    console.log('🔍 [DEBUG] Formatted as reference:', result);
+    return result;
   }
   
   if (token.type === 'dimension' || token.type === 'spacing' || token.type === 'sizing') {
     const transformedValue = transformValue(String(token.value), token.type, settings.baseFontSize, true);
+    console.log('🔍 [DEBUG] Transformed dimension value:', token.value, '->', transformedValue);
     return String(transformedValue);
   }
   
-  return String(token.value || '');
+  const result = String(token.value || '');
+  console.log('🔍 [DEBUG] Formatted as direct value:', result);
+  return result;
 }
 
 function shouldUpdateVariable(variable: Variable, token: any, modeId?: string, settings?: SettingsState): boolean {
