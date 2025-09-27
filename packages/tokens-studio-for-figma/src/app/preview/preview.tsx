@@ -88,9 +88,305 @@ const mockStartupParams: Omit<StartupMessage, 'licenseKey'> = {
   selectedExportThemes: [],
 };
 
+// Sample token data for different examples
+const sampleBasicTokens = {
+  colors: {
+    primary: { $value: '#2563eb', $type: 'color' },
+    secondary: { $value: '#64748b', $type: 'color' },
+    success: { $value: '#059669', $type: 'color' },
+    danger: { $value: '#dc2626', $type: 'color' },
+    'bg-primary': { $value: '#ffffff', $type: 'color' },
+    'bg-secondary': { $value: '#f8fafc', $type: 'color' },
+  },
+  spacing: {
+    xs: { $value: '4px', $type: 'spacing' },
+    sm: { $value: '8px', $type: 'spacing' },
+    md: { $value: '16px', $type: 'spacing' },
+    lg: { $value: '24px', $type: 'spacing' },
+    xl: { $value: '32px', $type: 'spacing' },
+  },
+  typography: {
+    'heading-lg': {
+      $value: { fontFamily: 'Inter', fontSize: '24px', fontWeight: '700' },
+      $type: 'typography',
+    },
+    'body-md': {
+      $value: { fontFamily: 'Inter', fontSize: '16px', fontWeight: '400' },
+      $type: 'typography',
+    },
+    'caption-sm': {
+      $value: { fontFamily: 'Inter', fontSize: '12px', fontWeight: '400' },
+      $type: 'typography',
+    },
+  },
+};
+
+const sampleComplexTokens = {
+  'core/colors': {
+    'blue-50': { $value: '#eff6ff', $type: 'color' },
+    'blue-100': { $value: '#dbeafe', $type: 'color' },
+    'blue-500': { $value: '#3b82f6', $type: 'color' },
+    'blue-900': { $value: '#1e3a8a', $type: 'color' },
+    'gray-50': { $value: '#f9fafb', $type: 'color' },
+    'gray-100': { $value: '#f3f4f6', $type: 'color' },
+    'gray-500': { $value: '#6b7280', $type: 'color' },
+    'gray-900': { $value: '#111827', $type: 'color' },
+  },
+  'semantic/colors': {
+    'text-primary': { $value: '{core/colors.gray-900}', $type: 'color' },
+    'text-secondary': { $value: '{core/colors.gray-500}', $type: 'color' },
+    'bg-primary': { $value: '{core/colors.blue-500}', $type: 'color' },
+    'bg-surface': { $value: '{core/colors.gray-50}', $type: 'color' },
+    'border-default': { $value: '{core/colors.gray-100}', $type: 'color' },
+  },
+  'component/button': {
+    'primary-bg': { $value: '{semantic/colors.bg-primary}', $type: 'color' },
+    'primary-text': { $value: '#ffffff', $type: 'color' },
+    'secondary-bg': { $value: 'transparent', $type: 'color' },
+    'secondary-text': { $value: '{semantic/colors.text-primary}', $type: 'color' },
+    'secondary-border': { $value: '{semantic/colors.border-default}', $type: 'color' },
+  },
+};
+
+const sampleThemes = [
+  {
+    id: 'light',
+    name: 'Light Theme',
+    selectedTokenSets: {
+      colors: 'enabled',
+      spacing: 'enabled',
+      typography: 'enabled',
+    },
+  },
+  {
+    id: 'dark',
+    name: 'Dark Theme',
+    selectedTokenSets: {
+      colors: 'enabled',
+      spacing: 'enabled',
+      typography: 'enabled',
+    },
+  },
+];
+
+// Create different startup scenarios for various use cases
 const mockActions = {
   STARTUP: {
     default: mockStartupParams,
+  },
+  // Fresh start - no tokens loaded
+  FRESH_START: {
+    type: AsyncMessageTypes.STARTUP,
+    activeTheme: {},
+    lastOpened: Date.now(),
+    initialLoad: true,
+    usedEmail: null,
+    authData: null,
+    onboardingExplainer: {
+      sets: false,
+      exportSets: false,
+      inspect: false,
+      syncProviders: false,
+    },
+    localApiProviders: [],
+    settings: mockSettings,
+    storageType: {
+      provider: StorageProviderType.LOCAL,
+    },
+    user: mockUser,
+    localTokenData: {
+      activeTheme: '',
+      checkForChanges: true,
+      themes: [],
+      usedTokenSet: null,
+      updatedAt: new Date().toISOString(),
+      values: {},
+      collapsedTokenSets: null,
+      tokenFormat: TokenFormatOptions.Legacy,
+      version: '91',
+    },
+    selectedExportThemes: [],
+  },
+  // Basic tokens loaded
+  WITH_BASIC_TOKENS: {
+    type: AsyncMessageTypes.STARTUP,
+    activeTheme: { light: 'enabled' },
+    lastOpened: Date.now(),
+    initialLoad: false,
+    usedEmail: null,
+    authData: null,
+    onboardingExplainer: {
+      sets: true,
+      exportSets: false,
+      inspect: false,
+      syncProviders: false,
+    },
+    localApiProviders: [],
+    settings: mockSettings,
+    storageType: {
+      provider: StorageProviderType.LOCAL,
+    },
+    user: mockUser,
+    localTokenData: {
+      activeTheme: 'light',
+      checkForChanges: true,
+      themes: sampleThemes,
+      usedTokenSet: { colors: true, spacing: true, typography: true },
+      updatedAt: new Date().toISOString(),
+      values: sampleBasicTokens,
+      collapsedTokenSets: null,
+      tokenFormat: TokenFormatOptions.Legacy,
+      version: '91',
+    },
+    selectedExportThemes: ['light'],
+  },
+  // Complex multi-level tokens with themes
+  WITH_COMPLEX_TOKENS: {
+    type: AsyncMessageTypes.STARTUP,
+    activeTheme: { 'light-theme': 'enabled' },
+    lastOpened: Date.now(),
+    initialLoad: false,
+    usedEmail: null,
+    authData: null,
+    onboardingExplainer: {
+      sets: true,
+      exportSets: true,
+      inspect: true,
+      syncProviders: false,
+    },
+    localApiProviders: [],
+    settings: mockSettings,
+    storageType: {
+      provider: StorageProviderType.LOCAL,
+    },
+    user: mockUser,
+    localTokenData: {
+      activeTheme: 'light-theme',
+      checkForChanges: true,
+      themes: [
+        {
+          id: 'light-theme',
+          name: 'Light Theme',
+          selectedTokenSets: {
+            'core/colors': 'source',
+            'semantic/colors': 'enabled',
+            'component/button': 'enabled',
+          },
+        },
+        {
+          id: 'dark-theme',
+          name: 'Dark Theme',
+          selectedTokenSets: {
+            'core/colors': 'source',
+            'semantic/colors': 'enabled',
+            'component/button': 'enabled',
+          },
+        },
+      ],
+      usedTokenSet: { 'core/colors': true, 'semantic/colors': true, 'component/button': true },
+      updatedAt: new Date().toISOString(),
+      values: sampleComplexTokens,
+      collapsedTokenSets: { 'semantic/colors': false },
+      tokenFormat: TokenFormatOptions.Legacy,
+      version: '91',
+    },
+    selectedExportThemes: ['light-theme', 'dark-theme'],
+  },
+  // With GitHub sync configured
+  WITH_GITHUB_SYNC: {
+    type: AsyncMessageTypes.STARTUP,
+    activeTheme: { main: 'enabled' },
+    lastOpened: Date.now(),
+    initialLoad: false,
+    usedEmail: 'developer@example.com',
+    authData: {
+      id: 'github-auth',
+      provider: 'github',
+      secret: 'mock-token',
+    },
+    onboardingExplainer: {
+      sets: true,
+      exportSets: true,
+      inspect: true,
+      syncProviders: true,
+    },
+    localApiProviders: [
+      {
+        provider: 'github',
+        id: 'github-sync',
+        name: 'Design Tokens Repo',
+        secret: 'mock-github-token',
+      },
+    ],
+    settings: mockSettings,
+    storageType: {
+      provider: StorageProviderType.GITHUB,
+      id: 'github-sync',
+      name: 'Design Tokens Repo',
+      owner: 'design-team',
+      repository: 'design-tokens',
+      branch: 'main',
+      filePath: 'tokens.json',
+    },
+    user: mockUser,
+    localTokenData: {
+      activeTheme: 'main',
+      checkForChanges: true,
+      themes: [
+        {
+          id: 'main',
+          name: 'Main Theme',
+          selectedTokenSets: {
+            foundation: 'enabled',
+            semantic: 'enabled',
+            components: 'enabled',
+          },
+        },
+      ],
+      usedTokenSet: { foundation: true, semantic: true, components: true },
+      updatedAt: new Date().toISOString(),
+      values: sampleComplexTokens,
+      collapsedTokenSets: null,
+      tokenFormat: TokenFormatOptions.DTCG,
+      version: '91',
+    },
+    selectedExportThemes: ['main'],
+  },
+  // Inspector mode with selection
+  INSPECTOR_MODE: {
+    type: AsyncMessageTypes.STARTUP,
+    activeTheme: { design: 'enabled' },
+    lastOpened: Date.now(),
+    initialLoad: false,
+    usedEmail: null,
+    authData: null,
+    onboardingExplainer: {
+      sets: true,
+      exportSets: true,
+      inspect: true,
+      syncProviders: false,
+    },
+    localApiProviders: [],
+    settings: {
+      ...mockSettings,
+      inspectDeep: true,
+    },
+    storageType: {
+      provider: StorageProviderType.LOCAL,
+    },
+    user: mockUser,
+    localTokenData: {
+      activeTheme: 'design',
+      checkForChanges: true,
+      themes: sampleThemes,
+      usedTokenSet: { colors: true, spacing: true, typography: true },
+      updatedAt: new Date().toISOString(),
+      values: sampleBasicTokens,
+      collapsedTokenSets: null,
+      tokenFormat: TokenFormatOptions.Legacy,
+      version: '91',
+    },
+    selectedExportThemes: ['design'],
   },
 };
 
@@ -107,6 +403,11 @@ const dispatchMockMessage = (message) => {
 const MockMessageForm = ({ type, handleClose }: { type?: string, handleClose: () => void }) => {
   const [value, setValue] = useState({
     STARTUP: JSON.stringify(mockStartupParams, null, 2),
+    FRESH_START: JSON.stringify(mockActions.FRESH_START, null, 2),
+    WITH_BASIC_TOKENS: JSON.stringify(mockActions.WITH_BASIC_TOKENS, null, 2),
+    WITH_COMPLEX_TOKENS: JSON.stringify(mockActions.WITH_COMPLEX_TOKENS, null, 2),
+    WITH_GITHUB_SYNC: JSON.stringify(mockActions.WITH_GITHUB_SYNC, null, 2),
+    INSPECTOR_MODE: JSON.stringify(mockActions.INSPECTOR_MODE, null, 2),
     DEFAULT: '',
   }[type || 'DEFAULT'] || '');
   const [error, setError] = useState('');
@@ -341,6 +642,10 @@ function PreviewApp({ children }: { children: ReactNode }) {
     [updateHash],
   );
 
+  const onQuickLinkClick = React.useCallback((hash: string) => () => {
+    window.location.hash = hash;
+  }, []);
+
   const handleCloseCustomModal = useCallback(() => {
     setMockMessageModalOpen('');
   }, []);
@@ -405,13 +710,21 @@ function PreviewApp({ children }: { children: ReactNode }) {
             className="content scroll-container"
           >
             {
-            [{ type: 'STARTUP' }, { type: 'CUSTOM' }].map((mockAction) => (
+            [
+              { type: 'STARTUP', label: 'Default Startup' },
+              { type: 'FRESH_START', label: 'Fresh Start (No Tokens)' },
+              { type: 'WITH_BASIC_TOKENS', label: 'Basic Design Tokens' },
+              { type: 'WITH_COMPLEX_TOKENS', label: 'Complex Token System' },
+              { type: 'WITH_GITHUB_SYNC', label: 'GitHub Sync Setup' },
+              { type: 'INSPECTOR_MODE', label: 'Inspector Mode' },
+              { type: 'CUSTOM', label: 'Custom JSON...' },
+            ].map((mockAction) => (
               <DropdownMenu.Item
                 key={mockAction.type}
                 onSelect={onActionSelected(mockAction.type)}
                 css={{ display: 'flex', gap: '$3' }}
               >
-                {mockAction.type}
+                {mockAction.label}
               </DropdownMenu.Item>
             ))
           }
@@ -447,6 +760,62 @@ function PreviewApp({ children }: { children: ReactNode }) {
       {PREVIEW_ENV === 'browser' ? (
         <>
           {previewHeader}
+
+          {/* Quick Preview Links */}
+          <Stack
+            direction="column"
+            gap={3}
+            css={{
+              color: '$fgMuted',
+              backgroundColor: '$bgSubtle',
+              padding: '$4',
+              borderRadius: '$medium',
+              marginBottom: '$4',
+              border: '1px solid $borderMuted',
+            }}
+          >
+            <Text css={{ fontSize: '$large', fontWeight: '$semibold' }}>Quick Start Examples</Text>
+            <Text css={{ fontSize: '$small', color: '$fgMuted' }}>
+              Click these links to quickly preview different plugin states. Useful for testing, screenshots, and development.
+            </Text>
+            <Stack direction="column" gap={2}>
+              <Stack direction="row" gap={3} css={{ flexWrap: 'wrap' }}>
+                {[
+                  { hash: '#tab=start&action=FRESH_START', label: 'Fresh Start' },
+                  { hash: '#tab=tokens&action=WITH_BASIC_TOKENS', label: 'Tokens Tab' },
+                  { hash: '#tab=inspector&action=INSPECTOR_MODE', label: 'Inspector' },
+                  { hash: '#tab=json&action=WITH_COMPLEX_TOKENS', label: 'JSON Editor' },
+                  { hash: '#tab=settings&action=WITH_GITHUB_SYNC', label: 'Settings' },
+                ].map(({ hash, label }) => (
+                  <Button
+                    key={hash}
+                    variant="secondary"
+                    size="small"
+                    onClick={onQuickLinkClick(hash)}
+                  >
+                    {label}
+                  </Button>
+                ))}
+              </Stack>
+              <Stack direction="row" gap={3} css={{ flexWrap: 'wrap' }}>
+                {[
+                  { hash: '#tab=tokens&action=WITH_COMPLEX_TOKENS&theme=dark', label: '🌙 Dark Theme' },
+                  { hash: '#tab=tokens&action=WITH_COMPLEX_TOKENS&fullscreen=true', label: '🔍 Fullscreen' },
+                  { hash: '#tab=tokens&action=WITH_GITHUB_SYNC&theme=system', label: '🔄 GitHub Sync' },
+                ].map(({ hash, label }) => (
+                  <Button
+                    key={hash}
+                    variant="invisible"
+                    size="small"
+                    onClick={onQuickLinkClick(hash)}
+                  >
+                    {label}
+                  </Button>
+                ))}
+              </Stack>
+            </Stack>
+          </Stack>
+
           <PreviewPluginWindow
             height={fullscreen ? '100%' : settings.uiWindow?.height}
             width={fullscreen ? '100%' : settings.uiWindow?.width}
