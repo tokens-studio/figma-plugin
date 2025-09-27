@@ -63,36 +63,17 @@ export default async function previewVariableSync({
         .map((token) => mapTokensToVariableInfo(token, theme, settings));
 
       for (const token of variablesToCreate) {
-        console.log('🔍 [DEBUG] Processing token for variable creation:', {
-          name: token.name,
-          path: token.path,
-          type: token.type,
-          value: token.value,
-          rawValue: token.rawValue,
-          description: token.description,
-          valueType: typeof token.value,
-          rawValueType: typeof token.rawValue,
-        });
-
         const existingVariable = existingVariables.find((v) => 
           (v.key === token.variableId && !v.remote) || v.name === token.path
         );
 
         if (existingVariable) {
           handledVariableKeys.add(existingVariable.key);
-          console.log('🔍 [DEBUG] Found existing variable:', existingVariable.name);
           
           // Check if this is an update
           const variableType = convertTokenTypeToVariableType(token.type, token.value);
           const currentValue = getCurrentVariableValue(existingVariable, theme.$figmaModeId);
           const newValue = getFormattedTokenValue(token, settings);
-          
-          console.log('🔍 [DEBUG] Update check:', {
-            variableType,
-            currentValue,
-            newValue,
-            shouldUpdate: shouldUpdateVariable(existingVariable, token, theme.$figmaModeId, settings),
-          });
           
           if (shouldUpdateVariable(existingVariable, token, theme.$figmaModeId, settings)) {
             changes.push({
@@ -115,7 +96,6 @@ export default async function previewVariableSync({
             });
           }
         } else {
-          console.log('🔍 [DEBUG] Creating new variable change preview');
           // This is a new variable
           changes.push({
             type: 'create',
@@ -248,12 +228,7 @@ function getCurrentVariableValue(variable: Variable, modeId?: string): string {
     const targetModeId = modeId || modes[0];
     const value = variable.valuesByMode[targetModeId];
     
-    console.log('🔍 [DEBUG] getCurrentVariableValue raw value:', {
-      variableName: variable.name,
-      variableType: variable.resolvedType,
-      modeId: targetModeId,
-      rawValue: value,
-    });
+    console.log(`🔍 ${variable.name} [${targetModeId}]:`, typeof value === 'object' && value && 'type' in value ? 'REFERENCE' : value);
     
     // Handle variable references - try to resolve them to actual values
     if (typeof value === 'object' && value && 'type' in value) {
@@ -276,47 +251,33 @@ function getCurrentVariableValue(variable: Variable, modeId?: string): string {
               // Try to find mode with same name in referenced collection
               const matchingMode = referencedCollection?.modes.find(m => m.name === currentModeName);
               referencedModeId = matchingMode?.modeId || referencedCollection?.modes[0]?.modeId || Object.keys(referencedVariable.valuesByMode)[0];
+              
+              console.log(`🔗 ${variable.name} → ${referencedVariable.name} [${currentModeName || 'unknown'}]`);
             }
-            
-            console.log('🔍 [DEBUG] Reference resolution details:', {
-              referencedVariableName: referencedVariable.name,
-              referencedModeId,
-              sameCollection: referencedVariable.variableCollectionId === variable.variableCollectionId,
-            });
             
             const referencedValue = referencedVariable.valuesByMode[referencedModeId];
             
             // If the referenced variable has a direct value (not another alias), use it
             if (typeof referencedValue === 'number' || typeof referencedValue === 'string' || typeof referencedValue === 'boolean') {
-              const result = String(referencedValue);
-              console.log('🔍 [DEBUG] Variable alias resolved to value:', result);
-              return result;
+              return String(referencedValue);
             }
             
             // If it's a color object, format it
             if (typeof referencedValue === 'object' && referencedValue && 'r' in referencedValue) {
               try {
-                const result = figmaRGBToHex(referencedValue);
-                console.log('🔍 [DEBUG] Variable alias resolved to color:', result);
-                return result;
+                return figmaRGBToHex(referencedValue);
               } catch (e) {
-                // Fallback to manual conversion
                 const r = Math.round(referencedValue.r * 255);
                 const g = Math.round(referencedValue.g * 255);
                 const b = Math.round(referencedValue.b * 255);
-                const result = `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`.toUpperCase();
-                console.log('🔍 [DEBUG] Variable alias resolved to color (fallback):', result);
-                return result;
+                return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`.toUpperCase();
               }
             }
           }
           
           // Fallback: show as reference if we can't resolve
-          const result = `{${referencedVariable?.name?.split('/').join('.') || 'unknown'}}`;
-          console.log('🔍 [DEBUG] Variable alias kept as reference (unresolvable):', result);
-          return result;
+          return `{${referencedVariable?.name?.split('/').join('.') || 'unknown'}}`;
         } catch (e) {
-          console.warn('🔍 [DEBUG] Could not resolve variable reference:', e);
           return `{reference to variable}`;
         }
       }
@@ -325,49 +286,33 @@ function getCurrentVariableValue(variable: Variable, modeId?: string): string {
     // Handle color objects (RGB/RGBA)
     if (typeof value === 'object' && value && 'r' in value && 'g' in value && 'b' in value) {
       try {
-        // Use figma helper to convert RGB to hex
-        const result = figmaRGBToHex(value);
-        console.log('🔍 [DEBUG] Color object formatted as hex using figmaRGBToHex:', result);
-        return result;
+        return figmaRGBToHex(value);
       } catch (e) {
-        // Fallback to manual conversion
         const r = Math.round(value.r * 255);
         const g = Math.round(value.g * 255);
         const b = Math.round(value.b * 255);
-        const result = `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`.toUpperCase();
-        console.log('🔍 [DEBUG] Color object formatted as hex (fallback):', result);
-        return result;
+        return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`.toUpperCase();
       }
     }
     
     // Handle boolean values
     if (typeof value === 'boolean') {
-      const result = value.toString();
-      console.log('🔍 [DEBUG] Boolean value formatted:', result);
-      return result;
+      return value.toString();
     }
     
     // Handle number values - apply rounding to match token processing
     if (typeof value === 'number') {
-      // Round to reasonable precision to avoid floating point errors
       const rounded = Math.round(value * 1000) / 1000; // 3 decimal places
-      const result = rounded.toString();
-      console.log('🔍 [DEBUG] Number value formatted with rounding:', value, '->', result);
-      return result;
+      return rounded.toString();
     }
     
     // Handle string values
     if (typeof value === 'string') {
-      console.log('🔍 [DEBUG] String value used as-is:', value);
       return value;
     }
     
-    // Fallback for any other type
-    const result = String(value || '');
-    console.log('🔍 [DEBUG] Unknown type formatted as string:', result);
-    return result;
+    return String(value || '');
   } catch (e) {
-    console.error('🔍 [DEBUG] Error getting current variable value:', e);
     return 'Unable to read';
   }
 }
@@ -434,54 +379,19 @@ function shouldUpdateVariable(variable: Variable, token: any, modeId?: string, s
   const currentValue = getCurrentVariableValue(variable, modeId);
   const newValue = getFormattedTokenValue(token, settings || {} as SettingsState);
   
-  console.log('🔍 [DEBUG] shouldUpdateVariable comparison:', {
-    variableName: variable.name,
-    currentValue,
-    newValue,
-    areEqual: currentValue === newValue,
-    currentDescription: variable.description,
-    newDescription: token.description || '',
-    descriptionChanged: variable.description !== (token.description || ''),
-    tokenRawValue: token.rawValue,
-    tokenValue: token.value,
-  });
-  
   // Special handling for reference comparison
   if (isTokenReference(token) && isVariableReference(variable, modeId)) {
     const referenceMatches = compareReferences(variable, token, modeId);
-    console.log('🔍 [DEBUG] Reference comparison result:', referenceMatches);
     if (referenceMatches !== null) {
-      // We were able to determine reference equality, use that result
-      if (referenceMatches) {
-        console.log('✅ [DEBUG] References match - checking description only');
-        // References match, only check description
-        if (variable.description !== (token.description || '')) {
-          console.log('✅ [DEBUG] Description changed - update needed');
-          return true;
-        }
-        console.log('❌ [DEBUG] References match and description unchanged - no update needed');
-        return false;
-      } else {
-        console.log('✅ [DEBUG] References differ - update needed');
-        return true;
-      }
+      console.log(`📋 ${variable.name}: Reference ${referenceMatches ? 'MATCH' : 'DIFFER'}`);
+      return !referenceMatches || (variable.description !== (token.description || ''));
     }
   }
   
-  // Check if values are different
-  if (currentValue !== newValue) {
-    console.log('✅ [DEBUG] Values are different - update needed');
-    return true;
-  }
+  const needsUpdate = currentValue !== newValue || (variable.description !== (token.description || ''));
+  console.log(`📋 ${variable.name}: ${currentValue} → ${newValue} [${needsUpdate ? 'UPDATE' : 'SKIP'}]`);
   
-  // Check if description changed
-  if (variable.description !== (token.description || '')) {
-    console.log('✅ [DEBUG] Description changed - update needed');
-    return true;
-  }
-  
-  console.log('❌ [DEBUG] No changes detected - update not needed');
-  return false;
+  return needsUpdate;
 }
 
 function isTokenReference(token: any): boolean {

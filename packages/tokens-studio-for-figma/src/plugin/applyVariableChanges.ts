@@ -179,28 +179,15 @@ async function handleCreateVariable(
   }
 
   if (!collection || !modeId) {
-    console.warn(`❌ [DEBUG] Could not determine collection/mode for: ${change.path} (collectionName: ${change.collectionName}, mode: ${change.mode})`);
-    console.log('🔧 [DEBUG] Available collections:', collections.map(c => ({ name: c.name, modes: c.modes.map(m => m.name) })));
+    console.warn(`❌ Could not determine collection/mode for: ${change.path} (collectionName: ${change.collectionName}, mode: ${change.mode})`);
     return;
   }
 
-  console.log('✅ [DEBUG] Found collection and mode:', {
-    collectionName: collection.name,
-    collectionId: collection.id,
-    modeId,
-    modeName: collection.modes.find(m => m.modeId === modeId)?.name,
-  });
+  console.log(`🔧 CREATE ${change.path} [${change.mode || 'default'}] in collection '${collection.name}'`);
 
   // Create variable
   const variableType = convertTokenTypeToVariableType(token.type as any, token.value);
-  console.log('🔧 [DEBUG] Creating variable with type:', variableType, 'from token type:', token.type, 'and value:', token.value);
-  
   const variable = figma.variables.createVariable(change.path, collection, variableType);
-  console.log('✅ [DEBUG] Variable created:', {
-    id: variable.id,
-    name: variable.name,
-    type: variable.resolvedType,
-  });
   
   if (change.description) {
     variable.description = change.description;
@@ -252,30 +239,18 @@ async function handleUpdateVariable(
   let modeId: string;
   if (change.mode && themeInfo) {
     const theme = themeInfo.themes.find((t: any) => t.name === change.mode);
-    console.log('🔧 [DEBUG] Finding mode for update:', {
-      changeName: change.name,
-      changeMode: change.mode,
-      foundTheme: !!theme,
-      themeFigmaModeId: theme?.$figmaModeId,
-      variableAvailableModes: Object.keys(variable.valuesByMode),
-    });
-    
     modeId = theme?.$figmaModeId || Object.keys(variable.valuesByMode)[0];
     
     // Verify the mode exists in the variable
     if (!variable.valuesByMode[modeId]) {
-      console.warn('🔧 [DEBUG] Mode not found in variable, using first available mode');
+      console.warn(`⚠️ Mode '${change.mode}' not found in variable ${variable.name}, using first available`);
       modeId = Object.keys(variable.valuesByMode)[0];
+    } else {
+      console.log(`🔧 UPDATE ${variable.name} [${change.mode}] with value from token`);
     }
   } else {
     modeId = Object.keys(variable.valuesByMode)[0];
   }
-  
-  console.log('🔧 [DEBUG] Using mode for update:', {
-    modeId,
-    modeName: 'Mode lookup needed',
-    variableName: variable.name,
-  });
 
   // Set new value
   await setVariableValue(variable, modeId, token, settings);
