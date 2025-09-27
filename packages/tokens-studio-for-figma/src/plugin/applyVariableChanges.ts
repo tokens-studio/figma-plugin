@@ -343,11 +343,10 @@ async function setVariableValue(
       if (typeof token.value === 'string' && !token.value.includes('{')) {
         console.log('🔧 [DEBUG] Setting string value:', token.value);
         setStringValuesOnVariable(variable, modeId, token.value);
-      } else if (token.type === TokenTypes.FONT_WEIGHTS && Array.isArray(token.value)) {
-        console.log('🔧 [DEBUG] Font weight array detected, using first element:', token.value, '->', token.value[0]);
-        setStringValuesOnVariable(variable, modeId, token.value[0]);
       } else {
         console.warn('❌ [DEBUG] String value invalid or is reference:', token.value);
+        // Note: Font weight arrays should now be normalized at preview time, 
+        // so we shouldn't reach this case for font weights anymore
       }
       break;
     default:

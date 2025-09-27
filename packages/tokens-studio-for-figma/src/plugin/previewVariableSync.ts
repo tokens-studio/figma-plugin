@@ -11,6 +11,7 @@ import { getOverallConfig } from '@/utils/tokenHelpers';
 import { convertTokenTypeToVariableType } from '@/utils/convertTokenTypeToVariableType';
 import { transformValue } from './helpers';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import { TokenTypes } from '@/constants/TokenTypes';
 
 export type PreviewVariableSyncParams = {
   tokens: Record<string, AnyTokenList>;
@@ -103,7 +104,7 @@ export default async function previewVariableSync({
               collectionName: getCollectionName(existingVariable),
               mode: theme.name,
               tokenData: {
-                value: token.value,
+                value: normalizeTokenValue(token),  // Use normalized value
                 rawValue: token.rawValue,
                 type: token.type,
                 parent: token.internal__Parent,
@@ -123,7 +124,7 @@ export default async function previewVariableSync({
             collectionName: theme.group ?? theme.name,
             mode: theme.name,
             tokenData: {
-              value: token.value,
+              value: normalizeTokenValue(token),  // Use normalized value
               rawValue: token.rawValue,
               type: token.type,
               parent: token.internal__Parent,
@@ -164,7 +165,7 @@ export default async function previewVariableSync({
               variableId: existingVariable.id,
               collectionName: getCollectionName(existingVariable),
               tokenData: {
-                value: token.value,
+                value: normalizeTokenValue(token),  // Use normalized value
                 rawValue: token.rawValue,
                 type: token.type,
                 parent: token.internal__Parent,
@@ -181,7 +182,7 @@ export default async function previewVariableSync({
             description: mappedToken.description,
             collectionName: 'Default', // Token sets use default collection
             tokenData: {
-              value: token.value,
+              value: normalizeTokenValue(token),  // Use normalized value
               rawValue: token.rawValue,
               type: token.type,
               parent: token.internal__Parent,
@@ -237,6 +238,16 @@ function getCurrentVariableValue(variable: Variable, modeId?: string): string {
   }
 }
 
+function normalizeTokenValue(token: any): any {
+  // Handle font weight arrays - take first element like in original logic
+  if (token.type === TokenTypes.FONT_WEIGHTS && Array.isArray(token.value)) {
+    console.log('🔍 [DEBUG] Normalizing font weight array:', token.value, '->', token.value[0]);
+    return token.value[0];
+  }
+  
+  return token.value;
+}
+
 function getFormattedTokenValue(token: any, settings: SettingsState): string {
   console.log('🔍 [DEBUG] getFormattedTokenValue called with:', {
     tokenValue: token.value,
@@ -250,13 +261,16 @@ function getFormattedTokenValue(token: any, settings: SettingsState): string {
     return result;
   }
   
+  // Use normalized value for formatting
+  const normalizedValue = normalizeTokenValue(token);
+  
   if (token.type === 'dimension' || token.type === 'spacing' || token.type === 'sizing') {
-    const transformedValue = transformValue(String(token.value), token.type, settings.baseFontSize, true);
-    console.log('🔍 [DEBUG] Transformed dimension value:', token.value, '->', transformedValue);
+    const transformedValue = transformValue(String(normalizedValue), token.type, settings.baseFontSize, true);
+    console.log('🔍 [DEBUG] Transformed dimension value:', normalizedValue, '->', transformedValue);
     return String(transformedValue);
   }
   
-  const result = String(token.value || '');
+  const result = String(normalizedValue || '');
   console.log('🔍 [DEBUG] Formatted as direct value:', result);
   return result;
 }
