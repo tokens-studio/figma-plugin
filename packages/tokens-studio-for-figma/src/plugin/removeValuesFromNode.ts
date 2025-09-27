@@ -12,11 +12,6 @@ function removeStrokeIfEmptySides(node) {
 }
 
 export default function removeValuesFromNode(node: BaseNode, prop: Properties) {
-  // Commit undo point before removing values from node
-  if (typeof figma !== 'undefined' && figma.commitUndo) {
-    figma.commitUndo();
-  }
-  
   // BORDER RADIUS
   switch (prop) {
     case 'width':
