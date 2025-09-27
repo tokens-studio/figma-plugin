@@ -255,14 +255,45 @@ function getCurrentVariableValue(variable: Variable, modeId?: string): string {
       rawValue: value,
     });
     
-    // Handle variable references
+    // Handle variable references - try to resolve them to actual values
     if (typeof value === 'object' && value && 'type' in value) {
       if (value.type === 'VARIABLE_ALIAS') {
-        // Try to get the referenced variable name for comparison
         try {
           const referencedVariable = figma.variables.getVariableById(value.id);
+          if (referencedVariable) {
+            // Try to get the resolved value from the referenced variable
+            const collection = figma.variables.getVariableCollectionById(referencedVariable.variableCollectionId);
+            const firstModeId = collection?.modes[0]?.modeId || Object.keys(referencedVariable.valuesByMode)[0];
+            const referencedValue = referencedVariable.valuesByMode[firstModeId];
+            
+            // If the referenced variable has a direct value (not another alias), use it
+            if (typeof referencedValue === 'number' || typeof referencedValue === 'string' || typeof referencedValue === 'boolean') {
+              const result = String(referencedValue);
+              console.log('🔍 [DEBUG] Variable alias resolved to value:', result);
+              return result;
+            }
+            
+            // If it's a color object, format it
+            if (typeof referencedValue === 'object' && referencedValue && 'r' in referencedValue) {
+              try {
+                const result = figmaRGBToHex(referencedValue);
+                console.log('🔍 [DEBUG] Variable alias resolved to color:', result);
+                return result;
+              } catch (e) {
+                // Fallback to manual conversion
+                const r = Math.round(referencedValue.r * 255);
+                const g = Math.round(referencedValue.g * 255);
+                const b = Math.round(referencedValue.b * 255);
+                const result = `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`.toUpperCase();
+                console.log('🔍 [DEBUG] Variable alias resolved to color (fallback):', result);
+                return result;
+              }
+            }
+          }
+          
+          // Fallback: show as reference if we can't resolve
           const result = `{${referencedVariable?.name?.split('/').join('.') || 'unknown'}}`;
-          console.log('🔍 [DEBUG] Variable alias formatted as:', result);
+          console.log('🔍 [DEBUG] Variable alias kept as reference (unresolvable):', result);
           return result;
         } catch (e) {
           console.warn('🔍 [DEBUG] Could not resolve variable reference:', e);
@@ -296,10 +327,12 @@ function getCurrentVariableValue(variable: Variable, modeId?: string): string {
       return result;
     }
     
-    // Handle number values
+    // Handle number values - apply rounding to match token processing
     if (typeof value === 'number') {
-      const result = value.toString();
-      console.log('🔍 [DEBUG] Number value formatted:', result);
+      // Round to reasonable precision to avoid floating point errors
+      const rounded = Math.round(value * 1000) / 1000; // 3 decimal places
+      const result = rounded.toString();
+      console.log('🔍 [DEBUG] Number value formatted with rounding:', value, '->', result);
       return result;
     }
     
@@ -355,8 +388,21 @@ function getFormattedTokenValue(token: any, settings: SettingsState): string {
   // For dimension/spacing/sizing tokens, apply transformations to the resolved value
   if (token.type === 'dimension' || token.type === 'spacing' || token.type === 'sizing') {
     const transformedValue = transformValue(String(normalizedValue), token.type, settings.baseFontSize, true);
+    // Apply same rounding as getCurrentVariableValue to ensure consistency
+    if (typeof transformedValue === 'number') {
+      const rounded = Math.round(transformedValue * 1000) / 1000; // 3 decimal places
+      console.log('🔍 [DEBUG] Transformed and rounded dimension value:', normalizedValue, '->', transformedValue, '->', rounded);
+      return String(rounded);
+    }
     console.log('🔍 [DEBUG] Transformed dimension value:', normalizedValue, '->', transformedValue);
     return String(transformedValue);
+  }
+  
+  // Apply rounding to numeric values for consistency
+  if (typeof normalizedValue === 'number') {
+    const rounded = Math.round(normalizedValue * 1000) / 1000; // 3 decimal places
+    console.log('🔍 [DEBUG] Formatted as rounded number:', normalizedValue, '->', rounded);
+    return String(rounded);
   }
   
   const result = String(normalizedValue || '');
