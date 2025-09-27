@@ -261,10 +261,30 @@ function getCurrentVariableValue(variable: Variable, modeId?: string): string {
         try {
           const referencedVariable = figma.variables.getVariableById(value.id);
           if (referencedVariable) {
-            // Try to get the resolved value from the referenced variable
-            const collection = figma.variables.getVariableCollectionById(referencedVariable.variableCollectionId);
-            const firstModeId = collection?.modes[0]?.modeId || Object.keys(referencedVariable.valuesByMode)[0];
-            const referencedValue = referencedVariable.valuesByMode[firstModeId];
+            // Determine which mode to use for the referenced variable
+            let referencedModeId: string;
+            
+            // If the referenced variable is in the same collection, use the same mode
+            if (referencedVariable.variableCollectionId === variable.variableCollectionId) {
+              referencedModeId = targetModeId;
+            } else {
+              // Different collection - use the first mode or try to find matching mode name
+              const referencedCollection = figma.variables.getVariableCollectionById(referencedVariable.variableCollectionId);
+              const currentCollection = figma.variables.getVariableCollectionById(variable.variableCollectionId);
+              const currentModeName = currentCollection?.modes.find(m => m.modeId === targetModeId)?.name;
+              
+              // Try to find mode with same name in referenced collection
+              const matchingMode = referencedCollection?.modes.find(m => m.name === currentModeName);
+              referencedModeId = matchingMode?.modeId || referencedCollection?.modes[0]?.modeId || Object.keys(referencedVariable.valuesByMode)[0];
+            }
+            
+            console.log('🔍 [DEBUG] Reference resolution details:', {
+              referencedVariableName: referencedVariable.name,
+              referencedModeId,
+              sameCollection: referencedVariable.variableCollectionId === variable.variableCollectionId,
+            });
+            
+            const referencedValue = referencedVariable.valuesByMode[referencedModeId];
             
             // If the referenced variable has a direct value (not another alias), use it
             if (typeof referencedValue === 'number' || typeof referencedValue === 'string' || typeof referencedValue === 'boolean') {
@@ -422,7 +442,31 @@ function shouldUpdateVariable(variable: Variable, token: any, modeId?: string, s
     currentDescription: variable.description,
     newDescription: token.description || '',
     descriptionChanged: variable.description !== (token.description || ''),
+    tokenRawValue: token.rawValue,
+    tokenValue: token.value,
   });
+  
+  // Special handling for reference comparison
+  if (isTokenReference(token) && isVariableReference(variable, modeId)) {
+    const referenceMatches = compareReferences(variable, token, modeId);
+    console.log('🔍 [DEBUG] Reference comparison result:', referenceMatches);
+    if (referenceMatches !== null) {
+      // We were able to determine reference equality, use that result
+      if (referenceMatches) {
+        console.log('✅ [DEBUG] References match - checking description only');
+        // References match, only check description
+        if (variable.description !== (token.description || '')) {
+          console.log('✅ [DEBUG] Description changed - update needed');
+          return true;
+        }
+        console.log('❌ [DEBUG] References match and description unchanged - no update needed');
+        return false;
+      } else {
+        console.log('✅ [DEBUG] References differ - update needed');
+        return true;
+      }
+    }
+  }
   
   // Check if values are different
   if (currentValue !== newValue) {
@@ -438,6 +482,55 @@ function shouldUpdateVariable(variable: Variable, token: any, modeId?: string, s
   
   console.log('❌ [DEBUG] No changes detected - update not needed');
   return false;
+}
+
+function isTokenReference(token: any): boolean {
+  return typeof token.rawValue === 'string' && token.rawValue.includes('{') && token.rawValue.includes('}');
+}
+
+function isVariableReference(variable: Variable, modeId?: string): boolean {
+  const modes = Object.keys(variable.valuesByMode);
+  const targetModeId = modeId || modes[0];
+  const value = variable.valuesByMode[targetModeId];
+  return typeof value === 'object' && value && 'type' in value && value.type === 'VARIABLE_ALIAS';
+}
+
+function compareReferences(variable: Variable, token: any, modeId?: string): boolean | null {
+  try {
+    // Get the current variable's reference
+    const modes = Object.keys(variable.valuesByMode);
+    const targetModeId = modeId || modes[0];
+    const currentValue = variable.valuesByMode[targetModeId];
+    
+    if (typeof currentValue !== 'object' || !currentValue || !('type' in currentValue) || currentValue.type !== 'VARIABLE_ALIAS') {
+      return null; // Not a reference
+    }
+    
+    // Get the referenced variable name from current value
+    const referencedVariable = figma.variables.getVariableById((currentValue as VariableAlias).id);
+    if (!referencedVariable) {
+      return null; // Can't resolve reference
+    }
+    
+    const currentReferenceName = referencedVariable.name.split('/').join('.');
+    
+    // Get the token's reference name
+    let tokenReferenceName = token.rawValue;
+    if (tokenReferenceName.startsWith('{') && tokenReferenceName.endsWith('}')) {
+      tokenReferenceName = tokenReferenceName.slice(1, -1);
+    }
+    
+    console.log('🔍 [DEBUG] Comparing references:', {
+      currentReferenceName,
+      tokenReferenceName,
+      match: currentReferenceName === tokenReferenceName,
+    });
+    
+    return currentReferenceName === tokenReferenceName;
+  } catch (e) {
+    console.warn('🔍 [DEBUG] Error comparing references:', e);
+    return null; // Fall back to value comparison
+  }
 }
 
 function getCollectionName(variable: Variable): string {

@@ -252,10 +252,30 @@ async function handleUpdateVariable(
   let modeId: string;
   if (change.mode && themeInfo) {
     const theme = themeInfo.themes.find((t: any) => t.name === change.mode);
+    console.log('🔧 [DEBUG] Finding mode for update:', {
+      changeName: change.name,
+      changeMode: change.mode,
+      foundTheme: !!theme,
+      themeFigmaModeId: theme?.$figmaModeId,
+      variableAvailableModes: Object.keys(variable.valuesByMode),
+    });
+    
     modeId = theme?.$figmaModeId || Object.keys(variable.valuesByMode)[0];
+    
+    // Verify the mode exists in the variable
+    if (!variable.valuesByMode[modeId]) {
+      console.warn('🔧 [DEBUG] Mode not found in variable, using first available mode');
+      modeId = Object.keys(variable.valuesByMode)[0];
+    }
   } else {
     modeId = Object.keys(variable.valuesByMode)[0];
   }
+  
+  console.log('🔧 [DEBUG] Using mode for update:', {
+    modeId,
+    modeName: 'Mode lookup needed',
+    variableName: variable.name,
+  });
 
   // Set new value
   await setVariableValue(variable, modeId, token, settings);
