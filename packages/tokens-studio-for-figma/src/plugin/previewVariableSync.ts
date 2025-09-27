@@ -12,6 +12,7 @@ import { convertTokenTypeToVariableType } from '@/utils/convertTokenTypeToVariab
 import { transformValue } from './helpers';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { TokenTypes } from '@/constants/TokenTypes';
+import { figmaRGBToHex } from '@figma-plugin/helpers';
 
 export type PreviewVariableSyncParams = {
   tokens: Record<string, AnyTokenList>;
@@ -226,14 +227,73 @@ function getCurrentVariableValue(variable: Variable, modeId?: string): string {
     const targetModeId = modeId || modes[0];
     const value = variable.valuesByMode[targetModeId];
     
-    if (typeof value === 'object' && 'type' in value) {
+    console.log('🔍 [DEBUG] getCurrentVariableValue raw value:', {
+      variableName: variable.name,
+      variableType: variable.resolvedType,
+      modeId: targetModeId,
+      rawValue: value,
+    });
+    
+    // Handle variable references
+    if (typeof value === 'object' && value && 'type' in value) {
       if (value.type === 'VARIABLE_ALIAS') {
-        return `{reference to variable}`;
+        // Try to get the referenced variable name for comparison
+        try {
+          const referencedVariable = figma.variables.getVariableById(value.id);
+          const result = `{${referencedVariable?.name?.split('/').join('.') || 'unknown'}}`;
+          console.log('🔍 [DEBUG] Variable alias formatted as:', result);
+          return result;
+        } catch (e) {
+          console.warn('🔍 [DEBUG] Could not resolve variable reference:', e);
+          return `{reference to variable}`;
+        }
       }
     }
     
-    return String(value || '');
+    // Handle color objects (RGB/RGBA)
+    if (typeof value === 'object' && value && 'r' in value && 'g' in value && 'b' in value) {
+      try {
+        // Use figma helper to convert RGB to hex
+        const result = figmaRGBToHex(value);
+        console.log('🔍 [DEBUG] Color object formatted as hex using figmaRGBToHex:', result);
+        return result;
+      } catch (e) {
+        // Fallback to manual conversion
+        const r = Math.round(value.r * 255);
+        const g = Math.round(value.g * 255);
+        const b = Math.round(value.b * 255);
+        const result = `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`.toUpperCase();
+        console.log('🔍 [DEBUG] Color object formatted as hex (fallback):', result);
+        return result;
+      }
+    }
+    
+    // Handle boolean values
+    if (typeof value === 'boolean') {
+      const result = value.toString();
+      console.log('🔍 [DEBUG] Boolean value formatted:', result);
+      return result;
+    }
+    
+    // Handle number values
+    if (typeof value === 'number') {
+      const result = value.toString();
+      console.log('🔍 [DEBUG] Number value formatted:', result);
+      return result;
+    }
+    
+    // Handle string values
+    if (typeof value === 'string') {
+      console.log('🔍 [DEBUG] String value used as-is:', value);
+      return value;
+    }
+    
+    // Fallback for any other type
+    const result = String(value || '');
+    console.log('🔍 [DEBUG] Unknown type formatted as string:', result);
+    return result;
   } catch (e) {
+    console.error('🔍 [DEBUG] Error getting current variable value:', e);
     return 'Unable to read';
   }
 }
@@ -255,19 +315,31 @@ function getFormattedTokenValue(token: any, settings: SettingsState): string {
     tokenType: token.type,
   });
 
-  if (typeof token.rawValue === 'string' && token.rawValue.startsWith('{')) {
-    const result = `{${token.rawValue.slice(1, -1)}}`;
-    console.log('🔍 [DEBUG] Formatted as reference:', result);
-    return result;
+  // Handle references - check rawValue for reference syntax
+  if (typeof token.rawValue === 'string' && token.rawValue.includes('{')) {
+    // If it's a simple reference like "{dimension.xs}", format it
+    if (token.rawValue.startsWith('{') && token.rawValue.endsWith('}') && !token.rawValue.includes('*') && !token.rawValue.includes('+') && !token.rawValue.includes('-') && !token.rawValue.includes('/')) {
+      const refName = token.rawValue.slice(1, -1);
+      const result = `{${refName}}`;
+      console.log('🔍 [DEBUG] Formatted as simple reference:', result);
+      return result;
+    } else if (token.rawValue.includes('{')) {
+      // Complex reference like "{dimension.xs} * {dimension.scale}" - return as-is
+      console.log('🔍 [DEBUG] Formatted as complex reference:', token.rawValue);
+      return token.rawValue;
+    }
   }
   
   // Use normalized value for formatting
   const normalizedValue = normalizeTokenValue(token);
   
   if (token.type === 'dimension' || token.type === 'spacing' || token.type === 'sizing') {
-    const transformedValue = transformValue(String(normalizedValue), token.type, settings.baseFontSize, true);
-    console.log('🔍 [DEBUG] Transformed dimension value:', normalizedValue, '->', transformedValue);
-    return String(transformedValue);
+    // Only transform if it's not a reference
+    if (typeof token.rawValue !== 'string' || !token.rawValue.includes('{')) {
+      const transformedValue = transformValue(String(normalizedValue), token.type, settings.baseFontSize, true);
+      console.log('🔍 [DEBUG] Transformed dimension value:', normalizedValue, '->', transformedValue);
+      return String(transformedValue);
+    }
   }
   
   const result = String(normalizedValue || '');
@@ -279,16 +351,29 @@ function shouldUpdateVariable(variable: Variable, token: any, modeId?: string, s
   const currentValue = getCurrentVariableValue(variable, modeId);
   const newValue = getFormattedTokenValue(token, settings || {} as SettingsState);
   
+  console.log('🔍 [DEBUG] shouldUpdateVariable comparison:', {
+    variableName: variable.name,
+    currentValue,
+    newValue,
+    areEqual: currentValue === newValue,
+    currentDescription: variable.description,
+    newDescription: token.description || '',
+    descriptionChanged: variable.description !== (token.description || ''),
+  });
+  
   // Check if values are different
   if (currentValue !== newValue) {
+    console.log('✅ [DEBUG] Values are different - update needed');
     return true;
   }
   
   // Check if description changed
   if (variable.description !== (token.description || '')) {
+    console.log('✅ [DEBUG] Description changed - update needed');
     return true;
   }
   
+  console.log('❌ [DEBUG] No changes detected - update not needed');
   return false;
 }
 
