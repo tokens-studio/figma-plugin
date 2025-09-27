@@ -21,12 +21,12 @@ function isFigmaColorObject(obj: VariableValue): obj is RGBOrRGBA {
 export default function setColorValuesOnVariable(variable: Variable, mode: string, value: string) {
   try {
     console.log('🎨 [DEBUG] setColorValuesOnVariable called:', { variableName: variable.name, mode, value });
-    
+
     const { color, opacity } = convertToFigmaColor(value);
     const existingVariableValue = variable.valuesByMode[mode];
-    
+
     console.log('🎨 [DEBUG] Color conversion result:', { color, opacity, existingVariableValue });
-    
+
     // For new variables, existingVariableValue will be undefined - we should set the value
     if (existingVariableValue === undefined) {
       const newValue = { ...color, a: opacity };
@@ -34,7 +34,7 @@ export default function setColorValuesOnVariable(variable: Variable, mode: strin
       variable.setValueForMode(mode, newValue);
       return;
     }
-    
+
     if (!(isFigmaColorObject(existingVariableValue) || isVariableWithAliasReference(existingVariableValue))) {
       console.warn('🎨 [DEBUG] Existing variable value is not a color or alias reference:', existingVariableValue);
       return;

@@ -15,15 +15,15 @@ import OptionsModal from './OptionsModal';
 import useTokens from '@/app/store/useTokens';
 import ExportSetsTab from './ExportSetsTab';
 import ExportThemesTab from './ExportThemesTab';
-import { allTokenSetsSelector, themesListSelector } from '@/selectors';
+import {
+  allTokenSetsSelector, themesListSelector, settingsStateSelector, tokensSelector,
+} from '@/selectors';
 import { ExportTokenSet } from '@/types/ExportTokenSet';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { Dispatch } from '@/app/store';
 import VariableSyncPreviewModal from '../VariableSyncPreviewModal';
-import { VariableChangePreview } from '@/types/AsyncMessages';
-import { settingsStateSelector, tokensSelector } from '@/selectors';
+import { VariableChangePreview, AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
-import { AsyncMessageTypes } from '@/types/AsyncMessages';
 
 export default function ManageStylesAndVariables({ showModal, setShowModal }: { showModal: boolean, setShowModal: (show: boolean) => void }) {
   const { t } = useTranslation(['manageStylesAndVariables']);
@@ -87,7 +87,7 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
   const handleVariablePreviewConfirm = React.useCallback(async (selectedChanges: VariableChangePreview[]) => {
     setShowVariablePreview(false);
     setShowModal(false);
-    
+
     // Apply only the selected variable changes
     if (selectedChanges.length > 0) {
       try {
@@ -103,7 +103,7 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
         console.error('Failed to apply variable changes:', error);
       }
     }
-    
+
     // Still create styles using existing methods
     if (activeTab === 'useSets') {
       await createStylesFromSelectedTokenSets(selectedSets);
@@ -118,7 +118,7 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
         || settings.variablesColor
         || settings.variablesNumber
         || settings.variablesString);
-    
+
     if (shouldCreateVariables) {
       handleShowVariablePreview();
     } else {
@@ -189,7 +189,7 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
           <ExportSetsTab selectedSets={selectedSets} setSelectedSets={setSelectedSets} />
         </Tabs>
       </Modal>
-      
+
       <VariableSyncPreviewModal
         isOpen={showVariablePreview}
         onClose={() => setShowVariablePreview(false)}
@@ -199,7 +199,7 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
         selectedThemes={activeTab === 'useThemes' ? selectedThemes : undefined}
         selectedSets={activeTab === 'useSets' ? selectedSets : undefined}
       />
-      
+
       <OptionsModal isOpen={showModal && showOptions && !showVariablePreview} title={t('optionsModalTitle')} closeAction={handleCancelOptions} />
     </>
   );

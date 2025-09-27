@@ -1,9 +1,8 @@
 import { AnyTokenList } from '@/types/tokens';
 import { SettingsState } from '@/app/store/models/settings';
 import { ExportTokenSet } from '@/types/ExportTokenSet';
-import { VariableChangePreview } from '@/types/AsyncMessages';
+import { VariableChangePreview, AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
-import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { convertTokenTypeToVariableType } from '@/utils/convertTokenTypeToVariableType';
 import { transformValue } from './helpers';
 import setColorValuesOnVariable from './setColorValuesOnVariable';
@@ -31,27 +30,27 @@ export default async function applyVariableChanges({
   selectedThemes,
   selectedSets,
 }: ApplyVariableChangesParams): Promise<{
-  variableIds: Record<string, string>;
-  totalVariables: number;
-}> {
+    variableIds: Record<string, string>;
+    totalVariables: number;
+  }> {
   const variableIds: Record<string, string> = {};
   let totalVariables = 0;
 
   // Get theme info if we're working with themes
   let themeInfo;
   let collections: VariableCollection[] = [];
-  
+
   if (selectedThemes && selectedThemes.length > 0) {
     themeInfo = await AsyncMessageChannel.PluginInstance.message({
       type: AsyncMessageTypes.GET_THEME_INFO,
     });
-    
+
     // Create necessary collections first (same as original logic)
     collections = await createNecessaryVariableCollections(themeInfo.themes, selectedThemes);
   } else if (selectedSets && selectedSets.length > 0) {
     // For token sets, we still need a default collection
     const existingCollections = figma.variables.getLocalVariableCollections();
-    const defaultCollection = existingCollections.find(c => c.name === 'Default') 
+    const defaultCollection = existingCollections.find((c) => c.name === 'Default')
       || figma.variables.createVariableCollection('Default');
     collections = [defaultCollection];
   }
@@ -76,7 +75,7 @@ export default async function applyVariableChanges({
       path: change.path,
       tokenType: change.tokenType,
     });
-    
+
     try {
       if (change.type === 'delete' && change.variableId) {
         console.log('🔧 [DEBUG] Processing DELETE change');
@@ -108,9 +107,9 @@ export default async function applyVariableChanges({
     }
   }
 
-  const createCount = changes.filter(c => c.type === 'create').length;
-  const updateCount = changes.filter(c => c.type === 'update').length;
-  const deleteCount = changes.filter(c => c.type === 'delete').length;
+  const createCount = changes.filter((c) => c.type === 'create').length;
+  const updateCount = changes.filter((c) => c.type === 'update').length;
+  const deleteCount = changes.filter((c) => c.type === 'delete').length;
 
   notifyUI(`Variables: ${createCount} created, ${updateCount} updated, ${deleteCount} deleted`);
 
@@ -123,7 +122,7 @@ async function handleCreateVariable(
   settings: SettingsState,
   themeInfo: any,
   collections: VariableCollection[],
-  variableIds: Record<string, string>
+  variableIds: Record<string, string>,
 ): Promise<void> {
   console.log('🔧 [DEBUG] handleCreateVariable - Starting creation for:', {
     changeName: change.name,
@@ -140,7 +139,7 @@ async function handleCreateVariable(
     console.warn(`❌ [DEBUG] Token data missing for path: ${change.path}`);
     return;
   }
-  
+
   const token = {
     name: change.name,
     path: change.path,
@@ -162,7 +161,7 @@ async function handleCreateVariable(
     const result = findCollectionAndModeIdForTheme(change.collectionName, change.mode, collections);
     collection = result.collection;
     modeId = result.modeId;
-    
+
     // If we still don't have a collection, try to find by theme
     if (!collection || !modeId) {
       const theme = themeInfo.themes.find((t: any) => t.name === change.mode);
@@ -188,7 +187,7 @@ async function handleCreateVariable(
   // Create variable
   const variableType = convertTokenTypeToVariableType(token.type as any, token.value);
   const variable = figma.variables.createVariable(change.path, collection, variableType);
-  
+
   if (change.description) {
     variable.description = change.description;
     console.log('🔧 [DEBUG] Set description:', change.description);
@@ -197,7 +196,7 @@ async function handleCreateVariable(
   // Set value
   console.log('🔧 [DEBUG] About to set variable value with:', { modeId, token, settings: !!settings });
   await setVariableValue(variable, modeId, token, settings);
-  
+
   console.log('✅ [DEBUG] Variable creation completed for:', change.path);
   variableIds[change.name] = variable.id;
 }
@@ -207,14 +206,14 @@ async function handleUpdateVariable(
   change: VariableChangePreview,
   tokens: Record<string, AnyTokenList>,
   settings: SettingsState,
-  themeInfo: any
+  themeInfo: any,
 ): Promise<void> {
   // Use token data from the change instead of searching
   if (!change.tokenData) {
     console.warn(`Token data missing for path: ${change.path}`);
     return;
   }
-  
+
   const token = {
     name: change.name,
     path: change.path,
@@ -240,7 +239,7 @@ async function handleUpdateVariable(
   if (change.mode && themeInfo) {
     const theme = themeInfo.themes.find((t: any) => t.name === change.mode);
     modeId = theme?.$figmaModeId || Object.keys(variable.valuesByMode)[0];
-    
+
     // Verify the mode exists in the variable
     if (!variable.valuesByMode[modeId]) {
       console.warn(`⚠️ Mode '${change.mode}' not found in variable ${variable.name}, using first available`);
@@ -260,7 +259,7 @@ async function setVariableValue(
   variable: Variable,
   modeId: string,
   token: any,
-  settings: SettingsState
+  settings: SettingsState,
 ): Promise<void> {
   console.log('🔧 [DEBUG] setVariableValue called with:', {
     variableName: variable.name,
@@ -280,13 +279,13 @@ async function setVariableValue(
     } else {
       referenceTokenName = token.rawValue!.toString().substring(1);
     }
-    
+
     console.log('🔧 [DEBUG] Looking for reference variable:', referenceTokenName);
-    
+
     // Find reference variable
     const referenceVariable = figma.variables.getLocalVariables()
-      .find(v => v.name === referenceTokenName.split('.').join('/'));
-    
+      .find((v) => v.name === referenceTokenName.split('.').join('/'));
+
     if (referenceVariable) {
       console.log('✅ [DEBUG] Found reference variable, setting alias');
       variable.setValueForMode(modeId, {
@@ -294,14 +293,13 @@ async function setVariableValue(
         id: referenceVariable.id,
       });
       return;
-    } else {
-      console.warn('❌ [DEBUG] Reference variable not found:', referenceTokenName);
     }
+    console.warn('❌ [DEBUG] Reference variable not found:', referenceTokenName);
   }
 
   // Set direct value based on type
   console.log('🔧 [DEBUG] Setting direct value for variable type:', variable.resolvedType);
-  
+
   switch (variable.resolvedType) {
     case 'BOOLEAN':
       console.log('🔧 [DEBUG] Processing BOOLEAN variable');
@@ -340,7 +338,7 @@ async function setVariableValue(
         setStringValuesOnVariable(variable, modeId, token.value);
       } else {
         console.warn('❌ [DEBUG] String value invalid or is reference:', token.value);
-        // Note: Font weight arrays should now be normalized at preview time, 
+        // Note: Font weight arrays should now be normalized at preview time,
         // so we shouldn't reach this case for font weights anymore
       }
       break;
@@ -348,7 +346,6 @@ async function setVariableValue(
       console.warn(`❌ [DEBUG] Unsupported variable type: ${variable.resolvedType}`);
       break;
   }
-  
+
   console.log('✅ [DEBUG] setVariableValue completed for:', variable.name);
 }
-

@@ -6,9 +6,8 @@ import {
 import { ChevronLeftIcon } from '@primer/octicons-react';
 import Modal from './Modal';
 import Box from './Box';
-import { VariableChangePreview } from '@/types/AsyncMessages';
+import { VariableChangePreview, AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
-import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { ExportTokenSet } from '@/types/ExportTokenSet';
 import { SettingsState } from '@/app/store/models/settings';
 
@@ -69,7 +68,7 @@ const VariableSyncPreviewModal: React.FC<VariableSyncPreviewProps> = ({
 
       setChanges(result.changes);
       setSummary(result.summary);
-      
+
       // Initially select all changes that match enabled categories
       const initialSelection = new Set<string>();
       result.changes.forEach((change, index) => {
@@ -103,18 +102,18 @@ const VariableSyncPreviewModal: React.FC<VariableSyncPreviewProps> = ({
     changes.forEach((change, index) => {
       const changeId = `${change.type}-${index}`;
       const wasSelected = selectedChanges.has(changeId);
-      
+
       if (newCategories[change.type] && wasSelected) {
         newSelection.add(changeId);
       } else if (!newCategories[change.type]) {
         // If category is disabled, don't include its changes
-        return;
+
       } else if (newCategories[change.type] && !categories[change.type]) {
         // If category was just enabled, select all its changes
         newSelection.add(changeId);
       }
     });
-    
+
     setSelectedChanges(newSelection);
   }, [categories, changes, selectedChanges]);
 
@@ -129,22 +128,22 @@ const VariableSyncPreviewModal: React.FC<VariableSyncPreviewProps> = ({
   }, [selectedChanges]);
 
   const handleSelectAll = useCallback((type: 'create' | 'update' | 'delete') => {
-    const typeChanges = changes.filter(change => change.type === type);
-    const allSelected = typeChanges.every((_, index) => selectedChanges.has(`${type}-${changes.findIndex(c => c === typeChanges[index])}`));
-    
+    const typeChanges = changes.filter((change) => change.type === type);
+    const allSelected = typeChanges.every((_, index) => selectedChanges.has(`${type}-${changes.findIndex((c) => c === typeChanges[index])}`));
+
     const newSelection = new Set(selectedChanges);
-    
+
     typeChanges.forEach((change) => {
-      const originalIndex = changes.findIndex(c => c === change);
+      const originalIndex = changes.findIndex((c) => c === change);
       const changeId = `${type}-${originalIndex}`;
-      
+
       if (allSelected) {
         newSelection.delete(changeId);
       } else {
         newSelection.add(changeId);
       }
     });
-    
+
     setSelectedChanges(newSelection);
   }, [changes, selectedChanges]);
 
@@ -156,12 +155,10 @@ const VariableSyncPreviewModal: React.FC<VariableSyncPreviewProps> = ({
     onConfirm(selectedChangesList);
   }, [changes, selectedChanges, categories, onConfirm]);
 
-  const getFilteredChanges = useCallback((type: 'create' | 'update' | 'delete') => {
-    return changes.filter(change => change.type === type);
-  }, [changes]);
+  const getFilteredChanges = useCallback((type: 'create' | 'update' | 'delete') => changes.filter((change) => change.type === type), [changes]);
 
   const renderChangeItem = useCallback((change: VariableChangePreview, index: number) => {
-    const originalIndex = changes.findIndex(c => c === change);
+    const originalIndex = changes.findIndex((c) => c === change);
     const changeId = `${change.type}-${originalIndex}`;
     const isSelected = selectedChanges.has(changeId);
     const isCategoryEnabled = categories[change.type];
@@ -189,7 +186,10 @@ const VariableSyncPreviewModal: React.FC<VariableSyncPreviewProps> = ({
                   {change.name}
                 </Text>
                 <Text css={{ fontSize: '$xsmall', color: '$textSubtle' }}>
-                  {change.path} • {change.tokenType}
+                  {change.path}
+                  {' '}
+                  •
+                  {change.tokenType}
                 </Text>
               </Stack>
               <Stack direction="column" align="end" gap={1}>
@@ -200,12 +200,14 @@ const VariableSyncPreviewModal: React.FC<VariableSyncPreviewProps> = ({
                 )}
                 {change.mode && (
                   <Text css={{ fontSize: '$xsmall', color: '$textSubtle' }}>
-                    {t('preview.details.mode')}: {change.mode}
+                    {t('preview.details.mode')}
+                    :
+                    {change.mode}
                   </Text>
                 )}
               </Stack>
             </Stack>
-            
+
             {change.description && (
               <Text css={{ fontSize: '$xsmall', color: '$textSubtle' }}>
                 {change.description}
@@ -216,10 +218,14 @@ const VariableSyncPreviewModal: React.FC<VariableSyncPreviewProps> = ({
             {change.type === 'update' && (
               <Stack direction="column" gap={1}>
                 <Text css={{ fontSize: '$xsmall', color: '$textSubtle' }}>
-                  {t('preview.details.current')}: <span style={{ fontFamily: 'monospace' }}>{change.currentValue}</span>
+                  {t('preview.details.current')}
+                  :
+                  <span style={{ fontFamily: 'monospace' }}>{change.currentValue}</span>
                 </Text>
                 <Text css={{ fontSize: '$xsmall', color: '$textSubtle' }}>
-                  {t('preview.details.new')}: <span style={{ fontFamily: 'monospace' }}>{change.newValue}</span>
+                  {t('preview.details.new')}
+                  :
+                  <span style={{ fontFamily: 'monospace' }}>{change.newValue}</span>
                 </Text>
               </Stack>
             )}
@@ -227,14 +233,18 @@ const VariableSyncPreviewModal: React.FC<VariableSyncPreviewProps> = ({
             {/* Show new value for creates */}
             {change.type === 'create' && (
               <Text css={{ fontSize: '$xsmall', color: '$textSubtle' }}>
-                {t('preview.details.value')}: <span style={{ fontFamily: 'monospace' }}>{change.newValue}</span>
+                {t('preview.details.value')}
+                :
+                <span style={{ fontFamily: 'monospace' }}>{change.newValue}</span>
               </Text>
             )}
 
             {/* Show current value for deletes */}
             {change.type === 'delete' && (
               <Text css={{ fontSize: '$xsmall', color: '$dangerFg' }}>
-                {t('preview.details.current')}: <span style={{ fontFamily: 'monospace' }}>{change.currentValue}</span>
+                {t('preview.details.current')}
+                :
+                <span style={{ fontFamily: 'monospace' }}>{change.currentValue}</span>
               </Text>
             )}
           </Stack>
@@ -246,7 +256,7 @@ const VariableSyncPreviewModal: React.FC<VariableSyncPreviewProps> = ({
   const renderTabContent = useCallback((type: 'create' | 'update' | 'delete') => {
     const filteredChanges = getFilteredChanges(type);
     const selectedCount = filteredChanges.filter((change) => {
-      const originalIndex = changes.findIndex(c => c === change);
+      const originalIndex = changes.findIndex((c) => c === change);
       return selectedChanges.has(`${type}-${originalIndex}`) && categories[type];
     }).length;
 
@@ -272,7 +282,12 @@ const VariableSyncPreviewModal: React.FC<VariableSyncPreviewProps> = ({
               {t(`preview.categories.${type}All` as const)}
             </Text>
             <Text css={{ color: '$textSubtle' }}>
-              ({selectedCount}/{filteredChanges.length} selected)
+              (
+              {selectedCount}
+              /
+              {filteredChanges.length}
+              {' '}
+              selected)
             </Text>
           </Stack>
           <Button
@@ -282,12 +297,12 @@ const VariableSyncPreviewModal: React.FC<VariableSyncPreviewProps> = ({
             disabled={!categories[type]}
           >
             {filteredChanges.every((_, index) => {
-              const originalIndex = changes.findIndex(c => c === filteredChanges[index]);
+              const originalIndex = changes.findIndex((c) => c === filteredChanges[index]);
               return selectedChanges.has(`${type}-${originalIndex}`);
             }) ? t('preview.actions.deselectAll') : t('preview.actions.selectAll')}
           </Button>
         </Stack>
-        
+
         <Stack direction="column" gap={2} css={{ maxHeight: '400px', overflow: 'auto' }}>
           {filteredChanges.map((change, index) => renderChangeItem(change, index))}
         </Stack>
@@ -297,7 +312,7 @@ const VariableSyncPreviewModal: React.FC<VariableSyncPreviewProps> = ({
 
   if (!isOpen) return null;
 
-  const selectedCount = Array.from(selectedChanges).filter(changeId => {
+  const selectedCount = Array.from(selectedChanges).filter((changeId) => {
     const [type] = changeId.split('-');
     return categories[type as keyof SyncCategories];
   }).length;
@@ -314,12 +329,16 @@ const VariableSyncPreviewModal: React.FC<VariableSyncPreviewProps> = ({
           <Button variant="secondary" onClick={onClose} icon={<ChevronLeftIcon />}>
             {t('preview.actions.cancel')}
           </Button>
-          <Button 
-            variant="primary" 
+          <Button
+            variant="primary"
             onClick={handleConfirm}
             disabled={selectedCount === 0 || loading}
           >
-            {t('preview.actions.applyChanges')} ({selectedCount})
+            {t('preview.actions.applyChanges')}
+            {' '}
+            (
+            {selectedCount}
+            )
           </Button>
         </Stack>
       )}
@@ -333,13 +352,19 @@ const VariableSyncPreviewModal: React.FC<VariableSyncPreviewProps> = ({
           <Box css={{ padding: '$4', backgroundColor: '$bgSubtle', borderRadius: '$small' }}>
             <Stack direction="row" gap={6}>
               <Text css={{ fontSize: '$small' }}>
-                <strong>{summary.toCreate}</strong> {t('preview.summary.toCreate')}
+                <strong>{summary.toCreate}</strong>
+                {' '}
+                {t('preview.summary.toCreate')}
               </Text>
               <Text css={{ fontSize: '$small' }}>
-                <strong>{summary.toUpdate}</strong> {t('preview.summary.toUpdate')}
+                <strong>{summary.toUpdate}</strong>
+                {' '}
+                {t('preview.summary.toUpdate')}
               </Text>
               <Text css={{ fontSize: '$small' }}>
-                <strong>{summary.toDelete}</strong> {t('preview.summary.toDelete')}
+                <strong>{summary.toDelete}</strong>
+                {' '}
+                {t('preview.summary.toDelete')}
               </Text>
             </Stack>
           </Box>
@@ -347,24 +372,36 @@ const VariableSyncPreviewModal: React.FC<VariableSyncPreviewProps> = ({
           <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)}>
             <Tabs.List>
               <Tabs.Trigger value="create" disabled={summary.toCreate === 0}>
-                {t('preview.tabs.create')} ({summary.toCreate})
+                {t('preview.tabs.create')}
+                {' '}
+                (
+                {summary.toCreate}
+                )
               </Tabs.Trigger>
               <Tabs.Trigger value="update" disabled={summary.toUpdate === 0}>
-                {t('preview.tabs.update')} ({summary.toUpdate})
+                {t('preview.tabs.update')}
+                {' '}
+                (
+                {summary.toUpdate}
+                )
               </Tabs.Trigger>
               <Tabs.Trigger value="delete" disabled={summary.toDelete === 0}>
-                {t('preview.tabs.delete')} ({summary.toDelete})
+                {t('preview.tabs.delete')}
+                {' '}
+                (
+                {summary.toDelete}
+                )
               </Tabs.Trigger>
             </Tabs.List>
-            
+
             <Tabs.Content value="create">
               {renderTabContent('create')}
             </Tabs.Content>
-            
+
             <Tabs.Content value="update">
               {renderTabContent('update')}
             </Tabs.Content>
-            
+
             <Tabs.Content value="delete">
               {renderTabContent('delete')}
             </Tabs.Content>

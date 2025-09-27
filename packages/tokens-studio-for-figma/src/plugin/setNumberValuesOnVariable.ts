@@ -12,21 +12,21 @@ function isNumberApproximatelyEqual(
 export default function setNumberValuesOnVariable(variable: Variable, mode: string, value: number) {
   try {
     console.log('🔢 [DEBUG] setNumberValuesOnVariable called:', { variableName: variable.name, mode, value });
-    
+
     if (isNaN(value)) {
       throw new Error(`Skipping due to invalid value: ${value}`);
     }
-    
+
     const existingVariableValue = variable.valuesByMode[mode];
     console.log('🔢 [DEBUG] Existing variable value:', existingVariableValue);
-    
+
     // For new variables, existingVariableValue will be undefined - we should set the value
     if (existingVariableValue === undefined) {
       console.log('🔢 [DEBUG] Setting number value on new variable:', value);
       variable.setValueForMode(mode, value);
       return;
     }
-    
+
     if (!(typeof existingVariableValue === 'number' || isVariableWithAliasReference(existingVariableValue))) {
       console.warn('🔢 [DEBUG] Existing variable value is not a number or alias reference:', existingVariableValue);
       return;
