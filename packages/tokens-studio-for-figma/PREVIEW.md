@@ -70,7 +70,7 @@ Add these parameters to any URL:
 
 ### Example URLs
 
-```
+```bash
 # Dark theme with complex tokens
 http://localhost:58630/#tab=tokens&action=WITH_COMPLEX_TOKENS&theme=dark
 
@@ -137,7 +137,7 @@ The preview is perfect for generating documentation screenshots:
 The preview uses realistic mock data:
 
 ```typescript
-// Basic token structure
+// Basic token structure (simple naming)
 {
   colors: {
     primary: { $value: '#2563eb', $type: 'color' },
@@ -149,7 +149,8 @@ The preview uses realistic mock data:
   }
 }
 
-// Complex token structure with references
+// Complex token structure with references (hierarchical naming)
+// Note: Use slash notation for token sets/groups, kebab-case for individual tokens
 {
   'core/colors': {
     'blue-500': { $value: '#3b82f6', $type: 'color' }
@@ -180,8 +181,8 @@ onQuickLinkClick(hash: string): void
 dispatchMockMessage(mockActions[action])
 
 // Available actions
-STARTUP, FRESH_START, WITH_BASIC_TOKENS, 
-WITH_COMPLEX_TOKENS, WITH_GITHUB_SYNC, INSPECTOR_MODE
+FRESH_START, WITH_BASIC_TOKENS, WITH_COMPLEX_TOKENS, 
+WITH_GITHUB_SYNC, INSPECTOR_MODE
 ```
 
 ## 🔧 Extending the Preview
