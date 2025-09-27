@@ -29,6 +29,10 @@ export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = asy
     });
   }
   if (msg.tokens) {
+    // Commit undo point before updating nodes with tokens
+    if (typeof figma !== 'undefined' && figma.commitUndo) {
+      figma.commitUndo();
+    }
     const {
       figmaVariableReferences, figmaStyleReferences, stylePathPrefix,
     } = await getThemeReferences(msg.settings.prefixStylesWithThemeName);
