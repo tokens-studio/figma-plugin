@@ -46,6 +46,37 @@ export default async function pullVariables(options: PullVariablesOptions, theme
     modes: { name: string, modeId: string }[]
   }>();
 
+  const createFigmaExtensions = (variable: Variable) => {
+    const extensions: any = {};
+
+    // Add scopes if they exist and are not default
+    if (variable.scopes && variable.scopes.length > 0) {
+      extensions.scopes = variable.scopes;
+    }
+
+    // Add code syntax if it exists
+    const codeSyntax: Record<string, string> = {};
+    try {
+      // Check if variable has code syntax for each platform
+      const variableAny = variable as any;
+      const webSyntax = variableAny.codeSyntax?.WEB;
+      const androidSyntax = variableAny.codeSyntax?.ANDROID;
+      const iosSyntax = variableAny.codeSyntax?.iOS;
+
+      if (webSyntax) codeSyntax.Web = webSyntax;
+      if (androidSyntax) codeSyntax.Android = androidSyntax;
+      if (iosSyntax) codeSyntax.iOS = iosSyntax;
+
+      if (Object.keys(codeSyntax).length > 0) {
+        extensions.codeSyntax = codeSyntax;
+      }
+    } catch (e) {
+      // Ignore errors accessing codeSyntax - it might not be available
+    }
+
+    return Object.keys(extensions).length > 0 ? { 'com.figma': extensions } : undefined;
+  };
+
   for (const variable of localVariables) {
     let collection = collectionsCache.get(variable.variableCollectionId);
     if (!collection) {
@@ -97,13 +128,16 @@ export default async function pullVariables(options: PullVariablesOptions, theme
 
             const modeName = collection?.modes.find((m) => m.modeId === mode)?.name;
             if (tokenValue) {
-              colors.push({
+              const figmaExtensions = createFigmaExtensions(variable);
+              const token = {
                 name: variableName,
                 value: tokenValue as string,
                 type: TokenTypes.COLOR,
                 parent: `${collection?.name}/${modeName}`,
                 ...(variable.description ? { description: variable.description } : {}),
-              });
+                ...(figmaExtensions ? { $extensions: figmaExtensions } : {}),
+              };
+              colors.push(token);
             }
           });
           break;
@@ -126,13 +160,16 @@ export default async function pullVariables(options: PullVariablesOptions, theme
               tokenValue = JSON.stringify(value);
             }
 
-            booleans.push({
+            const figmaExtensions = createFigmaExtensions(variable);
+            const token = {
               name: variableName,
               value: tokenValue,
               type: TokenTypes.BOOLEAN,
               parent: `${collection?.name}/${modeName}`,
               ...(variable.description ? { description: variable.description } : {}),
-            });
+              ...(figmaExtensions ? { $extensions: figmaExtensions } : {}),
+            };
+            booleans.push(token);
           });
           break;
         case 'STRING':
@@ -154,12 +191,14 @@ export default async function pullVariables(options: PullVariablesOptions, theme
               tokenValue = value;
             }
 
+            const figmaExtensions = createFigmaExtensions(variable);
             strings.push({
               name: variableName,
               value: tokenValue as string,
               type: TokenTypes.TEXT,
               parent: `${collection?.name}/${modeName}`,
               ...(variable.description ? { description: variable.description } : {}),
+              ...(figmaExtensions ? { $extensions: figmaExtensions } : {}),
             });
           });
           break;
@@ -188,6 +227,7 @@ export default async function pullVariables(options: PullVariablesOptions, theme
             }
             const modeName = collection?.modes.find((m) => m.modeId === mode)?.name;
 
+            const figmaExtensions = createFigmaExtensions(variable);
             if (options.useDimensions || options.useRem) {
               dimensions.push({
                 name: variableName,
@@ -195,6 +235,7 @@ export default async function pullVariables(options: PullVariablesOptions, theme
                 type: TokenTypes.DIMENSION,
                 parent: `${collection?.name}/${modeName}`,
                 ...(variable.description ? { description: variable.description } : {}),
+                ...(figmaExtensions ? { $extensions: figmaExtensions } : {}),
               });
             } else {
               numbers.push({
@@ -203,6 +244,7 @@ export default async function pullVariables(options: PullVariablesOptions, theme
                 type: TokenTypes.NUMBER,
                 parent: `${collection?.name}/${modeName}`,
                 ...(variable.description ? { description: variable.description } : {}),
+                ...(figmaExtensions ? { $extensions: figmaExtensions } : {}),
               });
             }
           });
