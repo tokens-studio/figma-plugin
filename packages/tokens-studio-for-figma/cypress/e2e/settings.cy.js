@@ -66,6 +66,14 @@ describe('Settings', () => {
     MockEnv();
   });
 
+  it('loads application with tokens and finds settings button', () => {
+    cy.startup(mockStartupParams);
+    cy.get('[data-testid=tokenlisting-sizing]').should('exist');
+    
+    // Look for settings button
+    cy.get('[data-testid="bottom-bar-settings"]').should('be.visible');
+  });
+
   it('successfully navigates to settings page', () => {
     cy.startup(mockStartupParams);
     cy.get('[data-testid=tokenlisting-sizing]').should('exist');
