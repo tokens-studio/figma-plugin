@@ -70,6 +70,8 @@ export default async function previewVariableSync({
           value: token.value,
           rawValue: token.rawValue,
           description: token.description,
+          valueType: typeof token.value,
+          rawValueType: typeof token.rawValue,
         });
 
         const existingVariable = existingVariables.find((v) => 
@@ -141,11 +143,30 @@ export default async function previewVariableSync({
     const enabledSets = selectedSets.filter(set => set.status === TokenSetStatus.ENABLED);
     
     for (const tokenSet of enabledSets) {
+      console.log('🔍 [DEBUG] Processing token set:', tokenSet.set);
       const setTokens = tokens[tokenSet.set] || [];
+      console.log('🔍 [DEBUG] Raw tokens in set:', setTokens.length);
+      
       const tokensToCreate = setTokens.filter((token) => checkIfTokenCanCreateVariable(token, settings));
+      console.log('🔍 [DEBUG] Filtered tokens that can create variables:', tokensToCreate.length);
       
       for (const token of tokensToCreate) {
+        console.log('🔍 [DEBUG] Processing token set token:', {
+          name: token.name,
+          value: token.value,
+          rawValue: token.rawValue,
+          type: token.type,
+          valueType: typeof token.value,
+        });
+        
         const mappedToken = mapTokensToVariableInfo(token, { name: 'Default', selectedTokenSets: { [tokenSet.set]: TokenSetStatus.ENABLED } } as any, settings);
+        console.log('🔍 [DEBUG] Mapped token:', {
+          name: mappedToken.name,
+          value: mappedToken.value,
+          rawValue: mappedToken.rawValue,
+          type: mappedToken.type,
+        });
+        
         const existingVariable = existingVariablesByName[mappedToken.path];
 
         if (existingVariable) {
@@ -305,6 +326,12 @@ function normalizeTokenValue(token: any): any {
     return token.value[0];
   }
   
+  // Handle empty or undefined values
+  if (token.value === undefined || token.value === null || token.value === '') {
+    console.log('🔍 [DEBUG] Token value is empty/null/undefined:', token.value);
+    return '';
+  }
+  
   return token.value;
 }
 
@@ -315,35 +342,25 @@ function getFormattedTokenValue(token: any, settings: SettingsState): string {
     tokenType: token.type,
   });
 
-  // Handle references - check rawValue for reference syntax
-  if (typeof token.rawValue === 'string' && token.rawValue.includes('{')) {
-    // If it's a simple reference like "{dimension.xs}", format it
-    if (token.rawValue.startsWith('{') && token.rawValue.endsWith('}') && !token.rawValue.includes('*') && !token.rawValue.includes('+') && !token.rawValue.includes('-') && !token.rawValue.includes('/')) {
-      const refName = token.rawValue.slice(1, -1);
-      const result = `{${refName}}`;
-      console.log('🔍 [DEBUG] Formatted as simple reference:', result);
-      return result;
-    } else if (token.rawValue.includes('{')) {
-      // Complex reference like "{dimension.xs} * {dimension.scale}" - return as-is
-      console.log('🔍 [DEBUG] Formatted as complex reference:', token.rawValue);
-      return token.rawValue;
-    }
-  }
-  
-  // Use normalized value for formatting
+  // Use normalized value for formatting (this handles the resolved value)
   const normalizedValue = normalizeTokenValue(token);
   
+  // Check if this is still a reference that couldn't be resolved
+  // Only treat as reference if the VALUE itself contains curly braces, not rawValue
+  if (typeof normalizedValue === 'string' && normalizedValue.includes('{') && normalizedValue.includes('}')) {
+    console.log('🔍 [DEBUG] Formatted as unresolved reference:', normalizedValue);
+    return normalizedValue;
+  }
+  
+  // For dimension/spacing/sizing tokens, apply transformations to the resolved value
   if (token.type === 'dimension' || token.type === 'spacing' || token.type === 'sizing') {
-    // Only transform if it's not a reference
-    if (typeof token.rawValue !== 'string' || !token.rawValue.includes('{')) {
-      const transformedValue = transformValue(String(normalizedValue), token.type, settings.baseFontSize, true);
-      console.log('🔍 [DEBUG] Transformed dimension value:', normalizedValue, '->', transformedValue);
-      return String(transformedValue);
-    }
+    const transformedValue = transformValue(String(normalizedValue), token.type, settings.baseFontSize, true);
+    console.log('🔍 [DEBUG] Transformed dimension value:', normalizedValue, '->', transformedValue);
+    return String(transformedValue);
   }
   
   const result = String(normalizedValue || '');
-  console.log('🔍 [DEBUG] Formatted as direct value:', result);
+  console.log('🔍 [DEBUG] Formatted as resolved value:', result);
   return result;
 }
 
