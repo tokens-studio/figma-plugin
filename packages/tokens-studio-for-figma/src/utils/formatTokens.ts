@@ -1,10 +1,11 @@
 import set from 'set-value';
 import { expand } from '@/utils/expand';
-import { AnyTokenList } from '@/types/tokens';
+import { AnyTokenList, GroupMetadataMap } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
 import removeTokenId from './removeTokenId';
 import { convertTokenToFormat } from './convertTokenToFormat';
 import { getGroupTypeName } from './stringifyTokens';
+import { injectGroupDescriptionsMultiSet } from './injectGroupDescriptions';
 
 type Options = {
   tokens: Record<string, AnyTokenList>;
@@ -16,7 +17,8 @@ type Options = {
   expandShadow?: boolean;
   expandComposition?: boolean;
   expandBorder?: boolean;
-  storeTokenIdInJsonEditor?: boolean
+  storeTokenIdInJsonEditor?: boolean;
+  groupMetadata?: GroupMetadataMap;
 };
 
 export default function formatTokens({
@@ -30,6 +32,7 @@ export default function formatTokens({
   expandComposition = false,
   expandBorder = false,
   storeTokenIdInJsonEditor = false,
+  groupMetadata,
 }: Options) {
   const nestUnderParent = includeAllTokens ? true : includeParent;
   const tokenObj = {};
@@ -73,6 +76,9 @@ export default function formatTokens({
       }
     });
   });
+
+  // Inject group descriptions using central utility
+  injectGroupDescriptionsMultiSet(tokenObj, groupMetadata);
 
   return JSON.stringify(tokenObj, null, 2);
 }
