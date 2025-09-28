@@ -21,11 +21,11 @@ Building a variable sync preview modal that allows users to preview all variable
 - [x] **Multi-Mode Support Fix** - Fixed preview logic to be collection-centric rather than theme-centric
 
 ### 🚧 Currently Working On
-- [x] **Multi-Mode Support (RESOLVED)**
-  - ✅ Fixed: Preview logic now groups themes by collection and processes all modes
-  - ✅ Fixed: Each variable gets preview entries for ALL modes it should have values for
-  - ✅ Fixed: Changed from theme-centric to collection-centric processing
-  - 🔄 **Testing Needed**: Verify fix works with Light/Dark mode collections
+- [x] **Multi-Mode Support (STILL HAS ISSUES)**
+  - ❌ Problem: Dark mode still not updated despite collection-centric fix
+  - ❌ Problem: Exporting JUST Dark mode shows "No changes" when changes should exist
+  - 🔍 **Investigation needed**: What comparison logic is used that causes false "no changes"?
+  - 🔍 **Debug**: Add targeted logging to understand mode processing flow
 
 ### 🔄 Next Steps
 - [ ] Test the multi-mode fix with actual Light/Dark theme setup
@@ -61,4 +61,12 @@ The multi-mode issue where "the second mode is never updated" has been fixed. Th
 - 53529ca9: Fix variable reference resolution and floating point precision
 
 ## Summary
-✅ **COMPLETED**: The variable preview feature now correctly handles multi-mode collections. The core issue has been resolved by changing from theme-centric to collection-centric processing. Ready for integration testing.
+❌ **ISSUE PERSISTS**: The multi-mode collection fix didn't resolve the Dark mode problem. 
+
+🔍 **DEBUG LOGGING ADDED**: Enhanced console output now shows:
+- Which themes are selected and processed
+- Token generation statistics per theme  
+- UPDATE/SKIP/CREATE decisions per theme
+- Final summary breakdown by mode
+
+**Ready for testing** - Use the enhanced logging to identify exactly why Dark mode shows "No changes" and whether it's being processed correctly.
