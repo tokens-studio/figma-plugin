@@ -1,8 +1,9 @@
 import React from 'react';
 import { ExclamationTriangleIcon } from '@radix-ui/react-icons';
-import { Box, Button, Heading } from '@tokens-studio/ui';
+import { Button, Heading } from '@tokens-studio/ui';
 import Stack from './Stack';
 import Text from './Text';
+import styles from './Callout.module.css';
 
 type Props = {
   id: string
@@ -22,14 +23,11 @@ export default function Callout({
   heading, description, action, secondaryAction, id,
 }: Props) {
   return (
-    <Box css={{
-      backgroundColor: '$dangerBg', border: '1px solid', borderColor: '$dangerBorder', padding: '$5', borderRadius: '$small',
-    }}
-    >
+    <div className={styles.callout}>
       <Stack direction="row" gap={4}>
-        <Box css={{ color: '$dangerFg', marginTop: '$3' }}>
+        <div className={styles.iconContainer}>
           <ExclamationTriangleIcon />
-        </Box>
+        </div>
         <Stack direction="column" gap={4}>
           <Stack align="start" direction="column" gap={2}>
             <Heading>{heading}</Heading>
@@ -56,6 +54,6 @@ export default function Callout({
           )}
         </Stack>
       </Stack>
-    </Box>
+    </div>
   );
 }

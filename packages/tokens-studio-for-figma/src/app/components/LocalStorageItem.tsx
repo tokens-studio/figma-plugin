@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Button, Box, Text,
+  Button, Text,
 } from '@tokens-studio/ui';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -13,6 +13,7 @@ import { storageTypeSelector } from '@/selectors';
 import useConfirm from '../hooks/useConfirm';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { TokenFormatBadge } from './TokenFormatBadge';
+import styles from './LocalStorageItem.module.css';
 
 const LocalStorageItem = () => {
   const { t } = useTranslation(['storage']);
@@ -48,32 +49,16 @@ const LocalStorageItem = () => {
 
   return (
     <StyledStorageItem active={isActive} style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-      <Box
-        css={{
-          alignItems: 'center',
-          flexDirection: 'row',
-          flexGrow: '1',
-          display: 'flex',
-          overflow: 'hidden',
-          gap: '$3',
-        }}
-      >
-        <Box>
+      <div className={styles.mainContainer}>
+        <div className={styles.iconContainer}>
           <IconFile />
-        </Box>
-        <Box>
-          <Box css={{ fontSize: '$small', fontWeight: '$sansBold' }}>{t('localDocument')}</Box>
+        </div>
+        <div className={styles.contentContainer}>
+          <div className={styles.titleText}>{t('localDocument')}</div>
           <Text muted size="xsmall">Tokens will be stored on this Figma file</Text>
-        </Box>
-      </Box>
-      <Box
-        css={{
-          marginRight: '$2',
-          minHeight: '$controlSmall',
-          display: 'flex',
-          alignItems: 'center',
-        }}
-      >
+        </div>
+      </div>
+      <div className={styles.actionsContainer}>
         {isActive ? (
           <TokenFormatBadge extended />
         ) : (
@@ -86,7 +71,7 @@ const LocalStorageItem = () => {
             {t('apply')}
           </Button>
         )}
-      </Box>
+      </div>
     </StyledStorageItem>
   );
 };

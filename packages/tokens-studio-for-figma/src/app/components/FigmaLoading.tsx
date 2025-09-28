@@ -1,6 +1,6 @@
 import React, { PropsWithChildren } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box, Spinner, Stack } from '@tokens-studio/ui';
+import { Spinner, Stack } from '@tokens-studio/ui';
 import TokensStudioIcon from '@/icons/tokensstudio.svg';
 import TokensStudioWord from '@/icons/tokensstudio-word.svg';
 import pjs from '../../../package.json';
@@ -43,9 +43,9 @@ export default function FigmaLoading({
 
   if (!isLoading) {
     return (
-      <Box>
+      <div>
         {children}
-      </Box>
+      </div>
     );
   }
 

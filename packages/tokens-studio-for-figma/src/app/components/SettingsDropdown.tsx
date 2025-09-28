@@ -1,13 +1,13 @@
 import { useDispatch, useSelector } from 'react-redux';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box, DropdownMenu, IconButton } from '@tokens-studio/ui';
+import { DropdownMenu, IconButton } from '@tokens-studio/ui';
 import { Check, Settings } from 'iconoir-react';
 import { Dispatch } from '../store';
 import { settingsStateSelector, localApiStateSelector, autoApplyThemeOnDropSelector } from '@/selectors';
 import { isEqual } from '@/utils/isEqual';
-
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import styles from './SettingsDropdown.module.css';
 
 export default function SettingsDropdown() {
   const localApiState = useSelector(localApiStateSelector);
@@ -59,9 +59,9 @@ export default function SettingsDropdown() {
               <Check />
             </DropdownMenu.ItemIndicator>
             {t('update.onChange.title')}
-            <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>
+            <div className={styles.description}>
               {t('update.onChange.description')}
-            </Box>
+            </div>
           </DropdownMenu.CheckboxItem>
           {localApiState?.provider === StorageProviderType.JSONBIN ? (
             <DropdownMenu.CheckboxItem
@@ -73,9 +73,9 @@ export default function SettingsDropdown() {
                 <Check />
               </DropdownMenu.ItemIndicator>
               {t('update.remoteJSONBin.title')}
-              <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>
+              <div className={styles.description}>
                 {t('update.remoteJSONBin.description')}
-              </Box>
+              </div>
             </DropdownMenu.CheckboxItem>
           ) : null}
           <DropdownMenu.CheckboxItem
@@ -87,9 +87,9 @@ export default function SettingsDropdown() {
               <Check />
             </DropdownMenu.ItemIndicator>
             {t('update.swapStyles.title')}
-            <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>
+            <div className={styles.description}>
               {t('update.swapStyles.description')}
-            </Box>
+            </div>
           </DropdownMenu.CheckboxItem>
           <DropdownMenu.CheckboxItem
             data-testid="should-update-styles"
@@ -100,9 +100,9 @@ export default function SettingsDropdown() {
               <Check />
             </DropdownMenu.ItemIndicator>
             {t('update.shouldUpdateStyles.title')}
-            <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>
+            <div className={styles.description}>
               {t('update.shouldUpdateStyles.description')}
-            </Box>
+            </div>
           </DropdownMenu.CheckboxItem>
           <DropdownMenu.CheckboxItem
             data-testid="auto-apply-theme-on-drop"

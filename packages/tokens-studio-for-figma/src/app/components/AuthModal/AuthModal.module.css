@@ -1,0 +1,11 @@
+.ctaContainer {
+  display: flex;
+  gap: var(--space-3, 12px);
+  align-items: center;
+}
+
+.forgotPasswordContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

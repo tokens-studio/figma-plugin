@@ -1,7 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { Box } from '@tokens-studio/ui';
 import { IconExpandArrow } from '@/icons';
 import { StyledFolderButton } from './StyledFolderButton';
 import { StyledItem } from './StyledItem';
@@ -12,6 +11,7 @@ import {
 } from '@/selectors';
 import { StyledThemeLabel } from '../ManageThemesModal/StyledThemeLabel';
 import Tooltip from '../Tooltip';
+import styles from './TokenSetTreeContent.module.css';
 
 type TreeItem<ItemType = unknown> = {
   key: string
@@ -88,17 +88,17 @@ export function TokenSetTreeContent<T extends TreeItem>({
                     size={keyPosition === 'start' ? 'small' : 'default'}
                   >
                     {keyPosition === 'start' ? (
-                      <Box css={{ display: 'flex', alignItems: 'center', gap: '$2' }}>
+                      <div className={styles.folderLabel}>
                         <StyledThemeLabel variant="folder">{item.label}</StyledThemeLabel>
-                      </Box>
+                      </div>
                     ) : null}
                     <StyledFolderButtonChevronBox collapsed={collapsed.includes(item.key)}>
                       <IconExpandArrow />
                     </StyledFolderButtonChevronBox>
                     {keyPosition === 'end' ? (
-                      <Box css={{ display: 'flex', alignItems: 'center', gap: '$2' }}>
+                      <div className={styles.folderLabel}>
                         <StyledThemeLabel variant="folder">{item.label}</StyledThemeLabel>
-                      </Box>
+                      </div>
                     ) : null}
                   </StyledFolderButton>
                 </Tooltip>

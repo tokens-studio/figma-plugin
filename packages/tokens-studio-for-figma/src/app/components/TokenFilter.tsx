@@ -3,11 +3,12 @@ import { useDebouncedCallback } from 'use-debounce';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { XCircleFillIcon } from '@primer/octicons-react';
-import { Box, IconButton } from '@tokens-studio/ui';
+import { IconButton } from '@tokens-studio/ui';
 import { Search } from 'iconoir-react';
 import { Dispatch } from '../store';
 import { styled } from '@/stitches.config';
 import { tokenFilterSelector } from '@/selectors';
+import styles from './TokenFilter.module.css';
 
 const StyledInput = styled('input', {
   background: 'transparent',
@@ -51,18 +52,8 @@ const TokenFilter = () => {
   }, [dispatch.uiState]);
 
   return (
-    <Box
-      css={{
-        display: 'flex',
-        flexGrow: 1,
-        flexShrink: 1,
-        flexBasis: 0,
-        alignItems: 'center',
-        gap: '$2',
-        position: 'relative',
-      }}
-    >
-      <Box css={{ position: 'absolute', left: '$2' }}><Search /></Box>
+    <div className={styles.container}>
+      <div className={styles.searchIcon}><Search /></div>
       <StyledInput
         spellCheck={false}
         type="text"
@@ -71,7 +62,7 @@ const TokenFilter = () => {
         placeholder={t('search') as string}
       />
       {tokenString && (
-        <Box css={{ position: 'absolute', right: '$2' }}>
+        <div className={styles.clearButton}>
           <IconButton
             onClick={handleResetSearchString}
             icon={<XCircleFillIcon />}
@@ -79,9 +70,9 @@ const TokenFilter = () => {
             variant="invisible"
             size="small"
           />
-        </Box>
+        </div>
       )}
-    </Box>
+    </div>
   );
 };
 

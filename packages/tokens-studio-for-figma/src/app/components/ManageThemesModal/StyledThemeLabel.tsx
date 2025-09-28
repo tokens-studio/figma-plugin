@@ -1,7 +1,6 @@
-import { Box } from '@tokens-studio/ui';
 import { styled } from '@/stitches.config';
 
-export const StyledThemeLabel = styled(Box, {
+export const StyledThemeLabel = styled('div', {
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   userSelect: 'none',
