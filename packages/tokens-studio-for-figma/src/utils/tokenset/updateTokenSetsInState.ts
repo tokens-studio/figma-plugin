@@ -87,7 +87,7 @@ export function updateTokenSetsInState(
 
   if (newTokenSets.length) {
     newTokenSets.forEach(([name]) => {
-      nextUsedTokenSet[name] = TokenSetStatus.DISABLED;
+      nextUsedTokenSet[name] = TokenSetStatus.ENABLED;
     });
   }
 
