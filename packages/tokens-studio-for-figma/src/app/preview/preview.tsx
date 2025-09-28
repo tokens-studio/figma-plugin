@@ -196,7 +196,7 @@ const mockActions = {
     user: mockUser,
     localTokenData: {
       activeTheme: '',
-      checkForChanges: true,
+      checkForChanges: false,
       themes: [],
       usedTokenSet: null,
       updatedAt: new Date().toISOString(),
@@ -229,7 +229,7 @@ const mockActions = {
     user: mockUser,
     localTokenData: {
       activeTheme: 'light',
-      checkForChanges: true,
+      checkForChanges: false,
       themes: sampleThemes,
       usedTokenSet: { colors: true, spacing: true, typography: true },
       updatedAt: new Date().toISOString(),
@@ -262,7 +262,7 @@ const mockActions = {
     user: mockUser,
     localTokenData: {
       activeTheme: 'light-theme',
-      checkForChanges: true,
+      checkForChanges: false,
       themes: [
         {
           id: 'light-theme',
@@ -345,7 +345,20 @@ const mockActions = {
       ],
       usedTokenSet: { foundation: true, semantic: true, components: true },
       updatedAt: new Date().toISOString(),
-      values: sampleComplexTokens,
+      values: {
+        foundation: [
+          { name: 'color.primary', value: '#2563eb', type: 'color' },
+          { name: 'spacing.base', value: '16px', type: 'spacing' },
+        ],
+        semantic: [
+          { name: 'text.primary', value: '{foundation.color.primary}', type: 'color' },
+          { name: 'layout.gap', value: '{foundation.spacing.base}', type: 'spacing' },
+        ],
+        components: [
+          { name: 'button.primary.bg', value: '{semantic.text.primary}', type: 'color' },
+          { name: 'button.padding', value: '{semantic.layout.gap}', type: 'spacing' },
+        ],
+      },
       collapsedTokenSets: null,
       tokenFormat: TokenFormatOptions.DTCG,
       version: '91',
@@ -377,7 +390,7 @@ const mockActions = {
     user: mockUser,
     localTokenData: {
       activeTheme: 'design',
-      checkForChanges: true,
+      checkForChanges: false,
       themes: sampleThemes,
       usedTokenSet: { colors: true, spacing: true, typography: true },
       updatedAt: new Date().toISOString(),
