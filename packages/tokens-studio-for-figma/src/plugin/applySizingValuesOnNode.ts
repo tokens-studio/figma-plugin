@@ -30,18 +30,18 @@ function handleFullSizeValue(
 
   // Handle regular layers: resize based on parent dimensions
   if (node.parent && 'resize' in node) {
-    const parent = node.parent;
-    
+    const { parent } = node;
+
     if (dimension === 'both' && 'width' in parent && 'height' in parent) {
       node.resize(parent.width, parent.height);
       return true;
-    } 
-    
+    }
+
     if (dimension === 'width' && 'width' in parent) {
       node.resize(parent.width, node.height);
       return true;
-    } 
-    
+    }
+
     if (dimension === 'height' && 'height' in parent) {
       node.resize(node.width, parent.height);
       return true;
@@ -130,7 +130,7 @@ export async function applySizingValuesOnNode(
     node.type !== 'DOCUMENT'
     && node.type !== 'PAGE'
     && !isPartOfInstance(node.id)
-    && (isSceneNode(node) && isAutoLayout(node)
+    && ((isSceneNode(node) && isAutoLayout(node))
       || (node.parent && isSceneNode(node.parent) && isAutoLayout(node.parent)))
   ) {
     // SIZING: MIN WIDTH
