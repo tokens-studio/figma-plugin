@@ -380,6 +380,21 @@ describe('GitlabTokenStorage', () => {
   });
 
   it('should return a validation error', async () => {
+    // Set up project ID for this test
+    mockGetProjects.mockImplementationOnce(() => (
+      Promise.resolve([{
+        name: 'figma-tokens',
+        id: 35102363,
+        path: 'figma-tokens',
+        path_with_namespace: 'six7/figma-tokens',
+        namespace: {
+          full_path: 'six7',
+          id: 51634506,
+        },
+      }])
+    ));
+    await storageProvider.assignProjectId();
+
     mockGetRepositories.mockImplementationOnce(() => (
       Promise.resolve([])
     ));

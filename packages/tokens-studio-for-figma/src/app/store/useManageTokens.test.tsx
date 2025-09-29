@@ -240,4 +240,22 @@ describe('useManageTokens', () => {
     await act(async () => result.current.deleteSingleToken(tokenToDelete));
     expect(mockRemoveStylesFromTokens).toBeCalledTimes(0);
   });
+
+  it('shows token name in delete confirmation description', async () => {
+    const tokenToDelete = {
+      path: 'color.primary',
+      parent: 'global',
+      type: TokenTypes.COLOR,
+    };
+    mockConfirm.mockImplementation(() => Promise.resolve(null)); // User cancels
+    await act(async () => result.current.deleteSingleToken(tokenToDelete));
+    
+    expect(mockConfirm).toHaveBeenCalledWith({
+      text: 'Delete token?',
+      description: 'Are you sure you want to delete the token "color.primary"?',
+      choices: [{ key: StyleOptions.REMOVE, label: 'Delete associated style' }],
+      confirmAction: 'Delete',
+      variant: 'danger',
+    });
+  });
 });
