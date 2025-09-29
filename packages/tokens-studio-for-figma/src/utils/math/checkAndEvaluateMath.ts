@@ -72,13 +72,18 @@ export function checkAndEvaluateMath(expr: string) {
     unit = calcReduced.unit;
   }
 
-  let evaluated: number;
+  let evaluated: number | string | boolean; // Can be array too, but arrays support in TS is blurry
 
   try {
     evaluated = parser.evaluate(`${unitlessExpr}`);
   } catch (ex) {
     return expr;
   }
+
+  if(typeof evaluated === 'boolean' || typeof evaluated === 'string') {
+    return evaluated;
+  }
+
   try {
     return unit ? `${evaluated}${unit}` : Number.parseFloat(evaluated.toFixed(3));
   } catch (ex) {
