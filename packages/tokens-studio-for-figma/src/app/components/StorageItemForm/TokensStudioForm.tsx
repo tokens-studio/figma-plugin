@@ -29,6 +29,7 @@ import { Dispatch } from '@/app/store';
 import { StudioConfigurationService } from '@/storage/tokensStudio/StudioConfigurationService';
 import { shouldUseSecureConnection } from '@/utils/shouldUseSecureConnection';
 import { isJWTError, getErrorMessage } from '@/utils/jwtErrorUtils';
+import { track } from '@/utils/analytics';
 
 type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.TOKENS_STUDIO }>;
 type Props = {
@@ -83,6 +84,9 @@ export default function TokensStudioForm({
   );
 
   const handleStartTrial = React.useCallback(() => {
+    track('Start Free Trial Clicked', {
+      source: 'tokens-studio-form',
+    });
     window.open('https://app.prod.tokens.studio', '_blank');
   }, []);
 
