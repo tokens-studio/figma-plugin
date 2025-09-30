@@ -59,6 +59,7 @@ export default function RenameTokenGroupModal({
       <Stack direction="column" gap={4}>
         <Input
           full
+          form="renameTokenGroup"
           onChange={handleNewTokenGroupNameChange}
           type="text"
           value={newName}

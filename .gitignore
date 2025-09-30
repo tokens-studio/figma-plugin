@@ -13,6 +13,7 @@ coverage
 .DS_Store
 packages/tokens-studio-for-figma/benchmark/output
 packages/tokens-studio-for-figma/benchmark/build
+packages/tokens-studio-for-figma/preview
 # Temporary flamegraphs between builds
 packages/tokens-studio-for-figma/benchmark/flamegraphs
 **.0x

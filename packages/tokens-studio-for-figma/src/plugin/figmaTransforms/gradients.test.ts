@@ -4,6 +4,7 @@ describe('convertStringtoFigmaGradient', () => {
   const test1 = {
     input: 'linear-gradient(45deg, #ffffff 0%, #000000 100%)',
     output: {
+      type: 'GRADIENT_LINEAR',
       gradientStops: [
         {
           color: {
@@ -34,6 +35,7 @@ describe('convertStringtoFigmaGradient', () => {
   const test2 = {
     input: 'linear-gradient(45deg, #ffffff 0%, rgba(255,0,0,0.5) 50%, #000000 100%)',
     output: {
+      type: 'GRADIENT_LINEAR',
       gradientStops: [
         {
           color: {
@@ -73,6 +75,7 @@ describe('convertStringtoFigmaGradient', () => {
   const test3 = {
     input: 'linear-gradient(45deg, #ffffff 0%, rgba(255,0,0,0.5) 50%, #000000 100%)',
     output: {
+      type: 'GRADIENT_LINEAR',
       gradientStops: [
         {
           color: {
@@ -112,6 +115,7 @@ describe('convertStringtoFigmaGradient', () => {
   const test4 = {
     input: 'linear-gradient(#000000, #ffffff)',
     output: {
+      type: 'GRADIENT_LINEAR',
       gradientStops: [
         {
           color: {
@@ -142,6 +146,7 @@ describe('convertStringtoFigmaGradient', () => {
   const test5 = {
     input: 'linear-gradient(0.25turn, #e66465, #9198e5)',
     output: {
+      type: 'GRADIENT_LINEAR',
       gradientStops: [
         {
           color: {
@@ -169,6 +174,7 @@ describe('convertStringtoFigmaGradient', () => {
   const test6 = {
     input: 'linear-gradient(to top, #e66465, #9198e5)',
     output: {
+      type: 'GRADIENT_LINEAR',
       gradientStops: [
         {
           color: {
@@ -199,6 +205,7 @@ describe('convertStringtoFigmaGradient', () => {
   const test7 = {
     input: 'linear-gradient(106.84deg, #FF0000 5.61%, #cc00ff00 89.41%)',
     output: {
+      type: 'GRADIENT_LINEAR',
       gradientStops: [
         {
           color: {
@@ -363,5 +370,135 @@ describe('convertFigmaGradientToString', () => {
 describe('convertDegreeToNumber', () => {
   it('should convert degree to number', () => {
     expect(convertDegreeToNumber('90deg')).toEqual(90);
+  });
+});
+
+describe('radial and conic gradients', () => {
+  it('should convert radial gradient', () => {
+    const result = convertStringToFigmaGradient('radial-gradient(#ff0000, #0000ff)');
+    expect(result.type).toEqual('GRADIENT_RADIAL');
+    expect(result.gradientStops).toHaveLength(2);
+    expect(result.gradientStops[0].color).toEqual({
+      r: 1, g: 0, b: 0, a: 1,
+    });
+    expect(result.gradientStops[1].color).toEqual({
+      r: 0, g: 0, b: 1, a: 1,
+    });
+    expect(result.gradientTransform).toEqual([[1, 0, 0], [0, 1, 0]]);
+  });
+
+  it('should convert conic gradient', () => {
+    const result = convertStringToFigmaGradient('conic-gradient(#ff0000, #0000ff)');
+    expect(result.type).toEqual('GRADIENT_ANGULAR');
+    expect(result.gradientStops).toHaveLength(2);
+    expect(result.gradientStops[0].color).toEqual({
+      r: 1, g: 0, b: 0, a: 1,
+    });
+    expect(result.gradientStops[1].color).toEqual({
+      r: 0, g: 0, b: 1, a: 1,
+    });
+  });
+
+  it('should convert conic gradient with from angle', () => {
+    const result = convertStringToFigmaGradient('conic-gradient(from 45deg, #ff0000, #0000ff)');
+    expect(result.type).toEqual('GRADIENT_ANGULAR');
+    expect(result.gradientStops).toHaveLength(2);
+  });
+
+  it('should convert radial gradient with positions', () => {
+    const result = convertStringToFigmaGradient('radial-gradient(#ff0000 0%, #0000ff 100%)');
+    expect(result.type).toEqual('GRADIENT_RADIAL');
+    expect(result.gradientStops).toHaveLength(2);
+    expect(result.gradientStops[0].position).toEqual(0);
+    expect(result.gradientStops[1].position).toEqual(1);
+  });
+
+  it('should fallback to linear gradient for unknown types', () => {
+    const result = convertStringToFigmaGradient('unknown-gradient(#ff0000, #0000ff)');
+    expect(result.type).toEqual('GRADIENT_LINEAR');
+    expect(result.gradientStops).toHaveLength(2);
+  });
+
+  it('should handle radial gradient with shape/size parameters', () => {
+    const result = convertStringToFigmaGradient('radial-gradient(circle at center, #ff0000, #0000ff)');
+    expect(result.type).toEqual('GRADIENT_RADIAL');
+    expect(result.gradientStops).toHaveLength(2);
+  });
+
+  it('should handle conic gradient with at position', () => {
+    const result = convertStringToFigmaGradient('conic-gradient(from 45deg at 50% 50%, #ff0000, #0000ff)');
+    expect(result.type).toEqual('GRADIENT_ANGULAR');
+    expect(result.gradientStops).toHaveLength(2);
+  });
+});
+
+describe('convertFigmaGradientToString with gradient types', () => {
+  it('should convert GRADIENT_RADIAL to radial-gradient string', () => {
+    const paint: GradientPaint = {
+      type: 'GRADIENT_RADIAL',
+      gradientStops: [
+        {
+          color: {
+            r: 1, g: 0, b: 0, a: 1,
+          },
+          position: 0,
+        },
+        {
+          color: {
+            r: 0, g: 0, b: 1, a: 1,
+          },
+          position: 1,
+        },
+      ],
+      gradientTransform: [[1, 0, 0], [0, 1, 0]],
+    };
+    const result = convertFigmaGradientToString(paint);
+    expect(result).toEqual('radial-gradient(#ff0000 0%, #0000ff 100%)');
+  });
+
+  it('should convert GRADIENT_ANGULAR to conic-gradient string', () => {
+    const paint: GradientPaint = {
+      type: 'GRADIENT_ANGULAR',
+      gradientStops: [
+        {
+          color: {
+            r: 1, g: 0, b: 0, a: 1,
+          },
+          position: 0,
+        },
+        {
+          color: {
+            r: 0, g: 0, b: 1, a: 1,
+          },
+          position: 1,
+        },
+      ],
+      gradientTransform: [[1, 0, 0], [0, 1, 0]],
+    };
+    const result = convertFigmaGradientToString(paint);
+    expect(result).toEqual('conic-gradient(#ff0000 0%, #0000ff 100%)');
+  });
+
+  it('should convert GRADIENT_DIAMOND to radial-gradient string', () => {
+    const paint: GradientPaint = {
+      type: 'GRADIENT_DIAMOND',
+      gradientStops: [
+        {
+          color: {
+            r: 1, g: 0, b: 0, a: 1,
+          },
+          position: 0,
+        },
+        {
+          color: {
+            r: 0, g: 0, b: 1, a: 1,
+          },
+          position: 1,
+        },
+      ],
+      gradientTransform: [[1, 0, 0], [0, 1, 0]],
+    };
+    const result = convertFigmaGradientToString(paint);
+    expect(result).toEqual('radial-gradient(#ff0000 0%, #0000ff 100%)');
   });
 });

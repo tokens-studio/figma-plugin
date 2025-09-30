@@ -29,12 +29,27 @@ describe('checkIfTokenCanCreateVariable', () => {
   });
 
   it('gradient colors can\'t create variable', () => {
-    const gradientColor = {
-      name: 'border-radius-multi-value',
+    const linearGradientColor = {
+      name: 'linear-gradient-color',
       value: 'linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(9,9,121,1) 35%, rgba(0,212,255,1) 100%)',
       type: TokenTypes.COLOR,
     } as ResolveTokenValuesResult;
-    expect(checkIfTokenCanCreateVariable(gradientColor, settings)).toBe(false);
+
+    const radialGradientColor = {
+      name: 'radial-gradient-color',
+      value: 'radial-gradient(circle, #ff0000 0%, #0000ff 100%)',
+      type: TokenTypes.COLOR,
+    } as ResolveTokenValuesResult;
+
+    const conicGradientColor = {
+      name: 'conic-gradient-color',
+      value: 'conic-gradient(from 90deg, #ff0000, #0000ff)',
+      type: TokenTypes.COLOR,
+    } as ResolveTokenValuesResult;
+
+    expect(checkIfTokenCanCreateVariable(linearGradientColor, settings)).toBe(false);
+    expect(checkIfTokenCanCreateVariable(radialGradientColor, settings)).toBe(false);
+    expect(checkIfTokenCanCreateVariable(conicGradientColor, settings)).toBe(false);
   });
 
   it('should return false for color token when variablesColor setting is false', () => {

@@ -136,6 +136,7 @@ export type BulkRemapTokensAsyncMessage = AsyncMessage<AsyncMessageTypes.BULK_RE
   oldName: string;
   newName: string;
   updateMode: UpdateMode;
+  useRegex: boolean;
 }>;
 export type BulkRemapTokensMessageAsyncResult = AsyncMessage<AsyncMessageTypes.BULK_REMAP_TOKENS>;
 
@@ -191,6 +192,7 @@ export type CreateLivingDocumentationAsyncMessage = AsyncMessage<AsyncMessageTyp
   startsWith: string;
   applyTokens: boolean;
   resolvedTokens: AnyTokenList;
+  useRegex?: boolean;
 }>;
 export type CreateLivingDocumentationAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_LIVING_DOCUMENTATION>;
 
