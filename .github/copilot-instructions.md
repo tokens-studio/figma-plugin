@@ -188,4 +188,66 @@ SENTRY_REPLAY_SAMPLING=0
 8. For UI components, use @tokens-studio/ui components that we use across the codebase instead of creating from scratch
 9. For UI work, use tokens from @tokens-studio/tokens, found in node_modules/@tokens-studio/tokens/dist/css/dark.css and node_modules/@tokens-studio/tokens/dist/css/core.css instead of using raw hex values.
 
+## Web Preview for Screenshots & Testing
+
+The plugin includes a comprehensive web preview system that allows you to view and test the Figma plugin interface in a browser. This is particularly useful for:
+
+- **Taking screenshots** of plugin features for documentation or issues
+- **Testing UI changes** without needing Figma 
+- **Demonstrating plugin functionality** to stakeholders
+- **Debugging** interface issues in browser dev tools
+
+### Getting Started with Preview
+
+1. Navigate to the plugin directory:
+   ```bash
+   cd packages/tokens-studio-for-figma
+   ```
+
+2. Start the preview:
+   ```bash
+   yarn preview
+   ```
+   This starts the preview server on `http://localhost:9000`
+
+3. For static builds, use:
+   ```bash
+   yarn build:preview
+   yarn serve:preview  # serves on port 58630
+   ```
+
+### Available Example Scenarios
+
+The preview includes predefined scenarios to showcase different plugin states:
+
+- **Fresh Start** - Plugin with no tokens loaded (onboarding state)
+- **Basic Design Tokens** - Simple color, spacing, and typography tokens
+- **Complex Token System** - Multi-level token architecture with aliases and references
+- **GitHub Sync Setup** - Plugin configured with GitHub synchronization
+- **Inspector Mode** - Plugin in inspection mode for analyzing Figma elements
+
+### Quick Navigation URLs
+
+Use these URLs to quickly navigate to specific plugin states:
+
+- Fresh start: `#tab=start&action=FRESH_START`
+- Tokens tab with basic tokens: `#tab=tokens&action=WITH_BASIC_TOKENS`
+- Inspector mode: `#tab=inspector&action=INSPECTOR_MODE` 
+- JSON editor with complex tokens: `#tab=json&action=WITH_COMPLEX_TOKENS`
+- Settings with GitHub sync: `#tab=settings&action=WITH_GITHUB_SYNC`
+- Dark theme view: `#tab=tokens&action=WITH_COMPLEX_TOKENS&theme=dark`
+- Fullscreen mode: `#tab=tokens&action=WITH_COMPLEX_TOKENS&fullscreen=true`
+
+### Using Preview for Development
+
+When building new features:
+
+1. **Start with preview** - Use appropriate scenario to test your changes
+2. **Take before/after screenshots** - Document your changes visually
+3. **Test different states** - Verify your feature works across different plugin states  
+4. **Use browser dev tools** - Debug CSS, inspect React components, monitor network requests
+5. **Test responsive behavior** - Verify UI works at different window sizes
+
+The preview system uses mock data and simulated Figma API responses, so it provides a realistic testing environment without requiring the actual Figma plugin sandbox.
+
 
