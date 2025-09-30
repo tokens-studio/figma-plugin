@@ -39,21 +39,6 @@
       "internalConsoleOptions": "neverOpen"
     },
     {
-      "type": "node",
-      "request": "launch",
-      "name": "Debug transformer tests",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": [
-        "run-script",
-        "test",
-        "--",
-        "--inspect-brk=9229"
-      ],
-      "console": "integratedTerminal",
-      "cwd": "${workspaceFolder}/token-transformer",
-      "internalConsoleOptions": "neverOpen"
-    },
-    {
       "name": "Test current file",
       "type": "node",
       "request": "launch",
