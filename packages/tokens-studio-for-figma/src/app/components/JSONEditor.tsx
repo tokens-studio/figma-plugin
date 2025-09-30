@@ -29,15 +29,111 @@ function JSONEditor({
   // Configure Monaco Editor for enhanced JSON support
   React.useEffect(() => {
     if (monaco) {
-      // Configure JSON language settings
+      // Define custom JSON schema for design tokens
+      const designTokenSchema = {
+        type: 'object',
+        properties: {
+          $themes: {
+            type: 'array',
+            description: 'Theme definitions for token sets',
+            items: {
+              type: 'object',
+              properties: {
+                id: { type: 'string' },
+                name: { type: 'string' },
+                selectedTokenSets: {
+                  type: 'object',
+                  additionalProperties: { type: 'string', enum: ['source', 'enabled', 'disabled'] },
+                },
+              },
+            },
+          },
+          $metadata: {
+            type: 'object',
+            description: 'Metadata for token sets',
+            properties: {
+              tokenSetOrder: {
+                type: 'array',
+                items: { type: 'string' },
+              },
+            },
+          },
+        },
+        patternProperties: {
+          '^(?!\\$).*': {
+            type: 'object',
+            description: 'Token group or token definition',
+            oneOf: [
+              {
+                description: 'Single token with value and type',
+                type: 'object',
+                properties: {
+                  value: {
+                    description: 'Token value',
+                  },
+                  type: {
+                    type: 'string',
+                    description: 'Token type',
+                    enum: [
+                      'color', 'dimension', 'fontFamilies', 'fontWeights', 'lineHeights',
+                      'fontSizes', 'letterSpacing', 'paragraphSpacing', 'sizing', 'spacing',
+                      'borderRadius', 'borderWidth', 'boxShadow', 'opacity', 'typography',
+                      'textCase', 'textDecoration', 'border', 'composition', 'asset',
+                      'boolean', 'text', 'number', 'other',
+                    ],
+                  },
+                  description: {
+                    type: 'string',
+                    description: 'Optional description for the token',
+                  },
+                },
+              },
+              {
+                description: 'DTCG format token with $ prefix',
+                type: 'object',
+                properties: {
+                  $value: {
+                    description: 'Token value (DTCG format)',
+                  },
+                  $type: {
+                    type: 'string',
+                    description: 'Token type (DTCG format)',
+                    enum: [
+                      'color', 'dimension', 'fontFamily', 'fontWeight', 'duration', 'cubicBezier',
+                      'number', 'string', 'fontSize', 'lineHeight', 'letterSpacing', 'paragraphSpacing',
+                      'sizing', 'spacing', 'borderRadius', 'borderWidth', 'boxShadow', 'opacity',
+                      'typography', 'textCase', 'textDecoration', 'border', 'composition',
+                    ],
+                  },
+                  $description: {
+                    type: 'string',
+                    description: 'Optional description for the token',
+                  },
+                },
+              },
+              {
+                description: 'Nested token group',
+                type: 'object',
+                additionalProperties: true,
+              },
+            ],
+          },
+        },
+        additionalProperties: false,
+      };
+
+      // Configure JSON language settings with custom schema
       monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
         validate: true,
         allowComments: false,
-        schemas: [{
-          fileMatch: ['*'],
-          uri: 'https://schemas.tokens.studio/latest/tokens-schema.json',
-        }],
-        enableSchemaRequest: true,
+        schemas: [
+          {
+            fileMatch: ['*'],
+            uri: 'http://tokens.studio/design-tokens-schema.json',
+            schema: designTokenSchema,
+          },
+        ],
+        enableSchemaRequest: false, // Use inline schema instead of remote
       });
 
       // Configure JSON language options for better syntax highlighting
