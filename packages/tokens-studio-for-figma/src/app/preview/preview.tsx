@@ -625,7 +625,7 @@ function PreviewApp({ children }: { children: ReactNode }) {
     if (tab) {
       dispatch.uiState.setActiveTab(Tabs[tab]);
     }
-  }, []);
+  }, [action, subAction, theme, tab, dispatch.uiState, updateHash]);
 
   useEffect(() => {
     if (uiState.activeTab && tab !== uiState.activeTab) {
