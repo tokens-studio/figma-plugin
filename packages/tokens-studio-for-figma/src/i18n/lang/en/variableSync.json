@@ -1,0 +1,38 @@
+{
+  "preview": {
+    "title": "Variable Sync Preview",
+    "loading": "Analyzing variable changes...",
+    "summary": {
+      "toCreate": "to create",
+      "toUpdate": "to update", 
+      "toDelete": "to delete"
+    },
+    "tabs": {
+      "create": "To Create",
+      "update": "To Update", 
+      "delete": "To Delete"
+    },
+    "categories": {
+      "createAll": "Create all",
+      "updateAll": "Update all",
+      "deleteAll": "Delete all"
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "applyChanges": "Apply Changes",
+      "selectAll": "Select All",
+      "deselectAll": "Deselect All"
+    },
+    "empty": {
+      "create": "No variables to create",
+      "update": "No variables to update",
+      "delete": "No variables to delete"
+    },
+    "details": {
+      "current": "Current",
+      "new": "New",
+      "value": "Value",
+      "mode": "Mode"
+    }
+  }
+}

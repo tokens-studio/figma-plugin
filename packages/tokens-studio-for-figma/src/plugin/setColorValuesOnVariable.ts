@@ -20,12 +20,25 @@ function isFigmaColorObject(obj: VariableValue): obj is RGBOrRGBA {
 
 export default function setColorValuesOnVariable(variable: Variable, mode: string, value: string) {
   try {
+    console.log('🎨 [DEBUG] setColorValuesOnVariable called:', { variableName: variable.name, mode, value });
+
     const { color, opacity } = convertToFigmaColor(value);
     const existingVariableValue = variable.valuesByMode[mode];
-    if (
-      !existingVariableValue
-      || !(isFigmaColorObject(existingVariableValue) || isVariableWithAliasReference(existingVariableValue))
-    ) return;
+
+    console.log('🎨 [DEBUG] Color conversion result:', { color, opacity, existingVariableValue });
+
+    // For new variables, existingVariableValue will be undefined - we should set the value
+    if (existingVariableValue === undefined) {
+      const newValue = { ...color, a: opacity };
+      console.log('🎨 [DEBUG] Setting color value on new variable:', newValue);
+      variable.setValueForMode(mode, newValue);
+      return;
+    }
+
+    if (!(isFigmaColorObject(existingVariableValue) || isVariableWithAliasReference(existingVariableValue))) {
+      console.warn('🎨 [DEBUG] Existing variable value is not a color or alias reference:', existingVariableValue);
+      return;
+    }
 
     const newValue = { ...color, a: opacity };
 
@@ -37,13 +50,15 @@ export default function setColorValuesOnVariable(variable: Variable, mode: strin
       };
 
       if (isColorApproximatelyEqual(existingValue, newValue)) {
+        console.log('🎨 [DEBUG] Color values are approximately equal, skipping update');
         // return if values are approximately equal
         return;
       }
     }
 
+    console.log('🎨 [DEBUG] Setting new color value:', newValue);
     variable.setValueForMode(mode, newValue);
   } catch (e) {
-    console.error('Error setting colorVariable', e);
+    console.error('❌ [DEBUG] Error setting colorVariable', e);
   }
 }
