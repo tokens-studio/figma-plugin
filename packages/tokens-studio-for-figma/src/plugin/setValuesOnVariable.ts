@@ -33,8 +33,9 @@ export default async function setValuesOnVariable(
         // If id matches the variableId, or name patches the token path, we can use it to update the variable instead of re-creating.
         // This has the nasty side-effect that if font weight changes from string to number, it will not update the variable given we cannot change type.
         // In that case, we should delete the variable and re-create it.
-        const variable = variablesInFigma.find((v) => (v.key === token.variableId && !v.remote) || v.name === token.path)
-          || figma.variables.createVariable(token.path, collection, variableType);
+        // IMPORTANT: Only look for variables within the current collection to avoid cross-contamination between themes
+        const existingVariable = variablesInFigma.find((v) => (v.key === token.variableId && !v.remote) || (v.name === token.path && v.variableCollectionId === collection.id));
+        const variable = existingVariable || figma.variables.createVariable(token.path, collection, variableType);
 
         if (variable) {
           // First, rename all variables that should be renamed (if the user choose to do so)
@@ -95,13 +96,13 @@ export default async function setValuesOnVariable(
             default:
               break;
           }
-          let referenceTokenName: string = '';
-          if (token.rawValue && token.rawValue?.toString().startsWith('{')) {
-            referenceTokenName = token.rawValue?.toString().slice(1, token.rawValue.toString().length - 1);
-          } else {
-            referenceTokenName = token.rawValue!.toString().substring(1);
-          }
+          // Only process reference tokens (those that start and end with curly braces)
           if (token && checkCanReferenceVariable(token)) {
+            let referenceTokenName: string = '';
+            if (token.rawValue && token.rawValue?.toString().startsWith('{')) {
+              referenceTokenName = token.rawValue?.toString().slice(1, token.rawValue.toString().length - 1);
+            }
+
             referenceVariableCandidates.push({
               variable,
               modeId: mode,
