@@ -26,6 +26,18 @@ export default async function setValuesOnVariable(
   const variableKeyMap: Record<string, string> = {};
   const referenceVariableCandidates: ReferenceVariableType[] = [];
   const renamedVariableKeys: string[] = [];
+
+  // Pre-build lookup maps to avoid O(n×m) complexity and prevent memory leaks
+  const variablesByKey = new Map<string, Variable>();
+  const variablesByName = new Map<string, Variable>();
+
+  variablesInFigma.forEach((variable) => {
+    if (!variable.remote) {
+      variablesByKey.set(variable.key, variable);
+      variablesByName.set(variable.name, variable);
+    }
+  });
+
   try {
     await Promise.all(
       tokens.map(async (token) => {

@@ -386,19 +386,19 @@ export const tokenState = createModel<RootModel>()({
       const existingTokens: StyleToCreateToken[] = [];
       const updatedTokens: StyleToCreateToken[] = [];
 
-      // Create a map of token names to tokens once, outside the loop
-      const tokenMap = new Map();
-      Object.values(state.tokens).forEach((tokenSet) => {
-        tokenSet.forEach((token) => {
+      // Create a map of token names to tokens once, outside the loop - more memory efficient
+      const tokenMap = new Map<string, any>();
+      for (const tokenSet of Object.values(state.tokens)) {
+        for (const token of tokenSet) {
           if (!tokenMap.has(token.name)) { // Only store first occurrence
             tokenMap.set(token.name, token);
           }
-        });
-      });
+        }
+      }
 
-      // Iterate over received styles and check if they existed before or need updating
-      Object.values(receivedStyles).forEach((values) => {
-        values.forEach((token) => {
+      // Process received styles more efficiently using for...of loops
+      for (const values of Object.values(receivedStyles)) {
+        for (const token of values) {
           const oldValue = tokenMap.get(token.name);
           if (oldValue) {
             if (isEqual(oldValue.value, token.value)) {
@@ -413,16 +413,17 @@ export const tokenState = createModel<RootModel>()({
                 });
               }
             } else {
-              const updatedToken = { ...token };
-              updatedToken.oldValue = oldValue.value;
-              updatedTokens.push(updatedToken);
+              updatedTokens.push({
+                ...token,
+                oldValue: oldValue.value,
+              });
             }
           } else {
             // Token doesn't exist in any token set
             newTokens.push(token);
           }
-        });
-      });
+        }
+      }
 
       return {
         ...state,
