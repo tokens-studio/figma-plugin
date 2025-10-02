@@ -46,7 +46,7 @@ describe('Settings Component', () => {
 
   it('renders token application settings switches', () => {
     const result = render(<Settings />);
-    
+
     // Check if the switches exist by ID
     expect(result.container.querySelector('#updateOnChange')).toBeTruthy();
     expect(result.container.querySelector('#shouldSwapStyles')).toBeTruthy();
@@ -57,7 +57,7 @@ describe('Settings Component', () => {
 
   it('renders export options switches', () => {
     const result = render(<Settings />);
-    
+
     // Check if the switches exist by ID
     expect(result.container.querySelector('#variablesColor')).toBeTruthy();
     expect(result.container.querySelector('#variablesString')).toBeTruthy();
@@ -70,7 +70,7 @@ describe('Settings Component', () => {
 
   it('renders export rules switches', () => {
     const result = render(<Settings />);
-    
+
     // Check if the switches exist by ID
     expect(result.container.querySelector('#ignoreFirstPartForStyles')).toBeTruthy();
     expect(result.container.querySelector('#prefixStylesWithThemeName')).toBeTruthy();
