@@ -43,4 +43,39 @@ describe('Settings Component', () => {
       expect(result.queryByText('Set up where tokens should be stored')).not.toBeNull();
     });
   });
+
+  it('renders token application settings switches', () => {
+    const result = render(<Settings />);
+    
+    // Check if the switches exist by ID
+    expect(result.container.querySelector('#updateOnChange')).toBeTruthy();
+    expect(result.container.querySelector('#shouldSwapStyles')).toBeTruthy();
+    expect(result.container.querySelector('#shouldUpdateStyles')).toBeTruthy();
+    expect(result.container.querySelector('#autoApplyThemeOnDrop')).toBeTruthy();
+    expect(result.container.querySelector('#inspectDeep')).toBeTruthy();
+  });
+
+  it('renders export options switches', () => {
+    const result = render(<Settings />);
+    
+    // Check if the switches exist by ID
+    expect(result.container.querySelector('#variablesColor')).toBeTruthy();
+    expect(result.container.querySelector('#variablesString')).toBeTruthy();
+    expect(result.container.querySelector('#variablesNumber')).toBeTruthy();
+    expect(result.container.querySelector('#variablesBoolean')).toBeTruthy();
+    expect(result.container.querySelector('#stylesColor')).toBeTruthy();
+    expect(result.container.querySelector('#stylesTypography')).toBeTruthy();
+    expect(result.container.querySelector('#stylesEffect')).toBeTruthy();
+  });
+
+  it('renders export rules switches', () => {
+    const result = render(<Settings />);
+    
+    // Check if the switches exist by ID
+    expect(result.container.querySelector('#ignoreFirstPartForStyles')).toBeTruthy();
+    expect(result.container.querySelector('#prefixStylesWithThemeName')).toBeTruthy();
+    expect(result.container.querySelector('#createStylesWithVariableReferences')).toBeTruthy();
+    expect(result.container.querySelector('#renameExistingStylesAndVariables')).toBeTruthy();
+    expect(result.container.querySelector('#removeStylesAndVariablesWithoutConnection')).toBeTruthy();
+  });
 });
