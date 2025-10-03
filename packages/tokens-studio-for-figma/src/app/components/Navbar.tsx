@@ -16,9 +16,8 @@ import { activeTabSelector } from '@/selectors';
 import { Dispatch } from '../store';
 import TokenFlowButton from './TokenFlowButton';
 import { secondScreenSelector } from '@/selectors/secondScreenSelector';
-import { licenseKeySelector } from '@/selectors/licenseKeySelector';
-import { licenseKeyErrorSelector } from '@/selectors/licenseKeyErrorSelector';
 import { useAuth } from '@/context/AuthContext';
+import { useIsProUser } from '@/app/hooks/useIsProUser';
 
 const Navbar: React.FC<React.PropsWithChildren<React.PropsWithChildren<unknown>>> = () => {
   const { user } = useAuth();
@@ -26,8 +25,7 @@ const Navbar: React.FC<React.PropsWithChildren<React.PropsWithChildren<unknown>>
   const dispatch = useDispatch<Dispatch>();
   const { handleResize } = useMinimizeWindow();
   const { t } = useTranslation(['navbar']);
-  const existingKey = useSelector(licenseKeySelector);
-  const licenseKeyError = useSelector(licenseKeyErrorSelector);
+  const isProUser = useIsProUser();
   const secondScreenisEnabled = useSelector(secondScreenSelector);
 
   const handleSwitch = useCallback(
@@ -70,7 +68,7 @@ const Navbar: React.FC<React.PropsWithChildren<React.PropsWithChildren<unknown>>
         <NavbarUndoButton />
       </Stack>
       <Stack direction="row" align="center" justify="end" gap={1} css={{ paddingRight: '$2', flexBasis: 'min-content' }}>
-        { (existingKey && !licenseKeyError) && <IconButton size="small" variant="invisible" icon={secondScreenIcon} tooltip="Second Screen" onClick={switchToSecondScreen} />}
+        { isProUser && <IconButton size="small" variant="invisible" icon={secondScreenIcon} tooltip="Second Screen" onClick={switchToSecondScreen} />}
         <TokenFlowButton />
         <IconButton size="small" variant="invisible" tooltip={t('minimize') as string} onClick={handleResize} icon={<Minimize />} />
       </Stack>
