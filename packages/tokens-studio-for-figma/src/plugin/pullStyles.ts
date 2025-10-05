@@ -89,101 +89,219 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
     const localVariables = await getVariablesWithoutZombies();
 
     figmaTextStyles.forEach((style) => {
-      if (!rawFontSizes.includes(style.fontSize)) rawFontSizes.push(style.fontSize);
-      fontCombinations.push(style.fontName);
-      rawLineHeights.push(style.lineHeight);
-      if (!rawParagraphSpacing.includes(style.paragraphSpacing)) rawParagraphSpacing.push(style.paragraphSpacing);
-      if (!rawParagraphIndent.includes(style.paragraphIndent)) rawParagraphIndent.push(style.paragraphIndent);
-      rawLetterSpacing.push(style.letterSpacing);
-      if (!rawTextCase.includes(style.textCase)) rawTextCase.push(style.textCase);
-      if (!rawTextDecoration.includes(style.textDecoration)) rawTextDecoration.push(style.textDecoration);
+      try {
+        // Safe property access with null/undefined checks
+        if (typeof style.fontSize === 'number' && !rawFontSizes.includes(style.fontSize)) {
+          rawFontSizes.push(style.fontSize);
+        }
+
+        if (style.fontName && typeof style.fontName === 'object' && style.fontName.family && style.fontName.style) {
+          fontCombinations.push(style.fontName);
+        }
+
+        if (style.lineHeight && typeof style.lineHeight === 'object') {
+          rawLineHeights.push(style.lineHeight);
+        }
+
+        if (typeof style.paragraphSpacing === 'number' && !rawParagraphSpacing.includes(style.paragraphSpacing)) {
+          rawParagraphSpacing.push(style.paragraphSpacing);
+        }
+
+        if (typeof style.paragraphIndent === 'number' && !rawParagraphIndent.includes(style.paragraphIndent)) {
+          rawParagraphIndent.push(style.paragraphIndent);
+        }
+
+        if (style.letterSpacing && typeof style.letterSpacing === 'object') {
+          rawLetterSpacing.push(style.letterSpacing);
+        }
+
+        if (style.textCase && typeof style.textCase === 'string' && !rawTextCase.includes(style.textCase)) {
+          rawTextCase.push(style.textCase);
+        }
+
+        if (style.textDecoration && typeof style.textDecoration === 'string' && !rawTextDecoration.includes(style.textDecoration)) {
+          rawTextDecoration.push(style.textDecoration);
+        }
+      } catch (error) {
+        console.warn(`Error processing text style "${style?.name || 'unknown'}":`, error);
+        // Continue processing other styles
+      }
     });
 
-    fontSizes = figmaTextStyles.map((style, idx) => processTextStyleProperty(
-      style,
-      'fontSize',
-      localVariables,
-      tokens,
-      TokenTypes.FONT_SIZES,
-      'fontSize',
-      idx,
-      (value) => value.toString(),
-    ));
+    fontSizes = figmaTextStyles.map((style, idx) => {
+      try {
+        if (!style || typeof style.fontSize !== 'number') {
+          return {
+            name: `fontSize.${idx}`,
+            value: '0',
+            type: TokenTypes.FONT_SIZES,
+          };
+        }
+        return processTextStyleProperty(
+          style,
+          'fontSize',
+          localVariables,
+          tokens,
+          TokenTypes.FONT_SIZES,
+          'fontSize',
+          idx,
+          (value) => value.toString(),
+        );
+      } catch (error) {
+        console.warn(`Error processing fontSize for style "${style?.name || 'unknown'}":`, error);
+        return {
+          name: `fontSize.${idx}`,
+          value: '0',
+          type: TokenTypes.FONT_SIZES,
+        };
+      }
+    });
 
     const uniqueFontCombinations = fontCombinations.filter(
       (v, i, a) => a.findIndex((t) => t.family === v.family && t.style === v.style) === i,
     );
 
-    lineHeights = figmaTextStyles.map((style, idx) => processTextStyleProperty(
-      style,
-      'lineHeight',
-      localVariables,
-      tokens,
-      TokenTypes.LINE_HEIGHTS,
-      'lineHeights',
-      idx,
-      (value) => convertFigmaToLineHeight(value).toString(),
-    ));
+    lineHeights = figmaTextStyles.map((style, idx) => {
+      try {
+        if (!style || !style.lineHeight) {
+          return {
+            name: `lineHeights.${idx}`,
+            value: 'AUTO',
+            type: TokenTypes.LINE_HEIGHTS,
+          };
+        }
+        return processTextStyleProperty(
+          style,
+          'lineHeight',
+          localVariables,
+          tokens,
+          TokenTypes.LINE_HEIGHTS,
+          'lineHeights',
+          idx,
+          (value) => convertFigmaToLineHeight(value).toString(),
+        );
+      } catch (error) {
+        console.warn(`Error processing lineHeight for style "${style?.name || 'unknown'}":`, error);
+        return {
+          name: `lineHeights.${idx}`,
+          value: 'AUTO',
+          type: TokenTypes.LINE_HEIGHTS,
+        };
+      }
+    });
 
     fontWeights = uniqueFontCombinations.map((font, idx) => {
-      const matchingStyle = figmaTextStyles.find((style) => style.fontName.family === font.family
- && style.fontName.style === font.style);
+      try {
+        if (!font || !font.family || !font.style) {
+          return {
+            name: `fontWeights.unknown-${idx}`,
+            value: 'Regular',
+            type: TokenTypes.FONT_WEIGHTS,
+          };
+        }
 
-      if (!matchingStyle) {
+        const matchingStyle = figmaTextStyles.find((style) => style?.fontName?.family === font.family
+  && style?.fontName?.style === font.style);
+
+        if (!matchingStyle) {
+          return {
+            name: `fontWeights.${slugify(font.family)}-${idx}`,
+            value: font.style,
+            type: TokenTypes.FONT_WEIGHTS,
+          };
+        }
+
+        return processTextStyleProperty(
+          matchingStyle,
+          'fontStyle',
+          localVariables,
+          tokens,
+          TokenTypes.FONT_WEIGHTS,
+          `fontWeights.${slugify(font.family)}`,
+          idx,
+          () => font.style,
+        );
+      } catch (error) {
+        console.warn(`Error processing fontWeight for font "${font?.family || 'unknown'}":`, error);
         return {
-          name: `fontWeights.${slugify(font.family)}-${idx}`,
-          value: font.style,
+          name: `fontWeights.unknown-${idx}`,
+          value: 'Regular',
           type: TokenTypes.FONT_WEIGHTS,
         };
       }
-
-      return processTextStyleProperty(
-        matchingStyle,
-        'fontStyle',
-        localVariables,
-        tokens,
-        TokenTypes.FONT_WEIGHTS,
-        `fontWeights.${slugify(font.family)}`,
-        idx,
-        () => font.style,
-      );
     });
 
-    fontFamilies = [...new Set(uniqueFontCombinations.map((font) => font.family))].map((fontFamily, idx) => {
-      const matchingStyle = figmaTextStyles.find((style) => style.fontName.family === fontFamily);
+    fontFamilies = [...new Set(uniqueFontCombinations.map((font) => font?.family).filter(Boolean))].map((fontFamily, idx) => {
+      try {
+        if (!fontFamily) {
+          return {
+            name: `fontFamilies.unknown-${idx}`,
+            value: 'Arial',
+            type: TokenTypes.FONT_FAMILIES,
+          };
+        }
 
-      if (!matchingStyle) {
+        const matchingStyle = figmaTextStyles.find((style) => style?.fontName?.family === fontFamily);
+
+        if (!matchingStyle) {
+          return {
+            name: `fontFamilies.${slugify(fontFamily)}`,
+            value: fontFamily,
+            type: TokenTypes.FONT_FAMILIES,
+          };
+        }
+
+        return processTextStyleProperty(
+          matchingStyle,
+          'fontFamily',
+          localVariables,
+          tokens,
+          TokenTypes.FONT_FAMILIES,
+          `fontFamilies.${slugify(fontFamily)}`,
+          idx,
+          () => fontFamily,
+        );
+      } catch (error) {
+        console.warn(`Error processing fontFamily "${fontFamily || 'unknown'}":`, error);
         return {
-          name: `fontFamilies.${slugify(fontFamily)}`,
-          value: fontFamily,
+          name: `fontFamilies.unknown-${idx}`,
+          value: 'Arial',
           type: TokenTypes.FONT_FAMILIES,
         };
       }
-
-      return processTextStyleProperty(
-        matchingStyle,
-        'fontFamily',
-        localVariables,
-        tokens,
-        TokenTypes.FONT_FAMILIES,
-        `fontFamilies.${slugify(fontFamily)}`,
-        idx,
-        () => fontFamily,
-      );
     });
 
-    paragraphSpacing = figmaTextStyles.map((style, idx) => processTextStyleProperty(
-      style,
-      'paragraphSpacing',
-      localVariables,
-      tokens,
-      TokenTypes.PARAGRAPH_SPACING,
-      'paragraphSpacing',
-      idx,
-      (value) => value.toString(),
-    ));
+    paragraphSpacing = figmaTextStyles.map((style, idx) => {
+      try {
+        if (!style || typeof style.paragraphSpacing !== 'number') {
+          return {
+            name: `paragraphSpacing.${idx}`,
+            value: '0',
+            type: TokenTypes.PARAGRAPH_SPACING,
+          };
+        }
+        return processTextStyleProperty(
+          style,
+          'paragraphSpacing',
+          localVariables,
+          tokens,
+          TokenTypes.PARAGRAPH_SPACING,
+          'paragraphSpacing',
+          idx,
+          (value) => value.toString(),
+        );
+      } catch (error) {
+        console.warn(`Error processing paragraphSpacing for style "${style?.name || 'unknown'}":`, error);
+        return {
+          name: `paragraphSpacing.${idx}`,
+          value: '0',
+          type: TokenTypes.PARAGRAPH_SPACING,
+        };
+      }
+    });
 
     paragraphIndent = rawParagraphIndent
+      .filter((size) => typeof size === 'number')
       .sort((a, b) => a - b)
       .map((size, idx) => ({
         name: `paragraphIndent.${idx}`,
@@ -191,117 +309,175 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
         type: TokenTypes.DIMENSION,
       }));
 
-    letterSpacing = figmaTextStyles.map((style, idx) => processTextStyleProperty(
-      style,
-      'letterSpacing',
-      localVariables,
-      tokens,
-      TokenTypes.LETTER_SPACING,
-      'letterSpacing',
-      idx,
-      (value) => convertFigmaToLetterSpacing(value).toString(),
-    ));
+    letterSpacing = figmaTextStyles.map((style, idx) => {
+      try {
+        if (!style || !style.letterSpacing) {
+          return {
+            name: `letterSpacing.${idx}`,
+            value: '0',
+            type: TokenTypes.LETTER_SPACING,
+          };
+        }
+        return processTextStyleProperty(
+          style,
+          'letterSpacing',
+          localVariables,
+          tokens,
+          TokenTypes.LETTER_SPACING,
+          'letterSpacing',
+          idx,
+          (value) => convertFigmaToLetterSpacing(value).toString(),
+        );
+      } catch (error) {
+        console.warn(`Error processing letterSpacing for style "${style?.name || 'unknown'}":`, error);
+        return {
+          name: `letterSpacing.${idx}`,
+          value: '0',
+          type: TokenTypes.LETTER_SPACING,
+        };
+      }
+    });
 
-    textCase = rawTextCase.map((value) => ({
+    textCase = rawTextCase.filter((value) => value && typeof value === 'string').map((value) => ({
       name: `textCase.${convertFigmaToTextCase(value)}`,
       value: convertFigmaToTextCase(value),
       type: TokenTypes.TEXT_CASE,
     }));
 
-    textDecoration = rawTextDecoration.map((value) => ({
+    textDecoration = rawTextDecoration.filter((value) => value && typeof value === 'string').map((value) => ({
       name: `textDecoration.${convertFigmaToTextDecoration(value)}`,
       value: convertFigmaToTextDecoration(value),
       type: TokenTypes.TEXT_DECORATION,
     }));
 
     typography = figmaTextStyles.map((style) => {
-      const foundFamily = fontFamilies.find(
-        findBoundVariable(
-          style,
-          'fontFamily',
-          localVariables,
-          (el) => el.value === style.fontName.family,
-        ),
-      );
-
-      const foundFontWeight = fontWeights.find(
-        findBoundVariable(
-          style,
-          'fontStyle',
-          localVariables,
-          (el) => el.name.includes(slugify(style.fontName.family)) && el.value === style.fontName?.style,
-        ),
-      );
-
-      const foundLineHeight = lineHeights.find(
-        findBoundVariable(
-          style,
-          'lineHeight',
-          localVariables,
-          (el) => el.value === convertFigmaToLineHeight(style.lineHeight).toString(),
-        ),
-      );
-      const foundFontSize = fontSizes.find(
-        findBoundVariable(
-          style,
-          'fontSize',
-          localVariables,
-          (el) => el.value === style.fontSize.toString(),
-        ),
-      );
-      const foundLetterSpacing = letterSpacing.find(
-        findBoundVariable(
-          style,
-          'letterSpacing',
-          localVariables,
-          (el) => el.value === convertFigmaToLetterSpacing(style.letterSpacing).toString(),
-        ),
-      );
-      const foundParagraphSpacing = paragraphSpacing.find((el: StyleToCreateToken) => {
-        if (style.boundVariables?.paragraphSpacing?.id) {
-          const paragraphSpacingVar = localVariables.find((v) => v.id === style.boundVariables?.paragraphSpacing?.id);
-          if (paragraphSpacingVar) {
-            const normalizedName = paragraphSpacingVar.name.replace(/\//g, '.');
-            return el.name === normalizedName;
-          }
+      try {
+        if (!style || !style.name) {
+          console.warn('Skipping text style with missing name or style object');
+          return null;
         }
-        return el.value === style.paragraphSpacing.toString();
-      });
-      const foundParagraphIndent = paragraphIndent.find(
-        (el: StyleToCreateToken) => el.value === `${style.paragraphIndent.toString()}px`,
-      );
-      const foundTextCase = textCase.find(
-        (el: StyleToCreateToken) => el.value === convertFigmaToTextCase(style.textCase.toString()),
-      );
-      const foundTextDecoration = textDecoration.find(
-        (el: StyleToCreateToken) => el.value === convertFigmaToTextDecoration(style.textDecoration.toString()),
-      );
 
-      const obj = {
-        fontFamily: `{${foundFamily?.name}}`,
-        fontWeight: `{${foundFontWeight?.name}}`,
-        lineHeight: `{${foundLineHeight?.name}}`,
-        fontSize: `{${foundFontSize?.name}}`,
-        letterSpacing: `{${foundLetterSpacing?.name}}`,
-        paragraphSpacing: `{${foundParagraphSpacing?.name}}`,
-        paragraphIndent: `{${foundParagraphIndent?.name}}`,
-        textCase: `{${foundTextCase?.name}}`,
-        textDecoration: `{${foundTextDecoration?.name}}`,
-      };
+        // Safe property access with fallbacks
+        const styleFontFamily = style.fontName?.family || 'Unknown';
+        const styleFontStyle = style.fontName?.style || 'Regular';
 
-      const normalizedName = style.name
-        .split('/')
-        .map((section) => section.trim())
-        .join('.');
+        const foundFamily = fontFamilies.find(
+          findBoundVariable(
+            style,
+            'fontFamily',
+            localVariables,
+            (el) => el.value === styleFontFamily,
+          ),
+        );
 
-      const styleObject: StyleToCreateToken = { name: normalizedName, value: obj, type: TokenTypes.TYPOGRAPHY };
+        const foundFontWeight = fontWeights.find(
+          findBoundVariable(
+            style,
+            'fontStyle',
+            localVariables,
+            (el) => el.name.includes(slugify(styleFontFamily)) && el.value === styleFontStyle,
+          ),
+        );
 
-      if (style.description) {
-        styleObject.description = style.description;
+        let foundLineHeight;
+        try {
+          foundLineHeight = lineHeights.find(
+            findBoundVariable(
+              style,
+              'lineHeight',
+              localVariables,
+              (el) => (style.lineHeight ? el.value === convertFigmaToLineHeight(style.lineHeight).toString() : false),
+            ),
+          );
+        } catch (error) {
+          console.warn(`Error processing lineHeight for style "${style.name}":`, error);
+        }
+
+        const foundFontSize = fontSizes.find(
+          findBoundVariable(
+            style,
+            'fontSize',
+            localVariables,
+            (el) => (typeof style.fontSize === 'number' ? el.value === style.fontSize.toString() : false),
+          ),
+        );
+
+        let foundLetterSpacing;
+        try {
+          foundLetterSpacing = letterSpacing.find(
+            findBoundVariable(
+              style,
+              'letterSpacing',
+              localVariables,
+              (el) => (style.letterSpacing ? el.value === convertFigmaToLetterSpacing(style.letterSpacing).toString() : false),
+            ),
+          );
+        } catch (error) {
+          console.warn(`Error processing letterSpacing for style "${style.name}":`, error);
+        }
+
+        const foundParagraphSpacing = paragraphSpacing.find((el: StyleToCreateToken) => {
+          if (style.boundVariables?.paragraphSpacing?.id) {
+            const paragraphSpacingVar = localVariables.find((v) => v.id === style.boundVariables?.paragraphSpacing?.id);
+            if (paragraphSpacingVar) {
+              const normalizedName = paragraphSpacingVar.name.replace(/\//g, '.');
+              return el.name === normalizedName;
+            }
+          }
+          return typeof style.paragraphSpacing === 'number' ? el.value === style.paragraphSpacing.toString() : false;
+        });
+
+        const foundParagraphIndent = paragraphIndent.find(
+          (el: StyleToCreateToken) => (typeof style.paragraphIndent === 'number' ? el.value === `${style.paragraphIndent.toString()}px` : false),
+        );
+
+        let foundTextCase;
+        try {
+          foundTextCase = textCase.find(
+            (el: StyleToCreateToken) => (style.textCase && typeof style.textCase === 'string' ? el.value === convertFigmaToTextCase(style.textCase.toString()) : false),
+          );
+        } catch (error) {
+          console.warn(`Error processing textCase for style "${style.name}":`, error);
+        }
+
+        let foundTextDecoration;
+        try {
+          foundTextDecoration = textDecoration.find(
+            (el: StyleToCreateToken) => (style.textDecoration && typeof style.textDecoration === 'string' ? el.value === convertFigmaToTextDecoration(style.textDecoration.toString()) : false),
+          );
+        } catch (error) {
+          console.warn(`Error processing textDecoration for style "${style.name}":`, error);
+        }
+
+        const obj = {
+          fontFamily: `{${foundFamily?.name || 'fontFamilies.default'}}`,
+          fontWeight: `{${foundFontWeight?.name || 'fontWeights.default'}}`,
+          lineHeight: `{${foundLineHeight?.name || 'lineHeights.default'}}`,
+          fontSize: `{${foundFontSize?.name || 'fontSize.default'}}`,
+          letterSpacing: `{${foundLetterSpacing?.name || 'letterSpacing.default'}}`,
+          paragraphSpacing: `{${foundParagraphSpacing?.name || 'paragraphSpacing.default'}}`,
+          paragraphIndent: `{${foundParagraphIndent?.name || 'paragraphIndent.default'}}`,
+          textCase: `{${foundTextCase?.name || 'textCase.default'}}`,
+          textDecoration: `{${foundTextDecoration?.name || 'textDecoration.default'}}`,
+        };
+
+        const normalizedName = style.name
+          .split('/')
+          .map((section) => section.trim())
+          .join('.');
+
+        const styleObject: StyleToCreateToken = { name: normalizedName, value: obj, type: TokenTypes.TYPOGRAPHY };
+
+        if (style.description) {
+          styleObject.description = style.description;
+        }
+
+        return styleObject;
+      } catch (error) {
+        console.warn(`Error processing typography for style "${style?.name || 'unknown'}":`, error);
+        return null;
       }
-
-      return styleObject;
-    });
+    }).filter(Boolean) as StyleToCreateToken[]; // Remove null entries
   }
 
   if (styleTypes.effectStyles) {
