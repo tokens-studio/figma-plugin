@@ -5,7 +5,7 @@ export default async function updateVariablesToReference(figmaVariables: Map<str
   await Promise.all(referenceVariableCandidates.map(async (aliasVariable) => {
     const referenceVariable = figmaVariables.get(aliasVariable.referenceVariable);
     if (!referenceVariable) return;
-    let variable;
+    let variable: Variable | null = null;
     try {
       variable = await figma.variables.importVariableByKeyAsync(referenceVariable);
     } catch (e) {
