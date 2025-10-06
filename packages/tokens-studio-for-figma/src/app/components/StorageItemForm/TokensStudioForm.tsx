@@ -170,7 +170,8 @@ export default function TokensStudioForm({
     if (!orgData) return [];
     const selectedOrgData = orgData.find((org) => org.id === values.orgId);
     if (!selectedOrgData) return [];
-    return selectedOrgData.projects.data.map((project) => ({
+    const sortedProjects = [...(selectedOrgData.projects?.data ?? [])].sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+    return sortedProjects.map((project) => ({
       label: project.name,
       value: project.id,
     }));
