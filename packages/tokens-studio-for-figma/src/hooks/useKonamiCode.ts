@@ -20,8 +20,8 @@ export function useKonamiCode(callback: () => void) {
     // Don't interfere with keyboard events in input fields
     const target = event.target as HTMLElement;
     if (
-      target.tagName === 'INPUT'
-      || target.tagName === 'TEXTAREA'
+      target instanceof HTMLInputElement
+      || target instanceof HTMLTextAreaElement
       || target.contentEditable === 'true'
     ) {
       return;
