@@ -14,9 +14,15 @@ import { activeTabSelector } from '@/selectors';
 import PluginResizerWrapper from './PluginResizer';
 import LoadingBar from './LoadingBar';
 import { ConvertToDTCGModal } from './ConvertToDTCGModal';
+import { useKonamiCode } from '@/hooks';
 
 function App() {
   const activeTab = useSelector(activeTabSelector);
+
+  useKonamiCode(() => {
+    // eslint-disable-next-line no-console
+    console.log('Konami Code activated! 🎮');
+  });
 
   return (
     <Box css={{ isolation: 'isolate' }}>
