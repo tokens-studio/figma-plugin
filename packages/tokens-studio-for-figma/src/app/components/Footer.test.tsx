@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, waitFor } from '../../../tests/config/setupTest';
+import { render, waitFor, createMockStore } from '../../../tests/config/setupTest';
 import { store } from '../store';
 import Footer from './Footer';
 import pjs from '../../../package.json';
@@ -52,6 +52,93 @@ describe('Footer', () => {
 
       expect(pullButton).toBeInTheDocument();
       expect(pullButton).not.toBeDisabled();
+    });
+  });
+
+  it('shows pull and push buttons for GitLab provider', () => {
+    const mockStore = createMockStore({
+      uiState: {
+        storageType: { provider: StorageProviderType.GITLAB },
+        localApiState: { 
+          provider: StorageProviderType.GITLAB, 
+          branch: 'develop',
+          filePath: 'tokens.json'
+        },
+      },
+    });
+    const { getByTestId } = render(<Footer />, { store: mockStore });
+
+    waitFor(() => {
+      const pullButton = getByTestId('footer-pull-button');
+      const pushButton = getByTestId('footer-push-button');
+
+      expect(pullButton).toBeInTheDocument();
+      expect(pushButton).toBeInTheDocument();
+    });
+  });
+
+  it('shows pull and push buttons for Bitbucket provider', () => {
+    const mockStore = createMockStore({
+      uiState: {
+        storageType: { provider: StorageProviderType.BITBUCKET },
+        localApiState: { 
+          provider: StorageProviderType.BITBUCKET, 
+          branch: 'main',
+          filePath: 'tokens.json'
+        },
+      },
+    });
+    const { getByTestId } = render(<Footer />, { store: mockStore });
+
+    waitFor(() => {
+      const pullButton = getByTestId('footer-pull-button');
+      const pushButton = getByTestId('footer-push-button');
+
+      expect(pullButton).toBeInTheDocument();
+      expect(pushButton).toBeInTheDocument();
+    });
+  });
+
+  it('shows pull and push buttons for ADO provider', () => {
+    const mockStore = createMockStore({
+      uiState: {
+        storageType: { provider: StorageProviderType.ADO },
+        localApiState: { 
+          provider: StorageProviderType.ADO, 
+          branch: 'feature-branch',
+          filePath: 'tokens.json'
+        },
+      },
+    });
+    const { getByTestId } = render(<Footer />, { store: mockStore });
+
+    waitFor(() => {
+      const pullButton = getByTestId('footer-pull-button');
+      const pushButton = getByTestId('footer-push-button');
+
+      expect(pullButton).toBeInTheDocument();
+      expect(pushButton).toBeInTheDocument();
+    });
+  });
+
+  it('shows pull and push buttons for Supernova provider', () => {
+    const mockStore = createMockStore({
+      uiState: {
+        storageType: { provider: StorageProviderType.SUPERNOVA },
+        localApiState: { 
+          provider: StorageProviderType.SUPERNOVA,
+          filePath: 'tokens.json'
+        },
+      },
+    });
+    const { getByTestId } = render(<Footer />, { store: mockStore });
+
+    waitFor(() => {
+      const pullButton = getByTestId('footer-pull-button');
+      const pushButton = getByTestId('footer-push-button');
+
+      expect(pullButton).toBeInTheDocument();
+      expect(pushButton).toBeInTheDocument();
     });
   });
 });

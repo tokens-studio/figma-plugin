@@ -121,4 +121,267 @@ describe('PushDialog', () => {
 
     result.unmount();
   });
+
+  it('should handle error state when push fails', () => {
+    const mockStore = createMockStore({
+      uiState: {
+        showPushDialog: { state: 'error' },
+        localApiState: {
+          branch: 'main',
+          provider: StorageProviderType.GITHUB,
+        },
+      },
+    });
+
+    const { container } = render(
+      <Provider store={mockStore}>
+        <PushDialog />
+      </Provider>,
+    );
+
+    // Error state should return null (dialog closes)
+    expect(container.firstChild).toBeNull();
+  });
+
+  it('should disable push button when commit message is empty for GitHub', () => {
+    const mockStore = createMockStore({
+      uiState: {
+        showPushDialog: { state: 'initial' },
+        localApiState: {
+          branch: 'main',
+          provider: StorageProviderType.GITHUB,
+        },
+      },
+    });
+
+    const result = render(
+      <Provider store={mockStore}>
+        <PushDialog />
+      </Provider>,
+    );
+
+    const pushButton = result.getByTestId('push-dialog-button-push-changes');
+    expect(pushButton).toBeDisabled();
+
+    result.unmount();
+  });
+
+  it('should disable push button when branch is empty for GitLab', () => {
+    const mockStore = createMockStore({
+      uiState: {
+        showPushDialog: { state: 'initial' },
+        localApiState: {
+          branch: '',
+          provider: StorageProviderType.GITLAB,
+        },
+      },
+    });
+
+    const result = render(
+      <Provider store={mockStore}>
+        <PushDialog />
+      </Provider>,
+    );
+
+    const pushButton = result.getByTestId('push-dialog-button-push-changes');
+    expect(pushButton).toBeDisabled();
+
+    result.unmount();
+  });
+
+  it('should enable push button for Supernova without commit message', () => {
+    const mockStore = createMockStore({
+      uiState: {
+        showPushDialog: { state: 'initial' },
+        localApiState: {
+          provider: StorageProviderType.SUPERNOVA,
+        },
+      },
+    });
+
+    const result = render(
+      <Provider store={mockStore}>
+        <PushDialog />
+      </Provider>,
+    );
+
+    const pushButton = result.getByTestId('push-dialog-button-push-changes');
+    expect(pushButton).not.toBeDisabled();
+
+    result.unmount();
+  });
+
+  it('should show loading state for Bitbucket', () => {
+    const mockStore = createMockStore({
+      uiState: {
+        showPushDialog: { state: 'loading' },
+        localApiState: {
+          provider: StorageProviderType.BITBUCKET,
+        },
+      },
+    });
+
+    const result = render(
+      <Provider store={mockStore}>
+        <PushDialog />
+      </Provider>,
+    );
+
+    expect(result.getByText('pushingTo Bitbucket')).toBeInTheDocument();
+
+    result.unmount();
+  });
+
+  it('should show loading state for ADO', () => {
+    const mockStore = createMockStore({
+      uiState: {
+        showPushDialog: { state: 'loading' },
+        localApiState: {
+          provider: StorageProviderType.ADO,
+        },
+      },
+    });
+
+    const result = render(
+      <Provider store={mockStore}>
+        <PushDialog />
+      </Provider>,
+    );
+
+    expect(result.getByText('pushingTo ADO')).toBeInTheDocument();
+
+    result.unmount();
+  });
+
+  it('should show loading state for GitLab', () => {
+    const mockStore = createMockStore({
+      uiState: {
+        showPushDialog: { state: 'loading' },
+        localApiState: {
+          provider: StorageProviderType.GITLAB,
+        },
+      },
+    });
+
+    const result = render(
+      <Provider store={mockStore}>
+        <PushDialog />
+      </Provider>,
+    );
+
+    expect(result.getByText('pushingTo GitLab')).toBeInTheDocument();
+
+    result.unmount();
+  });
+
+  it('should show success state for Bitbucket', () => {
+    const mockStore = createMockStore({
+      uiState: {
+        showPushDialog: { state: 'success' },
+        localApiState: {
+          branch: 'main',
+          provider: StorageProviderType.BITBUCKET,
+        },
+      },
+    });
+
+    const result = render(
+      <Provider store={mockStore}>
+        <PushDialog />
+      </Provider>,
+    );
+
+    expect(result.getByText('changesPushedTo Bitbucket')).toBeInTheDocument();
+    expect(result.getByText('createPullRequest')).toBeInTheDocument();
+
+    result.unmount();
+  });
+
+  it('should show success state for GitLab', () => {
+    const mockStore = createMockStore({
+      uiState: {
+        showPushDialog: { state: 'success' },
+        localApiState: {
+          branch: 'develop',
+          provider: StorageProviderType.GITLAB,
+        },
+      },
+    });
+
+    const result = render(
+      <Provider store={mockStore}>
+        <PushDialog />
+      </Provider>,
+    );
+
+    expect(result.getByText('changesPushedTo GitLab')).toBeInTheDocument();
+    expect(result.getByText('createPullRequest')).toBeInTheDocument();
+
+    result.unmount();
+  });
+
+  it('should show success state for ADO', () => {
+    const mockStore = createMockStore({
+      uiState: {
+        showPushDialog: { state: 'success' },
+        localApiState: {
+          branch: 'feature',
+          provider: StorageProviderType.ADO,
+        },
+      },
+    });
+
+    const result = render(
+      <Provider store={mockStore}>
+        <PushDialog />
+      </Provider>,
+    );
+
+    expect(result.getByText('changesPushedTo ADO')).toBeInTheDocument();
+    expect(result.getByText('createPullRequest')).toBeInTheDocument();
+
+    result.unmount();
+  });
+
+  it('should show success state for Supernova with different button text', () => {
+    const mockStore = createMockStore({
+      uiState: {
+        showPushDialog: { state: 'success' },
+        localApiState: {
+          provider: StorageProviderType.SUPERNOVA,
+        },
+      },
+    });
+
+    const result = render(
+      <Provider store={mockStore}>
+        <PushDialog />
+      </Provider>,
+    );
+
+    expect(result.getByText('changesPushedTo Supernova.io')).toBeInTheDocument();
+    expect(result.getByText('openSupernovaWorkspace')).toBeInTheDocument();
+
+    result.unmount();
+  });
+
+  it('should return null for unknown state', () => {
+    const mockStore = createMockStore({
+      uiState: {
+        showPushDialog: { state: 'unknown' },
+        localApiState: {
+          branch: 'main',
+          provider: StorageProviderType.GITHUB,
+        },
+      },
+    });
+
+    const { container } = render(
+      <Provider store={mockStore}>
+        <PushDialog />
+      </Provider>,
+    );
+
+    expect(container.firstChild).toBeNull();
+  });
 });
