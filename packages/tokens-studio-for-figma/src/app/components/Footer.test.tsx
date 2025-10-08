@@ -59,10 +59,10 @@ describe('Footer', () => {
     const mockStore = createMockStore({
       uiState: {
         storageType: { provider: StorageProviderType.GITLAB },
-        localApiState: { 
-          provider: StorageProviderType.GITLAB, 
+        localApiState: {
+          provider: StorageProviderType.GITLAB,
           branch: 'develop',
-          filePath: 'tokens.json'
+          filePath: 'tokens.json',
         },
       },
     });
@@ -81,10 +81,10 @@ describe('Footer', () => {
     const mockStore = createMockStore({
       uiState: {
         storageType: { provider: StorageProviderType.BITBUCKET },
-        localApiState: { 
-          provider: StorageProviderType.BITBUCKET, 
+        localApiState: {
+          provider: StorageProviderType.BITBUCKET,
           branch: 'main',
-          filePath: 'tokens.json'
+          filePath: 'tokens.json',
         },
       },
     });
@@ -103,10 +103,10 @@ describe('Footer', () => {
     const mockStore = createMockStore({
       uiState: {
         storageType: { provider: StorageProviderType.ADO },
-        localApiState: { 
-          provider: StorageProviderType.ADO, 
+        localApiState: {
+          provider: StorageProviderType.ADO,
           branch: 'feature-branch',
-          filePath: 'tokens.json'
+          filePath: 'tokens.json',
         },
       },
     });
@@ -125,9 +125,9 @@ describe('Footer', () => {
     const mockStore = createMockStore({
       uiState: {
         storageType: { provider: StorageProviderType.SUPERNOVA },
-        localApiState: { 
+        localApiState: {
           provider: StorageProviderType.SUPERNOVA,
-          filePath: 'tokens.json'
+          filePath: 'tokens.json',
         },
       },
     });
