@@ -28,7 +28,7 @@ export function textStyleMatchesTypographyToken(
   if (textStyle.fontName.style !== fontWeight) {
     return false;
   }
-  if (fontSize === undefined || textStyle.fontSize !== transformValue(fontSize, 'fontSizes', baseFontSize)) {
+  if (fontSize === undefined || textStyle.fontSize !== transformValue(String(fontSize), 'fontSizes', baseFontSize)) {
     return false;
   }
   // This will default to `{ unit: 'AUTO' }` if lineHeight token is not set:
@@ -58,13 +58,13 @@ export function textStyleMatchesTypographyToken(
   }
   if (
     paragraphSpacing === undefined
-    || textStyle.paragraphSpacing !== transformValue(paragraphSpacing, 'paragraphSpacing', baseFontSize)
+    || textStyle.paragraphSpacing !== transformValue(String(paragraphSpacing), 'paragraphSpacing', baseFontSize)
   ) {
     return false;
   }
   if (
     paragraphIndent === undefined
-    || textStyle.paragraphIndent !== transformValue(paragraphIndent, 'paragraphIndent', baseFontSize)
+    || textStyle.paragraphIndent !== transformValue(String(paragraphIndent), 'paragraphIndent', baseFontSize)
   ) {
     return false;
   }

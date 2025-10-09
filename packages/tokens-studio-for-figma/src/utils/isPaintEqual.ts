@@ -20,7 +20,7 @@ export function isPaintEqual(paint1?: Paint, paint2?: Paint) {
       }
 
       // Handle all gradient types (linear, radial, angular, diamond)
-      if ((paint1.type === 'GRADIENT_LINEAR' || paint1.type === 'GRADIENT_RADIAL' || paint1.type === 'GRADIENT_ANGULAR' || paint1.type === 'GRADIENT_DIAMOND') 
+      if ((paint1.type === 'GRADIENT_LINEAR' || paint1.type === 'GRADIENT_RADIAL' || paint1.type === 'GRADIENT_ANGULAR' || paint1.type === 'GRADIENT_DIAMOND')
           && (paint2.type === 'GRADIENT_LINEAR' || paint2.type === 'GRADIENT_RADIAL' || paint2.type === 'GRADIENT_ANGULAR' || paint2.type === 'GRADIENT_DIAMOND')) {
         return (
           paint1.gradientStops.length === paint2.gradientStops.length
