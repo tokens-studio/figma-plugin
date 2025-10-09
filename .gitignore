@@ -20,7 +20,8 @@ packages/tokens-studio-for-figma/benchmark/flamegraphs
 techdocs/
 .turbo
 cypress/downloads
-coverage-final.json
-clover.xml
-lcov.info
-lcov-report/
+# Test coverage reports
+**/coverage-final.json
+**/clover.xml
+**/lcov.info
+**/lcov-report/
