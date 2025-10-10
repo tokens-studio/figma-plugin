@@ -10,7 +10,7 @@ const numericTokenTypes = [
   TokenTypes.PARAGRAPH_SPACING,
 ];
 
-const getFinalValue = (styleValue: any, tokenType: TokenTypes, valueTransformer?: (value: any) => string) => {
+const getFinalValue = (styleValue: any, tokenType: TokenTypes, valueTransformer?: (value: any) => string | number) => {
   const transformedValue = valueTransformer ? valueTransformer(styleValue) : String(styleValue);
   return numericTokenTypes.includes(tokenType) && typeof styleValue === 'number'
     ? styleValue
@@ -25,7 +25,7 @@ export function processTextStyleProperty(
   tokenType: TokenTypes,
   defaultNamePrefix: string,
   idx: number,
-  valueTransformer?: (value: any) => string,
+  valueTransformer?: (value: any) => string | number,
 ): StyleToCreateToken {
   // Check if the style has a bound variable for this property
   const boundVariables = style.boundVariables as Record<string, { id: string; } | undefined>;

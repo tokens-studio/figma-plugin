@@ -115,10 +115,10 @@ describe('pullStyles', () => {
           value: {
             fontFamily: '{fontFamilies.inter}',
             fontWeight: '{fontWeights.inter-0}',
-            fontSize: '{fontsizes.0}',
+            fontSize: '{fontSize.0}',
             lineHeight: '{lineHeights.0}',
-            letterSpacing: '{letterspacing.0}',
-            paragraphSpacing: '{paragraphspacing.0}',
+            letterSpacing: '{letterSpacing.0}',
+            paragraphSpacing: '{paragraphSpacing.0}',
             paragraphIndent: '{paragraphIndent.0}',
             textCase: '{textCase.none}',
             textDecoration: '{textDecoration.none}',
@@ -133,16 +133,16 @@ describe('pullStyles', () => {
         { name: 'fontWeights.inter-0', type: 'fontWeights', value: 'Bold' },
       ],
       fontSizes: [
-        { name: 'fontsizes.0', type: 'fontSizes', value: '24.8' },
+        { name: 'fontSize.0', type: 'fontSizes', value: 24.8 },
       ],
       letterSpacing: [
-        { name: 'letterspacing.0', type: 'letterSpacing', value: '0%' },
+        { name: 'letterSpacing.0', type: 'letterSpacing', value: '0%' },
       ],
       lineHeights: [
         { name: 'lineHeights.0', type: 'lineHeights', value: 'AUTO' },
       ],
       paragraphSpacing: [
-        { name: 'paragraphspacing.0', type: 'paragraphSpacing', value: '0' },
+        { name: 'paragraphSpacing.0', type: 'paragraphSpacing', value: 0 },
       ],
       paragraphIndent: [
         { name: 'paragraphIndent.0', type: 'dimension', value: '0px' },
@@ -184,10 +184,10 @@ describe('pullStyles', () => {
           value: {
             fontFamily: '{fontFamilies.inter}',
             fontWeight: '{fontWeights.inter-0}',
-            fontSize: '{fontsizes.0}',
+            fontSize: '{fontSize.0}',
             lineHeight: '{lineHeights.0}',
-            letterSpacing: '{letterspacing.0}',
-            paragraphSpacing: '{paragraphspacing.0}',
+            letterSpacing: '{letterSpacing.0}',
+            paragraphSpacing: '{paragraphSpacing.0}',
             paragraphIndent: '{paragraphIndent.0}',
             textCase: '{textCase.uppercase}',
             textDecoration: '{textDecoration.underline}',
@@ -202,16 +202,16 @@ describe('pullStyles', () => {
         { name: 'fontWeights.inter-0', type: 'fontWeights', value: 'Regular' },
       ],
       fontSizes: [
-        { name: 'fontsizes.0', type: 'fontSizes', value: '24' },
+        { name: 'fontSize.0', type: 'fontSizes', value: 24 },
       ],
       letterSpacing: [
-        { name: 'letterspacing.0', type: 'letterSpacing', value: '-0.5' },
+        { name: 'letterSpacing.0', type: 'letterSpacing', value: -0.5 },
       ],
       lineHeights: [
-        { name: 'lineHeights.0', type: 'lineHeights', value: '32' },
+        { name: 'lineHeights.0', type: 'lineHeights', value: 32 },
       ],
       paragraphSpacing: [
-        { name: 'paragraphspacing.0', type: 'paragraphSpacing', value: '16' },
+        { name: 'paragraphSpacing.0', type: 'paragraphSpacing', value: 16 },
       ],
       paragraphIndent: [
         { name: 'paragraphIndent.0', type: 'dimension', value: '8px' },
@@ -323,10 +323,10 @@ describe('pullStyles', () => {
           value: {
             fontFamily: '{fontFamilies.roboto}', // Should use reference now
             fontWeight: '{fontWeights.roboto-0}', // Should use reference now
-            fontSize: '{fontsizes.0}', // Should use reference now
+            fontSize: '{fontSize.0}', // Should use reference now
             lineHeight: '{lineHeights.0}', // Should use reference now
-            letterSpacing: '{letterspacing.0}', // Should use reference now
-            paragraphSpacing: '{paragraphspacing.0}', // Should use reference now
+            letterSpacing: '{letterSpacing.0}', // Should use reference now
+            paragraphSpacing: '{paragraphSpacing.0}', // Should use reference now
             paragraphIndent: '{paragraphIndent.0}',
             textCase: '{textCase.none}',
             textDecoration: '{textDecoration.none}',
@@ -342,16 +342,16 @@ describe('pullStyles', () => {
         { name: 'fontWeights.roboto-0', type: 'fontWeights', value: 'Bold' },
       ],
       fontSizes: [
-        { name: 'fontsizes.0', type: 'fontSizes', value: '32' },
+        { name: 'fontSize.0', type: 'fontSizes', value: 32 },
       ],
       letterSpacing: [
-        { name: 'letterspacing.0', type: 'letterSpacing', value: '2%' },
+        { name: 'letterSpacing.0', type: 'letterSpacing', value: '2%' },
       ],
       lineHeights: [
-        { name: 'lineHeights.0', type: 'lineHeights', value: '40' },
+        { name: 'lineHeights.0', type: 'lineHeights', value: 40 },
       ],
       paragraphSpacing: [
-        { name: 'paragraphspacing.0', type: 'paragraphSpacing', value: '12' },
+        { name: 'paragraphSpacing.0', type: 'paragraphSpacing', value: 12 },
       ],
       paragraphIndent: [
         { name: 'paragraphIndent.0', type: 'dimension', value: '0px' },
@@ -434,10 +434,10 @@ describe('pullStyles', () => {
           value: {
             fontFamily: '{fontFamilies.roboto}', // Should create token with variable name
             fontWeight: '{fontWeights.roboto-0}', // Should create token with variable name
-            fontSize: '{fontsizes.0}', // Should preserve numeric value
+            fontSize: '{fontSize.0}', // Should preserve numeric value
             lineHeight: '{lineHeights.0}', // Should create token with variable name
-            letterSpacing: '{letterspacing.0}', // Should create token with variable name
-            paragraphSpacing: '{paragraphspacing.0}', // Should create token reference
+            letterSpacing: '{letterSpacing.0}', // Should create token with variable name
+            paragraphSpacing: '{paragraphSpacing.0}', // Should create token reference
             paragraphIndent: '{paragraphIndent.0}', // Should create token reference
             textCase: '{textCase.none}', // Should create token with default naming
             textDecoration: '{textDecoration.none}', // Should create token with default naming
@@ -452,16 +452,118 @@ describe('pullStyles', () => {
         { name: 'fontWeights.roboto-0', type: 'fontWeights', value: 'Bold' },
       ],
       fontSizes: [
-        { name: 'fontsizes.0', type: 'fontSizes', value: '32' },
+        { name: 'fontSize.0', type: 'fontSizes', value: 32 },
       ],
       letterSpacing: [
-        { name: 'letterspacing.0', type: 'letterSpacing', value: '2%' },
+        { name: 'letterSpacing.0', type: 'letterSpacing', value: '2%' },
       ],
       lineHeights: [
-        { name: 'lineHeights.0', type: 'lineHeights', value: '40' },
+        { name: 'lineHeights.0', type: 'lineHeights', value: 40 },
       ],
       paragraphSpacing: [
-        { name: 'paragraphspacing.0', type: 'paragraphSpacing', value: '12' },
+        { name: 'paragraphSpacing.0', type: 'paragraphSpacing', value: 12 },
+      ],
+      paragraphIndent: [
+        { name: 'paragraphIndent.0', type: 'dimension', value: '0px' },
+      ],
+      textCase: [
+        { name: 'textCase.none', type: 'textCase', value: 'none' },
+      ],
+      textDecoration: [
+        { name: 'textDecoration.none', type: 'textDecoration', value: 'none' },
+      ],
+    });
+  });
+
+  it('pulls multiple text styles with different values creating separate tokens', async () => {
+    figma.getLocalTextStyles.mockReturnValue([
+      {
+        name: 'small',
+        id: '456',
+        description: 'small text style',
+        fontSize: 12,
+        fontName: { family: 'Inter', style: 'Regular' },
+        lineHeight: { unit: 'AUTO' },
+        paragraphSpacing: 0,
+        paragraphIndent: 0,
+        letterSpacing: { unit: 'PERCENT', value: 0 },
+        textCase: 'ORIGINAL',
+        textDecoration: 'NONE',
+        boundVariables: {},
+      },
+      {
+        name: 'big',
+        id: '789',
+        description: 'big text style',
+        fontSize: 32,
+        fontName: { family: 'Inter', style: 'Regular' },
+        lineHeight: { unit: 'PERCENT', value: 140 },
+        paragraphSpacing: 0,
+        paragraphIndent: 0,
+        letterSpacing: { unit: 'PIXELS', value: 15 },
+        textCase: 'ORIGINAL',
+        textDecoration: 'NONE',
+        boundVariables: {},
+      },
+    ]);
+
+    await pullStyles({ textStyles: true });
+
+    expect(notifyStyleValuesSpy).toHaveBeenCalledWith({
+      typography: [
+        {
+          name: 'small',
+          type: 'typography',
+          value: {
+            fontFamily: '{fontFamilies.inter}',
+            fontWeight: '{fontWeights.inter-0}',
+            fontSize: '{fontSize.0}',
+            lineHeight: '{lineHeights.0}',
+            letterSpacing: '{letterSpacing.0}',
+            paragraphSpacing: '{paragraphSpacing.0}',
+            paragraphIndent: '{paragraphIndent.0}',
+            textCase: '{textCase.none}',
+            textDecoration: '{textDecoration.none}',
+          },
+          description: 'small text style',
+        },
+        {
+          name: 'big',
+          type: 'typography',
+          value: {
+            fontFamily: '{fontFamilies.inter}',
+            fontWeight: '{fontWeights.inter-0}',
+            fontSize: '{fontSize.1}',
+            lineHeight: '{lineHeights.1}',
+            letterSpacing: '{letterSpacing.1}',
+            paragraphSpacing: '{paragraphSpacing.0}',
+            paragraphIndent: '{paragraphIndent.0}',
+            textCase: '{textCase.none}',
+            textDecoration: '{textDecoration.none}',
+          },
+          description: 'big text style',
+        },
+      ],
+      fontFamilies: [
+        { name: 'fontFamilies.inter', type: 'fontFamilies', value: 'Inter' },
+      ],
+      fontWeights: [
+        { name: 'fontWeights.inter-0', type: 'fontWeights', value: 'Regular' },
+      ],
+      fontSizes: [
+        { name: 'fontSize.0', type: 'fontSizes', value: 12 },
+        { name: 'fontSize.1', type: 'fontSizes', value: 32 },
+      ],
+      letterSpacing: [
+        { name: 'letterSpacing.0', type: 'letterSpacing', value: '0%' },
+        { name: 'letterSpacing.1', type: 'letterSpacing', value: 15 },
+      ],
+      lineHeights: [
+        { name: 'lineHeights.0', type: 'lineHeights', value: 'AUTO' },
+        { name: 'lineHeights.1', type: 'lineHeights', value: '140%' },
+      ],
+      paragraphSpacing: [
+        { name: 'paragraphSpacing.0', type: 'paragraphSpacing', value: 0 },
       ],
       paragraphIndent: [
         { name: 'paragraphIndent.0', type: 'dimension', value: '0px' },
