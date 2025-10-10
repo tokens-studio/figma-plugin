@@ -10,6 +10,7 @@
     "build": "cross-env NODE_ENV=production webpack --mode=production",
     "build:dev": "cross-env NODE_ENV=development webpack --mode=development",
     "build:preview": "cross-env NODE_ENV=development webpack --mode=development --PREVIEW_ENV=browser",
+    "build:preview:gh-pages": "cross-env NODE_ENV=production webpack --mode=production --PREVIEW_ENV=browser",
     "build:cy": "cross-env LAUNCHDARKLY_FLAGS=tokenThemes,gitBranchSelector,multiFileSync,tokenFlowButton yarn build",
     "start": "cross-env webpack --mode=development --watch",
     "preview:ws": "node preview-server.js",
