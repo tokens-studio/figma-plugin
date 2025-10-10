@@ -68,7 +68,7 @@ Brief description of the changes made
 
 The project uses Vite with the following key configurations:
 
-- SWC for fast transpilation (via Vite's esbuild)
+- esbuild for fast transpilation
 - Different entry points for UI and plugin code
 - Source maps in development mode
 - Environment variables loaded via custom env plugin
