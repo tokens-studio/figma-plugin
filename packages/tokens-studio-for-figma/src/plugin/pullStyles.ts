@@ -20,7 +20,6 @@ import { processTextStyleProperty } from './processTextStyleProperty';
 import { findOrCreateToken } from '@/utils/findOrCreateToken';
 
 export default async function pullStyles(styleTypes: PullStyleOptions): Promise<void> {
-  console.log('pulling styles', styleTypes);
   const tokens = await getTokenData();
   // @TODO should be specifically typed according to their type
   let colors: StyleToCreateToken[] = [];
