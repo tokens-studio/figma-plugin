@@ -9,15 +9,15 @@ This is a monorepo using Turbo and Yarn workspaces. The main Figma plugin is in 
 ### Common Commands
 - `yarn --frozen-lockfile --immutable` - Install dependencies
 - `yarn build` - Build all packages 
-- `yarn start` - Start development mode (runs webpack in watch mode)
+- `yarn start` - Start development mode (runs Vite in watch mode)
 - `yarn lint` - Run ESLint across all packages
 - `yarn test` - Run Jest tests across all packages
 - `yarn test:watch` - Run tests in watch mode
 
 ### Plugin-Specific Commands (run from `packages/tokens-studio-for-figma/`)
-- `yarn build` - Production build with webpack
+- `yarn build` - Production build with Vite
 - `yarn build:dev` - Development build
-- `yarn start` - Start webpack in development watch mode
+- `yarn start` - Start Vite in development watch mode
 - `yarn test` - Run Jest tests with feature flags enabled
 - `yarn test:watch` - Run tests in watch mode without coverage
 - `yarn test:coverage` - Run tests with coverage reporting

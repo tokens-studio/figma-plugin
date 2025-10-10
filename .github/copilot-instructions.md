@@ -64,14 +64,20 @@ Brief description of the changes made
 - `yarn build:cy` - Build with feature flags for Cypress tests
 - `yarn start` - Development build with watch mode
 
-### Webpack Configuration
+### Build Configuration
 
-The project uses Webpack with the following key configurations:
+The project uses Vite with the following key configurations:
 
-- SWC for fast transpilation
+- SWC for fast transpilation (via Vite's esbuild)
 - Different entry points for UI and plugin code
 - Source maps in development mode
-- Environment variables loaded via dotenv-webpack
+- Environment variables loaded via custom env plugin
+- HTML inlining for Figma plugin compatibility
+- Multiple build configurations:
+  - `vite.config.ts` - Main plugin build
+  - `vite.config.transform.ts` - Token transformer build
+  - `vite.config.benchmark.ts` - Benchmark tests build
+
 
 ## Testing
 
