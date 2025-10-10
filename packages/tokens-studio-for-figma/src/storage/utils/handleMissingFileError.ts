@@ -15,6 +15,7 @@ export function isMissingFileError(error: any): boolean {
   const is404 = (
     (error as any).status === 404
     || (error as any).response?.status === 404
+    || (error as any).cause?.response?.status === 404
   );
 
   if (!is404) {
@@ -25,6 +26,7 @@ export function isMissingFileError(error: any): boolean {
   const hasNotFoundMessage = (
     (error as any).message?.includes('Not Found')
     || (error as any).response?.data?.message?.includes('Not Found')
+    || (error as any).cause?.description?.includes('Not Found')
     || String(error).includes('Not Found')
   );
 
