@@ -30,7 +30,7 @@ import { useChangedState } from '@/hooks/useChangedState';
 export default function BranchSelector() {
   const { confirm } = useConfirm();
   const {
-    pullTokens, pushTokens,
+    pullTokens, pushTokens, fetchBranches,
   } = useRemoteTokens();
   const dispatch = useDispatch<Dispatch>();
   const { setStorageType } = useStorage();
@@ -151,6 +151,22 @@ export default function BranchSelector() {
     [dispatch, apiData, localApiState],
   );
 
+  const handleRefreshBranches = React.useCallback(
+    async () => {
+      if (isGitProvider(apiData)) {
+        try {
+          const branches = await fetchBranches(apiData);
+          if (branches) {
+            dispatch.branchState.setBranches(branches);
+          }
+        } catch (error) {
+          console.error('Failed to refresh branches:', error);
+        }
+      }
+    },
+    [apiData, fetchBranches, dispatch],
+  );
+
   return currentBranch ? (
     <>
       <BranchSelectorPopover
@@ -161,6 +177,7 @@ export default function BranchSelector() {
         onCreateBranchFromCurrentChanges={createBranchFromCurrentChanges}
         branches={branchState.branches}
         currentBranch={currentBranch}
+        onRefreshBranches={handleRefreshBranches}
       />
       {createBranchModalVisible && startBranch && (
         <CreateBranchModal
