@@ -33,12 +33,12 @@ describe('TokenBottomBar', () => {
     await userEvent.click(toolsButton);
     const loadButton = await result.findByText('loadFromPreset');
     await userEvent.click(loadButton, { pointerEventsCheck: 0 });
-    expect(result.queryByText('Load from preset')).toBeInTheDocument();
+    expect(result.queryByText('importFromPreset')).toBeInTheDocument();
 
     const closeButton = await result.findByTestId('close-button');
     closeButton.click();
     waitFor(() => {
-      expect(result.queryByText('Load from preset')).toBeNull();
+      expect(result.queryByText('importFromPreset')).toBeNull();
     });
   });
 
