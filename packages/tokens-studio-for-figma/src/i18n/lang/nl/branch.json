@@ -9,5 +9,6 @@
   "search": "Zoeken...",
   "noBranchesFound": "Geen takken gevonden",
   "branchingProFeature": "Branching is een functie van het Pro-abonnement",
-  "upgradeToPro": "Upgrade naar Pro om takken te maken en te wisselen"
+  "upgradeToPro": "Upgrade naar Pro om takken te maken en te wisselen",
+  "switchingBranch": "Branch wisselen..."
 }

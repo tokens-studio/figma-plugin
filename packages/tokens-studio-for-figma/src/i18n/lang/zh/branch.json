@@ -9,5 +9,6 @@
   "search": "搜索...",
   "noBranchesFound": "未找到分支",
   "branchingProFeature": "分支管理是Pro订阅的功能",
-  "upgradeToPro": "升级到Pro以创建和切换分支"
+  "upgradeToPro": "升级到Pro以创建和切换分支",
+  "switchingBranch": "正在切换分支..."
 }
