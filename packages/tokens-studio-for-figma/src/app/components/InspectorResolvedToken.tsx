@@ -68,7 +68,7 @@ export default function InspectorResolvedToken({ token }: { token: Props }) {
             width: '40px',
           }}
         >
-          aA
+          Aa
         </Box>
       );
     }

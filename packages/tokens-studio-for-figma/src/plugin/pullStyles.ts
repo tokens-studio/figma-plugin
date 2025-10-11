@@ -17,7 +17,7 @@ import { StyleToCreateToken } from '@/types/payloads';
 import { getVariablesWithoutZombies } from './getVariablesWithoutZombies';
 import { getTokenData } from './node';
 import { processTextStyleProperty } from './processTextStyleProperty';
-import { findBoundVariable } from '@/utils/findBoundVariable';
+import { findOrCreateToken } from '@/utils/findOrCreateToken';
 
 export default async function pullStyles(styleTypes: PullStyleOptions): Promise<void> {
   const tokens = await getTokenData();
@@ -54,7 +54,7 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
               b,
               a,
             });
-          } else if (paint.type === 'GRADIENT_LINEAR') {
+          } else if (paint.type === 'GRADIENT_LINEAR' || paint.type === 'GRADIENT_RADIAL' || paint.type === 'GRADIENT_ANGULAR' || paint.type === 'GRADIENT_DIAMOND') {
             styleObject.value = convertFigmaGradientToString(paint);
           } else {
             styleObject = null;
@@ -99,16 +99,13 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
       if (!rawTextDecoration.includes(style.textDecoration)) rawTextDecoration.push(style.textDecoration);
     });
 
-    fontSizes = figmaTextStyles.map((style, idx) => processTextStyleProperty(
-      style,
-      'fontSize',
-      localVariables,
-      tokens,
-      TokenTypes.FONT_SIZES,
-      'fontSize',
-      idx,
-      (value) => value.toString(),
-    ));
+    fontSizes = rawFontSizes
+      .sort((a, b) => a - b)
+      .map((size, idx) => ({
+        name: `fontSize.${idx}`,
+        value: size,
+        type: TokenTypes.FONT_SIZES,
+      }));
 
     const uniqueFontCombinations = fontCombinations.filter(
       (v, i, a) => a.findIndex((t) => t.family === v.family && t.style === v.style) === i,
@@ -122,7 +119,7 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
       TokenTypes.LINE_HEIGHTS,
       'lineHeights',
       idx,
-      (value) => convertFigmaToLineHeight(value).toString(),
+      (value) => convertFigmaToLineHeight(value),
     ));
 
     fontWeights = uniqueFontCombinations.map((font, idx) => {
@@ -172,35 +169,30 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
       );
     });
 
-    paragraphSpacing = figmaTextStyles.map((style, idx) => processTextStyleProperty(
-      style,
-      'paragraphSpacing',
-      localVariables,
-      tokens,
-      TokenTypes.PARAGRAPH_SPACING,
-      'paragraphSpacing',
-      idx,
-      (value) => value.toString(),
-    ));
+    paragraphSpacing = rawParagraphSpacing
+      .sort((a, b) => a - b)
+      .map((spacing, idx) => ({
+        name: `paragraphSpacing.${idx}`,
+        value: spacing,
+        type: TokenTypes.PARAGRAPH_SPACING,
+      }));
 
     paragraphIndent = rawParagraphIndent
       .sort((a, b) => a - b)
       .map((size, idx) => ({
         name: `paragraphIndent.${idx}`,
-        value: `${size.toString()}px`,
+        value: `${size}px`, // DIMENSION type requires units
         type: TokenTypes.DIMENSION,
       }));
 
-    letterSpacing = figmaTextStyles.map((style, idx) => processTextStyleProperty(
-      style,
-      'letterSpacing',
-      localVariables,
-      tokens,
-      TokenTypes.LETTER_SPACING,
-      'letterSpacing',
-      idx,
-      (value) => convertFigmaToLetterSpacing(value).toString(),
-    ));
+    letterSpacing = rawLetterSpacing
+      .map((spacing) => convertFigmaToLetterSpacing(spacing))
+      .filter((value, index, array) => array.findIndex((v) => String(v) === String(value)) === index)
+      .map((value, idx) => ({
+        name: `letterSpacing.${idx}`,
+        value,
+        type: TokenTypes.LETTER_SPACING,
+      }));
 
     textCase = rawTextCase.map((value) => ({
       name: `textCase.${convertFigmaToTextCase(value)}`,
@@ -215,78 +207,60 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
     }));
 
     typography = figmaTextStyles.map((style) => {
-      const foundFamily = fontFamilies.find(
-        findBoundVariable(
-          style,
-          'fontFamily',
-          localVariables,
-          (el) => el.value === style.fontName.family,
-        ),
-      );
+      // Extract style values once to avoid repetition
+      const fontFamily = style.fontName.family;
+      const fontWeight = style.fontName.style;
+      const lineHeightValue = convertFigmaToLineHeight(style.lineHeight);
+      const letterSpacingValue = convertFigmaToLetterSpacing(style.letterSpacing);
+      const paragraphIndentValue = `${style.paragraphIndent}px`; // DIMENSION type requires units
+      const textCaseValue = convertFigmaToTextCase(style.textCase);
+      const textDecorationValue = convertFigmaToTextDecoration(style.textDecoration);
 
-      const foundFontWeight = fontWeights.find(
-        findBoundVariable(
-          style,
-          'fontStyle',
-          localVariables,
-          (el) => el.name.includes(slugify(style.fontName.family)) && el.value === style.fontName?.style,
-        ),
-      );
+      // Extract numeric values for typography object
+      const lineHeightNumeric = typeof lineHeightValue === 'number' ? lineHeightValue : lineHeightValue;
+      const fontSizeNumeric = typeof style.fontSize === 'number' ? style.fontSize : style.fontSize;
+      const letterSpacingNumeric = typeof letterSpacingValue === 'number' ? letterSpacingValue : letterSpacingValue;
+      const paragraphSpacingNumeric = typeof style.paragraphSpacing === 'number' ? style.paragraphSpacing : style.paragraphSpacing;
+      const paragraphIndentNumeric = typeof style.paragraphIndent === 'number' ? style.paragraphIndent : paragraphIndentValue;
 
-      const foundLineHeight = lineHeights.find(
-        findBoundVariable(
-          style,
-          'lineHeight',
-          localVariables,
-          (el) => el.value === convertFigmaToLineHeight(style.lineHeight).toString(),
-        ),
-      );
-      const foundFontSize = fontSizes.find(
-        findBoundVariable(
-          style,
-          'fontSize',
-          localVariables,
-          (el) => el.value === style.fontSize.toString(),
-        ),
-      );
-      const foundLetterSpacing = letterSpacing.find(
-        findBoundVariable(
-          style,
-          'letterSpacing',
-          localVariables,
-          (el) => el.value === convertFigmaToLetterSpacing(style.letterSpacing).toString(),
-        ),
-      );
-      const foundParagraphSpacing = paragraphSpacing.find((el: StyleToCreateToken) => {
-        if (style.boundVariables?.paragraphSpacing?.id) {
-          const paragraphSpacingVar = localVariables.find((v) => v.id === style.boundVariables?.paragraphSpacing?.id);
-          if (paragraphSpacingVar) {
-            const normalizedName = paragraphSpacingVar.name.replace(/\//g, '.');
-            return el.name === normalizedName;
-          }
+      const foundFamily = findOrCreateToken(style, 'fontFamily', fontFamily, fontFamilies, TokenTypes.FONT_FAMILIES, localVariables);
+
+      // Font weights need special handling since multiple fonts can have the same weight value
+      // We need to match by both font family name and weight value
+      let foundFontWeight: StyleToCreateToken | undefined;
+      const boundVariables = style.boundVariables as Record<string, { id: string; } | undefined>;
+
+      if (boundVariables?.fontStyle?.id) {
+        const variable = localVariables.find((v) => v.id === boundVariables.fontStyle?.id);
+        if (variable) {
+          const normalizedName = variable.name.replace(/\//g, '.');
+          foundFontWeight = fontWeights.find((token) => token.name === normalizedName);
         }
-        return el.value === style.paragraphSpacing.toString();
-      });
-      const foundParagraphIndent = paragraphIndent.find(
-        (el: StyleToCreateToken) => el.value === `${style.paragraphIndent.toString()}px`,
-      );
-      const foundTextCase = textCase.find(
-        (el: StyleToCreateToken) => el.value === convertFigmaToTextCase(style.textCase.toString()),
-      );
-      const foundTextDecoration = textDecoration.find(
-        (el: StyleToCreateToken) => el.value === convertFigmaToTextDecoration(style.textDecoration.toString()),
-      );
+      }
+
+      if (!foundFontWeight) {
+        // Match by font family name AND weight value
+        foundFontWeight = fontWeights.find((token) => token.name.includes(slugify(fontFamily))
+          && String(token.value) === String(fontWeight));
+      }
+      const foundLineHeight = findOrCreateToken(style, 'lineHeight', lineHeightValue, lineHeights, TokenTypes.LINE_HEIGHTS, localVariables);
+      const foundFontSize = findOrCreateToken(style, 'fontSize', style.fontSize, fontSizes, TokenTypes.FONT_SIZES, localVariables);
+      const foundLetterSpacing = findOrCreateToken(style, 'letterSpacing', letterSpacingValue, letterSpacing, TokenTypes.LETTER_SPACING, localVariables);
+      const foundParagraphSpacing = findOrCreateToken(style, 'paragraphSpacing', style.paragraphSpacing, paragraphSpacing, TokenTypes.PARAGRAPH_SPACING, localVariables);
+      const foundParagraphIndent = findOrCreateToken(style, 'paragraphIndent', paragraphIndentValue, paragraphIndent, TokenTypes.DIMENSION, localVariables);
+      const foundTextCase = findOrCreateToken(style, 'textCase', textCaseValue, textCase, TokenTypes.TEXT_CASE, localVariables);
+      const foundTextDecoration = findOrCreateToken(style, 'textDecoration', textDecorationValue, textDecoration, TokenTypes.TEXT_DECORATION, localVariables);
 
       const obj = {
-        fontFamily: `{${foundFamily?.name}}`,
-        fontWeight: `{${foundFontWeight?.name}}`,
-        lineHeight: `{${foundLineHeight?.name}}`,
-        fontSize: `{${foundFontSize?.name}}`,
-        letterSpacing: `{${foundLetterSpacing?.name}}`,
-        paragraphSpacing: `{${foundParagraphSpacing?.name}}`,
-        paragraphIndent: `{${foundParagraphIndent?.name}}`,
-        textCase: `{${foundTextCase?.name}}`,
-        textDecoration: `{${foundTextDecoration?.name}}`,
+        fontFamily: foundFamily?.name ? `{${foundFamily.name}}` : fontFamily,
+        fontWeight: foundFontWeight?.name ? `{${foundFontWeight.name}}` : fontWeight,
+        lineHeight: foundLineHeight?.name ? `{${foundLineHeight.name}}` : lineHeightNumeric,
+        fontSize: foundFontSize?.name ? `{${foundFontSize.name}}` : fontSizeNumeric,
+        letterSpacing: foundLetterSpacing?.name ? `{${foundLetterSpacing.name}}` : letterSpacingNumeric,
+        paragraphSpacing: foundParagraphSpacing?.name ? `{${foundParagraphSpacing.name}}` : paragraphSpacingNumeric,
+        paragraphIndent: foundParagraphIndent?.name ? `{${foundParagraphIndent.name}}` : paragraphIndentNumeric,
+        textCase: foundTextCase?.name ? `{${foundTextCase.name}}` : textCaseValue,
+        textDecoration: foundTextDecoration?.name ? `{${foundTextDecoration.name}}` : textDecorationValue,
       };
 
       const normalizedName = style.name

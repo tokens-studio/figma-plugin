@@ -6,10 +6,8 @@ export const StyledStorageItem = styled('div', {
   textAlign: 'left',
   display: 'flex',
   width: '100%',
-  flexDirection: 'row',
-  justifyContent: 'space-between',
+  flexDirection: 'column',
   borderRadius: '$medium',
-  alignItems: 'center',
   variants: {
     active: {
       true: {
@@ -19,6 +17,12 @@ export const StyledStorageItem = styled('div', {
       false: {
         borderColor: '$borderSubtle',
         backgroundColor: 'transparent',
+      },
+    },
+    hasError: {
+      true: {
+        borderColor: '$dangerBorder',
+        backgroundColor: '$dangerBg',
       },
     },
   },

@@ -1419,6 +1419,137 @@ describe('editToken', () => {
     expect(tokens.global).toEqual(expectedTokens);
   });
 
+  it('does not duplicate token to source set when deselected', () => {
+    store.dispatch.tokenState.duplicateToken({
+      newName: 'primary-copy',
+      oldName: 'primary',
+      parent: 'global',
+      value: '1',
+      type: 'sizing',
+      tokenSets: ['options'], // Note: 'global' (source set) is not included
+    });
+    const { tokens } = store.getState().tokenState;
+
+    // Source set (global) should remain unchanged
+    expect(tokens.global).toEqual([
+      {
+        name: 'primary',
+        value: '1',
+      },
+      {
+        name: 'alias',
+        value: '$primary',
+      },
+      {
+        name: 'primary50',
+        value: '0.50',
+      },
+      {
+        name: 'alias50',
+        value: '$primary50',
+      },
+      {
+        name: 'header 1',
+        type: 'typography',
+        value: {
+          fontWeight: '400',
+          fontSize: '16',
+        },
+      },
+      {
+        name: 'header 1',
+        type: 'typography',
+        value: {
+          fontWeight: '400',
+          fontSize: '16',
+        },
+      },
+      {
+        name: 'shadow.mixed',
+        type: 'boxShadow',
+        description: 'the one with mixed shadows',
+        value: shadowArray,
+      },
+      {
+        name: 'font.big',
+        type: 'sizing',
+        value: '24px',
+      },
+      {
+        name: 'font.small',
+        type: 'sizing',
+        value: '12px',
+      },
+      {
+        name: 'font.medium',
+        type: 'fontSizes',
+        value: '18px',
+      },
+      {
+        name: 'font.alias',
+        type: 'sizing',
+        value: '$font.small',
+      },
+      {
+        name: 'colors.blue.50',
+        type: 'color',
+        value: '#FCFDFF',
+        $extensions: {
+          'studio.tokens': {
+            modify: {
+              space: 'hsl',
+              type: 'darken',
+              value: '{colors.modifier-ramp.10}',
+            },
+          },
+        },
+      },
+      {
+        name: 'colors.blue.100',
+        type: 'color',
+        value: '#EAF4FA',
+        $extensions: {
+          'studio.tokens': {
+            modify: {
+              space: 'hsl',
+              type: 'darken',
+              value: '{colors.modifier-ramp.20}',
+            },
+          },
+        },
+      },
+      {
+        name: 'colors.modifier-ramp.10',
+        type: 'other',
+        value: '0.1',
+      },
+      {
+        name: 'colors.modifier-ramp.20',
+        type: 'other',
+        value: '0.2',
+      },
+    ]);
+
+    // Target set (options) should have the duplicated token
+    const expectedOptions = [
+      {
+        name: 'background',
+        value: '$primary',
+      },
+      {
+        name: 'primary-copy',
+        value: '1',
+        type: 'sizing',
+        $extensions: {
+          'studio.tokens': {
+            id: 'mock-uuid',
+          },
+        },
+      },
+    ];
+    expect(tokens.options).toEqual(expectedOptions);
+  });
+
   it('can duplicate token group', () => {
     store.dispatch.tokenState.duplicateTokenGroup({
       oldName: 'font',
