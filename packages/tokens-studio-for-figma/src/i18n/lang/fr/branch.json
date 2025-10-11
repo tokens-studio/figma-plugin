@@ -9,5 +9,6 @@
   "search": "Rechercher...",
   "noBranchesFound": "Aucune branche trouvée",
   "branchingProFeature": "La gestion des branches est une fonctionnalité de l'abonnement Pro",
-  "upgradeToPro": "Passez à Pro pour créer et changer de branches"
+  "upgradeToPro": "Passez à Pro pour créer et changer de branches",
+  "switchingBranch": "Changement de branche..."
 }
