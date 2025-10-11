@@ -1,5 +1,60 @@
 # @tokens-studio/figma-plugin
 
+## 2.9.0
+
+### Minor Changes
+
+- be9927391: **🎯 Auto-apply theme on component drop**
+
+  Introducing an exciting new feature that streamlines your design workflow! You can now automatically apply the current theme when inserting component instances into your Figma designs.
+
+  **What's new:**
+  No more manual token application after dropping components - they instantly inherit your theme styling
+
+  - ✨ **Smart theme application**: Automatically applies tokens from your active theme to newly inserted component instances
+  - ⚙️ **Configurable setting**: Toggle "Auto-apply theme on drop" in the plugin settings (bottom right) to enable/disable this behavior
+
+### Patch Changes
+
+- d10481dcd: Add regex toggle to bulk remap feature. Users can now enable/disable regular expression matching in the bulk remap modal, with literal string matching as the default.
+- 3eca8b10a: fix: prevent unnecessary variable alias recreation
+
+  Add optimization to skip variable updates when alias already points to the correct target variable. This means your variablres should no longer show up as changed in Figma if their value stayed the same.
+
+- d10481dcd: Fix bulk remap breaking token connections when using special regex characters like ".." to "."
+- cc2ddc464: Add ability to create empty file, folders or branch in a repository when setting up a new sync provider
+- 2215180b6: Fix Enter key to submit rename forms by connecting input fields to their forms using the form attribute
+- aba049033: Fix token duplication bug where tokens were duplicated to source set even when deselected. Now tokens are only duplicated to explicitly selected token sets, allowing users to exclude the source set from duplication.
+- f40af0160: Fixed a bug that caused the blue dot to remain visible when renaming a token set
+- 3eca8b10a: fix: improve variable precision handling and prevent unnecessary updates
+
+  Changed color and number variable precision handling from rounding to clipping for more consistent behavior. Numbers now normalize to 6 decimal places and variables won't update unnecessarily when normalized values are identical. This reduces flickering and improves performance by preventing redundant Figma API calls.
+
+- 375c1eef1: Add support for radial and conic gradients in addition to linear gradients. The plugin now supports:
+  - `radial-gradient()` CSS syntax mapped to Figma's GRADIENT_RADIAL type
+  - `conic-gradient()` CSS syntax mapped to Figma's GRADIENT_ANGULAR type
+  - Backward compatibility with existing linear gradient functionality
+  - Updated reference token extraction to work with all gradient types
+- b984e5596: Add regex pattern support to Living Documentation feature. Users can now toggle between simple "starts with" matching and regex patterns for filtering tokens when generating documentation. The regex toggle is disabled by default to maintain backward compatibility.
+- d37d54baf: Change typography visual preview from "aA" to "Aa" in documentation and inspector components
+- aeaa957db: Fix bitbucket sync issue some users are facing with new API tokens
+
+## 2.8.0
+
+### Minor Changes
+
+- b3495e70b: Atlassian is deprecating Bitbucket's App Passwords. As we were using this, we now offer the option to enter an API token instead. Existing App password setups will still work until June 9th, 2026. We added a migration warning, any new Bitbucket sync providers will need to use API tokens. Existing ones can still use App passwords, but we recommend switching over. Read more: https://docs.tokens.studio/token-storage/remote/sync-git-bitbucket
+
+### Patch Changes
+
+- b497582dd: Add the ability to retry fetching tokens while pulling tokens from sync providers
+
+## 2.7.1
+
+### Patch Changes
+
+- df73b78f6: Fixed an issue that caused themes to be duplicated when reordering in the Manage Themes dialog
+
 ## 2.7.0
 
 ### Minor Changes

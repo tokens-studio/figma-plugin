@@ -9,5 +9,6 @@
   "search": "Search...",
   "noBranchesFound": "No branches found",
   "branchingProFeature": "Branching is a feature of the Pro subscription",
-  "upgradeToPro": "Upgrade to Pro to create and switch branches"
+  "upgradeToPro": "Upgrade to Pro to create and switch branches",
+  "switchingBranch": "Switching branch..."
 }

@@ -107,7 +107,7 @@ describe('processTextStyleProperty', () => {
     // Expect the result to create a new token
     expect(result).toEqual({
       name: 'fontSize.2',
-      value: '16',
+      value: 16,
       type: TokenTypes.FONT_SIZES,
     });
   });
@@ -165,7 +165,7 @@ describe('processTextStyleProperty', () => {
     // Expect the result to create a new token
     expect(result).toEqual({
       name: 'fontSize.4',
-      value: '18',
+      value: 18,
       type: TokenTypes.FONT_SIZES,
     });
   });
@@ -190,7 +190,7 @@ describe('processTextStyleProperty', () => {
     // Expect the result to create a new token with the value converted to string
     expect(result).toEqual({
       name: 'fontSize.5',
-      value: '20',
+      value: 20,
       type: TokenTypes.FONT_SIZES,
     });
   });

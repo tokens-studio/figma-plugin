@@ -10,11 +10,11 @@ import { applyTokensToDocumentation } from './applyTokens';
 
 export const createLivingDocumentation: AsyncMessageChannelHandlers[AsyncMessageTypes.CREATE_LIVING_DOCUMENTATION] = async (msg) => {
   const {
-    tokenSet, startsWith, applyTokens, resolvedTokens,
+    tokenSet, startsWith, applyTokens, resolvedTokens, useRegex,
   } = msg;
 
   // Filter and group tokens by set
-  const tokensBySet = filterAndGroupTokens(resolvedTokens, tokenSet, startsWith);
+  const tokensBySet = filterAndGroupTokens(resolvedTokens, tokenSet, startsWith, useRegex);
   const totalTokens = Object.values(tokensBySet).flat().length;
 
   if (!totalTokens) return;

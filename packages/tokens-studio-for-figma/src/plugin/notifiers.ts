@@ -30,6 +30,13 @@ export function postToUI(props: PostToUIMessage) {
   figma.ui.postMessage(props);
 }
 
+export function notifyInstancesCreated(count: number) {
+  postToUI({
+    type: MessageFromPluginTypes.INSTANCES_CREATED,
+    count,
+  });
+}
+
 export function notifyNoSelection() {
   postToUI({
     type: MessageFromPluginTypes.NO_SELECTION,
@@ -83,6 +90,7 @@ export type SavedSettings = {
   aliasBaseFontSize: string;
   storeTokenIdInJsonEditor: boolean;
   tokenFormat: TokenFormatOptions;
+  autoApplyThemeOnDrop: boolean;
 };
 
 export function notifyUISettings(

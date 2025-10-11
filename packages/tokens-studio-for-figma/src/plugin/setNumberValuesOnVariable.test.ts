@@ -31,6 +31,22 @@ describe('setNumberValuesOnVariable', () => {
     expect(mockVariable.setValueForMode).not.toHaveBeenCalled();
   });
 
+  it('should not set value when normalized values are identical', () => {
+    // Set up a scenario where raw values are different but normalized values are the same
+    mockVariable.valuesByMode.light = 0.1234567;
+    (isVariableWithAliasReference as unknown as jest.Mock).mockReturnValue(false);
+    setNumberValuesOnVariable(mockVariable, mockMode, 0.1234569);
+    // Both normalize to 0.123456, so no update should occur
+    expect(mockVariable.setValueForMode).not.toHaveBeenCalled();
+  });
+
+  it('should set value when normalized values are different', () => {
+    mockVariable.valuesByMode.light = 0.123456;
+    (isVariableWithAliasReference as unknown as jest.Mock).mockReturnValue(false);
+    setNumberValuesOnVariable(mockVariable, mockMode, 0.123457);
+    expect(mockVariable.setValueForMode).toHaveBeenCalledWith(mockMode, 0.123457);
+  });
+
   it('should handle alias references', () => {
     mockVariable.valuesByMode.light = '{number.primary}';
     (isVariableWithAliasReference as unknown as jest.Mock).mockReturnValue(true);

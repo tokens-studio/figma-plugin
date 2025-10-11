@@ -98,6 +98,7 @@ describe('uiSettings', () => {
       tokenFormat: TokenFormatOptions.Legacy,
       aliasBaseFontSize: '16',
       baseFontSize: '16',
+      autoApplyThemeOnDrop: false,
     });
   });
 
@@ -159,6 +160,7 @@ describe('uiSettings', () => {
       tokenFormat: TokenFormatOptions.Legacy,
       aliasBaseFontSize: '16',
       baseFontSize: '16',
+      autoApplyThemeOnDrop: false,
     });
   });
 
