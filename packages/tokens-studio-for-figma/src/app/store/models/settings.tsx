@@ -86,7 +86,7 @@ export const settings = createModel<RootModel>()({
     autoApplyThemeOnDrop: false,
     inspectDeep: false,
     shouldSwapStyles: false,
-    shouldSwapFigmaModes: true,
+    shouldSwapFigmaModes: false,
     shouldUpdateStyles: false,
     baseFontSize: defaultBaseFontSize,
     aliasBaseFontSize: defaultBaseFontSize,

@@ -85,6 +85,7 @@ export type SavedSettings = {
   removeStylesAndVariablesWithoutConnection: boolean;
   inspectDeep: boolean;
   shouldSwapStyles: boolean;
+  shouldSwapFigmaModes: boolean;
   baseFontSize: string;
   aliasBaseFontSize: string;
   storeTokenIdInJsonEditor: boolean;
@@ -116,6 +117,7 @@ export function notifyUISettings(
     updateRemote = true,
     inspectDeep,
     shouldSwapStyles,
+    shouldSwapFigmaModes,
     baseFontSize,
     aliasBaseFontSize,
     storeTokenIdInJsonEditor,
@@ -151,6 +153,7 @@ export function notifyUISettings(
       prefixStylesWithThemeName,
       inspectDeep,
       shouldSwapStyles,
+      shouldSwapFigmaModes,
       baseFontSize,
       aliasBaseFontSize,
       storeTokenIdInJsonEditor,
