@@ -160,7 +160,7 @@ export default function BranchSelector() {
             dispatch.branchState.setBranches(branches);
           }
         } catch (error) {
-          console.error('Failed to refresh branches:', error);
+          console.error('Failed to refresh branches for provider', apiData.provider, ':', error);
         }
       }
     },
