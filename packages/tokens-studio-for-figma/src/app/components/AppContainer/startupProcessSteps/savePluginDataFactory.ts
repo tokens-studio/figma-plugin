@@ -41,6 +41,16 @@ export function savePluginDataFactory(dispatch: Dispatch, params: StartupMessage
       if (params.selectedExportThemes) {
         dispatch.uiState.setSelectedExportThemes(params.selectedExportThemes);
       }
+
+      // Store the selected export sets in the UI state
+      if (params.selectedExportSets) {
+        dispatch.uiState.setSelectedExportSets(params.selectedExportSets);
+      }
+
+      // Store the active export tab in the UI state
+      if (params.activeExportTab !== undefined) {
+        dispatch.uiState.setActiveExportTab(params.activeExportTab);
+      }
     } else {
       throw new Error('User not found');
     }

@@ -18,6 +18,8 @@ export const SharedPluginDataKeys = Object.freeze({
     isCompressed: 'isCompressed',
     variableExportSettings: 'variableExportSettings',
     selectedExportThemes: 'selectedExportThemes',
+    selectedExportSets: 'selectedExportSets',
+    activeExportTab: 'activeExportTab',
     ...Properties,
   },
 });
