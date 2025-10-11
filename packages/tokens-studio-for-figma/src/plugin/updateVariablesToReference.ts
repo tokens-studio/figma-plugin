@@ -8,28 +8,32 @@ import { processBatches } from '@/utils/processBatches';
 export default async function updateVariablesToReference(figmaVariables: Map<string, string>, referenceVariableCandidates: ReferenceVariableType[]): Promise<Variable[]> {
   const updatedVariables: Variable[] = [];
 
-  console.log('[REF UPDATE] Getting all local variables...');
   // Get all local variables to enable collection-aware lookup
   const allLocalVariables = await getVariablesWithoutZombies();
-  console.log('[REF UPDATE] Got', allLocalVariables.length, 'local variables');
+
+  // Pre-compute normalized name lookup for O(1) access instead of O(n) linear search
+  const normalizedVariableMap = new Map<string, Variable>();
+  allLocalVariables.forEach((v) => {
+    const normalizedName = v.name.split('/').join('.');
+    normalizedVariableMap.set(normalizedName, v);
+  });
+
+  // Cache for importVariableByKeyAsync to avoid redundant API calls
+  const importedVariableCache = new Map<string, Variable>();
 
   // Process references in batches to avoid overwhelming Figma's API and provide progress updates
-  console.log('[REF UPDATE] Starting processBatches with', referenceVariableCandidates.length, 'candidates...');
   let lastReported = 0;
   await processBatches(
     referenceVariableCandidates,
     100, // Process 100 references at a time
     async (aliasVariable) => {
-      // First, try to find the reference variable in the same collection as the aliasing variable
-      const sameCollectionVariable = allLocalVariables.find((v) => {
-        const normalizedName = v.name.split('/').join('.');
-        return normalizedName === aliasVariable.referenceVariable
-               && v.variableCollectionId === aliasVariable.variable.variableCollectionId;
-      });
+      // O(1) lookup instead of O(n) find
+      const sameCollectionVariable = normalizedVariableMap.get(aliasVariable.referenceVariable);
 
       let referenceVariableKey: string | undefined;
 
-      if (sameCollectionVariable) {
+      // Check if it's in the same collection
+      if (sameCollectionVariable && sameCollectionVariable.variableCollectionId === aliasVariable.variable.variableCollectionId) {
         // Prioritize variable from the same collection
         referenceVariableKey = sameCollectionVariable.key;
       } else {
@@ -39,13 +43,21 @@ export default async function updateVariablesToReference(figmaVariables: Map<str
 
       if (!referenceVariableKey) return;
 
-      let variable;
-      try {
-        variable = await figma.variables.importVariableByKeyAsync(referenceVariableKey);
-      } catch (e) {
-        console.log('error importing variable', e);
+      // Check cache first before calling importVariableByKeyAsync
+      let variable = importedVariableCache.get(referenceVariableKey);
+      if (!variable) {
+        try {
+          variable = await figma.variables.importVariableByKeyAsync(referenceVariableKey);
+          if (variable) {
+            importedVariableCache.set(referenceVariableKey, variable);
+          }
+        } catch (e) {
+          console.log('error importing variable', e);
+        }
       }
+
       if (!variable) return;
+
       try {
         await aliasVariable.variable.setValueForMode(aliasVariable.modeId, {
           type: 'VARIABLE_ALIAS',
@@ -58,10 +70,8 @@ export default async function updateVariablesToReference(figmaVariables: Map<str
     },
     (completed, total) => {
       // Report progress if there are enough references to track
-      console.log('[REF UPDATE] Progress:', completed, '/', total);
       if (referenceVariableCandidates.length > 10) {
         const delta = completed - lastReported;
-        console.log('[REF UPDATE] Sending delta:', delta);
         postToUI({
           type: MessageFromPluginTypes.COMPLETE_JOB_TASKS,
           name: BackgroundJobs.UI_LINK_VARIABLE_REFERENCES,
@@ -69,11 +79,8 @@ export default async function updateVariablesToReference(figmaVariables: Map<str
           timePerTask: 15,
         });
         lastReported = completed;
-        // Force UI update by yielding control briefly
-        return new Promise((resolve) => setTimeout(resolve, 0));
       }
     },
   );
-  console.log('[REF UPDATE] Finished processBatches, returning', updatedVariables.length, 'updated variables');
   return updatedVariables;
 }
