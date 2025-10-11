@@ -23,6 +23,7 @@ export type ModalProps = {
   close?: () => void;
   modal?: boolean;
   onInteractOutside?: (event: Event) => void;
+  onEscapeKeyDown?: (event: KeyboardEvent) => void;
   scrollContainerRef?: React.RefObject<HTMLDivElement>;
 };
 
@@ -92,6 +93,7 @@ export function Modal({
   backArrow = false,
   icon,
   onInteractOutside,
+  onEscapeKeyDown,
   scrollContainerRef,
 }: ModalProps) {
   const handleClose = React.useCallback(() => {
@@ -122,7 +124,7 @@ export function Modal({
             backgroundColor: '$modalBackdrop',
           }}
         />
-        <StyledDialogContent size={size} onInteractOutside={onInteractOutside}>
+        <StyledDialogContent size={size} onInteractOutside={onInteractOutside} onEscapeKeyDown={onEscapeKeyDown}>
           <Box
             css={{
               display: 'flex',

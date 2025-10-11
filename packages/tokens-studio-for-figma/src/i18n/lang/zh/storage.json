@@ -65,10 +65,11 @@
       "readMore": "阅读 Azure DevOps 同步指南。"
     },
     "bitbucket": {
-      "appPassword": "应用程序密码",
+      "apiToken": "API 令牌",
       "projectName": "项目名称（可选）",
       "repository": "存储库（工作区/存储库）",
-      "username": "比特桶用户名"
+      "username": "用户邮箱",
+      "usernameAppPassword": "用户名"
     },
     "tokensstudio": {
       "name": "名称",

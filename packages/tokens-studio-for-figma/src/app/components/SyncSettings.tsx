@@ -10,7 +10,7 @@ import StorageItem from './StorageItem';
 import EditStorageItemModal from './modals/EditStorageItemModal';
 import CreateStorageItemModal from './modals/CreateStorageItemModal';
 import { Dispatch } from '../store';
-import { apiProvidersSelector, localApiStateSelector } from '@/selectors';
+import { apiProvidersSelector, localApiStateSelector, triggerMigrationEditSelector } from '@/selectors';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import useRemoteTokens from '../store/remoteTokens';
 import { StorageTypeCredentials } from '@/types/StorageType';
@@ -20,6 +20,7 @@ import { StyledBetaBadge } from './SecondScreen';
 
 const SyncSettings = () => {
   const localApiState = useSelector(localApiStateSelector);
+  const triggerMigrationEdit = useSelector(triggerMigrationEditSelector);
 
   const { t } = useTranslation(['storage']);
 
@@ -68,6 +69,15 @@ const SyncSettings = () => {
 
   const [open, setOpen] = React.useState(false);
 
+  // Track when user opens the create new sync provider dialog
+  React.useEffect(() => {
+    if (open) {
+      track('Create Sync Provider Dialog Opened', {
+        source: 'sync-settings',
+      });
+    }
+  }, [open]);
+
   const { fetchBranches } = useRemoteTokens();
 
   const [editStorageItemModalVisible, setShowEditStorageModalVisible] = React.useState(Boolean(localApiState.new));
@@ -84,10 +94,22 @@ const SyncSettings = () => {
     [dispatch.branchState, fetchBranches],
   );
 
+  // Handle migration trigger from AppContainer
+  React.useEffect(() => {
+    if (triggerMigrationEdit) {
+      dispatch.uiState.setLocalApiState(triggerMigrationEdit);
+      setShowEditStorageModalVisible(true);
+      // Handle async branch fetching with error handling
+      setLocalBranches(triggerMigrationEdit);
+      // Clear the trigger
+      dispatch.uiState.setTriggerMigrationEdit(null);
+    }
+  }, [triggerMigrationEdit, dispatch, setLocalBranches]);
+
   const handleEditClick = React.useCallback(
-    (provider: any) => () => {
+    (provider: any, migrating = false) => () => {
       track('Edit Credentials');
-      dispatch.uiState.setLocalApiState(provider);
+      dispatch.uiState.setLocalApiState({ ...provider, migrating });
       setShowEditStorageModalVisible(true);
       setLocalBranches(provider);
     },
@@ -180,12 +202,14 @@ const SyncSettings = () => {
               </Dialog.Portal>
             </Dialog>
           </Stack>
+
           <Stack direction="column" gap={2} width="full" align="start">
             <LocalStorageItem />
             {apiProviders.length > 0 && apiProviders.map((item) => (
               <StorageItem
                 key={item?.internalId || `${item.provider}-${item.id}`}
                 onEdit={handleEditClick(item)}
+                onMigrate={handleEditClick(item, true)}
                 item={item}
               />
             ))}

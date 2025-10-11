@@ -1,8 +1,10 @@
 import React from 'react';
-import { Button, Checkbox } from '@tokens-studio/ui';
+import {
+  Button, Checkbox, FormField, IconButton, TextInput,
+} from '@tokens-studio/ui';
+import { Asterisk } from 'iconoir-react';
 import Modal from '../Modal';
 import Stack from '../Stack';
-import Input from '../Input';
 import useTokens from '../../store/useTokens';
 import Box from '../Box';
 import Label from '../Label';
@@ -17,6 +19,7 @@ export default function BulkRemapModal({ isOpen, onClose }: Props) {
   const [oldName, setOldName] = React.useState('');
   const [newName, setNewName] = React.useState('');
   const [shouldRemapDocument, setShouldRemapDocument] = React.useState(false);
+  const [useRegex, setUseRegex] = React.useState(false);
   const { handleBulkRemap } = useTokens();
 
   const handleClose = React.useCallback(() => {
@@ -25,9 +28,9 @@ export default function BulkRemapModal({ isOpen, onClose }: Props) {
 
   const onConfirm = React.useCallback(async () => {
     const updateMode = shouldRemapDocument ? UpdateMode.DOCUMENT : UpdateMode.SELECTION;
-    await handleBulkRemap(newName, oldName, updateMode);
+    await handleBulkRemap(newName, oldName, updateMode, useRegex);
     onClose();
-  }, [handleBulkRemap, onClose, newName, oldName, shouldRemapDocument]);
+  }, [handleBulkRemap, onClose, newName, oldName, shouldRemapDocument, useRegex]);
 
   const handleOldNameChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((e) => {
     setOldName(e.target.value);
@@ -41,33 +44,42 @@ export default function BulkRemapModal({ isOpen, onClose }: Props) {
     setShouldRemapDocument(!shouldRemapDocument);
   }, [shouldRemapDocument]);
 
+  const updateUseRegex = React.useCallback(() => {
+    setUseRegex(!useRegex);
+  }, [useRegex]);
+
   return (
     <Modal size="large" showClose isOpen={isOpen} close={handleClose} title="Bulk remap">
       <form
         onSubmit={onConfirm}
       >
         <Stack direction="column" gap={4}>
-          <Input
-            full
-            required
-            autofocus
-            type="text"
-            label="Match"
-            value={oldName}
-            placeholder=""
-            onChange={handleOldNameChange}
-            name="oldName"
-          />
-          <Input
-            required
-            full
-            type="text"
-            label="Remap"
-            value={newName}
-            placeholder=""
-            onChange={handleNewNameChange}
-            name="newName"
-          />
+          <FormField>
+            <Label htmlFor="oldName">Match</Label>
+            <TextInput
+              required
+              id="oldName"
+              autoFocus
+              type="text"
+              value={oldName}
+              placeholder={useRegex ? 'e.g. ^grey (regex active)' : 'e.g. grey'}
+              onChange={handleOldNameChange}
+              name="oldName"
+              trailingAction={<IconButton tooltip={useRegex ? 'Disable regex' : 'Enable regex'} size="small" onClick={updateUseRegex} icon={<Asterisk />} variant={useRegex ? 'primary' : 'invisible'} />}
+            />
+          </FormField>
+          <FormField>
+            <Label htmlFor="newName">Remap</Label>
+            <TextInput
+              required
+              id="newName"
+              type="text"
+              value={newName}
+              placeholder="e.g. gray"
+              onChange={handleNewNameChange}
+            />
+          </FormField>
+
           <Box css={{
             display: 'flex', alignItems: 'center', gap: '$3', fontSize: '$small',
           }}
