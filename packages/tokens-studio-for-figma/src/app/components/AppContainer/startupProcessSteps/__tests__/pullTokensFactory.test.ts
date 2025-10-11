@@ -330,6 +330,61 @@ describe('pullTokensFactory', () => {
     expect(state.tokenState.remoteData).toEqual({ metadata: null, themes: [], tokens: {} });
   });
 
+  it('should show recovery dialog with correct button labels and danger variant', async () => {
+    const mockStore = createMockStore({
+      uiState: {
+        storageType: mockStorageType,
+      },
+    });
+
+    const mockParams = {
+      localTokenData: {
+        checkForChanges: true,
+        values: {
+          global: [
+            {
+              type: TokenTypes.COLOR,
+              name: 'colors.red',
+              value: '#ff0000',
+              $extensions: {
+                'studio.tokens': {
+                  id: 'mock-uuid',
+                },
+              },
+            },
+          ],
+        },
+      },
+      localApiProviders: [
+        { ...mockStorageType, secret: 'secret' },
+      ],
+    } as unknown as StartupMessage;
+
+    mockConfirm.mockResolvedValueOnce(true);
+
+    const fn = pullTokensFactory(
+      mockStore,
+      mockStore.dispatch,
+      {},
+      mockParams,
+      mockUseConfirm,
+      mockUseRemoteTokens,
+    );
+
+    mockFetchBranches.mockResolvedValueOnce(['main']);
+
+    await fn();
+
+    // Verify the confirm dialog was called with correct parameters
+    expect(mockConfirm).toHaveBeenCalledWith({
+      text: 'Recover local changes?',
+      description: 'You have local changes unsaved to the remote storage.',
+      confirmAction: 'Recover changes',
+      cancelAction: 'Use remote',
+      variant: 'danger',
+    });
+  });
+
   it('should go to start tab if the localTokenData is missing somehow', async () => {
     const mockStore = createMockStore({
       uiState: {

@@ -31,6 +31,9 @@ export function pullTokensFactory(
     const shouldRecoverLocalChanges = await useConfirmResult.confirm({
       text: 'Recover local changes?',
       description: 'You have local changes unsaved to the remote storage.',
+      confirmAction: 'Recover changes',
+      cancelAction: 'Use remote',
+      variant: 'danger',
     });
     return shouldRecoverLocalChanges;
   };
