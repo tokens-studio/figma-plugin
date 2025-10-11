@@ -87,7 +87,7 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
   // Listen for token data changes from other users
   useEffect(() => {
     let unsubscribe: (() => void) | null = null;
-    
+
     if (!showLoadingScreen && startupProcess.isComplete) {
       const handleTokenDataChanged = (msg: { type: string; updatedAt: string }) => {
         if (msg.type === AsyncMessageTypes.TOKEN_DATA_CHANGED) {
@@ -112,7 +112,7 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
 
       unsubscribe = AsyncMessageChannel.ReactInstance.attachMessageListener(handleTokenDataChanged);
     }
-    
+
     return () => {
       if (unsubscribe) {
         unsubscribe();

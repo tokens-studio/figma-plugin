@@ -3,7 +3,6 @@ import { notifyInstancesCreated } from './notifiers';
 import { SharedPluginDataNamespaces } from '@/constants/SharedPluginDataNamespaces';
 import { SharedPluginDataKeys } from '@/constants/SharedPluginDataKeys';
 import { UpdatedAtProperty } from '@/figmaStorage';
-import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 
 // Track the last known updatedAt timestamp to avoid duplicate notifications
@@ -37,11 +36,11 @@ export async function sendDocumentChange(event: DocumentChangeEvent) {
     try {
       // Read the current updatedAt timestamp
       const currentUpdatedAt = await UpdatedAtProperty.read(figma.root);
-      
+
       // Only notify if the timestamp has actually changed
       if (currentUpdatedAt && currentUpdatedAt !== lastKnownUpdatedAt) {
         lastKnownUpdatedAt = currentUpdatedAt;
-        
+
         // Notify the UI that token data has changed
         figma.ui.postMessage({
           type: AsyncMessageTypes.TOKEN_DATA_CHANGED,
