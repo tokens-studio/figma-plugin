@@ -100,6 +100,15 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
     setThemeEditorOpen(false);
   }, []);
 
+  const handleEscapeKeyDown = useCallback((event: KeyboardEvent) => {
+    // If we're inside a theme editor, prevent closing the modal and go back to theme list
+    if (themeEditorOpen) {
+      event.preventDefault();
+      setThemeEditorOpen(false);
+    }
+    // If themeEditorOpen is false, let default behavior close the modal
+  }, [themeEditorOpen]);
+
   const handleSubmit = useCallback((values: FormValues) => {
     const id = typeof themeEditorOpen === 'string' ? themeEditorOpen : undefined;
     if (id) {
@@ -233,6 +242,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
         </Stack>
       )}
       close={handleClose}
+      onEscapeKeyDown={handleEscapeKeyDown}
       scrollContainerRef={themeListRef}
     >
       {!themes.length && !themeEditorOpen && (
