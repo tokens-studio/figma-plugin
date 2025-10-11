@@ -97,7 +97,7 @@ describe('SetValuesOnVariable', () => {
   const collection = {
     id: 'VariableCollectionId:309:16430',
   } as VariableCollection;
-  it('when there is a variable which is connected to the token, we only update the value if it has changed, but not for others', () => {
+  it('when there is a variable which is connected to the token, we only update the value if it has changed, but not for others', async () => {
     const tokens = [
       {
         name: 'button.primary.borderRadius',
@@ -164,7 +164,7 @@ describe('SetValuesOnVariable', () => {
         variableId: '130',
       },
     ] as SingleToken<true, { path: string, variableId: string }>[];
-    setValuesOnVariable(variablesInFigma, tokens, collection, mode, baseFontSize);
+    await setValuesOnVariable(variablesInFigma, tokens, collection, mode, baseFontSize);
     // Check that the right values are called (only those that were changed)
     expect(mockSetValueForMode).toBeCalledWith(mode, 8);
     expect(mockSetValueForMode).toBeCalledWith(mode, {
@@ -176,7 +176,7 @@ describe('SetValuesOnVariable', () => {
     expect(mockSetValueForMode).toHaveBeenCalledTimes(4);
   });
 
-  it('should create a new variable when there is no variable which is connected to the token', () => {
+  it('should create a new variable when there is no variable which is connected to the token', async () => {
     const tokens = [
       {
         name: 'button.primary.width',
@@ -186,7 +186,7 @@ describe('SetValuesOnVariable', () => {
         type: TokenTypes.SIZING,
       },
     ] as SingleToken<true, { path: string, variableId: string }>[];
-    setValuesOnVariable(variablesInFigma, tokens, collection, mode, baseFontSize);
+    await setValuesOnVariable(variablesInFigma, tokens, collection, mode, baseFontSize);
     expect(mockCreateVariable).toBeCalledWith('button/primary/width', collection, 'FLOAT');
   });
 

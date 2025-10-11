@@ -39,10 +39,13 @@ export default async function setValuesOnVariable(
       promises.add(variableWorker.schedule(async () => {
         try {
           const variableType = convertTokenTypeToVariableType(token.type, token.value);
-          // If id matches the variableId, or name patches the token path, we can use it to update the variable instead of re-creating.
+          // If id matches the variableId, or name matches the token path, we can use it to update the variable instead of re-creating.
+          // Prioritize finding by variableId (key) when present, otherwise fall back to name matching
           // This has the nasty side-effect that if font weight changes from string to number, it will not update the variable given we cannot change type.
           // In that case, we should delete the variable and re-create it.
-          let variable = variablesInFigma.find((v) => (v.key === token.variableId && !v.remote) || v.name === token.path);
+          let variable = token.variableId
+            ? variablesInFigma.find((v) => v.key === token.variableId && !v.remote)
+            : variablesInFigma.find((v) => v.name === token.path);
 
           if (!variable) {
             variable = figma.variables.createVariable(token.path, collection, variableType);

@@ -12,10 +12,13 @@ export default async function updateVariablesToReference(figmaVariables: Map<str
   const allLocalVariables = await getVariablesWithoutZombies();
 
   // Pre-compute normalized name lookup for O(1) access instead of O(n) linear search
-  const normalizedVariableMap = new Map<string, Variable>();
+  // Store arrays of variables per normalized name to handle multiple variables with same name in different collections
+  const normalizedVariableMap = new Map<string, Variable[]>();
   allLocalVariables.forEach((v) => {
     const normalizedName = v.name.split('/').join('.');
-    normalizedVariableMap.set(normalizedName, v);
+    const existing = normalizedVariableMap.get(normalizedName) || [];
+    existing.push(v);
+    normalizedVariableMap.set(normalizedName, existing);
   });
 
   // Cache for importVariableByKeyAsync to avoid redundant API calls
@@ -28,12 +31,17 @@ export default async function updateVariablesToReference(figmaVariables: Map<str
     100, // Process 100 references at a time
     async (aliasVariable) => {
       // O(1) lookup instead of O(n) find
-      const sameCollectionVariable = normalizedVariableMap.get(aliasVariable.referenceVariable);
+      const candidateVariables = normalizedVariableMap.get(aliasVariable.referenceVariable) || [];
+
+      // Find variable in the same collection first
+      const sameCollectionVariable = candidateVariables.find(
+        (v) => v.variableCollectionId === aliasVariable.variable.variableCollectionId,
+      );
 
       let referenceVariableKey: string | undefined;
 
       // Check if it's in the same collection
-      if (sameCollectionVariable && sameCollectionVariable.variableCollectionId === aliasVariable.variable.variableCollectionId) {
+      if (sameCollectionVariable) {
         // Prioritize variable from the same collection
         referenceVariableKey = sameCollectionVariable.key;
       } else {
