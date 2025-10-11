@@ -1,5 +1,6 @@
 import { UpdateMode } from '@/constants/UpdateMode';
 import { ThemeObjectsList } from '@/types';
+import { notifyUI, notifyException } from '../notifiers';
 
 function getRootNode(updateMode: UpdateMode) {
   const rootNode: (SceneNode | PageNode)[] = [];
@@ -35,16 +36,38 @@ export async function swapFigmaModes(activeTheme: Record<string, string>, themes
 
   const { $figmaCollectionId: collectionId, $figmaModeId: modeId } = activeThemeObject;
 
+  // Validate that the collection exists and contains the mode
+  const collection = await figma.variables.getVariableCollectionByIdAsync(collectionId);
+  if (!collection) {
+    console.warn(`Variable collection with ID ${collectionId} no longer exists. Cannot swap modes.`);
+    notifyUI('The variable collection linked to this theme no longer exists', { error: true });
+    return;
+  }
+
+  const modeExists = collection.modes.some((mode) => mode.modeId === modeId);
+  if (!modeExists) {
+    console.warn(`Mode ${modeId} no longer exists in collection ${collection.name}. Cannot swap modes.`);
+    notifyUI(`The mode linked to this theme no longer exists in collection "${collection.name}"`, { error: true });
+    return;
+  }
+
   // Get the root nodes based on update mode
   const rootNodes = getRootNode(updateMode);
 
   // Apply the mode to each root node
   rootNodes.forEach((node) => {
     try {
-      node.setExplicitVariableModeForCollection(collectionId, modeId);
+      // Pass the collection object instead of ID (new API)
+      node.setExplicitVariableModeForCollection(collection, modeId);
     } catch (error) {
-      // Silently fail if the collection doesn't exist or the node doesn't support variable modes
+      // Catch any remaining errors we didn't anticipate - report to Sentry
+      const errorMessage = error instanceof Error ? error.message : String(error);
       console.warn(`Failed to set variable mode for node ${node.name}:`, error);
+      notifyException(`Unexpected error in swapFigmaModes for node ${node.name}: ${errorMessage}`, {
+        collectionId,
+        modeId,
+        nodeType: node.type,
+      });
     }
   });
 }
