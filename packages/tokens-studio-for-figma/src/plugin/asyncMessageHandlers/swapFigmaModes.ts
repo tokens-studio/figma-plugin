@@ -2,19 +2,21 @@ import { UpdateMode } from '@/constants/UpdateMode';
 import { ThemeObjectsList } from '@/types';
 
 function getRootNode(updateMode: UpdateMode) {
-  const rootNode: SceneNode[] = [];
+  const rootNode: (SceneNode | PageNode)[] = [];
   switch (updateMode) {
     case UpdateMode.PAGE:
-      if (figma.currentPage.children) rootNode.push(...figma.currentPage.children);
+      // Set mode on the page itself instead of its children
+      rootNode.push(figma.currentPage);
       break;
     case UpdateMode.SELECTION:
       if (figma.currentPage.selection) rootNode.push(...figma.currentPage.selection);
       break;
     case UpdateMode.DOCUMENT:
-      figma.root.children.forEach((page) => rootNode.push(...page.children));
+      // Set mode on each page instead of all their children
+      rootNode.push(...figma.root.children);
       break;
     default:
-      rootNode.push(...figma.currentPage.children);
+      rootNode.push(figma.currentPage);
       break;
   }
   return rootNode;
