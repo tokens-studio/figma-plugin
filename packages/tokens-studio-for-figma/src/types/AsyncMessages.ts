@@ -78,6 +78,8 @@ export enum AsyncMessageTypes {
   SET_INITIAL_LOAD = 'async/set-initial-load',
   PREVIEW_REQUEST_STARTUP = 'async/preview-request-startup',
   GET_AVAILABLE_VARIABLE_COLLECTIONS = 'async/get-available-variable-collections',
+  TOKEN_DATA_CHANGED = 'async/token-data-changed',
+  RELOAD_TOKEN_DATA = 'async/reload-token-data',
 }
 
 export type AsyncMessage<T extends AsyncMessageTypes, P = unknown> = P & { type: T };
@@ -387,6 +389,19 @@ export type SetSelectedExportThemesMessageResult = AsyncMessage<AsyncMessageType
 export type PreviewRequestStartupAsyncMessage = AsyncMessage<AsyncMessageTypes.PREVIEW_REQUEST_STARTUP>;
 export type PreviewRequestStartupAsyncMessageResult = AsyncMessage<AsyncMessageTypes.PREVIEW_REQUEST_STARTUP>;
 
+export type TokenDataChangedMessage = AsyncMessage<AsyncMessageTypes.TOKEN_DATA_CHANGED, {
+  updatedAt: string;
+}>;
+export type TokenDataChangedMessageResult = AsyncMessage<AsyncMessageTypes.TOKEN_DATA_CHANGED>;
+
+export type ReloadTokenDataMessage = AsyncMessage<AsyncMessageTypes.RELOAD_TOKEN_DATA>;
+export type ReloadTokenDataMessageResult = AsyncMessage<AsyncMessageTypes.RELOAD_TOKEN_DATA, {
+  values: Record<string, any>;
+  themes: any[];
+  activeTheme: Record<string, string>;
+  usedTokenSet: UsedTokenSetsMap;
+}>;
+
 export type AsyncMessages =
   CreateStylesAsyncMessage
   | RenameStylesAsyncMessage
@@ -437,7 +452,9 @@ export type AsyncMessages =
   | RemoveRelaunchDataMessage
   | RemoveStylesWithoutConnectionMessage
   | SetVariableExportSettingsMessage
-  | SetSelectedExportThemesMessage;
+  | SetSelectedExportThemesMessage
+  | TokenDataChangedMessage
+  | ReloadTokenDataMessage;
 
 export type AsyncMessageResults =
   CreateStylesAsyncMessageResult
@@ -489,7 +506,9 @@ export type AsyncMessageResults =
   | RemoveRelaunchDataMessageResult
   | RemoveStylesWithoutConnectionResult
   | SetVariableExportSettingsMessageResult
-  | SetSelectedExportThemesMessageResult;
+  | SetSelectedExportThemesMessageResult
+  | TokenDataChangedMessageResult
+  | ReloadTokenDataMessageResult;
 
 export type AsyncMessagesMap = {
   [K in AsyncMessageTypes]: Extract<AsyncMessages, { type: K }>
