@@ -308,7 +308,7 @@ describe('pullTokensFactory', () => {
       ],
     } as unknown as StartupMessage;
 
-    mockConfirm.mockResolvedValueOnce(true);
+    mockConfirm.mockResolvedValueOnce(false);
 
     const fn = pullTokensFactory(
       mockStore,
@@ -360,7 +360,7 @@ describe('pullTokensFactory', () => {
       ],
     } as unknown as StartupMessage;
 
-    mockConfirm.mockResolvedValueOnce(true);
+    mockConfirm.mockResolvedValueOnce(false);
 
     const fn = pullTokensFactory(
       mockStore,
@@ -379,8 +379,8 @@ describe('pullTokensFactory', () => {
     expect(mockConfirm).toHaveBeenCalledWith({
       text: 'Recover local changes?',
       description: 'You have local changes unsaved to the remote storage.',
-      confirmAction: 'Recover changes',
-      cancelAction: 'Use remote',
+      confirmAction: 'Use remote',
+      cancelAction: 'Recover changes',
       variant: 'danger',
     });
   });
