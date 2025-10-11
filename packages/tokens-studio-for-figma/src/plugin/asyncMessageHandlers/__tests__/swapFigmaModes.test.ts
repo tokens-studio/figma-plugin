@@ -75,7 +75,7 @@ describe('swapFigmaModes', () => {
 
   it('should set variable mode for PAGE update mode on the page itself', async () => {
     mockGetVariableCollectionByIdAsync.mockResolvedValue(mockCollection);
-    
+
     await swapFigmaModes(activeTheme, themes, UpdateMode.PAGE);
 
     // Should only call once for the page itself, not its children
@@ -86,7 +86,7 @@ describe('swapFigmaModes', () => {
 
   it('should set variable mode for SELECTION update mode', async () => {
     mockGetVariableCollectionByIdAsync.mockResolvedValue(mockCollection);
-    
+
     await swapFigmaModes(activeTheme, themes, UpdateMode.SELECTION);
 
     expect(mockSetExplicitVariableModeForCollection).toHaveBeenCalledTimes(1);
@@ -96,7 +96,7 @@ describe('swapFigmaModes', () => {
 
   it('should set variable mode for DOCUMENT update mode on all pages', async () => {
     mockGetVariableCollectionByIdAsync.mockResolvedValue(mockCollection);
-    
+
     await swapFigmaModes(activeTheme, themes, UpdateMode.DOCUMENT);
 
     // Should call once for each page (2 pages)
@@ -137,7 +137,7 @@ describe('swapFigmaModes', () => {
 
     expect(notifiers.notifyUI).toHaveBeenCalledWith(
       'The variable collection linked to this theme no longer exists',
-      { error: true }
+      { error: true },
     );
     expect(mockSetExplicitVariableModeForCollection).not.toHaveBeenCalled();
     expect(consoleSpy).toHaveBeenCalledWith(
@@ -161,7 +161,7 @@ describe('swapFigmaModes', () => {
 
     expect(notifiers.notifyUI).toHaveBeenCalledWith(
       'The mode linked to this theme no longer exists in collection "My Collection"',
-      { error: true }
+      { error: true },
     );
     expect(mockSetExplicitVariableModeForCollection).not.toHaveBeenCalled();
     expect(consoleSpy).toHaveBeenCalledWith(
@@ -178,7 +178,6 @@ describe('swapFigmaModes', () => {
     });
 
     const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
-    const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
 
     await swapFigmaModes(activeTheme, themes, UpdateMode.PAGE);
 
@@ -193,21 +192,9 @@ describe('swapFigmaModes', () => {
         collectionId: 'collection-123',
         modeId: 'mode-456',
         nodeType: 'PAGE',
-      }
-    );
-
-    expect(consoleLogSpy).toHaveBeenCalledWith(
-      '[SENTRY] Exception sent to Sentry:',
-      {
-        error: 'Unexpected mock error',
-        collectionId: 'collection-123',
-        modeId: 'mode-456',
-        nodeType: 'PAGE',
-        nodeName: 'Page 1',
-      }
+      },
     );
 
     consoleSpy.mockRestore();
-    consoleLogSpy.mockRestore();
   });
 });

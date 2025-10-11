@@ -59,7 +59,7 @@ export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = asy
     }
 
     // Switch Figma's native theme mode when themes are switched
-    if (msg.activeTheme && msg.themes) {
+    if (msg.activeTheme && msg.themes && msg.settings.shouldSwapFigmaModes) {
       await swapFigmaModes(msg.activeTheme, msg.themes, msg.settings.updateMode);
     }
   }
