@@ -28,37 +28,37 @@ export default function SettingsDropdown() {
 
   const handleUpdateOnChange = React.useCallback(() => {
     const newValue = !updateOnChange;
-    track('updateOnChange', { enabled: newValue });
+    track('updateOnChange', { value: newValue });
     setUpdateOnChange(newValue);
   }, [updateOnChange, setUpdateOnChange]);
 
   const handleUpdateRemote = React.useCallback(() => {
     const newValue = !updateRemote;
-    track('updateRemote', { enabled: newValue });
+    track('updateRemote', { value: newValue });
     setUpdateRemote(newValue);
   }, [updateRemote, setUpdateRemote]);
 
   const handleShouldSwapStyles = React.useCallback(() => {
     const newValue = !shouldSwapStyles;
-    track('shouldSwapStyles', { enabled: newValue });
+    track('shouldSwapStyles', { value: newValue });
     setShouldSwapStyles(newValue);
   }, [shouldSwapStyles, setShouldSwapStyles]);
 
   const handleShouldUpdateStyles = React.useCallback(() => {
     const newValue = !shouldUpdateStyles;
-    track('shouldUpdateStyles', { enabled: newValue });
+    track('shouldUpdateStyles', { value: newValue });
     setShouldUpdateStyles(newValue);
   }, [shouldUpdateStyles, setShouldUpdateStyles]);
 
   const handleAutoApplyThemeOnDrop = React.useCallback(() => {
     const newValue = !autoApplyThemeOnDrop;
-    track('autoApplyThemeOnDrop', { enabled: newValue });
+    track('autoApplyThemeOnDrop', { value: newValue });
     setAutoApplyThemeOnDrop(newValue);
   }, [autoApplyThemeOnDrop, setAutoApplyThemeOnDrop]);
 
   const handleShouldSwapFigmaModes = React.useCallback(() => {
     const newValue = !shouldSwapFigmaModes;
-    track('shouldSwapFigmaModes', { enabled: newValue });
+    track('shouldSwapFigmaModes', { value: newValue });
     setShouldSwapFigmaModes(newValue);
   }, [shouldSwapFigmaModes, setShouldSwapFigmaModes]);
 
