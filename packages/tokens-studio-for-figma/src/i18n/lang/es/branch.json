@@ -9,5 +9,6 @@
   "search": "Buscar...",
   "noBranchesFound": "No se encontraron ramas",
   "branchingProFeature": "La gestión de ramas es una función de la suscripción Pro",
-  "upgradeToPro": "Actualice a Pro para crear y cambiar ramas"
+  "upgradeToPro": "Actualice a Pro para crear y cambiar ramas",
+  "switchingBranch": "Cambiando de rama..."
 }
