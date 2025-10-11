@@ -47,6 +47,16 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
 
   const checkSetting = !settings.variablesBoolean && !settings.variablesColor && !settings.variablesNumber && !settings.variablesString;
   if (!checkSetting && selectedThemes && selectedThemes.length > 0) {
+    // Show preparation phase
+    console.log('[VAR CREATE] Starting preparation phase...');
+    postToUI({
+      type: MessageFromPluginTypes.START_JOB,
+      job: {
+        name: BackgroundJobs.UI_PREPARING_VARIABLES,
+        isInfinite: true,
+      },
+    });
+
     const overallConfig = getOverallConfig(themeInfo.themes, selectedThemes);
     const collections = await createNecessaryVariableCollections(themeInfo.themes, selectedThemes);
 
@@ -57,10 +67,19 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
       return total + variableTokenCount;
     }, 0);
 
+    // Complete preparation phase
+    console.log('[VAR CREATE] Preparation complete');
+    postToUI({
+      type: MessageFromPluginTypes.COMPLETE_JOB,
+      name: BackgroundJobs.UI_PREPARING_VARIABLES,
+    });
+
     // Create a single global progress tracker for all variable creation
     let globalProgressTracker: ProgressTracker | null = null;
     if (totalVariableTokens > 10) {
+      console.log('[VAR CREATE] Will create progress tracker for', totalVariableTokens, 'tokens');
       // First, ensure any previous job is completed to avoid UI counter accumulation
+      console.log('[VAR CREATE] Completing any previous job...');
       postToUI({
         type: MessageFromPluginTypes.COMPLETE_JOB,
         name: BackgroundJobs.UI_CREATEVARIABLES,
@@ -70,6 +89,7 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
       await new Promise((resolve) => setTimeout(resolve, 100));
 
       globalProgressTracker = new ProgressTracker(BackgroundJobs.UI_CREATEVARIABLES);
+      console.log('[VAR CREATE] Starting job with totalTasks:', totalVariableTokens);
       postToUI({
         type: MessageFromPluginTypes.START_JOB,
         job: {
@@ -86,8 +106,10 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
       const { collection, modeId } = findCollectionAndModeIdForTheme(theme.group ?? theme.name, theme.name, collections);
 
       if (collection && modeId) {
+        // Use theme-specific config instead of overallConfig to respect each theme's token set configuration
+        const themeConfig = getOverallConfig(themeInfo.themes, [theme.id]);
         const allVariableObj = await updateVariables({
-          collection, mode: modeId, theme, tokens, settings, overallConfig, progressTracker: globalProgressTracker,
+          collection, mode: modeId, theme, tokens, settings, overallConfig: themeConfig, progressTracker: globalProgressTracker,
         });
 
         figmaVariablesAfterCreate += allVariableObj.removedVariables.length;
@@ -103,28 +125,62 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
       }
     }
     // Gather references that we should use. Merge current theme references with the ones from all themes as well as local variables
+    console.log('[VAR CREATE] Starting mergeVariableReferencesWithLocalVariables...');
     const existingVariables = await mergeVariableReferencesWithLocalVariables(selectedThemeObjects, themeInfo.themes);
+    console.log('[VAR CREATE] Finished mergeVariableReferencesWithLocalVariables, existingVariables size:', existingVariables.size);
 
-    // Update variables to use references instead of raw values
-    updatedVariables = await updateVariablesToReference(existingVariables, referenceVariableCandidates);
-
-    // Complete progress tracking like NodeManager
+    // Complete the variable creation job before starting reference updates
     if (totalVariableTokens > 10) {
+      console.log('[VAR CREATE] Completing variable creation job');
       postToUI({
         type: MessageFromPluginTypes.COMPLETE_JOB,
         name: BackgroundJobs.UI_CREATEVARIABLES,
       });
     }
+
+    // Update variables to use references instead of raw values
+    // This step can be significant with many references, so track progress
+    console.log('[VAR CREATE] Starting updateVariablesToReference with', referenceVariableCandidates.length, 'candidates...');
+    if (referenceVariableCandidates.length > 10) {
+      // Start a new progress job for reference updates
+      console.log('[VAR CREATE] Starting reference update job');
+      postToUI({
+        type: MessageFromPluginTypes.START_JOB,
+        job: {
+          name: BackgroundJobs.UI_LINK_VARIABLE_REFERENCES,
+          timePerTask: 15, // Reference updates are faster than variable creation
+          totalTasks: referenceVariableCandidates.length,
+          completedTasks: 0,
+        },
+      });
+    }
+
+    updatedVariables = await updateVariablesToReference(existingVariables, referenceVariableCandidates);
+    console.log('[VAR CREATE] Finished updateVariablesToReference, updated', updatedVariables.length, 'variables');
+
+    // Complete reference update job
+    if (referenceVariableCandidates.length > 10) {
+      console.log('[VAR CREATE] Completing reference update job');
+      postToUI({
+        type: MessageFromPluginTypes.COMPLETE_JOB,
+        name: BackgroundJobs.UI_LINK_VARIABLE_REFERENCES,
+      });
+    }
   }
 
+  console.log('[VAR CREATE] Calling getVariablesWithoutZombies for final count...');
   figmaVariablesAfterCreate += (await getVariablesWithoutZombies())?.length ?? 0;
+  console.log('[VAR CREATE] Got final variable count:', figmaVariablesAfterCreate);
   const figmaVariableCollectionsAfterCreate = figma.variables.getLocalVariableCollections()?.length;
+  console.log('[VAR CREATE] Got collection count:', figmaVariableCollectionsAfterCreate);
 
+  console.log('[VAR CREATE] Preparing notification...');
   if (figmaVariablesAfterCreate === figmaVariablesBeforeCreate) {
     notifyUI('No variables were created');
   } else {
     notifyUI(`${figmaVariableCollectionsAfterCreate - figmaVariableCollectionsBeforeCreate} collections and ${figmaVariablesAfterCreate - figmaVariablesBeforeCreate} variables created`);
   }
+  console.log('[VAR CREATE] Returning result...');
   return {
     allVariableCollectionIds,
     totalVariables: updatedVariables.length,

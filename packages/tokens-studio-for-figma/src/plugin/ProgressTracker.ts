@@ -15,6 +15,7 @@ export class ProgressTracker {
 
   constructor(name: BackgroundJobs, autoStart = true) {
     this.jobName = name;
+    console.log('[PROGRESS TRACKER] Created for job:', name, 'autoStart:', autoStart);
     if (autoStart) {
       this.startJob();
     }
@@ -25,6 +26,7 @@ export class ProgressTracker {
     this.lastReportedProgress = 0;
     this.jobStart = Date.now();
     this.lastProgressReport = Date.now();
+    console.log('[PROGRESS TRACKER]', this.jobName, 'job started');
   }
 
   public next() {
@@ -32,12 +34,16 @@ export class ProgressTracker {
   }
 
   public reportIfNecessary() {
-    if (Date.now() - this.lastProgressReport > 1000) {
+    const timeSinceLastReport = Date.now() - this.lastProgressReport;
+    if (timeSinceLastReport > 1000) {
+      const progressDelta = this.totalProgress - this.lastReportedProgress;
+      const timePerTask = (Date.now() - this.jobStart) / (this.totalProgress || 1);
+      console.log('[PROGRESS TRACKER]', this.jobName, 'reporting progress: total=', this.totalProgress, 'delta=', progressDelta, 'timePerTask=', timePerTask);
       postToUI({
         type: MessageFromPluginTypes.COMPLETE_JOB_TASKS,
         name: this.jobName,
-        count: this.totalProgress - this.lastReportedProgress,
-        timePerTask: (Date.now() - this.jobStart) / (this.totalProgress || 1),
+        count: progressDelta,
+        timePerTask,
       });
       this.lastProgressReport = Date.now();
       this.lastReportedProgress = this.totalProgress;
