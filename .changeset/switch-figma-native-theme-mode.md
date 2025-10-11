@@ -1,13 +1,13 @@
 ---
-'@tokens-studio/figma-plugin': patch
+'@tokens-studio/figma-plugin': minor
 ---
 
-Switch Figma native theme mode when users change themes in plugin
+**Swap Figma variable modes**
 
-When users apply tokens to selection or switch themes, the plugin now automatically switches Figma's native variable mode to match the selected theme. The mode switching respects the update mode setting:
+The plugin can now automatically switch Figma's native variable modes when you change themes, keeping your variables in sync with your active theme.
 
-- **Apply to selection**: Only affects the current root selection nodes
-- **Apply to page**: Only affects top-level frames in the current page  
-- **Apply to document**: Only affects top-level frames across all pages
-
-This ensures that Figma's native theme mode stays in sync with the plugin's active theme.
+**What's new:**
+- **Automatic mode switching**: When switching themes, the plugin updates Figma's variable modes to match the selected theme
+- **Configurable setting**: Toggle "Swap Figma variable modes" in the plugin settings (bottom right) to enable/disable this behavior (enabled by default)
+- Validates that collections and modes exist before switching, with helpful error notifications when something goes wrong
+- Works with Selection, Page, and Document update modes
