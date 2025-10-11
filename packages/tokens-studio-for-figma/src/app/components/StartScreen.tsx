@@ -19,6 +19,8 @@ import { transformProviderName } from '@/utils/transformProviderName';
 import { track } from '@/utils/analytics';
 import Footer from './Footer';
 import useRemoteTokens from '../store/remoteTokens';
+import LottieAnimation from './LottieAnimation';
+import manageThemesAnimation from '@/app/assets/animations/manage-themes.json';
 
 const StyledTokensStudioIcon = styled(TokensStudioLogo, {
   width: '200px',
@@ -123,6 +125,13 @@ function StartScreen() {
           <Stack direction="row" gap={4}>
             <StyledTokensStudioIcon />
           </Stack>
+          <LottieAnimation
+            animationData={manageThemesAnimation}
+            width={300}
+            height={170}
+            loop
+            autoplay
+          />
           <Text muted>{t('intro')}</Text>
           <Stack direction="column" gap={4}>
             <Heading size="large">
