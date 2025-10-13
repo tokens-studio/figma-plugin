@@ -13,27 +13,20 @@ describe('formatTokens per theme', () => {
   });
 
   it('should resolve font size tokens differently for each theme based on typography baseline', () => {
-    // Define token sets with different typography baselines
+    // Define token sets with different typography baselines (matching user's structure)
     const tokens: Record<string, AnyTokenList> = {
-      'typography-base': [
+      'mobile-base': [
         {
-          name: 'typography.base.fontSize',
+          name: 'typography.baseline',
           type: TokenTypes.FONT_SIZES,
-          value: '14px', // baseline for theme A
+          value: '14px', // mobile baseline
         },
       ],
-      'typography-base-b': [
+      'desktop-base': [
         {
-          name: 'typography.base.fontSize',
+          name: 'typography.baseline',
           type: TokenTypes.FONT_SIZES,
-          value: '15px', // baseline for theme B
-        },
-      ],
-      'typography-base-c': [
-        {
-          name: 'typography.base.fontSize',
-          type: TokenTypes.FONT_SIZES,
-          value: '16px', // baseline for theme C
+          value: '16px', // desktop baseline  
         },
       ],
       'typography-tokens': [
@@ -41,36 +34,28 @@ describe('formatTokens per theme', () => {
           name: 'typography.heading',
           type: TokenTypes.TYPOGRAPHY,
           value: {
-            fontSize: '{typography.base.fontSize}',
+            fontSize: '{typography.baseline}',
             fontWeight: 'bold',
           },
         },
       ],
     };
 
-    // Define themes that use different typography baselines
+    // Define themes that use different typography baselines  
     const themes: ThemeObject[] = [
       {
-        id: 'theme-a',
-        name: 'Theme A',
+        id: 'mobile',
+        name: 'Mobile Theme',
         selectedTokenSets: {
-          'typography-base': TokenSetStatus.ENABLED,
+          'mobile-base': TokenSetStatus.ENABLED,
           'typography-tokens': TokenSetStatus.ENABLED,
         },
       },
       {
-        id: 'theme-b',
-        name: 'Theme B',
+        id: 'desktop',
+        name: 'Desktop Theme',
         selectedTokenSets: {
-          'typography-base-b': TokenSetStatus.ENABLED,
-          'typography-tokens': TokenSetStatus.ENABLED,
-        },
-      },
-      {
-        id: 'theme-c',
-        name: 'Theme C',
-        selectedTokenSets: {
-          'typography-base-c': TokenSetStatus.ENABLED,
+          'desktop-base': TokenSetStatus.ENABLED,
           'typography-tokens': TokenSetStatus.ENABLED,
         },
       },
@@ -83,40 +68,30 @@ describe('formatTokens per theme', () => {
       return defaultTokenResolver.setTokens(mergedTokens);
     };
 
-    const themeAResolvedTokens = resolveTokensForTheme(themes[0]);
-    const themeBResolvedTokens = resolveTokensForTheme(themes[1]);
-    const themeCResolvedTokens = resolveTokensForTheme(themes[2]);
+    const mobileResolvedTokens = resolveTokensForTheme(themes[0]);
+    const desktopResolvedTokens = resolveTokensForTheme(themes[1]);
 
     // Format tokens for each theme
-    const themeAFormatted = JSON.parse(formatTokens({
+    const mobileFormatted = JSON.parse(formatTokens({
       tokens,
-      tokenSets: ['typography-base', 'typography-tokens'],
-      resolvedTokens: themeAResolvedTokens,
+      tokenSets: ['mobile-base', 'typography-tokens'],
+      resolvedTokens: mobileResolvedTokens,
       expandTypography: true,
     }));
 
-    const themeBFormatted = JSON.parse(formatTokens({
+    const desktopFormatted = JSON.parse(formatTokens({
       tokens,
-      tokenSets: ['typography-base-b', 'typography-tokens'],
-      resolvedTokens: themeBResolvedTokens,
+      tokenSets: ['desktop-base', 'typography-tokens'],
+      resolvedTokens: desktopResolvedTokens,
       expandTypography: true,
     }));
 
-    const themeCFormatted = JSON.parse(formatTokens({
-      tokens,
-      tokenSets: ['typography-base-c', 'typography-tokens'],
-      resolvedTokens: themeCResolvedTokens,
-      expandTypography: true,
-    }));
-
-    // Verify that each theme has different fontSize values
-    expect(themeAFormatted['typography-base']['typography']['base']['fontSize']['$value']).toBe('14px');
-    expect(themeBFormatted['typography-base-b']['typography']['base']['fontSize']['$value']).toBe('15px');
-    expect(themeCFormatted['typography-base-c']['typography']['base']['fontSize']['$value']).toBe('16px');
+    // Verify that each theme has different baseline values
+    expect(mobileFormatted['mobile-base']['typography']['baseline']['$value']).toBe('14px');
+    expect(desktopFormatted['desktop-base']['typography']['baseline']['$value']).toBe('16px');
 
     // Verify that typography heading fontSize resolves differently for each theme
-    expect(themeAFormatted['typography-tokens']['typography']['heading']['fontSize']['$value']).toBe('14px');
-    expect(themeBFormatted['typography-tokens']['typography']['heading']['fontSize']['$value']).toBe('15px');
-    expect(themeCFormatted['typography-tokens']['typography']['heading']['fontSize']['$value']).toBe('16px');
+    expect(mobileFormatted['typography-tokens']['typography']['heading']['fontSize']['$value']).toBe('14px');
+    expect(desktopFormatted['typography-tokens']['typography']['heading']['fontSize']['$value']).toBe('16px');
   });
 });
