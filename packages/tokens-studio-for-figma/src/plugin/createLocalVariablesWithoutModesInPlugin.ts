@@ -55,11 +55,6 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
 
     const selectedSetIds = selectedSets.map((set) => set.set);
 
-    const overallConfig = selectedSets.reduce((acc, set) => {
-      acc[set.set] = set.status;
-      return acc;
-    }, {} as UsedTokenSetsMap);
-
     const collections = await createNecessaryVariableCollections(themesToCreateCollections, selectedSetIds);
 
     // Calculate total number of variables for progress tracking
@@ -67,7 +62,9 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
       if (set.status === TokenSetStatus.ENABLED) {
         const theme = { id: '123', name: set.set, selectedTokenSets: { [set.set]: set.status } };
         const setConfig = { [set.set]: set.status };
-        const themeTokens = generateTokensToCreate({ theme, tokens, overallConfig: setConfig, filterByTokenSet: set.set });
+        const themeTokens = generateTokensToCreate({
+          theme, tokens, overallConfig: setConfig, filterByTokenSet: set.set,
+        });
         const variableTokenCount = themeTokens.filter((token) => checkIfTokenCanCreateVariable(token, settings)).length;
         return total + variableTokenCount;
       }
@@ -84,7 +81,7 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
       });
 
       // Small delay to ensure UI processes the completion
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      await new Promise((resolve) => { setTimeout(resolve, 100); });
 
       globalProgressTracker = new ProgressTracker(BackgroundJobs.UI_CREATEVARIABLES);
       postToUI({
@@ -128,7 +125,7 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
           }
           updatedVariableCollections.push(collection);
         }
-        index++;
+        index += 1;
       }
     }
 

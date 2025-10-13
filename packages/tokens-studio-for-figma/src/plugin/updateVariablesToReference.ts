@@ -76,7 +76,7 @@ export default async function updateVariablesToReference(figmaVariables: Map<str
         console.log('error setting value for mode', e, aliasVariable, variable);
       }
     },
-    (completed, total) => {
+    (completed, _total) => {
       // Report progress if there are enough references to track
       if (referenceVariableCandidates.length > 10) {
         const delta = completed - lastReported;

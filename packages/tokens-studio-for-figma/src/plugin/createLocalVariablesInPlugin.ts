@@ -82,7 +82,7 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
       });
 
       // Small delay to ensure UI processes the completion
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      await new Promise((resolve) => { setTimeout(resolve, 100); });
 
       globalProgressTracker = new ProgressTracker(BackgroundJobs.UI_CREATEVARIABLES);
       postToUI({
