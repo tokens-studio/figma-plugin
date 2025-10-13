@@ -90,7 +90,7 @@ describe('convertToTokenArray', () => {
       },
     };
 
-    expect(convertToTokenArray({ tokens: basicTokens })).toEqual([
+    expect(convertToTokenArray({ tokens: basicTokens }).tokens).toEqual([
       { name: 'global.withValue', value: 'bar', type: 'other' },
       { name: 'global.basic', value: '#ff0000', type: 'other' },
       { ...typographyTokens.withValue.output, name: 'global.typography.heading.h2' },
@@ -118,7 +118,7 @@ describe('convertToTokenArray', () => {
         expandShadow: true,
         expandComposition: true,
         expandBorder: true,
-      }),
+      }).tokens,
     ).toEqual([
       { name: 'global.withValue', value: 'bar', type: 'other' },
       { name: 'global.basic', value: '#ff0000', type: 'other' },
@@ -169,7 +169,7 @@ describe('convertToTokenArray', () => {
     const result = convertToTokenArray({ tokens: tokensWithGroupDescriptions });
     
     // Should only include actual tokens, not $description metadata
-    expect(result).toEqual([
+    expect(result.tokens).toEqual([
       {
         name: 'primary.10',
         value: '#061724',
@@ -189,7 +189,12 @@ describe('convertToTokenArray', () => {
     ]);
 
     // Verify that $description is not treated as a token
-    const hasDescriptionToken = result.some((token) => token.name.includes('$description') || token.name.includes('description'));
+    const hasDescriptionToken = result.tokens.some((token) => token.name.includes('$description') || token.name.includes('description'));
     expect(hasDescriptionToken).toBe(false);
+
+    // Verify metadata is captured correctly
+    expect(result.metadata.root?.$description).toBe('Root level description');
+    expect(result.metadata.groups?.['primary']?.$description).toBe('Primary brand colors');
+    expect(result.metadata.groups?.['secondary']?.$description).toBe('Secondary colors');
   });
 });

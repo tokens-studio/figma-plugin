@@ -1,6 +1,7 @@
 import set from 'set-value';
 import { appendTypeToToken } from '@/app/components/createTokenObj';
 import { AnyTokenList } from '@/types/tokens';
+import { TokenSetMetadata } from '@/types/tokens/TokenSetMetadata';
 import removeTokenId from './removeTokenId';
 import { TokenFormat, TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 import { TokenInJSON } from './convertTokens';
@@ -26,8 +27,20 @@ export default function stringifyTokens(
   tokens: Record<string, AnyTokenList>,
   activeTokenSet: string,
   storeTokenIdInJsonEditor?: boolean,
+  metadata?: Record<string, TokenSetMetadata>,
 ): string {
-  const tokenObj = {};
+  const tokenObj: any = {};
+  
+  // Add root-level metadata if available
+  if (metadata?.[activeTokenSet]?.root) {
+    if (metadata[activeTokenSet].root?.$description) {
+      tokenObj[TokenFormat.tokenDescriptionKey] = metadata[activeTokenSet].root.$description;
+    }
+    if (metadata[activeTokenSet].root?.$extensions) {
+      tokenObj.$extensions = metadata[activeTokenSet].root.$extensions;
+    }
+  }
+  
   tokens[activeTokenSet]?.forEach((token) => {
     const tokenWithType = appendTypeToToken(token);
     const { name, ...tokenWithoutName } = removeTokenId(tokenWithType, !storeTokenIdInJsonEditor);
@@ -58,6 +71,18 @@ export default function stringifyTokens(
       set(tokenObj, token.name, tokenInJSON, { merge: true });
     }
   });
+
+  // Add group-level metadata after tokens are set
+  if (metadata?.[activeTokenSet]?.groups) {
+    Object.entries(metadata[activeTokenSet].groups!).forEach(([groupPath, groupMetadata]) => {
+      if (groupMetadata.$description) {
+        set(tokenObj, `${groupPath}.${TokenFormat.tokenDescriptionKey}`, groupMetadata.$description);
+      }
+      if (groupMetadata.$extensions) {
+        set(tokenObj, `${groupPath}.$extensions`, groupMetadata.$extensions);
+      }
+    });
+  }
 
   return JSON.stringify(tokenObj, null, 2);
 }
