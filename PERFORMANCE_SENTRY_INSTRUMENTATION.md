@@ -4,6 +4,12 @@
 
 This document extends the performance analysis with a comprehensive Sentry instrumentation plan to establish baseline metrics and monitor improvements across all 3 implementation phases.
 
+**Important Note on Memory Tracking:** Direct memory measurement is not available in the Figma plugin sandbox environment. Memory improvements will be validated indirectly through:
+- Operational metrics (promise set size, worker pool size, array sizes)
+- Error rates (memory errors, crashes)
+- Operation success rates at scale (100k+ nodes)
+- Duration improvements (as memory pressure reduces, operations complete faster)
+
 ## Current Sentry Setup
 
 ### Existing Instrumentation
@@ -68,8 +74,8 @@ interface PerformanceMetric {
   operation: string;
   duration: number;
   nodeCount?: number;
-  memoryUsed?: number;
   timestamp: number;
+  // Note: Memory tracking not available in Figma plugin sandbox
 }
 
 export class PluginPerformanceMonitor {
@@ -77,6 +83,8 @@ export class PluginPerformanceMonitor {
   
   /**
    * Wrap an async function with performance tracking
+   * Note: Only tracks duration and operation counts - memory tracking
+   * is not available in the Figma plugin sandbox
    */
   async trackOperation<T>(
     operation: string,
@@ -84,18 +92,15 @@ export class PluginPerformanceMonitor {
     metadata?: Record<string, number>
   ): Promise<T> {
     const startTime = performance.now();
-    const startMemory = this.getMemoryUsage();
     
     try {
       const result = await fn();
       
       const duration = performance.now() - startTime;
-      const memoryUsed = this.getMemoryUsage() - startMemory;
       
       this.recordMetric({
         operation,
         duration,
-        memoryUsed,
         timestamp: Date.now(),
         ...metadata,
       });
@@ -112,12 +117,6 @@ export class PluginPerformanceMonitor {
       });
       throw error;
     }
-  }
-  
-  private getMemoryUsage(): number {
-    // Plugin sandbox doesn't have performance.memory
-    // We'll estimate based on operation context
-    return 0; // Placeholder
   }
   
   private recordMetric(metric: PerformanceMetric) {
@@ -337,9 +336,7 @@ export const handlePerformanceMetric = (metric: any) => {
   if (metric.nodeCount) {
     transaction.setMeasurement('nodeCount', metric.nodeCount, '');
   }
-  if (metric.memoryUsed) {
-    transaction.setMeasurement('memoryUsed', metric.memoryUsed, 'byte');
-  }
+  // Note: Memory tracking not available from plugin sandbox
 
   transaction.finish();
 };
@@ -370,10 +367,11 @@ export enum MessageFromPluginTypes {
    - `nodesPerSecond` - Processing rate
    - `tokenApplicationRate` - Tokens applied per second
 
-3. **Memory Indicators**
-   - `promiseSetSize` - Number of concurrent promises
-   - `workerPoolSize` - Current worker pool size
-   - `arraySize` - Size of accumulated node arrays
+3. **Memory Indicators** (indirect measurement via operational metrics)
+   - `promiseSetSize` - Number of concurrent promises (tracked in code)
+   - `workerPoolSize` - Current worker pool size (tracked in code)
+   - `arraySize` - Size of accumulated node arrays (tracked in code)
+   - Note: Direct memory measurement not available in plugin sandbox
 
 4. **Error Rates**
    - `operationFailureRate` - Percentage of failed operations
@@ -452,14 +450,14 @@ transaction.setMeasurement('batchCount', totalBatches, '');
 ```typescript
 transaction.setMeasurement('chunkSize', nodesPerChunk, '');
 transaction.setMeasurement('chunkProcessingTime', avgChunkTime, 'millisecond');
-transaction.setMeasurement('peakMemoryPerChunk', memoryMB, 'megabyte');
-transaction.setMeasurement('gcPauses', pauseCount, '');
+// Note: Direct memory measurement not available in plugin sandbox
+// Memory improvements validated indirectly through crash rate and operation success
 ```
 
 **Expected Changes:**
-- `peakMemory`: 950MB → 95MB
 - `operationDuration`: Reduce by 70%
 - `maxSafeNodes`: 20k → unlimited
+- `crashRate`: Monitor via error tracking (should be 0)
 
 ## Sentry Dashboard Configuration
 
@@ -479,9 +477,10 @@ transaction.setMeasurement('gcPauses', pauseCount, '');
    - Grouping: By operation
    - Alert: Rate < 10 nodes/sec
 
-3. **Memory Metrics**
+3. **Operational Metrics** (indirect memory indicators)
    - Chart: Area graph
    - Metrics: `promiseSetSize`, `workerPoolSize`, `arraySize`
+   - Note: Tracks operational counts that correlate with memory usage
    - Alert: Any metric > threshold
 
 4. **Error Rates**
@@ -596,9 +595,10 @@ describe('Performance Instrumentation', () => {
 - [ ] Operation duration reduced by 50%+
 
 ### Phase 3 Validation
-- [ ] Peak memory < 100MB regardless of node count
 - [ ] Operation duration reduced by 70%+
-- [ ] Successfully process 100k+ nodes
+- [ ] Successfully process 100k+ nodes without crashes
+- [ ] Zero memory-related errors in production
+- [ ] Worker pool size stays within configured limits
 
 ## Code Review Checklist
 
