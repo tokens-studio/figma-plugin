@@ -63,7 +63,10 @@ export default function formatTokens({
             set(tokenObj, nestUnderParent ? [tokenSet, token.name].join('.') : token.name, convertedToFormat);
           }
         } else {
-          const expanded = expand(tokenWithoutName.value);
+          // For object values, check if we have a resolved token to use instead
+          const resolvedToken = resolvedTokens.find((t) => t.name === name);
+          const valueToExpand = resolvedToken && typeof resolvedToken.value === 'object' ? resolvedToken.value : tokenWithoutName.value;
+          const expanded = expand(valueToExpand);
           const expandedToFormat = convertTokenToFormat(expanded, true);
 
           set(tokenObj, nestUnderParent ? [tokenSet, token.name].join('.') : token.name, { ...expandedToFormat });
