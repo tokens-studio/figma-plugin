@@ -5,7 +5,7 @@ import { SettingsState } from '@/app/store/models/settings';
 import checkIfTokenCanCreateVariable from '@/utils/checkIfTokenCanCreateVariable';
 import setValuesOnVariable from './setValuesOnVariable';
 import { mapTokensToVariableInfo } from '@/utils/mapTokensToVariableInfo';
-import { defaultTokenResolver } from '@/utils/TokenResolver';
+import { defaultTokenResolver, TokenResolver } from '@/utils/TokenResolver';
 import { mergeTokenGroups } from '@/utils/tokenHelpers';
 import { getAliasValue } from '@/utils/alias';
 
@@ -40,8 +40,10 @@ export default async function updateVariables({
   // Resolve the base font size for this specific theme
   let themeBaseFontSize = settings.baseFontSize;
   if (settings.aliasBaseFontSize) {
-    // Resolve tokens for this specific theme to get the correct base font size
-    const themeResolvedTokens = defaultTokenResolver.setTokens(
+    // Create a separate TokenResolver instance for this theme to avoid interference
+    // when multiple themes are processed concurrently
+    const themeTokenResolver = new TokenResolver([]);
+    const themeResolvedTokens = themeTokenResolver.setTokens(
       mergeTokenGroups(tokens, theme.selectedTokenSets, overallConfig)
     );
     const resolvedBaseFontSize = getAliasValue(settings.aliasBaseFontSize, themeResolvedTokens);
