@@ -15,12 +15,18 @@ This directory contains a comprehensive analysis of performance bottlenecks in t
 - **[PERFORMANCE_RECOMMENDATIONS.md](./PERFORMANCE_RECOMMENDATIONS.md)** - Implementation guide  
   *Complete guide with code examples for all 3 phases*
 
+- **[PERFORMANCE_SENTRY_INSTRUMENTATION.md](./PERFORMANCE_SENTRY_INSTRUMENTATION.md)** - Monitoring & metrics  
+  *Sentry instrumentation plan for baseline and phase validation*
+
 ### For Technical Deep-Dive
 - **[PERFORMANCE_ANALYSIS.md](./PERFORMANCE_ANALYSIS.md)** - Detailed technical analysis  
   *In-depth analysis of all 10 bottlenecks, memory profiling, root cause analysis*
 
 - **[PERFORMANCE_VISUALIZATION.md](./PERFORMANCE_VISUALIZATION.md)** - Visual diagrams  
   *Architecture diagrams, memory charts, processing timelines*
+
+- **[PERFORMANCE_SENTRY_INSTRUMENTATION.md](./PERFORMANCE_SENTRY_INSTRUMENTATION.md)** - Sentry monitoring plan  
+  *Complete instrumentation strategy, baseline metrics, dashboard configuration*
 
 ## 🚨 The Problem
 
@@ -82,6 +88,36 @@ Three-phase incremental optimization:
 1. Read [PERFORMANCE_VISUALIZATION.md](./PERFORMANCE_VISUALIZATION.md)
 2. Review current vs. proposed architecture diagrams
 3. Understand memory comparison charts
+
+### If you need to set up monitoring
+1. Read [PERFORMANCE_SENTRY_INSTRUMENTATION.md](./PERFORMANCE_SENTRY_INSTRUMENTATION.md)
+2. Review existing Sentry setup
+3. Implement baseline metrics collection
+4. Configure dashboards and alerts
+
+## 📊 Monitoring & Metrics
+
+### Existing Sentry Setup
+- ✅ Transaction monitoring in UI code (`src/profiling/transaction.ts`)
+- ✅ `updateDocument` operation tracked with token counts, sizes
+- ✅ Variable and style operations instrumented
+- ❌ **Missing:** Plugin-side performance tracking (updateNodes, NodeManager, Worker)
+
+### Proposed Instrumentation
+See [PERFORMANCE_SENTRY_INSTRUMENTATION.md](./PERFORMANCE_SENTRY_INSTRUMENTATION.md) for:
+- Complete baseline metrics collection plan
+- Plugin-side performance monitoring system
+- Sentry dashboard configuration
+- Alert thresholds and validation criteria
+- Phase-by-phase monitoring strategy
+
+### Key Metrics to Track
+- Operation duration (updateNodes, findBaseNodesWithData)
+- Node processing rate (nodes/second)
+- Memory usage (promise sets, worker pool, arrays)
+- Cache hit rate (Phase 2+)
+- Batch efficiency (Phase 2+)
+- Error rates and timeouts
 
 ## 📝 Key Files in Codebase
 
@@ -171,8 +207,8 @@ Week 3-6: Phase 3 Implementation, Testing, Rollout
 - **Created:** 2025-10-13
 - **Author:** Performance Analysis Team
 - **Status:** Complete ✅
-- **Version:** 1.0
-- **Total Size:** ~75 KB (6 documents)
+- **Version:** 1.1
+- **Total Size:** ~93 KB (7 documents)
 - **Analysis Time:** ~4 hours
 - **Issue Tracked:** Related to token application performance review
 
