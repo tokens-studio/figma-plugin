@@ -5,6 +5,9 @@ import { SettingsState } from '@/app/store/models/settings';
 import checkIfTokenCanCreateVariable from '@/utils/checkIfTokenCanCreateVariable';
 import setValuesOnVariable from './setValuesOnVariable';
 import { mapTokensToVariableInfo } from '@/utils/mapTokensToVariableInfo';
+import { defaultTokenResolver } from '@/utils/TokenResolver';
+import { mergeTokenGroups } from '@/utils/tokenHelpers';
+import { getAliasValue } from '@/utils/alias';
 
 export type CreateVariableTypes = {
   collection: VariableCollection;
@@ -34,6 +37,19 @@ export default async function updateVariables({
     overallConfig,
   });
 
+  // Resolve the base font size for this specific theme
+  let themeBaseFontSize = settings.baseFontSize;
+  if (settings.aliasBaseFontSize) {
+    // Resolve tokens for this specific theme to get the correct base font size
+    const themeResolvedTokens = defaultTokenResolver.setTokens(
+      mergeTokenGroups(tokens, theme.selectedTokenSets, overallConfig)
+    );
+    const resolvedBaseFontSize = getAliasValue(settings.aliasBaseFontSize, themeResolvedTokens);
+    if (resolvedBaseFontSize && typeof resolvedBaseFontSize === 'string') {
+      themeBaseFontSize = resolvedBaseFontSize;
+    }
+  }
+
   // Do not use getVariablesWithoutZombies. It's not working.
   // There seems to be a bug with getLocalVariablesAsync. It's not returning the variables in the collection - when they're being created.
   // We could also get the current collection with figma.variables.getVariableCollectionByIdAsync(collection.id) and then fetch each variable,
@@ -56,7 +72,7 @@ export default async function updateVariables({
     variablesToCreate,
     collection,
     mode,
-    settings.baseFontSize,
+    themeBaseFontSize,
     settings.renameExistingStylesAndVariables,
   );
   const removedVariables: string[] = [];
