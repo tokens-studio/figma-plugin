@@ -1,4 +1,5 @@
 import compact from 'just-compact';
+import JSZip from 'jszip';
 import {
   RemoteTokenStorage, RemoteTokenstorageErrorMessage, RemoteTokenStorageFile, RemoteTokenStorageMetadata, RemoteTokenStorageSingleTokenSetFile, RemoteTokenStorageThemesFile,
 } from './RemoteTokenStorage';
@@ -31,8 +32,80 @@ export class FileTokenStorage extends RemoteTokenStorage<unknown, SaveOption> {
     return this;
   }
 
+  private async readZipFile(zipFile: File): Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage> {
+    try {
+      const zip = new JSZip();
+      const content = await zip.loadAsync(zipFile);
+      const jsonFiles: { name: string; content: string }[] = [];
+
+      // Extract all JSON files from the ZIP
+      const filePromises = Object.keys(content.files).map(async (fileName) => {
+        const file = content.files[fileName];
+        if (!file.dir && fileName.endsWith('.json')) {
+          const fileContent = await file.async('text');
+          return { name: fileName, content: fileContent };
+        }
+        return null;
+      });
+
+      const extractedFiles = await Promise.all(filePromises);
+      jsonFiles.push(...extractedFiles.filter((f) => f !== null) as { name: string; content: string }[]);
+
+      // Sort files for consistent processing
+      jsonFiles.sort((a, b) => a.name.localeCompare(b.name));
+
+      // Process extracted files
+      const parsedFiles: RemoteTokenStorageFile[] = [];
+
+      for (const jsonFile of jsonFiles) {
+        if (jsonFile.content && IsJSONString(jsonFile.content)) {
+          const parsedJsonData = JSON.parse(jsonFile.content);
+          const validationResult = await multiFileSchema.safeParseAsync(parsedJsonData);
+
+          if (validationResult.success) {
+            const name = jsonFile.name.replace('.json', '');
+            const baseName = name.includes('/') ? name.substring(name.lastIndexOf('/') + 1) : name;
+
+            if (baseName === SystemFilenames.THEMES && Array.isArray(validationResult.data)) {
+              parsedFiles.push({
+                path: jsonFile.name,
+                type: 'themes',
+                data: validationResult.data,
+              } as RemoteTokenStorageThemesFile);
+            } else if (baseName === SystemFilenames.METADATA) {
+              parsedFiles.push({
+                path: jsonFile.name,
+                type: 'metadata',
+                data: validationResult.data as RemoteTokenStorageMetadata,
+              });
+            } else if (!Array.isArray(validationResult.data)) {
+              parsedFiles.push({
+                path: jsonFile.name,
+                name: baseName,
+                type: 'tokenSet',
+                data: validationResult.data,
+              } as RemoteTokenStorageSingleTokenSetFile);
+            }
+          }
+        }
+      }
+
+      return parsedFiles;
+    } catch (e) {
+      console.log('Error reading ZIP file:', e);
+      return {
+        errorMessage: ErrorMessages.FILE_CREDENTIAL_ERROR,
+      };
+    }
+  }
+
   public async read(): Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage> {
     try {
+      // Check if the file is a ZIP file
+      if (this.files.length === 1 && this.files[0].name.endsWith('.zip')) {
+        return this.readZipFile(this.files[0]);
+      }
+
       if (this.flags.multiFileEnabled && this.files.length > 1) {
         const jsonFiles = Array.from(this.files).filter((file) => file.webkitRelativePath.endsWith('.json'))
           .sort((a, b) => (
