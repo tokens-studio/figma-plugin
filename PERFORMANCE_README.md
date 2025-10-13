@@ -29,7 +29,7 @@ Users experience **crashes and out-of-memory errors** when applying design token
 **Root Cause:** Batch-and-wait architecture that accumulates all nodes in memory  
 **Peak Memory:** ~950 MB for 100,000 nodes  
 **Figma Limit:** ~1-2 GB  
-**Result:** 💥 Crash
+**Result:** [CRASH] Memory exhaustion
 
 ## ✅ The Solution
 
@@ -172,7 +172,7 @@ Week 3-6: Phase 3 Implementation, Testing, Rollout
 - **Author:** Performance Analysis Team
 - **Status:** Complete ✅
 - **Version:** 1.0
-- **Total Size:** ~64 KB (5 documents)
+- **Total Size:** ~75 KB (6 documents)
 - **Analysis Time:** ~4 hours
 - **Issue Tracked:** Related to token application performance review
 
