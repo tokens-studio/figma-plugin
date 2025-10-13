@@ -6,7 +6,7 @@ import updateVariablesToReference from './updateVariablesToReference';
 import { notifyUI, postToUI } from './notifiers';
 import { MessageFromPluginTypes } from '@/types/messages';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
-import { ThemeObject, UsedTokenSetsMap } from '@/types';
+import { ThemeObject } from '@/types';
 import { ExportTokenSet } from '@/types/ExportTokenSet';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { mergeVariableReferencesWithLocalVariables } from './mergeVariableReferences';
