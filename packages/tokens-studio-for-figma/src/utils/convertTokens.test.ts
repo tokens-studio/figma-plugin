@@ -141,4 +141,55 @@ describe('convertToTokenArray', () => {
       { name: 'global.nestGroupWithType.font.big', value: '24px', type: 'dimension' },
     ]);
   });
+
+  it('ignores group-level and root-level $description metadata', () => {
+    const tokensWithGroupDescriptions = {
+      $description: 'Root level description',
+      primary: {
+        $description: 'Primary brand colors',
+        10: {
+          $value: '#061724',
+          $type: 'color',
+          $description: 'Token level description',
+        },
+        20: {
+          $value: '#0a2540',
+          $type: 'color',
+        },
+      },
+      secondary: {
+        $description: 'Secondary colors',
+        light: {
+          $value: '#f0f0f0',
+          $type: 'color',
+        },
+      },
+    };
+
+    const result = convertToTokenArray({ tokens: tokensWithGroupDescriptions });
+    
+    // Should only include actual tokens, not $description metadata
+    expect(result).toEqual([
+      {
+        name: 'primary.10',
+        value: '#061724',
+        type: 'color',
+        description: 'Token level description',
+      },
+      {
+        name: 'primary.20',
+        value: '#0a2540',
+        type: 'color',
+      },
+      {
+        name: 'secondary.light',
+        value: '#f0f0f0',
+        type: 'color',
+      },
+    ]);
+
+    // Verify that $description is not treated as a token
+    const hasDescriptionToken = result.some((token) => token.name.includes('$description') || token.name.includes('description'));
+    expect(hasDescriptionToken).toBe(false);
+  });
 });

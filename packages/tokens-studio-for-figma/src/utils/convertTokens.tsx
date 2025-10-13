@@ -45,6 +45,13 @@ export type Tokens =
     $description?: string;
   };
 
+// Metadata keys that should not be treated as tokens
+const METADATA_KEYS = ['$description', '$extensions', 'description', 'extensions'];
+
+function isMetadataKey(key: string): boolean {
+  return METADATA_KEYS.includes(key);
+}
+
 // @TODO fix typings
 function checkForTokens({
   obj,
@@ -131,6 +138,10 @@ function checkForTokens({
 
     if (typeof tokenToCheck !== 'undefined' || tokenToCheck !== null) {
       Object.entries(tokenToCheck).forEach(([key, value]) => {
+        // Skip metadata keys like $description and $extensions at group level
+        if (isMetadataKey(key)) {
+          return;
+        }
         const [, result] = checkForTokens({
           obj,
           token: value as TokenGroupInJSON,
