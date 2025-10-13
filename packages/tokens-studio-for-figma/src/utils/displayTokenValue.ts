@@ -1,0 +1,19 @@
+import { convertTypographyNumberToFigma } from '@/plugin/figmaTransforms/generic';
+
+/**
+ * Converts a token value for display purposes, showing pixel equivalents for rem values
+ * @param value - The raw token value
+ * @param baseFontSize - The base font size to use for rem conversion
+ * @returns The formatted display value
+ */
+export function formatTokenValueForDisplay(value: string | number | object, baseFontSize: string = '16px'): string {
+  const valueString = String(value);
+  
+  // Check if the value is a rem value
+  if (typeof value === 'string' && (value.endsWith('rem') || value.endsWith('em'))) {
+    const convertedValue = convertTypographyNumberToFigma(value, baseFontSize);
+    return `${value} (${convertedValue}px)`;
+  }
+  
+  return valueString;
+}
