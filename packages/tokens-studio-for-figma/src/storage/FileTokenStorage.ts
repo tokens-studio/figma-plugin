@@ -49,7 +49,7 @@ export class FileTokenStorage extends RemoteTokenStorage<unknown, SaveOption> {
       });
 
       const extractedFiles = await Promise.all(filePromises);
-      jsonFiles.push(...extractedFiles.filter((f) => f !== null) as { name: string; content: string }[]);
+      jsonFiles.push(...extractedFiles.filter((f): f is { name: string; content: string } => f !== null));
 
       // Sort files for consistent processing
       jsonFiles.sort((a, b) => a.name.localeCompare(b.name));
