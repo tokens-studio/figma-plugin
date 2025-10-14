@@ -9,6 +9,7 @@ import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { ThemeObject } from '@/types';
 import { ExportTokenSet } from '@/types/ExportTokenSet';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import { UsedTokenSetsMap } from '@/types/UsedTokenSetsMap';
 import { mergeVariableReferencesWithLocalVariables } from './mergeVariableReferences';
 import { LocalVariableInfo } from './createLocalVariablesInPlugin';
 import { findCollectionAndModeIdForTheme } from './findCollectionAndModeIdForTheme';
@@ -57,13 +58,18 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
 
     const collections = await createNecessaryVariableCollections(themesToCreateCollections, selectedSetIds);
 
+    // Compute overallConfig once from all selected sets
+    const overallConfig = selectedSets.reduce((acc, set) => {
+      acc[set.set] = set.status;
+      return acc;
+    }, {} as UsedTokenSetsMap);
+
     // Calculate total number of variables for progress tracking
     const totalVariableTokens = selectedSets.reduce((total, set) => {
       if (set.status === TokenSetStatus.ENABLED) {
         const theme = { id: '123', name: set.set, selectedTokenSets: { [set.set]: set.status } };
-        const setConfig = { [set.set]: set.status };
         const themeTokens = generateTokensToCreate({
-          theme, tokens, overallConfig: setConfig, filterByTokenSet: set.set,
+          theme, tokens, overallConfig, filterByTokenSet: set.set,
         });
         const variableTokenCount = themeTokens.filter((token) => checkIfTokenCanCreateVariable(token, settings)).length;
         return total + variableTokenCount;
@@ -102,13 +108,11 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
         const { collection, modeId } = findCollectionAndModeIdForTheme(set.set, set.set, collections);
 
         if (collection && modeId) {
-          // Use set-specific config instead of overallConfig to respect each set's configuration
-          const setConfig = { [set.set]: set.status };
           const allVariableObj = await updateVariables({
             collection,
             mode: modeId,
             theme: { id: '123', name: set.set, selectedTokenSets: { [set.set]: set.status } },
-            overallConfig: setConfig,
+            overallConfig,
             tokens,
             settings,
             filterByTokenSet: set.set,

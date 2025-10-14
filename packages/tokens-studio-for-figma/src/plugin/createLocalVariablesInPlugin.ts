@@ -101,10 +101,9 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
       const { collection, modeId } = findCollectionAndModeIdForTheme(theme.group ?? theme.name, theme.name, collections);
 
       if (collection && modeId) {
-        // Use theme-specific config instead of overallConfig to respect each theme's token set configuration
-        const themeConfig = getOverallConfig(themeInfo.themes, [theme.id]);
+        // Use overallConfig to allow cross-theme token references
         const allVariableObj = await updateVariables({
-          collection, mode: modeId, theme, tokens, settings, overallConfig: themeConfig, progressTracker: globalProgressTracker,
+          collection, mode: modeId, theme, tokens, settings, overallConfig, progressTracker: globalProgressTracker,
         });
 
         figmaVariablesAfterCreate += allVariableObj.removedVariables.length;

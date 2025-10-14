@@ -136,6 +136,10 @@ export default async function setValuesOnVariable(
     });
 
     await Promise.all(promises);
+
+    // Ensure variableWorker completes all batched work before returning
+    // Critical for sequential theme/mode processing to prevent value mixing
+    await variableWorker.flush();
   } catch (e) {
     console.error('Setting values on variable failed', e);
   }

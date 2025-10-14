@@ -82,6 +82,13 @@ export class Worker {
       this.timeoutId = null;
     }
   };
+
+  public async flush(): Promise<void> {
+    // Process all remaining jobs until queue is empty
+    while (this.pool.size > 0) {
+      await this.tick();
+    }
+  }
 }
 
 export const defaultWorker = new Worker();
