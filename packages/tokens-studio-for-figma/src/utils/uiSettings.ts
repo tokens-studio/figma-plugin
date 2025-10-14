@@ -34,6 +34,7 @@ export async function updateUISettings(uiSettings: Partial<SavedSettings>) {
       stylesTypography: uiSettings.stylesTypography ?? data?.stylesTypography,
       inspectDeep: uiSettings.inspectDeep ?? data?.inspectDeep,
       shouldSwapStyles: uiSettings.shouldSwapStyles ?? data?.shouldSwapStyles,
+      shouldSwapFigmaModes: uiSettings.shouldSwapFigmaModes ?? data?.shouldSwapFigmaModes,
       baseFontSize: uiSettings.baseFontSize ?? data?.baseFontSize,
       aliasBaseFontSize: uiSettings.aliasBaseFontSize ?? data?.aliasBaseFontSize,
       storeTokenIdInJsonEditor: uiSettings.storeTokenIdInJsonEditor ?? data?.storeTokenIdInJsonEditor,
@@ -72,6 +73,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
     let removeStylesAndVariablesWithoutConnection: boolean;
     let inspectDeep: boolean;
     let shouldSwapStyles: boolean;
+    let shouldSwapFigmaModes: boolean;
     let baseFontSize: string;
     let aliasBaseFontSize: string;
     let language: string;
@@ -106,6 +108,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
       aliasBaseFontSize = typeof data.aliasBaseFontSize === 'undefined' ? defaultBaseFontSize : data.aliasBaseFontSize;
       inspectDeep = typeof data.inspectDeep === 'undefined' ? false : data.inspectDeep;
       shouldSwapStyles = typeof data.shouldSwapStyles === 'undefined' ? false : data.shouldSwapStyles;
+      shouldSwapFigmaModes = typeof data.shouldSwapFigmaModes === 'undefined' ? false : data.shouldSwapFigmaModes;
       sessionRecording = typeof data.sessionRecording === 'undefined' ? false : data.sessionRecording;
       storeTokenIdInJsonEditor = typeof data.storeTokenIdInJsonEditor === 'undefined' ? false : data.storeTokenIdInJsonEditor;
       tokenFormat = data.tokenFormat || TokenFormatOptions.Legacy;
@@ -135,6 +138,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
         removeStylesAndVariablesWithoutConnection,
         inspectDeep,
         shouldSwapStyles,
+        shouldSwapFigmaModes,
         baseFontSize,
         aliasBaseFontSize,
         storeTokenIdInJsonEditor,

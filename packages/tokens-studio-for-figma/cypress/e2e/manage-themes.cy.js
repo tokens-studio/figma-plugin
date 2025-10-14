@@ -32,6 +32,7 @@ describe('TokenListing', () => {
       updateOnChange: false,
       updateRemote: true,
       shouldUpdateStyles: true,
+      shouldSwapFigmaModes: false,
     },
     storageType: { provider: StorageProviderType.LOCAL },
     user: {

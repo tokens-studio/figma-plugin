@@ -30,6 +30,7 @@ export interface SettingsState {
   tokenType?: TokenModeType;
   inspectDeep: boolean;
   shouldSwapStyles: boolean;
+  shouldSwapFigmaModes: boolean;
   shouldUpdateStyles: boolean;
   baseFontSize: string;
   aliasBaseFontSize: string;
@@ -85,6 +86,7 @@ export const settings = createModel<RootModel>()({
     autoApplyThemeOnDrop: false,
     inspectDeep: false,
     shouldSwapStyles: false,
+    shouldSwapFigmaModes: false,
     shouldUpdateStyles: false,
     baseFontSize: defaultBaseFontSize,
     aliasBaseFontSize: defaultBaseFontSize,
@@ -225,6 +227,12 @@ export const settings = createModel<RootModel>()({
       return {
         ...state,
         autoApplyThemeOnDrop: payload,
+      };
+    },
+    setShouldSwapFigmaModes(state, payload: boolean) {
+      return {
+        ...state,
+        shouldSwapFigmaModes: payload,
       };
     },
   },
