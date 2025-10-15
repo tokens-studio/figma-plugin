@@ -34,6 +34,7 @@ export const setUi: AsyncMessageChannelHandlers[AsyncMessageTypes.SET_UI] = asyn
     sessionRecording: msg.sessionRecording,
     aliasBaseFontSize: msg.aliasBaseFontSize,
     shouldSwapStyles: msg.shouldSwapStyles,
+    shouldSwapFigmaModes: msg.shouldSwapFigmaModes,
     storeTokenIdInJsonEditor: msg.storeTokenIdInJsonEditor,
     autoApplyThemeOnDrop: msg.autoApplyThemeOnDrop,
   });

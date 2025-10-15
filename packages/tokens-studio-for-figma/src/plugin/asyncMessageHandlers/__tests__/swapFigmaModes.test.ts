@@ -136,7 +136,7 @@ describe('swapFigmaModes', () => {
     await swapFigmaModes(activeTheme, themes, UpdateMode.PAGE);
 
     expect(notifiers.notifyUI).toHaveBeenCalledWith(
-      'The variable collection linked to this theme no longer exists',
+      'One of the variable collections linked to this theme no longer exists',
       { error: true },
     );
     expect(mockSetExplicitVariableModeForCollection).not.toHaveBeenCalled();
@@ -160,7 +160,7 @@ describe('swapFigmaModes', () => {
     await swapFigmaModes(activeTheme, themes, UpdateMode.PAGE);
 
     expect(notifiers.notifyUI).toHaveBeenCalledWith(
-      'The mode linked to this theme no longer exists in collection "My Collection"',
+      'One of the modes linked to this theme no longer exists in collection "My Collection"',
       { error: true },
     );
     expect(mockSetExplicitVariableModeForCollection).not.toHaveBeenCalled();
@@ -196,5 +196,238 @@ describe('swapFigmaModes', () => {
     );
 
     consoleSpy.mockRestore();
+  });
+
+  describe('multi-dimensional themes', () => {
+    const mockBrandCollection = {
+      id: 'collection-brand',
+      name: 'Brand Collection',
+      modes: [
+        { modeId: 'mode-acme', name: 'Acme' },
+        { modeId: 'mode-techco', name: 'TechCo' },
+      ],
+    };
+
+    const mockModeCollection = {
+      id: 'collection-mode',
+      name: 'Mode Collection',
+      modes: [
+        { modeId: 'mode-light', name: 'Light' },
+        { modeId: 'mode-dark', name: 'Dark' },
+      ],
+    };
+
+    const multiDimensionalThemes = [
+      {
+        id: 'acme-dark',
+        name: 'Acme Dark',
+        selectedTokenSets: {},
+        group: 'brand',
+        $figmaCollectionId: 'collection-brand',
+        $figmaModeId: 'mode-acme',
+      },
+      {
+        id: 'dark-mode',
+        name: 'Dark Mode',
+        selectedTokenSets: {},
+        group: 'mode',
+        $figmaCollectionId: 'collection-mode',
+        $figmaModeId: 'mode-dark',
+      },
+      {
+        id: 'techco-light',
+        name: 'TechCo Light',
+        selectedTokenSets: {},
+        group: 'brand',
+        $figmaCollectionId: 'collection-brand',
+        $figmaModeId: 'mode-techco',
+      },
+      {
+        id: 'light-mode',
+        name: 'Light Mode',
+        selectedTokenSets: {},
+        group: 'mode',
+        $figmaCollectionId: 'collection-mode',
+        $figmaModeId: 'mode-light',
+      },
+    ];
+
+    it('should apply all dimensions of a multi-dimensional theme', async () => {
+      const multiDimensionalActiveTheme = {
+        brand: 'acme-dark',
+        mode: 'dark-mode',
+      };
+
+      mockGetVariableCollectionByIdAsync.mockImplementation(async (id: string) => {
+        if (id === 'collection-brand') return mockBrandCollection;
+        if (id === 'collection-mode') return mockModeCollection;
+        return null;
+      });
+
+      await swapFigmaModes(multiDimensionalActiveTheme, multiDimensionalThemes, UpdateMode.PAGE);
+
+      // Should call twice: once for brand collection, once for mode collection
+      expect(mockSetExplicitVariableModeForCollection).toHaveBeenCalledTimes(2);
+      expect(mockSetExplicitVariableModeForCollection).toHaveBeenCalledWith(mockBrandCollection, 'mode-acme');
+      expect(mockSetExplicitVariableModeForCollection).toHaveBeenCalledWith(mockModeCollection, 'mode-dark');
+      expect(notifiers.notifyUI).not.toHaveBeenCalled();
+    });
+
+    it('should apply all dimensions across multiple nodes in DOCUMENT mode', async () => {
+      const multiDimensionalActiveTheme = {
+        brand: 'techco-light',
+        mode: 'light-mode',
+      };
+
+      mockGetVariableCollectionByIdAsync.mockImplementation(async (id: string) => {
+        if (id === 'collection-brand') return mockBrandCollection;
+        if (id === 'collection-mode') return mockModeCollection;
+        return null;
+      });
+
+      await swapFigmaModes(multiDimensionalActiveTheme, multiDimensionalThemes, UpdateMode.DOCUMENT);
+
+      // Should call 4 times: 2 collections × 2 pages
+      expect(mockSetExplicitVariableModeForCollection).toHaveBeenCalledTimes(4);
+      expect(mockSetExplicitVariableModeForCollection).toHaveBeenCalledWith(mockBrandCollection, 'mode-techco');
+      expect(mockSetExplicitVariableModeForCollection).toHaveBeenCalledWith(mockModeCollection, 'mode-light');
+      expect(notifiers.notifyUI).not.toHaveBeenCalled();
+    });
+
+    it('should skip invalid dimensions but still apply valid ones', async () => {
+      const multiDimensionalActiveTheme = {
+        brand: 'acme-dark',
+        mode: 'dark-mode',
+      };
+
+      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
+
+      // Brand collection exists, but mode collection doesn't
+      mockGetVariableCollectionByIdAsync.mockImplementation(async (id: string) => {
+        if (id === 'collection-brand') return mockBrandCollection;
+        return null; // Mode collection doesn't exist
+      });
+
+      await swapFigmaModes(multiDimensionalActiveTheme, multiDimensionalThemes, UpdateMode.PAGE);
+
+      // Should still call once for the valid brand collection
+      expect(mockSetExplicitVariableModeForCollection).toHaveBeenCalledTimes(1);
+      expect(mockSetExplicitVariableModeForCollection).toHaveBeenCalledWith(mockBrandCollection, 'mode-acme');
+
+      // Should notify about the missing collection
+      expect(notifiers.notifyUI).toHaveBeenCalledWith(
+        'One of the variable collections linked to this theme no longer exists',
+        { error: true },
+      );
+
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Variable collection with ID collection-mode no longer exists'),
+      );
+
+      consoleSpy.mockRestore();
+    });
+
+    it('should skip dimensions with missing modes but still apply valid ones', async () => {
+      const multiDimensionalActiveTheme = {
+        brand: 'acme-dark',
+        mode: 'dark-mode',
+      };
+
+      const collectionWithMissingMode = {
+        ...mockModeCollection,
+        modes: [
+          { modeId: 'mode-light', name: 'Light' }, // Only has Light mode, Dark is missing
+        ],
+      };
+
+      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
+
+      mockGetVariableCollectionByIdAsync.mockImplementation(async (id: string) => {
+        if (id === 'collection-brand') return mockBrandCollection;
+        if (id === 'collection-mode') return collectionWithMissingMode;
+        return null;
+      });
+
+      await swapFigmaModes(multiDimensionalActiveTheme, multiDimensionalThemes, UpdateMode.PAGE);
+
+      // Should still call once for the valid brand collection
+      expect(mockSetExplicitVariableModeForCollection).toHaveBeenCalledTimes(1);
+      expect(mockSetExplicitVariableModeForCollection).toHaveBeenCalledWith(mockBrandCollection, 'mode-acme');
+
+      // Should notify about the missing mode
+      expect(notifiers.notifyUI).toHaveBeenCalledWith(
+        'One of the modes linked to this theme no longer exists in collection "Mode Collection"',
+        { error: true },
+      );
+
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Mode mode-dark no longer exists in collection Mode Collection'),
+      );
+
+      consoleSpy.mockRestore();
+    });
+
+    it('should handle multi-dimensional theme with some dimensions missing Figma metadata', async () => {
+      const themesWithPartialMetadata = [
+        {
+          id: 'acme-dark',
+          name: 'Acme Dark',
+          selectedTokenSets: {},
+          group: 'brand',
+          $figmaCollectionId: 'collection-brand',
+          $figmaModeId: 'mode-acme',
+        },
+        {
+          id: 'dark-mode',
+          name: 'Dark Mode',
+          selectedTokenSets: {},
+          group: 'mode',
+          // Missing $figmaCollectionId and $figmaModeId
+        },
+      ];
+
+      const multiDimensionalActiveTheme = {
+        brand: 'acme-dark',
+        mode: 'dark-mode',
+      };
+
+      mockGetVariableCollectionByIdAsync.mockResolvedValue(mockBrandCollection);
+
+      await swapFigmaModes(multiDimensionalActiveTheme, themesWithPartialMetadata, UpdateMode.PAGE);
+
+      // Should only call once for the dimension with metadata
+      expect(mockSetExplicitVariableModeForCollection).toHaveBeenCalledTimes(1);
+      expect(mockSetExplicitVariableModeForCollection).toHaveBeenCalledWith(mockBrandCollection, 'mode-acme');
+      expect(notifiers.notifyUI).not.toHaveBeenCalled();
+    });
+
+    it('should return early if all dimensions lack Figma metadata', async () => {
+      const themesWithoutMetadata = [
+        {
+          id: 'acme-dark',
+          name: 'Acme Dark',
+          selectedTokenSets: {},
+          group: 'brand',
+          // Missing $figmaCollectionId and $figmaModeId
+        },
+        {
+          id: 'dark-mode',
+          name: 'Dark Mode',
+          selectedTokenSets: {},
+          group: 'mode',
+          // Missing $figmaCollectionId and $figmaModeId
+        },
+      ];
+
+      const multiDimensionalActiveTheme = {
+        brand: 'acme-dark',
+        mode: 'dark-mode',
+      };
+
+      await swapFigmaModes(multiDimensionalActiveTheme, themesWithoutMetadata, UpdateMode.PAGE);
+
+      expect(mockSetExplicitVariableModeForCollection).not.toHaveBeenCalled();
+      expect(mockGetVariableCollectionByIdAsync).not.toHaveBeenCalled();
+    });
   });
 });
