@@ -19,10 +19,11 @@ type Props = {
   onCancel: () => void;
   hasErrored?: boolean;
   errorMessage?: string;
+  isLoading?: boolean;
 };
 
 export default function BitbucketForm({
-  onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
+  onChange, onSubmit, onCancel, values, hasErrored, errorMessage, isLoading = false,
 }: Props) {
   const { t } = useTranslation(['storage']);
   const [isMasked, setIsMasked] = React.useState(true);
@@ -251,6 +252,7 @@ export default function BitbucketForm({
             disabled={
               !values.name || (isNewSync && !values.apiToken) || (isEditingAppPasswordSync && !values.secret) || (!isEditingAppPasswordSync && !isNewSync && !values.apiToken)
             }
+            loading={isLoading}
           >
             {t('save')}
           </Button>

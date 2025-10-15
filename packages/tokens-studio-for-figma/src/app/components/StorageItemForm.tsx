@@ -20,11 +20,11 @@ type Props = {
   isNew?: boolean;
   hasErrored?: boolean;
   errorMessage?: string;
-
+  isLoading?: boolean;
 };
 
 export default function StorageItemForm({
-  isNew = false, onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
+  isNew = false, onChange, onSubmit, onCancel, values, hasErrored, errorMessage, isLoading = false,
 }: Props) {
   switch (values.provider) {
     case StorageProviderType.GITHUB:
@@ -37,6 +37,7 @@ export default function StorageItemForm({
           values={values}
           hasErrored={hasErrored}
           errorMessage={errorMessage}
+          isLoading={isLoading}
         />
       );
     }
@@ -49,6 +50,7 @@ export default function StorageItemForm({
           values={values}
           hasErrored={hasErrored}
           errorMessage={errorMessage}
+          isLoading={isLoading}
         />
       );
     }
@@ -61,6 +63,7 @@ export default function StorageItemForm({
           values={values}
           hasErrored={hasErrored}
           errorMessage={errorMessage}
+          isLoading={isLoading}
         />
       );
     }
@@ -73,6 +76,7 @@ export default function StorageItemForm({
           values={values}
           hasErrored={hasErrored}
           errorMessage={errorMessage}
+          isLoading={isLoading}
         />
       );
     }
@@ -85,6 +89,7 @@ export default function StorageItemForm({
           values={values}
           hasErrored={hasErrored}
           errorMessage={errorMessage}
+          isLoading={isLoading}
         />
       );
     }
@@ -98,6 +103,7 @@ export default function StorageItemForm({
           values={values}
           hasErrored={hasErrored}
           errorMessage={errorMessage}
+          isLoading={isLoading}
         />
       );
     }
@@ -110,6 +116,7 @@ export default function StorageItemForm({
           values={values}
           hasErrored={hasErrored}
           errorMessage={errorMessage}
+          isLoading={isLoading}
         />
       );
     }
@@ -122,6 +129,7 @@ export default function StorageItemForm({
           values={values}
           hasErrored={hasErrored}
           errorMessage={errorMessage}
+          isLoading={isLoading}
         />
       );
     }

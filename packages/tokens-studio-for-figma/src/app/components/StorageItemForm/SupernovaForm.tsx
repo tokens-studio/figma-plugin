@@ -18,10 +18,11 @@ type Props = {
   onCancel: () => void;
   hasErrored?: boolean;
   errorMessage?: string;
+  isLoading?: boolean;
 };
 
 export default function SupernovaForm({
-  onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
+  onChange, onSubmit, onCancel, values, hasErrored, errorMessage, isLoading = false,
 }: Props) {
   const inputEl = useRef<HTMLInputElement | null>(null);
   const [isMasked, setIsMasked] = React.useState(true);
@@ -121,6 +122,7 @@ export default function SupernovaForm({
             variant="primary"
             type="submit"
             disabled={!values.secret && !values.name && !values.designSystemUrl && !values.mapping}
+            loading={isLoading}
           >
             {t('save')}
           </Button>
