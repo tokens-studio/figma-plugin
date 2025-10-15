@@ -258,6 +258,9 @@ export const settings = createModel<RootModel>()({
     setShouldSwapStyles: (payload, rootState) => {
       setUI(rootState.settings);
     },
+    setShouldSwapFigmaModes: (payload, rootState) => {
+      setUI(rootState.settings);
+    },
     setShouldUpdateStyles: (payload, rootState) => {
       setUI(rootState.settings);
     },
