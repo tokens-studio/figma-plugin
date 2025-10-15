@@ -43,7 +43,7 @@ export function useGitHub() {
 
   const storageClientFactory = useCallback((context: GithubCredentials, owner?: string, repo?: string) => {
     const splitContextId = context.id.split('/');
-    const storageClient = new GithubTokenStorage(context.secret, owner ?? splitContextId[0], repo ?? splitContextId[1], context.baseUrl ?? '');
+    const storageClient = new GithubTokenStorage(context.secret, owner ?? splitContextId[0], repo ?? splitContextId[1], context.baseUrl);
 
     if (context.filePath) storageClient.changePath(context.filePath);
     if (context.branch) storageClient.selectBranch(context.branch);

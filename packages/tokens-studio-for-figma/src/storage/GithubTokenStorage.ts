@@ -51,13 +51,42 @@ const octokitClientDefaultHeaders = {
 export class GithubTokenStorage extends GitTokenStorage {
   private octokitClient: ExtendedOctokitClient;
 
+  /**
+   * Normalizes GitHub Enterprise base URL for API usage
+   * @param baseUrl The user-provided base URL
+   * @returns Normalized API URL or undefined for default GitHub
+   */
+  private static normalizeGitHubEnterpriseUrl(baseUrl?: string): string | undefined {
+    if (!baseUrl || baseUrl.trim() === '') {
+      return undefined; // Use default GitHub.com API
+    }
+
+    let normalizedUrl = baseUrl.trim();
+    
+    // Add protocol if missing
+    if (!normalizedUrl.startsWith('http://') && !normalizedUrl.startsWith('https://')) {
+      normalizedUrl = `https://${normalizedUrl}`;
+    }
+    
+    // Remove trailing slash
+    normalizedUrl = normalizedUrl.replace(/\/$/, '');
+    
+    // Add /api/v3 if not present (GitHub Enterprise Server API endpoint)
+    if (!normalizedUrl.includes('/api/v3')) {
+      normalizedUrl = `${normalizedUrl}/api/v3`;
+    }
+    
+    return normalizedUrl;
+  }
+
   constructor(
     secret: string,
     owner: string,
     repository: string,
     baseUrl?: string,
   ) {
-    super(secret, owner, repository, baseUrl);
+    const normalizedBaseUrl = GithubTokenStorage.normalizeGitHubEnterpriseUrl(baseUrl);
+    super(secret, owner, repository, normalizedBaseUrl);
     this.flags = {
       multiFileEnabled: false,
     };
@@ -66,7 +95,7 @@ export class GithubTokenStorage extends GitTokenStorage {
     const ExtendedOctokitConstructor = Octokit.plugin(require('octokit-commit-multiple-files'));
     this.octokitClient = new ExtendedOctokitConstructor({
       auth: this.secret,
-      baseUrl: this.baseUrl || undefined,
+      baseUrl: normalizedBaseUrl,
     }) as ExtendedOctokitClient;
   }
 

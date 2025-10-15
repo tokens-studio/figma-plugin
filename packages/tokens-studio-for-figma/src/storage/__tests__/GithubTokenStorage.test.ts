@@ -30,6 +30,35 @@ describe('GithubTokenStorage', () => {
     expect(getTreeMode('file')).toEqual('100644');
   });
 
+  it('should normalize GitHub Enterprise URLs correctly', () => {
+    // Test cases for GitHub Enterprise URL normalization
+    const testCases = [
+      // Empty/undefined cases should return undefined for default GitHub.com
+      { input: undefined, expected: undefined },
+      { input: '', expected: undefined },
+      { input: '   ', expected: undefined },
+      
+      // Domain-only cases should add protocol and API path
+      { input: 'github.enterprise.com', expected: 'https://github.enterprise.com/api/v3' },
+      { input: 'github.enterprise.com/', expected: 'https://github.enterprise.com/api/v3' },
+      
+      // Full URL cases should normalize properly  
+      { input: 'https://github.enterprise.com', expected: 'https://github.enterprise.com/api/v3' },
+      { input: 'https://github.enterprise.com/', expected: 'https://github.enterprise.com/api/v3' },
+      { input: 'https://github.enterprise.com/api/v3', expected: 'https://github.enterprise.com/api/v3' },
+      { input: 'http://github.enterprise.com', expected: 'http://github.enterprise.com/api/v3' },
+      
+      // Edge cases
+      { input: 'straumann.ghe.com', expected: 'https://straumann.ghe.com/api/v3' },
+    ];
+
+    testCases.forEach(({ input, expected }) => {
+      const storage = new GithubTokenStorage('token', 'owner', 'repo', input);
+      // Access the baseUrl from the parent class to verify normalization
+      expect((storage as any).baseUrl).toEqual(expected);
+    });
+  });
+
   it('should fetch branches as a simple list', async () => {
     expect(
       await storageProvider.fetchBranches(),
