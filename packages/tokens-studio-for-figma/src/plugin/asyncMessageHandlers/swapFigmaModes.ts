@@ -1,6 +1,17 @@
 import { UpdateMode } from '@/constants/UpdateMode';
-import { ThemeObjectsList } from '@/types';
+import { ThemeObjectsList, ThemeObject } from '@/types';
 import { notifyUI, notifyException } from '../notifiers';
+
+// Type predicate to check for Figma theme with collection and mode IDs
+function isFigmaThemeWithCollectionAndMode(
+  theme: ThemeObject | undefined,
+): theme is ThemeObject & { $figmaCollectionId: string; $figmaModeId: string } {
+  return (
+    theme != null
+    && typeof theme.$figmaCollectionId === 'string'
+    && typeof theme.$figmaModeId === 'string'
+  );
+}
 
 function getRootNode(updateMode: UpdateMode) {
   const rootNode: (SceneNode | PageNode)[] = [];
@@ -29,9 +40,7 @@ export async function swapFigmaModes(activeTheme: Record<string, string>, themes
   const activeThemeIds = Object.values(activeTheme);
   const activeThemeObjects = activeThemeIds
     .map((id) => themes.find((theme) => theme.id === id))
-    .filter((theme): theme is NonNullable<typeof theme> & { $figmaCollectionId: string; $figmaModeId: string } => (
-      theme != null && theme.$figmaCollectionId != null && theme.$figmaModeId != null
-    ));
+    .filter(isFigmaThemeWithCollectionAndMode);
 
   if (activeThemeObjects.length === 0) {
     // No Figma collection/mode information available for any active theme
@@ -75,8 +84,9 @@ export async function swapFigmaModes(activeTheme: Record<string, string>, themes
   const rootNodes = getRootNode(updateMode);
 
   // Apply all valid collection/mode pairs to each root node
-  rootNodes.forEach((node) => {
-    validCollectionModePairs.forEach(({ collection, modeId }) => {
+  // Batch operations to reduce iterations: apply all collections to a node at once
+  for (const node of rootNodes) {
+    for (const { collection, modeId } of validCollectionModePairs) {
       try {
         // Pass the collection object instead of ID (new API)
         node.setExplicitVariableModeForCollection(collection, modeId);
@@ -91,6 +101,6 @@ export async function swapFigmaModes(activeTheme: Record<string, string>, themes
           nodeType: node.type,
         });
       }
-    });
-  });
+    }
+  }
 }
