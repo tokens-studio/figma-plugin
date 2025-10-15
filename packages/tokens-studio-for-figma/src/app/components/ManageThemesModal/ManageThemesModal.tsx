@@ -256,7 +256,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
                 loading={isAttachingLocalVariables}
                 onClick={handleAttachAllVariables}
               >
-                Attach all variables
+                {t('attachAllVariables')}
               </Button>
               <Button
                 data-testid="button-manage-themes-modal-new-theme"
