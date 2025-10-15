@@ -7,9 +7,11 @@ import debounce from 'lodash.debounce';
 import { Button, EmptyState } from '@tokens-studio/ui';
 import { styled } from '@stitches/react';
 import { useTranslation } from 'react-i18next';
-import { activeThemeSelector, themesListSelector } from '@/selectors';
+import {
+  activeThemeSelector, themesListSelector, tokensSelector, isWaitingForBackgroundJobSelector,
+} from '@/selectors';
 import Modal from '../Modal';
-import { Dispatch } from '@/app/store';
+import { Dispatch, RootState } from '@/app/store';
 import Stack from '../Stack';
 import IconPlus from '@/icons/plus.svg';
 import { CreateOrEditThemeForm, FormValues } from './CreateOrEditThemeForm';
@@ -26,6 +28,10 @@ import { TreeItem, themeListToTree } from '@/utils/themeListToTree';
 import { ItemData } from '@/context';
 import { checkReorder } from '@/utils/motion';
 import { ensureFolderIsTogether, findOrderableTargetIndexesInThemeList } from '@/utils/dragDropOrder';
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { AsyncMessageTypes } from '@/types/AsyncMessages';
+import { BackgroundJobs } from '@/constants/BackgroundJobs';
+import { wrapTransaction } from '@/profiling/transaction';
 
 type Props = unknown;
 
@@ -44,6 +50,10 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
   const dispatch = useDispatch<Dispatch>();
   const themes = useSelector(themesListSelector);
   const activeTheme = useSelector(activeThemeSelector);
+  const tokens = useSelector(tokensSelector);
+  const isAttachingLocalVariables = useSelector(useCallback((state: RootState) => (
+    isWaitingForBackgroundJobSelector(state, BackgroundJobs.UI_ATTACHING_LOCAL_VARIABLES)
+  ), []));
   const { confirm } = useConfirm();
   const [themeEditorOpen, setThemeEditorOpen] = useState<boolean | string>(false);
   const [themeListScrollPosition, setThemeListScrollPosition] = useState<number>(0);
@@ -186,6 +196,47 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
 
   const debouncedHandleThemeListScroll = useMemo(() => debounce(handleThemeListScroll, 200), [handleThemeListScroll]);
 
+  const handleAttachAllVariables = useCallback(async () => {
+    if (themes.length === 0) return;
+
+    dispatch.uiState.startJob({
+      name: BackgroundJobs.UI_ATTACHING_LOCAL_VARIABLES,
+      isInfinite: true,
+    });
+
+    const themeVariableResults: Record<string, any> = {};
+
+    for (const theme of themes) {
+      try {
+        const result = await wrapTransaction({ name: 'attachVariables' }, async () => await AsyncMessageChannel.ReactInstance.message({
+          type: AsyncMessageTypes.ATTACH_LOCAL_VARIABLES_TO_THEME,
+          tokens,
+          theme,
+        }));
+
+        if (result.variableInfo) {
+          themeVariableResults[theme.id] = result.variableInfo;
+        }
+      } catch (error) {
+        console.error(`Error attaching variables to theme ${theme.name}:`, error);
+      }
+    }
+
+    const totalAttached = Object.values(themeVariableResults).reduce((sum, info) => (
+      sum + Object.values(info.variableIds || {}).length
+    ), 0);
+
+    if (totalAttached > 0) {
+      track('Attach variables to all themes', {
+        count: totalAttached,
+        themesProcessed: Object.keys(themeVariableResults).length,
+      });
+      dispatch.tokenState.assignVariableIdsToTheme(themeVariableResults);
+    }
+
+    dispatch.uiState.completeJob(BackgroundJobs.UI_ATTACHING_LOCAL_VARIABLES);
+  }, [themes, tokens, dispatch]);
+
   return (
     <Modal
       id="manage-themes-modal"
@@ -197,14 +248,25 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
       footer={(
         <Stack gap={2} direction="row" justify="end">
           {!themeEditorOpen && (
-            <Button
-              data-testid="button-manage-themes-modal-new-theme"
-              variant="secondary"
-              icon={<IconPlus />}
-              onClick={handleToggleOpenThemeEditor}
-            >
-              {t('newTheme')}
-            </Button>
+            <>
+              <Button
+                data-testid="button-manage-themes-modal-attach-all-variables"
+                variant="secondary"
+                disabled={isAttachingLocalVariables || themes.length === 0}
+                loading={isAttachingLocalVariables}
+                onClick={handleAttachAllVariables}
+              >
+                Attach all variables
+              </Button>
+              <Button
+                data-testid="button-manage-themes-modal-new-theme"
+                variant="secondary"
+                icon={<IconPlus />}
+                onClick={handleToggleOpenThemeEditor}
+              >
+                {t('newTheme')}
+              </Button>
+            </>
           )}
           {themeEditorOpen && (
             <>
