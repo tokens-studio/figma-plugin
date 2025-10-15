@@ -1,5 +1,6 @@
 import { ApplyVariablesStylesOrRawValues } from '@/constants/ApplyVariablesStyleOrder';
 import { defaultTokenValueRetriever } from '@/plugin/TokenValueRetriever';
+import { logApplyVariableError } from './error/logApplyVariableError';
 
 export async function tryApplyVariableId(node: SceneNode, type: VariableBindableNodeField, token: string) {
   const { applyVariablesStylesOrRawValue } = defaultTokenValueRetriever;
@@ -26,7 +27,7 @@ export async function tryApplyVariableId(node: SceneNode, type: VariableBindable
         return valueOnVariable === valueOnNode;
       }
     } catch (e) {
-      console.log('error', e);
+      logApplyVariableError(e);
     }
   }
   return false;

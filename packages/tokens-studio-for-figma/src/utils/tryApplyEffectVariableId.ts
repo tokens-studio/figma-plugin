@@ -1,5 +1,6 @@
 import { ApplyVariablesStylesOrRawValues } from '@/constants/ApplyVariablesStyleOrder';
 import { defaultTokenValueRetriever } from '@/plugin/TokenValueRetriever';
+import { logApplyVariableError } from './error/logApplyVariableError';
 
 export async function tryApplyEffectVariableId(effect: Effect, token: string) {
   const { applyVariablesStylesOrRawValue } = defaultTokenValueRetriever;
@@ -10,7 +11,7 @@ export async function tryApplyEffectVariableId(effect: Effect, token: string) {
   try {
     return figma.variables.setBoundVariableForEffect(effect, 'color', variable);
   } catch (e) {
-    console.log('error', e);
+    logApplyVariableError(e);
   }
   return false;
 }

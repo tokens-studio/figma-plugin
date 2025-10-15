@@ -1,32 +1,16 @@
 import hash from 'object-hash';
 import {
-  AsyncMessageResults, AsyncMessageResultsMap, AsyncMessages, AsyncMessagesMap, AsyncMessageTypes,
+  AsyncMessageResults, AsyncMessages, AsyncMessageTypes,
 } from './types/AsyncMessages';
+import {
+  AsyncMessageChannelHandlers,
+  IncomingMessageEvent,
+} from './types/AsyncMessageChannelTypes';
 
 import { AsyncMessageChannelPreview } from './AsyncMessageChannelPreview';
 
-// credits goes to https://github.com/microsoft/TypeScript/issues/23182#issuecomment-379091887
-type IsTypeOnlyObject<Obj extends Record<PropertyKey, unknown>> = [keyof Obj] extends ['type'] ? true : false;
-
-type IncomingMessageEvent<Message = unknown> = {
-  data: {
-    pluginMessage: {
-      id: string
-      message: Message
-    } | {
-      id: string
-      error: unknown
-    }
-  }
-};
-
-export type AsyncMessageChannelHandlers = {
-  [K in AsyncMessageTypes]: (incoming: AsyncMessagesMap[K]) => Promise<
-  IsTypeOnlyObject<AsyncMessageResultsMap[K]> extends true
-    ? void
-    : Omit<AsyncMessageResultsMap[K], 'type'>
-  >
-};
+// Re-export for backward compatibility
+export type { AsyncMessageChannelHandlers } from './types/AsyncMessageChannelTypes';
 
 class AsyncMessageChannel {
   public static PluginInstance: AsyncMessageChannel = new AsyncMessageChannel(true);

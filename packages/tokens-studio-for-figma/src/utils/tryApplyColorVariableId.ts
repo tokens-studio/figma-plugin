@@ -1,6 +1,7 @@
 import { clone } from '@figma-plugin/helpers';
 import { defaultTokenValueRetriever } from '@/plugin/TokenValueRetriever';
 import { ApplyVariablesStylesOrRawValues } from '@/constants/ApplyVariablesStyleOrder';
+import { logApplyVariableError } from './error/logApplyVariableError';
 
 export enum ColorPaintType {
   FILLS = 'fills',
@@ -40,7 +41,7 @@ export async function tryApplyColorVariableId(target: BaseNode | PaintStyle, tok
       return target.boundVariables?.paints?.[0]?.id === variable.id;
     }
   } catch (e) {
-    console.log('error', e);
+    logApplyVariableError(e);
   }
   return false;
 }
