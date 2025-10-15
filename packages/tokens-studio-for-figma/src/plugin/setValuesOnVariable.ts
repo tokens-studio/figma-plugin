@@ -33,6 +33,35 @@ export default async function setValuesOnVariable(
   // Use the passed-in global progress tracker to avoid double counting
   const promises: Set<Promise<void>> = new Set();
 
+  // Pre-fetch all variables referenced by variableId to avoid individual async lookups
+  // This is much more efficient than fetching one-by-one during token processing
+  const variableIdCache = new Map<string, Variable>();
+  const variableIdsToFetch = new Set<string>();
+
+  tokens.forEach((token) => {
+    if (token.variableId) {
+      variableIdsToFetch.add(token.variableId);
+    }
+  });
+
+  // Fetch all referenced variables in parallel
+  await Promise.all(
+    Array.from(variableIdsToFetch).map(async (variableId) => {
+      try {
+        const variable = await figma.variables.getVariableByIdAsync(variableId);
+        if (variable && variable.variableCollectionId === collection.id) {
+          variableIdCache.set(variableId, variable);
+          // Add to local cache if not already present
+          if (!variablesInFigma.some((v) => v.id === variable.id)) {
+            variablesInFigma.push(variable);
+          }
+        }
+      } catch (e) {
+        // Variable doesn't exist or can't be accessed - skip it
+      }
+    }),
+  );
+
   try {
     // Process tokens using variableWorker with higher batch size for better performance
     tokens.forEach((token) => {
@@ -47,8 +76,34 @@ export default async function setValuesOnVariable(
             ? variablesInFigma.find((v) => v.key === token.variableId && !v.remote)
             : variablesInFigma.find((v) => v.name === token.path);
 
+          // If not found in local collection, check the pre-fetched cache
+          if (!variable && token.variableId) {
+            variable = variableIdCache.get(token.variableId);
+          }
+
+          // If still no variable, try one more time to find by name in case it was just created
           if (!variable) {
-            variable = figma.variables.createVariable(token.path, collection, variableType);
+            variable = variablesInFigma.find((v) => v.name === token.path && v.variableCollectionId === collection.id);
+          }
+
+          if (!variable) {
+            try {
+              variable = figma.variables.createVariable(token.path, collection, variableType);
+              // Add to local cache immediately
+              variablesInFigma.push(variable);
+            } catch (e) {
+              // If creation fails (e.g., duplicate name), try to find the existing variable by name one more time
+              // This can happen if the variable was created in a previous run but the reference wasn't saved
+              const existingVariable = figma.variables.getLocalVariables().find(
+                (v) => v.name === token.path && v.variableCollectionId === collection.id,
+              );
+              if (existingVariable) {
+                variable = existingVariable;
+                variablesInFigma.push(variable);
+              } else {
+                throw e; // Re-throw if we still can't find/create the variable
+              }
+            }
           }
 
           if (variable) {

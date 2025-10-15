@@ -16,6 +16,7 @@ import { getOverallConfig } from '@/utils/tokenHelpers';
 import { generateTokensToCreate } from './generateTokensToCreate';
 import checkIfTokenCanCreateVariable from '@/utils/checkIfTokenCanCreateVariable';
 import { ProgressTracker } from './ProgressTracker';
+import { preResolveVariableReferences } from './preResolveVariableReferences';
 
 export type LocalVariableInfo = {
   collectionId: string;
@@ -55,6 +56,10 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
         isInfinite: true,
       },
     });
+
+    // Pre-resolve all variable references from themes to avoid bricking existing references
+    // Only references that can be successfully resolved will be used during variable creation
+    const validatedVariableCache = await preResolveVariableReferences(themeInfo.themes, selectedThemes);
 
     const overallConfig = getOverallConfig(themeInfo.themes, selectedThemes);
     const collections = await createNecessaryVariableCollections(themeInfo.themes, selectedThemes);
@@ -119,7 +124,7 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
       }
     }
     // Gather references that we should use. Merge current theme references with the ones from all themes as well as local variables
-    const existingVariables = await mergeVariableReferencesWithLocalVariables(selectedThemeObjects, themeInfo.themes);
+    const existingVariables = await mergeVariableReferencesWithLocalVariables(selectedThemeObjects, themeInfo.themes, validatedVariableCache);
 
     // Complete the variable creation job before starting reference updates
     if (totalVariableTokens > 10) {
