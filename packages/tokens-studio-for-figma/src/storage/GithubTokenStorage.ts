@@ -62,20 +62,20 @@ export class GithubTokenStorage extends GitTokenStorage {
     }
 
     let normalizedUrl = baseUrl.trim();
-    
+
     // Add protocol if missing
     if (!normalizedUrl.startsWith('http://') && !normalizedUrl.startsWith('https://')) {
       normalizedUrl = `https://${normalizedUrl}`;
     }
-    
+
     // Remove trailing slash
     normalizedUrl = normalizedUrl.replace(/\/$/, '');
-    
+
     // Add /api/v3 if not present (GitHub Enterprise Server API endpoint)
     if (!normalizedUrl.includes('/api/v3')) {
       normalizedUrl = `${normalizedUrl}/api/v3`;
     }
-    
+
     return normalizedUrl;
   }
 

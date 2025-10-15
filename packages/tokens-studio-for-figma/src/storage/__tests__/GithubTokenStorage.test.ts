@@ -37,17 +37,17 @@ describe('GithubTokenStorage', () => {
       { input: undefined, expected: undefined },
       { input: '', expected: undefined },
       { input: '   ', expected: undefined },
-      
+
       // Domain-only cases should add protocol and API path
       { input: 'github.enterprise.com', expected: 'https://github.enterprise.com/api/v3' },
       { input: 'github.enterprise.com/', expected: 'https://github.enterprise.com/api/v3' },
-      
-      // Full URL cases should normalize properly  
+
+      // Full URL cases should normalize properly
       { input: 'https://github.enterprise.com', expected: 'https://github.enterprise.com/api/v3' },
       { input: 'https://github.enterprise.com/', expected: 'https://github.enterprise.com/api/v3' },
       { input: 'https://github.enterprise.com/api/v3', expected: 'https://github.enterprise.com/api/v3' },
       { input: 'http://github.enterprise.com', expected: 'http://github.enterprise.com/api/v3' },
-      
+
       // Edge cases
       { input: 'straumann.ghe.com', expected: 'https://straumann.ghe.com/api/v3' },
     ];
