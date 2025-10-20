@@ -4,6 +4,7 @@ import {
 import * as Sentry from '@sentry/react';
 import { AnyTokenSet } from '@/types/tokens';
 import { notifyToUI } from '@/plugin/notifiers';
+import { deepClone } from '@/utils/deepClone';
 import {
   RemoteTokenStorage,
   RemoteTokenstorageErrorMessage,
@@ -93,7 +94,7 @@ async function getProjectData(id: string, orgId: string, client: any): Promise<P
     const returnData = tokenSets.reduce(
       (acc, tokenSet) => {
         if (!tokenSet.name) return acc;
-        acc.tokens[tokenSet.name] = JSON.parse(JSON.stringify(tokenSet.raw));
+        acc.tokens[tokenSet.name] = deepClone(tokenSet.raw);
         acc.tokenSets[tokenSet.name] = { isDynamic: tokenSet.type === TokenSetType.Dynamic };
         return acc;
       },

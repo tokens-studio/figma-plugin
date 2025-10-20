@@ -3,6 +3,7 @@ import { Direction } from '@/constants/Direction';
 import { StyleIdBackupKeys } from '@/constants/StyleIdBackupKeys';
 import { notifyUI } from '@/plugin/notifiers';
 import { SelectionValue } from '@/types';
+import { deepClone } from './deepClone';
 
 const DIST = 80;
 const BASE_SIZE = 12;
@@ -185,7 +186,7 @@ function createAnno(tokens: SelectionValue, direction: Direction) {
       break;
   }
   /* make a copy of the original node */
-  const arrowCopy = JSON.parse(JSON.stringify(arrow.vectorNetwork));
+  const arrowCopy = deepClone(arrow.vectorNetwork);
 
   /* if it has a strokeCap property, change */
   if ('strokeCap' in arrowCopy.vertices[arrowCopy.vertices.length - 1]) {
