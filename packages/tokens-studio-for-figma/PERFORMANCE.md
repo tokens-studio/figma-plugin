@@ -177,6 +177,13 @@ import { deepClone } from '@/utils/deepClone';
 const clone = deepClone(obj);
 ```
 
+**Note:** When you need to modify properties that are read-only in the original object (e.g., Figma API objects), use JSON cloning as `structuredClone` preserves property descriptors:
+
+```typescript
+// For Figma API objects with read-only properties
+const clone = JSON.parse(JSON.stringify(figmaObject));
+```
+
 ### Token Resolution
 
 The TokenResolver class uses memoization to cache resolved token values. Always reuse the same resolver instance when possible:
