@@ -239,6 +239,15 @@ describe('updateVariables', () => {
       aliasBaseFontSize: '{typography.baseline}',
     };
 
+    await updateVariables({
+      collection,
+      mode: '1:0',
+      theme: mobileTheme,
+      tokens: mobileTokens,
+      settings: settingsWithAlias,
+      overallConfig: { mobile: TokenSetStatus.ENABLED },
+    });
+
     // Verify that 1rem was converted to 16px (1 * 16)
     expect(mockSetValueForMode).toHaveBeenCalledWith('1:0', 16);
     // Verify that 2rem was converted to 32px (2 * 16)
@@ -273,6 +282,15 @@ describe('updateVariables', () => {
     };
 
     mockSetValueForMode.mockClear();
+
+    await updateVariables({
+      collection,
+      mode: '1:1',
+      theme: tabletTheme,
+      tokens: tabletTokens,
+      settings: settingsWithAlias,
+      overallConfig: { tablet: TokenSetStatus.ENABLED },
+    });
 
     // Verify that 1rem was converted to 15px (1 * 15)
     expect(mockSetValueForMode).toHaveBeenCalledWith('1:1', 15);
