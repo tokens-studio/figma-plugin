@@ -93,12 +93,9 @@ export default function SecondScreen() {
             border: '1px solid $borderWarning',
           }}
         >
-          <ExclamationTriangleIcon
-            style={{
-              color: 'var(--colors-dangerFg)',
-              flexShrink: 0,
-            }}
-          />
+          <Box css={{ color: '$dangerFg', flexShrink: 0 }}>
+            <ExclamationTriangleIcon />
+          </Box>
           <StyledP css={{ margin: 0 }}>
             {t('secondScreenDeprecationNotice')}
           </StyledP>
