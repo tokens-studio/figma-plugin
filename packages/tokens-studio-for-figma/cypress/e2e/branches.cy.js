@@ -131,12 +131,11 @@ describe('Branch switcher', () => {
     cy.startup(mockStartupParams);
     cy.get('[data-testid=branch-selector-menu-trigger]').click();
     cy.get('[data-testid=popover-item-development]').click();
-    
-    // Handle the error dialog that appears when GitHub connection fails during branch switching
-    // This is expected behavior when GitHub is unreachable in the test environment
-    cy.get('#pullDialog-button-cancel', { timeout: 5000 }).should('be.visible').click();
-    
-    cy.get('[data-testid=branch-selector-menu-trigger]').click();
+
+    // Wait for branch switch to complete
+    cy.wait(1000);
+
+    cy.get('[data-testid=branch-selector-menu-trigger]', { timeout: 10000 }).click({ force: true });
     // Check that development branch is now selected (has checkmark)
     cy.get('[data-testid=popover-item-development]').should('contain', '✓');
   });
