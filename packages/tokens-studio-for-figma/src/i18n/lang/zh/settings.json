@@ -32,6 +32,7 @@
   "storeTokenId": "将 ID 存储在存储器上",
   "storeTokenIdExplanation": "自动为您的令牌生成唯一 ID 以进行跟踪。",
   "secondScreenExplainer": "增强您的设计工作流程，让您可以在第二个屏幕中管理您的 Token。",
+  "secondScreenDeprecationNotice": "Second Screen 将于 12 月 31 日关闭。我们建议切换到 Studio 以获得更好的体验。",
   "language": "语言",
   "languageExplainer": "Tokens Studio 已经过 Mr. Biscuit 手动翻译，因此翻译较为准确。\n 没有看到您的语言？提交功能请求",
   "liveSyncActive": "实时同步激活",

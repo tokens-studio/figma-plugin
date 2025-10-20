@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  Link1Icon, LinkBreak1Icon, EnterIcon, ExitIcon, ExternalLinkIcon,
+  Link1Icon, LinkBreak1Icon, EnterIcon, ExitIcon, ExternalLinkIcon, ExclamationTriangleIcon,
 } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
 import {
@@ -80,6 +80,30 @@ export default function SecondScreen() {
             <StyledReadMoreLink href="https://docs.tokens.studio/sync/second-screen" target="_blank" rel="noreferrer">{t('readMore', { ns: 'general' })}</StyledReadMoreLink>
           </StyledP>
         </Stack>
+
+        <Box
+          css={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '$2',
+            margin: '0 $4',
+            padding: '$3 $4',
+            backgroundColor: '$bgWarning',
+            borderRadius: '$small',
+            border: '1px solid $borderWarning',
+          }}
+        >
+          <ExclamationTriangleIcon
+            style={{
+              color: 'var(--colors-dangerFg)',
+              flexShrink: 0,
+            }}
+          />
+          <StyledP css={{ margin: 0 }}>
+            {t('secondScreenDeprecationNotice')}
+          </StyledP>
+        </Box>
+
         {
           user ? (
             <>

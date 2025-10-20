@@ -21,6 +21,7 @@
   "debugging": "Debugging",
   "enableSessionRecording": "Grant permission to record session for bugfixing",
   "secondScreenExplainer": "Empower your design workflow, allowing you to manage your design tokens in a second screen.",
+  "secondScreenDeprecationNotice": "Second Screen will be shut down on December 31st. We recommend switching to Studio for a better experience.",
   "liveSync": "Live Sync",
   "signInToContinue": "Sign in to continue",
   "signedInAs": "Signed in as",
