@@ -132,8 +132,8 @@ describe('Branch switcher', () => {
     cy.get('[data-testid=branch-selector-menu-trigger]').click();
     cy.get('[data-testid=popover-item-development]').click();
 
-    // Wait for branch switch to complete
-    cy.wait(1000);
+    // Wait for branch switch to complete by checking that the branch selector trigger contains "development"
+    cy.get('[data-testid=branch-selector-menu-trigger]', { timeout: 10000 }).should('contain', 'development');
 
     cy.get('[data-testid=branch-selector-menu-trigger]', { timeout: 10000 }).click({ force: true });
     // Check that development branch is now selected (has checkmark)
