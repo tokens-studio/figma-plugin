@@ -9,73 +9,87 @@ import setNumberValuesOnVariable from './setNumberValuesOnVariable';
 import setStringValuesOnVariable from './setStringValuesOnVariable';
 import { UpdateTokenVariablePayload } from '@/types/payloads/UpdateTokenVariablePayload';
 import { checkCanReferenceVariable } from '@/utils/alias/checkCanReferenceVariable';
+import { wrapTransaction } from '@/profiling/transaction';
 
 export default async function updateVariablesFromPlugin(payload: UpdateTokenVariablePayload) {
-  const themeInfo = await AsyncMessageChannel.PluginInstance.message({
-    type: AsyncMessageTypes.GET_THEME_INFO,
-  });
-  const variableMap = await getVariablesMap();
-  const nameToVariableMap = (await figma.variables.getLocalVariablesAsync())?.reduce<Record<string, Variable>>((acc, curr) => {
-    acc[curr.name] = curr;
-    return acc;
-  }, {});
+  return wrapTransaction(
+    {
+      name: 'updateVariablesFromPlugin',
+      description: 'Update variables from plugin with new token values',
+      statExtractor: (_, transaction) => {
+        transaction.setTag('tokenType', payload.type);
+        transaction.setTag('tokenParent', payload.parent);
+        transaction.setTag('isReference', checkCanReferenceVariable(payload));
+      },
+    },
+    async () => {
+      const themeInfo = await AsyncMessageChannel.PluginInstance.message({
+        type: AsyncMessageTypes.GET_THEME_INFO,
+      });
+      const variableMap = await getVariablesMap();
+      const nameToVariableMap = (await figma.variables.getLocalVariablesAsync())?.reduce<Record<string, Variable>>((acc, curr) => {
+        acc[curr.name] = curr;
+        return acc;
+      }, {});
 
-  themeInfo.themes.forEach((theme) => {
-    if (
-      Object.entries(theme.selectedTokenSets).some(
-        ([tokenSet, status]) => status === TokenSetStatus.ENABLED && tokenSet === payload.parent,
-      )
-    ) {
-      // Filter themes which contains this token
-      if (theme.$figmaVariableReferences?.[payload.name] && theme.$figmaModeId) {
-        const variable = variableMap[theme?.$figmaVariableReferences?.[payload.name]];
-        if (Object.values(themeInfo.activeTheme).includes(theme.id)) {
-          if (checkCanReferenceVariable(payload)) {
-            // If new token reference to another token, we update the variable to reference to another variable
-            let referenceTokenName: string = '';
-            if (payload.rawValue && payload.rawValue?.toString().startsWith('{')) {
-              referenceTokenName = payload.rawValue?.toString().slice(1, payload.rawValue.toString().length - 1);
-            } else {
-              referenceTokenName = payload.rawValue!.toString().substring(1);
-            }
-            const referenceVariable = nameToVariableMap[referenceTokenName.split('.').join('/')];
-            if (referenceVariable) {
-              variable.setValueForMode(theme.$figmaModeId, {
-                type: 'VARIABLE_ALIAS',
-                id: referenceVariable.id,
-              });
-            }
-          } else {
-            switch (payload.type) {
-              case TokenTypes.COLOR:
-                if (typeof payload.value === 'string') {
-                  setColorValuesOnVariable(variable, theme.$figmaModeId, payload.value);
+      themeInfo.themes.forEach((theme) => {
+        if (
+          Object.entries(theme.selectedTokenSets).some(
+            ([tokenSet, status]) => status === TokenSetStatus.ENABLED && tokenSet === payload.parent,
+          )
+        ) {
+          // Filter themes which contains this token
+          if (theme.$figmaVariableReferences?.[payload.name] && theme.$figmaModeId) {
+            const variable = variableMap[theme?.$figmaVariableReferences?.[payload.name]];
+            if (Object.values(themeInfo.activeTheme).includes(theme.id)) {
+              if (checkCanReferenceVariable(payload)) {
+                // If new token reference to another token, we update the variable to reference to another variable
+                let referenceTokenName: string = '';
+                if (payload.rawValue && payload.rawValue?.toString().startsWith('{')) {
+                  referenceTokenName = payload.rawValue?.toString().slice(1, payload.rawValue.toString().length - 1);
+                } else {
+                  referenceTokenName = payload.rawValue!.toString().substring(1);
                 }
-                break;
-              case TokenTypes.BOOLEAN:
-                if (typeof payload.value === 'string') {
-                  setBooleanValuesOnVariable(variable, theme.$figmaModeId, payload.value);
+                const referenceVariable = nameToVariableMap[referenceTokenName.split('.').join('/')];
+                if (referenceVariable) {
+                  variable.setValueForMode(theme.$figmaModeId, {
+                    type: 'VARIABLE_ALIAS',
+                    id: referenceVariable.id,
+                  });
                 }
-                break;
-              case TokenTypes.TEXT:
-                if (typeof payload.value === 'string') {
-                  setStringValuesOnVariable(variable, theme.$figmaModeId, payload.value);
+              } else {
+                switch (payload.type) {
+                  case TokenTypes.COLOR:
+                    if (typeof payload.value === 'string') {
+                      setColorValuesOnVariable(variable, theme.$figmaModeId, payload.value);
+                    }
+                    break;
+                  case TokenTypes.BOOLEAN:
+                    if (typeof payload.value === 'string') {
+                      setBooleanValuesOnVariable(variable, theme.$figmaModeId, payload.value);
+                    }
+                    break;
+                  case TokenTypes.TEXT:
+                    if (typeof payload.value === 'string') {
+                      setStringValuesOnVariable(variable, theme.$figmaModeId, payload.value);
+                    }
+                    break;
+                  case TokenTypes.SIZING:
+                  case TokenTypes.DIMENSION:
+                  case TokenTypes.BORDER_RADIUS:
+                  case TokenTypes.BORDER_WIDTH:
+                  case TokenTypes.SPACING:
+                  case TokenTypes.NUMBER:
+                    setNumberValuesOnVariable(variable, theme.$figmaModeId, Number(payload.value));
+                    break;
+                  default:
+                    break;
                 }
-                break;
-              case TokenTypes.SIZING:
-              case TokenTypes.DIMENSION:
-              case TokenTypes.BORDER_RADIUS:
-              case TokenTypes.BORDER_WIDTH:
-              case TokenTypes.SPACING:
-              case TokenTypes.NUMBER:
-                setNumberValuesOnVariable(variable, theme.$figmaModeId, Number(payload.value));
-                break;
-              default:
-                break;
+              }
             }
           }
         }
-      }
-    }
-  });
+      });
+    },
+  );
 }
