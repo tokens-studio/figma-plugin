@@ -185,7 +185,9 @@ function createAnno(tokens: SelectionValue, direction: Direction) {
       break;
   }
   /* make a copy of the original node */
-  // Note: Using JSON clone here instead of deepClone because we need to modify read-only properties
+  // Note: Using JSON clone here instead of deepClone because structuredClone preserves
+  // property descriptors, which would prevent us from modifying read-only properties in
+  // Figma API objects. JSON clone creates a plain object that we can freely modify.
   const arrowCopy = JSON.parse(JSON.stringify(arrow.vectorNetwork));
 
   /* if it has a strokeCap property, change */
