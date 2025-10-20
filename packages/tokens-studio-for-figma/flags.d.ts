@@ -9,6 +9,5 @@ declare module 'launchdarkly-js-sdk-common' {
     secondScreen?: boolean;
     colorModifier?: boolean;
     idStorage?: boolean;
-    bypassLicenseCheck?: boolean;
   }
 }
