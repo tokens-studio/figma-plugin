@@ -1,4 +1,3 @@
-import compact from 'just-compact';
 import { notifyAPIProviders, notifyUI } from '@/plugin/notifiers';
 import isSameCredentials from './isSameCredentials';
 import { ApiProvidersProperty } from '@/figmaStorage';
@@ -49,9 +48,13 @@ export async function removeSingleCredential(context: StorageTypeCredentials) {
     const data = await ApiProvidersProperty.read();
     let existingProviders: NonNullable<typeof data> = [];
     if (data) {
-      existingProviders = compact(
-        data.map((i) => (isSameCredentials(i, context) ? null : i)).filter((i) => i),
-      );
+      // Optimize: combine map and filter into a single pass
+      existingProviders = data.reduce<NonNullable<typeof data>>((acc, item) => {
+        if (!isSameCredentials(item, context)) {
+          acc.push(item);
+        }
+        return acc;
+      }, []);
     }
     await ApiProvidersProperty.write(existingProviders);
     const newProviders = await ApiProvidersProperty.read();

@@ -8,6 +8,8 @@ This document outlines performance best practices and optimizations made to the 
 
 **Problem:** Using nested `.filter()` operations for duplicate detection resulted in O(n²) complexity.
 
+**Location:** `src/utils/validateGroupName.ts`
+
 **Before:**
 ```typescript
 let possibleDuplicates = newTokensAfterRename.filter((a) => 
@@ -51,6 +53,11 @@ const possibleDuplicates = Array.from(duplicatesMap.values());
 
 **Problem:** Using `JSON.parse(JSON.stringify(obj))` for deep cloning is slow and has limitations.
 
+**Locations:** 
+- `src/app/store/models/tokenState.tsx`
+- `src/storage/TokensStudioTokenStorage.ts`
+- `src/utils/annotations.tsx`
+
 **Before:**
 ```typescript
 const newTokens = JSON.parse(JSON.stringify(state.tokens));
@@ -70,6 +77,32 @@ const newTokens = deepClone(state.tokens);
 - Better error handling
 
 **Implementation:** See `src/utils/deepClone.ts`
+
+### 3. Chained Array Operations (Multiple Iterations → Single Pass)
+
+**Problem:** Using chained `.filter().map()` or `.map().filter()` causes multiple iterations over the same array.
+
+**Locations:**
+- `src/utils/credentials.ts`
+- `src/app/components/TokenSetTree.tsx`
+- `src/app/components/ConfirmDialog.tsx`
+
+**Before:**
+```typescript
+const result = array.filter(item => condition(item)).map(item => item.property);
+```
+
+**After:**
+```typescript
+const result = array.reduce<string[]>((acc, item) => {
+  if (condition(item)) {
+    acc.push(item.property);
+  }
+  return acc;
+}, []);
+```
+
+**Impact:** Reduces from 2 iterations to 1, effectively halving the processing time for these operations.
 
 ## Performance Best Practices
 
