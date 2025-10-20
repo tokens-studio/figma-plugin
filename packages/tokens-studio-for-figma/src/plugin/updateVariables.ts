@@ -5,8 +5,7 @@ import { SettingsState } from '@/app/store/models/settings';
 import checkIfTokenCanCreateVariable from '@/utils/checkIfTokenCanCreateVariable';
 import setValuesOnVariable from './setValuesOnVariable';
 import { mapTokensToVariableInfo } from '@/utils/mapTokensToVariableInfo';
-import { defaultTokenResolver, TokenResolver } from '@/utils/TokenResolver';
-import { mergeTokenGroups } from '@/utils/tokenHelpers';
+import { TokenResolver } from '@/utils/TokenResolver';
 import { getAliasValue } from '@/utils/alias';
 
 export type CreateVariableTypes = {
@@ -30,23 +29,22 @@ export default async function updateVariables({
   filterByTokenSet,
   overallConfig,
 }: CreateVariableTypes) {
-  const tokensToCreate = generateTokensToCreate({
+  // Create a separate TokenResolver instance for this theme to avoid interference
+  // when multiple themes are processed concurrently
+  const themeTokenResolver = new TokenResolver([]);
+
+  const { tokensToCreate, resolvedTokens } = generateTokensToCreate({
     theme,
     tokens,
     filterByTokenSet,
     overallConfig,
+    themeTokenResolver,
   });
 
-  // Resolve the base font size for this specific theme
+  // Resolve the base font size for this specific theme using the same resolved tokens
   let themeBaseFontSize = settings.baseFontSize;
   if (settings.aliasBaseFontSize) {
-    // Create a separate TokenResolver instance for this theme to avoid interference
-    // when multiple themes are processed concurrently
-    const themeTokenResolver = new TokenResolver([]);
-    const themeResolvedTokens = themeTokenResolver.setTokens(
-      mergeTokenGroups(tokens, theme.selectedTokenSets, overallConfig)
-    );
-    const resolvedBaseFontSize = getAliasValue(settings.aliasBaseFontSize, themeResolvedTokens);
+    const resolvedBaseFontSize = getAliasValue(settings.aliasBaseFontSize, resolvedTokens);
     if (resolvedBaseFontSize && typeof resolvedBaseFontSize === 'string') {
       themeBaseFontSize = resolvedBaseFontSize;
     }
@@ -65,7 +63,7 @@ export default async function updateVariables({
   const variablesToCreate: VariableToken[] = [];
   tokensToCreate.forEach((token) => {
     if (checkIfTokenCanCreateVariable(token, settings)) {
-      variablesToCreate.push(mapTokensToVariableInfo(token, theme, settings));
+      variablesToCreate.push(mapTokensToVariableInfo(token, theme, settings, themeBaseFontSize));
     }
   });
 
