@@ -14,9 +14,9 @@ export function useIsProUser() {
   return useMemo(() => {
     // Feature flag to bypass license check when server is down
     // If LaunchDarkly is down, flags.bypassLicenseCheck will be undefined
-    // In that case, default to true to keep the plugin working
+    // In that case, default to false to enforce normal license validation
     if (flags.bypassLicenseCheck === undefined) {
-      return true;
+      return Boolean(existingKey && !licenseKeyError) || Boolean(validPAT);
     }
 
     if (flags.bypassLicenseCheck === true) {
