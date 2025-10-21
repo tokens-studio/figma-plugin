@@ -26,8 +26,7 @@ describe('Navbar', () => {
     expect(mockStore.getState().uiState.activeTab).toEqual(Tabs.SETTINGS);
   });
 
-  // TEMPORARY: Skipped while license check is bypassed
-  it.skip('displays the token flow button if user has access to it via license key', () => {
+  it('displays the token flow button if user has access to it via license key', () => {
     const mockStore = createMockStore({});
     const result = render(
       <Provider store={mockStore}>
@@ -46,8 +45,7 @@ describe('Navbar', () => {
     });
   });
 
-  // TEMPORARY: Skipped while license check is bypassed
-  it.skip('displays the token flow button if user has access to it via Studio PAT', () => {
+  it('displays the token flow button if user has access to it via Studio PAT', () => {
     const mockStore = createMockStore({});
     const result = render(
       <Provider store={mockStore}>
@@ -66,7 +64,6 @@ describe('Navbar', () => {
     });
   });
 
-  // TEMPORARY: Skipped while license check is bypassed
   it('should open the token flow page when the button is clicked', async () => {
     global.open = jest.fn();
 
@@ -86,7 +83,6 @@ describe('Navbar', () => {
     });
   });
 
-  // TEMPORARY: Skipped while license check is bypassed
   it('displays the second screen icon if user has access to it via license key', () => {
     const mockStore = createMockStore({});
     const result = render(
@@ -104,7 +100,6 @@ describe('Navbar', () => {
     });
   });
 
-  // TEMPORARY: Skipped while license check is bypassed
   it('displays the second screen icon if user has access to it via Studio PAT', () => {
     const mockStore = createMockStore({});
     const result = render(
