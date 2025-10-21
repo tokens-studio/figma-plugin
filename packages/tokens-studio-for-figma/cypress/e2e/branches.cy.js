@@ -173,6 +173,9 @@ describe('Branch switcher', () => {
   });
 
   it('shows pro upgrade modal for non-pro users', () => {
+    // Set feature flags to disable license bypass
+    cy.setFeatureFlags({ bypassLicenseCheck: false });
+
     // Create a non-pro user setup
     const nonProUserParams = {
       ...mockStartupParams,
