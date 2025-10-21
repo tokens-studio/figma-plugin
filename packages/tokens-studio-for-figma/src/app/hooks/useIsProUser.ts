@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useSelector } from 'react-redux';
 import { useMemo } from 'react';
 import { licenseKeySelector } from '@/selectors/licenseKeySelector';
@@ -12,17 +11,20 @@ export function useIsProUser() {
   const validPAT = useSelector(tokensStudioPATSelector);
   const flags = useFlags();
 
-  // TEMPORARY: License server and LaunchDarkly are down, always return true
-  return useMemo(() => true, []);
-
-  /* Original implementation - restore when servers are back up
   return useMemo(() => {
     // Feature flag to bypass license check when server is down
-    if (flags.bypassLicenseCheck) {
+    // If LaunchDarkly is down, flags.bypassLicenseCheck will be undefined
+    // In that case, default to true to keep the plugin working
+    if (flags.bypassLicenseCheck === undefined) {
       return true;
     }
 
+    if (flags.bypassLicenseCheck === true) {
+      // Feature flag explicitly enabled, bypass license check
+      return true;
+    }
+
+    // Feature flag is false, use normal license validation
     return Boolean(existingKey && !licenseKeyError) || Boolean(validPAT);
   }, [existingKey, licenseKeyError, validPAT, flags.bypassLicenseCheck]);
-  */
 }
