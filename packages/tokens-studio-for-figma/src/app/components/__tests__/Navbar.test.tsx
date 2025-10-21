@@ -8,9 +8,6 @@ import {
 import Navbar from '../Navbar';
 
 describe('Navbar', () => {
-  beforeAll(() => {
-    process.env.LAUNCHDARKLY_FLAGS = 'tokenFlowButton';
-  });
 
   it('should work', async () => {
     const mockStore = createMockStore({});
@@ -26,8 +23,7 @@ describe('Navbar', () => {
     expect(mockStore.getState().uiState.activeTab).toEqual(Tabs.SETTINGS);
   });
 
-  // TEMPORARY: Skipped while license check is bypassed
-  it.skip('displays the token flow button if user has access to it via license key', () => {
+  it('hides token flow button for free users', () => {
     const mockStore = createMockStore({});
     const result = render(
       <Provider store={mockStore}>
@@ -35,10 +31,26 @@ describe('Navbar', () => {
       </Provider>,
     );
 
+    // Without license key, button should not be visible
+    expect(() => {
+      result.getByTestId('token-flow-button');
+    }).toThrowError();
+  });
+
+  it('displays the token flow button if user has access to it via license key', () => {
+    const mockStore = createMockStore({});
+    const result = render(
+      <Provider store={mockStore}>
+        <Navbar />
+      </Provider>,
+    );
+
+    // Without license key, button should not be visible
     expect(() => {
       result.getByTestId('token-flow-button');
     }).toThrowError();
 
+    // After setting license key, button should appear
     mockStore.dispatch.userState.setLicenseKey('test-key-123');
     waitFor(() => {
       const tokenFlowButton = result.getByTestId('token-flow-button');
@@ -46,8 +58,7 @@ describe('Navbar', () => {
     });
   });
 
-  // TEMPORARY: Skipped while license check is bypassed
-  it.skip('displays the token flow button if user has access to it via Studio PAT', () => {
+  it('displays the token flow button if user has access to it via Studio PAT', () => {
     const mockStore = createMockStore({});
     const result = render(
       <Provider store={mockStore}>
@@ -55,10 +66,12 @@ describe('Navbar', () => {
       </Provider>,
     );
 
+    // Without Studio PAT, button should not be visible
     expect(() => {
       result.getByTestId('token-flow-button');
     }).toThrowError();
 
+    // After setting Studio PAT, button should appear
     mockStore.dispatch.userState.setTokensStudioPAT('studio-pat-token-123');
     waitFor(() => {
       const tokenFlowButton = result.getByTestId('token-flow-button');
@@ -66,12 +79,10 @@ describe('Navbar', () => {
     });
   });
 
-  // TEMPORARY: Skipped while license check is bypassed
   it('should open the token flow page when the button is clicked', async () => {
     global.open = jest.fn();
 
     const mockStore = createMockStore({});
-
     const result = render(
       <Provider store={mockStore}>
         <Navbar />
@@ -86,7 +97,18 @@ describe('Navbar', () => {
     });
   });
 
-  // TEMPORARY: Skipped while license check is bypassed
+  it('hides second screen icon for free users', () => {
+    const mockStore = createMockStore({});
+    const result = render(
+      <Provider store={mockStore}>
+        <Navbar />
+      </Provider>,
+    );
+
+    // Without license, second screen should not be visible
+    expect(result.queryByLabelText('Second Screen')).not.toBeInTheDocument();
+  });
+
   it('displays the second screen icon if user has access to it via license key', () => {
     const mockStore = createMockStore({});
     const result = render(
@@ -104,7 +126,6 @@ describe('Navbar', () => {
     });
   });
 
-  // TEMPORARY: Skipped while license check is bypassed
   it('displays the second screen icon if user has access to it via Studio PAT', () => {
     const mockStore = createMockStore({});
     const result = render(

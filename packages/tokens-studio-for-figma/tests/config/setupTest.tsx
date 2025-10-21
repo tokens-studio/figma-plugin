@@ -12,6 +12,14 @@ import { RootState, store } from '../../src/app/store';
 import { models } from '../../src/app/store/models';
 import { undoableEnhancer } from '@/app/enhancers/undoableEnhancer';
 
+// Mock the useFlags hook from LaunchDarkly wrapper
+// Set bypassLicenseCheck to false globally to test normal license validation
+jest.mock('@/app/components/LaunchDarkly', () => ({
+  useFlags: jest.fn(() => ({ bypassLicenseCheck: false })),
+}));
+
+export const mockUseFlags = require('@/app/components/LaunchDarkly').useFlags;
+
 export const AllTheProviders: FC = ({ children }) => (
   <Provider store={store}>
     <TooltipProvider>

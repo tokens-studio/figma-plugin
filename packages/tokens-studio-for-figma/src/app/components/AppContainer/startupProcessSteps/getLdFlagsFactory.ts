@@ -16,10 +16,9 @@ export function getLdFlagsFactory(store: Store<RootState>, ldClientPromise: Prom
     const state = store.getState();
     const plan = planSelector(state);
     const entitlements = entitlementsSelector(state);
-    const licenseKey = licenseKeySelector(state);
     const clientEmail = clientEmailSelector(state);
 
-    if (user?.userId && licenseKey) {
+    if (user?.userId) {
       setUserData({ plan: plan ? 'pro' : 'free' });
       try {
         await (await ldClientPromise)?.identify(ldUserFactory(

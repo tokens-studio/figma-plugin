@@ -79,3 +79,10 @@ Cypress.Commands.add('receiveSelectionValues', (values) => {
     $window.postMessage(message, '*');
   });
 })
+
+Cypress.Commands.add('setFeatureFlags', (flags) => {
+  cy.window().then(($window) => {
+    // Store flags in window object so they can be accessed by the app
+    $window.__CYPRESS_FEATURE_FLAGS__ = flags;
+  });
+})
