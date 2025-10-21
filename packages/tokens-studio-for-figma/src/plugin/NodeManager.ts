@@ -46,7 +46,6 @@ export class NodeManager {
     nodesWithoutPluginData?: boolean;
   }) {
     const tracker = new ProgressTracker(BackgroundJobs.NODEMANAGER_FINDNODESWITHDATA);
-    const promises: Set<Promise<void>> = new Set();
     const returnedNodes: NodeManagerNode[] = [];
 
     // wait for previous update
@@ -74,21 +73,27 @@ export class NodeManager {
       },
     });
 
-    this.updating = (async () => {
-      for (let nodeIndex = 0; nodeIndex < relevantNodes.length; nodeIndex += 1) {
-        promises.add(defaultWorker.schedule(async () => {
-          const node = relevantNodes[nodeIndex];
+    // Performance optimization: Process nodes in batches to reduce overhead
+    // Batch size of 100 balances memory usage and throughput
+    const BATCH_SIZE = 100;
 
+    this.updating = (async () => {
+      for (let i = 0; i < relevantNodes.length; i += BATCH_SIZE) {
+        const batch = relevantNodes.slice(i, i + BATCH_SIZE);
+
+        // Process batch in parallel
+        const batchPromises = batch.map((node) => defaultWorker.schedule(async () => {
           returnedNodes.push({
-            node: relevantNodes[nodeIndex],
+            node,
             tokens: await tokensSharedDataHandler.getAll(node),
             id: node.id,
           });
           tracker.next();
           tracker.reportIfNecessary();
         }));
+
+        await Promise.all(batchPromises);
       }
-      await Promise.all(promises);
     })();
     await this.waitForUpdating();
 

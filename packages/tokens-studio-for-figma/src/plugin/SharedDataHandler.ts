@@ -4,6 +4,9 @@ import { SharedPluginDataNamespaces } from '@/constants/SharedPluginDataNamespac
 class SharedDataHandler {
   private namespace: string;
 
+  // Performance optimization: Cache parsed JSON to avoid repeated parsing
+  private parseCache: WeakMap<BaseNode, Record<string, any>> = new WeakMap();
+
   constructor(ns: string) {
     this.namespace = ns;
   }
@@ -21,6 +24,12 @@ class SharedDataHandler {
   }
 
   getAll<Result = string>(node: BaseNode) {
+    // Check cache first - significant performance improvement for repeated reads
+    const cached = this.parseCache.get(node);
+    if (cached) {
+      return cached as Record<string, Result>;
+    }
+
     const keys = this.keys(node);
     const result: Record<string, Result> = {};
     keys.forEach((key) => {
@@ -39,11 +48,22 @@ class SharedDataHandler {
       }
       return null;
     });
+
+    // Cache the parsed result
+    this.parseCache.set(node, result);
+
     return result;
   }
 
   set(node: BaseNode, key: string, value: string) {
+    // Invalidate cache when data is set
+    this.parseCache.delete(node);
     return node.setSharedPluginData(this.namespace, key, value);
+  }
+
+  // Method to clear cache if needed (for memory management)
+  clearCache() {
+    this.parseCache = new WeakMap();
   }
 }
 
