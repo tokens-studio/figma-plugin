@@ -165,6 +165,98 @@ const filteredThemes = themesByGroup.get(groupName) || [];
 
 **Impact:** Eliminates repeated array filtering and memoizes expensive calculations, improving render performance.
 
+### 5. Advanced Algorithm Optimizations
+
+**Problem:** Nested find operations, repeated regex compilation, and inefficient object iteration patterns.
+
+**Locations:**
+- `src/plugin/pluginData.ts`
+- `src/utils/alias/checkIfAlias.tsx`
+- `src/utils/convertTokens.tsx`
+- `src/utils/regexCache.ts` (new utility)
+
+**Before (pluginData.ts - nested find):**
+```typescript
+const isTokenApplied = acc.find((item) => 
+  item.type === variable.type && 
+  item.nodes.find((node) => isEqual(node, { id, name, type }))
+);
+```
+
+**After:**
+```typescript
+// Use Map for O(1) lookups
+const accMap = new Map<string, SelectionGroup>();
+acc.forEach((item) => {
+  const key = `${item.type}|${item.value}`;
+  accMap.set(key, item);
+});
+
+// O(1) lookup instead of O(n) find
+const existing = accMap.get(mapKey);
+```
+
+**Before (checkIfAlias - nested some):**
+```typescript
+aliasToken = arrayValue.some((value) => 
+  Object.values(value).some((singleValue) => 
+    Boolean(singleValue?.toString().match(AliasRegex))
+  )
+);
+```
+
+**After:**
+```typescript
+// Flatten nested operations
+aliasToken = arrayValue.some((value) => {
+  const values = Object.values(value);
+  for (let i = 0; i < values.length; i += 1) {
+    if (values[i]?.toString().match(AliasRegex)) {
+      return true;
+    }
+  }
+  return false;
+});
+```
+
+**Before (convertTokens - Object.values().map()):**
+```typescript
+return Object.values(result).map((token) => {
+  // transform token
+  return token;
+});
+```
+
+**After:**
+```typescript
+// Avoid intermediate array creation
+const keys = Object.keys(result);
+const output = [];
+for (let i = 0; i < keys.length; i += 1) {
+  const token = result[keys[i]];
+  // transform token
+  output.push(token);
+}
+return output;
+```
+
+**New: Regex Cache Utility:**
+```typescript
+import { getCachedRegex } from '@/utils/regexCache';
+
+// Instead of compiling regex repeatedly
+const pattern = /[a-z]+/gi;
+
+// Use cached regex for better performance
+const cachedPattern = getCachedRegex('[a-z]+', 'gi');
+```
+
+**Impact:** 
+- pluginData.ts: Eliminates O(n²) nested find operations
+- checkIfAlias: Reduces nested iteration overhead
+- convertTokens: Avoids creating intermediate arrays
+- regexCache: Reuses compiled regex patterns (significant gain for hot paths)
+
 ## Performance Best Practices
 
 ### Array Operations
