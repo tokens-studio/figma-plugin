@@ -172,8 +172,7 @@ describe('Branch switcher', () => {
     cy.get('[data-testid=push-dialog-success-heading]').should('have.length', 1);
   });
 
-  // TEMPORARY: Skipped while license check is bypassed
-  it.skip('shows pro upgrade modal for non-pro users', () => {
+  it('shows pro upgrade modal for non-pro users', () => {
     // Create a non-pro user setup
     const nonProUserParams = {
       ...mockStartupParams,
