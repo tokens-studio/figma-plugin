@@ -104,6 +104,67 @@ const result = array.reduce<string[]>((acc, item) => {
 
 **Impact:** Reduces from 2 iterations to 1, effectively halving the processing time for these operations.
 
+### 4. React Component Optimizations
+
+**Problem:** Recalculating expensive values on every render and filtering arrays multiple times in render methods.
+
+**Locations:**
+- `src/app/components/ImportedTokensDialog.tsx`
+- `src/app/components/ThemeSelector/ThemeSelector.tsx`
+
+**Before (ImportedTokensDialog):**
+```typescript
+const allParents = [...new Set([
+  ...importedTokens.newTokens.map((newToken) => newToken.parent), 
+  ...importedTokens.updatedTokens.map((updatedToken) => updatedToken.parent)
+])];
+```
+
+**After:**
+```typescript
+const allParents = React.useMemo(() => {
+  const parentSet = new Set<string>();
+  importedTokens.newTokens.forEach((newToken) => {
+    if (newToken.parent) parentSet.add(newToken.parent);
+  });
+  importedTokens.updatedTokens.forEach((updatedToken) => {
+    if (updatedToken.parent) parentSet.add(updatedToken.parent);
+  });
+  return Array.from(parentSet);
+}, [importedTokens.newTokens, importedTokens.updatedTokens]);
+```
+
+**Before (ThemeSelector):**
+```typescript
+groupNames.map((groupName) => {
+  const filteredThemes = groupName === INTERNAL_THEMES_NO_GROUP 
+    ? availableThemes.filter((theme) => typeof theme?.group === 'undefined') 
+    : availableThemes.filter((theme) => theme?.group === groupName);
+  // ...
+})
+```
+
+**After:**
+```typescript
+// Create Map once for O(1) lookup
+const themesByGroup = useMemo(() => {
+  const groups = new Map<string, AvailableTheme[]>();
+  availableThemes.forEach((theme) => {
+    const groupName = theme.group || INTERNAL_THEMES_NO_GROUP;
+    if (!groups.has(groupName)) {
+      groups.set(groupName, []);
+    }
+    groups.get(groupName)!.push(theme);
+  });
+  return groups;
+}, [availableThemes]);
+
+// Then use O(1) lookup instead of O(n) filter
+const filteredThemes = themesByGroup.get(groupName) || [];
+```
+
+**Impact:** Eliminates repeated array filtering and memoizes expensive calculations, improving render performance.
+
 ## Performance Best Practices
 
 ### Array Operations

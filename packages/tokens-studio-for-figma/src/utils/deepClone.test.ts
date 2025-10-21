@@ -69,4 +69,44 @@ describe('deepClone', () => {
     // Original should remain unchanged
     expect(obj.tokens.colors[0].value).toBe('#000000');
   });
+
+  it('should handle empty objects and arrays', () => {
+    expect(deepClone({})).toEqual({});
+    expect(deepClone([])).toEqual([]);
+    expect(deepClone({ a: [] })).toEqual({ a: [] });
+  });
+
+  it('should handle special number values', () => {
+    const obj = {
+      zero: 0,
+      negative: -1,
+      float: 3.14,
+      infinity: Infinity,
+      negInfinity: -Infinity,
+    };
+    const cloned = deepClone(obj);
+
+    expect(cloned.zero).toBe(0);
+    expect(cloned.negative).toBe(-1);
+    expect(cloned.float).toBe(3.14);
+    // Note: JSON doesn't support Infinity
+    expect(cloned.infinity).toBeNull();
+    expect(cloned.negInfinity).toBeNull();
+  });
+
+  it('should throw error for circular references', () => {
+    const obj: any = { a: 1 };
+    obj.self = obj; // Create circular reference
+
+    expect(() => deepClone(obj)).toThrow('Unable to clone object');
+  });
+
+  it('should handle mixed types in arrays', () => {
+    const arr = [1, 'string', true, null, { nested: 'object' }, [1, 2, 3]];
+    const cloned = deepClone(arr);
+
+    expect(cloned).toEqual(arr);
+    expect(cloned[4]).not.toBe(arr[4]);
+    expect(cloned[5]).not.toBe(arr[5]);
+  });
 });

@@ -8,6 +8,7 @@
  *
  * @param obj - The object to clone
  * @returns A deep clone of the object
+ * @throws {Error} When the object cannot be cloned (e.g., contains circular references)
  */
 export function deepClone<T>(obj: T): T {
   // Use native structuredClone if available (Node 17+, modern browsers)
@@ -23,5 +24,11 @@ export function deepClone<T>(obj: T): T {
 
   // Fallback to JSON-based cloning
   // Note: This doesn't handle functions, Date, RegExp, Map, Set, etc.
-  return JSON.parse(JSON.stringify(obj));
+  try {
+    return JSON.parse(JSON.stringify(obj));
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error('Failed to clone object:', e);
+    throw new Error('Unable to clone object: it may contain circular references or non-serializable values');
+  }
 }
