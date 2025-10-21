@@ -1,5 +1,11 @@
 # @tokens-studio/figma-plugin
 
+## 2.10.2
+
+### Patch Changes
+
+- 8552d66ec: Revert all Pro access.
+
 ## 2.10.1
 
 ### Patch Changes
