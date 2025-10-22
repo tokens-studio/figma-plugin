@@ -1,5 +1,54 @@
 # @tokens-studio/figma-plugin
 
+## 2.10.2
+
+### Patch Changes
+
+- 8552d66ec: Revert all Pro access.
+
+## 2.10.1
+
+### Patch Changes
+
+- 993c27c67: Add feature flag to disable license key check
+
+## 2.10.0
+
+### Minor Changes
+
+- 630b06d29: **Swap Figma variable modes**
+
+  The plugin can now automatically switch Figma's native variable modes when you change themes, keeping your variables in sync with your active theme.
+
+  **What's new:**
+
+  - **Automatic mode switching**: When switching themes, the plugin updates Figma's variable modes to match the selected theme
+  - **Configurable setting**: Toggle "Swap Figma variable modes" in the plugin settings (bottom right) to enable/disable this behavior (enabled by default)
+  - Validates that collections and modes exist before switching, with helpful error notifications when something goes wrong
+  - Works with Selection, Page, and Document update modes
+
+### Patch Changes
+
+- 7ba4299e8: Add immediate loading indicator when switching Git branches to provide instant user feedback
+- c3c219ac0: Fix ESC key behavior in Manage Themes modal to only close the theme editor when editing a theme, not the entire modal
+- 043f08782: Show specific token name in delete token confirmation dialog instead of generic "this token" text
+- faaee7b58: Tokens that have a value of 100% will now apply as "fill container" for auto layout frames, or stretch the width of the parent for regular frames
+- aefd08dc3: Fix inconsistent variable reference behavior when not using theme groups
+
+  When exporting tokens to variables without theme groups, variable references now correctly prioritize variables from the same collection instead of always using the first match found globally. This ensures Theme B displays its own primary color rather than incorrectly showing Theme A's primary color.
+
+- 21bd14ef9: Fixes an issue where a non existent file is not created in Gitlab when setting up a sync.
+- b79391dbe: New token sets are now enabled by default instead of disabled when created
+- be28ebdcd: Separate "Load from preset" into its own action in the tools menu. Split the combined "Load from file or preset" dropdown into two distinct menu items: "Load from file/folder" and "Load from preset", each opening their own focused dialog.
+- 2b8f9393a: Fix text style import issues with Figma variables and font weight matching
+
+  - Fixed broken typography tokens showing {undefined} when importing text styles that use Figma variables
+  - Text styles with variables now properly create tokens with the variable's actual values instead of showing {undefined}
+  - Font sizes, line heights, and spacing values are now correctly imported as numbers instead of strings
+  - Typography tokens now fall back to raw values when referenced tokens don't exist, preventing undefined references
+
+- f0eed3004: Fix issue in Bitbucket where branch names with slash are not processed
+
 ## 2.9.0
 
 ### Minor Changes

@@ -645,6 +645,7 @@ describe('Initiator', () => {
       updateRemote: false,
       updateOnChange: false,
       sessionRecording: false,
+      shouldSwapFigmaModes: false,
       shouldUpdateStyles: false,
       variablesColor: true,
       variablesNumber: true,

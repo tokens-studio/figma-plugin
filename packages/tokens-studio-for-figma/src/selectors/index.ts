@@ -74,6 +74,7 @@ export * from './stylesTypographySelector';
 export * from './stylesEffectSelector';
 export * from './createStylesWithVariableReferencesSelector';
 export * from './autoApplyThemeOnDropSelector';
+export * from './shouldSwapFigmaModesSelector';
 export * from './importedThemesSelector';
 export * from './renamedCollectionsSelector';
 export * from './tokensSizeSelector';
