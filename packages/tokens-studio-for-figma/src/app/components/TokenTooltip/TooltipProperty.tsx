@@ -1,12 +1,9 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { isEqual } from '@/utils/isEqual';
-import { useSelector } from 'react-redux';
 import Box from '../Box';
 import Stack from '../Stack';
 import AliasBadge from './AliasBadge';
-import { TokensContext } from '@/context';
-import { aliasBaseFontSizeSelector } from '@/selectors';
-import { getAliasValue } from '@/utils/alias';
+import { useResolvedBaseFontSize } from '@/app/hooks/useResolvedBaseFontSize';
 import { formatTokenValueForDisplay } from '@/utils/displayTokenValue';
 
 type Props = {
@@ -16,17 +13,7 @@ type Props = {
 };
 
 export default function TooltipProperty({ label, value, resolvedValue }: Props) {
-  const tokensContext = useContext(TokensContext);
-  const aliasBaseFontSize = useSelector(aliasBaseFontSizeSelector);
-  
-  // Get the current resolved base font size for rem conversion
-  const currentBaseFontSize = React.useMemo(() => {
-    if (aliasBaseFontSize) {
-      const resolvedBaseFontSize = getAliasValue(aliasBaseFontSize, tokensContext.resolvedTokens);
-      return resolvedBaseFontSize ? String(resolvedBaseFontSize) : '16px';
-    }
-    return '16px';
-  }, [aliasBaseFontSize, tokensContext.resolvedTokens]);
+  const currentBaseFontSize = useResolvedBaseFontSize();
   return typeof value !== 'undefined' || typeof resolvedValue !== 'undefined' ? (
     <Stack
       direction="row"

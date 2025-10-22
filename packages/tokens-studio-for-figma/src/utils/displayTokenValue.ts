@@ -11,7 +11,7 @@ export function formatTokenValueForDisplay(value: SingleToken['value'], baseFont
   const valueString = String(value);
 
   // Check if the value is a rem value
-  if (typeof value === 'string' && (value.endsWith('rem') || value.endsWith('em'))) {
+  if (typeof value === 'string' && value.endsWith('rem')) {
     const convertedValue = convertTypographyNumberToFigma(value, baseFontSize);
     return `${value} (${convertedValue}px)`;
   }

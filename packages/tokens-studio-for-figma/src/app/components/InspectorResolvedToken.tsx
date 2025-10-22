@@ -1,6 +1,5 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
 import Box from './Box';
 import Tooltip from './Tooltip';
 import IconBrokenLink from '@/icons/brokenlink.svg';
@@ -11,9 +10,7 @@ import { IconBorder, IconImage } from '@/icons';
 import { SingleToken } from '@/types/tokens';
 import { TokenTooltip } from './TokenTooltip';
 import { TokenTypographyValue, TokenBoxshadowValue, TokenBorderValue } from '@/types/values';
-import { TokensContext } from '@/context';
-import { aliasBaseFontSizeSelector } from '@/selectors';
-import { getAliasValue } from '@/utils/alias';
+import { useResolvedBaseFontSize } from '@/app/hooks/useResolvedBaseFontSize';
 import { formatTokenValueForDisplay } from '@/utils/displayTokenValue';
 
 type Props = {
@@ -25,18 +22,8 @@ type Props = {
 
 export default function InspectorResolvedToken({ token }: { token: Props }) {
   const { t } = useTranslation(['inspect']);
-  const tokensContext = useContext(TokensContext);
-  const aliasBaseFontSize = useSelector(aliasBaseFontSizeSelector);
-  
-  // Get the current resolved base font size for rem conversion
-  const currentBaseFontSize = React.useMemo(() => {
-    if (aliasBaseFontSize) {
-      const resolvedBaseFontSize = getAliasValue(aliasBaseFontSize, tokensContext.resolvedTokens);
-      return resolvedBaseFontSize ? String(resolvedBaseFontSize) : '16px';
-    }
-    return '16px';
-  }, [aliasBaseFontSize, tokensContext.resolvedTokens]);
-  
+  const currentBaseFontSize = useResolvedBaseFontSize();
+
   // TODO: Introduce shared component for token tooltips
   if (!token) {
     return (
