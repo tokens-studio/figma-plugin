@@ -76,7 +76,14 @@ function ConfirmDialog() {
   }, [chosen, inputValue, confirmState, onConfirm]);
 
   React.useEffect(() => {
-    if (confirmState.choices) setChosen(confirmState.choices.filter((c) => c.enabled).map((c) => c.key));
+    // Optimize: combine filter and map into single pass
+    if (confirmState.choices) {
+      const enabledKeys = confirmState.choices.reduce<string[]>((acc, c) => {
+        if (c.enabled) acc.push(c.key);
+        return acc;
+      }, []);
+      setChosen(enabledKeys);
+    }
     if (firstInput.current) {
       firstInput.current.focus();
     } else if (confirmButton.current) {

@@ -15,43 +15,60 @@ import getAppliedVariablesFromNode from './getAppliedVariablesFromNode';
 export function transformPluginDataToSelectionValues(pluginData: NodeManagerNode[]): SelectionGroup[] {
   const selectionValues = pluginData.reduce<SelectionGroup[]>((acc, curr) => {
     const { tokens, id, node: { name, type } } = curr;
+
+    // Optimize: Create a Map for faster lookups (O(1) vs O(n))
+    const accMap = new Map<string, SelectionGroup>();
+    acc.forEach((item) => {
+      const key = `${item.type}|${item.value}`;
+      accMap.set(key, item);
+    });
+
     // First we add plugin tokens
     Object.entries(tokens).forEach(([key, value]) => {
-      const existing = acc.find((item) => item.type === key && item.value === value);
+      const mapKey = `${key}|${value}`;
+      const existing = accMap.get(mapKey);
       if (existing) {
         existing.nodes.push({ id, name, type });
       } else {
         const category = get(Properties, key) as Properties | TokenTypes;
-
-        acc.push({
-          value, type: key, category, nodes: [{ id, name, type }], appliedType: 'token',
-        });
+        const newItem = {
+          value, type: key, category, nodes: [{ id, name, type }], appliedType: 'token' as const,
+        };
+        acc.push(newItem);
+        accMap.set(mapKey, newItem);
       }
     });
 
     // Second we add variables
     const localVariables = getAppliedVariablesFromNode(curr.node);
     localVariables.forEach((variable) => {
-      // Check if the token has been applied. If the token has been applied then we don't add variable.
-      const isTokenApplied = acc.find((item) => item.type === variable.type && item.nodes.find((node) => isEqual(node, { id, name, type })));
+      // Optimize: Use Map for O(1) lookup instead of find().find()
+      const isTokenApplied = Array.from(accMap.values()).some(
+        (item) => item.type === variable.type && item.nodes.some((node) => isEqual(node, { id, name, type })),
+      );
       if (!isTokenApplied) {
         const category = get(Properties, variable.type) as Properties | TokenTypes;
-        acc.push({
+        const newItem = {
           value: variable.name,
           type: variable.type,
           category,
           nodes: [{ id, name, type }],
           resolvedValue: variable.value,
-          appliedType: 'variable',
-        });
+          appliedType: 'variable' as const,
+        };
+        acc.push(newItem);
+        const mapKey = `${variable.type}|${variable.name}`;
+        accMap.set(mapKey, newItem);
       }
     });
 
     // Third we add styles
     const localStyles = getAppliedStylesFromNode(curr.node);
     localStyles.forEach((style) => {
-      // Check if the token or variable has been applied. If the token has been applied then we don't add style.
-      const isTokenApplied = acc.find((item) => item.type === style.type && item.nodes.find((node) => isEqual(node, { id, name, type })));
+      // Optimize: Use Map for O(1) lookup instead of find().find()
+      const isTokenApplied = Array.from(accMap.values()).some(
+        (item) => item.type === style.type && item.nodes.some((node) => isEqual(node, { id, name, type })),
+      );
       if (!isTokenApplied) {
         const category = get(Properties, style.type) as Properties | TokenTypes;
         acc.push({
