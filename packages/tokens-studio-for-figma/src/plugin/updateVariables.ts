@@ -6,6 +6,8 @@ import checkIfTokenCanCreateVariable from '@/utils/checkIfTokenCanCreateVariable
 import setValuesOnVariable from './setValuesOnVariable';
 import { mapTokensToVariableInfo } from '@/utils/mapTokensToVariableInfo';
 
+import { ProgressTracker } from './ProgressTracker';
+
 export type CreateVariableTypes = {
   collection: VariableCollection;
   mode: string;
@@ -14,6 +16,7 @@ export type CreateVariableTypes = {
   settings: SettingsState;
   filterByTokenSet?: string;
   overallConfig: UsedTokenSetsMap;
+  progressTracker?: ProgressTracker | null;
 };
 
 export type VariableToken = SingleToken<true, { path: string; variableId: string }>;
@@ -26,6 +29,7 @@ export default async function updateVariables({
   settings,
   filterByTokenSet,
   overallConfig,
+  progressTracker,
 }: CreateVariableTypes) {
   const tokensToCreate = generateTokensToCreate({
     theme,
@@ -58,7 +62,9 @@ export default async function updateVariables({
     mode,
     settings.baseFontSize,
     settings.renameExistingStylesAndVariables,
+    progressTracker,
   );
+
   const removedVariables: string[] = [];
 
   // Remove variables not handled in the current theme

@@ -157,6 +157,7 @@ describe('updateStyles', () => {
       colorTokens,
       false,
       undefined,
+      undefined,
     );
   });
 
@@ -217,6 +218,7 @@ describe('updateStyles', () => {
       }],
       false,
       undefined,
+      undefined,
     );
     expect(textSpy).toHaveBeenCalledWith(
       [{
@@ -232,6 +234,7 @@ describe('updateStyles', () => {
       }],
       undefined,
       false,
+      undefined,
       undefined,
     );
     expect(effectSpy).toHaveBeenCalledWith(
@@ -275,6 +278,7 @@ describe('updateStyles', () => {
       colorTokens,
       false,
       undefined,
+      undefined,
     );
     expect(textSpy).not.toHaveBeenCalled();
     expect(effectSpy).not.toHaveBeenCalled();
@@ -303,6 +307,7 @@ describe('updateStyles', () => {
       typographyTokens,
       undefined,
       false,
+      undefined,
       undefined,
     );
     expect(colorSpy).not.toHaveBeenCalled();
