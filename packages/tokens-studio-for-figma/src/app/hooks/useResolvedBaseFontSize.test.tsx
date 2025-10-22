@@ -26,7 +26,7 @@ describe('useResolvedBaseFontSize', () => {
     ],
   };
 
-  const wrapper = ({ children }: { children: React.ReactNode }) => (
+  const wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
     <Provider store={store}>
       <TokensContext.Provider value={mockTokensContext}>
         {children}
