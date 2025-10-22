@@ -331,4 +331,4 @@ class TokenResolver {
 
 const defaultTokenResolver = new TokenResolver([]);
 
-export { defaultTokenResolver };
+export { TokenResolver, defaultTokenResolver };

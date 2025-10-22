@@ -3,6 +3,8 @@ import { isEqual } from '@/utils/isEqual';
 import Box from '../Box';
 import Stack from '../Stack';
 import AliasBadge from './AliasBadge';
+import { useResolvedBaseFontSize } from '@/app/hooks/useResolvedBaseFontSize';
+import { formatTokenValueForDisplay } from '@/utils/displayTokenValue';
 
 type Props = {
   label?: string;
@@ -11,6 +13,7 @@ type Props = {
 };
 
 export default function TooltipProperty({ label, value, resolvedValue }: Props) {
+  const currentBaseFontSize = useResolvedBaseFontSize();
   return typeof value !== 'undefined' || typeof resolvedValue !== 'undefined' ? (
     <Stack
       direction="row"
@@ -27,7 +30,7 @@ export default function TooltipProperty({ label, value, resolvedValue }: Props) 
           {label}
           {typeof value !== 'undefined' && (
             <Box css={{ color: '$tooltipFgMuted', flexShrink: 1, wordBreak: 'break-word' }}>
-              {value}
+              {formatTokenValueForDisplay(value, currentBaseFontSize)}
             </Box>
           )}
         </Stack>
