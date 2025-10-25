@@ -44,4 +44,6 @@ export * from './preview';
 export * from './removeStylesWithoutConnection';
 export * from './setVariableExportSettings';
 export * from './setSelectedExportThemes';
+export * from './setSelectedExportSets';
+export * from './setActiveExportTab';
 export * from '../livingDocumentation';

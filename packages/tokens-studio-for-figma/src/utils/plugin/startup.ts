@@ -3,6 +3,8 @@ import {
 } from '@/figmaStorage';
 import { getActiveTheme } from '@/utils/getActiveTheme';
 import { getSelectedExportThemes } from '@/utils/getSelectedExportThemes';
+import { getSelectedExportSets } from '@/utils/getSelectedExportSets';
+import { getActiveExportTab } from '@/utils/getActiveExportTab';
 import { getVariableExportSettings } from '@/utils/getVariableExportSettings';
 import getLastOpened from '@/utils/getLastOpened';
 import getOnboardingExplainer from '@/utils/getOnboardingExplainer';
@@ -30,6 +32,8 @@ export async function startup() {
     usedEmail,
     variableExportSettings,
     selectedExportThemes,
+    selectedExportSets,
+    activeExportTab,
   ] = await Promise.all([
     getUISettings(false),
     getUsedTokenSet(),
@@ -46,6 +50,8 @@ export async function startup() {
     UsedEmailProperty.read(),
     getVariableExportSettings(),
     getSelectedExportThemes(),
+    getSelectedExportSets(),
+    getActiveExportTab(),
   ]);
 
   // If we have saved variable export settings, apply them to the settings
@@ -78,5 +84,7 @@ export async function startup() {
     authData,
     usedEmail,
     selectedExportThemes,
+    selectedExportSets,
+    activeExportTab,
   };
 }
