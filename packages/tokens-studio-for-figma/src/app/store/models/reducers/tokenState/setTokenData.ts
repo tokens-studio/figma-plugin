@@ -7,6 +7,7 @@ import removeIdPropertyFromTokens from '@/utils/removeIdPropertyFromTokens';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 import { TokenStore } from '@/types/tokens';
 import { checkStorageSize } from '@/utils/checkStorageSize';
+import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
 
 export function setTokenData(state: TokenState, payload: SetTokenDataPayload): TokenState {
   if (payload.values.length === 0) {
@@ -26,12 +27,37 @@ export function setTokenData(state: TokenState, payload: SetTokenDataPayload): T
   const usedTokenSets = Object.fromEntries(
     allAvailableTokenSets.map((tokenSet) => [tokenSet, payload.usedTokenSet?.[tokenSet] ?? TokenSetStatus.DISABLED]),
   );
-  const newActiveTheme = payload.activeTheme;
+  let newActiveTheme = payload.activeTheme;
   Object.entries(newActiveTheme ?? {}).forEach(([group, activeTheme]) => {
     if (!payload.themes?.find((t) => t.id === activeTheme) && newActiveTheme) {
       delete newActiveTheme[group];
     }
   });
+
+  // Auto-enable the first theme if no active theme is set and themes are available
+  const hasActiveTheme = newActiveTheme && Object.keys(newActiveTheme).length > 0;
+  const hasThemes = payload.themes && payload.themes.length > 0;
+  let finalUsedTokenSets = Array.isArray(payload.values) ? { global: TokenSetStatus.ENABLED } : usedTokenSets;
+
+  if (!hasActiveTheme && hasThemes) {
+    const firstTheme = payload.themes![0];
+    const groupKey = firstTheme.group || INTERNAL_THEMES_NO_GROUP;
+    newActiveTheme = { [groupKey]: firstTheme.id };
+
+    // Update usedTokenSet based on the first theme's selectedTokenSets
+    const selectedTokenSets: Record<string, TokenSetStatus> = {};
+    Object.entries(firstTheme.selectedTokenSets).forEach(([tokenSet, status]) => {
+      if (status !== TokenSetStatus.DISABLED) {
+        selectedTokenSets[tokenSet] = status;
+      }
+    });
+
+    finalUsedTokenSets = Object.fromEntries(
+      allAvailableTokenSets.map((tokenSet) => (
+        [tokenSet, selectedTokenSets?.[tokenSet] ?? TokenSetStatus.DISABLED]
+      )),
+    );
+  }
 
   const tokenValues = Array.isArray(payload.values) ? payload.values : removeIdPropertyFromTokens(payload.values);
 
@@ -58,7 +84,7 @@ export function setTokenData(state: TokenState, payload: SetTokenDataPayload): T
       : {
         activeTokenSet: Array.isArray(payload.values) ? 'global' : Object.keys(payload.values)[0],
       }),
-    usedTokenSet: Array.isArray(payload.values) ? { global: TokenSetStatus.ENABLED } : usedTokenSets,
+    usedTokenSet: finalUsedTokenSets,
     tokensSize,
     themesSize,
   };
