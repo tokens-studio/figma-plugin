@@ -3,6 +3,7 @@ export * from './setShouldSwapStyles';
 export * from './setStylesColor';
 export * from './setStylesEffect';
 export * from './setStylesTypography';
+export * from './setStylesGradient';
 export * from './setVariablesBoolean';
 export * from './setVariablesColor';
 export * from './setVariablesNumber';

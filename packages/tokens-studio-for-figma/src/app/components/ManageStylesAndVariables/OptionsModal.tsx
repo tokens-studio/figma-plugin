@@ -24,6 +24,7 @@ import {
   stylesColorSelector,
   stylesEffectSelector,
   stylesTypographySelector,
+  stylesGradientSelector,
 } from '@/selectors';
 import ignoreFirstPartImage from '@/app/assets/hints/ignoreFirstPartForStyles.png';
 import prefixStylesImage from '@/app/assets/hints/prefixStyles.png';
@@ -51,6 +52,7 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
   const stylesColor = useSelector(stylesColorSelector);
   const stylesTypography = useSelector(stylesTypographySelector);
   const stylesEffect = useSelector(stylesEffectSelector);
+  const stylesGradient = useSelector(stylesGradientSelector);
 
   const dispatch = useDispatch<Dispatch>();
 
@@ -136,6 +138,12 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
     },
     [dispatch.settings],
   );
+  const handleExportStylesGradient = React.useCallback(
+    (state: CheckedState) => {
+      dispatch.settings.setStylesGradient(!!state);
+    },
+    [dispatch.settings],
+  );
 
   const handleSaveOptions = React.useCallback(() => {
     closeAction();
@@ -196,6 +204,7 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
                   <LabelledCheckbox id="styleColor" onChange={handleExportStylesColor} checked={!!stylesColor} label={t('styles.color')} />
                   <LabelledCheckbox id="stylesTypography" onChange={handleExportStylesTypography} checked={!!stylesTypography} label={t('styles.typography')} />
                   <LabelledCheckbox id="stylesEffect" onChange={handleExportStylesEffect} checked={!!stylesEffect} label={t('styles.effects')} />
+                  <LabelledCheckbox id="stylesGradient" onChange={handleExportStylesGradient} checked={!!stylesGradient} label={t('styles.gradients')} />
                 </Stack>
               </Box>
             </Box>
