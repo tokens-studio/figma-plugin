@@ -6,11 +6,11 @@ import { convertToDefaultProperty } from './convertToDefaultProperty';
 /**
  * Maps property keys to their appropriate token types based on the parent composite token type
  */
-function getPropertyType(parentType: TokenTypes, propertyKey: string): string {
+function getPropertyType(parentType: TokenTypes, propertyKey: string): TokenTypes | string {
   // Handle border-specific properties
   if (parentType === TokenTypes.BORDER) {
     if (propertyKey === 'width') {
-      return Properties.borderWidth;
+      return TokenTypes.BORDER_WIDTH;
     }
     if (propertyKey === 'color') {
       return TokenTypes.COLOR;
@@ -25,7 +25,11 @@ function getPropertyType(parentType: TokenTypes, propertyKey: string): string {
   }
 
   // For other composite types, use the default conversion
-  return convertToDefaultProperty(propertyKey);
+  const defaultProperty = convertToDefaultProperty(propertyKey);
+  
+  // Map Properties enum values to TokenTypes enum values
+  // The convertToDefaultProperty returns string values that match TokenTypes enum values
+  return defaultProperty as TokenTypes;
 }
 
 /**
@@ -54,9 +58,9 @@ export function expandCompositeTokensForVariables(
           expandedTokens.push({
             ...token,
             name: `${token.name}.${propertyKey}`,
-            type: propertyType as TokenTypes,
+            type: propertyType,
             value: propertyValue,
-          });
+          } as ResolveTokenValuesResult);
         }
       });
     } else {
