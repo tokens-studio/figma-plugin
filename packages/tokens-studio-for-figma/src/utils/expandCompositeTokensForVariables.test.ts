@@ -204,4 +204,45 @@ describe('expandCompositeTokensForVariables', () => {
       }),
     ]);
   });
+
+  it('should expand typography tokens with paragraphIndent and paragraphSpacing', () => {
+    const tokens: ResolveTokenValuesResult[] = [
+      {
+        name: 'paragraph.style',
+        type: TokenTypes.TYPOGRAPHY,
+        value: {
+          fontFamily: 'Arial',
+          fontSize: '14px',
+          paragraphSpacing: '12px',
+          paragraphIndent: '20px',
+        },
+      } as ResolveTokenValuesResult,
+    ];
+
+    const result = expandCompositeTokensForVariables(tokens);
+
+    expect(result).toHaveLength(4);
+    expect(result).toEqual([
+      expect.objectContaining({
+        name: 'paragraph.style.fontFamily',
+        type: TokenTypes.FONT_FAMILIES,
+        value: 'Arial',
+      }),
+      expect.objectContaining({
+        name: 'paragraph.style.fontSize',
+        type: TokenTypes.FONT_SIZES,
+        value: '14px',
+      }),
+      expect.objectContaining({
+        name: 'paragraph.style.paragraphSpacing',
+        type: TokenTypes.PARAGRAPH_SPACING,
+        value: '12px',
+      }),
+      expect.objectContaining({
+        name: 'paragraph.style.paragraphIndent',
+        type: TokenTypes.PARAGRAPH_INDENT,
+        value: '20px',
+      }),
+    ]);
+  });
 });
