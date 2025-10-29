@@ -4,6 +4,7 @@ import { ThemeObject, UsedTokenSetsMap } from '@/types';
 import { AnyTokenList } from '@/types/tokens';
 import { defaultTokenResolver } from '@/utils/TokenResolver';
 import { mergeTokenGroups } from '@/utils/tokenHelpers';
+import { expandCompositeTokensForVariables } from '@/utils/expandCompositeTokensForVariables';
 
 export function generateTokensToCreate({
   theme,
@@ -21,7 +22,11 @@ export function generateTokensToCreate({
     .filter(([name, status]) => status === TokenSetStatus.ENABLED && (!filterByTokenSet || name === filterByTokenSet))
     .map(([tokenSet]) => tokenSet);
   const resolved = defaultTokenResolver.setTokens(mergeTokenGroups(tokens, theme.selectedTokenSets, overallConfig));
-  return resolved.filter(
+
+  // Expand composite tokens (typography, border, boxShadow, composition) into individual property tokens
+  const expandedTokens = expandCompositeTokensForVariables(resolved);
+
+  return expandedTokens.filter(
     (token) => ((!token.internal__Parent || enabledTokenSets.includes(token.internal__Parent)) && tokenTypesToCreateVariable.includes(token.type)), // filter out SOURCE tokens
   );
 }

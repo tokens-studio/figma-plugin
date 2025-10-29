@@ -27,6 +27,7 @@ export default async function updateVariables({
   filterByTokenSet,
   overallConfig,
 }: CreateVariableTypes) {
+  // Tokens are already expanded in generateTokensToCreate
   const tokensToCreate = generateTokensToCreate({
     theme,
     tokens,
