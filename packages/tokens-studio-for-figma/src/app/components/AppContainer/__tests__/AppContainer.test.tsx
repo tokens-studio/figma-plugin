@@ -34,7 +34,6 @@ describe('AppContainer', () => {
   afterAll(() => {
     savePluginDataFactorySpy.mockReset();
     addLicenseFactorySpy.mockReset();
-    getLdFlagsFactorySpy.mockReset();
     saveStorageInformationFactorySpy.mockReset();
     pullTokensFactorySpy.mockReset();
   });
@@ -52,7 +51,6 @@ describe('AppContainer', () => {
         expect(result.queryByText('Loading, please wait')).not.toBeNull();
         expect(savePluginDataFactorySpy).toBeCalledTimes(1);
         expect(addLicenseFactorySpy).toBeCalledTimes(1);
-        expect(getLdFlagsFactorySpy).toBeCalledTimes(1);
         expect(saveStorageInformationFactorySpy).toBeCalledTimes(1);
         expect(pullTokensFactorySpy).toBeCalledTimes(1);
       });
