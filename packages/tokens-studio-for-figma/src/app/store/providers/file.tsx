@@ -2,15 +2,17 @@ import { useCallback, useMemo } from 'react';
 import { FileTokenStorage } from '@/storage/FileTokenStorage';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { RemoteResponseData } from '@/types/RemoteResponseData';
+import { useIsProUser } from '@/app/hooks/useIsProUser';
 
 export default function useFile() {
+  const isProUser = useIsProUser();
+
   const storageClientFactory = useCallback((files: FileList) => {
     const storageClient = new FileTokenStorage(files);
 
-    // Enable multi-file support by default (previously gated by feature flag)
-    storageClient.enableMultiFile();
+    if (isProUser) storageClient.enableMultiFile();
     return storageClient;
-  }, []);
+  }, [isProUser]);
 
   const readTokensFromFileOrDirectory = useCallback(async (files: FileList): Promise<RemoteResponseData | null> => {
     const storage = storageClientFactory(files);

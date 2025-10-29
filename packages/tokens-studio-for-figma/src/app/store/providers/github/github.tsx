@@ -46,10 +46,9 @@ export function useGitHub() {
 
     if (context.filePath) storageClient.changePath(context.filePath);
     if (context.branch) storageClient.selectBranch(context.branch);
-    // Enable multi-file support by default (previously gated by feature flag)
-    storageClient.enableMultiFile();
+    if (isProUser) storageClient.enableMultiFile();
     return storageClient;
-  }, []);
+  }, [isProUser]);
 
   const askUserIfPull = useCallback(async () => {
     const confirmResult = await confirm({

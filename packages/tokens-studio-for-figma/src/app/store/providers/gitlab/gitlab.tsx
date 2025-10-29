@@ -37,8 +37,7 @@ export const clientFactory = async (context: GitlabCredentials, isProUser: boole
   const storageClient = new GitlabTokenStorage(secret, repositoryId, repoPathWithNamespace, baseUrl ?? '', branch, previousSourceBranch);
   if (filePath) storageClient.changePath(filePath);
   if (branch) storageClient.selectBranch(branch);
-  // Enable multi-file support by default (previously gated by feature flag)
-  storageClient.enableMultiFile();
+  if (isProUser) storageClient.enableMultiFile();
   return storageClient.assignProjectId();
 };
 
