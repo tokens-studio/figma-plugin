@@ -149,4 +149,50 @@ describe('updateVariables', () => {
     });
     expect(result.removedVariables).toEqual(['VariableID:1:toremove']);
   });
+
+  it('should expand composite tokens (typography, border, boxShadow) into individual variables', async () => {
+    const tokensWithComposite = {
+      core: [
+        {
+          name: 'heading.large',
+          value: {
+            fontFamily: 'Inter',
+            fontSize: '24px',
+            fontWeight: '700',
+            lineHeight: '1.5',
+          },
+          type: TokenTypes.TYPOGRAPHY,
+        },
+        {
+          name: 'border.primary',
+          value: {
+            color: '#ff0000',
+            width: '2px',
+            style: 'solid',
+          },
+          type: TokenTypes.BORDER,
+        },
+      ],
+    };
+
+    const result = await updateVariables({
+      collection,
+      mode: '1:2',
+      theme,
+      tokens: tokensWithComposite,
+      settings,
+      overallConfig: { core: TokenSetStatus.ENABLED },
+    });
+
+    // Should create variables for expanded properties
+    expect(result.variableIds['heading.large.fontFamily']).toBeDefined();
+    expect(result.variableIds['heading.large.fontSize']).toBeDefined();
+    expect(result.variableIds['heading.large.fontWeight']).toBeDefined();
+    expect(result.variableIds['heading.large.lineHeight']).toBeDefined();
+    expect(result.variableIds['border.primary.color']).toBeDefined();
+    expect(result.variableIds['border.primary.width']).toBeDefined();
+
+    // Should have 6 total expanded variables
+    expect(Object.keys(result.variableIds).length).toBe(6);
+  });
 });
