@@ -9,12 +9,14 @@ describe('CreateOrEditThemeForm', () => {
     const mockCancel = jest.fn();
     const mockStore = createMockStore({
       tokenState: {
-        themes: [{
-          id: 'light',
-          name: 'Light',
-          selectedTokenSets: {},
-          $figmaStyleReferences: {},
-        }],
+        themes: [
+          {
+            id: 'light',
+            name: 'Light',
+            selectedTokenSets: {},
+            $figmaStyleReferences: {},
+          },
+        ],
       },
     });
 
@@ -32,7 +34,9 @@ describe('CreateOrEditThemeForm', () => {
       </Provider>,
     );
 
-    expect((await result.findByTestId('create-or-edit-theme-form--input--name') as HTMLInputElement).value).toEqual('Light');
+    expect(((await result.findByTestId('create-or-edit-theme-form--input--name')) as HTMLInputElement).value).toEqual(
+      'Light',
+    );
 
     const stylesTabButton = await result.findByText('stylesAndVariables');
     act(() => stylesTabButton.click());

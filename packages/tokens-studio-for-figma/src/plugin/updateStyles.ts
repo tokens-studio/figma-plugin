@@ -25,42 +25,62 @@ export default async function updateStyles(
     .filter((theme) => Object.values(themeInfo.activeTheme).some((v) => v === theme.id))
     .reverse();
 
-  const styleTokens = tokens.map((token) => {
-    // When multiple theme has the same active Token set then the last activeTheme wins
-    const activeTheme = selectedTheme || activeThemes.find((theme) => Object.entries(theme.selectedTokenSets).some(([tokenSet]) => tokenSet === token.internal__Parent));
+  const styleTokens = tokens
+    .map((token) => {
+      // When multiple theme has the same active Token set then the last activeTheme wins
+      const activeTheme =
+        selectedTheme ||
+        activeThemes.find((theme) =>
+          Object.entries(theme.selectedTokenSets).some(([tokenSet]) => tokenSet === token.internal__Parent),
+        );
 
-    const prefix = settings.prefixStylesWithThemeName && activeTheme ? activeTheme.name : null;
-    const slice = settings?.ignoreFirstPartForStyles && token.name.split('.').length > 1 ? 1 : 0;
-    const path = convertTokenNameToPath(token.name, prefix, slice);
-    return {
-      ...token,
-      path,
-      value: typeof token.value === 'string' ? transformValue(token.value, token.type, settings.baseFontSize) : token.value,
-      styleId: activeTheme?.$figmaStyleReferences ? activeTheme?.$figmaStyleReferences[token.name] : '',
-    } as SingleToken<true, { path: string, styleId: string }>;
-  }).filter((token) => token.path);
+      const prefix = settings.prefixStylesWithThemeName && activeTheme ? activeTheme.name : null;
+      const slice = settings?.ignoreFirstPartForStyles && token.name.split('.').length > 1 ? 1 : 0;
+      const path = convertTokenNameToPath(token.name, prefix, slice);
+      return {
+        ...token,
+        path,
+        value:
+          typeof token.value === 'string'
+            ? transformValue(token.value, token.type, settings.baseFontSize)
+            : token.value,
+        styleId: activeTheme?.$figmaStyleReferences ? activeTheme?.$figmaStyleReferences[token.name] : '',
+      } as SingleToken<true, { path: string; styleId: string }>;
+    })
+    .filter((token) => token.path);
 
   const colorTokens = styleTokens.filter((n) => [TokenTypes.COLOR].includes(n.type)) as Extract<
-    typeof styleTokens[number],
-  { type: TokenTypes.COLOR }
+    (typeof styleTokens)[number],
+    { type: TokenTypes.COLOR }
   >[];
   const textTokens = styleTokens.filter((n) => [TokenTypes.TYPOGRAPHY].includes(n.type)) as Extract<
-    typeof styleTokens[number],
-  { type: TokenTypes.TYPOGRAPHY }
+    (typeof styleTokens)[number],
+    { type: TokenTypes.TYPOGRAPHY }
   >[];
   const effectTokens = styleTokens.filter((n) => [TokenTypes.BOX_SHADOW].includes(n.type)) as Extract<
-    typeof styleTokens[number],
-  { type: TokenTypes.BOX_SHADOW }
+    (typeof styleTokens)[number],
+    { type: TokenTypes.BOX_SHADOW }
   >[];
 
   if (!colorTokens && !textTokens && !effectTokens) return {};
 
   const allStyleIds = await Promise.all([
-    ...(colorTokens.length > 0 ? [updateColorStyles(colorTokens, shouldCreate, settings.renameExistingStylesAndVariables)] : []),
-    ...(textTokens.length > 0 ? [updateTextStyles(textTokens, settings.baseFontSize, shouldCreate, settings.renameExistingStylesAndVariables)] : []),
-    ...(effectTokens.length > 0 ? [updateEffectStyles({
-      effectTokens, baseFontSize: settings.baseFontSize, shouldCreate, shouldRename: settings.renameExistingStylesAndVariables,
-    })] : []),
+    ...(colorTokens.length > 0
+      ? [updateColorStyles(colorTokens, shouldCreate, settings.renameExistingStylesAndVariables)]
+      : []),
+    ...(textTokens.length > 0
+      ? [updateTextStyles(textTokens, settings.baseFontSize, shouldCreate, settings.renameExistingStylesAndVariables)]
+      : []),
+    ...(effectTokens.length > 0
+      ? [
+          updateEffectStyles({
+            effectTokens,
+            baseFontSize: settings.baseFontSize,
+            shouldCreate,
+            shouldRename: settings.renameExistingStylesAndVariables,
+          }),
+        ]
+      : []),
   ]).then((results) => Object.assign({}, ...results));
   if (styleTokens.length < tokens.length && shouldCreate) {
     notifyUI('Some styles were ignored due to "Ignore first part of token name" export setting', { error: true });

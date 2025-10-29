@@ -64,17 +64,18 @@ export async function applyTextCharacterValuesOnNode(
       await figma.loadFontAsync(node.fontName);
 
       // Use formatted display for objects and arrays, fallback to string for primitives
-      const value = typeof values.tokenValue === 'object' ? formatValueForDisplay(values.tokenValue) : values.tokenValue;
+      const value =
+        typeof values.tokenValue === 'object' ? formatValueForDisplay(values.tokenValue) : values.tokenValue;
       node.characters = String(value);
     }
   }
 
   // When a text token is applied we want to apply the token value
   if (
-    'characters' in node
-    && node.fontName !== figma.mixed
-    && typeof values.text === 'string'
-    && typeof data.text !== 'undefined'
+    'characters' in node &&
+    node.fontName !== figma.mixed &&
+    typeof values.text === 'string' &&
+    typeof data.text !== 'undefined'
   ) {
     if (!(await tryApplyVariableId(node, 'characters', data.text))) {
       await figma.loadFontAsync(node.fontName);

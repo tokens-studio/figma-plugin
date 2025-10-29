@@ -82,313 +82,476 @@ export enum AsyncMessageTypes {
 
 export type AsyncMessage<T extends AsyncMessageTypes, P = unknown> = P & { type: T };
 
-export type CredentialsAsyncMessage = AsyncMessage<AsyncMessageTypes.CREDENTIALS, {
-  credential: StorageTypeCredentials;
-}>;
+export type CredentialsAsyncMessage = AsyncMessage<
+  AsyncMessageTypes.CREDENTIALS,
+  {
+    credential: StorageTypeCredentials;
+  }
+>;
 export type CredentialsAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREDENTIALS>;
 
-export type ChangedTabsAsyncMessage = AsyncMessage<AsyncMessageTypes.CHANGED_TABS, { requiresSelectionValues: boolean; }>;
+export type ChangedTabsAsyncMessage = AsyncMessage<
+  AsyncMessageTypes.CHANGED_TABS,
+  { requiresSelectionValues: boolean }
+>;
 export type ChangedTabsAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CHANGED_TABS>;
 
-export type SetOnboardingExplainerSetsAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSETS, { onboardingExplainerSets: boolean; }>;
+export type SetOnboardingExplainerSetsAsyncMessage = AsyncMessage<
+  AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSETS,
+  { onboardingExplainerSets: boolean }
+>;
 export type SetOnboardingExplainerSetsAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSETS>;
 
-export type SetOnboardingExplainerExportSetsAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINEREXPORTSETS, { onboardingExplainerExportSets: boolean; }>;
-export type SetOnboardingExplainerExportSetsAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINEREXPORTSETS>;
+export type SetOnboardingExplainerExportSetsAsyncMessage = AsyncMessage<
+  AsyncMessageTypes.SET_ONBOARDINGEXPLAINEREXPORTSETS,
+  { onboardingExplainerExportSets: boolean }
+>;
+export type SetOnboardingExplainerExportSetsAsyncMessageResult =
+  AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINEREXPORTSETS>;
 
-export type SetOnboardingExplainerSyncProvidersAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSYNCPROVIDERS, { onboardingExplainerSyncProviders: boolean; }>;
-export type SetOnboardingExplainerSyncProvidersAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSYNCPROVIDERS>;
+export type SetOnboardingExplainerSyncProvidersAsyncMessage = AsyncMessage<
+  AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSYNCPROVIDERS,
+  { onboardingExplainerSyncProviders: boolean }
+>;
+export type SetOnboardingExplainerSyncProvidersAsyncMessageResult =
+  AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSYNCPROVIDERS>;
 
-export type SetOnboardingExplainerInspectAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINERINSPECT, { onboardingExplainerInspect: boolean; }>;
-export type SetOnboardingExplainerInspectAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINERINSPECT>;
+export type SetOnboardingExplainerInspectAsyncMessage = AsyncMessage<
+  AsyncMessageTypes.SET_ONBOARDINGEXPLAINERINSPECT,
+  { onboardingExplainerInspect: boolean }
+>;
+export type SetOnboardingExplainerInspectAsyncMessageResult =
+  AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINERINSPECT>;
 
-export type RemoveSingleCredentialAsyncMessage = AsyncMessage<AsyncMessageTypes.REMOVE_SINGLE_CREDENTIAL, { context: StorageTypeCredentials; }>;
+export type RemoveSingleCredentialAsyncMessage = AsyncMessage<
+  AsyncMessageTypes.REMOVE_SINGLE_CREDENTIAL,
+  { context: StorageTypeCredentials }
+>;
 export type RemoveSingleCredentialAsyncMessageResult = AsyncMessage<AsyncMessageTypes.REMOVE_SINGLE_CREDENTIAL>;
 
-export type SetStorageTypeAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_STORAGE_TYPE, { storageType: StorageType; }>;
+export type SetStorageTypeAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_STORAGE_TYPE, { storageType: StorageType }>;
 export type SetStorageTypeAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_STORAGE_TYPE>;
 
-export type SetNodeDataAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_NODE_DATA, { values: NodeTokenRefMap; tokens: AnyTokenList; settings: SettingsState; }>;
+export type SetNodeDataAsyncMessage = AsyncMessage<
+  AsyncMessageTypes.SET_NODE_DATA,
+  { values: NodeTokenRefMap; tokens: AnyTokenList; settings: SettingsState }
+>;
 export type SetNodeDataAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_NODE_DATA>;
 
-export type RemoveTokensByValueAsyncMessage = AsyncMessage<AsyncMessageTypes.REMOVE_TOKENS_BY_VALUE, {
-  tokensToRemove: { nodes: NodeInfo[]; property: Properties }[];
-}>;
+export type RemoveTokensByValueAsyncMessage = AsyncMessage<
+  AsyncMessageTypes.REMOVE_TOKENS_BY_VALUE,
+  {
+    tokensToRemove: { nodes: NodeInfo[]; property: Properties }[];
+  }
+>;
 export type RemoveTokensByValueAsyncMessageResult = AsyncMessage<AsyncMessageTypes.REMOVE_TOKENS_BY_VALUE>;
 
-export type SetNoneValuesOnNodeAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_NONE_VALUES_ON_NODE, {
-  tokensToSet: { nodes: NodeInfo[]; property: Properties }[];
-  tokens: AnyTokenList
-}>;
+export type SetNoneValuesOnNodeAsyncMessage = AsyncMessage<
+  AsyncMessageTypes.SET_NONE_VALUES_ON_NODE,
+  {
+    tokensToSet: { nodes: NodeInfo[]; property: Properties }[];
+    tokens: AnyTokenList;
+  }
+>;
 export type SetNoneValuesOnNodeAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_NONE_VALUES_ON_NODE>;
 
-export type RemapTokensAsyncMessage = AsyncMessage<AsyncMessageTypes.REMAP_TOKENS, {
-  oldName: string;
-  newName: string;
-  updateMode: UpdateMode;
-  category?: Properties | TokenTypes;
-  tokens?: AnyTokenList;
-  settings?: SettingsState;
-}>;
+export type RemapTokensAsyncMessage = AsyncMessage<
+  AsyncMessageTypes.REMAP_TOKENS,
+  {
+    oldName: string;
+    newName: string;
+    updateMode: UpdateMode;
+    category?: Properties | TokenTypes;
+    tokens?: AnyTokenList;
+    settings?: SettingsState;
+  }
+>;
 export type RemapTokensMessageAsyncResult = AsyncMessage<AsyncMessageTypes.REMAP_TOKENS>;
 
-export type BulkRemapTokensAsyncMessage = AsyncMessage<AsyncMessageTypes.BULK_REMAP_TOKENS, {
-  oldName: string;
-  newName: string;
-  updateMode: UpdateMode;
-  useRegex: boolean;
-}>;
+export type BulkRemapTokensAsyncMessage = AsyncMessage<
+  AsyncMessageTypes.BULK_REMAP_TOKENS,
+  {
+    oldName: string;
+    newName: string;
+    updateMode: UpdateMode;
+    useRegex: boolean;
+  }
+>;
 export type BulkRemapTokensMessageAsyncResult = AsyncMessage<AsyncMessageTypes.BULK_REMAP_TOKENS>;
 
-export type GotoNodeAsyncMessage = AsyncMessage<AsyncMessageTypes.GOTO_NODE, {
-  id: string;
-}>;
+export type GotoNodeAsyncMessage = AsyncMessage<
+  AsyncMessageTypes.GOTO_NODE,
+  {
+    id: string;
+  }
+>;
 export type GotoNodeMessageAsyncResult = AsyncMessage<AsyncMessageTypes.GOTO_NODE>;
 
 export type SelectNodesAsyncMessage = AsyncMessage<AsyncMessageTypes.SELECT_NODES, { ids: string[] }>;
 export type SelectNodesMessageAsyncResult = AsyncMessage<AsyncMessageTypes.SELECT_NODES>;
 
-export type PullStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.PULL_STYLES, { styleTypes: PullStyleOptions; }>;
+export type PullStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.PULL_STYLES, { styleTypes: PullStyleOptions }>;
 export type PullStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.PULL_STYLES>;
 
-export type PullVariablesAsyncMessage = AsyncMessage<AsyncMessageTypes.PULL_VARIABLES, {
-  options: PullVariablesOptions;
-  themes: ThemeObjectsList;
-  proUser: boolean;
-}>;
+export type PullVariablesAsyncMessage = AsyncMessage<
+  AsyncMessageTypes.PULL_VARIABLES,
+  {
+    options: PullVariablesOptions;
+    themes: ThemeObjectsList;
+    proUser: boolean;
+  }
+>;
 export type PullVariablesMessageResult = AsyncMessage<AsyncMessageTypes.PULL_VARIABLES>;
 
-export type NotifyAsyncMessage = AsyncMessage<AsyncMessageTypes.NOTIFY, {
-  msg: string;
-  opts: {
-    error?: boolean
-  };
-}>;
+export type NotifyAsyncMessage = AsyncMessage<
+  AsyncMessageTypes.NOTIFY,
+  {
+    msg: string;
+    opts: {
+      error?: boolean;
+    };
+  }
+>;
 export type NotifyAsyncMessageResult = AsyncMessage<AsyncMessageTypes.NOTIFY>;
 
-export type ResizeWindowAsyncMessage = AsyncMessage<AsyncMessageTypes.RESIZE_WINDOW, {
-  width: number;
-  height: number;
-}>;
+export type ResizeWindowAsyncMessage = AsyncMessage<
+  AsyncMessageTypes.RESIZE_WINDOW,
+  {
+    width: number;
+    height: number;
+  }
+>;
 export type ResizeWindowAsyncMessageResult = AsyncMessage<AsyncMessageTypes.RESIZE_WINDOW>;
 
 export type CancelOperationAsyncMessage = AsyncMessage<AsyncMessageTypes.CANCEL_OPERATION>;
 export type CancelOperationAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CANCEL_OPERATION>;
 
-export type SetShowEmptyGroupsAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_SHOW_EMPTY_GROUPS, { showEmptyGroups: boolean; }>;
+export type SetShowEmptyGroupsAsyncMessage = AsyncMessage<
+  AsyncMessageTypes.SET_SHOW_EMPTY_GROUPS,
+  { showEmptyGroups: boolean }
+>;
 export type SetShowEmptyGroupsAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_SHOW_EMPTY_GROUPS>;
 
 export type SetUiAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_UI, SettingsState>;
 export type SetUiAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_UI>;
 
-export type CreateAnnotationAsyncMessage = AsyncMessage<AsyncMessageTypes.CREATE_ANNOTATION, {
-  tokens: SelectionValue;
-  direction: Direction;
-}>;
+export type CreateAnnotationAsyncMessage = AsyncMessage<
+  AsyncMessageTypes.CREATE_ANNOTATION,
+  {
+    tokens: SelectionValue;
+    direction: Direction;
+  }
+>;
 export type CreateAnnotationAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_ANNOTATION>;
 
-export type CreateLivingDocumentationAsyncMessage = AsyncMessage<AsyncMessageTypes.CREATE_LIVING_DOCUMENTATION, {
-  tokenSet: string;
-  startsWith: string;
-  applyTokens: boolean;
-  resolvedTokens: AnyTokenList;
-  useRegex?: boolean;
-}>;
+export type CreateLivingDocumentationAsyncMessage = AsyncMessage<
+  AsyncMessageTypes.CREATE_LIVING_DOCUMENTATION,
+  {
+    tokenSet: string;
+    startsWith: string;
+    applyTokens: boolean;
+    resolvedTokens: AnyTokenList;
+    useRegex?: boolean;
+  }
+>;
 export type CreateLivingDocumentationAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_LIVING_DOCUMENTATION>;
 
-export type CreateStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.CREATE_STYLES, {
-  tokens: AnyTokenList;
-  sourceTokens: AnyTokenList;
-  settings: SettingsState;
-  selectedTheme?: ThemeObject;
-}>;
-export type CreateStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_STYLES, {
-  styleIds: Record<string, string>;
-}>;
+export type CreateStylesAsyncMessage = AsyncMessage<
+  AsyncMessageTypes.CREATE_STYLES,
+  {
+    tokens: AnyTokenList;
+    sourceTokens: AnyTokenList;
+    settings: SettingsState;
+    selectedTheme?: ThemeObject;
+  }
+>;
+export type CreateStylesAsyncMessageResult = AsyncMessage<
+  AsyncMessageTypes.CREATE_STYLES,
+  {
+    styleIds: Record<string, string>;
+  }
+>;
 
-export type RenameStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.RENAME_STYLES, {
-  tokensToRename: TokensToRenamePayload[];
-  parent: string;
-  settings: Partial<SettingsState>;
-}>;
-export type RenameStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.RENAME_STYLES, {
-  styleIds: string[];
-}>;
+export type RenameStylesAsyncMessage = AsyncMessage<
+  AsyncMessageTypes.RENAME_STYLES,
+  {
+    tokensToRename: TokensToRenamePayload[];
+    parent: string;
+    settings: Partial<SettingsState>;
+  }
+>;
+export type RenameStylesAsyncMessageResult = AsyncMessage<
+  AsyncMessageTypes.RENAME_STYLES,
+  {
+    styleIds: string[];
+  }
+>;
 
-export type RemoveStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.REMOVE_STYLES, {
-  token: DeleteTokenPayload;
-  settings: Partial<SettingsState>;
-}>;
-export type RemoveStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.REMOVE_STYLES, {
-  styleIds: string[];
-}>;
+export type RemoveStylesAsyncMessage = AsyncMessage<
+  AsyncMessageTypes.REMOVE_STYLES,
+  {
+    token: DeleteTokenPayload;
+    settings: Partial<SettingsState>;
+  }
+>;
+export type RemoveStylesAsyncMessageResult = AsyncMessage<
+  AsyncMessageTypes.REMOVE_STYLES,
+  {
+    styleIds: string[];
+  }
+>;
 
-export type UpdateAsyncMessage = AsyncMessage<AsyncMessageTypes.UPDATE, {
-  tokenValues: Record<string, AnyTokenList>;
-  tokens: AnyTokenList | null;
-  themes: ThemeObjectsList
-  compressedTokens: string;
-  compressedThemes: string;
-  updatedAt: string;
-  settings: SettingsState;
-  usedTokenSet: UsedTokenSetsMap;
-  activeTheme: Record<string, string>;
-  checkForChanges?: boolean
-  shouldSwapStyles?: boolean;
-  collapsedTokenSets: string[];
-  tokenFormat: TokenFormatOptions;
-  storageProvider: StorageProviderType;
-  storageSize: number;
-}>;
-export type UpdateAsyncMessageResult = AsyncMessage<AsyncMessageTypes.UPDATE, {
-  nodes: number
-}>;
+export type UpdateAsyncMessage = AsyncMessage<
+  AsyncMessageTypes.UPDATE,
+  {
+    tokenValues: Record<string, AnyTokenList>;
+    tokens: AnyTokenList | null;
+    themes: ThemeObjectsList;
+    compressedTokens: string;
+    compressedThemes: string;
+    updatedAt: string;
+    settings: SettingsState;
+    usedTokenSet: UsedTokenSetsMap;
+    activeTheme: Record<string, string>;
+    checkForChanges?: boolean;
+    shouldSwapStyles?: boolean;
+    collapsedTokenSets: string[];
+    tokenFormat: TokenFormatOptions;
+    storageProvider: StorageProviderType;
+    storageSize: number;
+  }
+>;
+export type UpdateAsyncMessageResult = AsyncMessage<
+  AsyncMessageTypes.UPDATE,
+  {
+    nodes: number;
+  }
+>;
 
-export type UpdateCheckForChangesAsyncMessage = AsyncMessage<AsyncMessageTypes.UPDATE_CHECK_FOR_CHANGES, {
-  checkForChanges: boolean;
-}>;
+export type UpdateCheckForChangesAsyncMessage = AsyncMessage<
+  AsyncMessageTypes.UPDATE_CHECK_FOR_CHANGES,
+  {
+    checkForChanges: boolean;
+  }
+>;
 export type UpdateCheckForChangesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.UPDATE_CHECK_FOR_CHANGES>;
 
-export type SetLicenseKeyMessage = AsyncMessage<AsyncMessageTypes.SET_LICENSE_KEY, {
-  licenseKey: string | null
-}>;
+export type SetLicenseKeyMessage = AsyncMessage<
+  AsyncMessageTypes.SET_LICENSE_KEY,
+  {
+    licenseKey: string | null;
+  }
+>;
 export type SetLicenseKeyMessageResult = AsyncMessage<AsyncMessageTypes.SET_LICENSE_KEY>;
 
-export type SetInitialLoadMessage = AsyncMessage<AsyncMessageTypes.SET_INITIAL_LOAD, {
-  initialLoad: boolean | null
-}>;
+export type SetInitialLoadMessage = AsyncMessage<
+  AsyncMessageTypes.SET_INITIAL_LOAD,
+  {
+    initialLoad: boolean | null;
+  }
+>;
 export type SetInitialLoadMessageResult = AsyncMessage<AsyncMessageTypes.SET_INITIAL_LOAD>;
 
-export type AttachLocalStylesToTheme = AsyncMessage<AsyncMessageTypes.ATTACH_LOCAL_STYLES_TO_THEME, {
-  theme: ThemeObject
-  tokens: Record<string, AnyTokenList>
-  category: 'typography' | 'colors' | 'effects' | 'all'
-  settings?: Partial<SettingsState>
-}>;
+export type AttachLocalStylesToTheme = AsyncMessage<
+  AsyncMessageTypes.ATTACH_LOCAL_STYLES_TO_THEME,
+  {
+    theme: ThemeObject;
+    tokens: Record<string, AnyTokenList>;
+    category: 'typography' | 'colors' | 'effects' | 'all';
+    settings?: Partial<SettingsState>;
+  }
+>;
 export type AttachLocalStylesToThemeResult = AsyncMessage<AsyncMessageTypes.ATTACH_LOCAL_STYLES_TO_THEME, ThemeObject>;
 
-export type ResolveStyleInfo = AsyncMessage<AsyncMessageTypes.RESOLVE_STYLE_INFO, {
-  styleIds: string[]
-}>;
-export type ResolveStyleInfoResult = AsyncMessage<AsyncMessageTypes.RESOLVE_STYLE_INFO, {
-  resolvedValues: {
-    id: string
-    key?: string
-    name?: string
-  }[];
-}>;
+export type ResolveStyleInfo = AsyncMessage<
+  AsyncMessageTypes.RESOLVE_STYLE_INFO,
+  {
+    styleIds: string[];
+  }
+>;
+export type ResolveStyleInfoResult = AsyncMessage<
+  AsyncMessageTypes.RESOLVE_STYLE_INFO,
+  {
+    resolvedValues: {
+      id: string;
+      key?: string;
+      name?: string;
+    }[];
+  }
+>;
 
 export type GetThemeInfoMessage = AsyncMessage<AsyncMessageTypes.GET_THEME_INFO>;
-export type GetThemeInfoMessageResult = AsyncMessage<AsyncMessageTypes.GET_THEME_INFO, {
-  activeTheme: Record<string, string>
-  themes: ThemeObjectsList
-}>;
+export type GetThemeInfoMessageResult = AsyncMessage<
+  AsyncMessageTypes.GET_THEME_INFO,
+  {
+    activeTheme: Record<string, string>;
+    themes: ThemeObjectsList;
+  }
+>;
 
-export type StartupMessage = AsyncMessage<AsyncMessageTypes.STARTUP, (
+export type StartupMessage = AsyncMessage<
+  AsyncMessageTypes.STARTUP,
   ReturnType<typeof startup> extends Promise<infer V> ? V : unknown
-)>;
+>;
 export type StartupMessageResult = AsyncMessage<AsyncMessageTypes.STARTUP>;
 
 export type GetFigmaFontsMessage = AsyncMessage<AsyncMessageTypes.GET_FIGMA_FONTS>;
-export type GetFigmaFontsMessageResult = AsyncMessage<AsyncMessageTypes.GET_FIGMA_FONTS, {
-  fonts: Array<Font>
-}>;
+export type GetFigmaFontsMessageResult = AsyncMessage<
+  AsyncMessageTypes.GET_FIGMA_FONTS,
+  {
+    fonts: Array<Font>;
+  }
+>;
 
 export type GetAvailableVariableCollectionsMessage = AsyncMessage<AsyncMessageTypes.GET_AVAILABLE_VARIABLE_COLLECTIONS>;
-export type GetAvailableVariableCollectionsMessageResult = AsyncMessage<AsyncMessageTypes.GET_AVAILABLE_VARIABLE_COLLECTIONS, {
-  collections: VariableCollectionInfo[]
-}>;
+export type GetAvailableVariableCollectionsMessageResult = AsyncMessage<
+  AsyncMessageTypes.GET_AVAILABLE_VARIABLE_COLLECTIONS,
+  {
+    collections: VariableCollectionInfo[];
+  }
+>;
 
-export type RemoveStylesWithoutConnectionMessage = AsyncMessage<AsyncMessageTypes.REMOVE_STYLES_WITHOUT_CONNECTION, {
-  usedStyleIds: string[]
-}>;
-export type RemoveStylesWithoutConnectionResult = AsyncMessage<AsyncMessageTypes.REMOVE_STYLES_WITHOUT_CONNECTION, {
-  countOfRemovedStyles: number
-}>;
-export type SetAuthDataMessage = AsyncMessage<AsyncMessageTypes.SET_AUTH_DATA, {
-  auth: AuthData | null
-}>;
+export type RemoveStylesWithoutConnectionMessage = AsyncMessage<
+  AsyncMessageTypes.REMOVE_STYLES_WITHOUT_CONNECTION,
+  {
+    usedStyleIds: string[];
+  }
+>;
+export type RemoveStylesWithoutConnectionResult = AsyncMessage<
+  AsyncMessageTypes.REMOVE_STYLES_WITHOUT_CONNECTION,
+  {
+    countOfRemovedStyles: number;
+  }
+>;
+export type SetAuthDataMessage = AsyncMessage<
+  AsyncMessageTypes.SET_AUTH_DATA,
+  {
+    auth: AuthData | null;
+  }
+>;
 export type SetAuthDataMessageResult = AsyncMessage<AsyncMessageTypes.SET_AUTH_DATA>;
 
-export type SetUsedEmailMessage = AsyncMessage<AsyncMessageTypes.SET_USED_EMAIL, {
-  email: string | undefined
-}>;
+export type SetUsedEmailMessage = AsyncMessage<
+  AsyncMessageTypes.SET_USED_EMAIL,
+  {
+    email: string | undefined;
+  }
+>;
 
 export type SetUsedEmailMessageResult = AsyncMessage<AsyncMessageTypes.SET_USED_EMAIL>;
 
-export type CreateLocalVariablesAsyncMessage = AsyncMessage<AsyncMessageTypes.CREATE_LOCAL_VARIABLES, {
-  tokens: Record<string, AnyTokenList>;
-  settings: SettingsState,
-  selectedThemes?: string[]
-}>;
-export type CreateLocalVariablesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_LOCAL_VARIABLES, {
-  variableIds: Record<string, LocalVariableInfo>
-  totalVariables: number
-}>;
+export type CreateLocalVariablesAsyncMessage = AsyncMessage<
+  AsyncMessageTypes.CREATE_LOCAL_VARIABLES,
+  {
+    tokens: Record<string, AnyTokenList>;
+    settings: SettingsState;
+    selectedThemes?: string[];
+  }
+>;
+export type CreateLocalVariablesAsyncMessageResult = AsyncMessage<
+  AsyncMessageTypes.CREATE_LOCAL_VARIABLES,
+  {
+    variableIds: Record<string, LocalVariableInfo>;
+    totalVariables: number;
+  }
+>;
 
-export type CreateLocalVariablesWithoutModesAsyncMessage = AsyncMessage<AsyncMessageTypes.CREATE_LOCAL_VARIABLES_WITHOUT_MODES, {
-  tokens: Record<string, AnyTokenList>;
-  settings: SettingsState,
-  selectedSets: ExportTokenSet[]
-}>;
-export type CreateLocalVariablesWithoutModesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_LOCAL_VARIABLES_WITHOUT_MODES, {
-  variableIds: Record<string, LocalVariableInfo>
-  totalVariables: number
-}>;
+export type CreateLocalVariablesWithoutModesAsyncMessage = AsyncMessage<
+  AsyncMessageTypes.CREATE_LOCAL_VARIABLES_WITHOUT_MODES,
+  {
+    tokens: Record<string, AnyTokenList>;
+    settings: SettingsState;
+    selectedSets: ExportTokenSet[];
+  }
+>;
+export type CreateLocalVariablesWithoutModesAsyncMessageResult = AsyncMessage<
+  AsyncMessageTypes.CREATE_LOCAL_VARIABLES_WITHOUT_MODES,
+  {
+    variableIds: Record<string, LocalVariableInfo>;
+    totalVariables: number;
+  }
+>;
 
-export type ResolveVariableInfo = AsyncMessage<AsyncMessageTypes.RESOLVE_VARIABLE_INFO, {
-  variableIds: string[]
-}>;
-export type ResolveVariableInfoResult = AsyncMessage<AsyncMessageTypes.RESOLVE_VARIABLE_INFO, {
-  resolvedValues: Record<string, ResolvedVariableInfo>;
-}>;
+export type ResolveVariableInfo = AsyncMessage<
+  AsyncMessageTypes.RESOLVE_VARIABLE_INFO,
+  {
+    variableIds: string[];
+  }
+>;
+export type ResolveVariableInfoResult = AsyncMessage<
+  AsyncMessageTypes.RESOLVE_VARIABLE_INFO,
+  {
+    resolvedValues: Record<string, ResolvedVariableInfo>;
+  }
+>;
 
-export type AttachLocalVariablesToTheme = AsyncMessage<AsyncMessageTypes.ATTACH_LOCAL_VARIABLES_TO_THEME, {
-  theme: ThemeObject
-  tokens: Record<string, AnyTokenList>
-}>;
-export type AttachLocalVariablesToThemeResult = AsyncMessage<AsyncMessageTypes.ATTACH_LOCAL_VARIABLES_TO_THEME, {
-  variableInfo: LocalVariableInfo | null
-}>;
+export type AttachLocalVariablesToTheme = AsyncMessage<
+  AsyncMessageTypes.ATTACH_LOCAL_VARIABLES_TO_THEME,
+  {
+    theme: ThemeObject;
+    tokens: Record<string, AnyTokenList>;
+  }
+>;
+export type AttachLocalVariablesToThemeResult = AsyncMessage<
+  AsyncMessageTypes.ATTACH_LOCAL_VARIABLES_TO_THEME,
+  {
+    variableInfo: LocalVariableInfo | null;
+  }
+>;
 
-export type RenameVariablesAsyncMessage = AsyncMessage<AsyncMessageTypes.RENAME_VARIABLES, {
-  tokens: {
-    oldName: string;
-    newName: string;
-  }[]
-}>;
-export type RenameVariablesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.RENAME_VARIABLES, {
-  renameVariableToken: RenameVariableToken[];
-}>;
+export type RenameVariablesAsyncMessage = AsyncMessage<
+  AsyncMessageTypes.RENAME_VARIABLES,
+  {
+    tokens: {
+      oldName: string;
+      newName: string;
+    }[];
+  }
+>;
+export type RenameVariablesAsyncMessageResult = AsyncMessage<
+  AsyncMessageTypes.RENAME_VARIABLES,
+  {
+    renameVariableToken: RenameVariableToken[];
+  }
+>;
 
-export type UpdateVariablesAsyncMessage = AsyncMessage<AsyncMessageTypes.UPDATE_VARIABLES, {
-  payload: UpdateTokenVariablePayload
-}>;
+export type UpdateVariablesAsyncMessage = AsyncMessage<
+  AsyncMessageTypes.UPDATE_VARIABLES,
+  {
+    payload: UpdateTokenVariablePayload;
+  }
+>;
 export type UpdateVariablesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.UPDATE_VARIABLES>;
 
 export type RemoveRelaunchDataMessage = AsyncMessage<
-AsyncMessageTypes.REMOVE_RELAUNCH_DATA,
-{
-  area: UpdateMode;
-}
+  AsyncMessageTypes.REMOVE_RELAUNCH_DATA,
+  {
+    area: UpdateMode;
+  }
 >;
 export type RemoveRelaunchDataMessageResult = AsyncMessage<AsyncMessageTypes.REMOVE_RELAUNCH_DATA>;
 
-export type SetVariableExportSettingsMessage = AsyncMessage<AsyncMessageTypes.SET_VARIABLE_EXPORT_SETTINGS, {
-  settings: string;
-}>;
+export type SetVariableExportSettingsMessage = AsyncMessage<
+  AsyncMessageTypes.SET_VARIABLE_EXPORT_SETTINGS,
+  {
+    settings: string;
+  }
+>;
 export type SetVariableExportSettingsMessageResult = AsyncMessage<AsyncMessageTypes.SET_VARIABLE_EXPORT_SETTINGS>;
 
-export type SetSelectedExportThemesMessage = AsyncMessage<AsyncMessageTypes.SET_SELECTED_EXPORT_THEMES, {
-  themes: string;
-}>;
+export type SetSelectedExportThemesMessage = AsyncMessage<
+  AsyncMessageTypes.SET_SELECTED_EXPORT_THEMES,
+  {
+    themes: string;
+  }
+>;
 export type SetSelectedExportThemesMessageResult = AsyncMessage<AsyncMessageTypes.SET_SELECTED_EXPORT_THEMES>;
 
 export type PreviewRequestStartupAsyncMessage = AsyncMessage<AsyncMessageTypes.PREVIEW_REQUEST_STARTUP>;
 export type PreviewRequestStartupAsyncMessageResult = AsyncMessage<AsyncMessageTypes.PREVIEW_REQUEST_STARTUP>;
 
 export type AsyncMessages =
-  CreateStylesAsyncMessage
+  | CreateStylesAsyncMessage
   | RenameStylesAsyncMessage
   | RemoveStylesAsyncMessage
   | CredentialsAsyncMessage
@@ -440,7 +603,7 @@ export type AsyncMessages =
   | SetSelectedExportThemesMessage;
 
 export type AsyncMessageResults =
-  CreateStylesAsyncMessageResult
+  | CreateStylesAsyncMessageResult
   | RenameStylesAsyncMessageResult
   | RemoveStylesAsyncMessageResult
   | CredentialsAsyncMessageResult
@@ -492,8 +655,8 @@ export type AsyncMessageResults =
   | SetSelectedExportThemesMessageResult;
 
 export type AsyncMessagesMap = {
-  [K in AsyncMessageTypes]: Extract<AsyncMessages, { type: K }>
+  [K in AsyncMessageTypes]: Extract<AsyncMessages, { type: K }>;
 };
 export type AsyncMessageResultsMap = {
-  [K in AsyncMessageTypes]: Extract<AsyncMessageResults, { type: K }>
+  [K in AsyncMessageTypes]: Extract<AsyncMessageResults, { type: K }>;
 };

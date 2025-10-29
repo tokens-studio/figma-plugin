@@ -1,7 +1,4 @@
-import {
-  MessageFromPluginTypes,
-  PostToUIMessage,
-} from '@/types/messages';
+import { MessageFromPluginTypes, PostToUIMessage } from '@/types/messages';
 import { TokenStore } from '@/types/tokens';
 import { SelectionGroup } from '@/types/SelectionGroup';
 import { SelectionValue } from '@/types/SelectionValue';
@@ -61,11 +58,11 @@ export function notifySelection({
 }
 
 export type SavedSettings = {
-  language: string,
+  language: string;
   sessionRecording: boolean;
   width: number;
   height: number;
-  showEmptyGroups: boolean
+  showEmptyGroups: boolean;
   updateMode: UpdateMode;
   updateRemote: boolean;
   updateOnChange: boolean;
@@ -93,39 +90,37 @@ export type SavedSettings = {
   autoApplyThemeOnDrop: boolean;
 };
 
-export function notifyUISettings(
-  {
-    language,
-    sessionRecording,
-    width,
-    height,
-    updateMode,
-    updateOnChange,
-    applyVariablesStylesOrRawValue,
-    shouldUpdateStyles,
-    showEmptyGroups,
-    variablesColor,
-    variablesNumber,
-    variablesString,
-    variablesBoolean,
-    stylesColor,
-    stylesTypography,
-    stylesEffect,
-    ignoreFirstPartForStyles,
-    createStylesWithVariableReferences,
-    prefixStylesWithThemeName,
-    updateRemote = true,
-    inspectDeep,
-    shouldSwapStyles,
-    shouldSwapFigmaModes,
-    baseFontSize,
-    aliasBaseFontSize,
-    storeTokenIdInJsonEditor,
-    tokenFormat,
-    renameExistingStylesAndVariables,
-    removeStylesAndVariablesWithoutConnection,
-  }: SavedSettings,
-) {
+export function notifyUISettings({
+  language,
+  sessionRecording,
+  width,
+  height,
+  updateMode,
+  updateOnChange,
+  applyVariablesStylesOrRawValue,
+  shouldUpdateStyles,
+  showEmptyGroups,
+  variablesColor,
+  variablesNumber,
+  variablesString,
+  variablesBoolean,
+  stylesColor,
+  stylesTypography,
+  stylesEffect,
+  ignoreFirstPartForStyles,
+  createStylesWithVariableReferences,
+  prefixStylesWithThemeName,
+  updateRemote = true,
+  inspectDeep,
+  shouldSwapStyles,
+  shouldSwapFigmaModes,
+  baseFontSize,
+  aliasBaseFontSize,
+  storeTokenIdInJsonEditor,
+  tokenFormat,
+  renameExistingStylesAndVariables,
+  removeStylesAndVariablesWithoutConnection,
+}: SavedSettings) {
   postToUI({
     type: MessageFromPluginTypes.UI_SETTINGS,
     settings: {
@@ -176,10 +171,7 @@ export function notifyStyleValues(values: Record<string, StyleToCreateToken[]>) 
   postToUI({ type: MessageFromPluginTypes.STYLES, values });
 }
 
-export function notifyVariableValues(
-  values: Record<string, VariableToCreateToken[]>,
-  themes?: ThemeObjectsList,
-) {
+export function notifyVariableValues(values: Record<string, VariableToCreateToken[]>, themes?: ThemeObjectsList) {
   postToUI({
     type: MessageFromPluginTypes.VARIABLES,
     values,

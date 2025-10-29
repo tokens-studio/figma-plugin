@@ -167,7 +167,10 @@ describe('convertStringtoFigmaGradient', () => {
           position: 1,
         },
       ],
-      gradientTransform: [[1, 0, 0], [0, 1, 0]],
+      gradientTransform: [
+        [1, 0, 0],
+        [0, 1, 0],
+      ],
     },
   };
 
@@ -271,7 +274,8 @@ describe('convertStringtoFigmaGradient with OKLCH colors', () => {
 
   it('should convert OKLCH colors with alpha in gradients', () => {
     // Test gradient with OKLCH colors with alpha and mixed color formats
-    const oklchAlphaGradient = 'linear-gradient(90deg, oklch(0.5 0.1 180 / 0.5) 0%, oklch(0.8 0.15 240) 50%, rgba(255,0,0,0.8) 100%)';
+    const oklchAlphaGradient =
+      'linear-gradient(90deg, oklch(0.5 0.1 180 / 0.5) 0%, oklch(0.8 0.15 240) 50%, rgba(255,0,0,0.8) 100%)';
     const oklchAlphaResult = convertStringToFigmaGradient(oklchAlphaGradient);
 
     expect(oklchAlphaResult.gradientStops).toHaveLength(3);
@@ -379,12 +383,21 @@ describe('radial and conic gradients', () => {
     expect(result.type).toEqual('GRADIENT_RADIAL');
     expect(result.gradientStops).toHaveLength(2);
     expect(result.gradientStops[0].color).toEqual({
-      r: 1, g: 0, b: 0, a: 1,
+      r: 1,
+      g: 0,
+      b: 0,
+      a: 1,
     });
     expect(result.gradientStops[1].color).toEqual({
-      r: 0, g: 0, b: 1, a: 1,
+      r: 0,
+      g: 0,
+      b: 1,
+      a: 1,
     });
-    expect(result.gradientTransform).toEqual([[1, 0, 0], [0, 1, 0]]);
+    expect(result.gradientTransform).toEqual([
+      [1, 0, 0],
+      [0, 1, 0],
+    ]);
   });
 
   it('should convert conic gradient', () => {
@@ -392,10 +405,16 @@ describe('radial and conic gradients', () => {
     expect(result.type).toEqual('GRADIENT_ANGULAR');
     expect(result.gradientStops).toHaveLength(2);
     expect(result.gradientStops[0].color).toEqual({
-      r: 1, g: 0, b: 0, a: 1,
+      r: 1,
+      g: 0,
+      b: 0,
+      a: 1,
     });
     expect(result.gradientStops[1].color).toEqual({
-      r: 0, g: 0, b: 1, a: 1,
+      r: 0,
+      g: 0,
+      b: 1,
+      a: 1,
     });
   });
 
@@ -439,18 +458,27 @@ describe('convertFigmaGradientToString with gradient types', () => {
       gradientStops: [
         {
           color: {
-            r: 1, g: 0, b: 0, a: 1,
+            r: 1,
+            g: 0,
+            b: 0,
+            a: 1,
           },
           position: 0,
         },
         {
           color: {
-            r: 0, g: 0, b: 1, a: 1,
+            r: 0,
+            g: 0,
+            b: 1,
+            a: 1,
           },
           position: 1,
         },
       ],
-      gradientTransform: [[1, 0, 0], [0, 1, 0]],
+      gradientTransform: [
+        [1, 0, 0],
+        [0, 1, 0],
+      ],
     };
     const result = convertFigmaGradientToString(paint);
     expect(result).toEqual('radial-gradient(#ff0000 0%, #0000ff 100%)');
@@ -462,18 +490,27 @@ describe('convertFigmaGradientToString with gradient types', () => {
       gradientStops: [
         {
           color: {
-            r: 1, g: 0, b: 0, a: 1,
+            r: 1,
+            g: 0,
+            b: 0,
+            a: 1,
           },
           position: 0,
         },
         {
           color: {
-            r: 0, g: 0, b: 1, a: 1,
+            r: 0,
+            g: 0,
+            b: 1,
+            a: 1,
           },
           position: 1,
         },
       ],
-      gradientTransform: [[1, 0, 0], [0, 1, 0]],
+      gradientTransform: [
+        [1, 0, 0],
+        [0, 1, 0],
+      ],
     };
     const result = convertFigmaGradientToString(paint);
     expect(result).toEqual('conic-gradient(#ff0000 0%, #0000ff 100%)');
@@ -485,18 +522,27 @@ describe('convertFigmaGradientToString with gradient types', () => {
       gradientStops: [
         {
           color: {
-            r: 1, g: 0, b: 0, a: 1,
+            r: 1,
+            g: 0,
+            b: 0,
+            a: 1,
           },
           position: 0,
         },
         {
           color: {
-            r: 0, g: 0, b: 1, a: 1,
+            r: 0,
+            g: 0,
+            b: 1,
+            a: 1,
           },
           position: 1,
         },
       ],
-      gradientTransform: [[1, 0, 0], [0, 1, 0]],
+      gradientTransform: [
+        [1, 0, 0],
+        [0, 1, 0],
+      ],
     };
     const result = convertFigmaGradientToString(paint);
     expect(result).toEqual('radial-gradient(#ff0000 0%, #0000ff 100%)');

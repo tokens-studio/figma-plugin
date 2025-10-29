@@ -6,11 +6,7 @@ import { notifyUI, notifyException } from '../notifiers';
 function isFigmaThemeWithCollectionAndMode(
   theme: ThemeObject | undefined,
 ): theme is ThemeObject & { $figmaCollectionId: string; $figmaModeId: string } {
-  return (
-    theme != null
-    && typeof theme.$figmaCollectionId === 'string'
-    && typeof theme.$figmaModeId === 'string'
-  );
+  return theme != null && typeof theme.$figmaCollectionId === 'string' && typeof theme.$figmaModeId === 'string';
 }
 
 function getRootNode(updateMode: UpdateMode) {
@@ -35,7 +31,11 @@ function getRootNode(updateMode: UpdateMode) {
 }
 
 // Switch Figma's native theme mode for nodes based on active theme
-export async function swapFigmaModes(activeTheme: Record<string, string>, themes: ThemeObjectsList, updateMode: UpdateMode) {
+export async function swapFigmaModes(
+  activeTheme: Record<string, string>,
+  themes: ThemeObjectsList,
+  updateMode: UpdateMode,
+) {
   // Find all active theme objects with Figma metadata
   const activeThemeIds = Object.values(activeTheme);
   const activeThemeObjects = activeThemeIds
@@ -67,7 +67,9 @@ export async function swapFigmaModes(activeTheme: Record<string, string>, themes
     if (!modeExists) {
       // eslint-disable-next-line no-console
       console.warn(`Mode ${modeId} no longer exists in collection ${collection.name}. Skipping this theme dimension.`);
-      notifyUI(`One of the modes linked to this theme no longer exists in collection "${collection.name}"`, { error: true });
+      notifyUI(`One of the modes linked to this theme no longer exists in collection "${collection.name}"`, {
+        error: true,
+      });
       // eslint-disable-next-line no-continue
       continue;
     }

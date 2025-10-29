@@ -1,8 +1,6 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  BookmarkIcon, ReaderIcon, ChatBubbleIcon, GitHubLogoIcon,
-} from '@radix-ui/react-icons';
+import { BookmarkIcon, ReaderIcon, ChatBubbleIcon, GitHubLogoIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
 import { Button, Heading } from '@tokens-studio/ui';
 import TokensStudioLogo from '@/icons/tokensstudio-full.svg';
@@ -68,9 +66,9 @@ function StartScreen() {
     const credentialsToSet = matchingProvider
       ? { ...matchingProvider, provider: storageType.provider, new: true }
       : {
-        ...storageType,
-        new: true,
-      };
+          ...storageType,
+          new: true,
+        };
     dispatch.uiState.setLastError(null);
     dispatch.uiState.setActiveTab(Tabs.SETTINGS);
     dispatch.tokenState.setEmptyTokens();
@@ -78,9 +76,10 @@ function StartScreen() {
   }, [apiProviders, dispatch.tokenState, dispatch.uiState, storageType]);
 
   const matchingProvider = React.useMemo(
-    () => (storageType && 'internalId' in storageType
-      ? apiProviders.find((i) => i.internalId === storageType.internalId)
-      : undefined),
+    () =>
+      storageType && 'internalId' in storageType
+        ? apiProviders.find((i) => i.internalId === storageType.internalId)
+        : undefined,
     [apiProviders, storageType],
   );
 
@@ -125,12 +124,12 @@ function StartScreen() {
           </Stack>
           <Text muted>{t('intro')}</Text>
           <Stack direction="column" gap={4}>
-            <Heading size="large">
-              {' '}
-              {t('guides')}
-            </Heading>
+            <Heading size="large"> {t('guides')}</Heading>
             <Stack direction="column" gap={3}>
-              <HelpfulLink href="https://docs.tokens.studio/get-started/install-figma-plugin?ref=startscreen" target="_blank">
+              <HelpfulLink
+                href="https://docs.tokens.studio/get-started/install-figma-plugin?ref=startscreen"
+                target="_blank"
+              >
                 <BookmarkIcon />
                 {t('gettingStarted')}
               </HelpfulLink>
@@ -153,20 +152,29 @@ function StartScreen() {
                 onClick: onSetSyncClick,
                 text: t('enterCredentials'),
               }}
-              secondaryAction={matchingProvider ? {
-                onClick: () => {
-                  dispatch.uiState.setLastError(null);
-                  restoreStoredProvider(matchingProvider);
-                },
-                text: t('retry'),
-              } : undefined}
+              secondaryAction={
+                matchingProvider
+                  ? {
+                      onClick: () => {
+                        dispatch.uiState.setLastError(null);
+                        restoreStoredProvider(matchingProvider);
+                      },
+                      text: t('retry'),
+                    }
+                  : undefined
+              }
             />
           ) : (
             <Stack direction="row" gap={2}>
               <Button data-testid="button-configure" size="small" variant="primary" onClick={onSetEmptyTokens}>
                 {t('newEmptyFile')}
               </Button>
-              <Button data-testid="button-configure-preset" size="small" variant="invisible" onClick={onSetDefaultTokens}>
+              <Button
+                data-testid="button-configure-preset"
+                size="small"
+                variant="invisible"
+                onClick={onSetDefaultTokens}
+              >
                 {t('loadExample')}
               </Button>
             </Stack>

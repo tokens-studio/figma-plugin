@@ -157,9 +157,9 @@ describe('applyTextCharacterValuesOnNode', () => {
       await applyTextCharacterValuesOnNode(mockNode, mockData, values);
 
       expect(mockNode.characters).toBe(
-        'shadows: x: 0\ny: 2\nblur: 4\ncolor: rgba(0, 0, 0, 0.1)\n\nx: 0\ny: 4\nblur: 8\ncolor: rgba(0, 0, 0, 0.15)\n'
-          + 'colors: primary: #007AFF\nsecondary: #5856D6\n'
-          + 'spacing: 8\n\n16\n\n24\n\n32',
+        'shadows: x: 0\ny: 2\nblur: 4\ncolor: rgba(0, 0, 0, 0.1)\n\nx: 0\ny: 4\nblur: 8\ncolor: rgba(0, 0, 0, 0.15)\n' +
+          'colors: primary: #007AFF\nsecondary: #5856D6\n' +
+          'spacing: 8\n\n16\n\n24\n\n32',
       );
     });
   });

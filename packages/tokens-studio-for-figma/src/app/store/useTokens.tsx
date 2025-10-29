@@ -200,15 +200,17 @@ export default function useTokens() {
     async (type: Properties | TokenTypes, name: string, newTokenName: string, resolvedTokens: SingleToken[]) => {
       track('remapToken', { fromInspect: true });
 
-      wrapTransaction({ name: 'remapToken' }, async () => AsyncMessageChannel.ReactInstance.message({
-        type: AsyncMessageTypes.REMAP_TOKENS,
-        category: type,
-        oldName: name,
-        newName: newTokenName,
-        updateMode: UpdateMode.SELECTION,
-        tokens: resolvedTokens,
-        settings,
-      }));
+      wrapTransaction({ name: 'remapToken' }, async () =>
+        AsyncMessageChannel.ReactInstance.message({
+          type: AsyncMessageTypes.REMAP_TOKENS,
+          category: type,
+          oldName: name,
+          newName: newTokenName,
+          updateMode: UpdateMode.SELECTION,
+          tokens: resolvedTokens,
+          settings,
+        }),
+      );
     },
     [settings],
   );
@@ -217,13 +219,15 @@ export default function useTokens() {
     async (newName: string, oldName: string, bulkUpdateMode = UpdateMode.SELECTION, useRegex = false) => {
       track('bulkRemapToken', { fromInspect: true });
 
-      wrapTransaction({ name: 'bulkRemapToken' }, async () => AsyncMessageChannel.ReactInstance.message({
-        type: AsyncMessageTypes.BULK_REMAP_TOKENS,
-        oldName,
-        newName,
-        updateMode: bulkUpdateMode,
-        useRegex,
-      }));
+      wrapTransaction({ name: 'bulkRemapToken' }, async () =>
+        AsyncMessageChannel.ReactInstance.message({
+          type: AsyncMessageTypes.BULK_REMAP_TOKENS,
+          oldName,
+          newName,
+          updateMode: bulkUpdateMode,
+          useRegex,
+        }),
+      );
     },
     [],
   );
@@ -233,12 +237,14 @@ export default function useTokens() {
     async (oldName: string, newName: string, remapUpdateMode?: UpdateMode) => {
       track('remapToken', { fromRename: true });
 
-      wrapTransaction({ name: 'remapToken' }, async () => AsyncMessageChannel.ReactInstance.message({
-        type: AsyncMessageTypes.REMAP_TOKENS,
-        oldName,
-        newName,
-        updateMode: remapUpdateMode || settings.updateMode,
-      }));
+      wrapTransaction({ name: 'remapToken' }, async () =>
+        AsyncMessageChannel.ReactInstance.message({
+          type: AsyncMessageTypes.REMAP_TOKENS,
+          oldName,
+          newName,
+          updateMode: remapUpdateMode || settings.updateMode,
+        }),
+      );
     },
     [settings.updateMode],
   );
@@ -290,11 +296,15 @@ export default function useTokens() {
       });
       if (confirmData && confirmData.result) {
         if (
-          Array.isArray(confirmData.data)
-          && confirmData.data.some((data: string) => [UpdateMode.DOCUMENT, UpdateMode.PAGE, UpdateMode.SELECTION].includes(data as UpdateMode))
+          Array.isArray(confirmData.data) &&
+          confirmData.data.some((data: string) =>
+            [UpdateMode.DOCUMENT, UpdateMode.PAGE, UpdateMode.SELECTION].includes(data as UpdateMode),
+          )
         ) {
           await Promise.all(
-            tokensToRename.map((tokenToRename) => handleBulkRemap(tokenToRename.newName, tokenToRename.oldName, confirmData.data[0] as UpdateMode)),
+            tokensToRename.map((tokenToRename) =>
+              handleBulkRemap(tokenToRename.newName, tokenToRename.oldName, confirmData.data[0] as UpdateMode),
+            ),
           );
           lastUsedRenameOption = confirmData.data[0] as UpdateMode;
         }
@@ -345,7 +355,8 @@ export default function useTokens() {
   // Asks user which styles to create, then calls Figma with all tokens to create styles
   const createStylesFromSelectedTokenSets = useCallback(
     async (selectedSets: ExportTokenSet[]) => {
-      const shouldCreateStyles = (settings.stylesTypography || settings.stylesColor || settings.stylesEffect) && selectedSets.length > 0;
+      const shouldCreateStyles =
+        (settings.stylesTypography || settings.stylesColor || settings.stylesEffect) && selectedSets.length > 0;
       if (!shouldCreateStyles) return;
 
       dispatch.uiState.startJob({
@@ -386,12 +397,14 @@ export default function useTokens() {
         return acc;
       }, []);
 
-      await wrapTransaction({ name: 'createStyles' }, async () => AsyncMessageChannel.ReactInstance.message({
-        type: AsyncMessageTypes.CREATE_STYLES,
-        tokens: tokensToCreate,
-        sourceTokens: resolved,
-        settings,
-      }));
+      await wrapTransaction({ name: 'createStyles' }, async () =>
+        AsyncMessageChannel.ReactInstance.message({
+          type: AsyncMessageTypes.CREATE_STYLES,
+          tokens: tokensToCreate,
+          sourceTokens: resolved,
+          settings,
+        }),
+      );
 
       track('createStyles', {
         type: 'sets',
@@ -414,7 +427,8 @@ export default function useTokens() {
 
   const createStylesFromSelectedThemes = useCallback(
     async (selectedThemes: string[]) => {
-      const shouldCreateStyles = (settings.stylesTypography || settings.stylesColor || settings.stylesEffect) && selectedThemes.length > 0;
+      const shouldCreateStyles =
+        (settings.stylesTypography || settings.stylesColor || settings.stylesEffect) && selectedThemes.length > 0;
       if (!shouldCreateStyles) return;
 
       dispatch.uiState.startJob({
@@ -469,19 +483,27 @@ export default function useTokens() {
 
             totalTokensToCreate += tokensToCreate.length;
 
-            const createStylesResult = await wrapTransaction({ name: 'createStyles' }, async () => AsyncMessageChannel.ReactInstance.message({
-              type: AsyncMessageTypes.CREATE_STYLES,
-              tokens: tokensToCreate,
-              sourceTokens: allTokens,
-              settings,
-              selectedTheme,
-            }));
+            const createStylesResult = await wrapTransaction({ name: 'createStyles' }, async () =>
+              AsyncMessageChannel.ReactInstance.message({
+                type: AsyncMessageTypes.CREATE_STYLES,
+                tokens: tokensToCreate,
+                sourceTokens: allTokens,
+                settings,
+                selectedTheme,
+              }),
+            );
 
             Object.assign(allStyleIds, createStylesResult.styleIds);
 
-            dispatch.tokenState.assignStyleIdsToCurrentTheme({ styleIds: createStylesResult.styleIds, tokens: tokensToCreate, selectedThemes });
+            dispatch.tokenState.assignStyleIdsToCurrentTheme({
+              styleIds: createStylesResult.styleIds,
+              tokens: tokensToCreate,
+              selectedThemes,
+            });
           } else {
-            notifyToUI(`No styles created for theme: ${selectedTheme.name}. Make sure some sets are enabled.`, { error: true });
+            notifyToUI(`No styles created for theme: ${selectedTheme.name}. Make sure some sets are enabled.`, {
+              error: true,
+            });
           }
         }
       }
@@ -501,10 +523,9 @@ export default function useTokens() {
       });
       // Remove styles that aren't in the theme or in the exposed token object
       if (settings.removeStylesAndVariablesWithoutConnection) {
-        const uniqueMergedStyleIds: string[] = Array.from(new Set([
-          ...Object.values(allExistingStyleReferences).flat(),
-          ...Object.values(allStyleIds).flat(),
-        ]));
+        const uniqueMergedStyleIds: string[] = Array.from(
+          new Set([...Object.values(allExistingStyleReferences).flat(), ...Object.values(allStyleIds).flat()]),
+        );
         const { countOfRemovedStyles } = await AsyncMessageChannel.ReactInstance.message({
           type: AsyncMessageTypes.REMOVE_STYLES_WITHOUT_CONNECTION,
           usedStyleIds: uniqueMergedStyleIds,
@@ -571,27 +592,30 @@ export default function useTokens() {
   );
 
   const filterMultiValueTokens = useCallback(() => {
-    const tempTokens = Object.entries(tokens).reduce((tempTokens, [tokenSetKey, tokenList]) => {
-      const filteredTokenList = tokenList.reduce((acc, tokenItem) => {
-        const resolvedValue = getAliasValue(tokenItem, tokensContext.resolvedTokens) || '';
-        // If extension data exists, it is likely that the token is a complex token containing color modifier data, etc
-        // in which case we collapse the value as it cannot be used as a variable
-        if ((tokenItem.$extensions || {})['studio.tokens'] && typeof resolvedValue === 'string') {
-          // We don't want to change the actual value as this could cause unintended side effects
-          tokenItem = { ...tokenItem };
-          tokenItem.value = resolvedValue;
-        }
-        if (typeof tokenItem.value === 'string' && VALID_TOKEN_TYPES.includes(tokenItem.type)) {
-          if (resolvedValue.toString().trim().includes(' ')) {
-            return acc;
+    const tempTokens = Object.entries(tokens).reduce(
+      (tempTokens, [tokenSetKey, tokenList]) => {
+        const filteredTokenList = tokenList.reduce((acc, tokenItem) => {
+          const resolvedValue = getAliasValue(tokenItem, tokensContext.resolvedTokens) || '';
+          // If extension data exists, it is likely that the token is a complex token containing color modifier data, etc
+          // in which case we collapse the value as it cannot be used as a variable
+          if ((tokenItem.$extensions || {})['studio.tokens'] && typeof resolvedValue === 'string') {
+            // We don't want to change the actual value as this could cause unintended side effects
+            tokenItem = { ...tokenItem };
+            tokenItem.value = resolvedValue;
           }
-        }
-        acc.push(tokenItem);
-        return acc;
-      }, [] as AnyTokenList);
-      tempTokens[tokenSetKey] = filteredTokenList;
-      return tempTokens;
-    }, {} as Record<string, AnyTokenList>);
+          if (typeof tokenItem.value === 'string' && VALID_TOKEN_TYPES.includes(tokenItem.type)) {
+            if (resolvedValue.toString().trim().includes(' ')) {
+              return acc;
+            }
+          }
+          acc.push(tokenItem);
+          return acc;
+        }, [] as AnyTokenList);
+        tempTokens[tokenSetKey] = filteredTokenList;
+        return tempTokens;
+      },
+      {} as Record<string, AnyTokenList>,
+    );
 
     return tempTokens;
   }, [tokens]);
@@ -612,11 +636,12 @@ export default function useTokens() {
           }
         },
       },
-      async () => await AsyncMessageChannel.ReactInstance.message({
-        type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES,
-        tokens: multiValueFilteredTokens,
-        settings,
-      }),
+      async () =>
+        await AsyncMessageChannel.ReactInstance.message({
+          type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES,
+          tokens: multiValueFilteredTokens,
+          settings,
+        }),
     );
     dispatch.tokenState.assignVariableIdsToTheme(createVariableResult.variableIds);
     dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
@@ -624,11 +649,12 @@ export default function useTokens() {
 
   const createVariablesFromSets = useCallback(
     async (selectedSets: ExportTokenSet[]) => {
-      const shouldCreateVariables = (settings.variablesBoolean
-          || settings.variablesColor
-          || settings.variablesNumber
-          || settings.variablesString)
-        && selectedSets.length > 0;
+      const shouldCreateVariables =
+        (settings.variablesBoolean ||
+          settings.variablesColor ||
+          settings.variablesNumber ||
+          settings.variablesString) &&
+        selectedSets.length > 0;
       if (!shouldCreateVariables) return;
 
       dispatch.uiState.startJob({
@@ -656,12 +682,13 @@ export default function useTokens() {
             }
           },
         },
-        async () => await AsyncMessageChannel.ReactInstance.message({
-          type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES_WITHOUT_MODES,
-          tokens,
-          settings,
-          selectedSets,
-        }),
+        async () =>
+          await AsyncMessageChannel.ReactInstance.message({
+            type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES_WITHOUT_MODES,
+            tokens,
+            settings,
+            selectedSets,
+          }),
       );
       dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
       Promise.resolve();
@@ -671,11 +698,12 @@ export default function useTokens() {
 
   const createVariablesFromThemes = useCallback(
     async (selectedThemes: string[]) => {
-      const shouldCreateVariables = (settings.variablesBoolean
-          || settings.variablesColor
-          || settings.variablesNumber
-          || settings.variablesString)
-        && selectedThemes.length > 0;
+      const shouldCreateVariables =
+        (settings.variablesBoolean ||
+          settings.variablesColor ||
+          settings.variablesNumber ||
+          settings.variablesString) &&
+        selectedThemes.length > 0;
       if (!shouldCreateVariables) return;
 
       dispatch.uiState.startJob({
@@ -703,12 +731,13 @@ export default function useTokens() {
             }
           },
         },
-        async () => await AsyncMessageChannel.ReactInstance.message({
-          type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES,
-          tokens,
-          settings,
-          selectedThemes,
-        }),
+        async () =>
+          await AsyncMessageChannel.ReactInstance.message({
+            type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES,
+            tokens,
+            settings,
+            selectedThemes,
+          }),
       );
       dispatch.tokenState.assignVariableIdsToTheme(createVariableResult.variableIds);
       dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
@@ -721,15 +750,17 @@ export default function useTokens() {
     async ({ oldName, newName }: TokenToRename) => {
       track('renameVariables', { oldName, newName });
 
-      const result = await wrapTransaction({ name: 'renameVariables' }, async () => AsyncMessageChannel.ReactInstance.message({
-        type: AsyncMessageTypes.RENAME_VARIABLES,
-        tokens: [
-          {
-            oldName,
-            newName,
-          },
-        ],
-      }));
+      const result = await wrapTransaction({ name: 'renameVariables' }, async () =>
+        AsyncMessageChannel.ReactInstance.message({
+          type: AsyncMessageTypes.RENAME_VARIABLES,
+          tokens: [
+            {
+              oldName,
+              newName,
+            },
+          ],
+        }),
+      );
 
       dispatch.tokenState.renameVariableIdsToTheme(result.renameVariableToken);
     },
@@ -739,10 +770,12 @@ export default function useTokens() {
   const updateVariablesFromToken = useCallback(async (payload: UpdateTokenVariablePayload) => {
     track('updateVariables', payload);
 
-    await wrapTransaction({ name: 'updateVariables' }, async () => AsyncMessageChannel.ReactInstance.message({
-      type: AsyncMessageTypes.UPDATE_VARIABLES,
-      payload,
-    }));
+    await wrapTransaction({ name: 'updateVariables' }, async () =>
+      AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.UPDATE_VARIABLES,
+        payload,
+      }),
+    );
   }, []);
 
   return useMemo(

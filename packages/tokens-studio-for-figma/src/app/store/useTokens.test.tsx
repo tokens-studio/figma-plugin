@@ -306,9 +306,11 @@ describe('useToken test', () => {
 
   it('should send message to pull styles from figma', async () => {
     const messageSpy = jest.spyOn(AsyncMessageChannel.ReactInstance, 'message');
-    mockConfirm.mockImplementation(() => Promise.resolve({
-      data: ['textStyles', 'colorStyles', 'effectStyles'],
-    }));
+    mockConfirm.mockImplementation(() =>
+      Promise.resolve({
+        data: ['textStyles', 'colorStyles', 'effectStyles'],
+      }),
+    );
     await act(async () => {
       await result.current.pullStyles();
     });
@@ -513,11 +515,7 @@ describe('useToken test', () => {
       });
 
       const { result: newResult } = renderHook(() => useTokens(), {
-        wrapper: ({ children }) => (
-          <Provider store={newMockStore}>
-            {children}
-          </Provider>
-        ),
+        wrapper: ({ children }) => <Provider store={newMockStore}>{children}</Provider>,
       });
 
       const tokensToCreate = [
@@ -616,11 +614,7 @@ describe('useToken test', () => {
       });
 
       const { result: newResult } = renderHook(() => useTokens(), {
-        wrapper: ({ children }) => (
-          <Provider store={newMockStore}>
-            {children}
-          </Provider>
-        ),
+        wrapper: ({ children }) => <Provider store={newMockStore}>{children}</Provider>,
       });
 
       const selectedSets: ExportTokenSet[] = [

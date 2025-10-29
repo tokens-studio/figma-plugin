@@ -52,9 +52,10 @@ export function Initiator() {
             dispatch.uiState.setSelectedLayers(selectedNodes);
             dispatch.uiState.setDisabled(false);
             if (mainNodeSelectionValues.length > 1) {
-              const allMainNodeSelectionValues = mainNodeSelectionValues.reduce((acc, crr) => (
-                Object.assign(acc, crr)
-              ), {});
+              const allMainNodeSelectionValues = mainNodeSelectionValues.reduce(
+                (acc, crr) => Object.assign(acc, crr),
+                {},
+              );
               const sortedMainNodeSelectionValues = sortSelectionValueByProperties(allMainNodeSelectionValues);
               dispatch.uiState.setMainNodeSelectionValues(sortedMainNodeSelectionValues);
             } else if (mainNodeSelectionValues.length > 0) {
@@ -190,9 +191,15 @@ export function Initiator() {
         const event = parseWsEvent(e);
         onMessageEvent({ data: { pluginMessage: event } });
       };
-      (AsyncMessageChannel as typeof AsyncMessageChannelPreview).ReactInstance.getWs()?.addEventListener('message', listener);
+      (AsyncMessageChannel as typeof AsyncMessageChannelPreview).ReactInstance.getWs()?.addEventListener(
+        'message',
+        listener,
+      );
       return () => {
-        (AsyncMessageChannel as typeof AsyncMessageChannelPreview).ReactInstance.getWs()?.removeEventListener('message', listener);
+        (AsyncMessageChannel as typeof AsyncMessageChannelPreview).ReactInstance.getWs()?.removeEventListener(
+          'message',
+          listener,
+        );
       };
     }
     window.onmessage = onMessageEvent;

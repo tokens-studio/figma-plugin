@@ -15,7 +15,5 @@ type Props = {
 };
 
 export default function AliasBadge({ value }: Props) {
-  return (
-    <StyledAliasBadge>{value}</StyledAliasBadge>
-  );
+  return <StyledAliasBadge>{value}</StyledAliasBadge>;
 }

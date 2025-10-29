@@ -34,13 +34,13 @@ type GenericTokenInput<T extends TokenTypes, V = string> = {
   value: V;
   description?: string;
   oldName?: string; // only passed when editing token
-  shouldUpdate?: boolean
+  shouldUpdate?: boolean;
   shouldUpdateDocument?: boolean;
-  $extensions?: { 'studio.tokens'?: { modify?: ColorModifier, urn?: string; } }
+  $extensions?: { 'studio.tokens'?: { modify?: ColorModifier; urn?: string } };
 };
 
 export type UpdateTokenPayload =
-  GenericTokenInput<TokenTypes.COLOR, SingleColorToken['value']>
+  | GenericTokenInput<TokenTypes.COLOR, SingleColorToken['value']>
   | GenericTokenInput<TokenTypes.BORDER_RADIUS, SingleBorderRadiusToken['value']>
   | GenericTokenInput<TokenTypes.TEXT, SingleTextToken['value']>
   | GenericTokenInput<TokenTypes.TYPOGRAPHY, SingleTypographyToken['value']>

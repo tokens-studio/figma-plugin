@@ -5,7 +5,7 @@ import Modal from '../Modal';
 import DefaultPreset from '../PresetProvider/DefaultPreset';
 
 type Props = {
-  onClose: () => void
+  onClose: () => void;
 };
 
 export default function PresetLoadModal({ onClose }: Props) {

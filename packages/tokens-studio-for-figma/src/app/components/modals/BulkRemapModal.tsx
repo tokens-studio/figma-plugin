@@ -1,7 +1,5 @@
 import React from 'react';
-import {
-  Button, Checkbox, FormField, IconButton, TextInput,
-} from '@tokens-studio/ui';
+import { Button, Checkbox, FormField, IconButton, TextInput } from '@tokens-studio/ui';
 import { Asterisk } from 'iconoir-react';
 import Modal from '../Modal';
 import Stack from '../Stack';
@@ -11,7 +9,7 @@ import Label from '../Label';
 import { UpdateMode } from '@/constants/UpdateMode';
 
 type Props = {
-  isOpen: boolean
+  isOpen: boolean;
   onClose: () => void;
 };
 
@@ -50,9 +48,7 @@ export default function BulkRemapModal({ isOpen, onClose }: Props) {
 
   return (
     <Modal size="large" showClose isOpen={isOpen} close={handleClose} title="Bulk remap">
-      <form
-        onSubmit={onConfirm}
-      >
+      <form onSubmit={onConfirm}>
         <Stack direction="column" gap={4}>
           <FormField>
             <Label htmlFor="oldName">Match</Label>
@@ -65,7 +61,15 @@ export default function BulkRemapModal({ isOpen, onClose }: Props) {
               placeholder={useRegex ? 'e.g. ^grey (regex active)' : 'e.g. grey'}
               onChange={handleOldNameChange}
               name="oldName"
-              trailingAction={<IconButton tooltip={useRegex ? 'Disable regex' : 'Enable regex'} size="small" onClick={updateUseRegex} icon={<Asterisk />} variant={useRegex ? 'primary' : 'invisible'} />}
+              trailingAction={
+                <IconButton
+                  tooltip={useRegex ? 'Disable regex' : 'Enable regex'}
+                  size="small"
+                  onClick={updateUseRegex}
+                  icon={<Asterisk />}
+                  variant={useRegex ? 'primary' : 'invisible'}
+                />
+              }
             />
           </FormField>
           <FormField>
@@ -80,15 +84,15 @@ export default function BulkRemapModal({ isOpen, onClose }: Props) {
             />
           </FormField>
 
-          <Box css={{
-            display: 'flex', alignItems: 'center', gap: '$3', fontSize: '$small',
-          }}
+          <Box
+            css={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '$3',
+              fontSize: '$small',
+            }}
           >
-            <Checkbox
-              checked={shouldRemapDocument}
-              id="remapDocument"
-              onCheckedChange={updateShouldRemapDocument}
-            />
+            <Checkbox checked={shouldRemapDocument} id="remapDocument" onCheckedChange={updateShouldRemapDocument} />
             <Label htmlFor="remapDocument" css={{ fontSize: '$small', fontWeight: '$sansBold' }}>
               Remap across document (slow)
             </Label>

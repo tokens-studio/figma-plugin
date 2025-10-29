@@ -19,9 +19,7 @@ export default function ToggleEmptyButton() {
   return (
     <Stack direction="row" align="center" justify="center" css={{ marginTop: '$4', marginBottom: '$4' }}>
       <Button variant="secondary" size="small" onClick={handleShowEmptyGroups}>
-        {t(showEmptyGroups ? 'hide' : 'show')}
-        {' '}
-        {t('emptyGroups')}
+        {t(showEmptyGroups ? 'hide' : 'show')} {t('emptyGroups')}
       </Button>
     </Stack>
   );

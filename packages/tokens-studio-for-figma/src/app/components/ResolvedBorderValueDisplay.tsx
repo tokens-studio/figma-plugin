@@ -6,7 +6,7 @@ import { styled } from '@/stitches.config';
 import Box from './Box';
 
 type Props = {
-  value: SingleBorderToken['value']
+  value: SingleBorderToken['value'];
 };
 
 const StyledPropertyItem = styled('div', {
@@ -18,7 +18,9 @@ const StyledValueItem = styled('div', {
   marginBottom: '$2',
 });
 
-export const ResolvedBorderValueDisplay: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({ value }) => {
+export const ResolvedBorderValueDisplay: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
+  value,
+}) => {
   const seed = useUIDSeed();
   const { t } = useTranslation(['tokens']);
   const properties = {
@@ -28,15 +30,18 @@ export const ResolvedBorderValueDisplay: React.FC<React.PropsWithChildren<React.
   };
 
   return (
-    <Box css={{
-      display: 'flex', backgroundColor: '$bgSubtle', padding: '$4', fontSize: '$xsmall',
-    }}
+    <Box
+      css={{
+        display: 'flex',
+        backgroundColor: '$bgSubtle',
+        padding: '$4',
+        fontSize: '$xsmall',
+      }}
     >
       <Box css={{ display: 'grid', marginRight: '$6' }}>
         {Object.values(properties).map((v) => (
           <StyledPropertyItem key={seed(v)}>{v}</StyledPropertyItem>
         ))}
-
       </Box>
       <Box>
         {Object.keys(properties).map((key) => (

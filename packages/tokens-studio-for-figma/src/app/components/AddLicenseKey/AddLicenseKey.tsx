@@ -1,13 +1,9 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import React, {
-  useCallback, useEffect, useState,
-} from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLDClient } from 'launchdarkly-react-client-sdk';
 import { useTranslation } from 'react-i18next';
-import {
-  Button, Heading, TextInput, Box, Stack, IconButton,
-} from '@tokens-studio/ui';
+import { Button, Heading, TextInput, Box, Stack, IconButton } from '@tokens-studio/ui';
 import { EyeClosedIcon, EyeOpenIcon } from '@radix-ui/react-icons';
 import { licenseKeySelector } from '@/selectors/licenseKeySelector';
 import { styled } from '@/stitches.config';
@@ -128,14 +124,14 @@ export default function AddLicenseKey() {
         <Box css={{ flexGrow: 1 }}>
           <TextInput
             type={isMasked ? 'password' : 'text'}
-            trailingAction={(
+            trailingAction={
               <IconButton
                 variant="invisible"
                 size="small"
                 onClick={toggleMask}
                 icon={isMasked ? <EyeClosedIcon /> : <EyeOpenIcon />}
               />
-            )}
+            }
             name="license-key"
             data-testid="settings-license-key-input"
             value={newKey || ''}

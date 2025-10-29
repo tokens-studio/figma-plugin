@@ -4,7 +4,10 @@ import * as getVariablesWithoutZombiesModule from './getVariablesWithoutZombies'
 
 // Mock the getVariablesWithoutZombies function
 jest.mock('./getVariablesWithoutZombies');
-const mockGetVariablesWithoutZombies = getVariablesWithoutZombiesModule.getVariablesWithoutZombies as jest.MockedFunction<typeof getVariablesWithoutZombiesModule.getVariablesWithoutZombies>;
+const mockGetVariablesWithoutZombies =
+  getVariablesWithoutZombiesModule.getVariablesWithoutZombies as jest.MockedFunction<
+    typeof getVariablesWithoutZombiesModule.getVariablesWithoutZombies
+  >;
 
 describe('updateVariablesToReference', () => {
   beforeEach(() => {
@@ -55,9 +58,7 @@ describe('updateVariablesToReference', () => {
     };
 
     // Global map that would return the different collection variable
-    const figmaVariables = new Map([
-      ['color.primary', 'V:different-collection'],
-    ]);
+    const figmaVariables = new Map([['color.primary', 'V:different-collection']]);
 
     // Call the function
     await updateVariablesToReference(figmaVariables, [referenceVariableCandidate]);
@@ -84,9 +85,7 @@ describe('updateVariablesToReference', () => {
     };
 
     // Mock getVariablesWithoutZombies to return only the different collection variable
-    mockGetVariablesWithoutZombies.mockResolvedValue([
-      differentCollectionVariable as any,
-    ]);
+    mockGetVariablesWithoutZombies.mockResolvedValue([differentCollectionVariable as any]);
 
     // Mock importVariableByKeyAsync
     const mockReferencedVariable = { id: 'imported-var-id' };
@@ -105,9 +104,7 @@ describe('updateVariablesToReference', () => {
     };
 
     // Global map with the variable
-    const figmaVariables = new Map([
-      ['color.primary', 'V:global-fallback'],
-    ]);
+    const figmaVariables = new Map([['color.primary', 'V:global-fallback']]);
 
     // Call the function
     await updateVariablesToReference(figmaVariables, [referenceVariableCandidate]);

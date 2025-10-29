@@ -3,9 +3,9 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { updateCredentials } from '@/utils/credentials';
 import { credentials } from '../credentials';
 
-jest.mock('@/utils/credentials', (() => ({
+jest.mock('@/utils/credentials', () => ({
   updateCredentials: jest.fn(),
-})));
+}));
 
 describe('credentials', () => {
   it('should update credentials', async () => {

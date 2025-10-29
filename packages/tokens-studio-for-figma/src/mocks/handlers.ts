@@ -60,5 +60,7 @@ export const handlers = [
 
   rest.put(`${process.env.LICENSE_API_URL}/detach-license`, mockDetachLicenseHandler),
 
-  rest.post(`${process.env.TOKEN_FLOW_APP_URL}/api/tokens`, (req, res, ctx) => res(ctx.status(200), ctx.json({ result: 'test-id' }))),
+  rest.post(`${process.env.TOKEN_FLOW_APP_URL}/api/tokens`, (req, res, ctx) =>
+    res(ctx.status(200), ctx.json({ result: 'test-id' })),
+  ),
 ];

@@ -23,9 +23,14 @@ describe('ThemeSelector', () => {
         activeTheme: {
           [INTERNAL_THEMES_NO_GROUP]: 'light',
         },
-        themes: [{
-          id: 'light', name: 'Light', selectedTokenSets: {}, $figmaStyleReferences: {},
-        }],
+        themes: [
+          {
+            id: 'light',
+            name: 'Light',
+            selectedTokenSets: {},
+            $figmaStyleReferences: {},
+          },
+        ],
       },
     });
     const component = render(
@@ -57,9 +62,14 @@ describe('ThemeSelector', () => {
   it('be possible to select a theme', async () => {
     const mockStore = createMockStore({
       tokenState: {
-        themes: [{
-          id: 'light', name: 'Light', selectedTokenSets: {}, $figmaStyleReferences: {},
-        }],
+        themes: [
+          {
+            id: 'light',
+            name: 'Light',
+            selectedTokenSets: {},
+            $figmaStyleReferences: {},
+          },
+        ],
       },
     });
     const component = render(

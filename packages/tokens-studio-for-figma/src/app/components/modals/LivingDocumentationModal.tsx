@@ -1,7 +1,5 @@
 import React from 'react';
-import {
-  Button, Stack, Select, Switch, Label, Text, IconButton, TextInput, FormField,
-} from '@tokens-studio/ui';
+import { Button, Stack, Select, Switch, Label, Text, IconButton, TextInput, FormField } from '@tokens-studio/ui';
 import { Asterisk } from 'iconoir-react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -36,9 +34,7 @@ type Props = {
   initialStartsWith?: string;
 };
 
-export default function LivingDocumentationModal({
-  isOpen, onClose, initialTokenSet, initialStartsWith,
-}: Props) {
+export default function LivingDocumentationModal({ isOpen, onClose, initialTokenSet, initialStartsWith }: Props) {
   const { t } = useTranslation(['tokens']);
   const allTokenSets = useSelector(allTokenSetsSelector);
   const tokens = useSelector(tokensSelector);
@@ -117,8 +113,7 @@ export default function LivingDocumentationModal({
       <Stack direction="column" gap={4}>
         <Stack direction="column" gap={3}>
           <Text size="small" muted>
-            Generate living documentation to showcase your design tokens in Figma.
-            {' '}
+            Generate living documentation to showcase your design tokens in Figma.{' '}
             <a
               href="https://docs.tokens.studio/figma/generate-documentation"
               target="_blank"
@@ -129,16 +124,9 @@ export default function LivingDocumentationModal({
             </a>
           </Text>
           <Text size="small" muted>
-            Use our preset template, or select a custom template frame with layers named with properties like
-            {' '}
-            <StyledCode>__tokenName</StyledCode>
-            ,
-            {' '}
-            <StyledCode>__value</StyledCode>
-            ,
-            {' '}
-            <StyledCode>__tokenValue</StyledCode>
-            , etc.
+            Use our preset template, or select a custom template frame with layers named with properties like{' '}
+            <StyledCode>__tokenName</StyledCode>, <StyledCode>__value</StyledCode>,{' '}
+            <StyledCode>__tokenValue</StyledCode>, etc.
           </Text>
         </Stack>
         <Stack direction="column" gap={2}>
@@ -162,7 +150,15 @@ export default function LivingDocumentationModal({
               value={startsWith}
               onChange={handleStartsWithChange}
               placeholder={useRegex ? 'color\\.(primary|secondary) (regex active)' : 'color'}
-              trailingAction={<IconButton tooltip={useRegex ? 'Disable regex' : 'Enable regex'} size="small" onClick={handleUseRegexChange} icon={<Asterisk />} variant={useRegex ? 'primary' : 'invisible'} />}
+              trailingAction={
+                <IconButton
+                  tooltip={useRegex ? 'Disable regex' : 'Enable regex'}
+                  size="small"
+                  onClick={handleUseRegexChange}
+                  icon={<Asterisk />}
+                  variant={useRegex ? 'primary' : 'invisible'}
+                />
+              }
             />
           </FormField>
         </Stack>

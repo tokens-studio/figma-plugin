@@ -11,9 +11,9 @@ export function isColorApproximatelyEqual(
   threshold: number = 0.0001,
 ): boolean {
   return (
-    Math.abs(color1.r - color2.r) < threshold
-    && Math.abs(color1.g - color2.g) < threshold
-    && Math.abs(color1.b - color2.b) < threshold
-    && Math.abs(color1.a - color2.a) < threshold
+    Math.abs(color1.r - color2.r) < threshold &&
+    Math.abs(color1.g - color2.g) < threshold &&
+    Math.abs(color1.b - color2.b) < threshold &&
+    Math.abs(color1.a - color2.a) < threshold
   );
 }

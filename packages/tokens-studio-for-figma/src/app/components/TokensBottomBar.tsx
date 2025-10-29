@@ -45,18 +45,19 @@ export default function TokensBottomBar({ handleError }: Props) {
   const { handleJSONUpdate } = useTokens();
 
   const hasDuplicates = useMemo(
-    () => Object.keys(tokens).some((setName) => {
-      const currentSetTokens = tokens[setName];
-      const seenNames = new Set();
+    () =>
+      Object.keys(tokens).some((setName) => {
+        const currentSetTokens = tokens[setName];
+        const seenNames = new Set();
 
-      return currentSetTokens.some((token) => {
-        if (seenNames.has(token.name)) {
-          return true;
-        }
-        seenNames.add(token.name);
-        return false;
-      });
-    }),
+        return currentSetTokens.some((token) => {
+          if (seenNames.has(token.name)) {
+            return true;
+          }
+          seenNames.add(token.name);
+          return false;
+        });
+      }),
     [tokens],
   );
 
@@ -93,9 +94,7 @@ export default function TokensBottomBar({ handleError }: Props) {
         >
           <Box css={{ fontSize: '$xsmall' }}>{t('unsavedChanges')}</Box>
           <Button variant="primary" onClick={handleSaveJSON}>
-            {t('save')}
-            {' '}
-            JSON
+            {t('save')} JSON
           </Button>
         </Box>
       ) : (

@@ -1,9 +1,7 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import { StorageProviderType } from '@/constants/StorageProviderType';
-import {
-  act, render, resetStore, createMockStore, fireEvent,
-} from '../../../tests/config/setupTest';
+import { act, render, resetStore, createMockStore, fireEvent } from '../../../tests/config/setupTest';
 import PushDialog from './PushDialog';
 
 describe('PushDialog', () => {

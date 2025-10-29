@@ -2,9 +2,7 @@ import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 
 export function convertTokenToFormat(token, isExpanded = false) {
   if (token.inheritTypeLevel) delete token.type;
-  const {
-    type, value, description, ...remainingTokenValues
-  } = token;
+  const { type, value, description, ...remainingTokenValues } = token;
   if (isExpanded) {
     const returnedToken = {};
     Object.entries(token).forEach(([key, val]) => {
@@ -12,7 +10,7 @@ export function convertTokenToFormat(token, isExpanded = false) {
     });
     return returnedToken;
   }
-  if ((typeof value === 'undefined')) return token;
+  if (typeof value === 'undefined') return token;
   const returnValue = {
     ...remainingTokenValues,
     ...(value ? { [TokenFormat.tokenValueKey]: value } : {}),

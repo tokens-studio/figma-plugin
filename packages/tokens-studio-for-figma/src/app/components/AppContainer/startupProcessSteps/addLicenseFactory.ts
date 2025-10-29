@@ -11,7 +11,7 @@ export function addLicenseFactory(dispatch: Dispatch, params: StartupMessage) {
     let { licenseKey } = params;
     const { initialLoad } = params;
 
-    if ((licenseKey === null || licenseKey === undefined) && (initialLoad && initialLoad.toString() !== 'true')) {
+    if ((licenseKey === null || licenseKey === undefined) && initialLoad && initialLoad.toString() !== 'true') {
       const result = await getLicenseKey(user!.figmaId);
       if ('key' in result && result.key) {
         licenseKey = result.key;
@@ -19,13 +19,17 @@ export function addLicenseFactory(dispatch: Dispatch, params: StartupMessage) {
     }
 
     if (licenseKey) {
-      await addLicenseKey(dispatch, {
-        key: licenseKey,
-        source: AddLicenseSource.INITAL_LOAD,
-      }, {
-        userId: user!.figmaId,
-        userName: user!.name,
-      });
+      await addLicenseKey(
+        dispatch,
+        {
+          key: licenseKey,
+          source: AddLicenseSource.INITAL_LOAD,
+        },
+        {
+          userId: user!.figmaId,
+          userName: user!.name,
+        },
+      );
     } else {
       dispatch.userState.setLicenseStatus(LicenseStatus.NO_LICENSE);
     }

@@ -10,7 +10,11 @@ import { normalizeVariableName } from '@/utils/normalizeVariableName';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 
-export default async function pullVariables(options: PullVariablesOptions, themes: ThemeObjectsList, proUser: boolean): Promise<void> {
+export default async function pullVariables(
+  options: PullVariablesOptions,
+  themes: ThemeObjectsList,
+  proUser: boolean,
+): Promise<void> {
   // @TODO should be specifically typed according to their type
   const colors: VariableToCreateToken[] = [];
   const booleans: VariableToCreateToken[] = [];
@@ -23,9 +27,8 @@ export default async function pullVariables(options: PullVariablesOptions, theme
     const uiSettings = await figma.clientStorage.getAsync('uiSettings');
     const settings = JSON.parse(await uiSettings);
     if (settings?.baseFontSize) {
-      const baseFontSizeValue = typeof settings.baseFontSize === 'number'
-        ? settings.baseFontSize
-        : parseFloat(settings.baseFontSize);
+      const baseFontSizeValue =
+        typeof settings.baseFontSize === 'number' ? settings.baseFontSize : parseFloat(settings.baseFontSize);
 
       baseRem = !isNaN(baseFontSizeValue) ? Number(baseFontSizeValue) : 16;
     }
@@ -33,18 +36,24 @@ export default async function pullVariables(options: PullVariablesOptions, theme
 
   const localVariables = await getVariablesWithoutZombies();
 
-  const collections = new Map<string, {
-    id: string,
-    name: string,
-    modes: { name: string, modeId: string }[]
-  }>();
+  const collections = new Map<
+    string,
+    {
+      id: string;
+      name: string;
+      modes: { name: string; modeId: string }[];
+    }
+  >();
 
   // Cache for collection lookups
-  const collectionsCache = new Map<string, {
-    id: string,
-    name: string,
-    modes: { name: string, modeId: string }[]
-  }>();
+  const collectionsCache = new Map<
+    string,
+    {
+      id: string;
+      name: string;
+      modes: { name: string; modeId: string }[];
+    }
+  >();
 
   for (const variable of localVariables) {
     let collection = collectionsCache.get(variable.variableCollectionId);
@@ -251,67 +260,77 @@ export default async function pullVariables(options: PullVariablesOptions, theme
       });
     });
 
-    await Promise.all(Array.from(collections.values()).map(async (collection) => {
-      // Filter collections based on selectedCollections option
-      if (options.selectedCollections) {
-        const selectedCollection = options.selectedCollections[collection.id];
-        if (!selectedCollection) {
-          return; // Skip this collection if it's not selected
-        }
-      }
-
-      await Promise.all(collection.modes.map(async (mode) => {
-        // Filter modes based on selectedCollections option
+    await Promise.all(
+      Array.from(collections.values()).map(async (collection) => {
+        // Filter collections based on selectedCollections option
         if (options.selectedCollections) {
           const selectedCollection = options.selectedCollections[collection.id];
-          if (selectedCollection && !selectedCollection.selectedModes.includes(mode.modeId)) {
-            return; // Skip this mode if it's not selected
+          if (!selectedCollection) {
+            return; // Skip this collection if it's not selected
           }
         }
 
-        const collectionVariables = localVariables.filter((v) => v.variableCollectionId === collection.id);
-
-        const variableReferences = collectionVariables.reduce((acc, variable) => ({
-          ...acc,
-          [normalizeVariableName(variable.name)]: variable.key,
-        }), {});
-
-        const tokenSetName = `${collection.name}/${mode.name}`;
-        const themeId = `${collection.name.toLowerCase()}-${mode.name.toLowerCase()}`;
-
-        processedThemes.add(`${collection.id}:${mode.modeId}`);
-
-        // Check if there's an existing theme with the same collection ID and mode ID but different token set name
-        const matchingTheme = themeInfo.themes?.find((t) => t.$figmaCollectionId === collection.id
-          && t.$figmaModeId === mode.modeId);
-
-        if (matchingTheme) {
-          // Find token sets in this theme that are different from the current token set name
-          Object.keys(matchingTheme.selectedTokenSets || {}).forEach((existingTokenSet) => {
-            if (existingTokenSet !== tokenSetName
-                && existingTokenSet.includes('/')
-                && !renamedCollections.has(existingTokenSet)
-                && !Array.from(renamedCollections.values()).includes(tokenSetName)) {
-              renamedCollections.set(existingTokenSet, tokenSetName);
+        await Promise.all(
+          collection.modes.map(async (mode) => {
+            // Filter modes based on selectedCollections option
+            if (options.selectedCollections) {
+              const selectedCollection = options.selectedCollections[collection.id];
+              if (selectedCollection && !selectedCollection.selectedModes.includes(mode.modeId)) {
+                return; // Skip this mode if it's not selected
+              }
             }
-          });
-        }
 
-        // Track this collection/mode combination
-        themesToCreate.push({
-          id: themeId,
-          name: mode.name,
-          group: collection.name,
-          selectedTokenSets: {
-            [tokenSetName]: TokenSetStatus.ENABLED,
-          },
-          $figmaStyleReferences: {},
-          $figmaVariableReferences: variableReferences,
-          $figmaModeId: mode.modeId,
-          $figmaCollectionId: collection.id,
-        });
-      }));
-    }));
+            const collectionVariables = localVariables.filter((v) => v.variableCollectionId === collection.id);
+
+            const variableReferences = collectionVariables.reduce(
+              (acc, variable) => ({
+                ...acc,
+                [normalizeVariableName(variable.name)]: variable.key,
+              }),
+              {},
+            );
+
+            const tokenSetName = `${collection.name}/${mode.name}`;
+            const themeId = `${collection.name.toLowerCase()}-${mode.name.toLowerCase()}`;
+
+            processedThemes.add(`${collection.id}:${mode.modeId}`);
+
+            // Check if there's an existing theme with the same collection ID and mode ID but different token set name
+            const matchingTheme = themeInfo.themes?.find(
+              (t) => t.$figmaCollectionId === collection.id && t.$figmaModeId === mode.modeId,
+            );
+
+            if (matchingTheme) {
+              // Find token sets in this theme that are different from the current token set name
+              Object.keys(matchingTheme.selectedTokenSets || {}).forEach((existingTokenSet) => {
+                if (
+                  existingTokenSet !== tokenSetName &&
+                  existingTokenSet.includes('/') &&
+                  !renamedCollections.has(existingTokenSet) &&
+                  !Array.from(renamedCollections.values()).includes(tokenSetName)
+                ) {
+                  renamedCollections.set(existingTokenSet, tokenSetName);
+                }
+              });
+            }
+
+            // Track this collection/mode combination
+            themesToCreate.push({
+              id: themeId,
+              name: mode.name,
+              group: collection.name,
+              selectedTokenSets: {
+                [tokenSetName]: TokenSetStatus.ENABLED,
+              },
+              $figmaStyleReferences: {},
+              $figmaVariableReferences: variableReferences,
+              $figmaModeId: mode.modeId,
+              $figmaCollectionId: collection.id,
+            });
+          }),
+        );
+      }),
+    );
 
     const currentTokenSets = new Set(themesToCreate.map((theme) => `${theme.group}/${theme.name}`));
     for (const existingSet of existingTokenSets) {
@@ -326,15 +345,20 @@ export default async function pullVariables(options: PullVariablesOptions, theme
             return false;
           }
 
-          const hasMatchingCurrentTheme = themesToCreate.some((currentTheme) => currentTheme.$figmaCollectionId === t.$figmaCollectionId
-            && currentTheme.$figmaModeId === t.$figmaModeId);
+          const hasMatchingCurrentTheme = themesToCreate.some(
+            (currentTheme) =>
+              currentTheme.$figmaCollectionId === t.$figmaCollectionId && currentTheme.$figmaModeId === t.$figmaModeId,
+          );
 
           return hasMatchingCurrentTheme && Object.keys(t.selectedTokenSets || {}).includes(existingSet);
         });
 
         if (matchingTheme) {
-          const currentTheme = themesToCreate.find((t) => t.$figmaCollectionId === matchingTheme.$figmaCollectionId
-            && t.$figmaModeId === matchingTheme.$figmaModeId);
+          const currentTheme = themesToCreate.find(
+            (t) =>
+              t.$figmaCollectionId === matchingTheme.$figmaCollectionId &&
+              t.$figmaModeId === matchingTheme.$figmaModeId,
+          );
 
           if (currentTheme) {
             const newSet = `${currentTheme.group}/${currentTheme.name}`;
@@ -355,10 +379,7 @@ export default async function pullVariables(options: PullVariablesOptions, theme
       }
       return acc;
     }, {});
-    notifyVariableValues(
-      processedTokens,
-      themesToCreate,
-    );
+    notifyVariableValues(processedTokens, themesToCreate);
 
     if (renamedCollections.size > 0) {
       notifyRenamedCollections(Array.from(renamedCollections.entries()));

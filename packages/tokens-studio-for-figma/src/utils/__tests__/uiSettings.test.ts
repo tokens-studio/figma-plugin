@@ -36,39 +36,46 @@ describe('uiSettings', () => {
       baseFontSize: '16',
       aliasBaseFontSize: '16',
     });
-    expect(mockSetAsync).toBeCalledWith('uiSettings', JSON.stringify({
-      width: 400,
-      height: 400,
-      showEmptyGroups: true,
-      updateMode: UpdateMode.PAGE,
-      updateRemote: true,
-      updateOnChange: true,
-      applyVariablesStylesOrRawValue: ApplyVariablesStylesOrRawValues.VARIABLES_STYLES,
-      shouldUpdateStyles: true,
-      ignoreFirstPartForStyles: false,
-      createStylesWithVariableReferences: true,
-      prefixStylesWithThemeName: false,
-      renameExistingStylesAndVariables: false,
-      removeStylesAndVariablesWithoutConnection: false,
-      variablesBoolean: false,
-      variablesColor: false,
-      variablesNumber: false,
-      variablesString: false,
-      stylesColor: false,
-      stylesEffect: false,
-      stylesTypography: false,
-      inspectDeep: false,
-      shouldSwapStyles: false,
-      baseFontSize: '16',
-      aliasBaseFontSize: '16',
-    }));
+    expect(mockSetAsync).toBeCalledWith(
+      'uiSettings',
+      JSON.stringify({
+        width: 400,
+        height: 400,
+        showEmptyGroups: true,
+        updateMode: UpdateMode.PAGE,
+        updateRemote: true,
+        updateOnChange: true,
+        applyVariablesStylesOrRawValue: ApplyVariablesStylesOrRawValues.VARIABLES_STYLES,
+        shouldUpdateStyles: true,
+        ignoreFirstPartForStyles: false,
+        createStylesWithVariableReferences: true,
+        prefixStylesWithThemeName: false,
+        renameExistingStylesAndVariables: false,
+        removeStylesAndVariablesWithoutConnection: false,
+        variablesBoolean: false,
+        variablesColor: false,
+        variablesNumber: false,
+        variablesString: false,
+        stylesColor: false,
+        stylesEffect: false,
+        stylesTypography: false,
+        inspectDeep: false,
+        shouldSwapStyles: false,
+        baseFontSize: '16',
+        aliasBaseFontSize: '16',
+      }),
+    );
   });
 
   it('can read the UI settings', async () => {
-    mockGetAsync.mockImplementationOnce(() => Promise.resolve(JSON.stringify({
-      width: 1000,
-      height: 1000,
-    })));
+    mockGetAsync.mockImplementationOnce(() =>
+      Promise.resolve(
+        JSON.stringify({
+          width: 1000,
+          height: 1000,
+        }),
+      ),
+    );
     expect(await getUISettings()).toEqual({
       width: 1000,
       height: 1000,
@@ -104,34 +111,38 @@ describe('uiSettings', () => {
   });
 
   it('can read the UI settings from the plugin', async () => {
-    mockGetAsync.mockImplementationOnce(() => Promise.resolve(JSON.stringify({
-      width: 1000,
-      height: 1000,
-      showEmptyGroups: true,
-      updateMode: UpdateMode.PAGE,
-      updateRemote: true,
-      updateOnChange: true,
-      applyVariablesStylesOrRawValue: ApplyVariablesStylesOrRawValues.VARIABLES_STYLES,
-      shouldUpdateStyles: true,
-      variablesColor: true,
-      variablesNumber: true,
-      variablesString: true,
-      variablesBoolean: true,
-      stylesEffect: true,
-      stylesTypography: true,
-      stylesColor: true,
-      createStylesWithVariableReferences: true,
-      ignoreFirstPartForStyles: false,
-      prefixStylesWithThemeName: false,
-      scopeVariablesByTokenType: false,
-      renameExistingStylesAndVariables: false,
-      inspectDeep: false,
-      shouldSwapStyles: false,
-      storeTokenIdInJsonEditor: false,
-      tokenFormat: TokenFormatOptions.Legacy,
-      aliasBaseFontSize: '16',
-      baseFontSize: '16',
-    })));
+    mockGetAsync.mockImplementationOnce(() =>
+      Promise.resolve(
+        JSON.stringify({
+          width: 1000,
+          height: 1000,
+          showEmptyGroups: true,
+          updateMode: UpdateMode.PAGE,
+          updateRemote: true,
+          updateOnChange: true,
+          applyVariablesStylesOrRawValue: ApplyVariablesStylesOrRawValues.VARIABLES_STYLES,
+          shouldUpdateStyles: true,
+          variablesColor: true,
+          variablesNumber: true,
+          variablesString: true,
+          variablesBoolean: true,
+          stylesEffect: true,
+          stylesTypography: true,
+          stylesColor: true,
+          createStylesWithVariableReferences: true,
+          ignoreFirstPartForStyles: false,
+          prefixStylesWithThemeName: false,
+          scopeVariablesByTokenType: false,
+          renameExistingStylesAndVariables: false,
+          inspectDeep: false,
+          shouldSwapStyles: false,
+          storeTokenIdInJsonEditor: false,
+          tokenFormat: TokenFormatOptions.Legacy,
+          aliasBaseFontSize: '16',
+          baseFontSize: '16',
+        }),
+      ),
+    );
     expect(await getUISettings()).toEqual({
       width: 1000,
       height: 1000,

@@ -18,21 +18,23 @@ export const DragOverItem: React.FC<React.PropsWithChildren<React.PropsWithChild
 }) => {
   const displayType = useSelector(displayTypeSelector);
 
-  const isDraggable = useMemo(() => (
-    token.name && isNaN(Number(token.name.split('.')[token.name.split('.').length - 1]))
-  ), [token]);
+  const isDraggable = useMemo(
+    () => token.name && isNaN(Number(token.name.split('.')[token.name.split('.').length - 1])),
+    [token],
+  );
 
-  const isColorAndListDisplayType = useMemo(() => (
-    token.type === TokenTypes.COLOR && displayType === 'LIST'
-  ), [token, displayType]);
+  const isColorAndListDisplayType = useMemo(
+    () => token.type === TokenTypes.COLOR && displayType === 'LIST',
+    [token, displayType],
+  );
 
   const hasDragOverToken = useMemo(() => {
     if (
-      draggedToken
-      && draggedToken !== token
-      && dragOverToken === token
-      && isDraggable
-      && draggedToken.type === dragOverToken.type
+      draggedToken &&
+      draggedToken !== token &&
+      dragOverToken === token &&
+      isDraggable &&
+      draggedToken.type === dragOverToken.type
     ) {
       const draggedItemName = draggedToken?.name.split('.');
       const dragOverName = dragOverToken?.name.split('.');
@@ -50,8 +52,8 @@ export const DragOverItem: React.FC<React.PropsWithChildren<React.PropsWithChild
   return (
     <div
       className={cx(
-        (hasDragOverToken && isColorAndListDisplayType) && 'drag-over-item-list-absolute',
-        (hasDragOverToken && !isColorAndListDisplayType) && 'drag-over-item-grid-absolute',
+        hasDragOverToken && isColorAndListDisplayType && 'drag-over-item-list-absolute',
+        hasDragOverToken && !isColorAndListDisplayType && 'drag-over-item-grid-absolute',
       )}
     />
   );

@@ -15,8 +15,7 @@ describe('complexSingleFileSchema', () => {
       },
       mobile: {
         iphone: {
-          value: {
-          },
+          value: {},
           type: 'typography',
         },
       },

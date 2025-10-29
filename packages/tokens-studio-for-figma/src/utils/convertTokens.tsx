@@ -24,26 +24,26 @@ export type TokenInJSON<T extends TokenTypes = any, V = any> = {
   };
 } & (
   | {
-    type: T;
-    value: V;
-    description?: string;
-  }
+      type: T;
+      value: V;
+      description?: string;
+    }
   | {
-    $type: T;
-    $value: V;
-    $description?: string;
-  }
+      $type: T;
+      $value: V;
+      $description?: string;
+    }
 );
 
 export type Tokens =
   | Partial<Record<string, Partial<Record<TokenTypes, Record<string, TokenInJSON>>>>>
   | TokenGroupInJSON;
 
-  type OptionalDTCGKeys = {
-    $type?: TokenTypes;
-    $value?: SingleToken['value'];
-    $description?: string;
-  };
+type OptionalDTCGKeys = {
+  $type?: TokenTypes;
+  $value?: SingleToken['value'];
+  $description?: string;
+};
 
 // @TODO fix typings
 function checkForTokens({
@@ -70,16 +70,16 @@ function checkForTokens({
   inheritType?: string;
   groupLevel?: number;
   currentTypeLevel?: number;
-}): [(SingleToken & SingleToken & OptionalDTCGKeys)[], SingleToken & OptionalDTCGKeys | undefined] {
+}): [(SingleToken & SingleToken & OptionalDTCGKeys)[], (SingleToken & OptionalDTCGKeys) | undefined] {
   let returnValue:
-  | Pick<SingleToken<false>, 'name' | 'value' | 'type' | 'description' | 'inheritTypeLevel'>
-  | {
-    type: TokenTypes;
-    value: Record<string, SingleToken['value']>;
-    description?: string;
-    inheritTypeLevel?: number;
-  }
-  | undefined;
+    | Pick<SingleToken<false>, 'name' | 'value' | 'type' | 'description' | 'inheritTypeLevel'>
+    | {
+        type: TokenTypes;
+        value: Record<string, SingleToken['value']>;
+        description?: string;
+        inheritTypeLevel?: number;
+      }
+    | undefined;
   if (isSingleTokenInJSON(token)) {
     returnValue = token as SingleToken<false>;
     returnValue.value = token[TokenFormat.tokenValueKey];
@@ -97,10 +97,10 @@ function checkForTokens({
       }
     }
   } else if (
-    isSingleTypographyToken(token)
-    || isSingleBoxShadowToken(token)
-    || isSingleCompositionToken(token)
-    || isSingleBorderToken(token)
+    isSingleTypographyToken(token) ||
+    isSingleBoxShadowToken(token) ||
+    isSingleCompositionToken(token) ||
+    isSingleBorderToken(token)
   ) {
     returnValue = token as SingleToken<false>;
     returnValue.value = Object.entries(token).reduce<Record<string, SingleToken['value']>>((acc, [key, val]) => {

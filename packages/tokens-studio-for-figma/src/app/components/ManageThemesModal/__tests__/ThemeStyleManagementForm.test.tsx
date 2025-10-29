@@ -39,13 +39,13 @@ const mockAttachLocalStylesToTheme = jest.fn(async () => ({
 
 describe('ThemeStyleManagementForm', () => {
   it('should work', async () => {
-    const runAfter = [
-      AsyncMessageChannel.PluginInstance.connect(),
-      AsyncMessageChannel.ReactInstance.connect(),
-    ];
+    const runAfter = [AsyncMessageChannel.PluginInstance.connect(), AsyncMessageChannel.ReactInstance.connect()];
 
     AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RESOLVE_STYLE_INFO, mockResolveStyleInfoHandler);
-    AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.ATTACH_LOCAL_STYLES_TO_THEME, mockAttachLocalStylesToTheme);
+    AsyncMessageChannel.PluginInstance.handle(
+      AsyncMessageTypes.ATTACH_LOCAL_STYLES_TO_THEME,
+      mockAttachLocalStylesToTheme,
+    );
 
     const store = createMockStore({
       tokenState: {

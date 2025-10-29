@@ -8,42 +8,44 @@ describe('bulkRemapTokens', () => {
   const mockSetSharedPluginData = jest.fn();
 
   it('should be able to replace all matching token names with new token name', async () => {
-    findNodesSpy.mockImplementationOnce(() => Promise.resolve([
-      {
-        id: '295:3',
-        node: {
+    findNodesSpy.mockImplementationOnce(() =>
+      Promise.resolve([
+        {
           id: '295:3',
-          setSharedPluginData: mockSetSharedPluginData,
-        } as unknown as BaseNode,
-        tokens: {
-          borderRadius: 'old.border-radius',
-          fill: 'old.slate.400',
-          sizing: 'old-size.450',
-          spacing: 'something-else.foobar',
+          node: {
+            id: '295:3',
+            setSharedPluginData: mockSetSharedPluginData,
+          } as unknown as BaseNode,
+          tokens: {
+            borderRadius: 'old.border-radius',
+            fill: 'old.slate.400',
+            sizing: 'old-size.450',
+            spacing: 'something-else.foobar',
+          },
         },
-      },
-      {
-        id: '295:4',
-        node: {
+        {
           id: '295:4',
-          setSharedPluginData: mockSetSharedPluginData,
-        } as unknown as RectangleNode,
-        tokens: {
-          fill: 'old.red.500',
-          sizing: 'old-size.1600',
+          node: {
+            id: '295:4',
+            setSharedPluginData: mockSetSharedPluginData,
+          } as unknown as RectangleNode,
+          tokens: {
+            fill: 'old.red.500',
+            sizing: 'old-size.1600',
+          },
         },
-      },
-      {
-        id: '295:5',
-        node: {
+        {
           id: '295:5',
-          setSharedPluginData: mockSetSharedPluginData,
-        } as unknown as TextNode,
-        tokens: {
-          fill: 'old-color.gray.300',
+          node: {
+            id: '295:5',
+            setSharedPluginData: mockSetSharedPluginData,
+          } as unknown as TextNode,
+          tokens: {
+            fill: 'old-color.gray.300',
+          },
         },
-      },
-    ]));
+      ]),
+    );
     await bulkRemapTokens({
       type: AsyncMessageTypes.BULK_REMAP_TOKENS,
       oldName: 'old',
@@ -58,42 +60,44 @@ describe('bulkRemapTokens', () => {
   });
 
   it('should be able to replace all matching token names with new token name using regex', async () => {
-    findNodesSpy.mockImplementationOnce(() => Promise.resolve([
-      {
-        id: '295:3',
-        node: {
+    findNodesSpy.mockImplementationOnce(() =>
+      Promise.resolve([
+        {
           id: '295:3',
-          setSharedPluginData: mockSetSharedPluginData,
-        } as unknown as BaseNode,
-        tokens: {
-          borderRadius: 'old.border-radius',
-          fill: 'old.slate.400',
-          sizing: 'old-size.450',
-          spacing: 'something-else.foobar',
+          node: {
+            id: '295:3',
+            setSharedPluginData: mockSetSharedPluginData,
+          } as unknown as BaseNode,
+          tokens: {
+            borderRadius: 'old.border-radius',
+            fill: 'old.slate.400',
+            sizing: 'old-size.450',
+            spacing: 'something-else.foobar',
+          },
         },
-      },
-      {
-        id: '295:4',
-        node: {
+        {
           id: '295:4',
-          setSharedPluginData: mockSetSharedPluginData,
-        } as unknown as RectangleNode,
-        tokens: {
-          fill: 'old.red.500',
-          sizing: 'old-size.1600',
+          node: {
+            id: '295:4',
+            setSharedPluginData: mockSetSharedPluginData,
+          } as unknown as RectangleNode,
+          tokens: {
+            fill: 'old.red.500',
+            sizing: 'old-size.1600',
+          },
         },
-      },
-      {
-        id: '295:5',
-        node: {
+        {
           id: '295:5',
-          setSharedPluginData: mockSetSharedPluginData,
-        } as unknown as TextNode,
-        tokens: {
-          fill: 'old-color.gray.300',
+          node: {
+            id: '295:5',
+            setSharedPluginData: mockSetSharedPluginData,
+          } as unknown as TextNode,
+          tokens: {
+            fill: 'old-color.gray.300',
+          },
         },
-      },
-    ]));
+      ]),
+    );
     await bulkRemapTokens({
       type: AsyncMessageTypes.BULK_REMAP_TOKENS,
       oldName: '/old-size.*/g',
@@ -108,20 +112,22 @@ describe('bulkRemapTokens', () => {
   });
 
   it('should treat patterns as literal strings when regex mode is disabled', async () => {
-    findNodesSpy.mockImplementationOnce(() => Promise.resolve([
-      {
-        id: '295:8',
-        node: {
+    findNodesSpy.mockImplementationOnce(() =>
+      Promise.resolve([
+        {
           id: '295:8',
-          setSharedPluginData: mockSetSharedPluginData,
-        } as unknown as BaseNode,
-        tokens: {
-          pattern1: 'old-size.*',
-          pattern2: 'old-size.large',
-          pattern3: 'old-size.medium',
+          node: {
+            id: '295:8',
+            setSharedPluginData: mockSetSharedPluginData,
+          } as unknown as BaseNode,
+          tokens: {
+            pattern1: 'old-size.*',
+            pattern2: 'old-size.large',
+            pattern3: 'old-size.medium',
+          },
         },
-      },
-    ]));
+      ]),
+    );
     await bulkRemapTokens({
       type: AsyncMessageTypes.BULK_REMAP_TOKENS,
       oldName: 'old-size.*',
@@ -136,20 +142,22 @@ describe('bulkRemapTokens', () => {
   });
 
   it('should treat patterns as regex when regex mode is enabled', async () => {
-    findNodesSpy.mockImplementationOnce(() => Promise.resolve([
-      {
-        id: '295:9',
-        node: {
+    findNodesSpy.mockImplementationOnce(() =>
+      Promise.resolve([
+        {
           id: '295:9',
-          setSharedPluginData: mockSetSharedPluginData,
-        } as unknown as BaseNode,
-        tokens: {
-          pattern1: 'old-size.*',
-          pattern2: 'old-size.large',
-          pattern3: 'old-size.medium',
+          node: {
+            id: '295:9',
+            setSharedPluginData: mockSetSharedPluginData,
+          } as unknown as BaseNode,
+          tokens: {
+            pattern1: 'old-size.*',
+            pattern2: 'old-size.large',
+            pattern3: 'old-size.medium',
+          },
         },
-      },
-    ]));
+      ]),
+    );
     await bulkRemapTokens({
       type: AsyncMessageTypes.BULK_REMAP_TOKENS,
       oldName: 'old-size.*',
@@ -166,21 +174,23 @@ describe('bulkRemapTokens', () => {
   });
 
   it('should handle special regex characters in literal string matching', async () => {
-    findNodesSpy.mockImplementationOnce(() => Promise.resolve([
-      {
-        id: '295:6',
-        node: {
+    findNodesSpy.mockImplementationOnce(() =>
+      Promise.resolve([
+        {
           id: '295:6',
-          setSharedPluginData: mockSetSharedPluginData,
-        } as unknown as BaseNode,
-        tokens: {
-          borderRadius: 'size..border',
-          fill: 'size.border',
-          sizing: 'size...spacing',
-          spacing: 'other.token',
+          node: {
+            id: '295:6',
+            setSharedPluginData: mockSetSharedPluginData,
+          } as unknown as BaseNode,
+          tokens: {
+            borderRadius: 'size..border',
+            fill: 'size.border',
+            sizing: 'size...spacing',
+            spacing: 'other.token',
+          },
         },
-      },
-    ]));
+      ]),
+    );
     await bulkRemapTokens({
       type: AsyncMessageTypes.BULK_REMAP_TOKENS,
       oldName: '..',
@@ -196,23 +206,25 @@ describe('bulkRemapTokens', () => {
   });
 
   it('should handle other special regex characters as literal strings', async () => {
-    findNodesSpy.mockImplementationOnce(() => Promise.resolve([
-      {
-        id: '295:7',
-        node: {
+    findNodesSpy.mockImplementationOnce(() =>
+      Promise.resolve([
+        {
           id: '295:7',
-          setSharedPluginData: mockSetSharedPluginData,
-        } as unknown as BaseNode,
-        tokens: {
-          pattern1: 'color[main]',
-          pattern2: 'color.main',
-          pattern3: 'size*large',
-          pattern4: 'size+medium',
-          pattern5: 'border?solid',
-          pattern6: 'border-solid',
+          node: {
+            id: '295:7',
+            setSharedPluginData: mockSetSharedPluginData,
+          } as unknown as BaseNode,
+          tokens: {
+            pattern1: 'color[main]',
+            pattern2: 'color.main',
+            pattern3: 'size*large',
+            pattern4: 'size+medium',
+            pattern5: 'border?solid',
+            pattern6: 'border-solid',
+          },
         },
-      },
-    ]));
+      ]),
+    );
     await bulkRemapTokens({
       type: AsyncMessageTypes.BULK_REMAP_TOKENS,
       oldName: '[main]',

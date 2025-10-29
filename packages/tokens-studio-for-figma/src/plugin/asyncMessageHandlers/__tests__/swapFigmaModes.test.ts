@@ -17,7 +17,11 @@ const mockCurrentPage = {
   type: 'PAGE',
   setExplicitVariableModeForCollection: mockSetExplicitVariableModeForCollection,
   selection: [
-    { name: 'Selected Frame', type: 'FRAME', setExplicitVariableModeForCollection: mockSetExplicitVariableModeForCollection },
+    {
+      name: 'Selected Frame',
+      type: 'FRAME',
+      setExplicitVariableModeForCollection: mockSetExplicitVariableModeForCollection,
+    },
   ],
 };
 

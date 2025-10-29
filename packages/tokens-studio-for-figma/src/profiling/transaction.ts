@@ -33,11 +33,11 @@ interface TransactionOptions<U> {
    *  },()=>{...})
    * ```
    */
-  statExtractor?: (val: U, transaction: Transaction) => void
+  statExtractor?: (val: U, transaction: Transaction) => void;
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-export const wrapTransaction = async<U>(opts: TransactionOptions<U>, fn: () => U): Promise<U> => {
+export const wrapTransaction = async <U>(opts: TransactionOptions<U>, fn: () => U): Promise<U> => {
   // Do not run profiling if we are not in production
   if (!shouldProfile()) {
     return fn();
@@ -67,7 +67,7 @@ export const wrapTransaction = async<U>(opts: TransactionOptions<U>, fn: () => U
   return result;
 };
 
-export const spanTransaction = async<U>(opts: TransactionOptions<U>, fn: () => U): Promise<U> => {
+export const spanTransaction = async <U>(opts: TransactionOptions<U>, fn: () => U): Promise<U> => {
   // Do not run profiling if we are not in production
   if (!shouldProfile()) {
     return fn();

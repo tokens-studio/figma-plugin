@@ -73,21 +73,23 @@ describe('remapTokens', () => {
   ] as AnyTokenList;
   const findNodesSpy = jest.spyOn(defaultNodeManager, 'findBaseNodesWithData');
   it('should update plugin data', async () => {
-    findNodesSpy.mockImplementationOnce(() => Promise.resolve([
-      {
-        id: '295:3',
-        node: {
+    findNodesSpy.mockImplementationOnce(() =>
+      Promise.resolve([
+        {
           id: '295:3',
-          setSharedPluginData: mockSetSharedPluginData,
-        } as unknown as BaseNode,
-        tokens: {
-          borderRadius: 'border-radius.7',
-          borderWidth: 'border-width.4',
-          fill: 'color.red.400',
-          opacity: 'opacity.80',
+          node: {
+            id: '295:3',
+            setSharedPluginData: mockSetSharedPluginData,
+          } as unknown as BaseNode,
+          tokens: {
+            borderRadius: 'border-radius.7',
+            borderWidth: 'border-width.4',
+            fill: 'color.red.400',
+            opacity: 'opacity.80',
+          },
         },
-      },
-    ]));
+      ]),
+    );
 
     await remapTokens({
       type: AsyncMessageTypes.REMAP_TOKENS,
@@ -102,22 +104,24 @@ describe('remapTokens', () => {
   });
 
   it('should update plugin data with old tokens when remapping composition token', async () => {
-    findNodesSpy.mockImplementationOnce(() => Promise.resolve([
-      {
-        id: '295:3',
-        node: {
+    findNodesSpy.mockImplementationOnce(() =>
+      Promise.resolve([
+        {
           id: '295:3',
-          setSharedPluginData: mockSetSharedPluginData,
-        } as unknown as BaseNode,
-        tokens: {
-          borderRadius: 'border-radius.7',
-          borderWidth: 'border-width.4',
-          fill: 'color.red.400',
-          opacity: 'opacity.80',
-          composition: 'composition.old',
+          node: {
+            id: '295:3',
+            setSharedPluginData: mockSetSharedPluginData,
+          } as unknown as BaseNode,
+          tokens: {
+            borderRadius: 'border-radius.7',
+            borderWidth: 'border-width.4',
+            fill: 'color.red.400',
+            opacity: 'opacity.80',
+            composition: 'composition.old',
+          },
         },
-      },
-    ]));
+      ]),
+    );
 
     await remapTokens({
       type: AsyncMessageTypes.REMAP_TOKENS,
@@ -132,22 +136,24 @@ describe('remapTokens', () => {
   });
 
   it('should update plugin data with empty values when updateMode is not selection', async () => {
-    findNodesSpy.mockImplementationOnce(() => Promise.resolve([
-      {
-        id: '295:3',
-        node: {
+    findNodesSpy.mockImplementationOnce(() =>
+      Promise.resolve([
+        {
           id: '295:3',
-          setSharedPluginData: mockSetSharedPluginData,
-        } as unknown as BaseNode,
-        tokens: {
-          borderRadius: 'border-radius.7',
-          borderWidth: 'border-width.4',
-          fill: 'color.red.400',
-          opacity: 'opacity.80',
-          composition: 'composition.old',
+          node: {
+            id: '295:3',
+            setSharedPluginData: mockSetSharedPluginData,
+          } as unknown as BaseNode,
+          tokens: {
+            borderRadius: 'border-radius.7',
+            borderWidth: 'border-width.4',
+            fill: 'color.red.400',
+            opacity: 'opacity.80',
+            composition: 'composition.old',
+          },
         },
-      },
-    ]));
+      ]),
+    );
 
     await remapTokens({
       type: AsyncMessageTypes.REMAP_TOKENS,

@@ -57,7 +57,6 @@ function App() {
             </Box>
             {activeTab !== 'loading' && activeTab !== 'start' && <Footer />}
           </Box>
-
         </PluginResizerWrapper>
         <ConvertToDTCGModal />
       </IconoirProvider>

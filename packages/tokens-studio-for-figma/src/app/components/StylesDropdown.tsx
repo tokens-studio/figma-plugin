@@ -21,14 +21,7 @@ export default function StylesDropdown() {
   const { t } = useTranslation(['tokens']);
 
   const [showModal, setShowModal] = React.useState(false);
-  const {
-    isDialogOpen,
-    collections,
-    isLoading,
-    openDialog,
-    closeDialog,
-    importVariables,
-  } = useImportVariables();
+  const { isDialogOpen, collections, isLoading, openDialog, closeDialog, importVariables } = useImportVariables();
 
   const handleOpenModal = useCallback(() => {
     setShowModal(true);
@@ -38,9 +31,12 @@ export default function StylesDropdown() {
     openDialog();
   }, [openDialog]);
 
-  const handleConfirmImport = useCallback((selectedCollections, options) => {
-    importVariables(selectedCollections, options, themes, proUser);
-  }, [importVariables, themes, proUser]);
+  const handleConfirmImport = useCallback(
+    (selectedCollections, options) => {
+      importVariables(selectedCollections, options, themes, proUser);
+    },
+    [importVariables, themes, proUser],
+  );
 
   return (
     <>
@@ -53,9 +49,19 @@ export default function StylesDropdown() {
 
         <DropdownMenu.Portal>
           <DropdownMenu.Content side="top">
-            <DropdownMenu.Item textValue="Export styles & variables" onSelect={handleOpenModal}>{t('exportStylesAndVariables')}</DropdownMenu.Item>
-            <DropdownMenu.Item textValue="Import variables" disabled={importDisabled || isLoading} onSelect={handleImportVariables}>{t('importVariables')}</DropdownMenu.Item>
-            <DropdownMenu.Item textValue="Import styles" disabled={importDisabled} onSelect={pullStyles}>{t('importStyles')}</DropdownMenu.Item>
+            <DropdownMenu.Item textValue="Export styles & variables" onSelect={handleOpenModal}>
+              {t('exportStylesAndVariables')}
+            </DropdownMenu.Item>
+            <DropdownMenu.Item
+              textValue="Import variables"
+              disabled={importDisabled || isLoading}
+              onSelect={handleImportVariables}
+            >
+              {t('importVariables')}
+            </DropdownMenu.Item>
+            <DropdownMenu.Item textValue="Import styles" disabled={importDisabled} onSelect={pullStyles}>
+              {t('importStyles')}
+            </DropdownMenu.Item>
           </DropdownMenu.Content>
         </DropdownMenu.Portal>
       </DropdownMenu>

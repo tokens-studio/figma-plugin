@@ -33,43 +33,49 @@ export function useImportVariables() {
     setCollections([]);
   }, []);
 
-  const importVariables = useCallback(async (
-    selectedCollections: SelectedCollections,
-    options: { useDimensions: boolean; useRem: boolean },
-    themes: ThemeObjectsList,
-    proUser: boolean,
-  ) => {
-    try {
-      // Calculate analytics data
-      const selectedCollectionIds = Object.keys(selectedCollections);
-      const totalSelectedModes = selectedCollectionIds.reduce((count, collectionId) => count + selectedCollections[collectionId].selectedModes.length, 0);
-      const totalAvailableModes = collections.reduce((count, collection) => count + collection.modes.length, 0);
+  const importVariables = useCallback(
+    async (
+      selectedCollections: SelectedCollections,
+      options: { useDimensions: boolean; useRem: boolean },
+      themes: ThemeObjectsList,
+      proUser: boolean,
+    ) => {
+      try {
+        // Calculate analytics data
+        const selectedCollectionIds = Object.keys(selectedCollections);
+        const totalSelectedModes = selectedCollectionIds.reduce(
+          (count, collectionId) => count + selectedCollections[collectionId].selectedModes.length,
+          0,
+        );
+        const totalAvailableModes = collections.reduce((count, collection) => count + collection.modes.length, 0);
 
-      // Track analytics
-      track('Import Variables', {
-        useDimensions: options.useDimensions,
-        useRem: options.useRem,
-        selectedCollections: selectedCollectionIds.length,
-        totalCollections: collections.length,
-        selectedModes: totalSelectedModes,
-        totalModes: totalAvailableModes,
-      });
-
-      await AsyncMessageChannel.ReactInstance.message({
-        type: AsyncMessageTypes.PULL_VARIABLES,
-        options: {
+        // Track analytics
+        track('Import Variables', {
           useDimensions: options.useDimensions,
           useRem: options.useRem,
-          selectedCollections,
-        },
-        themes,
-        proUser,
-      });
-      closeDialog();
-    } catch (error) {
-      console.error('Error importing variables:', error);
-    }
-  }, [closeDialog, collections]);
+          selectedCollections: selectedCollectionIds.length,
+          totalCollections: collections.length,
+          selectedModes: totalSelectedModes,
+          totalModes: totalAvailableModes,
+        });
+
+        await AsyncMessageChannel.ReactInstance.message({
+          type: AsyncMessageTypes.PULL_VARIABLES,
+          options: {
+            useDimensions: options.useDimensions,
+            useRem: options.useRem,
+            selectedCollections,
+          },
+          themes,
+          proUser,
+        });
+        closeDialog();
+      } catch (error) {
+        console.error('Error importing variables:', error);
+      }
+    },
+    [closeDialog, collections],
+  );
 
   return {
     isDialogOpen,

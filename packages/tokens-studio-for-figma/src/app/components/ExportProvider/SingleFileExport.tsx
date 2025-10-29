@@ -1,13 +1,9 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import set from 'set-value';
-import {
-  Button, Heading, Textarea, Checkbox,
-} from '@tokens-studio/ui';
+import { Button, Heading, Textarea, Checkbox } from '@tokens-studio/ui';
 import useTokens from '@/app/store/useTokens';
-import {
-  themesListSelector, tokensSelector,
-} from '@/selectors';
+import { themesListSelector, tokensSelector } from '@/selectors';
 import Label from '../Label';
 import Box from '../Box';
 import Stack from '../Stack';
@@ -15,7 +11,7 @@ import { SystemFilenames } from '@/constants/SystemFilenames';
 import { track } from '@/utils/analytics';
 
 type Props = {
-  onClose: () => void
+  onClose: () => void;
 };
 
 export default function SingleFileExport({ onClose }: Props) {
@@ -55,14 +51,36 @@ export default function SingleFileExport({ onClose }: Props) {
 
   const handleClickExport = React.useCallback(() => {
     track('Export file', {
-      includeParent, includeAllTokens, expandComposition, expandShadow, expandTypography, expandBorder,
+      includeParent,
+      includeAllTokens,
+      expandComposition,
+      expandShadow,
+      expandTypography,
+      expandBorder,
     });
     onClose();
   }, [expandComposition, expandShadow, expandTypography, expandBorder, includeAllTokens, includeParent, onClose]);
 
-  const formattedTokens = React.useMemo(() => getFormattedTokens({
-    includeAllTokens, includeParent, expandTypography, expandShadow, expandComposition, expandBorder,
-  }), [includeAllTokens, includeParent, expandTypography, expandShadow, expandComposition, expandBorder, getFormattedTokens]);
+  const formattedTokens = React.useMemo(
+    () =>
+      getFormattedTokens({
+        includeAllTokens,
+        includeParent,
+        expandTypography,
+        expandShadow,
+        expandComposition,
+        expandBorder,
+      }),
+    [
+      includeAllTokens,
+      includeParent,
+      expandTypography,
+      expandShadow,
+      expandComposition,
+      expandBorder,
+      getFormattedTokens,
+    ],
+  );
 
   const exportData = React.useMemo(() => {
     const returnValue = JSON.parse(formattedTokens);

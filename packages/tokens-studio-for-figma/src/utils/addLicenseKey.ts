@@ -6,18 +6,20 @@ import { notifyToUI } from '@/plugin/notifiers';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 
-export async function addLicenseKey(dispatch: Dispatch, payload: { key: string; source: AddLicenseSource }, user: {
-  userId: string | null;
-  userName?: string;
-}) {
+export async function addLicenseKey(
+  dispatch: Dispatch,
+  payload: { key: string; source: AddLicenseSource },
+  user: {
+    userId: string | null;
+    userName?: string;
+  },
+) {
   dispatch.userState.setLicenseStatus(LicenseStatus.VERIFYING);
 
   const { userId, userName } = user;
   const { key, source } = payload;
 
-  const {
-    error, plan, email: clientEmail, entitlements,
-  } = await validateLicense(key, userId, userName);
+  const { error, plan, email: clientEmail, entitlements } = await validateLicense(key, userId, userName);
 
   if (error) {
     dispatch.userState.setLicenseStatus(LicenseStatus.ERROR);

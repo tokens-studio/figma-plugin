@@ -13,7 +13,10 @@ describe('setColorValuesOnVariable', () => {
 
   it('should set new color value when values are different', () => {
     mockVariable.valuesByMode[mockMode] = {
-      r: 0, g: 0, b: 0, a: 1,
+      r: 0,
+      g: 0,
+      b: 0,
+      a: 1,
     };
 
     setColorValuesOnVariable(mockVariable, mockMode, '#FF0000');
@@ -21,14 +24,20 @@ describe('setColorValuesOnVariable', () => {
     expect(mockVariable.setValueForMode).toHaveBeenCalledWith(
       mockMode,
       expect.objectContaining({
-        r: 1, g: 0, b: 0, a: 1,
+        r: 1,
+        g: 0,
+        b: 0,
+        a: 1,
       }),
     );
   });
 
   it('should not set value when colors are identical', () => {
     mockVariable.valuesByMode[mockMode] = {
-      r: 1, g: 0, b: 0, a: 1,
+      r: 1,
+      g: 0,
+      b: 0,
+      a: 1,
     };
 
     setColorValuesOnVariable(mockVariable, mockMode, '#FF0000');
@@ -39,7 +48,10 @@ describe('setColorValuesOnVariable', () => {
   it('should not set value when normalized colors are identical', () => {
     // Set up values that when clipped to 6 decimals should be identical
     mockVariable.valuesByMode[mockMode] = {
-      r: 0.123456, g: 0.234567, b: 0.345678, a: 1,
+      r: 0.123456,
+      g: 0.234567,
+      b: 0.345678,
+      a: 1,
     };
 
     const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
@@ -60,7 +72,10 @@ describe('setColorValuesOnVariable', () => {
     // Since jest.doMock doesn't work well in this context, let's test the core logic differently
     // Just test that identical normalized values don't trigger updates
     mockVariable.valuesByMode[mockMode] = {
-      r: 0.123456, g: 0.234567, b: 0.345678, a: 1,
+      r: 0.123456,
+      g: 0.234567,
+      b: 0.345678,
+      a: 1,
     };
 
     // Try setting with a color that should result in the same normalized values
@@ -69,7 +84,10 @@ describe('setColorValuesOnVariable', () => {
     // Reset and test with exact match
     jest.clearAllMocks();
     mockVariable.valuesByMode[mockMode] = {
-      r: 1, g: 0, b: 0, a: 1,
+      r: 1,
+      g: 0,
+      b: 0,
+      a: 1,
     };
     setColorValuesOnVariable(mockVariable, mockMode, '#FF0000');
     expect(mockVariable.setValueForMode).not.toHaveBeenCalled();
@@ -90,10 +108,7 @@ describe('setColorValuesOnVariable', () => {
 
     setColorValuesOnVariable(mockVariable, mockMode, 'invalid-color');
 
-    expect(consoleSpy).toHaveBeenCalledWith(
-      'Error setting colorVariable',
-      expect.any(Error),
-    );
+    expect(consoleSpy).toHaveBeenCalledWith('Error setting colorVariable', expect.any(Error));
     consoleSpy.mockRestore();
   });
 });

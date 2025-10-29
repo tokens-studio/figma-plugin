@@ -25,18 +25,20 @@ export default function CompositionTokenForm({
   internalEditToken: Extract<EditTokenObject, { type: TokenTypes.COMPOSITION }>;
   setTokenValue: (newTokenValue: NodeTokenRefMap) => void;
   resolvedTokens: ResolveTokenValuesResult[];
-  onSubmit: () => void
+  onSubmit: () => void;
 }) {
   const seed = useUIDSeed();
   const [orderObj, setOrderObj] = React.useState<NodeTokenRefMap>({});
   const [error, setError] = React.useState(false);
   const { t } = useTranslation(['tokens']);
 
-  const propertiesMenu = React.useMemo(() => (
-    filterValidCompositionTokenTypes(Object.keys(Properties)).map((key: string) => (
-      String(Properties[key as CompositionTokenProperty])
-    ))
-  ), []);
+  const propertiesMenu = React.useMemo(
+    () =>
+      filterValidCompositionTokenTypes(Object.keys(Properties)).map((key: string) =>
+        String(Properties[key as CompositionTokenProperty]),
+      ),
+    [],
+  );
 
   React.useEffect(() => {
     const defaultOrderObj: NodeTokenRefMap = {};
@@ -49,8 +51,14 @@ export default function CompositionTokenForm({
   // keep order of the properties in composition token
   const arrangedTokenValue = React.useMemo<NodeTokenRefMap>(() => {
     const internalEditTokenValue = internalEditToken.value || internalEditToken.schema.schemas.value.properties;
-    return Object.assign({}, ...Object.keys(internalEditTokenValue).sort((a, b) => Number(orderObj[a as CompositionTokenProperty]) - Number(orderObj[b as CompositionTokenProperty]))
-      .map((x) => ({ [x as CompositionTokenProperty]: internalEditTokenValue[x as CompositionTokenProperty] })));
+    return Object.assign(
+      {},
+      ...Object.keys(internalEditTokenValue)
+        .sort(
+          (a, b) => Number(orderObj[a as CompositionTokenProperty]) - Number(orderObj[b as CompositionTokenProperty]),
+        )
+        .map((x) => ({ [x as CompositionTokenProperty]: internalEditTokenValue[x as CompositionTokenProperty] })),
+    );
   }, [internalEditToken, orderObj]);
 
   const addToken = useCallback(() => {
@@ -62,27 +70,41 @@ export default function CompositionTokenForm({
     setTokenValue(internalEditTokenValue as NodeTokenRefMap);
   }, [internalEditToken]);
 
-  const removeToken = useCallback((property: string) => {
-    const internalEditTokenValue = internalEditToken.value || internalEditToken.schema.schemas.value.properties;
-    const { [property as keyof typeof internalEditTokenValue]: removeProperty, ...newTokenValue } = internalEditTokenValue;
-    setTokenValue(newTokenValue as NodeTokenRefMap);
-  }, [internalEditToken]);
+  const removeToken = useCallback(
+    (property: string) => {
+      const internalEditTokenValue = internalEditToken.value || internalEditToken.schema.schemas.value.properties;
+      const { [property as keyof typeof internalEditTokenValue]: removeProperty, ...newTokenValue } =
+        internalEditTokenValue;
+      setTokenValue(newTokenValue as NodeTokenRefMap);
+    },
+    [internalEditToken],
+  );
 
   const handleOrderObj = useCallback((newOrderObj: NodeTokenRefMap) => {
     setOrderObj(newOrderObj);
   }, []);
 
-  const handleReorder = React.useCallback((reorderedItems: string[]) => {
-    const newOrderObj: NodeTokenRefMap = {};
-    const internalEditTokenValue = internalEditToken.value || internalEditToken.schema.schemas.value.properties;
-    reorderedItems.forEach((key, index) => {
-      newOrderObj[key as keyof typeof Properties] = String(index);
-    });
-    const rearrangedTokenValue = Object.assign({}, ...Object.keys(internalEditTokenValue).sort((a, b) => Number(newOrderObj[a as CompositionTokenProperty]) - Number(newOrderObj[b as CompositionTokenProperty]))
-      .map((x) => ({ [x as CompositionTokenProperty]: internalEditTokenValue[x as CompositionTokenProperty] })));
-    setOrderObj(newOrderObj);
-    setTokenValue(rearrangedTokenValue as NodeTokenRefMap);
-  }, [internalEditToken, setTokenValue]);
+  const handleReorder = React.useCallback(
+    (reorderedItems: string[]) => {
+      const newOrderObj: NodeTokenRefMap = {};
+      const internalEditTokenValue = internalEditToken.value || internalEditToken.schema.schemas.value.properties;
+      reorderedItems.forEach((key, index) => {
+        newOrderObj[key as keyof typeof Properties] = String(index);
+      });
+      const rearrangedTokenValue = Object.assign(
+        {},
+        ...Object.keys(internalEditTokenValue)
+          .sort(
+            (a, b) =>
+              Number(newOrderObj[a as CompositionTokenProperty]) - Number(newOrderObj[b as CompositionTokenProperty]),
+          )
+          .map((x) => ({ [x as CompositionTokenProperty]: internalEditTokenValue[x as CompositionTokenProperty] })),
+      );
+      setOrderObj(newOrderObj);
+      setTokenValue(rearrangedTokenValue as NodeTokenRefMap);
+    },
+    [internalEditToken, setTokenValue],
+  );
 
   return (
     <div>
@@ -99,50 +121,42 @@ export default function CompositionTokenForm({
         />
       </Box>
       <Box css={{ display: 'flex', flexDirection: 'column', gap: '$4' }}>
-        {
-            Object.entries(arrangedTokenValue).length < 1 ? (
-              <SingleCompositionTokenForm
-                index={0}
-                property=""
-                propertyValue=""
-                tokenValue={arrangedTokenValue}
-                properties={propertiesMenu}
-                resolvedTokens={resolvedTokens}
-                setTokenValue={setTokenValue}
-                onRemove={removeToken}
-                setOrderObj={handleOrderObj}
-                setError={setError}
-                onSubmit={onSubmit}
-              />
-            ) : (
-              <ReorderGroup
-                layoutScroll
-                values={Object.keys(arrangedTokenValue)}
-                onReorder={handleReorder}
-              >
-                {
-                  Object.entries(arrangedTokenValue).map(([property, propertyValue], index) => (
-                    <DragItem<string> key={property} item={property}>
-                      <SingleCompositionTokenContent
-                        key={`single-style-${seed(index)}`}
-                        index={index}
-                        property={property}
-                        propertyValue={propertyValue}
-                        tokenValue={arrangedTokenValue}
-                        properties={propertiesMenu}
-                        resolvedTokens={resolvedTokens}
-                        setTokenValue={setTokenValue}
-                        onRemove={removeToken}
-                        setOrderObj={handleOrderObj}
-                        setError={setError}
-                        onSubmit={onSubmit}
-                      />
-                    </DragItem>
-                  ))
-                }
-              </ReorderGroup>
-            )
-          }
+        {Object.entries(arrangedTokenValue).length < 1 ? (
+          <SingleCompositionTokenForm
+            index={0}
+            property=""
+            propertyValue=""
+            tokenValue={arrangedTokenValue}
+            properties={propertiesMenu}
+            resolvedTokens={resolvedTokens}
+            setTokenValue={setTokenValue}
+            onRemove={removeToken}
+            setOrderObj={handleOrderObj}
+            setError={setError}
+            onSubmit={onSubmit}
+          />
+        ) : (
+          <ReorderGroup layoutScroll values={Object.keys(arrangedTokenValue)} onReorder={handleReorder}>
+            {Object.entries(arrangedTokenValue).map(([property, propertyValue], index) => (
+              <DragItem<string> key={property} item={property}>
+                <SingleCompositionTokenContent
+                  key={`single-style-${seed(index)}`}
+                  index={index}
+                  property={property}
+                  propertyValue={propertyValue}
+                  tokenValue={arrangedTokenValue}
+                  properties={propertiesMenu}
+                  resolvedTokens={resolvedTokens}
+                  setTokenValue={setTokenValue}
+                  onRemove={removeToken}
+                  setOrderObj={handleOrderObj}
+                  setError={setError}
+                  onSubmit={onSubmit}
+                />
+              </DragItem>
+            ))}
+          </ReorderGroup>
+        )}
       </Box>
     </div>
   );

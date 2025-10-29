@@ -1,11 +1,7 @@
 import { isVariableWithAliasReference } from '@/utils/isAliasReference';
 
 // Helper function to check if two numbers are approximately equal within a threshold
-function isNumberApproximatelyEqual(
-  num1: number,
-  num2: number,
-  threshold: number = 0.000001,
-): boolean {
+function isNumberApproximatelyEqual(num1: number, num2: number, threshold: number = 0.000001): boolean {
   return Math.abs(num1 - num2) < threshold;
 }
 
@@ -16,9 +12,10 @@ export default function setNumberValuesOnVariable(variable: Variable, mode: stri
     }
     const existingVariableValue = variable.valuesByMode[mode];
     if (
-      existingVariableValue === undefined
-      || !(typeof existingVariableValue === 'number' || isVariableWithAliasReference(existingVariableValue))
-    ) return;
+      existingVariableValue === undefined ||
+      !(typeof existingVariableValue === 'number' || isVariableWithAliasReference(existingVariableValue))
+    )
+      return;
 
     // For direct number values, compare using threshold
     if (typeof existingVariableValue === 'number') {

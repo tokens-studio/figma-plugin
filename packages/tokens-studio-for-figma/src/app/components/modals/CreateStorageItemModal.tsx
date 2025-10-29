@@ -14,26 +14,25 @@ type Props = {
   storageProvider: StorageProviderType;
 };
 
-export default function CreateStorageItemModal({
-  isOpen, onClose, onSuccess, storageProvider,
-}: Props) {
+export default function CreateStorageItemModal({ isOpen, onClose, onSuccess, storageProvider }: Props) {
   const { addNewProviderItem } = useRemoteTokens();
   const [hasErrored, setHasErrored] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState<string>();
 
   const getHeaderText = (storageProvider: StorageProviderType) => {
     const icon = getProviderIcon(storageProvider);
-    const providerText = {
-      url: 'a server URL',
-      jsonbin: 'JSONBIN',
-      github: 'GitHub',
-      gitlab: 'GitLab',
-      ado: 'Azure DevOps',
-      bitbucket: 'Bitbucket',
-      supernova: 'Supernova',
-      genericVersionedStorage: 'Generic Versioned Storage',
-      tokensstudio: 'Tokens Studio',
-    }[storageProvider] || storageProvider;
+    const providerText =
+      {
+        url: 'a server URL',
+        jsonbin: 'JSONBIN',
+        github: 'GitHub',
+        gitlab: 'GitLab',
+        ado: 'Azure DevOps',
+        bitbucket: 'Bitbucket',
+        supernova: 'Supernova',
+        genericVersionedStorage: 'Generic Versioned Storage',
+        tokensstudio: 'Tokens Studio',
+      }[storageProvider] || storageProvider;
     return { icon, text: `Sync to ${providerText}` };
   };
 

@@ -126,33 +126,15 @@ describe('pullStyles', () => {
           description: 'the big one',
         },
       ],
-      fontFamilies: [
-        { name: 'fontFamilies.inter', type: 'fontFamilies', value: 'Inter' },
-      ],
-      fontWeights: [
-        { name: 'fontWeights.inter-0', type: 'fontWeights', value: 'Bold' },
-      ],
-      fontSizes: [
-        { name: 'fontSize.0', type: 'fontSizes', value: 24.8 },
-      ],
-      letterSpacing: [
-        { name: 'letterSpacing.0', type: 'letterSpacing', value: '0%' },
-      ],
-      lineHeights: [
-        { name: 'lineHeights.0', type: 'lineHeights', value: 'AUTO' },
-      ],
-      paragraphSpacing: [
-        { name: 'paragraphSpacing.0', type: 'paragraphSpacing', value: 0 },
-      ],
-      paragraphIndent: [
-        { name: 'paragraphIndent.0', type: 'dimension', value: '0px' },
-      ],
-      textCase: [
-        { name: 'textCase.none', type: 'textCase', value: 'none' },
-      ],
-      textDecoration: [
-        { name: 'textDecoration.none', type: 'textDecoration', value: 'none' },
-      ],
+      fontFamilies: [{ name: 'fontFamilies.inter', type: 'fontFamilies', value: 'Inter' }],
+      fontWeights: [{ name: 'fontWeights.inter-0', type: 'fontWeights', value: 'Bold' }],
+      fontSizes: [{ name: 'fontSize.0', type: 'fontSizes', value: 24.8 }],
+      letterSpacing: [{ name: 'letterSpacing.0', type: 'letterSpacing', value: '0%' }],
+      lineHeights: [{ name: 'lineHeights.0', type: 'lineHeights', value: 'AUTO' }],
+      paragraphSpacing: [{ name: 'paragraphSpacing.0', type: 'paragraphSpacing', value: 0 }],
+      paragraphIndent: [{ name: 'paragraphIndent.0', type: 'dimension', value: '0px' }],
+      textCase: [{ name: 'textCase.none', type: 'textCase', value: 'none' }],
+      textDecoration: [{ name: 'textDecoration.none', type: 'textDecoration', value: 'none' }],
     });
   });
 
@@ -195,33 +177,15 @@ describe('pullStyles', () => {
           description: 'the regular one',
         },
       ],
-      fontFamilies: [
-        { name: 'fontFamilies.inter', type: 'fontFamilies', value: 'Inter' },
-      ],
-      fontWeights: [
-        { name: 'fontWeights.inter-0', type: 'fontWeights', value: 'Regular' },
-      ],
-      fontSizes: [
-        { name: 'fontSize.0', type: 'fontSizes', value: 24 },
-      ],
-      letterSpacing: [
-        { name: 'letterSpacing.0', type: 'letterSpacing', value: -0.5 },
-      ],
-      lineHeights: [
-        { name: 'lineHeights.0', type: 'lineHeights', value: 32 },
-      ],
-      paragraphSpacing: [
-        { name: 'paragraphSpacing.0', type: 'paragraphSpacing', value: 16 },
-      ],
-      paragraphIndent: [
-        { name: 'paragraphIndent.0', type: 'dimension', value: '8px' },
-      ],
-      textCase: [
-        { name: 'textCase.uppercase', type: 'textCase', value: 'uppercase' },
-      ],
-      textDecoration: [
-        { name: 'textDecoration.underline', type: 'textDecoration', value: 'underline' },
-      ],
+      fontFamilies: [{ name: 'fontFamilies.inter', type: 'fontFamilies', value: 'Inter' }],
+      fontWeights: [{ name: 'fontWeights.inter-0', type: 'fontWeights', value: 'Regular' }],
+      fontSizes: [{ name: 'fontSize.0', type: 'fontSizes', value: 24 }],
+      letterSpacing: [{ name: 'letterSpacing.0', type: 'letterSpacing', value: -0.5 }],
+      lineHeights: [{ name: 'lineHeights.0', type: 'lineHeights', value: 32 }],
+      paragraphSpacing: [{ name: 'paragraphSpacing.0', type: 'paragraphSpacing', value: 16 }],
+      paragraphIndent: [{ name: 'paragraphIndent.0', type: 'dimension', value: '8px' }],
+      textCase: [{ name: 'textCase.uppercase', type: 'textCase', value: 'uppercase' }],
+      textDecoration: [{ name: 'textDecoration.underline', type: 'textDecoration', value: 'underline' }],
     });
   });
 
@@ -335,33 +299,15 @@ describe('pullStyles', () => {
         },
       ],
       // Should create new tokens with default naming since existing tokens don't match
-      fontFamilies: [
-        { name: 'fontFamilies.roboto', type: 'fontFamilies', value: 'Roboto' },
-      ],
-      fontWeights: [
-        { name: 'fontWeights.roboto-0', type: 'fontWeights', value: 'Bold' },
-      ],
-      fontSizes: [
-        { name: 'fontSize.0', type: 'fontSizes', value: 32 },
-      ],
-      letterSpacing: [
-        { name: 'letterSpacing.0', type: 'letterSpacing', value: '2%' },
-      ],
-      lineHeights: [
-        { name: 'lineHeights.0', type: 'lineHeights', value: 40 },
-      ],
-      paragraphSpacing: [
-        { name: 'paragraphSpacing.0', type: 'paragraphSpacing', value: 12 },
-      ],
-      paragraphIndent: [
-        { name: 'paragraphIndent.0', type: 'dimension', value: '0px' },
-      ],
-      textCase: [
-        { name: 'textCase.none', type: 'textCase', value: 'none' },
-      ],
-      textDecoration: [
-        { name: 'textDecoration.none', type: 'textDecoration', value: 'none' },
-      ],
+      fontFamilies: [{ name: 'fontFamilies.roboto', type: 'fontFamilies', value: 'Roboto' }],
+      fontWeights: [{ name: 'fontWeights.roboto-0', type: 'fontWeights', value: 'Bold' }],
+      fontSizes: [{ name: 'fontSize.0', type: 'fontSizes', value: 32 }],
+      letterSpacing: [{ name: 'letterSpacing.0', type: 'letterSpacing', value: '2%' }],
+      lineHeights: [{ name: 'lineHeights.0', type: 'lineHeights', value: 40 }],
+      paragraphSpacing: [{ name: 'paragraphSpacing.0', type: 'paragraphSpacing', value: 12 }],
+      paragraphIndent: [{ name: 'paragraphIndent.0', type: 'dimension', value: '0px' }],
+      textCase: [{ name: 'textCase.none', type: 'textCase', value: 'none' }],
+      textDecoration: [{ name: 'textDecoration.none', type: 'textDecoration', value: 'none' }],
     });
   });
 
@@ -445,33 +391,15 @@ describe('pullStyles', () => {
           description: 'text style with variables but no tokens',
         },
       ],
-      fontFamilies: [
-        { name: 'fontFamilies.roboto', type: 'fontFamilies', value: 'Roboto' },
-      ],
-      fontWeights: [
-        { name: 'fontWeights.roboto-0', type: 'fontWeights', value: 'Bold' },
-      ],
-      fontSizes: [
-        { name: 'fontSize.0', type: 'fontSizes', value: 32 },
-      ],
-      letterSpacing: [
-        { name: 'letterSpacing.0', type: 'letterSpacing', value: '2%' },
-      ],
-      lineHeights: [
-        { name: 'lineHeights.0', type: 'lineHeights', value: 40 },
-      ],
-      paragraphSpacing: [
-        { name: 'paragraphSpacing.0', type: 'paragraphSpacing', value: 12 },
-      ],
-      paragraphIndent: [
-        { name: 'paragraphIndent.0', type: 'dimension', value: '0px' },
-      ],
-      textCase: [
-        { name: 'textCase.none', type: 'textCase', value: 'none' },
-      ],
-      textDecoration: [
-        { name: 'textDecoration.none', type: 'textDecoration', value: 'none' },
-      ],
+      fontFamilies: [{ name: 'fontFamilies.roboto', type: 'fontFamilies', value: 'Roboto' }],
+      fontWeights: [{ name: 'fontWeights.roboto-0', type: 'fontWeights', value: 'Bold' }],
+      fontSizes: [{ name: 'fontSize.0', type: 'fontSizes', value: 32 }],
+      letterSpacing: [{ name: 'letterSpacing.0', type: 'letterSpacing', value: '2%' }],
+      lineHeights: [{ name: 'lineHeights.0', type: 'lineHeights', value: 40 }],
+      paragraphSpacing: [{ name: 'paragraphSpacing.0', type: 'paragraphSpacing', value: 12 }],
+      paragraphIndent: [{ name: 'paragraphIndent.0', type: 'dimension', value: '0px' }],
+      textCase: [{ name: 'textCase.none', type: 'textCase', value: 'none' }],
+      textDecoration: [{ name: 'textDecoration.none', type: 'textDecoration', value: 'none' }],
     });
   });
 
@@ -544,12 +472,8 @@ describe('pullStyles', () => {
           description: 'big text style',
         },
       ],
-      fontFamilies: [
-        { name: 'fontFamilies.inter', type: 'fontFamilies', value: 'Inter' },
-      ],
-      fontWeights: [
-        { name: 'fontWeights.inter-0', type: 'fontWeights', value: 'Regular' },
-      ],
+      fontFamilies: [{ name: 'fontFamilies.inter', type: 'fontFamilies', value: 'Inter' }],
+      fontWeights: [{ name: 'fontWeights.inter-0', type: 'fontWeights', value: 'Regular' }],
       fontSizes: [
         { name: 'fontSize.0', type: 'fontSizes', value: 12 },
         { name: 'fontSize.1', type: 'fontSizes', value: 32 },
@@ -562,18 +486,10 @@ describe('pullStyles', () => {
         { name: 'lineHeights.0', type: 'lineHeights', value: 'AUTO' },
         { name: 'lineHeights.1', type: 'lineHeights', value: '140%' },
       ],
-      paragraphSpacing: [
-        { name: 'paragraphSpacing.0', type: 'paragraphSpacing', value: 0 },
-      ],
-      paragraphIndent: [
-        { name: 'paragraphIndent.0', type: 'dimension', value: '0px' },
-      ],
-      textCase: [
-        { name: 'textCase.none', type: 'textCase', value: 'none' },
-      ],
-      textDecoration: [
-        { name: 'textDecoration.none', type: 'textDecoration', value: 'none' },
-      ],
+      paragraphSpacing: [{ name: 'paragraphSpacing.0', type: 'paragraphSpacing', value: 0 }],
+      paragraphIndent: [{ name: 'paragraphIndent.0', type: 'dimension', value: '0px' }],
+      textCase: [{ name: 'textCase.none', type: 'textCase', value: 'none' }],
+      textDecoration: [{ name: 'textDecoration.none', type: 'textDecoration', value: 'none' }],
     });
   });
 

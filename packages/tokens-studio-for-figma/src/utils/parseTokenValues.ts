@@ -14,7 +14,10 @@ export default function parseTokenValues(tokens: SetTokenDataPayload['values']):
 
   // For a regular token-schema go through each and convert their values to a token array
   // reducing them down to a entries list which can be picked up using Object.fromEntries
-  type TokenEntry = [string, AnyTokenList | Record<string, Partial<Record<TokenTypes, Record<string, SingleToken<false>>>>>];
+  type TokenEntry = [
+    string,
+    AnyTokenList | Record<string, Partial<Record<TokenTypes, Record<string, SingleToken<false>>>>>,
+  ];
   const reducedTokens = Object.entries(tokens).reduce<[string, AnyTokenList][]>((prev, group: TokenEntry) => {
     const parsedGroup = group[1];
 

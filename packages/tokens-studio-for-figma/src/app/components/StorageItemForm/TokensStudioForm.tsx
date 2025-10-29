@@ -41,9 +41,7 @@ type Props = {
   errorMessage?: string;
 };
 
-export default function TokensStudioForm({
-  onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
-}: Props) {
+export default function TokensStudioForm({ onChange, onSubmit, onCancel, values, hasErrored, errorMessage }: Props) {
   const { t } = useTranslation(['storage']);
   const [fetchOrgsError, setFetchOrgsError] = React.useState<string | null>(null);
   const [baseUrlError, setBaseUrlError] = React.useState<string | null>(null);
@@ -156,7 +154,9 @@ export default function TokensStudioForm({
       label: org.name,
       value: org.id,
     }));
-    return opts.sort((a, b) => (a.label ?? '').trim().localeCompare((b.label ?? '').trim(), undefined, { sensitivity: 'base' }));
+    return opts.sort((a, b) =>
+      (a.label ?? '').trim().localeCompare((b.label ?? '').trim(), undefined, { sensitivity: 'base' }),
+    );
   }, [orgData]);
 
   const onOrgChange = React.useCallback(
@@ -170,7 +170,9 @@ export default function TokensStudioForm({
     if (!orgData) return [];
     const selectedOrgData = orgData.find((org) => org.id === values.orgId);
     if (!selectedOrgData) return [];
-    const sortedProjects = [...(selectedOrgData.projects?.data ?? [])].sort((a, b) => (a.name ?? '').trim().localeCompare((b.name ?? '').trim(), undefined, { sensitivity: 'base' }));
+    const sortedProjects = [...(selectedOrgData.projects?.data ?? [])].sort((a, b) =>
+      (a.name ?? '').trim().localeCompare((b.name ?? '').trim(), undefined, { sensitivity: 'base' }),
+    );
     return sortedProjects.map((project) => ({
       label: project.name,
       value: project.id,
@@ -206,16 +208,10 @@ export default function TokensStudioForm({
             <br />
             {t('tokensStudioForm.description2')}
             <br />
-            <Link
-              href="https://tokens.studio/studio"
-              target="_blank"
-              rel="noreferrer"
-            >
+            <Link href="https://tokens.studio/studio" target="_blank" rel="noreferrer">
               {t('tokensStudioForm.learnMore')}
-            </Link>
-            {' '}
-            or check out our
-            {' '}
+            </Link>{' '}
+            or check out our{' '}
             <Link
               href="https://documentation.tokens.studio/guides/migrating-from-tokens-studio-for-figma-plugin-to-the-tokens-studio-platform"
               target="_blank"
@@ -226,7 +222,9 @@ export default function TokensStudioForm({
             .
           </Box>
           <Stack direction="row" gap={3}>
-            <Button variant="primary" onClick={handleStartTrial}>{t('tokensStudioForm.startFreeTrial')}</Button>
+            <Button variant="primary" onClick={handleStartTrial}>
+              {t('tokensStudioForm.startFreeTrial')}
+            </Button>
           </Stack>
         </Stack>
         <FormField>
@@ -267,14 +265,14 @@ export default function TokensStudioForm({
             onBlur={fetchOrgData}
             required
             type={isMasked ? 'password' : 'text'}
-            trailingAction={(
+            trailingAction={
               <IconButton
                 variant="invisible"
                 size="small"
                 onClick={toggleMask}
                 icon={isMasked ? <EyeClosedIcon /> : <EyeOpenIcon />}
               />
-            )}
+            }
           />
           {fetchOrgsError && <Text muted>{fetchOrgsError}</Text>}
         </FormField>

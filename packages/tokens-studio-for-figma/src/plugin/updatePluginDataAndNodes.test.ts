@@ -19,40 +19,36 @@ describe('updatePluginDataAndNodes', () => {
       setSharedPluginData: mockSetSharedPluginData,
     };
 
-    const entries: BaseNode[] = [
-      node as unknown as BaseNode,
-    ];
+    const entries: BaseNode[] = [node as unknown as BaseNode];
     const values = {
       borderRadius: 'none',
       fill: 'red',
       spacing: 'delete',
     };
-    const tokensMap = new Map([
-      ['red', { value: '#ff0000', type: TokenTypes.COLOR } as SingleToken],
-    ]);
+    const tokensMap = new Map([['red', { value: '#ff0000', type: TokenTypes.COLOR } as SingleToken]]);
 
     await updatePluginDataAndNodes({
-      entries, values, tokensMap,
+      entries,
+      values,
+      tokensMap,
     });
 
     expect(mockSetSharedPluginData).toBeCalledWith('tokens', 'borderRadius', 'none');
     expect(mockSetSharedPluginData).toBeCalledWith('tokens', 'fill', '"red"');
     expect(mockSetSharedPluginData).toBeCalledWith('tokens', 'spacing', '');
-    expect(setValuesOnNodeSpy).toBeCalledWith(
-      {
-        node,
-        values: {
-          fill: {
-            type: 'color',
-            value: '#ff0000',
-          },
-        },
-        data: {
-          borderRadius: 'none',
-          fill: 'red',
-          spacing: 'delete',
+    expect(setValuesOnNodeSpy).toBeCalledWith({
+      node,
+      values: {
+        fill: {
+          type: 'color',
+          value: '#ff0000',
         },
       },
-    );
+      data: {
+        borderRadius: 'none',
+        fill: 'red',
+        spacing: 'delete',
+      },
+    });
   });
 });

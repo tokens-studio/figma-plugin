@@ -29,10 +29,7 @@ const defaultOnRetry = (error: any, attempt: number, maxRetries: number, delayMs
   console.log(`Retry attempt ${attempt}/${maxRetries} after ${delayMs}ms delay. Error:`, error.message || error);
 };
 
-export async function retryWithBackoff<T>(
-  fn: () => Promise<T>,
-  options: RetryOptions = {},
-): Promise<T> {
+export async function retryWithBackoff<T>(fn: () => Promise<T>, options: RetryOptions = {}): Promise<T> {
   const {
     maxRetries = 3,
     initialDelayMs = 100,

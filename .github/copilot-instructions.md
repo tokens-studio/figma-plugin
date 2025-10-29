@@ -187,5 +187,3 @@ SENTRY_REPLAY_SAMPLING=0
 7. **Always create a changeset (see Changeset Requirements section above)**
 8. For UI components, use @tokens-studio/ui components that we use across the codebase instead of creating from scratch
 9. For UI work, use tokens from @tokens-studio/tokens, found in node_modules/@tokens-studio/tokens/dist/css/dark.css and node_modules/@tokens-studio/tokens/dist/css/core.css instead of using raw hex values.
-
-

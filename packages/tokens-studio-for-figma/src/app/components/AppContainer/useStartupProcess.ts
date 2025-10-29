@@ -1,7 +1,4 @@
-import {
-  useEffect,
-  useMemo,
-} from 'react';
+import { useEffect, useMemo } from 'react';
 import { useDispatch, useStore } from 'react-redux';
 import { useLDClient } from 'launchdarkly-react-client-sdk';
 import { LDClient } from 'launchdarkly-js-client-sdk';
@@ -10,7 +7,11 @@ import { useProcess } from '@/hooks';
 import { ApplicationInitSteps } from './ApplicationInitSteps';
 import { Dispatch, RootState } from '@/app/store';
 import {
-  addLicenseFactory, savePluginDataFactory, getLdFlagsFactory, saveStorageInformationFactory, pullTokensFactory,
+  addLicenseFactory,
+  savePluginDataFactory,
+  getLdFlagsFactory,
+  saveStorageInformationFactory,
+  pullTokensFactory,
 } from './startupProcessSteps';
 import useStorage from '@/app/store/useStorage';
 import { useFlags } from '../LaunchDarkly';
@@ -31,30 +32,35 @@ export function useStartupProcess(params: StartupMessage) {
   const useRemoteTokensResult = useRemoteTokens();
   const flags = useFlags();
 
-  const startupProcess = useProcess<ApplicationInitSteps>(useMemo(() => ([
-    {
-      key: ApplicationInitSteps.SAVE_PLUGIN_DATA,
-      fn: savePluginDataFactory(dispatch, params),
-    },
-    {
-      key: ApplicationInitSteps.ADD_LICENSE,
-      fn: addLicenseFactory(dispatch, params),
-    },
-    {
-      key: ApplicationInitSteps.GET_LD_FLAGS,
-      fn: getLdFlagsFactory(store, ldClientPromise, params),
-    },
-    {
-      key: ApplicationInitSteps.SAVE_STORAGE_INFORMATION,
-      fn: saveStorageInformationFactory(dispatch, params, useStorageResult),
-    },
-    {
-      key: ApplicationInitSteps.PULL_TOKENS,
-      fn: pullTokensFactory(store, dispatch, flags, params, useConfirmResult, useRemoteTokensResult),
-    },
-  // disabling as we don't want some of those deps to trigger the process
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  ]), [params, store, flags]));
+  const startupProcess = useProcess<ApplicationInitSteps>(
+    useMemo(
+      () => [
+        {
+          key: ApplicationInitSteps.SAVE_PLUGIN_DATA,
+          fn: savePluginDataFactory(dispatch, params),
+        },
+        {
+          key: ApplicationInitSteps.ADD_LICENSE,
+          fn: addLicenseFactory(dispatch, params),
+        },
+        {
+          key: ApplicationInitSteps.GET_LD_FLAGS,
+          fn: getLdFlagsFactory(store, ldClientPromise, params),
+        },
+        {
+          key: ApplicationInitSteps.SAVE_STORAGE_INFORMATION,
+          fn: saveStorageInformationFactory(dispatch, params, useStorageResult),
+        },
+        {
+          key: ApplicationInitSteps.PULL_TOKENS,
+          fn: pullTokensFactory(store, dispatch, flags, params, useConfirmResult, useRemoteTokensResult),
+        },
+        // disabling as we don't want some of those deps to trigger the process
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+      ],
+      [params, store, flags],
+    ),
+  );
 
   useEffect(() => {
     if (ldClient) {

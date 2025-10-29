@@ -25,7 +25,8 @@ export function pullTokensFactory(
   useConfirmResult: ReturnType<typeof useConfirm>,
   useRemoteTokensResult: ReturnType<typeof useRemoteTokens>,
 ) {
-  const activeTheme = typeof params.activeTheme === 'string' ? { [INTERNAL_THEMES_NO_GROUP]: params.activeTheme } : params.activeTheme;
+  const activeTheme =
+    typeof params.activeTheme === 'string' ? { [INTERNAL_THEMES_NO_GROUP]: params.activeTheme } : params.activeTheme;
 
   const askUserIfRecoverLocalChanges = async () => {
     const shouldRecoverLocalChanges = await useConfirmResult.confirm({
@@ -40,24 +41,23 @@ export function pullTokensFactory(
     const storageType = storageTypeSelector(state);
 
     if (isRemoteStorage) {
-      const matchingSet = params.localApiProviders?.find((provider) => (
-        isSameCredentials(provider, storageType)
-      ));
+      const matchingSet = params.localApiProviders?.find((provider) => isSameCredentials(provider, storageType));
 
       if (matchingSet) {
         // found API credentials
         try {
-          const isMultifile = isGitProvider(matchingSet) && 'filePath' in matchingSet && !matchingSet.filePath.endsWith('.json');
+          const isMultifile =
+            isGitProvider(matchingSet) && 'filePath' in matchingSet && !matchingSet.filePath.endsWith('.json');
           track('Fetched from remote', { provider: matchingSet.provider, isMultifile });
           if (!matchingSet.internalId) {
             track('missingInternalId', { provider: matchingSet.provider });
           }
 
           if (
-            matchingSet.provider === StorageProviderType.GITHUB
-            || matchingSet.provider === StorageProviderType.GITLAB
-            || matchingSet.provider === StorageProviderType.ADO
-            || matchingSet.provider === StorageProviderType.BITBUCKET
+            matchingSet.provider === StorageProviderType.GITHUB ||
+            matchingSet.provider === StorageProviderType.GITLAB ||
+            matchingSet.provider === StorageProviderType.ADO ||
+            matchingSet.provider === StorageProviderType.BITBUCKET
           ) {
             const branches = await useRemoteTokensResult.fetchBranches(matchingSet);
             if (branches) dispatch.branchState.setBranches(branches);
@@ -117,14 +117,11 @@ export function pullTokensFactory(
         }
       } else {
         // no API credentials available for storage type
-        const { type, message, header } = categorizeError(
-          new Error('No credentials configured'),
-          {
-            provider: params.storageType.provider,
-            operation: 'pull',
-            hasCredentials: false,
-          },
-        );
+        const { type, message, header } = categorizeError(new Error('No credentials configured'), {
+          provider: params.storageType.provider,
+          operation: 'pull',
+          hasCredentials: false,
+        });
         dispatch.uiState.setLastError({ type, message, header });
         dispatch.uiState.setActiveTab(Tabs.START);
       }
@@ -152,8 +149,8 @@ export function pullTokensFactory(
       StorageProviderType.TOKENS_STUDIO,
     ].includes(storageType.provider);
 
-    const hasLocalData = params.localTokenData
-                         && Object.values(params.localTokenData?.values ?? {}).some((value) => value.length > 0);
+    const hasLocalData =
+      params.localTokenData && Object.values(params.localTokenData?.values ?? {}).some((value) => value.length > 0);
 
     // Check if storage is remote and local data is empty
     if (isRemoteStorage && !hasLocalData) {
@@ -162,13 +159,7 @@ export function pullTokensFactory(
     } else if (params.localTokenData) {
       const checkForChanges = params.localTokenData.checkForChanges ?? false;
 
-      if (
-        !checkForChanges
-        || (
-          isRemoteStorage
-          && checkForChanges && (!await askUserIfRecoverLocalChanges())
-        )
-      ) {
+      if (!checkForChanges || (isRemoteStorage && checkForChanges && !(await askUserIfRecoverLocalChanges()))) {
         // get API credentials
         await getApiCredentials(true, isRemoteStorage);
       } else {

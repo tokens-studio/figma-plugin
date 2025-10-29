@@ -12,10 +12,7 @@ import {
 /**
  * Apply token data to template placeholders
  */
-export function applyTokenDataToTemplate(
-  template: any,
-  token: any,
-): void {
+export function applyTokenDataToTemplate(template: any, token: any): void {
   if ('name' in template && 'appendChild' in template) {
     // Get cached placeholders or create them
     let placeholders = getTemplatePlaceholders(template);
@@ -47,10 +44,7 @@ export function applyTokenDataToTemplate(
 /**
  * Process a single token and return the cloned template
  */
-export async function processSingleToken(
-  token: any,
-  progressTracker: ProgressTracker,
-): Promise<any> {
+export async function processSingleToken(token: any, progressTracker: ProgressTracker): Promise<any> {
   return defaultWorker.schedule(async () => {
     console.log('Processing token:', token.name);
     try {
@@ -87,10 +81,7 @@ export async function processSingleToken(
 /**
  * Process a batch of tokens and return the cloned templates
  */
-export async function processTokenBatch(
-  batch: any[],
-  progressTracker: ProgressTracker,
-): Promise<any[]> {
+export async function processTokenBatch(batch: any[], progressTracker: ProgressTracker): Promise<any[]> {
   const promises: Set<Promise<any>> = new Set();
 
   // Process this batch of tokens

@@ -355,16 +355,13 @@ describe('editToken', () => {
         },
       ],
     });
-    const {
-      tokens, themes, usedTokenSet,
-    } = store.getState().tokenState;
+    const { tokens, themes, usedTokenSet } = store.getState().tokenState;
     expect(tokens).toEqual({});
     expect(themes).toEqual([
       {
         id: 'base',
         name: 'Base',
-        selectedTokenSets: {
-        },
+        selectedTokenSets: {},
       },
     ]);
     expect(usedTokenSet).toEqual({});
@@ -392,9 +389,7 @@ describe('editToken', () => {
 
   it('can delete a token set', () => {
     store.dispatch.tokenState.deleteTokenSet('global');
-    const {
-      tokens, usedTokenSet,
-    } = store.getState().tokenState;
+    const { tokens, usedTokenSet } = store.getState().tokenState;
 
     const expectedTokens = {
       options: [
@@ -840,8 +835,8 @@ describe('editToken', () => {
   });
 
   it('should save tokens from json data', () => {
-    store.dispatch.tokenState.setJSONData(JSON.stringify(
-      {
+    store.dispatch.tokenState.setJSONData(
+      JSON.stringify({
         1: {
           value: 1,
           type: 'sizing',
@@ -859,8 +854,8 @@ describe('editToken', () => {
           },
           type: 'color',
         },
-      },
-    ));
+      }),
+    );
     const { tokens } = store.getState().tokenState;
     expect(tokens.global).toEqual([
       {
@@ -2109,7 +2104,6 @@ describe('editToken', () => {
       },
       themes: [],
       metadata: null,
-
     });
   });
 });

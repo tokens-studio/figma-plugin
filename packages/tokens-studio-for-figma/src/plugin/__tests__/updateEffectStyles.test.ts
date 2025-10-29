@@ -29,14 +29,16 @@ describe('updateEffectStyles', () => {
       color: '#000000',
     };
 
-    const existingTokens: ExtendedShadowTokenArray = [{
-      name: 'shadows.lg',
-      value: tokenValue,
-      resolvedValueWithReferences: tokenValue,
-      type: TokenTypes.BOX_SHADOW,
-      path: 'shadows/lg',
-      styleId: '',
-    }];
+    const existingTokens: ExtendedShadowTokenArray = [
+      {
+        name: 'shadows.lg',
+        value: tokenValue,
+        resolvedValueWithReferences: tokenValue,
+        type: TokenTypes.BOX_SHADOW,
+        path: 'shadows/lg',
+        styleId: '',
+      },
+    ];
 
     defaultTokenValueRetriever.initiate({
       tokens: existingTokens,
@@ -53,7 +55,10 @@ describe('updateEffectStyles', () => {
         type: 'DROP_SHADOW',
         blendMode: 'NORMAL',
         color: {
-          r: 0, g: 0, b: 0, a: 1,
+          r: 0,
+          g: 0,
+          b: 0,
+          a: 1,
         },
         offset: { x: 0, y: 0 },
         radius: 10,
@@ -70,19 +75,24 @@ describe('updateEffectStyles', () => {
         type: 'EFFECT',
         id: '1234',
         name: 'shadows/lg',
-        effects: [{
-          type: 'DROP_SHADOW',
-          blendMode: 'NORMAL',
-          color: {
-            r: 0, g: 0, b: 0, a: 1,
+        effects: [
+          {
+            type: 'DROP_SHADOW',
+            blendMode: 'NORMAL',
+            color: {
+              r: 0,
+              g: 0,
+              b: 0,
+              a: 1,
+            },
+            offset: { x: 0, y: 0 },
+            radius: 10,
+            showShadowBehindNode: false,
+            spread: 0,
+            opacity: 1,
+            visible: true,
           },
-          offset: { x: 0, y: 0 },
-          radius: 10,
-          showShadowBehindNode: false,
-          spread: 0,
-          opacity: 1,
-          visible: true,
-        }],
+        ],
       },
     ];
     mockGetLocalEffectStyles.mockImplementation(() => existingStyles);
@@ -96,14 +106,16 @@ describe('updateEffectStyles', () => {
       color: '#000000',
     };
 
-    const existingTokens: ExtendedShadowTokenArray = [{
-      name: 'shadows.lg',
-      value: tokenValue,
-      resolvedValueWithReferences: tokenValue,
-      type: TokenTypes.BOX_SHADOW,
-      path: 'shadows/lg',
-      styleId: '1234',
-    }];
+    const existingTokens: ExtendedShadowTokenArray = [
+      {
+        name: 'shadows.lg',
+        value: tokenValue,
+        resolvedValueWithReferences: tokenValue,
+        type: TokenTypes.BOX_SHADOW,
+        path: 'shadows/lg',
+        styleId: '1234',
+      },
+    ];
 
     defaultTokenValueRetriever.initiate({
       tokens: existingTokens,
@@ -120,7 +132,10 @@ describe('updateEffectStyles', () => {
         type: 'DROP_SHADOW',
         blendMode: 'NORMAL',
         color: {
-          r: 0, g: 0, b: 0, a: 1,
+          r: 0,
+          g: 0,
+          b: 0,
+          a: 1,
         },
         offset: { x: 0, y: 0 },
         radius: 100,
@@ -140,33 +155,40 @@ describe('updateEffectStyles', () => {
       spread: 0,
       color: '#000000',
     };
-    const existingTokens: ExtendedShadowTokenArray = [{
-      name: 'shadows.lg',
-      value: tokenValue,
-      resolvedValueWithReferences: tokenValue,
-      type: TokenTypes.BOX_SHADOW,
-      path: 'shadows/lg',
-      styleId: '',
-    }];
+    const existingTokens: ExtendedShadowTokenArray = [
+      {
+        name: 'shadows.lg',
+        value: tokenValue,
+        resolvedValueWithReferences: tokenValue,
+        type: TokenTypes.BOX_SHADOW,
+        path: 'shadows/lg',
+        styleId: '',
+      },
+    ];
 
     const existingStyles = [
       {
         type: 'EFFECT',
         id: '1234',
         name: 'shadows/lg',
-        effects: [{
-          type: 'DROP_SHADOW',
-          blendMode: 'NORMAL',
-          color: {
-            r: 0, g: 0, b: 0, a: 1,
+        effects: [
+          {
+            type: 'DROP_SHADOW',
+            blendMode: 'NORMAL',
+            color: {
+              r: 0,
+              g: 0,
+              b: 0,
+              a: 1,
+            },
+            offset: { x: 0, y: 0 },
+            radius: 10,
+            showShadowBehindNode: false,
+            spread: 0,
+            opacity: 1,
+            visible: true,
           },
-          offset: { x: 0, y: 0 },
-          radius: 10,
-          showShadowBehindNode: false,
-          spread: 0,
-          opacity: 1,
-          visible: true,
-        }],
+        ],
       },
     ];
 
@@ -188,7 +210,10 @@ describe('updateEffectStyles', () => {
         type: 'DROP_SHADOW',
         blendMode: 'NORMAL',
         color: {
-          r: 0, g: 0, b: 0, a: 1,
+          r: 0,
+          g: 0,
+          b: 0,
+          a: 1,
         },
         offset: { x: 0, y: 0 },
         radius: 100,
@@ -204,26 +229,31 @@ describe('updateEffectStyles', () => {
       {
         id: '1234',
         name: 'type/h1',
-        effects: [{
-          type: 'DROP_SHADOW',
-          blendMode: 'NORMAL',
-          color: {
-            r: 0, g: 0, b: 0, a: 1,
+        effects: [
+          {
+            type: 'DROP_SHADOW',
+            blendMode: 'NORMAL',
+            color: {
+              r: 0,
+              g: 0,
+              b: 0,
+              a: 1,
+            },
+            offset: { x: 0, y: 0 },
+            radius: 10,
+            showShadowBehindNode: false,
+            spread: 0,
+            opacity: 1,
+            visible: true,
           },
-          offset: { x: 0, y: 0 },
-          radius: 10,
-          showShadowBehindNode: false,
-          spread: 0,
-          opacity: 1,
-          visible: true,
-        }],
+        ],
       },
     ];
     mockGetLocalEffectStyles.mockImplementation(() => existingStyles);
 
-    await updateEffectStyles(
-      {
-        effectTokens: [{
+    await updateEffectStyles({
+      effectTokens: [
+        {
           name: 'shadows.large-RENAMED',
           value: {
             type: BoxShadowTypes.DROP_SHADOW,
@@ -236,11 +266,11 @@ describe('updateEffectStyles', () => {
           type: TokenTypes.BOX_SHADOW,
           path: 'shadows/large-RENAMED',
           styleId: '1234',
-        }],
-        baseFontSize: '16',
-        shouldRename: true,
-      },
-    );
+        },
+      ],
+      baseFontSize: '16',
+      shouldRename: true,
+    });
 
     expect(existingStyles[0].name).toEqual('shadows/large-RENAMED');
   });

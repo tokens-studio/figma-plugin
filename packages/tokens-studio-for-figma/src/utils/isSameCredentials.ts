@@ -16,10 +16,10 @@ function isSameCredentials(
     case StorageProviderType.ADO:
     case StorageProviderType.BITBUCKET: {
       return (
-        credential.id === stored.id
-        && credential.provider === stored.provider
-        && credential.filePath === stored.filePath
-        && credential.branch === stored.branch
+        credential.id === stored.id &&
+        credential.provider === stored.provider &&
+        credential.filePath === stored.filePath &&
+        credential.branch === stored.branch
       );
     }
     case StorageProviderType.GENERIC_VERSIONED_STORAGE:
@@ -29,17 +29,17 @@ function isSameCredentials(
     }
     case StorageProviderType.SUPERNOVA:
       return (
-        credential.id === stored.id
-        && credential.provider === stored.provider
-        && credential.designSystemUrl === stored.designSystemUrl
-        && JSON.stringify(credential.mapping) === JSON.stringify(stored.mapping)
+        credential.id === stored.id &&
+        credential.provider === stored.provider &&
+        credential.designSystemUrl === stored.designSystemUrl &&
+        JSON.stringify(credential.mapping) === JSON.stringify(stored.mapping)
       );
     case StorageProviderType.TOKENS_STUDIO:
       return (
-        credential.id === stored.id
-        && credential.provider === stored.provider
-        && credential.orgId === stored.orgId
-        && credential.baseUrl === stored.baseUrl
+        credential.id === stored.id &&
+        credential.provider === stored.provider &&
+        credential.orgId === stored.orgId &&
+        credential.baseUrl === stored.baseUrl
       );
     default:
       return false;

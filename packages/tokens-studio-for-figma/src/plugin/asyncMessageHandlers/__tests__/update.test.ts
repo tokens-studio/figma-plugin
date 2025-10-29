@@ -6,7 +6,11 @@ import { AsyncMessageTypes, UpdateAsyncMessage } from '@/types/AsyncMessages';
 import { update } from '../update';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import {
-  UpdatedAtProperty, UsedTokenSetProperty, ThemesProperty, ValuesProperty, ActiveThemeProperty,
+  UpdatedAtProperty,
+  UsedTokenSetProperty,
+  ThemesProperty,
+  ValuesProperty,
+  ActiveThemeProperty,
 } from '@/figmaStorage';
 import * as NodeManager from '../../NodeManager';
 import * as swapStyles from '../swapStyles';
@@ -78,10 +82,7 @@ describe('update', () => {
   };
 
   it('should work', async () => {
-    const runAfter = [
-      AsyncMessageChannel.PluginInstance.connect(),
-      AsyncMessageChannel.ReactInstance.connect(),
-    ];
+    const runAfter = [AsyncMessageChannel.PluginInstance.connect(), AsyncMessageChannel.ReactInstance.connect()];
 
     AsyncMessageChannel.ReactInstance.handle(AsyncMessageTypes.GET_THEME_INFO, async () => ({
       type: AsyncMessageTypes.GET_THEME_INFO,
@@ -95,9 +96,7 @@ describe('update', () => {
     mockGetVariableCollectionByIdAsync.mockResolvedValue({
       id: 'collection-123',
       name: 'Test Collection',
-      modes: [
-        { modeId: 'mode-456', name: 'Light' },
-      ],
+      modes: [{ modeId: 'mode-456', name: 'Light' }],
     });
 
     await update(mockUpdateMessage);
@@ -107,17 +106,22 @@ describe('update', () => {
     expect(UsedTokenSetPropertyWriteSpy).toBeCalledWith(mockUpdateMessage.usedTokenSet);
     expect(UpdatedAtPropertyWriteSpy).toBeCalledWith(mockUpdateMessage.updatedAt);
     expect(ActiveThemePropertyWriteSpy).toBeCalledWith(mockUpdateMessage.activeTheme);
-    expect(mockSwapStyles).toBeCalledWith(mockUpdateMessage.activeTheme, mockUpdateMessage.themes, mockUpdateMessage.settings.updateMode);
-    expect(mockSwapFigmaModes).toBeCalledWith(mockUpdateMessage.activeTheme, mockUpdateMessage.themes, mockUpdateMessage.settings.updateMode);
+    expect(mockSwapStyles).toBeCalledWith(
+      mockUpdateMessage.activeTheme,
+      mockUpdateMessage.themes,
+      mockUpdateMessage.settings.updateMode,
+    );
+    expect(mockSwapFigmaModes).toBeCalledWith(
+      mockUpdateMessage.activeTheme,
+      mockUpdateMessage.themes,
+      mockUpdateMessage.settings.updateMode,
+    );
 
     runAfter.forEach((fn) => fn());
   });
 
   it('should not call swapFigmaModes when shouldSwapFigmaModes is false', async () => {
-    const runAfter = [
-      AsyncMessageChannel.PluginInstance.connect(),
-      AsyncMessageChannel.ReactInstance.connect(),
-    ];
+    const runAfter = [AsyncMessageChannel.PluginInstance.connect(), AsyncMessageChannel.ReactInstance.connect()];
 
     AsyncMessageChannel.ReactInstance.handle(AsyncMessageTypes.GET_THEME_INFO, async () => ({
       type: AsyncMessageTypes.GET_THEME_INFO,

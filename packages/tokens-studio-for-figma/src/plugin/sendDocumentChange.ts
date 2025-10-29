@@ -7,10 +7,16 @@ export async function sendDocumentChange(event: DocumentChangeEvent) {
     return;
   }
 
-  if (event.documentChanges.length === 1 && event.documentChanges[0].type === 'PROPERTY_CHANGE' && event.documentChanges[0].id === '0:0') {
+  if (
+    event.documentChanges.length === 1 &&
+    event.documentChanges[0].type === 'PROPERTY_CHANGE' &&
+    event.documentChanges[0].id === '0:0'
+  ) {
     return;
   }
-  const selfChangedNodeIds = event.documentChanges.filter((change) => change.origin === 'REMOTE' && change.type === 'PROPERTY_CHANGE').map((change) => change.id);
+  const selfChangedNodeIds = event.documentChanges
+    .filter((change) => change.origin === 'REMOTE' && change.type === 'PROPERTY_CHANGE')
+    .map((change) => change.id);
 
   // Look for CREATE events of instance nodes and notify UI, so we can apply theme to inserted nodes
   const instanceCreations = event.documentChanges.filter(
@@ -19,10 +25,11 @@ export async function sendDocumentChange(event: DocumentChangeEvent) {
 
   // Look for PROPERTY_CHANGE events on instance nodes where component properties changed
   const instanceVariantChanges = event.documentChanges.filter(
-    (change) => change.type === 'PROPERTY_CHANGE'
-      && change.origin === 'LOCAL'
+    (change) =>
+      change.type === 'PROPERTY_CHANGE' &&
+      change.origin === 'LOCAL' &&
       // @ts-ignore variant is a valid property, not sure why it complains
-      && (change.properties.includes('componentProperties') || change.properties.includes('variant')),
+      (change.properties.includes('componentProperties') || change.properties.includes('variant')),
   );
 
   if (selfChangedNodeIds.length > 0) {

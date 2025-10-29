@@ -12,10 +12,10 @@ import { normalizeVariableName } from '@/utils/normalizeVariableName';
 export function checkVariableAliasEquality(existingValue: VariableValue, rawValue?: string): boolean {
   // Only proceed if we have an alias reference and a rawValue with reference syntax
   if (
-    !isVariableWithAliasReference(existingValue)
-    || !rawValue
-    || !rawValue.startsWith('{')
-    || !rawValue.endsWith('}')
+    !isVariableWithAliasReference(existingValue) ||
+    !rawValue ||
+    !rawValue.startsWith('{') ||
+    !rawValue.endsWith('}')
   ) {
     return false;
   }

@@ -7,7 +7,12 @@ import useConfirm from '@/app/hooks/useConfirm';
 import usePushDialog from '@/app/hooks/usePushDialog';
 import { notifyToUI } from '@/plugin/notifiers';
 import {
-  activeThemeSelector, storeTokenIdInJsonEditorSelector, localApiStateSelector, themesListSelector, tokensSelector, usedTokenSetSelector,
+  activeThemeSelector,
+  storeTokenIdInJsonEditorSelector,
+  localApiStateSelector,
+  themesListSelector,
+  tokensSelector,
+  usedTokenSetSelector,
 } from '@/selectors';
 import { BitbucketTokenStorage } from '@/storage/BitbucketTokenStorage';
 import { isEqual } from '@/utils/isEqual';
@@ -66,90 +71,104 @@ export function useBitbucket() {
     return confirmResult;
   }, [confirm]);
 
-  const pushTokensToBitbucket = useCallback(async (context: BitbucketCredentials, overrides?: PushOverrides): Promise<RemoteResponseData> => {
-    const storage = storageClientFactory(context);
+  const pushTokensToBitbucket = useCallback(
+    async (context: BitbucketCredentials, overrides?: PushOverrides): Promise<RemoteResponseData> => {
+      const storage = storageClientFactory(context);
 
-    dispatch.uiState.setLocalApiState({ ...context });
+      dispatch.uiState.setLocalApiState({ ...context });
 
-    const pushSettings = await pushDialog({ state: 'initial', overrides });
-    if (pushSettings) {
-      const { commitMessage, customBranch } = pushSettings;
-      try {
-        if (customBranch) storage.selectBranch(customBranch);
-        const metadata = {
-          tokenSetOrder: Object.keys(tokens),
-        };
-        await storage.save({
-          themes,
-          tokens,
-          metadata,
-        }, { commitMessage, storeTokenIdInJsonEditor });
-        dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as BitbucketCredentials);
-        dispatch.uiState.setApiData({ ...context, branch: customBranch });
-        dispatch.tokenState.setTokenData({
-          values: tokens,
-          themes,
-          usedTokenSet,
-          activeTheme,
-          hasChangedRemote: true,
-        });
-        dispatch.tokenState.setRemoteData({
-          tokens,
-          themes,
-          metadata,
-        });
-        const stringifiedRemoteTokens = JSON.stringify(compact([tokens, themes, TokenFormat.format]), null, 2);
-        dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
-        pushDialog({ state: 'success' });
-        return {
-          status: 'success',
-          tokens,
-          themes,
-        };
-      } catch (e) {
-        closePushDialog();
-        console.log('Error pushing to Bitbucket', e);
-        if (e instanceof Error && e.message === ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR) {
+      const pushSettings = await pushDialog({ state: 'initial', overrides });
+      if (pushSettings) {
+        const { commitMessage, customBranch } = pushSettings;
+        try {
+          if (customBranch) storage.selectBranch(customBranch);
+          const metadata = {
+            tokenSetOrder: Object.keys(tokens),
+          };
+          await storage.save(
+            {
+              themes,
+              tokens,
+              metadata,
+            },
+            { commitMessage, storeTokenIdInJsonEditor },
+          );
+          dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as BitbucketCredentials);
+          dispatch.uiState.setApiData({ ...context, branch: customBranch });
+          dispatch.tokenState.setTokenData({
+            values: tokens,
+            themes,
+            usedTokenSet,
+            activeTheme,
+            hasChangedRemote: true,
+          });
+          dispatch.tokenState.setRemoteData({
+            tokens,
+            themes,
+            metadata,
+          });
+          const stringifiedRemoteTokens = JSON.stringify(compact([tokens, themes, TokenFormat.format]), null, 2);
+          dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
+          pushDialog({ state: 'success' });
+          return {
+            status: 'success',
+            tokens,
+            themes,
+          };
+        } catch (e) {
+          closePushDialog();
+          console.log('Error pushing to Bitbucket', e);
+          if (e instanceof Error && e.message === ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR) {
+            return {
+              status: 'failure',
+              errorMessage: ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR,
+            };
+          }
+          const { message } = categorizeError(e, {
+            provider: StorageProviderType.BITBUCKET,
+            operation: 'push',
+            hasCredentials: true,
+          });
           return {
             status: 'failure',
-            errorMessage: ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR,
+            errorMessage: message,
           };
         }
-        const { message } = categorizeError(e, {
-          provider: StorageProviderType.BITBUCKET,
-          operation: 'push',
-          hasCredentials: true,
-        });
-        return {
-          status: 'failure',
-          errorMessage: message,
-        };
       }
-    }
 
-    return {
-      status: 'success',
+      return {
+        status: 'success',
+        tokens,
+        themes,
+        metadata: {},
+      };
+    },
+    [
+      storageClientFactory,
+      dispatch.uiState,
+      dispatch.tokenState,
+      pushDialog,
+      closePushDialog,
       tokens,
       themes,
-      metadata: {},
-    };
-  }, [
-    storageClientFactory,
-    dispatch.uiState,
-    dispatch.tokenState,
-    pushDialog,
-    closePushDialog,
-    tokens,
-    themes,
-    localApiState,
-    usedTokenSet,
-    activeTheme,
-  ]);
+      localApiState,
+      usedTokenSet,
+      activeTheme,
+    ],
+  );
 
   const checkAndSetAccess = useCallback(
     async ({
-      context, owner, repo, receivedFeatureFlags,
-    }: { context: BitbucketCredentials; owner: string; repo: string, receivedFeatureFlags?: LDProps['flags'] }) => {
+      context,
+      owner,
+      repo,
+      receivedFeatureFlags,
+    }: {
+      context: BitbucketCredentials;
+      owner: string;
+      repo: string;
+      receivedFeatureFlags?: LDProps['flags'];
+    }) => {
       const storage = storageClientFactory(context, owner, repo);
       if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
       try {
@@ -166,14 +185,20 @@ export function useBitbucket() {
   );
 
   const pullTokensFromBitbucket = useCallback(
-    async (context: BitbucketCredentials, receivedFeatureFlags?: LDProps['flags']): Promise<RemoteResponseData | null> => {
+    async (
+      context: BitbucketCredentials,
+      receivedFeatureFlags?: LDProps['flags'],
+    ): Promise<RemoteResponseData | null> => {
       const storage = storageClientFactory(context);
       if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
 
       const [owner, repo] = context.id.split('/');
 
       await checkAndSetAccess({
-        context, owner, repo, receivedFeatureFlags,
+        context,
+        owner,
+        repo,
+        receivedFeatureFlags,
       });
 
       try {
@@ -230,9 +255,9 @@ export function useBitbucket() {
         }
         if (content) {
           if (
-            !isEqual(content.tokens, tokens)
-            || !isEqual(content.themes, themes)
-            || !isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
+            !isEqual(content.tokens, tokens) ||
+            !isEqual(content.themes, themes) ||
+            !isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
           ) {
             const userDecision = await askUserIfPull();
             if (userDecision) {
@@ -248,7 +273,11 @@ export function useBitbucket() {
                 themes: content.themes,
                 metadata: content.metadata,
               });
-              const stringifiedRemoteTokens = JSON.stringify(compact([sortedValues, content.themes, TokenFormat.format]), null, 2);
+              const stringifiedRemoteTokens = JSON.stringify(
+                compact([sortedValues, content.themes, TokenFormat.format]),
+                null,
+                2,
+              );
               dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
               dispatch.tokenState.setCollapsedTokenSets([]);
               notifyToUI('Pulled tokens from Bitbucket');
@@ -318,11 +347,7 @@ export function useBitbucket() {
         metadata: {},
       };
     },
-    [
-      syncTokensWithBitbucket,
-      tokens,
-      themes,
-    ],
+    [syncTokensWithBitbucket, tokens, themes],
   );
 
   const fetchBitbucketBranches = useCallback(

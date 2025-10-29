@@ -23,7 +23,7 @@ type UpdateRemoteTokensPayload = {
   updatedAt: string;
   oldUpdatedAt?: string;
   storeTokenIdInJsonEditor: boolean;
-  dispatch: Dispatch
+  dispatch: Dispatch;
 };
 
 type UpdateTokensOnSourcesPayload = {
@@ -45,11 +45,11 @@ type UpdateTokensOnSourcesPayload = {
   checkForChanges: boolean;
   shouldSwapStyles?: boolean;
   collapsedTokenSets: string[];
-  storeTokenIdInJsonEditor: boolean
-  dispatch: Dispatch
-  tokenFormat: TokenFormatOptions
-  tokensSize: number
-  themesSize: number
+  storeTokenIdInJsonEditor: boolean;
+  dispatch: Dispatch;
+  tokenFormat: TokenFormatOptions;
+  tokensSize: number;
+  themesSize: number;
 };
 
 async function updateRemoteTokens({
@@ -80,7 +80,11 @@ async function updateRemoteTokens({
         dispatch,
       });
       track('pushTokens', {
-        provider: StorageProviderType.JSONBIN, setCount, tokensCount, themeCount, tokenFormat,
+        provider: StorageProviderType.JSONBIN,
+        setCount,
+        tokensCount,
+        themeCount,
+        tokenFormat,
       });
 
       break;
@@ -98,7 +102,11 @@ async function updateRemoteTokens({
       });
 
       track('pushTokens', {
-        provider: StorageProviderType.GENERIC_VERSIONED_STORAGE, setCount, tokensCount, themeCount, tokenFormat,
+        provider: StorageProviderType.GENERIC_VERSIONED_STORAGE,
+        setCount,
+        tokensCount,
+        themeCount,
+        tokenFormat,
       });
 
       break;
@@ -162,9 +170,7 @@ export default async function updateTokensOnSources({
     });
   }
 
-  const mergedTokens = tokens
-    ? defaultTokenResolver.setTokens(mergeTokenGroups(tokens, usedTokenSet))
-    : null;
+  const mergedTokens = tokens ? defaultTokenResolver.setTokens(mergeTokenGroups(tokens, usedTokenSet)) : null;
 
   const tokensSize = (compressedTokens.length / 1024) * 2; // UTF-16 uses 2 bytes per character
   const themesSize = (compressedThemes.length / 1024) * 2;
@@ -187,7 +193,7 @@ export default async function updateTokensOnSources({
     collapsedTokenSets,
     tokenFormat,
     storageProvider: storageType.provider,
-    storageSize: (tokensSize + themesSize),
+    storageSize: tokensSize + themesSize,
     compressedTokens,
     compressedThemes,
   }).then((result) => {

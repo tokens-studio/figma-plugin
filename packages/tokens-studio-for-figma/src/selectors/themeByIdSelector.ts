@@ -6,9 +6,5 @@ const idSelector = (state: RootState, id: string) => id;
 export const themeByIdSelector = createSelector(
   idSelector,
   themesListSelector,
-  (id, themes) => (
-    themes.find((theme) => (
-      theme.id === id
-    )) ?? null
-  ),
+  (id, themes) => themes.find((theme) => theme.id === id) ?? null,
 );

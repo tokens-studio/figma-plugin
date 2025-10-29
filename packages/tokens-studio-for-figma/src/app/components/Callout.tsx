@@ -5,26 +5,29 @@ import Stack from './Stack';
 import Text from './Text';
 
 type Props = {
-  id: string
-  heading: React.ReactNode
-  description: React.ReactNode
+  id: string;
+  heading: React.ReactNode;
+  description: React.ReactNode;
   action?: {
-    text: React.ReactNode
-    onClick: React.ComponentProps<typeof Button>['onClick']
-  }
+    text: React.ReactNode;
+    onClick: React.ComponentProps<typeof Button>['onClick'];
+  };
   secondaryAction?: {
-    text: React.ReactNode
-    onClick: React.ComponentProps<typeof Button>['onClick']
-  }
+    text: React.ReactNode;
+    onClick: React.ComponentProps<typeof Button>['onClick'];
+  };
 };
 
-export default function Callout({
-  heading, description, action, secondaryAction, id,
-}: Props) {
+export default function Callout({ heading, description, action, secondaryAction, id }: Props) {
   return (
-    <Box css={{
-      backgroundColor: '$dangerBg', border: '1px solid', borderColor: '$dangerBorder', padding: '$5', borderRadius: '$small',
-    }}
+    <Box
+      css={{
+        backgroundColor: '$dangerBg',
+        border: '1px solid',
+        borderColor: '$dangerBorder',
+        padding: '$5',
+        borderRadius: '$small',
+      }}
     >
       <Stack direction="row" gap={4}>
         <Box css={{ color: '$dangerFg', marginTop: '$3' }}>
@@ -33,7 +36,9 @@ export default function Callout({
         <Stack direction="column" gap={4}>
           <Stack align="start" direction="column" gap={2}>
             <Heading>{heading}</Heading>
-            <Text muted size="xsmall">{description}</Text>
+            <Text muted size="xsmall">
+              {description}
+            </Text>
           </Stack>
           {(action || secondaryAction) && (
             <Stack direction="row" gap={2}>

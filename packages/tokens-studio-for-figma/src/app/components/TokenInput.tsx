@@ -40,19 +40,17 @@ const Wrapper = styled('div', {
 });
 
 type Props = {
-  name: string
-  label: string
-  type: string
-  onChange: React.ChangeEventHandler<HTMLInputElement>
-  value?: string | number
-  required?: boolean
-  custom?: string
-  placeholder?: string
+  name: string;
+  label: string;
+  type: string;
+  onChange: React.ChangeEventHandler<HTMLInputElement>;
+  value?: string | number;
+  required?: boolean;
+  custom?: string;
+  placeholder?: string;
 };
 
-function TokenInput({
-  name, required = false, label, onChange, custom = '', value, type, placeholder = '',
-}: Props) {
+function TokenInput({ name, required = false, label, onChange, custom = '', value, type, placeholder = '' }: Props) {
   return (
     <Wrapper>
       <StyledLabel htmlFor={name}>{label}</StyledLabel>

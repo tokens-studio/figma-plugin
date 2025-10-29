@@ -1,10 +1,7 @@
 import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Dispatch } from '@/app/store';
-import {
-  apiProvidersSelector,
-  showBitbucketMigrationDialogSelector,
-} from '@/selectors';
+import { apiProvidersSelector, showBitbucketMigrationDialogSelector } from '@/selectors';
 import {
   hasAppPasswordCredentials,
   findAppPasswordCredentials,
@@ -34,12 +31,15 @@ export function useBitbucketMigration() {
     }
   }, [hasAppPasswords, showMigrationDialog]);
 
-  const handleMigrate = useCallback((credential: BitbucketCredentials) => {
-    hideMigrationDialog();
-    // Navigate to settings and trigger migration edit for the specific credential
-    dispatch.uiState.setActiveTab(Tabs.SETTINGS);
-    dispatch.uiState.setTriggerMigrationEdit({ ...credential, migrating: true });
-  }, [hideMigrationDialog, dispatch]);
+  const handleMigrate = useCallback(
+    (credential: BitbucketCredentials) => {
+      hideMigrationDialog();
+      // Navigate to settings and trigger migration edit for the specific credential
+      dispatch.uiState.setActiveTab(Tabs.SETTINGS);
+      dispatch.uiState.setTriggerMigrationEdit({ ...credential, migrating: true });
+    },
+    [hideMigrationDialog, dispatch],
+  );
 
   const closeDialog = useCallback(() => {
     hideMigrationDialog();

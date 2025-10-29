@@ -5,10 +5,10 @@ export function matchStyleName<T extends EffectStyle | PaintStyle | TextStyle>(
   stylesMap?: Map<string, T>,
 ) {
   return (
-    figmaStyleReferences[tokenName]
-    || stylesMap?.get(tokenName)?.id
-    || figmaStyleReferences[tokenPath]
-    || stylesMap?.get(tokenPath)?.id
+    figmaStyleReferences[tokenName] ||
+    stylesMap?.get(tokenName)?.id ||
+    figmaStyleReferences[tokenPath] ||
+    stylesMap?.get(tokenPath)?.id
     // during the non-local styles beta we saved the figmaStyleReferences by their path
     // which includes the theme name
   );

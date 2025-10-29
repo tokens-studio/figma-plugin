@@ -24,7 +24,6 @@ export default function TokenNode({ id, name, type }: NodeInfo) {
         },
       }}
     >
-
       <NodeIcon type={type} />
       <Box
         css={{

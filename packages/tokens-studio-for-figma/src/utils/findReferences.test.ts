@@ -35,9 +35,7 @@ describe('findMatchingReferences', () => {
 describe('replaceReferences', () => {
   it('replaces references with new name', () => {
     expect(replaceReferences('{colors.blue}', 'colors.blue', 'colors.yellow')).toEqual('{colors.yellow}');
-    expect(replaceReferences('rgba({colors.blue})', 'colors.blue', 'colors.yellow')).toEqual(
-      'rgba({colors.yellow})',
-    );
+    expect(replaceReferences('rgba({colors.blue})', 'colors.blue', 'colors.yellow')).toEqual('rgba({colors.yellow})');
     expect(replaceReferences('{colors.blue} * 2', 'colors.blue', 'colors.yellow')).toEqual('{colors.yellow} * 2');
     expect(replaceReferences('{colors.blue} * {colors.red}', 'colors.blue', 'colors.yellow')).toEqual(
       '{colors.yellow} * {colors.red}',
@@ -51,9 +49,7 @@ describe('replaceReferences', () => {
   it('doesnt replace anything if it doesnt match empty if it doesnt match', () => {
     expect(replaceReferences('$colors.blue', 'colors.other', 'colors.yellow')).toEqual('$colors.blue');
     expect(replaceReferences('{colors.blue}', 'colors.other', 'colors.yellow')).toEqual('{colors.blue}');
-    expect(replaceReferences('rgba({colors.blue})', 'colors.other', 'colors.yellow')).toEqual(
-      'rgba({colors.blue})',
-    );
+    expect(replaceReferences('rgba({colors.blue})', 'colors.other', 'colors.yellow')).toEqual('rgba({colors.blue})');
     expect(replaceReferences('{colors.blue} * 2', 'colors.other', 'colors.yellow')).toEqual('{colors.blue} * 2');
     expect(replaceReferences('{colors.blue} * {colors.red}', 'colors.other', 'colors.yellow')).toEqual(
       '{colors.blue} * {colors.red}',

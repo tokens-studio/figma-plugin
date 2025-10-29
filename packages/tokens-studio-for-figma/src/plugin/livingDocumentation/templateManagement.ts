@@ -22,10 +22,7 @@ export function getAllTokenTypes(tokensBySet: Record<string, any[]>): Set<string
 /**
  * Initialize templates - either use user template or create type-specific templates
  */
-export async function initializeTemplates(
-  tokensBySet: Record<string, any[]>,
-  userTemplate?: any,
-): Promise<void> {
+export async function initializeTemplates(tokensBySet: Record<string, any[]>, userTemplate?: any): Promise<void> {
   // Clear caches at the beginning to ensure fresh start
   templatePlaceholdersCache.clear();
   templateCache.clear();

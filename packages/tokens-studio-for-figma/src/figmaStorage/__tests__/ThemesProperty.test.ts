@@ -32,11 +32,7 @@ describe('ThemesProperty', () => {
     );
 
     // Then should set the actual data
-    expect(mockRootSetSharedPluginData).toHaveBeenCalledWith(
-      'tokens',
-      'themes',
-      compressedMockThemes,
-    );
+    expect(mockRootSetSharedPluginData).toHaveBeenCalledWith('tokens', 'themes', compressedMockThemes);
   });
 
   it('should be able to read', async () => {

@@ -1,10 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useUIDSeed } from 'react-uid';
-import {
-  Box, Text, Button,
-  IconButton,
-  TextInput,
-} from '@tokens-studio/ui';
+import { Box, Text, Button, IconButton, TextInput } from '@tokens-studio/ui';
 import * as Popover from '@radix-ui/react-popover';
 import Downshift from 'downshift';
 import { ArrowLeftIcon, PlusIcon } from '@radix-ui/react-icons';
@@ -91,18 +87,24 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
     }
   }, 1000); // 1 second debounce
 
-  const handleSearchChangeWithTracking = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
-    setSearchValue(value);
-    debouncedTrackSearch();
-  }, [debouncedTrackSearch]);
+  const handleSearchChangeWithTracking = React.useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const { value } = e.target;
+      setSearchValue(value);
+      debouncedTrackSearch();
+    },
+    [debouncedTrackSearch],
+  );
 
-  const handleBackButtonClick = React.useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleBackButtonClick = React.useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
 
-    handleSetMode('switch');
-  }, [handleSetMode]);
+      handleSetMode('switch');
+    },
+    [handleSetMode],
+  );
 
   const handleNonProUserClick = React.useCallback(() => {
     setShowUpgradeModal(true);
@@ -112,7 +114,7 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
     setShowUpgradeModal(false);
   }, []);
 
-  const getTitle = () => ((mode === 'switch') ? 'Switch branch' : 'Create branch from');
+  const getTitle = () => (mode === 'switch' ? 'Switch branch' : 'Create branch from');
 
   // Prepare items based on current mode
   const items = React.useMemo(() => {
@@ -140,28 +142,40 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
     }
 
     return returnedItems;
-  }, [filteredBranches, hasChanges, mode, currentBranch, onBranchSelected, onCreateBranchFromSelected, t, onCreateBranchFromCurrentChanges]);
+  }, [
+    filteredBranches,
+    hasChanges,
+    mode,
+    currentBranch,
+    onBranchSelected,
+    onCreateBranchFromSelected,
+    t,
+    onCreateBranchFromCurrentChanges,
+  ]);
 
-  const handleDownshiftSelect = React.useCallback((selectedItem: any) => {
-    if (!isProUser) {
-      return;
-    }
-    if (!selectedItem) {
-      onOpenChange(false);
-      return;
-    }
+  const handleDownshiftSelect = React.useCallback(
+    (selectedItem: any) => {
+      if (!isProUser) {
+        return;
+      }
+      if (!selectedItem) {
+        onOpenChange(false);
+        return;
+      }
 
-    if (selectedItem.isCurrentChanges) {
-      onCreateBranchFromCurrentChanges();
-      return;
-    }
-    if (mode === 'switch') {
-      onBranchSelected(selectedItem.id);
-    }
-    if (mode === 'create') {
-      onCreateBranchFromSelected(selectedItem.id);
-    }
-  }, [isProUser, mode, onOpenChange, onCreateBranchFromCurrentChanges, onBranchSelected, onCreateBranchFromSelected]);
+      if (selectedItem.isCurrentChanges) {
+        onCreateBranchFromCurrentChanges();
+        return;
+      }
+      if (mode === 'switch') {
+        onBranchSelected(selectedItem.id);
+      }
+      if (mode === 'create') {
+        onCreateBranchFromSelected(selectedItem.id);
+      }
+    },
+    [isProUser, mode, onOpenChange, onCreateBranchFromCurrentChanges, onBranchSelected, onCreateBranchFromSelected],
+  );
 
   const handleItemToString = React.useCallback((item: any) => item?.label ?? '', []);
 
@@ -196,17 +210,14 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
         </>
       ) : (
         /* For pro users, show the full popover functionality */
-        <Downshift
-          isOpen={isOpen}
-          onSelect={handleDownshiftSelect}
-          itemToString={handleItemToString}
-        >
+        <Downshift isOpen={isOpen} onSelect={handleDownshiftSelect} itemToString={handleItemToString}>
           {({ getItemProps, getInputProps, highlightedIndex }) => (
-            <div style={{
-              position: 'relative',
-              flexShrink: 1,
-              overflow: 'hidden',
-            }}
+            <div
+              style={{
+                position: 'relative',
+                flexShrink: 1,
+                overflow: 'hidden',
+              }}
             >
               <Popover.Root open={isOpen} onOpenChange={onOpenChange}>
                 <Popover.Trigger asChild>
@@ -225,12 +236,7 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
                 </Popover.Trigger>
 
                 <Popover.Portal>
-                  <Popover.Content
-                    side="top"
-                    align="start"
-                    sideOffset={4}
-                    style={{ width: 'auto' }}
-                  >
+                  <Popover.Content side="top" align="start" sideOffset={4} style={{ width: 'auto' }}>
                     <Box
                       css={{
                         backgroundColor: '$bgCanvas',
@@ -262,7 +268,7 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
                           gap: '$1',
                         }}
                       >
-                        {(mode === 'create') && (
+                        {mode === 'create' && (
                           <IconButton
                             onMouseDown={handleBackButtonClick}
                             icon={<ArrowLeftIcon />}
@@ -276,17 +282,17 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
                           {getTitle()}
                         </Text>
                         {mode === 'switch' && (
-                        <IconButton
-                          type="button"
-                          tooltip={t('createNew')}
-                          tooltipSide="top"
-                          aria-label={t('createNew')}
-                          onClick={handleCreateButtonClick}
-                          css={{ flexShrink: 0 }}
-                          variant="invisible"
-                          size="small"
-                          icon={<PlusIcon />}
-                        />
+                          <IconButton
+                            type="button"
+                            tooltip={t('createNew')}
+                            tooltipSide="top"
+                            aria-label={t('createNew')}
+                            onClick={handleCreateButtonClick}
+                            css={{ flexShrink: 0 }}
+                            variant="invisible"
+                            size="small"
+                            icon={<PlusIcon />}
+                          />
                         )}
                       </Box>
 
@@ -323,47 +329,56 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
 
                       <Box css={{ maxHeight: '50vh', overflow: 'auto', padding: '$2' }}>
                         {/* Items List */}
-                        {items.length > 0 && items.map((item, index) => {
-                          const itemProps = getItemProps({ item, index });
+                        {items.length > 0 &&
+                          items.map((item, index) => {
+                            const itemProps = getItemProps({ item, index });
 
-                          return (
-                            <Box
-                              key={seed(index)}
-                              {...itemProps}
-                              data-testid={`popover-item-${item.id}`}
-                              css={{
-                                padding: '$3',
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                fontFamily: '$mono',
-                                borderRadius: '$medium',
-                                gap: '$2',
-                                backgroundColor: highlightedIndex === index ? 'var(--colors-bgDefault)' : 'transparent',
-                                '&:hover': { backgroundColor: 'var(--colors-bgDefault)' },
-                              }}
-                            >
-                              {item.isSelected && (
-                              <Box css={{
-                                width: '16px', height: '16px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              }}
+                            return (
+                              <Box
+                                key={seed(index)}
+                                {...itemProps}
+                                data-testid={`popover-item-${item.id}`}
+                                css={{
+                                  padding: '$3',
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  fontFamily: '$mono',
+                                  borderRadius: '$medium',
+                                  gap: '$2',
+                                  backgroundColor:
+                                    highlightedIndex === index ? 'var(--colors-bgDefault)' : 'transparent',
+                                  '&:hover': { backgroundColor: 'var(--colors-bgDefault)' },
+                                }}
                               >
-                                ✓
+                                {item.isSelected && (
+                                  <Box
+                                    css={{
+                                      width: '16px',
+                                      height: '16px',
+                                      flexShrink: 0,
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                    }}
+                                  >
+                                    ✓
+                                  </Box>
+                                )}
+                                {!item.isSelected && <Box css={{ width: '16px', flexShrink: 0 }} />}
+                                <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                                  {item.label}
+                                </span>
                               </Box>
-                              )}
-                              {!item.isSelected && <Box css={{ width: '16px', flexShrink: 0 }} />}
-                              <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{item.label}</span>
-                            </Box>
-                          );
-                        })}
+                            );
+                          })}
 
                         {/* Empty State */}
                         {items.length === 0 && searchValue && (
-                        <Box css={{ padding: '12px', textAlign: 'center', color: 'var(--colors-fgMuted)' }}>
-                          {t('noBranchesFound')}
-                        </Box>
+                          <Box css={{ padding: '12px', textAlign: 'center', color: 'var(--colors-fgMuted)' }}>
+                            {t('noBranchesFound')}
+                          </Box>
                         )}
-
                       </Box>
                     </Box>
                   </Popover.Content>

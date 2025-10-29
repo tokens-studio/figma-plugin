@@ -74,8 +74,10 @@ describe('applyBorderWidthValuesOnNode', () => {
 
     // Mock tryApplyVariableId to return true for all individual stroke weights
     mockTryApplyVariableId.mockImplementation(async (node, type, token) => {
-      if (token === 'border-width-token'
-          && ['strokeTopWeight', 'strokeRightWeight', 'strokeBottomWeight', 'strokeLeftWeight'].includes(type)) {
+      if (
+        token === 'border-width-token' &&
+        ['strokeTopWeight', 'strokeRightWeight', 'strokeBottomWeight', 'strokeLeftWeight'].includes(type)
+      ) {
         return true;
       }
       return false;

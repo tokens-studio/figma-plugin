@@ -10,7 +10,7 @@ export function findOrCreateToken(
   tokenType: TokenTypes,
   localVariables: Variable[],
 ): StyleToCreateToken | undefined {
-  const boundVariables = style.boundVariables as Record<string, { id: string; } | undefined>;
+  const boundVariables = style.boundVariables as Record<string, { id: string } | undefined>;
 
   // Always check for existing token by value first (to preserve existing naming conventions)
   const stringValue = String(value);
@@ -33,9 +33,8 @@ export function findOrCreateToken(
 
       // Create new token with variable name and resolved value
       // Preserve numeric values for appropriate token types
-      const finalValue = ExportNumberVariablesTokenTypes.includes(tokenType) && typeof value === 'number'
-        ? value
-        : String(value);
+      const finalValue =
+        ExportNumberVariablesTokenTypes.includes(tokenType) && typeof value === 'number' ? value : String(value);
 
       const newToken = {
         name: normalizedName,
@@ -55,9 +54,8 @@ export function findOrCreateToken(
 
   // Create new token with default naming
   // Preserve numeric values for appropriate token types
-  const finalValue = ExportNumberVariablesTokenTypes.includes(tokenType) && typeof value === 'number'
-    ? value
-    : stringValue;
+  const finalValue =
+    ExportNumberVariablesTokenTypes.includes(tokenType) && typeof value === 'number' ? value : stringValue;
 
   // Generate unique token name based on existing tokens count
   const existingTokensCount = tokenArray.length;

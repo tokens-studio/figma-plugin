@@ -30,15 +30,21 @@ export const SearchInputWithToggle: React.FC<SearchInputWithToggleProps> = ({
     onToggleSearch();
   }, [onSearchTermChange, onToggleSearch]);
 
-  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    onSearchTermChange(e.target.value);
-  }, [onSearchTermChange]);
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      onSearchTermChange(e.target.value);
+    },
+    [onSearchTermChange],
+  );
 
-  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      onToggleSearch();
-    }
-  }, [onToggleSearch]);
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter') {
+        onToggleSearch();
+      }
+    },
+    [onToggleSearch],
+  );
 
   useEffect(() => {
     if (autofocus && isSearchActive && inputRef.current) {
@@ -55,7 +61,7 @@ export const SearchInputWithToggle: React.FC<SearchInputWithToggleProps> = ({
         onChange={handleInputChange}
         onKeyDown={handleKeyDown}
         data-testid="search-input-with-toggle-input"
-        trailingAction={(
+        trailingAction={
           <IconButton
             icon={<Xmark />}
             size="small"
@@ -64,7 +70,7 @@ export const SearchInputWithToggle: React.FC<SearchInputWithToggleProps> = ({
             tooltip={t('clearSearch')}
             data-testid="search-input-with-toggle-clear"
           />
-        )}
+        }
       />
     );
   }

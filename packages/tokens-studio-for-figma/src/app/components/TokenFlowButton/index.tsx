@@ -51,18 +51,15 @@ export default function TokenFlowButton() {
     setLoading(false);
   }, [activeTheme, availableThemes, themeObjects, tokens, usedTokenSet]);
 
-  return (
-    isProUser
-      ? (
-        <IconButton
-          size="small"
-          variant="invisible"
-          tooltip="Open visualization flow"
-          data-testid="token-flow-button"
-          loading={loading}
-          onClick={handleOpenTokenFlowApp}
-          icon={<FlowIcon />}
-        />
-      ) : null
-  );
+  return isProUser ? (
+    <IconButton
+      size="small"
+      variant="invisible"
+      tooltip="Open visualization flow"
+      data-testid="token-flow-button"
+      loading={loading}
+      onClick={handleOpenTokenFlowApp}
+      icon={<FlowIcon />}
+    />
+  ) : null;
 }

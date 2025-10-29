@@ -1,7 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import {
-  Button, Checkbox, Label, Stack, Heading,
-} from '@tokens-studio/ui';
+import { Button, Checkbox, Label, Stack, Heading } from '@tokens-studio/ui';
 import Modal from './Modal';
 import Box from './Box';
 import { VariableCollectionInfo, SelectedCollections } from '@/types/VariableCollectionSelection';
@@ -13,9 +11,7 @@ type Props = {
   collections: VariableCollectionInfo[];
 };
 
-export default function ImportVariablesDialog({
-  isOpen, onClose, onConfirm, collections,
-}: Props) {
+export default function ImportVariablesDialog({ isOpen, onClose, onConfirm, collections }: Props) {
   const [selectedCollections, setSelectedCollections] = useState<SelectedCollections>({});
   const [useDimensions, setUseDimensions] = useState(false);
   const [useRem, setUseRem] = useState(false);
@@ -34,25 +30,28 @@ export default function ImportVariablesDialog({
     }
   }, [collections]);
 
-  const handleCollectionToggle = useCallback((collectionId: string, collectionName: string, modes: { modeId: string; name: string }[]) => {
-    setSelectedCollections((prev) => {
-      const isCurrentlySelected = prev[collectionId];
-      if (isCurrentlySelected) {
-        // Remove collection
-        const newSelection = { ...prev };
-        delete newSelection[collectionId];
-        return newSelection;
-      }
-      // Add collection with all modes selected
-      return {
-        ...prev,
-        [collectionId]: {
-          name: collectionName,
-          selectedModes: modes.map((mode) => mode.modeId),
-        },
-      };
-    });
-  }, []);
+  const handleCollectionToggle = useCallback(
+    (collectionId: string, collectionName: string, modes: { modeId: string; name: string }[]) => {
+      setSelectedCollections((prev) => {
+        const isCurrentlySelected = prev[collectionId];
+        if (isCurrentlySelected) {
+          // Remove collection
+          const newSelection = { ...prev };
+          delete newSelection[collectionId];
+          return newSelection;
+        }
+        // Add collection with all modes selected
+        return {
+          ...prev,
+          [collectionId]: {
+            name: collectionName,
+            selectedModes: modes.map((mode) => mode.modeId),
+          },
+        };
+      });
+    },
+    [],
+  );
 
   const handleModeToggle = useCallback((collectionId: string, modeId: string) => {
     setSelectedCollections((prev) => {
@@ -94,7 +93,8 @@ export default function ImportVariablesDialog({
   }, []);
 
   const createCollectionToggleHandler = useCallback(
-    (collectionId: string, collectionName: string, modes: { modeId: string; name: string }[]) => () => handleCollectionToggle(collectionId, collectionName, modes),
+    (collectionId: string, collectionName: string, modes: { modeId: string; name: string }[]) => () =>
+      handleCollectionToggle(collectionId, collectionName, modes),
     [handleCollectionToggle],
   );
 
@@ -111,10 +111,15 @@ export default function ImportVariablesDialog({
     if (allCollectionsSelected) {
       setSelectedCollections({});
     } else {
-      setSelectedCollections(collections.reduce((acc, collection) => ({
-        ...acc,
-        [collection.id]: { name: collection.name, selectedModes: collection.modes.map((mode) => mode.modeId) },
-      }), {}));
+      setSelectedCollections(
+        collections.reduce(
+          (acc, collection) => ({
+            ...acc,
+            [collection.id]: { name: collection.name, selectedModes: collection.modes.map((mode) => mode.modeId) },
+          }),
+          {},
+        ),
+      );
     }
   }, [collections, allCollectionsSelected]);
 
@@ -124,7 +129,7 @@ export default function ImportVariablesDialog({
       showClose
       isOpen={isOpen}
       close={onClose}
-      footer={(
+      footer={
         <Stack direction="row" gap={4} justify="between">
           <Button variant="secondary" onClick={onClose}>
             Cancel
@@ -133,7 +138,7 @@ export default function ImportVariablesDialog({
             Import
           </Button>
         </Stack>
-      )}
+      }
     >
       <Stack direction="column" gap={4} css={{ padding: '$4' }}>
         <Box css={{ fontSize: '$small', color: '$fgMuted' }}>
@@ -144,24 +149,12 @@ export default function ImportVariablesDialog({
         <Stack direction="column" gap={2}>
           <Heading size="medium">Options</Heading>
           <Stack direction="row" gap={2} align="center">
-            <Checkbox
-              checked={useDimensions}
-              onCheckedChange={handleDimensionsChange}
-              id="useDimensions"
-            />
-            <Label htmlFor="useDimensions">
-              Convert numbers to dimensions
-            </Label>
+            <Checkbox checked={useDimensions} onCheckedChange={handleDimensionsChange} id="useDimensions" />
+            <Label htmlFor="useDimensions">Convert numbers to dimensions</Label>
           </Stack>
           <Stack direction="row" gap={2} align="center">
-            <Checkbox
-              checked={useRem}
-              onCheckedChange={handleRemChange}
-              id="useRem"
-            />
-            <Label htmlFor="useRem">
-              Use rem for dimension values
-            </Label>
+            <Checkbox checked={useRem} onCheckedChange={handleRemChange} id="useRem" />
+            <Label htmlFor="useRem">Use rem for dimension values</Label>
           </Stack>
         </Stack>
 
@@ -170,9 +163,14 @@ export default function ImportVariablesDialog({
           <Stack direction="row" gap={2} align="center" justify="between">
             <Heading size="medium">Variable Collections</Heading>
             <Stack direction="row" gap={2} align="center">
-              <Label css={{
-                color: '$fgDefault', fontWeight: 'bold', userSelect: 'none', display: 'flex', flexDirection: 'row',
-              }}
+              <Label
+                css={{
+                  color: '$fgDefault',
+                  fontWeight: 'bold',
+                  userSelect: 'none',
+                  display: 'flex',
+                  flexDirection: 'row',
+                }}
               >
                 <Checkbox
                   checked={allCollectionsSelected}
@@ -184,9 +182,13 @@ export default function ImportVariablesDialog({
             </Stack>
           </Stack>
           {collections.length === 0 ? (
-            <Box css={{
-              padding: '$3', backgroundColor: '$bgMuted', borderRadius: '$small', textAlign: 'center',
-            }}
+            <Box
+              css={{
+                padding: '$3',
+                backgroundColor: '$bgMuted',
+                borderRadius: '$small',
+                textAlign: 'center',
+              }}
             >
               There are no collections present in this file
             </Box>
@@ -202,10 +204,17 @@ export default function ImportVariablesDialog({
                       <Stack direction="row" gap={2} align="center">
                         <Checkbox
                           checked={isCollectionSelected}
-                          onCheckedChange={createCollectionToggleHandler(collection.id, collection.name, collection.modes)}
+                          onCheckedChange={createCollectionToggleHandler(
+                            collection.id,
+                            collection.name,
+                            collection.modes,
+                          )}
                           id={`collection-${collection.id}`}
                         />
-                        <Label htmlFor={`collection-${collection.id}`} css={{ color: '$fgDefault', fontWeight: 'bold', userSelect: 'none' }}>
+                        <Label
+                          htmlFor={`collection-${collection.id}`}
+                          css={{ color: '$fgDefault', fontWeight: 'bold', userSelect: 'none' }}
+                        >
                           {collection.name || `Collection ${collection.id.slice(0, 8)}`}
                         </Label>
                       </Stack>
@@ -219,7 +228,10 @@ export default function ImportVariablesDialog({
                                 onCheckedChange={createModeToggleHandler(collection.id, mode.modeId)}
                                 id={`mode-${collection.id}-${mode.modeId}`}
                               />
-                              <Label htmlFor={`mode-${collection.id}-${mode.modeId}`} css={{ color: '$fgDefault', userSelect: 'none' }}>
+                              <Label
+                                htmlFor={`mode-${collection.id}-${mode.modeId}`}
+                                css={{ color: '$fgDefault', userSelect: 'none' }}
+                              >
                                 {mode.name || `Mode ${mode.modeId.slice(0, 8)}`}
                               </Label>
                             </Stack>
@@ -235,9 +247,13 @@ export default function ImportVariablesDialog({
         </Stack>
 
         {!hasSelections && (
-          <Box css={{
-            padding: '$3', backgroundColor: '$dangerBg', color: '$dangerFg', borderRadius: '$small',
-          }}
+          <Box
+            css={{
+              padding: '$3',
+              backgroundColor: '$dangerBg',
+              color: '$dangerFg',
+              borderRadius: '$small',
+            }}
           >
             Please select at least one collection and mode to import.
           </Box>

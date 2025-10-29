@@ -1,6 +1,10 @@
 import hash from 'object-hash';
 import {
-  AsyncMessageResults, AsyncMessageResultsMap, AsyncMessages, AsyncMessagesMap, AsyncMessageTypes,
+  AsyncMessageResults,
+  AsyncMessageResultsMap,
+  AsyncMessages,
+  AsyncMessagesMap,
+  AsyncMessageTypes,
 } from './types/AsyncMessages';
 
 import { AsyncMessageChannelPreview } from './AsyncMessageChannelPreview';
@@ -10,22 +14,24 @@ type IsTypeOnlyObject<Obj extends Record<PropertyKey, unknown>> = [keyof Obj] ex
 
 type IncomingMessageEvent<Message = unknown> = {
   data: {
-    pluginMessage: {
-      id: string
-      message: Message
-    } | {
-      id: string
-      error: unknown
-    }
-  }
+    pluginMessage:
+      | {
+          id: string;
+          message: Message;
+        }
+      | {
+          id: string;
+          error: unknown;
+        };
+  };
 };
 
 export type AsyncMessageChannelHandlers = {
-  [K in AsyncMessageTypes]: (incoming: AsyncMessagesMap[K]) => Promise<
-  IsTypeOnlyObject<AsyncMessageResultsMap[K]> extends true
-    ? void
-    : Omit<AsyncMessageResultsMap[K], 'type'>
-  >
+  [K in AsyncMessageTypes]: (
+    incoming: AsyncMessagesMap[K],
+  ) => Promise<
+    IsTypeOnlyObject<AsyncMessageResultsMap[K]> extends true ? void : Omit<AsyncMessageResultsMap[K], 'type'>
+  >;
 };
 
 class AsyncMessageChannel {
@@ -45,7 +51,7 @@ class AsyncMessageChannel {
     if (this.isInFigmaSandbox) {
       const listener = async (msg: Message) => {
         const possiblePromise = callback(msg);
-        if (possiblePromise === false || (possiblePromise && await possiblePromise === false)) {
+        if (possiblePromise === false || (possiblePromise && (await possiblePromise) === false)) {
           figma.ui.off('message', listener);
         }
       };
@@ -55,7 +61,7 @@ class AsyncMessageChannel {
 
     const listener = async (event: { data: { pluginMessage: Message } }) => {
       const possiblePromise = callback(event.data.pluginMessage);
-      if (possiblePromise === false || (possiblePromise && await possiblePromise === false)) {
+      if (possiblePromise === false || (possiblePromise && (await possiblePromise) === false)) {
         window.removeEventListener('message', listener);
       }
     };
@@ -77,9 +83,7 @@ class AsyncMessageChannel {
           // @README need to cast to any to make this work
           // it causes a complex type which can not be resolved due to its depth
           const result = await (handler as any)(msg.message);
-          const payload = result
-            ? { ...result, type: msg.message.type }
-            : { type: msg.message.type };
+          const payload = result ? { ...result, type: msg.message.type } : { type: msg.message.type };
 
           if (this.isInFigmaSandbox) {
             figma.ui.postMessage({
@@ -87,9 +91,12 @@ class AsyncMessageChannel {
               message: payload,
             });
           } else {
-            parent.postMessage({
-              pluginMessage: { id: msg.id, message: payload },
-            }, '*');
+            parent.postMessage(
+              {
+                pluginMessage: { id: msg.id, message: payload },
+              },
+              '*',
+            );
           }
         } catch (err) {
           console.error(err);
@@ -99,19 +106,19 @@ class AsyncMessageChannel {
               error: err,
             });
           } else {
-            parent.postMessage({
-              pluginMessage: { id: msg.id, error: err },
-            }, '*');
+            parent.postMessage(
+              {
+                pluginMessage: { id: msg.id, error: err },
+              },
+              '*',
+            );
           }
         }
       }
     });
   }
 
-  public handle<T extends AsyncMessageTypes>(
-    type: T,
-    fn: AsyncMessageChannelHandlers[T],
-  ) {
+  public handle<T extends AsyncMessageTypes>(type: T, fn: AsyncMessageChannelHandlers[T]) {
     this.$handlers[type] = fn;
   }
 
@@ -121,25 +128,24 @@ class AsyncMessageChannel {
       datetime: Date.now(),
     });
     const promise = new Promise<AsyncMessageResults & { type: Message['type'] }>((resolve, reject) => {
-      this.attachMessageListener((msg: IncomingMessageEvent<AsyncMessageResults & { type: Message['type'] }>['data']['pluginMessage']) => {
-        if (msg.id === messageId) {
-          if ('message' in msg) {
-            resolve(msg.message);
-          } else {
-            reject(msg.error);
+      this.attachMessageListener(
+        (msg: IncomingMessageEvent<AsyncMessageResults & { type: Message['type'] }>['data']['pluginMessage']) => {
+          if (msg.id === messageId) {
+            if ('message' in msg) {
+              resolve(msg.message);
+            } else {
+              reject(msg.error);
+            }
+            return false;
           }
-          return false;
-        }
-        return undefined;
-      });
+          return undefined;
+        },
+      );
     });
     if (this.isInFigmaSandbox) {
       figma.ui.postMessage({ id: messageId, message });
     } else {
-      parent.postMessage(
-        { pluginMessage: { id: messageId, message } },
-        '*',
-      );
+      parent.postMessage({ pluginMessage: { id: messageId, message } }, '*');
     }
     return promise;
   }

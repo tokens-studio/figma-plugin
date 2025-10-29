@@ -1,9 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import {
-  Button, Heading, Spinner, Stack,
-} from '@tokens-studio/ui';
+import { Button, Heading, Spinner, Stack } from '@tokens-studio/ui';
 import { storageTypeSelector, lastErrorSelector } from '@/selectors';
 import usePullDialog from '../hooks/usePullDialog';
 import Modal from './Modal';
@@ -45,7 +43,7 @@ function PullDialog() {
           isOpen
           close={onCancel}
           stickyFooter
-          footer={(
+          footer={
             <Stack direction="row" gap={4} justify="between">
               <Button variant="secondary" id="pullDialog-button-close" onClick={handleClose}>
                 {t('cancel')}
@@ -54,7 +52,7 @@ function PullDialog() {
                 {t('pullTokens')}
               </Button>
             </Stack>
-          )}
+          }
         >
           <Stack direction="row" gap={2} css={{ padding: '$4', paddingBottom: 0 }}>
             {t('override')}
@@ -83,21 +81,17 @@ function PullDialog() {
           isOpen
           close={onCancel}
           stickyFooter
-          footer={(
+          footer={
             <Stack direction="row" gap={4} justify="end">
               <Button variant="secondary" id="pullDialog-button-cancel" onClick={onCancel}>
                 {t('cancel')}
               </Button>
             </Stack>
-          )}
+          }
         >
           <Stack direction="column" gap={4} css={{ padding: '$4' }}>
             {lastError && (
-              <Callout
-                id="pull-dialog-error"
-                heading={getErrorHeading()}
-                description={lastError.message}
-              />
+              <Callout id="pull-dialog-error" heading={getErrorHeading()} description={lastError.message} />
             )}
           </Stack>
         </Modal>

@@ -17,7 +17,11 @@ describe('UsedTokenSetProperty', () => {
 
     await UsedTokenSetProperty.write(mockUsedTokenSet);
 
-    expect(mockRootSetSharedPluginData).toHaveBeenCalledWith('tokens', 'usedTokenSet', JSON.stringify(mockUsedTokenSet));
+    expect(mockRootSetSharedPluginData).toHaveBeenCalledWith(
+      'tokens',
+      'usedTokenSet',
+      JSON.stringify(mockUsedTokenSet),
+    );
   });
 
   it('should be able to read', async () => {

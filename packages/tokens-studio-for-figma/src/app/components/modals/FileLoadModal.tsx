@@ -5,7 +5,7 @@ import Modal from '../Modal';
 import FilePreset from '../PresetProvider/FilePreset';
 
 type Props = {
-  onClose: () => void
+  onClose: () => void;
 };
 
 export default function FileLoadModal({ onClose }: Props) {

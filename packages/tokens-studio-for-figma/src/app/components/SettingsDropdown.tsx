@@ -5,7 +5,10 @@ import { Box, DropdownMenu, IconButton } from '@tokens-studio/ui';
 import { Check, Settings } from 'iconoir-react';
 import { Dispatch } from '../store';
 import {
-  settingsStateSelector, localApiStateSelector, autoApplyThemeOnDropSelector, shouldSwapFigmaModesSelector,
+  settingsStateSelector,
+  localApiStateSelector,
+  autoApplyThemeOnDropSelector,
+  shouldSwapFigmaModesSelector,
 } from '@/selectors';
 import { isEqual } from '@/utils/isEqual';
 import { track } from '@/utils/analytics';
@@ -16,14 +19,20 @@ export default function SettingsDropdown() {
   const localApiState = useSelector(localApiStateSelector);
   const { t } = useTranslation(['tokens']);
 
-  const {
-    updateRemote, updateOnChange, shouldSwapStyles, shouldUpdateStyles,
-  } = useSelector(settingsStateSelector, isEqual);
+  const { updateRemote, updateOnChange, shouldSwapStyles, shouldUpdateStyles } = useSelector(
+    settingsStateSelector,
+    isEqual,
+  );
   const autoApplyThemeOnDrop = useSelector(autoApplyThemeOnDropSelector);
   const shouldSwapFigmaModes = useSelector(shouldSwapFigmaModesSelector);
 
   const {
-    setUpdateOnChange, setUpdateRemote, setShouldSwapStyles, setShouldSwapFigmaModes, setShouldUpdateStyles, setAutoApplyThemeOnDrop,
+    setUpdateOnChange,
+    setUpdateRemote,
+    setShouldSwapStyles,
+    setShouldSwapFigmaModes,
+    setShouldUpdateStyles,
+    setAutoApplyThemeOnDrop,
   } = useDispatch<Dispatch>().settings;
 
   const handleUpdateOnChange = React.useCallback(() => {
@@ -79,9 +88,7 @@ export default function SettingsDropdown() {
               <Check />
             </DropdownMenu.ItemIndicator>
             {t('update.onChange.title')}
-            <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>
-              {t('update.onChange.description')}
-            </Box>
+            <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>{t('update.onChange.description')}</Box>
           </DropdownMenu.CheckboxItem>
           {localApiState?.provider === StorageProviderType.JSONBIN ? (
             <DropdownMenu.CheckboxItem
@@ -93,9 +100,7 @@ export default function SettingsDropdown() {
                 <Check />
               </DropdownMenu.ItemIndicator>
               {t('update.remoteJSONBin.title')}
-              <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>
-                {t('update.remoteJSONBin.description')}
-              </Box>
+              <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>{t('update.remoteJSONBin.description')}</Box>
             </DropdownMenu.CheckboxItem>
           ) : null}
           <DropdownMenu.CheckboxItem
@@ -107,9 +112,7 @@ export default function SettingsDropdown() {
               <Check />
             </DropdownMenu.ItemIndicator>
             {t('update.swapStyles.title')}
-            <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>
-              {t('update.swapStyles.description')}
-            </Box>
+            <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>{t('update.swapStyles.description')}</Box>
           </DropdownMenu.CheckboxItem>
           <DropdownMenu.CheckboxItem
             data-testid="should-update-styles"
@@ -120,9 +123,7 @@ export default function SettingsDropdown() {
               <Check />
             </DropdownMenu.ItemIndicator>
             {t('update.shouldUpdateStyles.title')}
-            <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>
-              {t('update.shouldUpdateStyles.description')}
-            </Box>
+            <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>{t('update.shouldUpdateStyles.description')}</Box>
           </DropdownMenu.CheckboxItem>
           <DropdownMenu.CheckboxItem
             data-testid="auto-apply-theme-on-drop"
@@ -133,9 +134,7 @@ export default function SettingsDropdown() {
               <Check />
             </DropdownMenu.ItemIndicator>
             {t('update.autoApplyThemeOnDrop.title')}
-            <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>
-              {t('update.autoApplyThemeOnDrop.description')}
-            </Box>
+            <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>{t('update.autoApplyThemeOnDrop.description')}</Box>
           </DropdownMenu.CheckboxItem>
           <DropdownMenu.CheckboxItem
             data-testid="should-swap-figma-modes"
@@ -146,9 +145,7 @@ export default function SettingsDropdown() {
               <Check />
             </DropdownMenu.ItemIndicator>
             {t('update.shouldSwapFigmaModes.title')}
-            <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>
-              {t('update.shouldSwapFigmaModes.description')}
-            </Box>
+            <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>{t('update.shouldSwapFigmaModes.description')}</Box>
           </DropdownMenu.CheckboxItem>
         </DropdownMenu.Content>
       </DropdownMenu.Portal>

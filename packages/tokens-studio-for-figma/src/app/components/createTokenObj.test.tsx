@@ -4,10 +4,18 @@ import { createTokensObject, transformName, appendTypeToToken } from './createTo
 const baseTokens = {
   input: [
     {
-      id: '123', type: TokenTypes.COLOR, description: 'some color', name: 'global.colors.gray.500', value: '#ff0000',
+      id: '123',
+      type: TokenTypes.COLOR,
+      description: 'some color',
+      name: 'global.colors.gray.500',
+      value: '#ff0000',
     },
     {
-      id: '123', type: TokenTypes.COLOR, description: 'some color', name: 'global.colors.gray.400', value: '#ff0000',
+      id: '123',
+      type: TokenTypes.COLOR,
+      description: 'some color',
+      name: 'global.colors.gray.400',
+      value: '#ff0000',
     },
     {
       id: '123',
@@ -24,10 +32,18 @@ const baseTokens = {
       value: '#ff0000',
     },
     {
-      id: '123', type: TokenTypes.ASSET, description: 'some assets', name: 'global.assets.image', value: 'http://image.png',
+      id: '123',
+      type: TokenTypes.ASSET,
+      description: 'some assets',
+      name: 'global.assets.image',
+      value: 'http://image.png',
     },
     {
-      id: '123', type: TokenTypes.OTHER, description: 'some other components', name: 'components.button', value: '{composition.action.button}',
+      id: '123',
+      type: TokenTypes.OTHER,
+      description: 'some other components',
+      name: 'components.button',
+      value: '{composition.action.button}',
     },
   ],
   output: {
