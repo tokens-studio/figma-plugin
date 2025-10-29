@@ -1,16 +1,13 @@
-/* eslint-disable jsx-a11y/label-has-associated-control */
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import {
   Box, Link, Text, Button, Heading, Label, Stack, Switch,
 } from '@tokens-studio/ui';
-import { track } from '@/utils/analytics';
 import SyncSettings from '../SyncSettings';
 import { LanguageSelector } from '../LanguageSelector';
 import { Dispatch } from '../../store';
 import {
-  storeTokenIdInJsonEditorSelector,
   uiStateSelector,
 } from '@/selectors';
 import AddLicenseKey from '../AddLicenseKey/AddLicenseKey';
@@ -33,7 +30,6 @@ function Settings() {
     url: 'https://docs.tokens.studio/token-storage/remote?ref=onboarding_explainer_syncproviders',
   };
 
-  const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
   const uiState = useSelector(uiStateSelector);
   const dispatch = useDispatch<Dispatch>();
   const debugMode = useSelector(sessionRecordingSelector);
@@ -79,14 +75,6 @@ function Settings() {
     }
     getSessionId();
   });
-
-  const handleStoreTokenIdInJsonEditorChange = React.useCallback(
-    (state: CheckedState) => {
-      track('setStoreTokenIdInJsonEditorSelector', { value: state });
-      dispatch.settings.setStoreTokenIdInJsonEditorSelector(!!state);
-    },
-    [dispatch.settings],
-  );
 
   const closeOnboarding = React.useCallback(() => {
     dispatch.uiState.setOnboardingExplainerSyncProviders(false);
@@ -135,16 +123,6 @@ function Settings() {
               width: '100%',
             }}
           >
-
-            <Stack direction="row" gap={3} align="center" css={{ width: '100%' }}>
-              <Label htmlFor="storeTokenIdInJsonEditor">{t('storeTokenId')}</Label>
-              <Switch
-                id="storeTokenIdInJsonEditor"
-                checked={!!storeTokenIdInJsonEditor}
-                defaultChecked={storeTokenIdInJsonEditor}
-                onCheckedChange={handleStoreTokenIdInJsonEditorChange}
-              />
-            </Stack>
             <RemConfiguration />
           </Stack>
           <Stack

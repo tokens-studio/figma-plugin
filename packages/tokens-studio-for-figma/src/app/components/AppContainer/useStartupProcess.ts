@@ -1,5 +1,4 @@
 import {
-  useEffect,
   useMemo,
 } from 'react';
 import { useDispatch, useStore } from 'react-redux';

@@ -7,13 +7,11 @@ import {
 import { AppContainer } from '../AppContainer';
 import * as savePluginDataFactoryModule from '../startupProcessSteps/savePluginDataFactory';
 import * as addLicenseFactoryModule from '../startupProcessSteps/addLicenseFactory';
-import * as getLdFlagsFactorySpyModule from '../startupProcessSteps/getLdFlagsFactory';
 import * as saveStorageInformationFactoryModule from '../startupProcessSteps/saveStorageInformationFactory';
 import * as pullTokensFactoryModule from '../startupProcessSteps/pullTokensFactory';
 
 const savePluginDataFactorySpy = jest.spyOn(savePluginDataFactoryModule, 'savePluginDataFactory');
 const addLicenseFactorySpy = jest.spyOn(addLicenseFactoryModule, 'addLicenseFactory');
-const getLdFlagsFactorySpy = jest.spyOn(getLdFlagsFactorySpyModule, 'getLdFlagsFactory');
 const saveStorageInformationFactorySpy = jest.spyOn(saveStorageInformationFactoryModule, 'saveStorageInformationFactory');
 const pullTokensFactorySpy = jest.spyOn(pullTokensFactoryModule, 'pullTokensFactory');
 
@@ -23,9 +21,6 @@ describe('AppContainer', () => {
       () => Promise.resolve()
     ));
     addLicenseFactorySpy.mockImplementation(() => (
-      () => Promise.resolve()
-    ));
-    getLdFlagsFactorySpy.mockImplementation(() => (
       () => Promise.resolve()
     ));
     saveStorageInformationFactorySpy.mockImplementation(() => (

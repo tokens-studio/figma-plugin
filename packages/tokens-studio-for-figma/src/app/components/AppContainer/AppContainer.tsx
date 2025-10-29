@@ -39,6 +39,7 @@ const applicationInitStepLabels = {
 };
 
 export const AppContainer = (params: Props) => {
+  const { authData } = params;
   const { isDarkTheme } = useFigmaTheme();
   const dispatch = useDispatch<Dispatch>();
   const startupProcess = useStartupProcess(params);
@@ -109,5 +110,5 @@ export const AppContainer = (params: Props) => {
     </Box>
   );
 
-  return <AuthContextProvider authData={params.authData}>{appContent}</AuthContextProvider>;
+  return <AuthContextProvider authData={authData}>{appContent}</AuthContextProvider>;
 };

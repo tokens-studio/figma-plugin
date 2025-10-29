@@ -16,14 +16,12 @@ import useConfirm from '@/app/hooks/useConfirm';
 import { AddLicenseSource } from '@/app/store/models/userState';
 import ProBadge from '../ProBadge';
 import { userIdSelector } from '@/selectors/userIdSelector';
-import { licenseDetailsSelector } from '@/selectors';
 import { ErrorMessage } from '../ErrorMessage';
 import { addLicenseKey } from '@/utils/addLicenseKey';
 
 export default function AddLicenseKey() {
   const dispatch = useDispatch<Dispatch>();
   const existingKey = useSelector(licenseKeySelector);
-  const licenseDetails = useSelector(licenseDetailsSelector);
   const licenseKeyError = useSelector(licenseKeyErrorSelector);
   const [newKey, setLicenseKey] = useState(existingKey);
   const { confirm } = useConfirm();
