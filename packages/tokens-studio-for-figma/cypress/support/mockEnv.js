@@ -15,14 +15,6 @@ const MockEnv = () => {
     success: true
   }).as('storyblok')
 
-  cy.intercept('GET', `https://app.launchdarkly.com/**`, {
-    success: true
-  }).as('app-launchdarkly')
-
-  cy.intercept('POST', `https://events.launchdarkly.com/**`, {
-    success: true
-  }).as('events-launchdarkly')
-
   cy.intercept('GET', `**/get-license*`, {
     plan: 'pro'
   }).as('getLicense')

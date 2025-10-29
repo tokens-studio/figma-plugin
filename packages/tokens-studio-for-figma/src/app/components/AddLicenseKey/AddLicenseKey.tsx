@@ -3,7 +3,6 @@ import React, {
   useCallback, useEffect, useState,
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useLDClient } from 'launchdarkly-react-client-sdk';
 import { useTranslation } from 'react-i18next';
 import {
   Button, Heading, TextInput, Box, Stack, IconButton,
@@ -18,7 +17,6 @@ import { AddLicenseSource } from '@/app/store/models/userState';
 import ProBadge from '../ProBadge';
 import { userIdSelector } from '@/selectors/userIdSelector';
 import { licenseDetailsSelector } from '@/selectors';
-import { ldUserFactory } from '@/utils/ldUserFactory';
 import { ErrorMessage } from '../ErrorMessage';
 import { addLicenseKey } from '@/utils/addLicenseKey';
 
@@ -30,7 +28,6 @@ export default function AddLicenseKey() {
   const [newKey, setLicenseKey] = useState(existingKey);
   const { confirm } = useConfirm();
   const userId = useSelector(userIdSelector);
-  const ldClient = useLDClient();
   const { t } = useTranslation(['licence']);
   const [isMasked, setIsMasked] = useState(true);
 
@@ -50,14 +47,6 @@ export default function AddLicenseKey() {
     }
   }, [newKey, dispatch, userId]);
 
-  const removeAccessToFeatures = useCallback(() => {
-    if (userId) {
-      ldClient?.identify({
-        key: userId,
-      });
-    }
-  }, [userId, ldClient]);
-
   const removeKey = useCallback(async () => {
     if (licenseKeyError) {
       dispatch.userState.removeLicenseKey(undefined);
@@ -69,10 +58,9 @@ export default function AddLicenseKey() {
       });
       if (confirmation) {
         dispatch.userState.removeLicenseKey(undefined);
-        removeAccessToFeatures();
       }
     }
-  }, [t, dispatch, confirm, removeAccessToFeatures, licenseKeyError]);
+  }, [t, dispatch, confirm, licenseKeyError]);
 
   const ManageSubscriptionLink = styled('a', {
     color: '$accentDefault',
@@ -82,14 +70,6 @@ export default function AddLicenseKey() {
   useEffect(() => {
     setLicenseKey(existingKey);
   }, [existingKey]);
-
-  useEffect(() => {
-    if (userId && existingKey && licenseDetails) {
-      ldClient?.identify(
-        ldUserFactory(userId, licenseDetails.plan, licenseDetails.entitlements, licenseDetails.clientEmail),
-      );
-    }
-  }, [userId, ldClient, existingKey, licenseDetails]);
 
   const onLicenseKeyChange = useCallback((ev: React.ChangeEvent<HTMLInputElement>) => {
     setLicenseKey(ev.target.value.trim());

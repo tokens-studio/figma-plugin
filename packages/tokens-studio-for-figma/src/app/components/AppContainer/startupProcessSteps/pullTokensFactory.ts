@@ -1,5 +1,4 @@
 import * as Sentry from '@sentry/react';
-import type { LDFlagSet } from 'launchdarkly-js-client-sdk';
 import { Store } from 'redux';
 import { INTERNAL_THEMES_NO_GROUP } from '../../../../constants/InternalTokenGroup';
 import type { StartupMessage } from '@/types/AsyncMessages';
@@ -20,7 +19,6 @@ import { categorizeError } from '@/utils/error/categorizeError';
 export function pullTokensFactory(
   store: Store<RootState>,
   dispatch: Dispatch,
-  flags: LDFlagSet,
   params: StartupMessage,
   useConfirmResult: ReturnType<typeof useConfirm>,
   useRemoteTokensResult: ReturnType<typeof useRemoteTokens>,
@@ -72,7 +70,6 @@ export function pullTokensFactory(
 
           const remoteData = await useRemoteTokensResult.pullTokens({
             context: matchingSet,
-            featureFlags: flags,
             activeTheme,
             usedTokenSet: params.localTokenData?.usedTokenSet,
             collapsedTokenSets: params.localTokenData?.collapsedTokenSets,

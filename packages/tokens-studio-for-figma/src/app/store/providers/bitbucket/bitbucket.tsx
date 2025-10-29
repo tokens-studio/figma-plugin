@@ -1,6 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
-import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
 import compact from 'just-compact';
 import { Dispatch } from '@/app/store';
 import useConfirm from '@/app/hooks/useConfirm';
@@ -52,10 +51,11 @@ export function useBitbucket() {
       );
       if (context.filePath) storageClient.changePath(context.filePath);
       if (context.branch) storageClient.selectBranch(context.branch);
-      if (isProUser) storageClient.enableMultiFile();
+      // Enable multi-file support by default (previously gated by feature flag)
+      storageClient.enableMultiFile();
       return storageClient;
     },
-    [isProUser],
+    [],
   );
 
   const askUserIfPull = useCallback(async () => {
@@ -148,10 +148,9 @@ export function useBitbucket() {
 
   const checkAndSetAccess = useCallback(
     async ({
-      context, owner, repo, receivedFeatureFlags,
-    }: { context: BitbucketCredentials; owner: string; repo: string, receivedFeatureFlags?: LDProps['flags'] }) => {
+      context, owner, repo,
+    }: { context: BitbucketCredentials; owner: string; repo: string }) => {
       const storage = storageClientFactory(context, owner, repo);
-      if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
       try {
         const hasWriteAccess = await storage.canWrite();
         dispatch.tokenState.setEditProhibited(!hasWriteAccess);
@@ -166,14 +165,13 @@ export function useBitbucket() {
   );
 
   const pullTokensFromBitbucket = useCallback(
-    async (context: BitbucketCredentials, receivedFeatureFlags?: LDProps['flags']): Promise<RemoteResponseData | null> => {
+    async (context: BitbucketCredentials): Promise<RemoteResponseData | null> => {
       const storage = storageClientFactory(context);
-      if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
 
       const [owner, repo] = context.id.split('/');
 
       await checkAndSetAccess({
-        context, owner, repo, receivedFeatureFlags,
+        context, owner, repo,
       });
 
       try {

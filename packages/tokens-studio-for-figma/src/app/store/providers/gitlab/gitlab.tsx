@@ -1,6 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
-import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
 import compact from 'just-compact';
 import { Dispatch } from '@/app/store';
 import useConfirm from '@/app/hooks/useConfirm';
@@ -38,7 +37,8 @@ export const clientFactory = async (context: GitlabCredentials, isProUser: boole
   const storageClient = new GitlabTokenStorage(secret, repositoryId, repoPathWithNamespace, baseUrl ?? '', branch, previousSourceBranch);
   if (filePath) storageClient.changePath(filePath);
   if (branch) storageClient.selectBranch(branch);
-  if (isProUser) storageClient.enableMultiFile();
+  // Enable multi-file support by default (previously gated by feature flag)
+  storageClient.enableMultiFile();
   return storageClient.assignProjectId();
 };
 
@@ -151,19 +151,17 @@ export function useGitLab() {
   ]);
 
   const checkAndSetAccess = useCallback(async ({
-    context, receivedFeatureFlags,
-  }: { context: GitlabCredentials; receivedFeatureFlags?: LDProps['flags'] }) => {
+    context,
+  }: { context: GitlabCredentials }) => {
     const storage = await storageClientFactory(context, isProUser);
-    if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
     const hasWriteAccess = await storage.canWrite();
     dispatch.tokenState.setEditProhibited(!hasWriteAccess);
   }, [dispatch, storageClientFactory, isProUser]);
 
-  const pullTokensFromGitLab = useCallback(async (context: GitlabCredentials, receivedFeatureFlags?: LDProps['flags']): Promise<RemoteResponseData | null> => {
+  const pullTokensFromGitLab = useCallback(async (context: GitlabCredentials): Promise<RemoteResponseData | null> => {
     const storage = await storageClientFactory(context, isProUser);
-    if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
     await checkAndSetAccess({
-      context, receivedFeatureFlags,
+      context,
     });
 
     try {

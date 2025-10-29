@@ -19,7 +19,6 @@ import OnboardingExplainer from '../OnboardingExplainer';
 import RemConfiguration from '../RemConfiguration';
 import { replay } from '@/app/sentry';
 import { sessionRecordingSelector } from '@/selectors/sessionRecordingSelector';
-import { useFlags } from '../LaunchDarkly';
 import { ExplainerModal } from '../ExplainerModal';
 
 // TODO: expose types from @tokens-studio/ui/checkbox
@@ -39,7 +38,6 @@ function Settings() {
   const dispatch = useDispatch<Dispatch>();
   const debugMode = useSelector(sessionRecordingSelector);
   const [debugSession, setDebugSession] = useState('');
-  const { idStorage } = useFlags();
 
   const toggleDebugMode = React.useCallback(async (checked: CheckedState) => {
     if (checked && process.env.ENVIRONMENT === 'development') {
@@ -138,17 +136,15 @@ function Settings() {
             }}
           >
 
-            {idStorage && (
-              <Stack direction="row" gap={3} align="center" css={{ width: '100%' }}>
-                <Label htmlFor="storeTokenIdInJsonEditor">{t('storeTokenId')}</Label>
-                <Switch
-                  id="storeTokenIdInJsonEditor"
-                  checked={!!storeTokenIdInJsonEditor}
-                  defaultChecked={storeTokenIdInJsonEditor}
-                  onCheckedChange={handleStoreTokenIdInJsonEditorChange}
-                />
-              </Stack>
-            )}
+            <Stack direction="row" gap={3} align="center" css={{ width: '100%' }}>
+              <Label htmlFor="storeTokenIdInJsonEditor">{t('storeTokenId')}</Label>
+              <Switch
+                id="storeTokenIdInJsonEditor"
+                checked={!!storeTokenIdInJsonEditor}
+                defaultChecked={storeTokenIdInJsonEditor}
+                onCheckedChange={handleStoreTokenIdInJsonEditorChange}
+              />
+            </Stack>
             <RemConfiguration />
           </Stack>
           <Stack
