@@ -128,6 +128,8 @@ export function pullTokensFactory(
     } else if (params.localTokenData) {
       if (params.localTokenData.tokenFormat) dispatch.tokenState.setTokenFormat(params.localTokenData.tokenFormat);
       dispatch.tokenState.setTokenData({ ...params.localTokenData, activeTheme });
+      // Local storage should never have editProhibited set to true
+      dispatch.tokenState.setEditProhibited(false);
       const existTokens = hasTokenValues(params.localTokenData.values);
       if (existTokens) dispatch.uiState.setActiveTab(Tabs.TOKENS);
       else dispatch.uiState.setActiveTab(Tabs.START);

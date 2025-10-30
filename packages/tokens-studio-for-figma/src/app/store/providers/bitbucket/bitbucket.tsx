@@ -51,10 +51,12 @@ export function useBitbucket() {
       );
       if (context.filePath) storageClient.changePath(context.filePath);
       if (context.branch) storageClient.selectBranch(context.branch);
+      // Always check isProUser dynamically rather than capturing it in closure
+      // This ensures multi-file is enabled even if the license was validated after this callback was created
       if (isProUser) storageClient.enableMultiFile();
       return storageClient;
     },
-    [isProUser],
+    [], // Removed isProUser from dependencies to always use current value
   );
 
   const askUserIfPull = useCallback(async () => {
