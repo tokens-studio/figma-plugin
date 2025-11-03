@@ -1,5 +1,17 @@
 # @tokens-studio/figma-plugin
 
+## 2.10.2
+
+### Patch Changes
+
+- 8552d66ec: Revert all Pro access.
+
+## 2.10.1
+
+### Patch Changes
+
+- 993c27c67: Add feature flag to disable license key check
+
 ## 2.10.0
 
 ### Minor Changes

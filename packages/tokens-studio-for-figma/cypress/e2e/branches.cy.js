@@ -177,10 +177,10 @@ describe('Branch switcher', () => {
       ...mockStartupParams,
       licenseKey: null, // Remove license to make user non-pro
     };
-    
+
     cy.startup(nonProUserParams);
     cy.get('[data-testid=branch-selector-menu-trigger]').click();
-    
+
     // Should show pro upgrade modal
     cy.contains('Branching is a feature of the Pro subscription').should('be.visible');
     cy.contains('You can switch branches, create new ones from current changes or any other branch, easily find branches, and collaborate seamlessly with your team. Branching enables powerful version control and team collaboration workflows.').should('be.visible');
