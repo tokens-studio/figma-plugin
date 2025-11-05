@@ -18,7 +18,6 @@ export * from './apiProvidersSelector';
 export * from './activeApiProviderSelector';
 export * from './hasUnsavedChangesSelector';
 export * from './activeTabSelector';
-export * from './changelogSelector';
 export * from './projectURLSelector';
 export * from './lastSyncedStateSelector';
 export * from './lastErrorSelector';
