@@ -1,6 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
 import React from 'react';
-import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
 import compact from 'just-compact';
 import { Dispatch } from '@/app/store';
 import useConfirm from '@/app/hooks/useConfirm';
@@ -42,9 +41,11 @@ export const useADO = () => {
     const storageClient = new ADOTokenStorage(context);
     if (context.filePath) storageClient.changePath(context.filePath);
     if (context.branch) storageClient.selectBranch(context.branch);
+    // Always check isProUser dynamically rather than capturing it in closure
+    // This ensures multi-file is enabled even if the license was validated after this callback was created
     if (isProUser) storageClient.enableMultiFile();
     return storageClient;
-  }, [isProUser]);
+  }, []); // Removed isProUser from dependencies to always use current value
 
   const askUserIfPull = React.useCallback(async () => {
     const confirmResult = await confirm({
@@ -136,21 +137,19 @@ export const useADO = () => {
     localApiState,
   ]);
 
-  const checkAndSetAccess = React.useCallback(async (context: AdoCredentials, receivedFeatureFlags?: LDProps['flags']) => {
+  const checkAndSetAccess = React.useCallback(async (context: AdoCredentials) => {
     const storage = storageClientFactory(context);
-    if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
     const hasWriteAccess = await storage.canWrite();
     dispatch.tokenState.setEditProhibited(!hasWriteAccess);
   }, [dispatch, storageClientFactory]);
 
-  const pullTokensFromADO = React.useCallback(async (context: AdoCredentials, receivedFeatureFlags?: LDProps['flags']): Promise<RemoteResponseData | null> => {
+  const pullTokensFromADO = React.useCallback(async (context: AdoCredentials): Promise<RemoteResponseData | null> => {
     const storage = storageClientFactory(context);
     if (context.branch) {
       storage.setSource(context.branch);
     }
-    if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
 
-    await checkAndSetAccess(context, receivedFeatureFlags);
+    await checkAndSetAccess(context);
 
     try {
       const content = await storage.retrieve();
