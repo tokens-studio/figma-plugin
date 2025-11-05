@@ -8,7 +8,7 @@ export function mapTokensToVariableInfo(
   token: ResolveTokenValuesResult,
   theme: ThemeObject,
   settings: SettingsState,
-  baseFontSize?: string
+  baseFontSize?: string,
 ) {
   // Use the provided baseFontSize (theme-specific) or fall back to settings.baseFontSize
   const effectiveBaseFontSize = baseFontSize || settings?.baseFontSize;

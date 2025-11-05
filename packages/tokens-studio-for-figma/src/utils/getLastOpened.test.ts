@@ -1,7 +1,7 @@
 import getLastOpened from './getLastOpened';
 import { mockGetAsync } from '../../tests/__mocks__/figmaMock';
 
-describe('fetchChangelog', () => {
+describe('getLastOpened', () => {
   it('user lanch the plugin for the first time', async () => {
     expect.assertions(1);
     try {

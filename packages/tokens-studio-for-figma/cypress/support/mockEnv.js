@@ -11,10 +11,6 @@ const MockEnv = () => {
     success: true
   }).as('mixpanel')
 
-  cy.intercept('GET', `https://api.storyblok.com/**`, {
-    success: true
-  }).as('storyblok')
-
   cy.intercept('GET', `https://app.launchdarkly.com/**`, {
     success: true
   }).as('app-launchdarkly')

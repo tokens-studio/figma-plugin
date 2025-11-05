@@ -137,7 +137,6 @@ Required environment variables in `.env` files:
 
 ```
 MIXPANEL_ACCESS_TOKEN=
-STORYBLOK_ACCESS_TOKEN=
 ENVIRONMENT=development
 LICENSE_API_URL=https://licence.tokens.studio
 LAUNCHDARKLY_SDK_CLIENT=626fb05d52e5c715abd11b5e
