@@ -1,5 +1,17 @@
 # @tokens-studio/figma-plugin
 
+## 2.10.3
+
+### Patch Changes
+
+- 2dceaf0e3: Fix base URL for github enterprise API calls
+- d4140d9b8: Enhanced UI display for rem values to show pixel equivalents based on current theme baseline font size. Token tooltips and inspector now display rem values as "1rem (16px)" format.
+- d4140d9b8: Fix font size token export for different typography baselines across themes
+
+  When exporting tokens with expandTypography enabled, composite tokens (like typography tokens) now correctly use resolved values from the provided resolvedTokens array instead of the original unresolved token values. This ensures that font size tokens and other properties within typography tokens reflect the correct baseline values for each theme when tokens are resolved per theme.
+
+- d4140d9b8: Fixed multi-theme variable export to use correct base font size per theme for rem conversion. Previously, when exporting multiple themes simultaneously, all themes would use the base font size from the currently active theme due to shared TokenResolver state.
+
 ## 2.10.2
 
 ### Patch Changes
