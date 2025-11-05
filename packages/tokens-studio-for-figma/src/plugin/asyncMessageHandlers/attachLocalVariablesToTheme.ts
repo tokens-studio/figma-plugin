@@ -15,8 +15,8 @@ export const attachLocalVariablesToTheme: AsyncMessageChannelHandlers[AsyncMessa
   );
   if (collection && mode) {
     const collectionVariableIds: Record<string, string> = {};
-    const tokensToCreateVariablesFor = generateTokensToCreate({ theme, tokens });
-    tokensToCreateVariablesFor.forEach((token) => {
+    const { tokensToCreate } = generateTokensToCreate({ theme, tokens });
+    tokensToCreate.forEach((token) => {
       const variable = figmaVariableMaps.get(token.name.split('.').join('/'));
       if (variable) {
         collectionVariableIds[token.name] = variable.key;

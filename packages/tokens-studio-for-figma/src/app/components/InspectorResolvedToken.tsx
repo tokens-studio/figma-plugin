@@ -10,6 +10,8 @@ import { IconBorder, IconImage } from '@/icons';
 import { SingleToken } from '@/types/tokens';
 import { TokenTooltip } from './TokenTooltip';
 import { TokenTypographyValue, TokenBoxshadowValue, TokenBorderValue } from '@/types/values';
+import { useResolvedBaseFontSize } from '@/app/hooks/useResolvedBaseFontSize';
+import { formatTokenValueForDisplay } from '@/utils/displayTokenValue';
 
 type Props = {
   name: string;
@@ -20,6 +22,8 @@ type Props = {
 
 export default function InspectorResolvedToken({ token }: { token: Props }) {
   const { t } = useTranslation(['inspect']);
+  const currentBaseFontSize = useResolvedBaseFontSize();
+
   // TODO: Introduce shared component for token tooltips
   if (!token) {
     return (
@@ -160,7 +164,7 @@ export default function InspectorResolvedToken({ token }: { token: Props }) {
             overflow: 'hidden',
           }}
         >
-          {String(token.value)}
+          {formatTokenValueForDisplay(token.value, currentBaseFontSize)}
         </Box>
       );
     }
