@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useEffect } from 'react';
 import compact from 'just-compact';
 import { Dispatch } from '@/app/store';
 import useConfirm from '@/app/hooks/useConfirm';
@@ -50,7 +50,7 @@ export function useGitHub() {
     // This ensures multi-file is enabled even if the license was validated after this callback was created
     if (isProUser) storageClient.enableMultiFile();
     return storageClient;
-  }, []); // Removed isProUser from dependencies to always use current value
+  }, [isProUser]);
 
   const askUserIfPull = useCallback(async () => {
     const confirmResult = await confirm({
@@ -171,9 +171,27 @@ export function useGitHub() {
     context, owner, repo,
   }: { context: GithubCredentials; owner: string; repo: string }) => {
     const storage = storageClientFactory(context, owner, repo);
+
+    // Enable multi-file if user is pro, even if storage was created before license validation
+    if (isProUser) {
+      storage.enableMultiFile();
+    }
+
     const hasWriteAccess = await storage.canWrite();
     dispatch.tokenState.setEditProhibited(!hasWriteAccess);
-  }, [dispatch, storageClientFactory]);
+  }, [dispatch, storageClientFactory, isProUser]);
+
+  // Re-check access when isProUser changes from false to true (license validation during startup)
+  useEffect(() => {
+    if (isProUser && localApiState && localApiState.id && localApiState.provider === 'github') {
+      const [owner, repo] = localApiState.id.split('/');
+      checkAndSetAccess({
+        context: localApiState as GithubCredentials,
+        owner,
+        repo,
+      });
+    }
+  }, [isProUser, localApiState, checkAndSetAccess]);
 
   const pullTokensFromGitHub = useCallback(async (context: GithubCredentials): Promise<RemoteResponseData | null> => {
     const storage = storageClientFactory(context);

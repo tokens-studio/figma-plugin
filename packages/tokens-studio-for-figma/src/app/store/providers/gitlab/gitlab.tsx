@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useEffect } from 'react';
 import compact from 'just-compact';
 import { Dispatch } from '@/app/store';
 import useConfirm from '@/app/hooks/useConfirm';
@@ -153,9 +153,21 @@ export function useGitLab() {
     context,
   }: { context: GitlabCredentials }) => {
     const storage = await storageClientFactory(context, isProUser);
+    if (isProUser) {
+      storage.enableMultiFile();
+    }
     const hasWriteAccess = await storage.canWrite();
     dispatch.tokenState.setEditProhibited(!hasWriteAccess);
   }, [dispatch, storageClientFactory, isProUser]);
+
+  // Re-check access when isProUser changes from false to true (license validation during startup)
+  useEffect(() => {
+    if (isProUser && localApiState && localApiState.id && localApiState.provider === 'gitlab') {
+      checkAndSetAccess({
+        context: localApiState as GitlabCredentials,
+      });
+    }
+  }, [isProUser, localApiState, checkAndSetAccess]);
 
   const pullTokensFromGitLab = useCallback(async (context: GitlabCredentials): Promise<RemoteResponseData | null> => {
     const storage = await storageClientFactory(context, isProUser);
