@@ -1,6 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
-import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
 import compact from 'just-compact';
 import { Dispatch } from '@/app/store';
 import useConfirm from '@/app/hooks/useConfirm';
@@ -47,9 +46,11 @@ export function useGitHub() {
 
     if (context.filePath) storageClient.changePath(context.filePath);
     if (context.branch) storageClient.selectBranch(context.branch);
+    // Always check isProUser dynamically rather than capturing it in closure
+    // This ensures multi-file is enabled even if the license was validated after this callback was created
     if (isProUser) storageClient.enableMultiFile();
     return storageClient;
-  }, [isProUser]);
+  }, []); // Removed isProUser from dependencies to always use current value
 
   const askUserIfPull = useCallback(async () => {
     const confirmResult = await confirm({
@@ -167,22 +168,20 @@ export function useGitHub() {
   ]);
 
   const checkAndSetAccess = useCallback(async ({
-    context, owner, repo, receivedFeatureFlags,
-  }: { context: GithubCredentials; owner: string; repo: string, receivedFeatureFlags?: LDProps['flags'] }) => {
+    context, owner, repo,
+  }: { context: GithubCredentials; owner: string; repo: string }) => {
     const storage = storageClientFactory(context, owner, repo);
-    if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
     const hasWriteAccess = await storage.canWrite();
     dispatch.tokenState.setEditProhibited(!hasWriteAccess);
   }, [dispatch, storageClientFactory]);
 
-  const pullTokensFromGitHub = useCallback(async (context: GithubCredentials, receivedFeatureFlags?: LDProps['flags']): Promise<RemoteResponseData | null> => {
+  const pullTokensFromGitHub = useCallback(async (context: GithubCredentials): Promise<RemoteResponseData | null> => {
     const storage = storageClientFactory(context);
-    if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
 
     const [owner, repo] = context.id.split('/');
 
     await checkAndSetAccess({
-      context, owner, repo, receivedFeatureFlags,
+      context, owner, repo,
     });
 
     try {

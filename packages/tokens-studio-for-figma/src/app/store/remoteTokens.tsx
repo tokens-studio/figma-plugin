@@ -1,6 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
-import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
 import compact from 'just-compact';
 import { track } from '@/utils/analytics';
 import { useJSONbin } from './providers/jsonbin';
@@ -38,7 +37,6 @@ export type PushOverrides = { branch: string; commitMessage: string };
 
 type PullTokensOptions = {
   context?: StorageTypeCredentials;
-  featureFlags?: LDProps['flags'];
   usedTokenSet?: UsedTokenSetsMap | null;
   activeTheme?: Record<string, string>;
   collapsedTokenSets?: string[] | null;
@@ -107,7 +105,6 @@ export default function useRemoteTokens() {
   const pullTokens = useCallback(
     async ({
       context = api,
-      featureFlags,
       usedTokenSet,
       activeTheme,
       collapsedTokenSets,
@@ -126,19 +123,19 @@ export default function useRemoteTokens() {
             break;
           }
           case StorageProviderType.GITHUB: {
-            remoteData = await pullTokensFromGitHub(context, featureFlags);
+            remoteData = await pullTokensFromGitHub(context);
             break;
           }
           case StorageProviderType.BITBUCKET: {
-            remoteData = await pullTokensFromBitbucket(context, featureFlags);
+            remoteData = await pullTokensFromBitbucket(context);
             break;
           }
           case StorageProviderType.GITLAB: {
-            remoteData = await pullTokensFromGitLab(context, featureFlags);
+            remoteData = await pullTokensFromGitLab(context);
             break;
           }
           case StorageProviderType.ADO: {
-            remoteData = await pullTokensFromADO(context, featureFlags);
+            remoteData = await pullTokensFromADO(context);
             break;
           }
           case StorageProviderType.URL: {
