@@ -6,6 +6,9 @@ import { transformTypographyKeyToFigmaVariable } from './transformTypographyKeyT
 import { SingleTypographyToken } from '@/types/tokens';
 import { ApplyVariablesStylesOrRawValues } from '@/constants/ApplyVariablesStyleOrder';
 
+// Cache to track font loading promises to prevent race conditions in Promise.all
+const fontLoadingPromises = new Map<string, Promise<void>>();
+
 export async function tryApplyTypographyCompositeVariable({
   target, value, baseFontSize, resolvedValue,
 }: {
@@ -36,15 +39,30 @@ export async function tryApplyTypographyCompositeVariable({
         // e.g. font weight = 600, we dont know that we need to load "Bold".
         if (key === 'fontFamily' && variableToApply) {
           const firstVariableValue = Object.values(variableToApply.valuesByMode)[0];
-          if (firstVariableValue) {
-            const fontsMatching = (await figma.listAvailableFontsAsync() || []).filter((font) => font.fontName.family === firstVariableValue);
-            for (const font of fontsMatching) {
-              await figma.loadFontAsync(font.fontName);
+          if (firstVariableValue && typeof firstVariableValue === 'string') {
+            // Check if we already have a loading promise for this font family
+            let loadingPromise = fontLoadingPromises.get(firstVariableValue);
+            if (!loadingPromise) {
+              // Create and cache the loading promise
+              loadingPromise = (async () => {
+                const fontsMatching = (await figma.listAvailableFontsAsync() || []).filter((font) => font.fontName.family === firstVariableValue);
+                for (const font of fontsMatching) {
+                  await figma.loadFontAsync(font.fontName);
+                }
+              })();
+              fontLoadingPromises.set(firstVariableValue, loadingPromise);
             }
+            // Wait for the loading to complete
+            await loadingPromise;
           }
         }
         if (variableToApply) {
-          if (target.fontName !== figma.mixed) await figma.loadFontAsync(target.fontName);
+          // Wrapping loadfont in a try catch as the previous value could be malformed but we still want to apply the value
+          try {
+            if (target.fontName !== figma.mixed) await figma.loadFontAsync(target.fontName);
+          } catch (e) {
+            console.error('error loading font', e);
+          }
           try {
             target.setBoundVariable(key, variableToApply);
             successfullyAppliedVariable = true;

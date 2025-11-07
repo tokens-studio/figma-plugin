@@ -15,6 +15,16 @@ export class Worker {
 
   private timeoutId: ReturnType<typeof setTimeout> | null = null;
 
+  private batchSize: number;
+
+  constructor(batchSize = 30) {
+    this.batchSize = batchSize;
+  }
+
+  public setBatchSize(size: number) {
+    this.batchSize = size;
+  }
+
   private tick = async () => {
     let numberOfJobs = 0;
 
@@ -31,7 +41,7 @@ export class Worker {
       }));
 
       numberOfJobs += 1;
-      if (numberOfJobs >= 30) {
+      if (numberOfJobs >= this.batchSize) {
         break;
       }
     }
@@ -72,7 +82,18 @@ export class Worker {
       this.timeoutId = null;
     }
   };
+
+  public async flush(): Promise<void> {
+    // Process all remaining jobs until queue is empty
+    while (this.pool.size > 0) {
+      await this.tick();
+    }
+  }
 }
 
 export const defaultWorker = new Worker();
 defaultWorker.start();
+
+// Create a specialized worker for variable creation with higher batch size
+export const variableWorker = new Worker(100);
+variableWorker.start();

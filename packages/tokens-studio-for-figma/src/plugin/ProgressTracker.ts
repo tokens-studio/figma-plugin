@@ -32,12 +32,15 @@ export class ProgressTracker {
   }
 
   public reportIfNecessary() {
-    if (Date.now() - this.lastProgressReport > 1000) {
+    const timeSinceLastReport = Date.now() - this.lastProgressReport;
+    if (timeSinceLastReport > 1000) {
+      const progressDelta = this.totalProgress - this.lastReportedProgress;
+      const timePerTask = (Date.now() - this.jobStart) / (this.totalProgress || 1);
       postToUI({
         type: MessageFromPluginTypes.COMPLETE_JOB_TASKS,
         name: this.jobName,
-        count: this.totalProgress - this.lastReportedProgress,
-        timePerTask: (Date.now() - this.jobStart) / (this.totalProgress || 1),
+        count: progressDelta,
+        timePerTask,
       });
       this.lastProgressReport = Date.now();
       this.lastReportedProgress = this.totalProgress;

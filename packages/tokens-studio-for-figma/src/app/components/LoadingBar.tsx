@@ -24,7 +24,9 @@ export const backgroundJobTitles = {
   [BackgroundJobs.UI_REDOING]: 'Redoing action...',
   [BackgroundJobs.UI_UNDOING]: 'Undoing action...',
   [BackgroundJobs.UI_ATTACHING_LOCAL_STYLES]: 'Attaching local styles to theme...',
+  [BackgroundJobs.UI_PREPARING_VARIABLES]: 'Preparing variable collections...',
   [BackgroundJobs.UI_CREATEVARIABLES]: 'Creating variables...',
+  [BackgroundJobs.UI_LINK_VARIABLE_REFERENCES]: 'Updating aliases...',
   [BackgroundJobs.UI_CREATE_STYLES]: 'Creating styles...',
   [BackgroundJobs.UI_CREATE_LIVING_DOCUMENTATION]: 'Creating documentation...',
 };

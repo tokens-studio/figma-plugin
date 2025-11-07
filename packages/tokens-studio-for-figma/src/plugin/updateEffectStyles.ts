@@ -2,6 +2,7 @@ import { SingleBoxShadowToken } from '@/types/tokens';
 import setEffectValuesOnTarget from './setEffectValuesOnTarget';
 import { getEffectStylesIdMap } from '@/utils/getEffectStylesIdMap';
 import { getEffectStylesKeyMap } from '@/utils/getEffectStylesKeyMap';
+import { processBatches } from '@/utils/processBatches';
 
 // Iterate over effectTokens to create objects that match figma styles
 // @returns A map of token names and their respective style IDs (if created or found)
@@ -10,17 +11,20 @@ export default async function updateEffectStyles({
   baseFontSize,
   shouldCreate = false,
   shouldRename = false,
+  onProgress,
 }: {
   effectTokens: SingleBoxShadowToken<true, { path: string; styleId: string }>[];
   baseFontSize: string;
   shouldCreate?: boolean;
   shouldRename?: boolean;
+  onProgress?: (completed: number) => void;
 }) {
   const effectStylesToIdMap = getEffectStylesIdMap();
   const effectStylesToKeyMap = getEffectStylesKeyMap();
   const tokenToStyleMap: Record<string, string> = {};
 
-  await Promise.all(effectTokens.map(async (token) => {
+  // Process tokens in batches of 50 to avoid overwhelming memory and API limits
+  await processBatches(effectTokens, 50, async (token) => {
     if (effectStylesToIdMap.has(token.styleId)) {
       const effectStyle = effectStylesToIdMap.get(token.styleId)!;
       if (shouldRename) {
@@ -40,7 +44,7 @@ export default async function updateEffectStyles({
 
       await setEffectValuesOnTarget(style, token.name, baseFontSize);
     }
-  }));
+  }, onProgress);
 
   return tokenToStyleMap;
 }
