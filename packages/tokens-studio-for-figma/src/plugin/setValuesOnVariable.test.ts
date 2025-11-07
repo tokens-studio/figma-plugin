@@ -9,6 +9,21 @@ const baseFontSize = '16px';
 
 describe('SetValuesOnVariable', () => {
   const mockSetValueForMode = jest.fn();
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockCreateVariable.mockImplementation((name, collection, type) => ({
+      id: `VariableID:${Date.now()}`,
+      key: `key-${Date.now()}`,
+      name,
+      resolvedType: type,
+      description: '',
+      variableCollectionId: collection.id,
+      valuesByMode: {},
+      setValueForMode: jest.fn(),
+      remove: jest.fn(),
+    }));
+  });
   const variablesInFigma = [
     {
       id: 'VariableID:309:16431',
