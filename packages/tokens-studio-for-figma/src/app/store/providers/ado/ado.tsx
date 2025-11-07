@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import React from 'react';
+import React, { useEffect } from 'react';
 import compact from 'just-compact';
 import { Dispatch } from '@/app/store';
 import useConfirm from '@/app/hooks/useConfirm';
@@ -45,7 +45,7 @@ export const useADO = () => {
     // This ensures multi-file is enabled even if the license was validated after this callback was created
     if (isProUser) storageClient.enableMultiFile();
     return storageClient;
-  }, []); // Removed isProUser from dependencies to always use current value
+  }, [isProUser]);
 
   const askUserIfPull = React.useCallback(async () => {
     const confirmResult = await confirm({
@@ -139,9 +139,19 @@ export const useADO = () => {
 
   const checkAndSetAccess = React.useCallback(async (context: AdoCredentials) => {
     const storage = storageClientFactory(context);
+    if (isProUser) {
+      storage.enableMultiFile();
+    }
     const hasWriteAccess = await storage.canWrite();
     dispatch.tokenState.setEditProhibited(!hasWriteAccess);
-  }, [dispatch, storageClientFactory]);
+  }, [dispatch, storageClientFactory, isProUser]);
+
+  // Re-check access when isProUser changes from false to true (license validation during startup)
+  useEffect(() => {
+    if (isProUser && localApiState && localApiState.id && localApiState.provider === 'ado') {
+      checkAndSetAccess(localApiState as AdoCredentials);
+    }
+  }, [isProUser, localApiState, checkAndSetAccess]);
 
   const pullTokensFromADO = React.useCallback(async (context: AdoCredentials): Promise<RemoteResponseData | null> => {
     const storage = storageClientFactory(context);
