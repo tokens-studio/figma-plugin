@@ -9,6 +9,7 @@ export type VariableToCreateToken = {
   parent: string, // collection name - is there a type for this?
   description?: string
   oldDescription?: string
+  $extensions?: SingleToken['$extensions']
 };
 
 export type SetTokensFromVariablesPayload = Record<string, VariableToCreateToken[]>;

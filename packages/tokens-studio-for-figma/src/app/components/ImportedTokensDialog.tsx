@@ -122,11 +122,8 @@ export default function ImportedTokensDialog() {
 
   const handleCreateAllClick = React.useCallback(() => {
     const multipleNewTokens = newTokens.map((token) => ({
+      ...token,
       parent: token.parent || activeTokenSet,
-      name: token.name,
-      value: token.value,
-      type: token.type,
-      description: token.description,
       shouldUpdateDocument: false,
     }));
 
@@ -137,11 +134,8 @@ export default function ImportedTokensDialog() {
 
   const handleUpdateAllClick = React.useCallback(() => {
     const multipleUpdatedTokens = updatedTokens.map((token) => ({
+      ...token,
       parent: token.parent || activeTokenSet,
-      name: token.name,
-      value: token.value,
-      type: token.type,
-      description: token.description,
       shouldUpdateDocument: false,
     }));
 
@@ -152,20 +146,14 @@ export default function ImportedTokensDialog() {
 
   const handleImportAllClick = React.useCallback(() => {
     const multipleUpdatedTokens = updatedTokens.map((token) => ({
+      ...token,
       parent: token.parent || activeTokenSet,
-      name: token.name,
-      value: token.value,
-      type: token.type,
-      description: token.description,
       shouldUpdateDocument: false,
     }));
 
     const multipleNewTokens = newTokens.map((token) => ({
+      ...token,
       parent: token.parent || activeTokenSet,
-      name: token.name,
-      value: token.value,
-      type: token.type,
-      description: token.description,
       shouldUpdateDocument: false,
     }));
 
