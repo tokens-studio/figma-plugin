@@ -66,8 +66,8 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
 
     // Calculate total number of variables for progress tracking
     const totalVariableTokens = selectedThemeObjects.reduce((total, theme) => {
-      const themeTokens = generateTokensToCreate({ theme, tokens, overallConfig });
-      const variableTokenCount = themeTokens.filter((token) => checkIfTokenCanCreateVariable(token, settings)).length;
+      const { tokensToCreate } = generateTokensToCreate({ theme, tokens, overallConfig });
+      const variableTokenCount = tokensToCreate.filter((token) => checkIfTokenCanCreateVariable(token, settings)).length;
       return total + variableTokenCount;
     }, 0);
 

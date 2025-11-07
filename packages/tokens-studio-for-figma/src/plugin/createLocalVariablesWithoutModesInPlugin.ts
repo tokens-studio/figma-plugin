@@ -72,10 +72,10 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
     const totalVariableTokens = selectedSets.reduce((total, set) => {
       if (set.status === TokenSetStatus.ENABLED) {
         const theme = { id: '123', name: set.set, selectedTokenSets: { [set.set]: set.status } };
-        const themeTokens = generateTokensToCreate({
+        const { tokensToCreate } = generateTokensToCreate({
           theme, tokens, overallConfig, filterByTokenSet: set.set,
         });
-        const variableTokenCount = themeTokens.filter((token) => checkIfTokenCanCreateVariable(token, settings)).length;
+        const variableTokenCount = tokensToCreate.filter((token) => checkIfTokenCanCreateVariable(token, settings)).length;
         return total + variableTokenCount;
       }
       return total;
