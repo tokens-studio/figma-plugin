@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useEffect } from 'react';
 import compact from 'just-compact';
 import { Dispatch } from '@/app/store';
 import useConfirm from '@/app/hooks/useConfirm';
@@ -56,7 +56,7 @@ export function useBitbucket() {
       if (isProUser) storageClient.enableMultiFile();
       return storageClient;
     },
-    [], // Removed isProUser from dependencies to always use current value
+    [isProUser],
   );
 
   const askUserIfPull = useCallback(async () => {
@@ -152,6 +152,9 @@ export function useBitbucket() {
       context, owner, repo,
     }: { context: BitbucketCredentials; owner: string; repo: string }) => {
       const storage = storageClientFactory(context, owner, repo);
+      if (isProUser) {
+        storage.enableMultiFile();
+      }
       try {
         const hasWriteAccess = await storage.canWrite();
         dispatch.tokenState.setEditProhibited(!hasWriteAccess);
@@ -162,8 +165,20 @@ export function useBitbucket() {
         dispatch.tokenState.setEditProhibited(true);
       }
     },
-    [dispatch, storageClientFactory],
+    [dispatch, storageClientFactory, isProUser],
   );
+
+  // Re-check access when isProUser changes from false to true (license validation during startup)
+  useEffect(() => {
+    if (isProUser && localApiState && 'id' in localApiState && localApiState.id && localApiState.provider === 'bitbucket') {
+      const [owner, repo] = localApiState.id.split('/');
+      checkAndSetAccess({
+        context: localApiState as BitbucketCredentials,
+        owner,
+        repo,
+      });
+    }
+  }, [isProUser, localApiState, checkAndSetAccess]);
 
   const pullTokensFromBitbucket = useCallback(
     async (context: BitbucketCredentials): Promise<RemoteResponseData | null> => {
