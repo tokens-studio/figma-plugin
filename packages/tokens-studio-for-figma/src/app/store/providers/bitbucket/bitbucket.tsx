@@ -170,7 +170,7 @@ export function useBitbucket() {
 
   // Re-check access when isProUser changes from false to true (license validation during startup)
   useEffect(() => {
-    if (isProUser && localApiState && localApiState.id && localApiState.provider === 'bitbucket') {
+    if (isProUser && localApiState && 'id' in localApiState && localApiState.id && localApiState.provider === 'bitbucket') {
       const [owner, repo] = localApiState.id.split('/');
       checkAndSetAccess({
         context: localApiState as BitbucketCredentials,
