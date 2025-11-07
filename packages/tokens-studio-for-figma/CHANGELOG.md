@@ -1,5 +1,11 @@
 # @tokens-studio/figma-plugin
 
+## 2.10.4
+
+### Patch Changes
+
+- 3db28e694: Fixed an issue that caused the plugin to stay in readonly mode
+
 ## 2.10.3
 
 ### Patch Changes
