@@ -37,6 +37,7 @@ export default function FilePreset({ onCancel }: Props) {
   const isProUser = useIsProUser();
   const hiddenFileInput = React.useRef<HTMLInputElement>(null);
   const hiddenDirectoryInput = React.useRef<HTMLInputElement>(null);
+  const hiddenZipInput = React.useRef<HTMLInputElement>(null);
   const { fetchTokensFromFileOrDirectory } = useRemoteTokens();
 
   const handleFileButtonClick = React.useCallback(() => {
@@ -48,6 +49,11 @@ export default function FilePreset({ onCancel }: Props) {
     track('Import', { type: 'directory' });
     hiddenDirectoryInput.current?.click();
   }, [hiddenDirectoryInput]);
+
+  const handleZipButtonClick = React.useCallback(() => {
+    track('Import', { type: 'zip' });
+    hiddenZipInput.current?.click();
+  }, [hiddenZipInput]);
 
   const handleFileOrDirectoryChange = React.useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = event.target;
@@ -63,7 +69,7 @@ export default function FilePreset({ onCancel }: Props) {
           Import your existing tokens JSON files into the plugin.
         </Heading>
         <Text>
-          If you&lsquo;re using a single file, the first-level keys should be the token set names. If you&lsquo;re using multiple files, the file name / path are the set names.
+          If you&lsquo;re using a single file, the first-level keys should be the token set names. If you&lsquo;re using multiple files or a ZIP archive, the file name / path are the set names.
         </Text>
       </Stack>
       <Stack direction="row" gap={3} justify="end">
@@ -93,6 +99,19 @@ export default function FilePreset({ onCancel }: Props) {
           style={{ display: 'none' }}
           onChange={handleFileOrDirectoryChange}
           webkitdirectory=""
+        />
+        <Button
+          variant="primary"
+          onClick={handleZipButtonClick}
+        >
+          Choose ZIP
+        </Button>
+        <input
+          type="file"
+          ref={hiddenZipInput}
+          style={{ display: 'none' }}
+          onChange={handleFileOrDirectoryChange}
+          accept=".zip"
         />
       </Stack>
     </Stack>
