@@ -45,3 +45,5 @@ export * from './removeStylesWithoutConnection';
 export * from './setVariableExportSettings';
 export * from './setSelectedExportThemes';
 export * from '../livingDocumentation';
+export * from './tokenDataChanged';
+export * from './reloadTokenData';
