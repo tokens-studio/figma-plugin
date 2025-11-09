@@ -4,12 +4,12 @@ import {
   BookmarkIcon, ReaderIcon, ChatBubbleIcon, GitHubLogoIcon,
 } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
-import { Button, Heading } from '@tokens-studio/ui';
+import { Button, Heading, Select, Label } from '@tokens-studio/ui';
 import TokensStudioLogo from '@/icons/tokensstudio-full.svg';
 import Text from './Text';
 import Callout from './Callout';
 import { Dispatch } from '../store';
-import { apiProvidersSelector, storageTypeSelector, lastErrorSelector } from '@/selectors';
+import { apiProvidersSelector, storageTypeSelector, lastErrorSelector, themeOptionsSelector, activeThemeSelector } from '@/selectors';
 import Stack from './Stack';
 import { styled } from '@/stitches.config';
 import { Tabs } from '@/constants/Tabs';
@@ -18,6 +18,7 @@ import Box from './Box';
 import { transformProviderName } from '@/utils/transformProviderName';
 import { track } from '@/utils/analytics';
 import Footer from './Footer';
+import { autoSelectFirstThemesPerGroup } from '@/utils/autoSelectThemes';
 import useRemoteTokens from '../store/remoteTokens';
 
 const StyledTokensStudioIcon = styled(TokensStudioLogo, {
@@ -40,11 +41,13 @@ const HelpfulLink = styled('a', {
 function StartScreen() {
   const dispatch = useDispatch<Dispatch>();
   const { t } = useTranslation(['startScreen']);
-  const { restoreStoredProvider } = useRemoteTokens();
+  const { restoreStoredProvider, restoreProviderWithAutoPull } = useRemoteTokens();
 
   const storageType = useSelector(storageTypeSelector);
   const apiProviders = useSelector(apiProvidersSelector);
   const lastError = useSelector(lastErrorSelector);
+  const availableThemes = useSelector(themeOptionsSelector);
+  const activeTheme = useSelector(activeThemeSelector);
 
   const onSetEmptyTokens = React.useCallback(() => {
     track('Start with empty set');
@@ -77,6 +80,37 @@ function StartScreen() {
     dispatch.uiState.setLocalApiState(credentialsToSet);
   }, [apiProviders, dispatch.tokenState, dispatch.uiState, storageType]);
 
+  const onProviderSelect = React.useCallback(async (providerId: string) => {
+    const selectedProvider = apiProviders.find((provider) => provider.internalId === providerId);
+    if (selectedProvider) {
+      track('Start with sync provider', { provider: selectedProvider.provider });
+      dispatch.uiState.setLastError(null);
+      
+      try {
+        await restoreProviderWithAutoPull(selectedProvider);
+        
+        // Auto-select first themes if no themes are currently selected
+        if (availableThemes.length > 0) {
+          const newActiveTheme = autoSelectFirstThemesPerGroup(availableThemes, activeTheme);
+          if (Object.keys(newActiveTheme).length > 0 && Object.keys(activeTheme).length === 0) {
+            dispatch.tokenState.setActiveTheme({ 
+              newActiveTheme, 
+              shouldUpdateNodes: true 
+            });
+            track('Auto-selected themes', { themes: newActiveTheme });
+          }
+        }
+      } catch (error) {
+        console.error('Error loading provider:', error);
+        dispatch.uiState.setLastError({
+          type: 'connectivity',
+          header: 'Failed to load provider',
+          message: 'Unable to connect to the selected sync provider. Please check your credentials and try again.',
+        });
+      }
+    }
+  }, [apiProviders, availableThemes, activeTheme, dispatch, restoreProviderWithAutoPull]);
+
   const matchingProvider = React.useMemo(
     () => (storageType && 'internalId' in storageType
       ? apiProviders.find((i) => i.internalId === storageType.internalId)
@@ -98,6 +132,17 @@ function StartScreen() {
       description: lastError.message,
     };
   }, [lastError, storageType?.provider, matchingProvider, t]);
+
+  // Create provider options for the select dropdown
+  const providerOptions = React.useMemo(() => 
+    apiProviders.map((provider) => ({
+      value: provider.internalId,
+      label: `${provider.name} (${transformProviderName(provider.provider)})`,
+    }))
+  , [apiProviders]);
+
+  // Determine if we should show the provider selector
+  const shouldShowProviderSelector = apiProviders.length > 0 && storageType?.provider === StorageProviderType.LOCAL;
 
   return (
     <Box
@@ -162,13 +207,36 @@ function StartScreen() {
               } : undefined}
             />
           ) : (
-            <Stack direction="row" gap={2}>
-              <Button data-testid="button-configure" size="small" variant="primary" onClick={onSetEmptyTokens}>
-                {t('newEmptyFile')}
-              </Button>
-              <Button data-testid="button-configure-preset" size="small" variant="invisible" onClick={onSetDefaultTokens}>
-                {t('loadExample')}
-              </Button>
+            <Stack direction="column" gap={4}>
+              {shouldShowProviderSelector && (
+                <Stack direction="column" gap={3}>
+                  <Heading size="medium">{t('loadFromProvider', { defaultValue: 'Load from sync provider' })}</Heading>
+                  <Stack direction="row" justify="between" align="center" gap={4} css={{ width: '100%' }}>
+                    <Label>{t('selectProvider', { defaultValue: 'Select a provider' })}</Label>
+                    <Select onValueChange={onProviderSelect}>
+                      <Select.Trigger 
+                        value={t('chooseProvider', { defaultValue: 'Choose a provider...' })}
+                        data-testid="provider-selector"
+                      />
+                      <Select.Content>
+                        {providerOptions.map((option) => (
+                          <Select.Item key={option.value} value={option.value}>
+                            {option.label}
+                          </Select.Item>
+                        ))}
+                      </Select.Content>
+                    </Select>
+                  </Stack>
+                </Stack>
+              )}
+              <Stack direction="row" gap={2}>
+                <Button data-testid="button-configure" size="small" variant="primary" onClick={onSetEmptyTokens}>
+                  {t('newEmptyFile')}
+                </Button>
+                <Button data-testid="button-configure-preset" size="small" variant="invisible" onClick={onSetDefaultTokens}>
+                  {t('loadExample')}
+                </Button>
+              </Stack>
             </Stack>
           )}
           <Stack direction="row" align="center" gap={3}>
