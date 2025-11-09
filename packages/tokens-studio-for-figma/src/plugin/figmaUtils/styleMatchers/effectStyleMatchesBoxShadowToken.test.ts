@@ -3,7 +3,6 @@ import { TokenBoxshadowValue } from '@/types/values';
 import { effectStyleMatchesBoxShadowToken } from './effectStyleMatchesBoxShadowToken';
 
 describe('effectStyleMatchesBoxShadowToken', () => {
-  // tslint:disable-next-line: no-empty
   const noop: () => void = () => {};
   const dummyFunc: <T>() => T = <T>() => (undefined as unknown) as T;
   const dummyFigmaEffectStyle: EffectStyle = {
