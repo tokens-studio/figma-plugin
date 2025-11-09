@@ -8,7 +8,7 @@ import { ThemeObject } from '@/types';
 import IconDiveInto from '@/icons/dive-into.svg';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { Dispatch } from '@/app/store';
-import { activeThemeSelector } from '@/selectors';
+import { activeThemeSelector, editProhibitedSelector } from '@/selectors';
 
 type Props = {
   theme: ThemeObject
@@ -43,6 +43,7 @@ export const SingleThemeEntry: React.FC<React.PropsWithChildren<React.PropsWithC
   theme, isActive, groupName, onOpen,
 }) => {
   const activeTheme = useSelector(activeThemeSelector);
+  const editProhibited = useSelector(editProhibitedSelector);
   const dispatch = useDispatch<Dispatch>();
 
   const tokenSetCount = useMemo(() => (
@@ -123,6 +124,7 @@ export const SingleThemeEntry: React.FC<React.PropsWithChildren<React.PropsWithC
         onClick={handleOpenClick}
         size="small"
         variant="invisible"
+        disabled={editProhibited}
       />
 
     </Box>

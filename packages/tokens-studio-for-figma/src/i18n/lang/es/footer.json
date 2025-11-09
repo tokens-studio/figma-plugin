@@ -4,5 +4,6 @@
   "feedback": "comentario",
   "pullFrom": "Extraer de {{provider}}",
   "pushTo": "Empuje a {{provider}}",
-  "goTo": "Ir a __MARCADOR__"
+  "goTo": "Ir a __MARCADOR__",
+  "readOnly": "Solo lectura"
 }

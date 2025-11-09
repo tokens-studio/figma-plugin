@@ -226,6 +226,21 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
     }
   }
 
+  public async canWrite(): Promise<boolean> {
+    // For Tokens Studio, we don't have a direct API to check write permissions
+    // We return true optimistically and handle permission errors when they occur
+    // This will be used to set editProhibited state appropriately
+    try {
+      await this.ensureClient();
+      // If we can initialize the client successfully, we assume write access
+      // If the user has read-only access, write operations will fail with permission errors
+      return true;
+    } catch (error) {
+      console.error('Failed to check write permissions:', error);
+      return false;
+    }
+  }
+
   public async read(): Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage> {
     let tokens: AnyTokenSet | null | undefined = {};
     let themes: ThemeObjectsList = [];

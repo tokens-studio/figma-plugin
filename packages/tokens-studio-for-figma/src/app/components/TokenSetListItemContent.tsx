@@ -76,9 +76,9 @@ export function TokenSetListItemContent({ item }: Parameters<TreeRenderFunction>
       item={item}
       onCheck={handleCheckedChange}
       canEdit={!editProhibited}
-      canDuplicate={!tokenSetMetadata[item.path]?.isDynamic}
+      canDuplicate={!editProhibited && !tokenSetMetadata[item.path]?.isDynamic}
       canReorder={!editProhibited}
-      canDelete={!editProhibited || Object.keys(item.tokenSets).length > 1}
+      canDelete={!editProhibited && Object.keys(item.tokenSets).length > 1}
       onRename={item.onRename}
       onDelete={item.onDelete}
       onDuplicate={item.onDuplicate}
