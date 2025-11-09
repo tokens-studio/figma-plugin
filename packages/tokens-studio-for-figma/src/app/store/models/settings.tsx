@@ -49,6 +49,7 @@ export interface SettingsState {
   stylesColor: boolean;
   stylesTypography: boolean;
   stylesEffect: boolean;
+  stylesGradient: boolean;
   ignoreFirstPartForStyles?: boolean;
   prefixStylesWithThemeName?: boolean;
   createStylesWithVariableReferences?: boolean;
@@ -98,6 +99,7 @@ export const settings = createModel<RootModel>()({
     stylesColor: true,
     stylesTypography: true,
     stylesEffect: true,
+    stylesGradient: false,
   } as SettingsState,
   reducers: {
     ...settingsStateReducers,
