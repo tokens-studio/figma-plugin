@@ -32,12 +32,12 @@ export const setNoneValuesOnNode: AsyncMessageChannelHandlers[AsyncMessageTypes.
 
   Object.entries(nodesToRemove).forEach(([nodeId, keys]) => {
     promises.add(defaultWorker.schedule(async () => {
-      keys.forEach(async (key) => {
-        const nodeToUpdate = figma.getNodeById(nodeId);
+      for (const key of keys) {
+        const nodeToUpdate = await figma.getNodeByIdAsync(nodeId);
         if (nodeToUpdate) {
           await setNonePluginData({ nodes: [nodeToUpdate], key });
         }
-      });
+      }
       tracker.next();
       tracker.reportIfNecessary();
     }));
