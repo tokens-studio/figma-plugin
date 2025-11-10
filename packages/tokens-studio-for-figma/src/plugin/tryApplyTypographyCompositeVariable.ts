@@ -21,7 +21,15 @@ export async function tryApplyTypographyCompositeVariable({
   const isStyle = 'consumers' in target;
   const shouldCreateStylesWithVariables = (isStyle && defaultTokenValueRetriever.createStylesWithVariableReferences) || (!isStyle && shouldApplyStylesAndVariables);
 
-  if (typeof value === 'string') return;
+  // When we receive a string value, it's a reference to another typography token (reference mode)
+  // We still want to apply the typography properties from resolvedValue
+  if (typeof value === 'string') {
+    // Only proceed if we have resolvedValue properties to apply
+    if (Object.keys(resolvedValue).length === 0) return;
+    
+    // In reference mode, the resolvedValue contains the resolved object form that we can use
+    value = resolvedValue as SingleTypographyToken['value'];
+  }
 
   try {
     // We iterate over all keys of the typography object and apply variables if available, otherwise we apply the value directly
