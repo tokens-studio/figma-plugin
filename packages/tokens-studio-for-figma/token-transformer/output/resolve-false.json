@@ -1,4 +1,151 @@
 {
+  "theme": {
+    "background": {
+      "value": "{colors.gray.900}",
+      "description": "Alias value",
+      "type": "color"
+    },
+    "backgroundSubtle": {
+      "value": "rgba({colors.gray.900}, 0.5)",
+      "description": "Nested color value",
+      "type": "color"
+    },
+    "size": {
+      "default": {
+        "value": "{sizing.base}",
+        "description": "Sizing value",
+        "type": "sizing"
+      }
+    },
+    "backgroundDark": {
+      "value": "{colors.gray.500}",
+      "description": "Darkened color value",
+      "type": "color",
+      "$extensions": {
+        "modify": {
+          "type": "darken",
+          "amount": 0.5,
+          "space": "hsl"
+        }
+      }
+    },
+    "components": {
+      "cards": {
+        "default": {
+          "type": "composition",
+          "value": {
+            "borderRadius": "{sizing.base}",
+            "fill": "{theme.backgroundSubtle}",
+            "border": "{theme.background}"
+          }
+        }
+      }
+    }
+  },
+  "typography": {
+    "fontFamily": {
+      "value": "Roboto",
+      "description": "Font value",
+      "type": "fontFamilies"
+    },
+    "fontWeight": {
+      "value": "Bold",
+      "description": "Weight value",
+      "type": "fontWeights"
+    },
+    "h1": {
+      "value": {
+        "fontFamily": "{typography.fontFamily}",
+        "fontSize": 96,
+        "fontWeight": "{typography.fontWeight}"
+      },
+      "type": "typography"
+    },
+    "h2": {
+      "value": {
+        "fontFamily": "{typography.fontFamily}",
+        "fontSize": 60,
+        "fontWeight": "{typography.fontWeight}"
+      },
+      "type": "typography"
+    },
+    "reference": {
+      "value": {
+        "fontFamily": "Roboto",
+        "fontSize": 96,
+        "fontWeight": "Bold"
+      },
+      "type": "typography"
+    }
+  },
+  "border": {
+    "base": {
+      "value": {
+        "width": "{sizing.base}",
+        "color": "{colors.gray.900}",
+        "style": "solid"
+      },
+      "description": "Font value",
+      "type": "border"
+    }
+  },
+  "composition": {
+    "size": {
+      "value": 24,
+      "type": "sizing"
+    },
+    "opacity": {
+      "value": "50%",
+      "type": "opacity"
+    },
+    "fontFamily": {
+      "value": "Roboto",
+      "description": "Font value",
+      "type": "fontFamilies"
+    },
+    "fontWeight": {
+      "value": "Bold",
+      "description": "Weight value",
+      "type": "fontWeights"
+    },
+    "header": {
+      "value": {
+        "fontFamily": "{composition.fontFamily}",
+        "fontSize": 96,
+        "fontWeight": "{composition.fontWeight}"
+      },
+      "type": "composition"
+    },
+    "body": {
+      "value": {
+        "width": "{composition.size}",
+        "opacity": "{composition.opacity}"
+      },
+      "type": "composition"
+    }
+  },
+  "themes-light": {
+    "id": "8f240f308c8cc4acb7106c1073dc37a682997059",
+    "selectedTokenSets": {
+      "base/options": "source",
+      "base/sizing": "source",
+      "themes/light": "enabled",
+      "core/shadows": "enabled"
+    },
+    "$figmaStyleReferences": {},
+    "type": "other"
+  },
+  "themes-dark": {
+    "id": "8f240f308c8cc4acb7106c1073dc37a682997059",
+    "selectedTokenSets": {
+      "base/options": "source",
+      "base/sizing": "source",
+      "themes/dark": "enabled",
+      "core/shadows": "enabled"
+    },
+    "$figmaStyleReferences": {},
+    "type": "other"
+  },
   "shadows": {
     "multiple": {
       "value": [
@@ -63,49 +210,6 @@
         "spread": 0
       },
       "type": "boxShadow"
-    }
-  },
-  "theme": {
-    "background": {
-      "value": "{colors.gray.900}",
-      "description": "Alias value",
-      "type": "color"
-    },
-    "backgroundSubtle": {
-      "value": "rgba({colors.gray.900}, 0.5)",
-      "description": "Nested color value",
-      "type": "color"
-    },
-    "backgroundDark": {
-      "value": "{colors.gray.500}",
-      "description": "Darkened color value",
-      "type": "color",
-      "$extensions": {
-        "modify": {
-          "type": "darken",
-          "amount": 0.5,
-          "space": "hsl"
-        }
-      }
-    },
-    "size": {
-      "default": {
-        "value": "{sizing.base}",
-        "description": "Sizing value",
-        "type": "sizing"
-      }
-    },
-    "components": {
-      "cards": {
-        "default": {
-          "type": "composition",
-          "value": {
-            "borderRadius": "{sizing.base}",
-            "fill": "{theme.backgroundSubtle}",
-            "border": "{theme.background}"
-          }
-        }
-      }
     }
   }
 }
