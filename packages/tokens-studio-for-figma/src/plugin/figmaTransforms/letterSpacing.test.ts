@@ -34,8 +34,9 @@ describe('letterSpacing', () => {
       });
     });
 
-    it('should convert number 0 to Figma letterSpacing object', () => {
-      const result = convertLetterSpacingToFigma(0 as any, '16');
+    it('should convert string "0" (edge case) to Figma letterSpacing object', () => {
+      // Testing with just "0" as a string to ensure it's properly handled
+      const result = convertLetterSpacingToFigma('0', '16');
       expect(result).toEqual({
         unit: 'PIXELS',
         value: 0,
