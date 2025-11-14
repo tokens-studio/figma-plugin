@@ -18,9 +18,20 @@ describe('letterSpacing', () => {
       });
     });
 
-    it('should return null for "none"', () => {
+    it('should convert "none" to 0 (fixing the bug where 0 becomes none)', () => {
       const result = convertLetterSpacingToFigma('none', '16');
-      expect(result).toBeNull();
+      expect(result).toEqual({
+        unit: 'PIXELS',
+        value: 0,
+      });
+    });
+
+    it('should convert "NONE" (uppercase) to 0', () => {
+      const result = convertLetterSpacingToFigma('NONE', '16');
+      expect(result).toEqual({
+        unit: 'PIXELS',
+        value: 0,
+      });
     });
 
     it('should convert number 0 to Figma letterSpacing object', () => {
