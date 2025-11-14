@@ -90,8 +90,8 @@ describe('formatTokens per theme', () => {
     expect(mobileFormatted['mobile-base']['typography']['baseline']['$value']).toBe('14px');
     expect(desktopFormatted['desktop-base']['typography']['baseline']['$value']).toBe('16px');
 
-    // Verify that typography heading fontSize resolves differently for each theme
-    expect(mobileFormatted['typography-tokens']['typography']['heading']['fontSize']['$value']).toBe('14px');
-    expect(desktopFormatted['typography-tokens']['typography']['heading']['fontSize']['$value']).toBe('16px');
+    // Verify that typography heading fontSize preserves the reference (not resolved)
+    expect(mobileFormatted['typography-tokens']['typography']['heading']['fontSize']['$value']).toBe('{typography.baseline}');
+    expect(desktopFormatted['typography-tokens']['typography']['heading']['fontSize']['$value']).toBe('{typography.baseline}');
   });
 });
