@@ -15,7 +15,8 @@ export function convertTokenToFormat(token, isExpanded = false) {
   if ((typeof value === 'undefined')) return token;
   const returnValue = {
     ...remainingTokenValues,
-    ...(value ? { [TokenFormat.tokenValueKey]: value } : {}),
+    // Use explicit undefined check instead of truthy check to include falsy values like 0
+    ...(value !== undefined ? { [TokenFormat.tokenValueKey]: value } : {}),
     ...(type ? { [TokenFormat.tokenTypeKey]: type } : {}),
     ...(description ? { [TokenFormat.tokenDescriptionKey]: description } : {}),
   };
