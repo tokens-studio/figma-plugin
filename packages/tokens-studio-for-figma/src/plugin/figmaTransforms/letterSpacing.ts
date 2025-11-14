@@ -5,18 +5,7 @@ import { numberRegex } from '../../constants/numberRegex';
 export function convertLetterSpacingToFigma(inputValue: string, baseFontSize: string, shouldOutputForVariables = false): number | LetterSpacing | null {
   let letterSpacing: LetterSpacing | null = null;
   const value = inputValue.toString();
-  
-  // Handle "none" as 0 to fix the issue where letterSpacing 0 is incorrectly shown as "none"
-  // "none" is not a valid CSS letter-spacing value - the default should be 0
-  if (value.toLowerCase() === 'none') {
-    if (shouldOutputForVariables) {
-      return 0;
-    }
-    letterSpacing = {
-      unit: 'PIXELS',
-      value: 0,
-    };
-  } else if (numberMatchesPercentage(value)) {
+  if (numberMatchesPercentage(value)) {
     letterSpacing = {
       unit: 'PERCENT',
       value: Number(value.slice(0, -1)),
