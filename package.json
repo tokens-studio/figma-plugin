@@ -16,7 +16,7 @@
     "@types/fs-extra": "^11.0.2",
     "@types/glob": "^8.1.0",
     "eslint": "^8.48.0",
-    "glob": "^10.3.10",
+    "glob": "^11.1.0",
     "prettier": "^3.0.3",
     "ts-node": "^10.8.1",
     "turbo": "latest"
