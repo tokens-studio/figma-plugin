@@ -94,7 +94,7 @@
     "i18next": "^23.2.3",
     "iconoir-react": "^7.3.0",
     "ignore-styles": "^5.0.1",
-    "js-yaml": "^4.1.0",
+    "js-yaml": "^4.1.1",
     "json5": "^2.2.3",
     "jszip": "^3.10.0",
     "just-compact": "^3.0.1",
