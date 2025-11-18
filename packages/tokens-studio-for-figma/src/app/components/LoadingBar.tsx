@@ -50,7 +50,7 @@ export default function LoadingBar() {
       (!backgroundJobs.length || expectedWaitTime < 100)
         && !hasInfiniteJobs
     ),
-    500,
+    200,
     true,
     false,
   );
