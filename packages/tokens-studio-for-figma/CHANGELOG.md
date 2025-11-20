@@ -1,5 +1,17 @@
 # @tokens-studio/figma-plugin
 
+## 2.10.6
+
+### Patch Changes
+
+- f92a70b74: Improve variable creation performance with batching, and tighten progress tracking; fix theme token-source handling.
+
+  - Added batching for variable creation to avoid memory-related issues.
+  - Faster alias linking and caching for imports.
+  - Clear progress phases and accurate counts.
+
+- f92a70b74: Fixed an issue that caused the plugin to stay in readonly mode
+
 ## 2.10.5
 
 ### Patch Changes
