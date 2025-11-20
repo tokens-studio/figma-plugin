@@ -1,5 +1,17 @@
 # @tokens-studio/figma-plugin
 
+## 2.10.5
+
+### Patch Changes
+
+- 96d1b6111: Fix letterSpacing value 0 being omitted from exported tokens. Changed truthy check to explicit undefined check in convertTokenToFormat to include falsy values like 0.
+
+## 2.10.4
+
+### Patch Changes
+
+- 3db28e694: Fixed an issue that caused the plugin to stay in readonly mode
+
 ## 2.10.3
 
 ### Patch Changes
