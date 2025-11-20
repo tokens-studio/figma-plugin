@@ -39,10 +39,11 @@ type Props = {
   onCancel: () => void;
   hasErrored?: boolean;
   errorMessage?: string;
+  isLoading?: boolean;
 };
 
 export default function TokensStudioForm({
-  onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
+  onChange, onSubmit, onCancel, values, hasErrored, errorMessage, isLoading = false,
 }: Props) {
   const { t } = useTranslation(['storage']);
   const [fetchOrgsError, setFetchOrgsError] = React.useState<string | null>(null);
@@ -317,7 +318,7 @@ export default function TokensStudioForm({
           <Button variant="secondary" onClick={onCancel}>
             {t('cancel')}
           </Button>
-          <Button variant="primary" type="submit" disabled={!values.secret && !values.name}>
+          <Button variant="primary" type="submit" disabled={!values.secret && !values.name} loading={isLoading}>
             {t('save')}
           </Button>
         </Stack>

@@ -20,6 +20,7 @@ export default function EditStorageItemModal({
   const { t } = useTranslation(['storage']);
   const [formFields, setFormFields] = React.useState<StorageTypeFormValues<true>>(initialValue);
   const [hasErrored, setHasErrored] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
   const { addNewProviderItem } = useRemoteTokens();
   const [errorMessage, setErrorMessage] = React.useState<string>();
 
@@ -28,7 +29,10 @@ export default function EditStorageItemModal({
   }, [formFields]);
 
   const handleSubmit = React.useCallback(async (values: StorageTypeFormValues<false>) => {
+    setIsLoading(true);
+    setHasErrored(false);
     const response = await addNewProviderItem(values);
+    setIsLoading(false);
     if (response.status === 'success') {
       onSuccess();
     } else {
@@ -47,6 +51,7 @@ export default function EditStorageItemModal({
           values={formFields}
           hasErrored={hasErrored}
           errorMessage={errorMessage}
+          isLoading={isLoading}
         />
       </Stack>
     </Modal>
