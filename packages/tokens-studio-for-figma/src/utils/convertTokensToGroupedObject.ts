@@ -41,8 +41,14 @@ export default function convertTokensToGroupedObject(
       || (!!options.expandComposition && tokenWithType.type === TokenTypes.COMPOSITION)
       || (!!options.expandBorder && tokenWithType.type === TokenTypes.BORDER)
     ) {
-      const expanded = expand(tokenWithType.value);
-      set(obj, token.name, { ...expanded });
+      // Only expand if the value is an object, not a string (alias)
+      if (typeof tokenWithType.value === 'object' && tokenWithType.value !== null) {
+        const expanded = expand(tokenWithType.value);
+        set(obj, token.name, { ...expanded });
+      } else {
+        // If it's a string (alias), keep it as-is
+        set(obj, token.name, tokenWithType);
+      }
     } else {
       set(obj, token.name, tokenWithType);
     }
