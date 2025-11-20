@@ -26,7 +26,7 @@ describe('formatTokens per theme', () => {
         {
           name: 'typography.baseline',
           type: TokenTypes.FONT_SIZES,
-          value: '16px', // desktop baseline  
+          value: '16px', // desktop baseline
         },
       ],
       'typography-tokens': [
@@ -41,7 +41,7 @@ describe('formatTokens per theme', () => {
       ],
     };
 
-    // Define themes that use different typography baselines  
+    // Define themes that use different typography baselines
     const themes: ThemeObject[] = [
       {
         id: 'mobile',
@@ -87,11 +87,11 @@ describe('formatTokens per theme', () => {
     }));
 
     // Verify that each theme has different baseline values
-    expect(mobileFormatted['mobile-base']['typography']['baseline']['$value']).toBe('14px');
-    expect(desktopFormatted['desktop-base']['typography']['baseline']['$value']).toBe('16px');
+    expect(mobileFormatted['mobile-base'].typography.baseline.$value).toBe('14px');
+    expect(desktopFormatted['desktop-base'].typography.baseline.$value).toBe('16px');
 
     // Verify that typography heading fontSize preserves the reference (not resolved)
-    expect(mobileFormatted['typography-tokens']['typography']['heading']['fontSize']['$value']).toBe('{typography.baseline}');
-    expect(desktopFormatted['typography-tokens']['typography']['heading']['fontSize']['$value']).toBe('{typography.baseline}');
+    expect(mobileFormatted['typography-tokens'].typography.heading.fontSize.$value).toBe('{typography.baseline}');
+    expect(desktopFormatted['typography-tokens'].typography.heading.fontSize.$value).toBe('{typography.baseline}');
   });
 });

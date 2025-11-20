@@ -22,7 +22,7 @@ type Options = {
 export default function formatTokens({
   tokens,
   tokenSets,
-  resolvedTokens,
+  resolvedTokens: _resolvedTokens,
   includeAllTokens = false,
   includeParent = true,
   expandTypography = false,
@@ -32,8 +32,6 @@ export default function formatTokens({
   storeTokenIdInJsonEditor = false,
 }: Options) {
   const nestUnderParent = includeAllTokens ? true : includeParent;
-  // Create a map for efficient token lookup when expanding composite tokens
-  const resolvedTokensMap = new Map(resolvedTokens.map((t) => [t.name, t]));
 
   const tokenObj = {};
   tokenSets.forEach((tokenSet) => {
