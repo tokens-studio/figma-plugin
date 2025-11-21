@@ -160,6 +160,32 @@ describe('applyBooleanTokenValuesOnNode', () => {
       expect(mockNode.leadingTrim).toBe('CAP_HEIGHT');
       expect(global.figma.loadFontAsync).not.toHaveBeenCalled();
     });
+
+    it('should not apply verticalTrim when variable is applied', async () => {
+      (tryApplyVariableId as jest.Mock).mockResolvedValue(true);
+      const mockNode = {
+        type: 'TEXT',
+        fontName: { family: 'Arial', style: 'Regular' },
+        leadingTrim: 'NONE',
+      } as unknown as TextNode;
+
+      global.figma = {
+        loadFontAsync: jest.fn().mockResolvedValue(undefined),
+        mixed: Symbol('mixed'),
+      } as any;
+
+      await applyBooleanTokenValuesOnNode(
+        mockNode,
+        { verticalTrim: 'test-token' },
+        { verticalTrim: 'true' },
+      );
+
+      expect(mockNode.leadingTrim).toBe('NONE');
+      expect(global.figma.loadFontAsync).not.toHaveBeenCalled();
+
+      // Reset mock for other tests
+      (tryApplyVariableId as jest.Mock).mockResolvedValue(false);
+    });
   });
 
   describe('combined properties', () => {

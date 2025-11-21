@@ -25,6 +25,7 @@ export async function applyBooleanTokenValuesOnNode(
     node.type === 'TEXT'
     && typeof values.verticalTrim === 'string'
     && typeof data.verticalTrim !== 'undefined'
+    && !(await tryApplyVariableId(node, 'leadingTrim' as any, data.verticalTrim))
   ) {
     // Load the font before applying leadingTrim
     try {
