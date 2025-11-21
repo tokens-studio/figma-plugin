@@ -229,6 +229,7 @@ export function usePropertiesForTokenType(type: TokenTypes, value?: SingleToken[
       case TokenTypes.BOOLEAN:
         properties.push(
           { label: 'Visibility', name: Properties.visibility },
+          { label: 'Vertical trim', name: Properties.verticalTrim },
         );
         break;
       default:

@@ -48,6 +48,7 @@ export enum Properties {
   textDecoration = 'textDecoration',
   asset = 'asset',
   visibility = 'visibility',
+  verticalTrim = 'verticalTrim',
   text = 'text',
   number = 'number',
   tokenValue = 'tokenValue',

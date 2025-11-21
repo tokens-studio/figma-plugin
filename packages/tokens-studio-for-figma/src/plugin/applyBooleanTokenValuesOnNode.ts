@@ -19,4 +19,27 @@ export async function applyBooleanTokenValuesOnNode(
       node.visible = false;
     }
   }
+
+  // Apply vertical trim (leadingTrim) to text nodes
+  if (
+    node.type === 'TEXT'
+    && typeof values.verticalTrim === 'string'
+    && typeof data.verticalTrim !== 'undefined'
+    && !(await tryApplyVariableId(node, 'leadingTrim' as any, data.verticalTrim))
+  ) {
+    // Load the font before applying leadingTrim
+    try {
+      if (node.fontName !== figma.mixed) {
+        await figma.loadFontAsync(node.fontName);
+      }
+
+      if (values.verticalTrim === 'true') {
+        node.leadingTrim = 'CAP_HEIGHT';
+      } else if (values.verticalTrim === 'false') {
+        node.leadingTrim = 'NONE';
+      }
+    } catch (e) {
+      console.error('Error applying vertical trim:', e);
+    }
+  }
 }

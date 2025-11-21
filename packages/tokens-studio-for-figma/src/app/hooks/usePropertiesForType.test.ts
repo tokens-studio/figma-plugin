@@ -479,6 +479,13 @@ describe('usePropertiesForTokenType', () => {
         },
       ],
     },
+    {
+      type: 'boolean',
+      properties: [
+        { label: 'Visibility', name: Properties.visibility },
+        { label: 'Vertical trim', name: Properties.verticalTrim },
+      ],
+    },
   ];
   it('should return properties', () => {
     testData.forEach((data) => {
