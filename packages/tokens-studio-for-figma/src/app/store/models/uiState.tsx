@@ -2,9 +2,8 @@
 import { createModel } from '@rematch/core';
 import { track } from '@/utils/analytics';
 import type { RootModel } from '@/types/RootModel';
-import fetchChangelog from '@/utils/storyblok';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
-import { SelectionGroup, StoryblokStory, ErrorCategory } from '@/types';
+import { SelectionGroup, ErrorCategory } from '@/types';
 import { Tabs } from '@/constants/Tabs';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
@@ -68,7 +67,6 @@ export interface UIState {
   apiProviders: StorageTypeCredentials[];
   localApiState: StorageTypeFormValues<true>;
   lastUpdatedAt: string | null;
-  changelog: StoryblokStory['content'][];
   lastOpened: number | null;
   onboardingExplainerSets: boolean;
   onboardingExplainerExportSets: boolean;
@@ -132,7 +130,6 @@ export const uiState = createModel<RootModel>()({
       format: TokenFormatOptions.Legacy,
     },
     lastUpdatedAt: null,
-    changelog: [],
     lastOpened: '',
     onboardingExplainerSets: null,
     onboardingExplainerExportSets: null,
@@ -312,12 +309,6 @@ export const uiState = createModel<RootModel>()({
         apiProviders: payload,
       };
     },
-    setChangelog(state, payload: StoryblokStory['content'][]) {
-      return {
-        ...state,
-        changelog: payload,
-      };
-    },
     setLastOpened(state, payload: number) {
       return {
         ...state,
@@ -450,12 +441,7 @@ export const uiState = createModel<RootModel>()({
       triggerMigrationEdit: data,
     }),
   },
-  effects: (dispatch) => ({
-    setLastOpened: (payload) => {
-      fetchChangelog(payload, (result) => {
-        dispatch.uiState.setChangelog(result);
-      });
-    },
+  effects: (_dispatch) => ({
     setOnboardingExplainerSets: (payload) => {
       AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSETS,

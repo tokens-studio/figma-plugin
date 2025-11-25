@@ -1,5 +1,53 @@
 # @tokens-studio/figma-plugin
 
+## 2.10.6
+
+### Patch Changes
+
+- f92a70b74: Improve variable creation performance with batching, and tighten progress tracking; fix theme token-source handling.
+
+  - Added batching for variable creation to avoid memory-related issues.
+  - Faster alias linking and caching for imports.
+  - Clear progress phases and accurate counts.
+
+- f92a70b74: Fixed an issue that caused the plugin to stay in readonly mode
+
+## 2.10.5
+
+### Patch Changes
+
+- 96d1b6111: Fix letterSpacing value 0 being omitted from exported tokens. Changed truthy check to explicit undefined check in convertTokenToFormat to include falsy values like 0.
+
+## 2.10.4
+
+### Patch Changes
+
+- 3db28e694: Fixed an issue that caused the plugin to stay in readonly mode
+
+## 2.10.3
+
+### Patch Changes
+
+- 2dceaf0e3: Fix base URL for github enterprise API calls
+- d4140d9b8: Enhanced UI display for rem values to show pixel equivalents based on current theme baseline font size. Token tooltips and inspector now display rem values as "1rem (16px)" format.
+- d4140d9b8: Fix font size token export for different typography baselines across themes
+
+  When exporting tokens with expandTypography enabled, composite tokens (like typography tokens) now correctly use resolved values from the provided resolvedTokens array instead of the original unresolved token values. This ensures that font size tokens and other properties within typography tokens reflect the correct baseline values for each theme when tokens are resolved per theme.
+
+- d4140d9b8: Fixed multi-theme variable export to use correct base font size per theme for rem conversion. Previously, when exporting multiple themes simultaneously, all themes would use the base font size from the currently active theme due to shared TokenResolver state.
+
+## 2.10.2
+
+### Patch Changes
+
+- 8552d66ec: Revert all Pro access.
+
+## 2.10.1
+
+### Patch Changes
+
+- 993c27c67: Add feature flag to disable license key check
+
 ## 2.10.0
 
 ### Minor Changes

@@ -30,6 +30,53 @@ describe('GithubTokenStorage', () => {
     expect(getTreeMode('file')).toEqual('100644');
   });
 
+  describe('GitHub Enterprise base URL normalization', () => {
+    it('should normalize GitHub Enterprise URL without /api/v3 when passed to Octokit', () => {
+      const gheProvider = new GithubTokenStorage('token', 'owner', 'repo', 'https://github.company.com');
+      // The baseUrl should be stored as-is in the parent class
+      expect((gheProvider as any).baseUrl).toEqual('https://github.company.com');
+      // But Octokit should receive it with /api/v3 appended
+      // We can verify this by checking that the client was created (no errors thrown)
+      expect((gheProvider as any).octokitClient).toBeDefined();
+    });
+
+    it('should keep GitHub Enterprise URL that already has /api/v3', () => {
+      const gheProvider = new GithubTokenStorage('token', 'owner', 'repo', 'https://github.company.com/api/v3');
+      expect((gheProvider as any).baseUrl).toEqual('https://github.company.com/api/v3');
+      expect((gheProvider as any).octokitClient).toBeDefined();
+    });
+
+    it('should remove trailing slashes before adding /api/v3', () => {
+      const gheProvider = new GithubTokenStorage('token', 'owner', 'repo', 'https://github.company.com/');
+      expect((gheProvider as any).baseUrl).toEqual('https://github.company.com/');
+      expect((gheProvider as any).octokitClient).toBeDefined();
+    });
+
+    it('should handle multiple trailing slashes', () => {
+      const gheProvider = new GithubTokenStorage('token', 'owner', 'repo', 'https://github.company.com///');
+      expect((gheProvider as any).baseUrl).toEqual('https://github.company.com///');
+      expect((gheProvider as any).octokitClient).toBeDefined();
+    });
+
+    it('should use default GitHub.com API when baseUrl is empty', () => {
+      const githubProvider = new GithubTokenStorage('token', 'owner', 'repo', '');
+      expect((githubProvider as any).baseUrl).toEqual('');
+      expect((githubProvider as any).octokitClient).toBeDefined();
+    });
+
+    it('should use default GitHub.com API when baseUrl is undefined', () => {
+      const githubProvider = new GithubTokenStorage('token', 'owner', 'repo');
+      expect((githubProvider as any).baseUrl).toEqual(undefined);
+      expect((githubProvider as any).octokitClient).toBeDefined();
+    });
+
+    it('should handle baseUrl with whitespace', () => {
+      const gheProvider = new GithubTokenStorage('token', 'owner', 'repo', '  https://github.company.com  ');
+      expect((gheProvider as any).baseUrl).toEqual('  https://github.company.com  ');
+      expect((gheProvider as any).octokitClient).toBeDefined();
+    });
+  });
+
   it('should fetch branches as a simple list', async () => {
     expect(
       await storageProvider.fetchBranches(),

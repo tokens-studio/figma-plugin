@@ -197,7 +197,6 @@ module.exports = wrapper((env, argv) => {
       }),
       new webpack.DefinePlugin({
         'process.env.PREVIEW_ENV': JSON.stringify(argv.PREVIEW_ENV),
-        'process.env.LAUNCHDARKLY_FLAGS': JSON.stringify(process.env.LAUNCHDARKLY_FLAGS),
       }),
       new ForkTsCheckerWebpackPlugin({
         async: argv.mode === 'development',

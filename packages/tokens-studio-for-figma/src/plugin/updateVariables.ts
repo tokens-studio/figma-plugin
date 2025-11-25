@@ -5,6 +5,10 @@ import { SettingsState } from '@/app/store/models/settings';
 import checkIfTokenCanCreateVariable from '@/utils/checkIfTokenCanCreateVariable';
 import setValuesOnVariable from './setValuesOnVariable';
 import { mapTokensToVariableInfo } from '@/utils/mapTokensToVariableInfo';
+import { TokenResolver } from '@/utils/TokenResolver';
+import { getAliasValue } from '@/utils/alias';
+
+import { ProgressTracker } from './ProgressTracker';
 
 export type CreateVariableTypes = {
   collection: VariableCollection;
@@ -14,6 +18,7 @@ export type CreateVariableTypes = {
   settings: SettingsState;
   filterByTokenSet?: string;
   overallConfig: UsedTokenSetsMap;
+  progressTracker?: ProgressTracker | null;
 };
 
 export type VariableToken = SingleToken<true, { path: string; variableId: string }>;
@@ -26,13 +31,28 @@ export default async function updateVariables({
   settings,
   filterByTokenSet,
   overallConfig,
+  progressTracker,
 }: CreateVariableTypes) {
-  const tokensToCreate = generateTokensToCreate({
+  // Create a separate TokenResolver instance for this theme to avoid interference
+  // when multiple themes are processed concurrently
+  const themeTokenResolver = new TokenResolver([]);
+
+  const { tokensToCreate, resolvedTokens } = generateTokensToCreate({
     theme,
     tokens,
     filterByTokenSet,
     overallConfig,
+    themeTokenResolver,
   });
+
+  // Resolve the base font size for this specific theme using the same resolved tokens
+  let themeBaseFontSize = settings.baseFontSize;
+  if (settings.aliasBaseFontSize) {
+    const resolvedBaseFontSize = getAliasValue(settings.aliasBaseFontSize, resolvedTokens);
+    if (resolvedBaseFontSize && typeof resolvedBaseFontSize === 'string') {
+      themeBaseFontSize = resolvedBaseFontSize;
+    }
+  }
 
   // Do not use getVariablesWithoutZombies. It's not working.
   // There seems to be a bug with getLocalVariablesAsync. It's not returning the variables in the collection - when they're being created.
@@ -47,7 +67,7 @@ export default async function updateVariables({
   const variablesToCreate: VariableToken[] = [];
   tokensToCreate.forEach((token) => {
     if (checkIfTokenCanCreateVariable(token, settings)) {
-      variablesToCreate.push(mapTokensToVariableInfo(token, theme, settings));
+      variablesToCreate.push(mapTokensToVariableInfo(token, theme, settings, themeBaseFontSize));
     }
   });
 
@@ -56,9 +76,11 @@ export default async function updateVariables({
     variablesToCreate,
     collection,
     mode,
-    settings.baseFontSize,
+    themeBaseFontSize,
     settings.renameExistingStylesAndVariables,
+    progressTracker,
   );
+
   const removedVariables: string[] = [];
 
   // Remove variables not handled in the current theme

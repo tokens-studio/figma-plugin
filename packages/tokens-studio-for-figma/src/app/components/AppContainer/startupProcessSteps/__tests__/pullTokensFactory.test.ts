@@ -82,7 +82,6 @@ describe('pullTokensFactory', () => {
     const fn = pullTokensFactory(
       mockStore,
       mockStore.dispatch,
-      {},
       mockParams,
       mockUseConfirm,
       mockUseRemoteTokens,
@@ -114,7 +113,6 @@ describe('pullTokensFactory', () => {
     const fn = pullTokensFactory(
       mockStore,
       mockStore.dispatch,
-      {},
       mockParams,
       mockUseConfirm,
       mockUseRemoteTokens,
@@ -147,7 +145,6 @@ describe('pullTokensFactory', () => {
     const fn = pullTokensFactory(
       mockStore,
       mockStore.dispatch,
-      {},
       mockParams,
       mockUseConfirm,
       mockUseRemoteTokens,
@@ -198,7 +195,6 @@ describe('pullTokensFactory', () => {
     const fn = pullTokensFactory(
       mockStore,
       mockStore.dispatch,
-      {},
       mockParams,
       mockUseConfirm,
       mockUseRemoteTokens,
@@ -260,7 +256,6 @@ describe('pullTokensFactory', () => {
     const fn = pullTokensFactory(
       mockStore,
       mockStore.dispatch,
-      {},
       mockParams,
       mockUseConfirm,
       mockUseRemoteTokens,
@@ -313,7 +308,6 @@ describe('pullTokensFactory', () => {
     const fn = pullTokensFactory(
       mockStore,
       mockStore.dispatch,
-      {},
       mockParams,
       mockUseConfirm,
       mockUseRemoteTokens,
@@ -343,7 +337,6 @@ describe('pullTokensFactory', () => {
     const fn = pullTokensFactory(
       mockStore,
       mockStore.dispatch,
-      {},
       mockParams,
       mockUseConfirm,
       mockUseRemoteTokens,
@@ -375,7 +368,6 @@ describe('pullTokensFactory', () => {
     const fn = pullTokensFactory(
       mockStore,
       mockStore.dispatch,
-      {},
       mockParams,
       mockUseConfirm,
       mockUseRemoteTokens,
