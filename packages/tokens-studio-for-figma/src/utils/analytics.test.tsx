@@ -13,7 +13,7 @@ describe('without mixpanel env', () => {
 
     initializeAnalytics();
     track('test', { data: 'foo' });
-    identify({ userId: '123456', figmaId: 'figma-123', name: 'John Doe' });
+    identify({ userId: '123456', figmaId: 'figma-123' });
     setUserData({ likes: 'Apples' });
     expect(mockInit).not.toHaveBeenCalled();
     expect(mockTrack).not.toHaveBeenCalled();
@@ -40,7 +40,7 @@ describe('with mixpanel env', () => {
       const expectedFigmaHash = crypto.createHmac('sha256', TEST_SECRET).update('figma-123').digest('hex');
       const expectedUserIdHash = crypto.createHmac('sha256', TEST_SECRET).update('123456').digest('hex');
       
-      identify({ userId: '123456', figmaId: 'figma-123', name: 'John Doe' });
+      identify({ userId: '123456', figmaId: 'figma-123' });
       expect(mockIdentify).toHaveBeenCalledWith(expectedFigmaHash);
       expect(mockPeopleSet).toHaveBeenCalledWith({
         USER_ID: expectedUserIdHash,
