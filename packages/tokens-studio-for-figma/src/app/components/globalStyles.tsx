@@ -1,5 +1,4 @@
 import { globalCss } from '@/stitches.config';
-import '@/app/assets/fonts/fonts.css';
 
 export const globalStyles = globalCss({
   body: {
