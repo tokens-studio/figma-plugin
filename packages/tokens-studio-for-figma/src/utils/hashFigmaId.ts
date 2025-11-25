@@ -1,8 +1,7 @@
 import crypto from 'crypto';
 
-const secret = process.env.FIGMA_ID_HASH_SECRET || '';
-
 export function hashFigmaUserId(userId: string): string {
+  const secret = process.env.FIGMA_ID_HASH_SECRET || '';
   if (!secret) {
     throw new Error('Missing FIGMA_ID_HASH_SECRET');
   }

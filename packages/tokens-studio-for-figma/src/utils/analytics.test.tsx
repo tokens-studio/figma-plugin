@@ -5,6 +5,7 @@ import {
   mockTrack, mockInit, mockIdentify, mockPeopleSet,
 } from '../../tests/__mocks__/mixpanelMock';
 import pjs from '../../package.json';
+import crypto from 'crypto';
 
 describe('without mixpanel env', () => {
   it('should not track when mixpanel env isnt set', () => {
@@ -21,8 +22,10 @@ describe('without mixpanel env', () => {
   });
 });
 describe('with mixpanel env', () => {
+  const TEST_SECRET = 'test-secret-for-hashing';
   beforeAll(() => {
     process.env.MIXPANEL_ACCESS_TOKEN = '123';
+    process.env.FIGMA_ID_HASH_SECRET = TEST_SECRET;
   });
 
   describe('track', () => {
@@ -33,12 +36,14 @@ describe('with mixpanel env', () => {
   });
   describe('identify', () => {
     it('should identify user', () => {
-      identify({ userId: '123456', figmaId: 'figma-123', name: 'John Doe' });
-      // The expected hash for 'figma-123' with the current secret
-      expect(mockIdentify).toHaveBeenCalledWith('1244d333afb1ab6c245fa8a6047ae67e158eee7faf4f21cb7ff0928667432ee7');
+      const expectedFigmaHash = crypto.createHmac('sha256', TEST_SECRET).update('figma-123').digest('hex');
+      const expectedUserIdHash = crypto.createHmac('sha256', TEST_SECRET).update('123456').digest('hex');
+
+      identify({ userId: '123456', figmaId: 'figma-123' });
+      expect(mockIdentify).toHaveBeenCalledWith(expectedFigmaHash);
       expect(mockPeopleSet).toHaveBeenCalledWith({
-        USER_ID: '3d8ce42cd62e71dd507338d5f41c9005fbeda2ba0b9d3cf273bb26b79eaec6a7',
-        FIGMA_USER_ID: '1244d333afb1ab6c245fa8a6047ae67e158eee7faf4f21cb7ff0928667432ee7',
+        USER_ID: expectedUserIdHash,
+        FIGMA_USER_ID: expectedFigmaHash,
         version: pjs.version,
       });
     });
