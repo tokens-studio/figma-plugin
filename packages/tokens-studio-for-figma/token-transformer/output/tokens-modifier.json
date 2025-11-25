@@ -1,19 +1,15 @@
 {
-  "tokenSetOrder": {
-    "0": {
-      "value": "core",
-      "type": "other",
-      "rawValue": "core"
-    },
-    "1": {
-      "value": "theme/01-light",
-      "type": "other",
-      "rawValue": "theme/01-light"
-    },
-    "2": {
-      "value": "theme/02-dark",
-      "type": "other",
-      "rawValue": "theme/02-dark"
+  "color": {
+    "button": {
+      "primary": {
+        "press": {
+          "bg-color": {
+            "value": "#007182",
+            "type": "color",
+            "rawValue": "#00a2ba"
+          }
+        }
+      }
     }
   },
   "core": {
@@ -30,19 +26,6 @@
           "value": "#ffffff1a",
           "type": "color",
           "rawValue": "rgba($core.color.neutral.white, 0.1)"
-        }
-      }
-    }
-  },
-  "color": {
-    "button": {
-      "primary": {
-        "press": {
-          "bg-color": {
-            "value": "#007182",
-            "type": "color",
-            "rawValue": "#00a2ba"
-          }
         }
       }
     }

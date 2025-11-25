@@ -1,144 +1,4 @@
 {
-  "theme": {
-    "background": {
-      "value": "#FAFBFC",
-      "description": "Alias value",
-      "type": "color"
-    },
-    "backgroundSubtle": {
-      "value": "#fafbfc80",
-      "description": "Nested color value",
-      "type": "color"
-    },
-    "backgroundDark": {
-      "value": "#949DA7",
-      "description": "Darkened color value",
-      "type": "color"
-    },
-    "size": {
-      "default": {
-        "value": 8,
-        "description": "Sizing value",
-        "type": "sizing"
-      }
-    },
-    "components": {
-      "cards": {
-        "default": {
-          "type": "composition",
-          "value": {
-            "borderRadius": 4,
-            "fill": "#fafbfc80",
-            "border": "#FAFBFC"
-          }
-        }
-      }
-    }
-  },
-  "typography": {
-    "fontFamily": {
-      "value": "Roboto",
-      "description": "Font value",
-      "type": "fontFamilies"
-    },
-    "fontWeight": {
-      "value": "Bold",
-      "description": "Weight value",
-      "type": "fontWeights"
-    },
-    "h1": {
-      "value": {
-        "fontFamily": "Roboto",
-        "fontSize": 96,
-        "fontWeight": "Bold"
-      },
-      "type": "typography"
-    },
-    "h2": {
-      "value": {
-        "fontFamily": "Roboto",
-        "fontSize": 60,
-        "fontWeight": "Bold"
-      },
-      "type": "typography"
-    },
-    "reference": {
-      "value": {
-        "fontFamily": "Roboto",
-        "fontSize": 96,
-        "fontWeight": "Bold"
-      },
-      "type": "typography"
-    }
-  },
-  "border": {
-    "base": {
-      "value": {
-        "width": 4,
-        "color": "#1B1F24",
-        "style": "solid"
-      },
-      "description": "Font value",
-      "type": "border"
-    }
-  },
-  "composition": {
-    "size": {
-      "value": 24,
-      "type": "sizing"
-    },
-    "opacity": {
-      "value": "50%",
-      "type": "opacity"
-    },
-    "fontFamily": {
-      "value": "Roboto",
-      "description": "Font value",
-      "type": "fontFamilies"
-    },
-    "fontWeight": {
-      "value": "Bold",
-      "description": "Weight value",
-      "type": "fontWeights"
-    },
-    "header": {
-      "value": {
-        "fontFamily": "Roboto",
-        "fontSize": 96,
-        "fontWeight": "Bold"
-      },
-      "type": "composition"
-    },
-    "body": {
-      "value": {
-        "width": 24,
-        "opacity": "50%"
-      },
-      "type": "composition"
-    }
-  },
-  "themes-light": {
-    "id": "8f240f308c8cc4acb7106c1073dc37a682997059",
-    "selectedTokenSets": {
-      "base/options": "source",
-      "base/sizing": "source",
-      "themes/light": "enabled",
-      "core/shadows": "enabled"
-    },
-    "$figmaStyleReferences": {},
-    "type": "other"
-  },
-  "themes-dark": {
-    "id": "8f240f308c8cc4acb7106c1073dc37a682997059",
-    "selectedTokenSets": {
-      "base/options": "source",
-      "base/sizing": "source",
-      "themes/dark": "enabled",
-      "core/shadows": "enabled"
-    },
-    "$figmaStyleReferences": {},
-    "type": "other"
-  },
   "shadows": {
     "multiple": {
       "value": [
@@ -203,6 +63,25 @@
         "spread": 0
       },
       "type": "boxShadow"
+    }
+  },
+  "theme": {
+    "background": {
+      "value": "#FAFBFC",
+      "description": "Alias value",
+      "type": "color"
+    },
+    "backgroundSubtle": {
+      "value": "#fafbfc80",
+      "description": "Nested color value",
+      "type": "color"
+    },
+    "size": {
+      "default": {
+        "value": 8,
+        "description": "Sizing value",
+        "type": "sizing"
+      }
     }
   }
 }

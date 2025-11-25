@@ -1,87 +1,4 @@
 {
-  "button": {
-    "background": {
-      "value": "{colors.accent}",
-      "type": "color",
-      "failedToResolve": true
-    },
-    "text": {
-      "value": "{colors.on-accent}",
-      "type": "color",
-      "failedToResolve": true
-    }
-  },
-  "composition": {
-    "size": {
-      "value": 24,
-      "type": "sizing"
-    },
-    "opacity": {
-      "value": "50%",
-      "type": "opacity"
-    },
-    "fontFamily": {
-      "value": "Roboto",
-      "type": "fontFamilies",
-      "description": "Font value"
-    },
-    "fontWeight": {
-      "value": "Bold",
-      "type": "fontWeights",
-      "description": "Weight value"
-    },
-    "header": {
-      "value": {
-        "fontFamily": "Roboto",
-        "fontSize": 96,
-        "fontWeight": "Bold"
-      },
-      "type": "composition"
-    },
-    "body": {
-      "value": {
-        "width": 24,
-        "opacity": "50%"
-      },
-      "type": "composition"
-    }
-  },
-  "typography": {
-    "fontFamily": {
-      "value": "Roboto",
-      "type": "fontFamilies",
-      "description": "Font value"
-    },
-    "fontWeight": {
-      "value": "Bold",
-      "type": "fontWeights",
-      "description": "Weight value"
-    },
-    "h1": {
-      "value": {
-        "fontFamily": "Roboto",
-        "fontSize": 96,
-        "fontWeight": "Bold"
-      },
-      "type": "typography"
-    },
-    "h2": {
-      "value": {
-        "fontFamily": "Roboto",
-        "fontSize": 60,
-        "fontWeight": "Bold"
-      },
-      "type": "typography"
-    },
-    "reference": {
-      "value": {
-        "fontFamily": "Roboto",
-        "fontSize": 96,
-        "fontWeight": "Bold"
-      },
-      "type": "typography"
-    }
-  },
   "theme": {
     "background": {
       "value": "#FAFBFC",
@@ -93,28 +10,11 @@
       "description": "Nested color value",
       "type": "color"
     },
-    "backgroundDark": {
-      "value": "#949DA7",
-      "description": "Darkened color value",
-      "type": "color"
-    },
     "size": {
       "default": {
         "value": 8,
         "description": "Sizing value",
         "type": "sizing"
-      }
-    },
-    "components": {
-      "cards": {
-        "default": {
-          "type": "composition",
-          "value": {
-            "borderRadius": 4,
-            "fill": "#fafbfc80",
-            "border": "#FAFBFC"
-          }
-        }
       }
     }
   },

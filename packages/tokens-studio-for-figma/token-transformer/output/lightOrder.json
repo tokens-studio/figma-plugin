@@ -1,4 +1,8 @@
 {
+  "default": {
+    "value": "#2B70E8",
+    "type": "color"
+  },
   "gray": {
     "value": "#2B70E8",
     "type": "color"
@@ -6,39 +10,6 @@
   "background": {
     "value": "#E6EFFF",
     "type": "color"
-  },
-  "tokenSetOrder": {
-    "0": {
-      "value": "foundations",
-      "type": "other"
-    },
-    "1": {
-      "value": "light",
-      "type": "other"
-    },
-    "2": {
-      "value": "dark",
-      "type": "other"
-    }
-  },
-  "lightOrder": {
-    "id": "8f240f308c8cc4acb7106c1073dc37a682997059",
-    "selectedTokenSets": {
-      "foundations": "enabled",
-      "light": "enabled"
-    },
-    "$figmaStyleReferences": {},
-    "type": "other"
-  },
-  "darkOrder": {
-    "id": "8f240f308c8cc4acb7106c1073dc37a682997059",
-    "selectedTokenSets": {
-      "foundations": "source",
-      "light": "source",
-      "dark": "enabled"
-    },
-    "$figmaStyleReferences": {},
-    "type": "other"
   },
   "color": {
     "neutral": {
@@ -51,9 +22,5 @@
         "type": "color"
       }
     }
-  },
-  "default": {
-    "value": "#2B70E8",
-    "type": "color"
   }
 }
