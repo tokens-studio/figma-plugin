@@ -7,11 +7,20 @@
   font-display: swap;
 }
 
-/* Inter Bold */
+/* Inter Medium */
 @font-face {
   font-family: 'Inter';
-  src: url('./Inter-Bold.woff2') format('woff2');
-  font-weight: 700;
+  src: url('./Inter-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Inter SemiBold */
+@font-face {
+  font-family: 'Inter';
+  src: url('./Inter-SemiBold.woff2') format('woff2');
+  font-weight: 600;
   font-style: normal;
   font-display: swap;
 }
