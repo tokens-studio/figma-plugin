@@ -14,10 +14,10 @@ describe('without mixpanel env', () => {
     track('test', { data: 'foo' });
     identify({ userId: '123456', figmaId: 'figma-123', name: 'John Doe' });
     setUserData({ likes: 'Apples' });
-    expect(mockInit).not.toBeCalled();
-    expect(mockTrack).not.toBeCalled();
-    expect(mockIdentify).not.toBeCalled();
-    expect(mockPeopleSet).not.toBeCalled();
+    expect(mockInit).not.toHaveBeenCalled();
+    expect(mockTrack).not.toHaveBeenCalled();
+    expect(mockIdentify).not.toHaveBeenCalled();
+    expect(mockPeopleSet).not.toHaveBeenCalled();
   });
 });
 describe('with mixpanel env', () => {
@@ -28,17 +28,17 @@ describe('with mixpanel env', () => {
   describe('track', () => {
     it('should track when called', () => {
       track('test', { data: 'foo' });
-      expect(mockTrack).toBeCalledWith('test', { data: 'foo' });
+      expect(mockTrack).toHaveBeenCalledWith('test', { data: 'foo' });
     });
   });
   describe('identify', () => {
     it('should identify user', () => {
       identify({ userId: '123456', figmaId: 'figma-123', name: 'John Doe' });
-      expect(mockIdentify).toBeCalledWith('figma-123');
-      expect(mockPeopleSet).toBeCalledWith({
-        USER_ID: '123456',
-        FIGMA_USER_ID: 'figma-123',
-        NAME: 'John Doe',
+      // The expected hash for 'figma-123' with the current secret
+      expect(mockIdentify).toHaveBeenCalledWith('1244d333afb1ab6c245fa8a6047ae67e158eee7faf4f21cb7ff0928667432ee7');
+      expect(mockPeopleSet).toHaveBeenCalledWith({
+        USER_ID: '3d8ce42cd62e71dd507338d5f41c9005fbeda2ba0b9d3cf273bb26b79eaec6a7',
+        FIGMA_USER_ID: '1244d333afb1ab6c245fa8a6047ae67e158eee7faf4f21cb7ff0928667432ee7',
         version: pjs.version,
       });
     });
@@ -46,13 +46,13 @@ describe('with mixpanel env', () => {
   describe('setUserData', () => {
     it('should append user data', () => {
       setUserData({ likes: 'Apples' });
-      expect(mockPeopleSet).toBeCalledWith({ likes: 'Apples' });
+      expect(mockPeopleSet).toHaveBeenCalledWith({ likes: 'Apples' });
     });
   });
   describe('initializeAnalytics', () => {
     it('should initialize mixpanel', () => {
       initializeAnalytics();
-      expect(mockInit).toBeCalled();
+      expect(mockInit).toHaveBeenCalled();
     });
   });
 });
