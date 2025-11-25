@@ -1,4 +1,5 @@
 import 'regenerator-runtime/runtime';
+import './assets/fonts/fonts.css';
 import './assets/fonts/jetbrainsmono.css';
 import './styles/preflight.css';
 import '@/i18n';

@@ -39,6 +39,9 @@ module.exports = wrapper((env, argv) => {
     // This is necessary because Figma's 'eval' works differently than normal eval
     devtool: argv.mode === 'production' ? 'source-map' : 'inline-source-map',
 
+    // Disable persistent caching in development to avoid module resolution issues
+    cache: argv.mode === 'production' ? { type: 'memory' } : false,
+
     entry: {
       ui: './src/app/index.tsx', // The entry point for your UI code
       code: './src/plugin/controller.ts', // The entry point for your plugin code
