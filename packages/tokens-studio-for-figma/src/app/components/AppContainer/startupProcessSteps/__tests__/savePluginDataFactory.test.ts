@@ -14,7 +14,6 @@ describe('savePluginDataFactory', () => {
       user: {
         userId: 'figma:1234',
         figmaId: 'figma:1234',
-        name: 'Jan Six',
       },
       lastOpened: Date.now(),
       onboardingExplainer: {
@@ -36,7 +35,6 @@ describe('savePluginDataFactory', () => {
 
     const state = mockStore.getState();
     expect(state.userState.userId).toEqual(mockParams.user?.figmaId);
-    expect(state.userState.userName).toEqual(mockParams.user?.name);
     expect(state.uiState.lastOpened).toEqual(mockParams.lastOpened);
     expect(identifySpy).toBeCalledWith(mockParams.user);
   });
