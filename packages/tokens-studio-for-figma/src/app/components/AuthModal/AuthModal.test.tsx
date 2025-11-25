@@ -10,14 +10,6 @@ import { AuthContextProvider } from '@/context/AuthContext';
 // Hide log calls unless they are expected. This is mainly related to react-modal
 jest.spyOn(console, 'error').mockImplementation(() => {});
 
-jest.mock('launchdarkly-react-client-sdk', () => ({
-  LDProvider: (props: React.PropsWithChildren<unknown>) => props.children,
-  useLDClient: () => ({
-    identify: () => Promise.resolve(),
-  }),
-  useFlags: () => ({}),
-}));
-
 describe('Add license key', () => {
   beforeEach(() => {
     resetStore();

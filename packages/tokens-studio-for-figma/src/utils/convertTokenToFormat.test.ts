@@ -22,6 +22,34 @@ describe('convertTokenToFormat', () => {
       $description: 'Size for small text',
     });
   });
+
+  it('should include value field even when value is 0', () => {
+    const token = {
+      type: 'letterSpacing',
+      value: 0,
+    };
+
+    const result = convertTokenToFormat(token);
+
+    expect(result).toEqual({
+      $value: 0,
+      $type: 'letterSpacing',
+    });
+  });
+
+  it('should include value field even when value is empty string', () => {
+    const token = {
+      type: 'string',
+      value: '',
+    };
+
+    const result = convertTokenToFormat(token);
+
+    expect(result).toEqual({
+      $value: '',
+      $type: 'string',
+    });
+  });
 });
 
 describe('convertTokenToFormat', () => {

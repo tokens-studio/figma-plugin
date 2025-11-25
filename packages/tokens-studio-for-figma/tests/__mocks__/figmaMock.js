@@ -81,6 +81,7 @@ module.exports.mockGetLocalVariableCollectionsAsync = jest.fn();
 module.exports.mockCreateVariableCollection = jest.fn();
 module.exports.mockImportVariableByKeyAsync = jest.fn();
 module.exports.mockGetVariableById = jest.fn();
+module.exports.mockGetVariableByIdAsync = jest.fn(() => Promise.resolve(null));
 module.exports.mockGetVariableCollectionByIdAsync = jest.fn(() => Promise.resolve(null));
 module.exports.mockSetValueForMode = jest.fn();
 module.exports.mockSetBoundVariableForPaint = jest.fn();
@@ -124,6 +125,7 @@ module.exports.figma = {
     createVariableCollection: module.exports.mockCreateVariableCollection,
     importVariableByKeyAsync: module.exports.mockImportVariableByKeyAsync,
     getVariableById: module.exports.mockGetVariableById,
+    getVariableByIdAsync: module.exports.mockGetVariableByIdAsync,
     getVariableCollectionByIdAsync: module.exports.mockGetVariableCollectionByIdAsync,
     setValueForMode: module.exports.mockSetValueForMode,
     setBoundVariableForPaint: module.exports.mockSetBoundVariableForPaint

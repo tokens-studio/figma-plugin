@@ -24,7 +24,9 @@ export const backgroundJobTitles = {
   [BackgroundJobs.UI_REDOING]: 'Redoing action...',
   [BackgroundJobs.UI_UNDOING]: 'Undoing action...',
   [BackgroundJobs.UI_ATTACHING_LOCAL_STYLES]: 'Attaching local styles to theme...',
+  [BackgroundJobs.UI_PREPARING_VARIABLES]: 'Preparing variable collections...',
   [BackgroundJobs.UI_CREATEVARIABLES]: 'Creating variables...',
+  [BackgroundJobs.UI_LINK_VARIABLE_REFERENCES]: 'Updating aliases...',
   [BackgroundJobs.UI_CREATE_STYLES]: 'Creating styles...',
   [BackgroundJobs.UI_CREATE_LIVING_DOCUMENTATION]: 'Creating documentation...',
 };
@@ -42,11 +44,15 @@ export default function LoadingBar() {
   const expectedWaitTimeInSeconds = React.useMemo(() => (
     Math.round(expectedWaitTime / 1000)
   ), [expectedWaitTime]);
+    // Only delay showing the loading bar, hide immediately when jobs are cleared
   const shouldShow = useDelayedFlag(
     !(
       (!backgroundJobs.length || expectedWaitTime < 100)
-      && !hasInfiniteJobs
+        && !hasInfiniteJobs
     ),
+    200,
+    true,
+    false,
   );
   const completedTasks = React.useMemo(() => backgroundJobs.reduce((total, job) => (
     total + (job.completedTasks ?? 0)
