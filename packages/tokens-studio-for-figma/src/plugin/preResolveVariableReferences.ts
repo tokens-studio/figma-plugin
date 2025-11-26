@@ -34,6 +34,8 @@ export async function preResolveVariableReferences(
             variableIdsToResolve.add(variableRef);
           } else if (variableRef) {
             // Variable keys (for remote/library variables) don't start with VariableID:
+            // We don't validate the key format here since Figma's API will reject invalid keys gracefully
+            // and the exact format may vary across different Figma library configurations
             variableKeysToResolve.add(variableRef);
           }
         }
