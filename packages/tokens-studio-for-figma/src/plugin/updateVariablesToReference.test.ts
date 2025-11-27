@@ -153,4 +153,125 @@ describe('updateVariablesToReference', () => {
     // Verify empty result
     expect(result).toEqual([]);
   });
+
+  it('should fall back to finding variable by name when importVariableByKeyAsync fails for non-local library variables', async () => {
+    // Simulate scenario where a remote/library variable is already imported and available by name
+    // but importVariableByKeyAsync fails (e.g., library not properly enabled, permissions issue)
+    const collection1Id = 'coll1';
+    const libraryCollectionId = 'library-coll';
+
+    // Mock a variable from a published library that's already imported/available
+    const libraryVariable = {
+      name: 'library/colors/brand',
+      key: 'eae96b38ba5c7e98ce9dcd43c105e19ccff36d4d', // Real-world key format
+      id: 'VariableID:remote:123',
+      variableCollectionId: libraryCollectionId,
+    };
+
+    // Mock getVariablesWithoutZombies to return the library variable
+    // This simulates the variable being already imported and accessible in the consuming file
+    mockGetVariablesWithoutZombies.mockResolvedValue([
+      libraryVariable as any,
+    ]);
+
+    // Mock importVariableByKeyAsync to fail (simulating library not enabled or permission issue)
+    (figma.variables.importVariableByKeyAsync as jest.Mock).mockRejectedValue(
+      new Error('could not find variable with key "eae96b38ba5c7e98ce9dcd43c105e19ccff36d4d"'),
+    );
+
+    // Create a mock alias variable in the local collection that needs to reference the library variable
+    const mockAliasVariable = {
+      variableCollectionId: collection1Id,
+      setValueForMode: jest.fn(),
+    };
+
+    const referenceVariableCandidate: ReferenceVariableType = {
+      variable: mockAliasVariable as any,
+      modeId: 'mode1',
+      referenceVariable: 'library.colors.brand', // Normalized name matching the library variable
+    };
+
+    // Global map with the library variable's key
+    const figmaVariables = new Map([
+      ['library.colors.brand', 'eae96b38ba5c7e98ce9dcd43c105e19ccff36d4d'],
+    ]);
+
+    // Call the function
+    const result = await updateVariablesToReference(figmaVariables, [referenceVariableCandidate]);
+
+    // Verify that importVariableByKeyAsync was attempted
+    expect(figma.variables.importVariableByKeyAsync).toHaveBeenCalledWith('eae96b38ba5c7e98ce9dcd43c105e19ccff36d4d');
+
+    // Verify that setValueForMode was called with the fallback variable found by name
+    expect(mockAliasVariable.setValueForMode).toHaveBeenCalledWith('mode1', {
+      type: 'VARIABLE_ALIAS',
+      id: 'VariableID:remote:123', // Using the library variable's ID
+    });
+
+    // Verify the variable was successfully updated
+    expect(result).toHaveLength(1);
+    expect(result[0]).toBe(mockAliasVariable);
+  });
+
+  it('should successfully import and reference non-local library variables when import succeeds', async () => {
+    // Test the successful path for remote/library variables
+    const collection1Id = 'coll1';
+    const libraryCollectionId = 'library-coll';
+
+    // Mock a variable from a published library
+    const libraryVariableByName = {
+      name: 'library/colors/accent',
+      key: 'abc123def456',
+      variableCollectionId: libraryCollectionId,
+    };
+
+    // Mock the imported variable (what importVariableByKeyAsync returns)
+    const importedLibraryVariable = {
+      id: 'VariableID:remote:456',
+      name: 'library/colors/accent',
+      key: 'abc123def456',
+      variableCollectionId: libraryCollectionId,
+    };
+
+    // Mock getVariablesWithoutZombies to return the library variable
+    mockGetVariablesWithoutZombies.mockResolvedValue([
+      libraryVariableByName as any,
+    ]);
+
+    // Mock importVariableByKeyAsync to succeed
+    (figma.variables.importVariableByKeyAsync as jest.Mock).mockResolvedValue(importedLibraryVariable);
+
+    // Create a mock alias variable that needs to reference the library variable
+    const mockAliasVariable = {
+      variableCollectionId: collection1Id,
+      setValueForMode: jest.fn(),
+    };
+
+    const referenceVariableCandidate: ReferenceVariableType = {
+      variable: mockAliasVariable as any,
+      modeId: 'mode1',
+      referenceVariable: 'library.colors.accent',
+    };
+
+    // Global map with the library variable's key
+    const figmaVariables = new Map([
+      ['library.colors.accent', 'abc123def456'],
+    ]);
+
+    // Call the function
+    const result = await updateVariablesToReference(figmaVariables, [referenceVariableCandidate]);
+
+    // Verify that importVariableByKeyAsync was called
+    expect(figma.variables.importVariableByKeyAsync).toHaveBeenCalledWith('abc123def456');
+
+    // Verify that setValueForMode was called with the imported variable
+    expect(mockAliasVariable.setValueForMode).toHaveBeenCalledWith('mode1', {
+      type: 'VARIABLE_ALIAS',
+      id: 'VariableID:remote:456',
+    });
+
+    // Verify the variable was successfully updated
+    expect(result).toHaveLength(1);
+    expect(result[0]).toBe(mockAliasVariable);
+  });
 });
