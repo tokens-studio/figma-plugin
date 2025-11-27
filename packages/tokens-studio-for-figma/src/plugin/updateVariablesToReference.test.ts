@@ -159,11 +159,12 @@ describe('updateVariablesToReference', () => {
     // but importVariableByKeyAsync fails (e.g., library not properly enabled, permissions issue)
     const collection1Id = 'coll1';
     const libraryCollectionId = 'library-coll';
+    const libraryVariableKey = 'eae96b38ba5c7e98ce9dcd43c105e19ccff36d4d'; // Sample library variable key (hash format)
 
     // Mock a variable from a published library that's already imported/available
     const libraryVariable = {
       name: 'library/colors/brand',
-      key: 'eae96b38ba5c7e98ce9dcd43c105e19ccff36d4d', // Real-world key format
+      key: libraryVariableKey,
       id: 'VariableID:remote:123',
       variableCollectionId: libraryCollectionId,
     };
@@ -176,7 +177,7 @@ describe('updateVariablesToReference', () => {
 
     // Mock importVariableByKeyAsync to fail (simulating library not enabled or permission issue)
     (figma.variables.importVariableByKeyAsync as jest.Mock).mockRejectedValue(
-      new Error('could not find variable with key "eae96b38ba5c7e98ce9dcd43c105e19ccff36d4d"'),
+      new Error(`could not find variable with key "${libraryVariableKey}"`),
     );
 
     // Create a mock alias variable in the local collection that needs to reference the library variable
@@ -193,14 +194,14 @@ describe('updateVariablesToReference', () => {
 
     // Global map with the library variable's key
     const figmaVariables = new Map([
-      ['library.colors.brand', 'eae96b38ba5c7e98ce9dcd43c105e19ccff36d4d'],
+      ['library.colors.brand', libraryVariableKey],
     ]);
 
     // Call the function
     const result = await updateVariablesToReference(figmaVariables, [referenceVariableCandidate]);
 
     // Verify that importVariableByKeyAsync was attempted
-    expect(figma.variables.importVariableByKeyAsync).toHaveBeenCalledWith('eae96b38ba5c7e98ce9dcd43c105e19ccff36d4d');
+    expect(figma.variables.importVariableByKeyAsync).toHaveBeenCalledWith(libraryVariableKey);
 
     // Verify that setValueForMode was called with the fallback variable found by name
     expect(mockAliasVariable.setValueForMode).toHaveBeenCalledWith('mode1', {
