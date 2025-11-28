@@ -10,7 +10,7 @@ import { getVariablesWithoutZombies } from './getVariablesWithoutZombies';
 // Remote/library variables may fail to import during pre-resolution (in preResolveVariableReferences)
 // but can successfully import later when actually setting references (in updateVariablesToReference).
 // The Figma API behavior differs between these contexts, so we defer validation to the actual usage point.
-export async function mergeVariableReferencesWithLocalVariables(themes: ThemeObject[] = [], allThemes: ThemeObject[] = [], _validatedVariableCache?: Map<string, Variable>): Promise<Map<string, string>> {
+export async function mergeVariableReferencesWithLocalVariables(themes: ThemeObject[] = [], allThemes: ThemeObject[] = []): Promise<Map<string, string>> {
   const localVariables = await getVariablesWithoutZombies();
 
   const variables = new Map();

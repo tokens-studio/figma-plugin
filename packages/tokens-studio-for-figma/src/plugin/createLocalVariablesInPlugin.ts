@@ -124,7 +124,7 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
       }
     }
     // Gather references that we should use. Merge current theme references with the ones from all themes as well as local variables
-    const existingVariables = await mergeVariableReferencesWithLocalVariables(selectedThemeObjects, themeInfo.themes, validatedVariableCache);
+    const existingVariables = await mergeVariableReferencesWithLocalVariables(selectedThemeObjects, themeInfo.themes);
 
     // Complete the variable creation job before starting reference updates
     if (totalVariableTokens > 10) {

@@ -137,7 +137,7 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
       }
     }
 
-    const existingVariables = await mergeVariableReferencesWithLocalVariables([], themesToCreateCollections, validatedVariableCache);
+    const existingVariables = await mergeVariableReferencesWithLocalVariables([], themesToCreateCollections);
 
     // Complete the variable creation job before starting reference updates
     if (totalVariableTokens > 10) {
