@@ -56,8 +56,6 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
 
     const selectedSetIds = selectedSets.map((set) => set.set);
 
-    // Pre-resolve all variable references from themes to avoid bricking existing references
-
     const collections = await createNecessaryVariableCollections(themesToCreateCollections, selectedSetIds);
 
     // Compute overallConfig once from all selected sets

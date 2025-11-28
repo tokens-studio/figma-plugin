@@ -6,10 +6,9 @@ import { getVariablesWithoutZombies } from './getVariablesWithoutZombies';
 // This is why we also pass in allThemes and merge them together. This is naive because it might be that the reference required is not the "first to detect".
 // We need to refactor this probably. Themes should be able to strictly specify which other theme the references are coming from, like we do for token sets.
 //
-// IMPORTANT: We include ALL variable references regardless of pre-resolution validation status.
-// Remote/library variables may fail to import during pre-resolution (in preResolveVariableReferences)
-// but can successfully import later when actually setting references (in updateVariablesToReference).
-// The Figma API behavior differs between these contexts, so we defer validation to the actual usage point.
+// IMPORTANT: We include ALL variable references from themes without filtering.
+// Remote/library variables may not be immediately importable, but updateVariablesToReference
+// will attempt to import them and fall back to finding them by name if import fails.
 export async function mergeVariableReferencesWithLocalVariables(themes: ThemeObject[] = [], allThemes: ThemeObject[] = []): Promise<Map<string, string>> {
   const localVariables = await getVariablesWithoutZombies();
 

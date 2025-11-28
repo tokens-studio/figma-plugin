@@ -56,9 +56,6 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
       },
     });
 
-    // Pre-resolve all variable references from themes to avoid bricking existing references
-    // Only references that can be successfully resolved will be used during variable creation
-
     const overallConfig = getOverallConfig(themeInfo.themes, selectedThemes);
     const collections = await createNecessaryVariableCollections(themeInfo.themes, selectedThemes);
 
