@@ -13,7 +13,6 @@ import ConfirmDialog from '../ConfirmDialog';
 import WindowResizer from '../WindowResizer';
 import ImportedTokensDialog from '../ImportedTokensDialog';
 import PushDialog from '../PushDialog';
-import Changelog from '../Changelog';
 import OnboardingFlow from '../OnboardingFlow';
 import { Initiator } from '../Initiator';
 import { globalStyles } from '../globalStyles';
@@ -103,7 +102,6 @@ export const AppContainer = (params: Props) => {
       }
       <WindowResizer />
       <OnboardingFlow />
-      <Changelog />
       <SecondScreenSync />
       <AuthModal />
       <BitbucketMigrationDialog />
