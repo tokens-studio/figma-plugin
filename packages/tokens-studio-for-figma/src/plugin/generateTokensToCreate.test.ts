@@ -31,9 +31,9 @@ describe('generateTokensToCreate', () => {
   };
 
   it('returns the correct tokens for enabled sets', () => {
-    const result = generateTokensToCreate({ theme, tokens });
+    const { tokensToCreate } = generateTokensToCreate({ theme, tokens });
 
-    expect(result).toEqual([
+    expect(tokensToCreate).toEqual([
       {
         name: 'primary.red',
         value: '#ff0000',
@@ -56,8 +56,8 @@ describe('generateTokensToCreate', () => {
       ],
     };
 
-    const result = generateTokensToCreate({ theme, tokens: tokensWithInvalidType });
+    const { tokensToCreate } = generateTokensToCreate({ theme, tokens: tokensWithInvalidType });
 
-    expect(result).toEqual([]);
+    expect(tokensToCreate).toEqual([]);
   });
 });

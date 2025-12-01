@@ -8,10 +8,6 @@ import {
 import Navbar from '../Navbar';
 
 describe('Navbar', () => {
-  beforeAll(() => {
-    process.env.LAUNCHDARKLY_FLAGS = 'tokenFlowButton';
-  });
-
   it('should work', async () => {
     const mockStore = createMockStore({});
     const result = render(

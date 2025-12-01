@@ -7906,7 +7906,7 @@ balanced-match@^1.0.0:
   resolved "https://registry.npmjs.org/balanced-match/-/balanced-match-1.0.2.tgz"
   integrity sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==
 
-base64-js@^1.0.2, base64-js@^1.3.0, base64-js@^1.3.1:
+base64-js@^1.0.2, base64-js@^1.3.1:
   version "1.5.1"
   resolved "https://registry.npmjs.org/base64-js/-/base64-js-1.5.1.tgz"
   integrity sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==
@@ -15310,32 +15310,6 @@ latest-version@^3.0.0:
   dependencies:
     package-json "^4.0.0"
 
-launchdarkly-js-client-sdk@2.24.2, launchdarkly-js-client-sdk@^2.24.2:
-  version "2.24.2"
-  resolved "https://registry.yarnpkg.com/launchdarkly-js-client-sdk/-/launchdarkly-js-client-sdk-2.24.2.tgz#8a8a206d8ea22f1bfbc2906e0615115c6e075798"
-  integrity sha512-8jrLOia0vfZ4stqQRv9TjAYfRGK2JyWpLIL6PbTl99LqTtJMuYtryFUQp0b8WH1153YN+gVdoqPVI7uwbbzLLQ==
-  dependencies:
-    escape-string-regexp "^4.0.0"
-    launchdarkly-js-sdk-common "3.8.2"
-
-launchdarkly-js-sdk-common@3.8.2:
-  version "3.8.2"
-  resolved "https://registry.yarnpkg.com/launchdarkly-js-sdk-common/-/launchdarkly-js-sdk-common-3.8.2.tgz#38838f1c4e30cb07b4827de6f2928ab3530ea7c6"
-  integrity sha512-pEqZ3FTKtYrTaPdbPntFJs87svzcezrkoRWY2GEFmyPC33txOqU788x0yby2+haC/saFPNfXpH6bbiJE/GjMSA==
-  dependencies:
-    base64-js "^1.3.0"
-    fast-deep-equal "^2.0.1"
-    uuid "^3.3.2"
-
-launchdarkly-react-client-sdk@^2.28.0:
-  version "2.29.4"
-  resolved "https://registry.yarnpkg.com/launchdarkly-react-client-sdk/-/launchdarkly-react-client-sdk-2.29.4.tgz#7c1bb9c3db5d1df55688d801eed2e7c56f173526"
-  integrity sha512-f0vcrn/PtZl6DC0r2qQwwXg0JY/bkrFahijOfeB9RJY/gEgSAmO/eNmTGEyjKEGdc9SwzVmRzwS6i8OXs8np/w==
-  dependencies:
-    hoist-non-react-statics "^3.3.2"
-    launchdarkly-js-client-sdk "2.24.2"
-    lodash.camelcase "^4.3.0"
-
 lazy-ass@^1.6.0:
   version "1.6.0"
   resolved "https://registry.npmjs.org/lazy-ass/-/lazy-ass-1.6.0.tgz"
@@ -15540,11 +15514,6 @@ locate-path@^6.0.0:
   integrity sha512-iPZK6eYjbxRu3uB4/WZ3EsEIMJFMqAoopl3R+zuq0UjcAm/MO6KCweDgPfP3elTztoKP3KtnVHxTn2NHBSDVUw==
   dependencies:
     p-locate "^5.0.0"
-
-lodash.camelcase@^4.3.0:
-  version "4.3.0"
-  resolved "https://registry.npmjs.org/lodash.camelcase/-/lodash.camelcase-4.3.0.tgz"
-  integrity sha512-TwuEnCnxbc3rAvhf/LbG7tJUDzhqXyFnv3dtzLOPgCG/hODL7WFnsbwktkD7yUV0RrreP/l1PALq/YSg6VvjlA==
 
 lodash.clonedeep@^4.5.0:
   version "4.5.0"

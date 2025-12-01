@@ -20,14 +20,6 @@ import { addLicenseKey } from '@/utils/addLicenseKey';
 // Hide log calls unless they are expected. This is mainly related to react-modal
 jest.spyOn(console, 'error').mockImplementation(() => { });
 
-jest.mock('launchdarkly-react-client-sdk', () => ({
-  LDProvider: (props: React.PropsWithChildren<unknown>) => props.children,
-  useLDClient: () => ({
-    identify: () => Promise.resolve(),
-  }),
-  useFlags: () => ({}),
-}));
-
 function setup(jsx: JSX.Element) {
   return {
     user: userEvent.setup(),
