@@ -61,6 +61,15 @@ export default async function updateVariablesToReference(figmaVariables: Map<str
           }
         } catch (e) {
           console.log('error importing variable', e);
+
+          // Fallback: If import fails, try to find by name in candidate variables
+          // This handles cases where remote library variables are already imported but
+          // can't be re-imported via key (e.g., library not enabled, permissions issues)
+          if (candidateVariables.length > 0) {
+            // Try to use the first available variable with this name as a fallback
+            [variable] = candidateVariables;
+            console.log(`Using fallback variable by name: ${variable.name} (id: ${variable.id})`);
+          }
         }
       }
 
