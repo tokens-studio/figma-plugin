@@ -16,6 +16,7 @@ type WindowSettingsType = {
   width: number;
   height: number;
   isMinimized: boolean;
+  seenGenericVersionedHeaderMigrationDialog?: boolean;
 };
 
 type TokenModeType = 'object' | 'array';
@@ -70,6 +71,7 @@ export const settings = createModel<RootModel>()({
       width: 400,
       height: 600,
       isMinimized: false,
+      seenGenericVersionedHeaderMigrationDialog: false,
     },
     language: 'en',
     sessionRecording: false,
@@ -233,6 +235,17 @@ export const settings = createModel<RootModel>()({
       return {
         ...state,
         shouldSwapFigmaModes: payload,
+      };
+    },
+    setSeenGenericVersionedHeaderMigrationDialog(state, payload: boolean) {
+      return {
+        ...state,
+        uiWindow: {
+          width: state.uiWindow?.width ?? 400,
+          height: state.uiWindow?.height ?? 600,
+          isMinimized: state.uiWindow?.isMinimized ?? false,
+          seenGenericVersionedHeaderMigrationDialog: payload,
+        },
       };
     },
   },
