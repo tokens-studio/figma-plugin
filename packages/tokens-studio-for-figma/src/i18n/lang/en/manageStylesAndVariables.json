@@ -2,6 +2,10 @@
 "modalTitle": "Export to Figma",
 "buttonLabel": "Styles and Variables",
 "optionsModalTitle": "Export to Figma: Options",
+"searchThemes": "Search themes",
+"searchSets": "Search sets",
+"noThemesFound": "No themes found",
+"noSetsFound": "No sets found",
 "actions": {
   "export": "Export to Figma",
   "import": "Import from Figma",

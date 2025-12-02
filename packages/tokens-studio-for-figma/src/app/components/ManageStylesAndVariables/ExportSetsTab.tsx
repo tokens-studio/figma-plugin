@@ -1,8 +1,8 @@
 import { FileDirectoryIcon } from '@primer/octicons-react';
 import {
-  Tabs, Stack, Heading, Button,
+  Tabs, Stack, Heading, Button, Box,
 } from '@tokens-studio/ui';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import { useDispatch, useSelector, useStore } from 'react-redux';
 import { useForm, Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -23,6 +23,7 @@ import { TokenSetThemeItem } from '../ManageThemesModal/TokenSetThemeItem';
 import { FormValues } from '../ManageThemesModal/CreateOrEditThemeForm';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { ExportTokenSet } from '@/types/ExportTokenSet';
+import { SearchInputWithToggle } from '../SearchInputWithToggle';
 
 export default function ExportSetsTab({ selectedSets, setSelectedSets }: { selectedSets: ExportTokenSet[], setSelectedSets: (sets: ExportTokenSet[]) => void }) {
   const dispatch = useDispatch<Dispatch>();
@@ -49,6 +50,19 @@ export default function ExportSetsTab({ selectedSets, setSelectedSets }: { selec
 
   const [showChangeSets, setShowChangeSets] = React.useState(false);
   const [previousSetSelection, setPreviousSetSelection] = React.useState({});
+  const [isSearchActive, setIsSearchActive] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const handleToggleSearch = useCallback(() => {
+    setIsSearchActive(!isSearchActive);
+    if (isSearchActive) {
+      setSearchTerm('');
+    }
+  }, [isSearchActive]);
+
+  const handleSearchTermChange = useCallback((term: string) => {
+    setSearchTerm(term);
+  }, []);
 
   const allSets = useSelector(allTokenSetsSelector);
 
@@ -56,13 +70,55 @@ export default function ExportSetsTab({ selectedSets, setSelectedSets }: { selec
 
   const setsTree = React.useMemo(() => tokenSetListToTree(availableTokenSets), [availableTokenSets]);
 
+  const filteredSetsTree = useMemo(() => {
+    if (!searchTerm || !isSearchActive) {
+      return setsTree;
+    }
+
+    const lowerSearchTerm = searchTerm.toLowerCase();
+    const matchingItems = new Set<string>();
+
+    // First pass: find all items that match the search term
+    setsTree.forEach((item) => {
+      if (item.label.toLowerCase().includes(lowerSearchTerm)) {
+        matchingItems.add(item.path);
+
+        // Add all parent paths
+        let currentParentPath = item.parent;
+        while (currentParentPath && currentParentPath !== '') {
+          matchingItems.add(currentParentPath);
+          const pathToFind = currentParentPath;
+          const parentItem = setsTree.find((i) => i.path === pathToFind);
+          currentParentPath = parentItem?.parent || null;
+        }
+      }
+    });
+
+    // Second pass: include children of matching folders
+    setsTree.forEach((item) => {
+      if (!item.isLeaf && matchingItems.has(item.path)) {
+        setsTree.forEach((child) => {
+          if (child.path.startsWith(`${item.path}/`)) {
+            matchingItems.add(child.path);
+          }
+        });
+      }
+    });
+
+    return setsTree.filter((item) => matchingItems.has(item.path));
+  }, [setsTree, searchTerm, isSearchActive]);
+
   const handleCancelChangeSets = React.useCallback(() => {
     reset(previousSetSelection);
     setShowChangeSets(false);
+    setIsSearchActive(false);
+    setSearchTerm('');
   }, [previousSetSelection, reset]);
 
   const handleSaveChangeSets = React.useCallback(() => {
     setShowChangeSets(false);
+    setIsSearchActive(false);
+    setSearchTerm('');
   }, []);
 
   const handleShowChangeSets = React.useCallback(() => {
@@ -161,9 +217,20 @@ export default function ExportSetsTab({ selectedSets, setSelectedSets }: { selec
           </Stack>
           )}
       >
-        <Heading>
-          {t('exportSetsTab.changeSetsHeading')}
-        </Heading>
+        <Stack direction="row" justify="between" align="center" css={{ width: '100%' }}>
+          <Heading>
+            {t('exportSetsTab.changeSetsHeading')}
+          </Heading>
+          <SearchInputWithToggle
+            isSearchActive={isSearchActive}
+            searchTerm={searchTerm}
+            onToggleSearch={handleToggleSearch}
+            onSearchTermChange={handleSearchTermChange}
+            placeholder={t('searchSets')}
+            tooltip={t('searchSets')}
+            autofocus
+          />
+        </Stack>
         {/* Commenting until we have docs <Link target="_blank" href={docsLinks.sets}>{`${t('generic.learnMore')} – ${t('docs.referenceOnlyMode')}`}</Link> */}
         <Stack
           direction="column"
@@ -172,7 +239,13 @@ export default function ExportSetsTab({ selectedSets, setSelectedSets }: { selec
             marginBlockStart: '$4',
           }}
         >
-          <TokenSetTreeContent items={setsTree} renderItemContent={TokenSetThemeItemInput} keyPosition="end" />
+          {filteredSetsTree.length === 0 && isSearchActive && searchTerm ? (
+            <Box css={{ padding: '$4', textAlign: 'center', color: '$fgMuted' }}>
+              {t('noSetsFound')}
+            </Box>
+          ) : (
+            <TokenSetTreeContent items={filteredSetsTree} renderItemContent={TokenSetThemeItemInput} keyPosition="end" />
+          )}
         </Stack>
       </Modal>
     </Tabs.Content>
