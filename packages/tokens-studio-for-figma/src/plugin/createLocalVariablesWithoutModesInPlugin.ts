@@ -18,7 +18,6 @@ import { getVariablesWithoutZombies } from './getVariablesWithoutZombies';
 import { generateTokensToCreate } from './generateTokensToCreate';
 import checkIfTokenCanCreateVariable from '@/utils/checkIfTokenCanCreateVariable';
 import { ProgressTracker } from './ProgressTracker';
-import { preResolveVariableReferences } from './preResolveVariableReferences';
 
 /**
 * This function is used to create variables based on token sets, without the use of themes
@@ -56,9 +55,6 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
     }, [] as ThemeObject[]);
 
     const selectedSetIds = selectedSets.map((set) => set.set);
-
-    // Pre-resolve all variable references from themes to avoid bricking existing references
-    const validatedVariableCache = await preResolveVariableReferences(themesToCreateCollections);
 
     const collections = await createNecessaryVariableCollections(themesToCreateCollections, selectedSetIds);
 
@@ -137,7 +133,7 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
       }
     }
 
-    const existingVariables = await mergeVariableReferencesWithLocalVariables([], themesToCreateCollections, validatedVariableCache);
+    const existingVariables = await mergeVariableReferencesWithLocalVariables([], themesToCreateCollections);
 
     // Complete the variable creation job before starting reference updates
     if (totalVariableTokens > 10) {

@@ -153,18 +153,9 @@ describe('formatTokens', () => {
                   },
                 },
                 alias: {
-                  fontFamily: {
-                    $value: 'Inter',
-                    $type: 'fontFamilies',
-                  },
-                  fontWeight: {
-                    $value: 'Bold',
-                    $type: 'fontWeights',
-                  },
-                  fontSize: {
-                    $value: 36,
-                    $type: 'fontSizes',
-                  },
+                  $value: '{typography.heading.h1}',
+                  $type: 'typography',
+                  $description: 'Use for headings',
                 },
                 non_resolved: {
                   $value: '{typography.heading.new}',
@@ -289,32 +280,8 @@ describe('formatTokens', () => {
                 },
               },
               alias: {
-                0: {
-                  type: {
-                    $value: 'dropShadow',
-                    $type: 'type',
-                  },
-                  color: {
-                    $value: 'rgba({colors.red.500}, 0.5)',
-                    $type: 'color',
-                  },
-                  x: {
-                    $value: 0,
-                    $type: 'x',
-                  },
-                  y: {
-                    $value: 0,
-                    $type: 'y',
-                  },
-                  blur: {
-                    $value: 2,
-                    $type: 'blur',
-                  },
-                  spread: {
-                    $value: 4,
-                    $type: 'spread',
-                  },
-                },
+                $value: '{shadows.md}',
+                $type: TokenTypes.BOX_SHADOW,
               },
             },
           },
