@@ -68,7 +68,9 @@
     "introPro": "Las combinaciones de conjuntos de tokens crean temas. Usa Temas para crear múltiples colecciones de variables o estilos para cambiar fácilmente entre conceptos de diseño como modos de color claro u oscuro, múltiples marcas, productos o plataformas. O cambia a Conjuntos para exportar sin usar Temas",
     "introBasic": "Las combinaciones de conjuntos de tokens crean temas. Usa Temas para crear múltiples colecciones de variables o estilos para cambiar fácilmente entre conceptos de diseño como modos de color claro u oscuro, múltiples marcas, productos o plataformas.",
     "confirmThemes": "Confirmar Temas",
-    "combinationsOfSetsMakeThemes": "Las combinaciones de conjuntos de tokens crean temas"
+    "combinationsOfSetsMakeThemes": "Las combinaciones de conjuntos de tokens crean temas",
+    "otherThemesSelected_one": "{{count}} otro tema seleccionado",
+    "otherThemesSelected_other": "{{count}} otros temas seleccionados"
   },
   "exportSetsTab": {
     "changeSetsHeading": "Los conjuntos habilitados se exportarán a Figma",
