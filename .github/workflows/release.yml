@@ -32,21 +32,6 @@ jobs:
         name: ${{ inputs.environment }}
     runs-on: ubuntu-22.04
     steps:
-      # Pull secrets from vault
-      - name: Import Secrets
-        id: secrets
-        uses: hashicorp/vault-action@v2
-        with:
-          url: ${{ vars.VAULT_URL }}
-          role: ${{ vars.VAULT_ROLE }}_${{ inputs.environment  }}
-          method: jwt
-          namespace: admin
-          secrets: |
-            ${{ vars.VAULT_PATH }} MIXPANEL_ACCESS_TOKEN | MIXPANEL_ACCESS_TOKEN;
-            ${{ vars.VAULT_PATH }} STORYBLOK_ACCESS_TOKEN | STORYBLOK_ACCESS_TOKEN;
-            ${{ vars.VAULT_PATH }} SUPABASE_ANON_KEY | SUPABASE_ANON_KEY;
-            ${{ vars.VAULT_PATH }} SENTRY_AUTH_TOKEN | SENTRY_AUTH_TOKEN;    
-            ${{ vars.VAULT_PATH }} TOKENS_STUDIO_API_HOST | TOKENS_STUDIO_API_HOST;
       - name: Checkout
         uses: actions/checkout@v3
       - name: Setup Node.js environment
