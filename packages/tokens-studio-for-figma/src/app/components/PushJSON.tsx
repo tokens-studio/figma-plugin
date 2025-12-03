@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import Stack from './Stack';
 import ChangeStateListingHeading from './ChangeStateListingHeading';
 import { storeTokenIdInJsonEditorSelector, themesListSelector, tokensSelector } from '@/selectors';
+import { groupMetadataSelector } from '@/app/store/selectors/groupMetadataSelector';
 import stringifyTokens from '@/utils/stringifyTokens';
 import { styled } from '@/stitches.config';
 
@@ -16,6 +17,7 @@ function PushJSON() {
   const tokens = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
   const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
+  const groupMetadata = useSelector(groupMetadataSelector);
   const [collapsed, setCollapsed] = React.useState(false);
   const [collapsedChangedStateList, setCollapsedChangedStateList] = React.useState<Array<string>>([]);
 
@@ -48,7 +50,7 @@ function PushJSON() {
             <ChangeStateListingHeading onCollapse={handleSetIntCollapsed} set={tokenSet} label={tokenSet} isCollapsed={collapsedChangedStateList.includes(tokenSet)} />
             {!collapsedChangedStateList.includes(tokenSet) && tokenList && (
             <StyledJSONContent>
-              {stringifyTokens(tokens, tokenSet, storeTokenIdInJsonEditor)}
+              {stringifyTokens(tokens, tokenSet, storeTokenIdInJsonEditor, groupMetadata)}
             </StyledJSONContent>
             )}
           </>
