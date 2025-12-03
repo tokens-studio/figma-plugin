@@ -32,6 +32,7 @@
   "storeTokenId": "Bewaar ID's op opslag",
   "storeTokenIdExplanation": "Genereer automatisch unieke ID's voor uw tokens voor tracking.",
   "secondScreenExplainer": "Versterk uw ontwerpworkflow, zodat u uw ontwerptokens in een tweede scherm kunt beheren.",
+  "secondScreenDeprecationNotice": "Second Screen wordt op 31 december afgesloten. We raden aan om over te stappen naar Studio voor een betere ervaring.",
   "language": "Taal",
   "languageExplainer": "Tokens Studio is automatisch vertaald, daarom kunnen vertalingen onnauwkeurig lijken.\n Zie je je taal niet? Dien een functieverzoek in",
   "liveSyncActive": "Live synchronisatie actief",
