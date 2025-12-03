@@ -218,9 +218,11 @@ export default function ExportSetsTab({ selectedSets, setSelectedSets }: { selec
           )}
       >
         <Stack direction="row" justify="between" align="center" css={{ width: '100%' }}>
-          <Heading>
-            {t('exportSetsTab.changeSetsHeading')}
-          </Heading>
+          {!isSearchActive && (
+            <Heading>
+              {t('exportSetsTab.changeSetsHeading')}
+            </Heading>
+          )}
           <SearchInputWithToggle
             isSearchActive={isSearchActive}
             searchTerm={searchTerm}

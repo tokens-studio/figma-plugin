@@ -52,6 +52,14 @@ export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: {
 
   const ungroupedThemes = React.useMemo(() => filteredThemes.filter((theme) => !theme.group), [filteredThemes]);
 
+  const excludedSelectedThemesCount = useMemo(() => {
+    if (!isSearchActive || !searchTerm) {
+      return 0;
+    }
+    const filteredThemeIds = new Set(filteredThemes.map((theme) => theme.id));
+    return selectedThemes.filter((themeId) => !filteredThemeIds.has(themeId)).length;
+  }, [selectedThemes, filteredThemes, isSearchActive, searchTerm]);
+
   const handleSelectTheme = React.useCallback((themeId: string) => {
     if (selectedThemes.includes(themeId)) {
       setSelectedThemes(selectedThemes.filter((id) => id !== themeId));
@@ -135,7 +143,9 @@ export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: {
         <StyledCard>
           <Stack direction="column" align="start" gap={4}>
             <Stack direction="row" justify="between" align="center" css={{ width: '100%' }}>
-              <Heading>{t('exportThemesTab.confirmThemes')}</Heading>
+              {!isSearchActive && (
+                <Heading>{t('exportThemesTab.confirmThemes')}</Heading>
+              )}
               <SearchInputWithToggle
                 isSearchActive={isSearchActive}
                 searchTerm={searchTerm}
@@ -173,6 +183,11 @@ export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: {
                 </>
               )}
             </Stack>
+            {excludedSelectedThemesCount > 0 && isSearchActive && (
+              <Box css={{ color: '$fgMuted' }}>
+                {t('exportThemesTab.otherThemesSelected', { count: excludedSelectedThemesCount })}
+              </Box>
+            )}
           </Stack>
 
         </StyledCard>
