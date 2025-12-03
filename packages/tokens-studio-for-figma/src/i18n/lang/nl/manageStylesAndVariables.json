@@ -68,7 +68,9 @@
     "introPro": "Combinaties van token sets creëren thema's. Gebruik Thema's om meerdere verzamelingen van variabelen of stijlen te maken voor eenvoudig schakelen tussen ontwerpconcepten zoals lichte of donkere kleurmodi, meerdere merken, producten of platforms. Of schakel over naar Sets om te exporteren zonder gebruik te maken van Thema's",
     "introBasic": "Combinaties van token sets creëren thema's. Gebruik Thema's om meerdere verzamelingen van variabelen of stijlen te maken voor eenvoudig schakelen tussen ontwerpconcepten zoals lichte of donkere kleurmodi, meerdere merken, producten of platforms.",
     "confirmThemes": "Thema's bevestigen",
-    "combinationsOfSetsMakeThemes": "Combinaties van token sets creëren thema's"
+    "combinationsOfSetsMakeThemes": "Combinaties van token sets creëren thema's",
+    "otherThemesSelected_one": "{{count}} ander thema geselecteerd",
+    "otherThemesSelected_other": "{{count}} andere thema's geselecteerd"
   },
   "exportSetsTab": {
     "changeSetsHeading": "Ingeschakelde sets worden geëxporteerd naar Figma",
