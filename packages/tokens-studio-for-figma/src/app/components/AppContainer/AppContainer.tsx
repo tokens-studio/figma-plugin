@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import App from '../App';
 import FigmaLoading from '../FigmaLoading';
 import { AsyncMessageTypes, StartupMessage } from '@/types/AsyncMessages';
@@ -24,6 +24,23 @@ import { useFigmaTheme } from '@/hooks/useFigmaTheme';
 import Box from '../Box';
 import { darkThemeMode, lightThemeMode } from '@/stitches.config';
 import BitbucketMigrationDialog from '../BitbucketMigrationDialog';
+import GenericVersionedHeaderMigrationDialog from '../GenericVersionedHeaderMigrationDialog';
+import { StorageProviderType } from '@/constants/StorageProviderType';
+
+function useShowGenericVersionedHeaderMigrationDialog(apiProviders: any[], seenFlag: boolean, setSeenFlag: (v: boolean) => void) {
+  const [open, setOpen] = React.useState(false);
+  useEffect(() => {
+    const hasGeneric = apiProviders?.some((p) => p?.provider === StorageProviderType.GENERIC_VERSIONED_STORAGE);
+    if (!seenFlag && hasGeneric) {
+      setOpen(true);
+    }
+  }, [apiProviders, seenFlag]);
+  const handleClose = useCallback(() => {
+    setSeenFlag(true);
+    setOpen(false);
+  }, [setSeenFlag]);
+  return { open, handleClose };
+}
 
 type Props = StartupMessage & {
   // @README only for unit testing purposes
@@ -84,6 +101,14 @@ export const AppContainer = (params: Props) => {
 
   globalStyles();
 
+  // Get apiProviders from Redux (uiState) using useSelector
+  const apiProviders = useSelector((state: any) => state.uiState?.apiProviders || []);
+  const seenMigrationDialog = useSelector((state: any) => state.settings?.uiWindow?.seenGenericVersionedHeaderMigrationDialog ?? false);
+  const setSeenMigrationDialog = useCallback((flag: boolean) => {
+    dispatch.settings.setSeenGenericVersionedHeaderMigrationDialog(flag);
+  }, [dispatch]);
+  const { open: showMigrationDialog, handleClose: handleMigrationDialogClose } = useShowGenericVersionedHeaderMigrationDialog(apiProviders, seenMigrationDialog, setSeenMigrationDialog);
+
   const appContent = (
     <Box css={{ backgroundColor: '$bgDefault', color: '$fgDefault' }}>
       <FigmaLoading
@@ -105,6 +130,7 @@ export const AppContainer = (params: Props) => {
       <SecondScreenSync />
       <AuthModal />
       <BitbucketMigrationDialog />
+      <GenericVersionedHeaderMigrationDialog isOpen={showMigrationDialog} onClose={handleMigrationDialogClose} />
     </Box>
   );
 

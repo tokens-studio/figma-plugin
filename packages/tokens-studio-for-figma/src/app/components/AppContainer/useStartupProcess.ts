@@ -7,7 +7,7 @@ import { useProcess } from '@/hooks';
 import { ApplicationInitSteps } from './ApplicationInitSteps';
 import { Dispatch, RootState } from '@/app/store';
 import {
-  addLicenseFactory, savePluginDataFactory, saveStorageInformationFactory, pullTokensFactory,
+  addLicenseFactory, savePluginDataFactory, saveStorageInformationFactory, pullTokensFactory, migrateRemoveAdditionalHeadersFactory,
 } from './startupProcessSteps';
 import useStorage from '@/app/store/useStorage';
 import useConfirm from '@/app/hooks/useConfirm';
@@ -28,6 +28,10 @@ export function useStartupProcess(params: StartupMessage) {
     {
       key: ApplicationInitSteps.ADD_LICENSE,
       fn: addLicenseFactory(dispatch, params),
+    },
+    {
+      key: ApplicationInitSteps.MIGRATE_REMOVE_ADDITIONAL_HEADERS,
+      fn: migrateRemoveAdditionalHeadersFactory(dispatch, params),
     },
     {
       key: ApplicationInitSteps.SAVE_STORAGE_INFORMATION,
