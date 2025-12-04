@@ -214,12 +214,20 @@ export default function ImportedTokensDialog() {
 
     const combinedTokens = [...multipleUpdatedTokens, ...multipleNewTokens];
 
-    const uniqueCollectionCount = combinedTokens.reduce((acc, token) => {
+    // Collect all unique imported token sets
+    const importedTokenSets = combinedTokens.reduce((acc, token) => {
       if (token.parent && !acc.includes(token.parent)) {
         acc.push(token.parent);
       }
       return acc;
-    }, [] as string[]).length;
+    }, [] as string[]);
+
+    // If the current active token set is not in the imported sets, switch to the first imported set
+    if (importedTokenSets.length > 0 && !importedTokenSets.includes(activeTokenSet)) {
+      dispatch.tokenState.setActiveTokenSet(importedTokenSets[0]);
+    }
+
+    const uniqueCollectionCount = importedTokenSets.length;
 
     track('Import variables', {
       totalCount: multipleUpdatedTokens.length + multipleNewTokens.length,

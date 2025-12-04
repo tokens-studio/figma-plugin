@@ -21,7 +21,13 @@ export const ClientStorageProperty = {
       await cleanupOldTokenPrefixes(fileKey);
     }
 
-    return figma.clientStorage.setAsync(prefixedKey, value);
+    try {
+      await figma.clientStorage.setAsync(prefixedKey, value);
+      return true;
+    } catch (error) {
+      console.error('Error writing to client storage:', error);
+      return false;
+    }
   },
   async read(key: string) {
     try {
