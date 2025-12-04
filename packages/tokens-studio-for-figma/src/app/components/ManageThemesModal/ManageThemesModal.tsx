@@ -7,7 +7,7 @@ import debounce from 'lodash.debounce';
 import { Button, EmptyState } from '@tokens-studio/ui';
 import { styled } from '@stitches/react';
 import { useTranslation } from 'react-i18next';
-import { activeThemeSelector, themesListSelector } from '@/selectors';
+import { activeThemeSelector, editProhibitedSelector, themesListSelector } from '@/selectors';
 import Modal from '../Modal';
 import { Dispatch } from '@/app/store';
 import Stack from '../Stack';
@@ -44,6 +44,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
   const dispatch = useDispatch<Dispatch>();
   const themes = useSelector(themesListSelector);
   const activeTheme = useSelector(activeThemeSelector);
+  const editProhibited = useSelector(editProhibitedSelector);
   const { confirm } = useConfirm();
   const [themeEditorOpen, setThemeEditorOpen] = useState<boolean | string>(false);
   const [themeListScrollPosition, setThemeListScrollPosition] = useState<number>(0);
@@ -202,6 +203,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
               variant="secondary"
               icon={<IconPlus />}
               onClick={handleToggleOpenThemeEditor}
+              disabled={editProhibited}
             >
               {t('newTheme')}
             </Button>
@@ -215,6 +217,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
                   variant="danger"
                   type="submit"
                   onClick={handleDeleteTheme}
+                  disabled={editProhibited}
                 >
                   {t('delete')}
                 </Button>
@@ -233,6 +236,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
                   variant="primary"
                   type="submit"
                   form="form-create-or-edit-theme"
+                  disabled={editProhibited}
                 >
                   {t('saveTheme')}
                 </Button>
