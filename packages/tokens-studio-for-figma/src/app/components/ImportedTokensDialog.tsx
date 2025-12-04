@@ -110,6 +110,7 @@ export default function ImportedTokensDialog() {
   const [updatedThemes, setUpdatedThemes] = React.useState(importedThemes.updatedThemes);
   const [newTokens, setNewTokens] = React.useState(importedTokens.newTokens);
   const [updatedTokens, setUpdatedTokens] = React.useState(importedTokens.updatedTokens);
+  // TODO: find a better way to implement this to trigger document update when importing variables
   const [shouldTriggerUpdate, setShouldTriggerUpdate] = React.useState(false);
 
   const { t } = useTranslation(['tokens']);
@@ -206,7 +207,7 @@ export default function ImportedTokensDialog() {
 
     // Update all existing tokens, and create new ones
     importMultipleTokens({ multipleUpdatedTokens, multipleNewTokens });
-    
+
     // Trigger document update if using local storage
     if (newThemes.length > 0 || updatedThemes.length > 0 || multipleUpdatedTokens.length > 0 || multipleNewTokens.length > 0) {
       setShouldTriggerUpdate(true);
