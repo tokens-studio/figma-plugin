@@ -848,30 +848,6 @@ export const tokenState = createModel<RootModel>()({
     toggleUsedTokenSet() {
       dispatch.tokenState.updateDocument({ updateRemote: false });
     },
-    createMultipleTokens(_payload: CreateSingleTokenData[], rootState) {
-      if (rootState.uiState.storageType.provider === StorageProviderType.LOCAL) {
-        dispatch.tokenState.updateDocument({
-          updateRemote: false,
-          shouldUpdateNodes: false,
-        });
-      }
-    },
-    editMultipleTokens(_payload: EditSingleTokenData[], rootState) {
-      if (rootState.uiState.storageType.provider === StorageProviderType.LOCAL) {
-        dispatch.tokenState.updateDocument({
-          updateRemote: false,
-          shouldUpdateNodes: false,
-        });
-      }
-    },
-    setThemes(_payload: ThemeObjectsList, rootState) {
-      if (rootState.uiState.storageType.provider === StorageProviderType.LOCAL) {
-        dispatch.tokenState.updateDocument({
-          updateRemote: false,
-          shouldUpdateNodes: false,
-        });
-      }
-    },
     toggleManyTokenSets() {
       dispatch.tokenState.updateDocument({ updateRemote: false });
     },
