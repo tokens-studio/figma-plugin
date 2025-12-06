@@ -57,27 +57,41 @@ export class BitbucketTokenStorage extends GitTokenStorage {
       // Use direct HTTP call for API token authentication
       const authString = `${this.username || this.owner}:${this.apiToken}`;
       const authHeader = `Basic ${btoa(authString)}`;
+      let pageNumber = 1;
+      let nextPage = true;
+      let branches: string[] = [];
+      // Get the branches from all the pages
+      while (nextPage) {
+        const response = await fetch(`https://api.bitbucket.org/2.0/repositories/${this.owner}/${this.repository}/refs/branches?page=${pageNumber}`, {
+          headers: {
+            Authorization: authHeader,
+            'Content-Type': 'application/json',
+          },
+        });
 
-      const response = await fetch(`https://api.bitbucket.org/2.0/repositories/${this.owner}/${this.repository}/refs/branches`, {
-        headers: {
-          Authorization: authHeader,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        // Re-throw authentication errors instead of catching them
-        if (response.status === 401) {
-          throw new Error('BITBUCKET_UNAUTHORIZED');
+        if (!response.ok) {
+          // Re-throw authentication errors instead of catching them
+          if (response.status === 401) {
+            throw new Error('BITBUCKET_UNAUTHORIZED');
+          }
+          throw new Error(`Failed to fetch branches: ${response.status} ${response.statusText}`);
         }
-        throw new Error(`Failed to fetch branches: ${response.status} ${response.statusText}`);
-      }
 
-      const data = await response.json();
-      if (!data.values) {
-        return [];
+        const data = await response.json();
+        if (!data.values) {
+          return [];
+        }
+
+        let branchesInPage = data.values.map((branch: any) => branch.name) as string[];
+        branches = branches.concat(branchesInPage);
+        // If there's no next page, stop the while loop
+        if (!data.next)
+          nextPage = false;
+        else
+          pageNumber++;
+
       }
-      return data.values.map((branch: any) => branch.name) as string[];
+      return branches;
     } catch (error) {
       // Re-throw authentication errors and other specific errors
       if (error instanceof Error && error.message === 'BITBUCKET_UNAUTHORIZED') {
@@ -102,24 +116,44 @@ export class BitbucketTokenStorage extends GitTokenStorage {
    */
   public async createBranch(branch: string, source?: string) {
     try {
-      const originBranch = await this.bitbucketClient.repositories.listRefs({
-        workspace: this.owner,
-        repo_slug: this.repository,
-      });
+      // Search by every pages that the API return
+      let keepLoop = true;
+      let currentPage = 1;
+      let originBranch;
+      let sourceBranchName;
+      let sourceBranch;
+      const errorMessage = 'Could not retrieve origin branch';
 
-      const sourceBranchName = source || this.branch;
-      const sourceBranch = originBranch.data.values.find(
-        (branchValue: Schema.Branch) => branchValue.name === sourceBranchName,
-      );
+      while (keepLoop) {
 
-      if (
-        !originBranch.data
-        || !originBranch.data.values
-        || !sourceBranch
-        || !sourceBranch.target
-        || !sourceBranch.target.hash
-      ) {
-        throw new Error('Could not retrieve origin branch');
+        originBranch = await this.bitbucketClient.repositories.listRefs({
+          workspace: this.owner,
+          repo_slug: this.repository,
+          page: currentPage
+        });
+
+        if (!originBranch.data || !originBranch.data.values) throw new Error(errorMessage);
+
+
+        sourceBranchName = source || this.branch;
+        sourceBranch = originBranch.data.values.find(
+          (branchValue: Schema.Branch) => branchValue.name === sourceBranchName,
+        );
+
+        if (!sourceBranch
+          || !sourceBranch.target
+          || !sourceBranch.target.hash
+        ) {
+          //If the origin branch wasn't found in that page, check if there's a next page; if there's no next, return error.
+          if (!originBranch.data.next) {
+            keepLoop = false;
+            throw new Error(errorMessage);
+          }
+          else { currentPage++ };
+        } else keepLoop = false;
+
+
+
       }
 
       const newBranch = await this.bitbucketClient.refs.createBranch({

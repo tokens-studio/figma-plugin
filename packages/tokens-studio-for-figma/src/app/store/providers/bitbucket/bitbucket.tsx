@@ -199,7 +199,12 @@ export function useBitbucket() {
           };
         }
         if (content) {
-          return content;
+          const sortedTokens = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder ?? Object.keys(content.tokens));
+
+          return {
+            ...content,
+            tokens: sortedTokens,
+          };
         }
       } catch (e) {
         console.log('Error', e);
