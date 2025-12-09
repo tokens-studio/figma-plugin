@@ -103,7 +103,7 @@ export const AppContainer = (params: Props) => {
 
   // Get apiProviders from Redux (uiState) using useSelector
   const apiProviders = useSelector((state: any) => state.uiState?.apiProviders || []);
-  const seenMigrationDialog = useSelector((state: any) => state.settings?.uiWindow?.seenGenericVersionedHeaderMigrationDialog ?? false);
+  const seenMigrationDialog = useSelector((state: any) => state.settings?.seenGenericVersionedHeaderMigrationDialog ?? false);
   const setSeenMigrationDialog = useCallback((flag: boolean) => {
     dispatch.settings.setSeenGenericVersionedHeaderMigrationDialog(flag);
   }, [dispatch]);

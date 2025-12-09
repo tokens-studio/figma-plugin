@@ -37,6 +37,7 @@ export const setUi: AsyncMessageChannelHandlers[AsyncMessageTypes.SET_UI] = asyn
     shouldSwapFigmaModes: msg.shouldSwapFigmaModes,
     storeTokenIdInJsonEditor: msg.storeTokenIdInJsonEditor,
     autoApplyThemeOnDrop: msg.autoApplyThemeOnDrop,
+    seenGenericVersionedHeaderMigrationDialog: msg.seenGenericVersionedHeaderMigrationDialog,
   });
   figma.ui.resize(width, height);
   if (store.inspectDeep !== msg.inspectDeep) {

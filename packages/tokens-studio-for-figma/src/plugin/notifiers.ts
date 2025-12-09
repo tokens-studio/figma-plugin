@@ -91,6 +91,7 @@ export type SavedSettings = {
   storeTokenIdInJsonEditor: boolean;
   tokenFormat: TokenFormatOptions;
   autoApplyThemeOnDrop: boolean;
+  seenGenericVersionedHeaderMigrationDialog?: boolean;
 };
 
 export function notifyUISettings(
