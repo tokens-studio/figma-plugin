@@ -91,6 +91,7 @@ export type SavedSettings = {
   storeTokenIdInJsonEditor: boolean;
   tokenFormat: TokenFormatOptions;
   autoApplyThemeOnDrop: boolean;
+  seenGenericVersionedHeaderMigrationDialog?: boolean;
 };
 
 export function notifyUISettings(
@@ -124,6 +125,7 @@ export function notifyUISettings(
     tokenFormat,
     renameExistingStylesAndVariables,
     removeStylesAndVariablesWithoutConnection,
+    seenGenericVersionedHeaderMigrationDialog,
   }: SavedSettings,
 ) {
   postToUI({
@@ -160,6 +162,7 @@ export function notifyUISettings(
       tokenFormat,
       renameExistingStylesAndVariables,
       removeStylesAndVariablesWithoutConnection,
+      seenGenericVersionedHeaderMigrationDialog,
     },
   });
   postToUI({

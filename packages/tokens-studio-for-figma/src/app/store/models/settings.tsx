@@ -16,7 +16,6 @@ type WindowSettingsType = {
   width: number;
   height: number;
   isMinimized: boolean;
-  seenGenericVersionedHeaderMigrationDialog?: boolean;
 };
 
 type TokenModeType = 'object' | 'array';
@@ -56,6 +55,7 @@ export interface SettingsState {
   renameExistingStylesAndVariables?: boolean;
   removeStylesAndVariablesWithoutConnection?: boolean;
   autoApplyThemeOnDrop?: boolean;
+  seenGenericVersionedHeaderMigrationDialog?: boolean;
 }
 
 const setUI = (state: SettingsState) => {
@@ -71,8 +71,8 @@ export const settings = createModel<RootModel>()({
       width: 400,
       height: 600,
       isMinimized: false,
-      seenGenericVersionedHeaderMigrationDialog: false,
     },
+    seenGenericVersionedHeaderMigrationDialog: false,
     language: 'en',
     sessionRecording: false,
     updateMode: UpdateMode.SELECTION,
@@ -240,12 +240,7 @@ export const settings = createModel<RootModel>()({
     setSeenGenericVersionedHeaderMigrationDialog(state, payload: boolean) {
       return {
         ...state,
-        uiWindow: {
-          width: state.uiWindow?.width ?? 400,
-          height: state.uiWindow?.height ?? 600,
-          isMinimized: state.uiWindow?.isMinimized ?? false,
-          seenGenericVersionedHeaderMigrationDialog: payload,
-        },
+        seenGenericVersionedHeaderMigrationDialog: payload,
       };
     },
   },
@@ -308,6 +303,9 @@ export const settings = createModel<RootModel>()({
       setUI(rootState.settings);
     },
     setAutoApplyThemeOnDrop: (payload: boolean, rootState) => {
+      setUI(rootState.settings);
+    },
+    setSeenGenericVersionedHeaderMigrationDialog: (payload: boolean, rootState) => {
       setUI(rootState.settings);
     },
     ...Object.fromEntries(
