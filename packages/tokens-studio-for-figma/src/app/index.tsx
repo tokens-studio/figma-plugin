@@ -1,5 +1,4 @@
 import 'regenerator-runtime/runtime';
-import './assets/fonts/jetbrainsmono.css';
 import './styles/preflight.css';
 import '@/i18n';
 import * as asyncHandlers from './asyncMessageHandlers';
@@ -15,4 +14,8 @@ initializeSentry();
 AsyncMessageChannel.ReactInstance.connect();
 AsyncMessageChannel.ReactInstance.handle(AsyncMessageTypes.GET_THEME_INFO, asyncHandlers.getThemeInfo);
 
-startup();
+startup().then(() => {
+  // Load fonts after startup to prevent blocking in watch mode
+  require('./assets/fonts/fonts.css');
+  require('./assets/fonts/jetbrainsmono.css');
+});

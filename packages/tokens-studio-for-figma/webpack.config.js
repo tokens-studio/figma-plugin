@@ -98,14 +98,26 @@ module.exports = wrapper((env, argv) => {
           ],
         }]),
         // Enables including CSS by doing "import './file.css'" in your TypeScript code
-        { test: /\.css$/, use: [{ loader: 'style-loader' }, { loader: 'css-loader' }] },
+        { 
+          test: /\.css$/, 
+          use: [
+            { loader: 'style-loader' }, 
+            { 
+              loader: 'css-loader',
+              options: {
+                url: true,
+                import: true,
+              }
+            }
+          ] 
+        },
         // Imports webfonts
         {
           test: /\.(woff|woff2)$/,
           use: {
             loader: 'url-loader',
             options: {
-              name: '[name].[ext]',
+              limit: 1000000, // Inline files up to 1MB (all our fonts)
             },
           },
         },
@@ -145,7 +157,7 @@ module.exports = wrapper((env, argv) => {
       concatenateModules: true
     },
     output: {
-      publicPath: '',
+      publicPath: '/',
       filename: '[name].js',
       sourceMapFilename: "[name].js.map",
       path: path.resolve(__dirname, argv.PREVIEW_ENV === 'browser' && !isDevServer ? 'preview' : 'dist'), // Compile into a folder called "dist"
