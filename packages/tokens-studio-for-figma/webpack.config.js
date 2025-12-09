@@ -117,7 +117,12 @@ module.exports = wrapper((env, argv) => {
         // Imports webfonts
         {
           test: /\.(woff|woff2)$/,
-          type: 'asset/inline',
+          use: {
+            loader: 'url-loader',
+            options: {
+              limit: 1000000, // Inline files up to 1MB (all our fonts)
+            },
+          },
         },
         { test: /\.(png|jpg|gif|webp)$/, use: [{ loader: 'url-loader' }] },
         {
