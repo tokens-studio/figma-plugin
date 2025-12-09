@@ -1,3 +1,4 @@
+/* eslint-disable global-require */
 import 'regenerator-runtime/runtime';
 import './styles/preflight.css';
 import '@/i18n';
