@@ -101,16 +101,23 @@ module.exports = wrapper((env, argv) => {
           ],
         }]),
         // Enables including CSS by doing "import './file.css'" in your TypeScript code
-        { test: /\.css$/, use: [{ loader: 'style-loader' }, { loader: 'css-loader' }] },
+        { 
+          test: /\.css$/, 
+          use: [
+            { loader: 'style-loader' }, 
+            { 
+              loader: 'css-loader',
+              options: {
+                url: true,
+                import: true,
+              }
+            }
+          ] 
+        },
         // Imports webfonts
         {
           test: /\.(woff|woff2)$/,
-          use: {
-            loader: 'url-loader',
-            options: {
-              name: '[name].[ext]',
-            },
-          },
+          type: 'asset/inline',
         },
         { test: /\.(png|jpg|gif|webp)$/, use: [{ loader: 'url-loader' }] },
         {
