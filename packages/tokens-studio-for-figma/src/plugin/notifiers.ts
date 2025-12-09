@@ -125,6 +125,7 @@ export function notifyUISettings(
     tokenFormat,
     renameExistingStylesAndVariables,
     removeStylesAndVariablesWithoutConnection,
+    seenGenericVersionedHeaderMigrationDialog,
   }: SavedSettings,
 ) {
   postToUI({
@@ -161,6 +162,7 @@ export function notifyUISettings(
       tokenFormat,
       renameExistingStylesAndVariables,
       removeStylesAndVariablesWithoutConnection,
+      seenGenericVersionedHeaderMigrationDialog,
     },
   });
   postToUI({
