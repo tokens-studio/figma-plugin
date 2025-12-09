@@ -1,5 +1,14 @@
 # @tokens-studio/figma-plugin
 
+## 2.10.8
+
+### Patch Changes
+
+- c49aa807b: Fix: Trigger document update when importing variables to ensure they persist in local storage
+- a65098248: Add search functionality to the Export to Figma dialog for filtering themes and sets
+- 0aa9dcf87: Add error handling for failure when writing to client Storage property in Figma
+- 0ecc24430: Switch to first imported token set when current set is not in imported sets after variable import
+
 ## 2.10.7
 
 ### Patch Changes

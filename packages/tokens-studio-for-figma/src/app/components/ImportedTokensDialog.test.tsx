@@ -464,4 +464,77 @@ describe('ImportedTokensDialog', () => {
     expect(mockStore.getState().tokenState.importedTokens.updatedTokens).toEqual([]);
     expect(result.queryByText('imported')).not.toBeInTheDocument();
   });
+
+  it('should switch to first imported token set when current set is not in imported sets', async () => {
+    const storeWithDifferentParent = {
+      tokenState: {
+        activeTokenSet: 'global',
+        tokens: {
+          global: [],
+          'collection/mode1': [],
+        },
+        importedTokens: {
+          newTokens: [
+            {
+              name: 'small',
+              type: 'sizing',
+              value: '12',
+              parent: 'collection/mode1',
+            },
+          ],
+          updatedTokens: [],
+        },
+      },
+    };
+    const mockStore = createMockStore(storeWithDifferentParent);
+    const result = render(
+      <Provider store={mockStore}>
+        <ImportedTokensDialog />
+      </Provider>,
+    );
+
+    await waitFor(async () => {
+      const importButton = await result.findByText('importAll') as HTMLButtonElement;
+      importButton.click();
+
+      // Should switch to 'collection/mode1' since 'global' is not in the imported sets
+      expect(mockStore.getState().tokenState.activeTokenSet).toEqual('collection/mode1');
+    });
+  });
+
+  it('should not switch token set when current set is in imported sets', async () => {
+    const storeWithSameParent = {
+      tokenState: {
+        activeTokenSet: 'global',
+        tokens: {
+          global: [],
+        },
+        importedTokens: {
+          newTokens: [
+            {
+              name: 'small',
+              type: 'sizing',
+              value: '12',
+              parent: 'global',
+            },
+          ],
+          updatedTokens: [],
+        },
+      },
+    };
+    const mockStore = createMockStore(storeWithSameParent);
+    const result = render(
+      <Provider store={mockStore}>
+        <ImportedTokensDialog />
+      </Provider>,
+    );
+
+    await waitFor(async () => {
+      const importButton = await result.findByText('importAll') as HTMLButtonElement;
+      importButton.click();
+
+      // Should stay on 'global' since it's in the imported sets
+      expect(mockStore.getState().tokenState.activeTokenSet).toEqual('global');
+    });
+  });
 });

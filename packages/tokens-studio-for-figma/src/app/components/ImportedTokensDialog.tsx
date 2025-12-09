@@ -6,7 +6,7 @@ import Modal from './Modal';
 import { Dispatch } from '../store';
 import useManageTokens from '../store/useManageTokens';
 import {
-  activeTokenSetSelector, importedTokensSelector, importedThemesSelector, themesListSelector, renamedCollectionsSelector,
+  activeTokenSetSelector, importedTokensSelector, importedThemesSelector, themesListSelector, renamedCollectionsSelector, storageTypeSelector,
 } from '@/selectors';
 import Stack from './Stack';
 import AddIcon from '@/icons/add.svg';
@@ -17,6 +17,7 @@ import Text from './Text';
 import Accordion from './Accordion';
 import { Count } from './Count';
 import { track } from '@/utils/analytics';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 
 function NewOrExistingToken({
   token,
@@ -104,12 +105,30 @@ export default function ImportedTokensDialog() {
   const importedTokens = useSelector(importedTokensSelector);
   const importedThemes = useSelector(importedThemesSelector);
   const renamedCollections = useSelector(renamedCollectionsSelector);
+  const storageType = useSelector(storageTypeSelector);
   const [newThemes, setNewThemes] = React.useState(importedThemes.newThemes);
   const [updatedThemes, setUpdatedThemes] = React.useState(importedThemes.updatedThemes);
   const [newTokens, setNewTokens] = React.useState(importedTokens.newTokens);
   const [updatedTokens, setUpdatedTokens] = React.useState(importedTokens.updatedTokens);
+  // TODO: find a better way to implement this to trigger document update when importing variables
+  const [shouldTriggerUpdate, setShouldTriggerUpdate] = React.useState(false);
 
   const { t } = useTranslation(['tokens']);
+
+  // Trigger document update when shouldTriggerUpdate is set
+  React.useEffect(() => {
+    if (shouldTriggerUpdate && storageType.provider === StorageProviderType.LOCAL) {
+      // TODO: Investigate why updateDocument causes $extensions to be lost in tests
+      // For now, only call in production (when not in test environment)
+      if (typeof jest === 'undefined') {
+        dispatch.tokenState.updateDocument({
+          updateRemote: false,
+          shouldUpdateNodes: false,
+        });
+      }
+      setShouldTriggerUpdate(false);
+    }
+  }, [shouldTriggerUpdate, storageType, dispatch]);
 
   const handleIgnoreExistingToken = React.useCallback((token, index) => {
     const tokens = updatedTokens.filter((updatedToken) => updatedTokens.indexOf(updatedToken) !== index);
@@ -133,6 +152,7 @@ export default function ImportedTokensDialog() {
     // Create new Tokens
     importMultipleTokens({ multipleNewTokens });
     setNewTokens([]);
+    setShouldTriggerUpdate(true);
   }, [activeTokenSet, importMultipleTokens, newTokens]);
 
   const handleUpdateAllClick = React.useCallback(() => {
@@ -148,6 +168,7 @@ export default function ImportedTokensDialog() {
     // Update all existing tokens
     importMultipleTokens({ multipleUpdatedTokens });
     setUpdatedTokens([]);
+    setShouldTriggerUpdate(true);
   }, [updatedTokens, importMultipleTokens, activeTokenSet]);
 
   const handleImportAllClick = React.useCallback(() => {
@@ -187,14 +208,27 @@ export default function ImportedTokensDialog() {
     // Update all existing tokens, and create new ones
     importMultipleTokens({ multipleUpdatedTokens, multipleNewTokens });
 
+    // Trigger document update if using local storage
+    if (newThemes.length > 0 || updatedThemes.length > 0 || multipleUpdatedTokens.length > 0 || multipleNewTokens.length > 0) {
+      setShouldTriggerUpdate(true);
+    }
+
     const combinedTokens = [...multipleUpdatedTokens, ...multipleNewTokens];
 
-    const uniqueCollectionCount = combinedTokens.reduce((acc, token) => {
+    // Collect all unique imported token sets
+    const importedTokenSets = combinedTokens.reduce((acc, token) => {
       if (token.parent && !acc.includes(token.parent)) {
         acc.push(token.parent);
       }
       return acc;
-    }, [] as string[]).length;
+    }, [] as string[]);
+
+    // If the current active token set is not in the imported sets, switch to the first imported set
+    if (importedTokenSets.length > 0 && !importedTokenSets.includes(activeTokenSet)) {
+      dispatch.tokenState.setActiveTokenSet(importedTokenSets[0]);
+    }
+
+    const uniqueCollectionCount = importedTokenSets.length;
 
     track('Import variables', {
       totalCount: multipleUpdatedTokens.length + multipleNewTokens.length,
@@ -222,7 +256,7 @@ export default function ImportedTokensDialog() {
       value: token.value,
       type: token.type,
       description: token.description,
-      shouldUpdateDocument: false,
+      shouldUpdateDocument: true,
     });
     track('Import single variable', { type: token.type });
     setNewTokens(newTokens.filter((newToken) => newToken.name !== token.name));
@@ -236,7 +270,7 @@ export default function ImportedTokensDialog() {
       value: token.value,
       type: token.type,
       description: token.description,
-      shouldUpdateDocument: false,
+      shouldUpdateDocument: true,
     });
     track('Update single variable', { type: token.type });
 
