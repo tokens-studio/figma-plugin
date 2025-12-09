@@ -310,6 +310,9 @@ export const settings = createModel<RootModel>()({
     setAutoApplyThemeOnDrop: (payload: boolean, rootState) => {
       setUI(rootState.settings);
     },
+    setSeenGenericVersionedHeaderMigrationDialog: (payload: boolean, rootState) => {
+      setUI(rootState.settings);
+    },
     ...Object.fromEntries(
       (Object.entries(settingsStateEffects).map(([key, factory]) => (
         [key, factory()]
