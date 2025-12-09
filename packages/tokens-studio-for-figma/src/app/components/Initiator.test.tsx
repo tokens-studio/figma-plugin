@@ -664,6 +664,7 @@ describe('Initiator', () => {
       aliasBaseFontSize: '16',
       applyVariablesStylesOrRawValue: ApplyVariablesStylesOrRawValues.VARIABLES_STYLES,
       autoApplyThemeOnDrop: false,
+      seenGenericVersionedHeaderMigrationDialog: false,
     });
   });
 

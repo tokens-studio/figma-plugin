@@ -61,6 +61,7 @@ describe('uiSettings', () => {
       shouldSwapStyles: false,
       baseFontSize: '16',
       aliasBaseFontSize: '16',
+      seenGenericVersionedHeaderMigrationDialog: undefined,
     }));
   });
 
@@ -100,6 +101,7 @@ describe('uiSettings', () => {
       aliasBaseFontSize: '16',
       baseFontSize: '16',
       autoApplyThemeOnDrop: false,
+      seenGenericVersionedHeaderMigrationDialog: false,
     });
   });
 
@@ -163,6 +165,7 @@ describe('uiSettings', () => {
       aliasBaseFontSize: '16',
       baseFontSize: '16',
       autoApplyThemeOnDrop: false,
+      seenGenericVersionedHeaderMigrationDialog: false,
     });
   });
 
