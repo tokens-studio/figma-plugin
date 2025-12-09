@@ -68,7 +68,9 @@
     "introPro": "Les combinaisons d'ensembles de jetons créent des thèmes. Utilisez les thèmes pour créer plusieurs collections de variables ou de styles pour basculer facilement entre des concepts de design tels que les modes de couleur clair ou sombre, plusieurs marques, produits ou plates-formes. Ou passez aux ensembles pour exporter sans utiliser de thèmes.",
     "introBasic": "Les combinaisons d'ensembles de jetons créent des thèmes. Utilisez les thèmes pour créer plusieurs collections de variables ou de styles pour basculer facilement entre des concepts de design tels que les modes de couleur clair ou sombre, plusieurs marques, produits ou plates-formes.",
     "confirmThemes": "Confirmer les thèmes",
-    "combinationsOfSetsMakeThemes": "Les combinaisons d'ensembles de jetons créent des thèmes"
+    "combinationsOfSetsMakeThemes": "Les combinaisons d'ensembles de jetons créent des thèmes",
+    "otherThemesSelected_one": "{{count}} autre thème sélectionné",
+    "otherThemesSelected_other": "{{count}} autres thèmes sélectionnés"
   },
   "exportSetsTab": {
     "changeSetsHeading": "Les ensembles activés seront exportés vers Figma",

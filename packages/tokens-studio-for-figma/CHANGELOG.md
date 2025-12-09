@@ -1,5 +1,24 @@
 # @tokens-studio/figma-plugin
 
+## 2.10.8
+
+### Patch Changes
+
+- c49aa807b: Fix: Trigger document update when importing variables to ensure they persist in local storage
+- a65098248: Add search functionality to the Export to Figma dialog for filtering themes and sets
+- 0aa9dcf87: Add error handling for failure when writing to client Storage property in Figma
+- 0ecc24430: Switch to first imported token set when current set is not in imported sets after variable import
+
+## 2.10.7
+
+### Patch Changes
+
+- 5d39f05db: Fix variable export regression for external library variables introduced in v2.10.6. Removed overly strict validation that was filtering out remote/library variable references. Added fallback mechanism in `updateVariablesToReference` to find variables by name when import by key fails. This restores the ability to properly attach variable references from published libraries in non-local setups.
+- 5b8b9ce70: Fix bug where tokens were incorrectly resolved during export when expand options are enabled. When using "Export to JSON" with options like "Expand Typography" enabled, alias tokens (references like `{typography.heading.h1}`) will now keep their references instead of being resolved to actual values. This preserves the token relationships needed for downstream processing pipelines.
+- feff2515f: Fixed an issue with spacing tokens that are set to AUTO and switch back to a number/dimension value, which caused other token changes to be ignored. Contributed by lethxrgy1
+- ae37b3106: Remove Storyblok integration and changelog dialog feature. The changelog dialog functionality has been removed and can be brought back with a different system in the future.
+- a07afc516: Add support for vertical trim (cap to baseline) on boolean tokens. Boolean tokens can now be applied to text nodes to enable or disable leadingTrim (vertical trim) feature in Figma.
+
 ## 2.10.6
 
 ### Patch Changes
