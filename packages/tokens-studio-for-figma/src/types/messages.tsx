@@ -70,6 +70,7 @@ export type UiSettingsFromPluginMessage = {
     aliasBaseFontSize: string;
     storeTokenIdInJsonEditor: boolean;
     tokenFormat: TokenFormatOptions;
+    seenGenericVersionedHeaderMigrationDialog?: boolean;
   };
 };
 

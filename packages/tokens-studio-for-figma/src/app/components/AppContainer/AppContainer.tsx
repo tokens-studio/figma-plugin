@@ -24,6 +24,7 @@ import { useFigmaTheme } from '@/hooks/useFigmaTheme';
 import Box from '../Box';
 import { darkThemeMode, lightThemeMode } from '@/stitches.config';
 import BitbucketMigrationDialog from '../BitbucketMigrationDialog';
+import GenericVersionedHeaderMigrationDialog from '../GenericVersionedHeaderMigrationDialog';
 
 type Props = StartupMessage & {
   // @README only for unit testing purposes
@@ -84,6 +85,7 @@ export const AppContainer = (params: Props) => {
 
   globalStyles();
 
+
   const appContent = (
     <Box css={{ backgroundColor: '$bgDefault', color: '$fgDefault' }}>
       <FigmaLoading
@@ -105,6 +107,7 @@ export const AppContainer = (params: Props) => {
       <SecondScreenSync />
       <AuthModal />
       <BitbucketMigrationDialog />
+      <GenericVersionedHeaderMigrationDialog />
     </Box>
   );
 
