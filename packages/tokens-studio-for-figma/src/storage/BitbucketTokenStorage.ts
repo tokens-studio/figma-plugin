@@ -54,32 +54,31 @@ export class BitbucketTokenStorage extends GitTokenStorage {
   // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-refs/#api-repositories-workspace-repo-slug-refs-get
   public async fetchBranches(): Promise<string[]> {
     try {
-      // Use direct HTTP call for API token authentication
       const authString = `${this.username || this.owner}:${this.apiToken}`;
       const authHeader = `Basic ${btoa(authString)}`;
-
-      const response = await fetch(`https://api.bitbucket.org/2.0/repositories/${this.owner}/${this.repository}/refs/branches`, {
-        headers: {
-          Authorization: authHeader,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        // Re-throw authentication errors instead of catching them
-        if (response.status === 401) {
-          throw new Error('BITBUCKET_UNAUTHORIZED');
+      const branches: string[] = [];
+      let url = `https://api.bitbucket.org/2.0/repositories/${this.owner}/${this.repository}/refs/branches?pagelen=50`;
+      while (url) {
+        const response = await fetch(url, {
+          headers: {
+            Authorization: authHeader,
+            'Content-Type': 'application/json',
+          },
+        });
+        if (!response.ok) {
+          if (response.status === 401) {
+            throw new Error('BITBUCKET_UNAUTHORIZED');
+          }
+          throw new Error(`Failed to fetch branches: ${response.status} ${response.statusText}`);
         }
-        throw new Error(`Failed to fetch branches: ${response.status} ${response.statusText}`);
+        const data = await response.json();
+        if (data.values && Array.isArray(data.values)) {
+          branches.push(...data.values.map((branch: any) => branch.name));
+        }
+        url = data.next || null;
       }
-
-      const data = await response.json();
-      if (!data.values) {
-        return [];
-      }
-      return data.values.map((branch: any) => branch.name) as string[];
+      return branches;
     } catch (error) {
-      // Re-throw authentication errors and other specific errors
       if (error instanceof Error && error.message === 'BITBUCKET_UNAUTHORIZED') {
         throw error;
       }
