@@ -25,7 +25,6 @@ import Box from '../Box';
 import { darkThemeMode, lightThemeMode } from '@/stitches.config';
 import BitbucketMigrationDialog from '../BitbucketMigrationDialog';
 import GenericVersionedHeaderMigrationDialog from '../GenericVersionedHeaderMigrationDialog';
-import { useShowGenericVersionedHeaderMigrationDialog } from '@/hooks/useShowGenericVersionedHeaderMigrationDialog';
 
 type Props = StartupMessage & {
   // @README only for unit testing purposes
@@ -86,8 +85,6 @@ export const AppContainer = (params: Props) => {
 
   globalStyles();
 
-  // Use migration dialog hook (now handles all Redux logic internally)
-  const { open: showMigrationDialog, handleClose: handleMigrationDialogClose } = useShowGenericVersionedHeaderMigrationDialog();
 
   const appContent = (
     <Box css={{ backgroundColor: '$bgDefault', color: '$fgDefault' }}>
@@ -110,7 +107,7 @@ export const AppContainer = (params: Props) => {
       <SecondScreenSync />
       <AuthModal />
       <BitbucketMigrationDialog />
-      <GenericVersionedHeaderMigrationDialog isOpen={showMigrationDialog} onClose={handleMigrationDialogClose} />
+      <GenericVersionedHeaderMigrationDialog />
     </Box>
   );
 
