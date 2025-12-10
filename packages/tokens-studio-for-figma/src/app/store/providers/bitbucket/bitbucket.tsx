@@ -183,13 +183,8 @@ export function useBitbucket() {
   const pullTokensFromBitbucket = useCallback(
     async (context: BitbucketCredentials): Promise<RemoteResponseData | null> => {
       const storage = storageClientFactory(context);
-
       const [owner, repo] = context.id.split('/');
-
-      await checkAndSetAccess({
-        context, owner, repo,
-      });
-
+      await checkAndSetAccess({ context, owner, repo });
       try {
         const content = await storage.retrieve();
         if (content?.status === 'failure') {
@@ -199,7 +194,12 @@ export function useBitbucket() {
           };
         }
         if (content) {
-          return content;
+          // Sort token sets using applyTokenSetOrder if metadata is present
+          const sortedTokens = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder);
+          return {
+            ...content,
+            tokens: sortedTokens,
+          };
         }
       } catch (e) {
         console.log('Error', e);
