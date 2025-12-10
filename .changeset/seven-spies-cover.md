@@ -2,4 +2,4 @@
 "@tokens-studio/figma-plugin": patch
 ---
 
-Remove additional headers from Generic Versioned Storage saved on local storage.
+Adjusted generic versioned storage to store additional headers in clientStorage instead of sharedPluginData.
