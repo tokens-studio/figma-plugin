@@ -40,20 +40,20 @@ export default function GenericVersionedHeaderMigrationDialog() {
       <Stack direction="column" gap={4}>
         <Heading size="medium">Security Update</Heading>
         <Text>
-          We have improved the security of Generic Versioned Storage providers.
+          Previously when using the Generic Versioned Storage provider, anything stored inside
           {' '}
           <b>Additional headers</b>
           {' '}
-          are now stored only in your client (browser) and
+          was saved in shared plugin data - possibly exposing sensitive information to other collaborators or stored in Figma files. We fixed this in the background, additional headers are now stored only in your client (browser)
           {' '}
           <b>no longer saved in shared plugin data</b>
           .
         </Text>
         <Text>
-          This change ensures sensitive information in headers is never shared with other collaborators or stored in Figma files.
+          If you relied on other users to have access to the additional headers, those users will need to add them again. This only affected users who have a Generic Versioned Storage provider configured.
         </Text>
         <Text>
-          You are seeing this message because you have a Generic Versioned Storage provider configured. This dialog will only appear once.
+          This change ensures sensitive information in headers is never shared with other collaborators or stored in Figma files. You are seeing this message because you have a Generic Versioned Storage provider configured. This dialog will only appear once.
         </Text>
         <Box css={{ display: 'flex', justifyContent: 'flex-end' }}>
           <Button variant="primary" onClick={handleClose}>OK</Button>
