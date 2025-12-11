@@ -1,5 +1,12 @@
 # @tokens-studio/figma-plugin
 
+## 2.10.9
+
+### Patch Changes
+
+- 8fbc48fe6: Fix: Bitbucket alphabetical reordering of token sets on sync, makes branch selection dropdown scrollable and searchable for all remote branches.
+- 5a6d25eb0: Adjusted generic versioned storage to store additional headers in clientStorage instead of sharedPluginData.
+
 ## 2.10.8
 
 ### Patch Changes
