@@ -3,6 +3,7 @@ import { useDispatch, useSelector, useStore } from 'react-redux';
 import { activeTokenSetSelector, tokensSelector } from '@/selectors';
 import { SingleToken } from '@/types/tokens';
 import { Dispatch, RootState } from '@/app/store';
+import { getParentPath, wouldCauseNameCollision, getNewTokenName } from '@/utils/token';
 
 type Props = {
   token: SingleToken;
@@ -47,26 +48,62 @@ export const DraggableWrapper: React.FC<React.PropsWithChildren<React.PropsWithC
     e.stopPropagation();
 
     const tokens = tokensSelector(store.getState());
+    const tokenSet = tokens[activeTokenSet];
 
-    let draggedTokenIndex: number | null = null;
-    let dropTokenIndex: number | null = null;
-
-    if (draggedToken && token && draggedToken.type === token.type) {
-      tokens[activeTokenSet].forEach((element, index) => {
-        if (element.name === draggedToken.name) draggedTokenIndex = index;
-        if (element.name === token.name) dropTokenIndex = index;
-      });
-      if (draggedTokenIndex !== null && dropTokenIndex !== null) {
-        const insertTokensIndex = draggedTokenIndex > dropTokenIndex ? dropTokenIndex : dropTokenIndex - 1;
-        const set = [...tokens[activeTokenSet]];
-        set.splice(insertTokensIndex, 0, set.splice(draggedTokenIndex, 1)[0]);
-        const newTokens = {
-          ...tokens,
-          [activeTokenSet]: set,
-        };
-        dispatch.tokenState.setTokens(newTokens);
-      }
+    if (!draggedToken || !token || draggedToken.type !== token.type) {
+      return;
     }
+
+    // Don't allow dropping on itself
+    if (draggedToken.name === token.name) {
+      return;
+    }
+
+    // Get the target parent path (where we're dropping the token)
+    const targetParentPath = getParentPath(token.name);
+
+    // Check if moving to a new parent would cause a name collision
+    if (wouldCauseNameCollision(draggedToken, targetParentPath, tokenSet)) {
+      // TODO: Show user-friendly error message
+      console.warn('Cannot move token: A token with this name already exists in the target location');
+      return;
+    }
+
+    // Find indices
+    const draggedTokenIndex = tokenSet.findIndex((t) => t.name === draggedToken.name);
+    const dropTokenIndex = tokenSet.findIndex((t) => t.name === token.name);
+
+    if (draggedTokenIndex === -1 || dropTokenIndex === -1) {
+      return;
+    }
+
+    // Create a copy of the token set
+    const newSet = [...tokenSet];
+
+    // Get the token being moved
+    const [movedToken] = newSet.splice(draggedTokenIndex, 1);
+
+    // Update the token's name if moving to a different parent
+    const currentParent = getParentPath(draggedToken.name);
+    const updatedToken = currentParent !== targetParentPath
+      ? { ...movedToken, name: getNewTokenName(movedToken, targetParentPath) }
+      : movedToken;
+
+    // Calculate the insertion index
+    // If dragging down (higher index), insert at dropTokenIndex
+    // If dragging up (lower index), insert before dropTokenIndex
+    const adjustedDropIndex = draggedTokenIndex > dropTokenIndex
+      ? dropTokenIndex
+      : dropTokenIndex - 1;
+
+    // Insert the token at the new position
+    newSet.splice(adjustedDropIndex, 0, updatedToken);
+
+    // Update the tokens in the state
+    dispatch.tokenState.setTokens({
+      ...tokens,
+      [activeTokenSet]: newSet,
+    });
   }, [store, token, draggedToken, dispatch, activeTokenSet]);
 
   const draggerProps = React.useMemo(() => ({
