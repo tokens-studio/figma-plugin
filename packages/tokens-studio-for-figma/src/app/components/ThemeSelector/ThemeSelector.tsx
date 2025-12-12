@@ -81,11 +81,24 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
     );
   }), [handleSelectTheme]);
 
+  // Optimize: Create a Map for faster theme lookup by group
+  const themesByGroup = useMemo(() => {
+    const groups = new Map<string, AvailableTheme[]>();
+    availableThemes.forEach((theme) => {
+      const groupName = theme.group || INTERNAL_THEMES_NO_GROUP;
+      if (!groups.has(groupName)) {
+        groups.set(groupName, []);
+      }
+      groups.get(groupName)!.push(theme);
+    });
+    return groups;
+  }, [availableThemes]);
+
   const availableThemeOptions = useMemo(() => (
     <Box className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }}>
       {
         groupNames.map((groupName) => {
-          const filteredThemes = groupName === INTERNAL_THEMES_NO_GROUP ? availableThemes.filter((theme) => (typeof theme?.group === 'undefined')) : availableThemes.filter((theme) => (theme?.group === groupName));
+          const filteredThemes = themesByGroup.get(groupName) || [];
           return (
             filteredThemes.length > 0 && (
               <DropdownMenu.RadioGroup key={groupName} value={typeof activeTheme[groupName] !== 'undefined' ? activeTheme[groupName] : ''}>
@@ -99,7 +112,7 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
         })
       }
     </Box>
-  ), [availableThemes, groupNames, activeTheme, renderThemeOption]);
+  ), [groupNames, activeTheme, renderThemeOption, themesByGroup]);
 
   return (
     <DropdownMenu>
