@@ -64,6 +64,8 @@ export enum AsyncMessageTypes {
   SET_VARIABLE_EXPORT_SETTINGS = 'async/set-variable-export-settings',
   SET_SELECTED_EXPORT_THEMES = 'async/set-selected-export-themes',
   CREATE_LIVING_DOCUMENTATION = 'async/create-living-documentation',
+  PREVIEW_VARIABLE_SYNC = 'async/preview-variable-sync',
+  APPLY_VARIABLE_CHANGES = 'async/apply-variable-changes',
   // the below messages are going from plugin to UI
   STARTUP = 'async/startup',
   GET_THEME_INFO = 'async/get-theme-info',
@@ -195,6 +197,55 @@ export type CreateLivingDocumentationAsyncMessage = AsyncMessage<AsyncMessageTyp
   useRegex?: boolean;
 }>;
 export type CreateLivingDocumentationAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_LIVING_DOCUMENTATION>;
+
+export type PreviewVariableSyncAsyncMessage = AsyncMessage<AsyncMessageTypes.PREVIEW_VARIABLE_SYNC, {
+  tokens: Record<string, AnyTokenList>;
+  settings: SettingsState;
+  selectedThemes?: string[];
+  selectedSets?: ExportTokenSet[];
+}>;
+
+export type VariableChangePreview = {
+  type: 'create' | 'update' | 'delete';
+  name: string;
+  path: string;
+  tokenType: string;
+  currentValue?: string;
+  newValue?: string;
+  description?: string;
+  variableId?: string;
+  collectionName?: string;
+  mode?: string;
+  // Additional token information needed for creation
+  tokenData?: {
+    value: any;
+    rawValue?: any;
+    type: string;
+    parent?: string;
+  };
+};
+
+export type PreviewVariableSyncAsyncMessageResult = AsyncMessage<AsyncMessageTypes.PREVIEW_VARIABLE_SYNC, {
+  changes: VariableChangePreview[];
+  summary: {
+    toCreate: number;
+    toUpdate: number;
+    toDelete: number;
+  };
+}>;
+
+export type ApplyVariableChangesAsyncMessage = AsyncMessage<AsyncMessageTypes.APPLY_VARIABLE_CHANGES, {
+  changes: VariableChangePreview[];
+  tokens: Record<string, AnyTokenList>;
+  settings: SettingsState;
+  selectedThemes?: string[];
+  selectedSets?: ExportTokenSet[];
+}>;
+
+export type ApplyVariableChangesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.APPLY_VARIABLE_CHANGES, {
+  variableIds: Record<string, string>;
+  totalVariables: number;
+}>;
 
 export type CreateStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.CREATE_STYLES, {
   tokens: AnyTokenList;
@@ -414,6 +465,8 @@ export type AsyncMessages =
   | SetUiAsyncMessage
   | CreateAnnotationAsyncMessage
   | CreateLivingDocumentationAsyncMessage
+  | PreviewVariableSyncAsyncMessage
+  | ApplyVariableChangesAsyncMessage
   | UpdateAsyncMessage
   | UpdateCheckForChangesAsyncMessage
   | GetThemeInfoMessage
@@ -466,6 +519,8 @@ export type AsyncMessageResults =
   | SetUiAsyncMessageResult
   | CreateAnnotationAsyncMessageResult
   | CreateLivingDocumentationAsyncMessageResult
+  | PreviewVariableSyncAsyncMessageResult
+  | ApplyVariableChangesAsyncMessageResult
   | UpdateAsyncMessageResult
   | UpdateCheckForChangesAsyncMessageResult
   | GetThemeInfoMessageResult
