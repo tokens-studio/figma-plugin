@@ -73,6 +73,7 @@ export const ThemeStyleManagementCategory: React.FC<React.PropsWithChildren<Reac
         <Button
           size="small"
           disabled={isAttachingLocalStyles}
+          loading={isAttachingLocalStyles}
           onClick={onAttachLocalStyles}
         >
           {t('attachLocalStyles')}
