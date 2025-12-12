@@ -266,7 +266,7 @@ export default function useRemoteTokens() {
                 values: remoteData.tokens,
                 themes: remoteData.themes,
                 activeTheme: filteredThemes,
-                usedTokenSet: usedTokenSet ?? {},
+                usedTokenSet: usedTokenSet || undefined,
                 hasChangedRemote: true,
               });
 
@@ -641,7 +641,7 @@ export default function useRemoteTokens() {
             values: sortedTokens,
             themes: remoteData.themes,
             activeTheme: activeTheme ?? {},
-            usedTokenSet: usedTokenSet ?? {},
+            usedTokenSet: usedTokenSet || undefined,
             shouldUpdate: true,
           });
           track('Launched with token sets', {
