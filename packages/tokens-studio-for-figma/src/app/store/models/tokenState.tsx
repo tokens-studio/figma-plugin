@@ -57,6 +57,7 @@ import { CreateSingleTokenData, EditSingleTokenData } from '../useManageTokens';
 import { singleTokensToRawTokenSet } from '@/utils/convert';
 import { checkStorageSize } from '@/utils/checkStorageSize';
 import { compareLastSyncedState } from '@/utils/compareLastSyncedState';
+import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
@@ -704,8 +705,37 @@ export const tokenState = createModel<RootModel>()({
         }
       });
 
+      // Auto-enable the first theme if no active theme is set and themes are available
+      let newActiveTheme = state.activeTheme;
+      let newUsedTokenSet = state.usedTokenSet;
+      const hasActiveTheme = Object.keys(state.activeTheme).length > 0;
+      const allThemes = [...state.themes, ...newThemes];
+
+      if (!hasActiveTheme && allThemes.length > 0) {
+        // Get the first theme
+        const firstTheme = allThemes[0];
+        const groupKey = firstTheme.group || INTERNAL_THEMES_NO_GROUP;
+        newActiveTheme = { [groupKey]: firstTheme.id };
+
+        // Update usedTokenSet based on the first theme's selectedTokenSets
+        const selectedTokenSets: Record<string, TokenSetStatus> = {};
+        Object.entries(firstTheme.selectedTokenSets).forEach(([tokenSet, status]) => {
+          if (status !== TokenSetStatus.DISABLED) {
+            selectedTokenSets[tokenSet] = status;
+          }
+        });
+
+        newUsedTokenSet = Object.fromEntries(
+          Object.keys(state.tokens).map((tokenSet) => (
+            [tokenSet, selectedTokenSets?.[tokenSet] ?? TokenSetStatus.DISABLED]
+          )),
+        );
+      }
+
       return {
         ...state,
+        activeTheme: newActiveTheme,
+        usedTokenSet: newUsedTokenSet,
         importedThemes: {
           newThemes,
           updatedThemes,
