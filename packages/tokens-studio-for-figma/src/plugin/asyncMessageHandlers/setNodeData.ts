@@ -9,6 +9,11 @@ import { defaultTokenValueRetriever } from '../TokenValueRetriever';
 export const setNodeData: AsyncMessageChannelHandlers[AsyncMessageTypes.SET_NODE_DATA] = async (msg) => {
   try {
     if (figma.currentPage.selection.length) {
+      // Commit undo point before setting node data
+      if (typeof figma !== 'undefined' && figma.commitUndo) {
+        figma.commitUndo();
+      }
+      
       const tokensMap = tokenArrayGroupToMap(msg.tokens);
       const nodes = figma.currentPage.selection;
       const {
