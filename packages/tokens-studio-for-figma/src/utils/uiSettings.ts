@@ -32,6 +32,7 @@ export async function updateUISettings(uiSettings: Partial<SavedSettings>) {
       stylesColor: uiSettings.stylesColor ?? data?.stylesColor,
       stylesEffect: uiSettings.stylesEffect ?? data?.stylesEffect,
       stylesTypography: uiSettings.stylesTypography ?? data?.stylesTypography,
+      stylesGradient: uiSettings.stylesGradient ?? data?.stylesGradient,
       inspectDeep: uiSettings.inspectDeep ?? data?.inspectDeep,
       shouldSwapStyles: uiSettings.shouldSwapStyles ?? data?.shouldSwapStyles,
       shouldSwapFigmaModes: uiSettings.shouldSwapFigmaModes ?? data?.shouldSwapFigmaModes,
@@ -67,6 +68,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
     let stylesColor: boolean;
     let stylesEffect: boolean;
     let stylesTypography: boolean;
+    let stylesGradient: boolean;
     let ignoreFirstPartForStyles: boolean;
     let createStylesWithVariableReferences: boolean;
     let prefixStylesWithThemeName: boolean;
@@ -101,6 +103,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
       stylesColor = typeof data.stylesColor === 'undefined' ? false : data.stylesColor;
       stylesTypography = typeof data.stylesTypography === 'undefined' ? true : data.stylesTypography;
       stylesEffect = typeof data.stylesEffect === 'undefined' ? true : data.stylesEffect;
+      stylesGradient = typeof data.stylesGradient === 'undefined' ? false : data.stylesGradient;
       ignoreFirstPartForStyles = typeof data.ignoreFirstPartForStyles === 'undefined' ? false : data.ignoreFirstPartForStyles;
       createStylesWithVariableReferences = typeof data.createStylesWithVariableReferences === 'undefined' ? true : data.createStylesWithVariableReferences;
       prefixStylesWithThemeName = typeof data.prefixStylesWithThemeName === 'undefined' ? false : data.prefixStylesWithThemeName;
@@ -134,6 +137,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
         stylesColor,
         stylesEffect,
         stylesTypography,
+        stylesGradient,
         ignoreFirstPartForStyles,
         createStylesWithVariableReferences,
         prefixStylesWithThemeName,
