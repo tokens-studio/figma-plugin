@@ -1,14 +1,13 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button } from '@tokens-studio/ui';
-import { css } from '@stitches/react';
+import { styled } from '@/stitches.config';
 import { Modal } from './Modal/Modal';
+import Link from './Link';
 
-const linkStyle = css({
-  color: '#2563eb',
-  textDecoration: 'underline',
-  fontWeight: 600,
-  cursor: 'pointer',
+const ModalFooterRight = styled('div', {
+  display: 'flex',
+  justifyContent: 'flex-end',
 });
 
 export const TERMS_UPDATE_MODAL_KEY = 'seenTermsUpdate2026';
@@ -37,39 +36,22 @@ export default function TermsUpdateModal() {
       isOpen={open}
       close={handleClose}
       showClose={false}
-      footer={
-        (
-          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <Button variant="primary" onClick={handleClose}>Continue</Button>
-          </div>
-        )
-      }
+      footer={(
+        <ModalFooterRight>
+          <Button variant="primary" onClick={handleClose}>Continue</Button>
+        </ModalFooterRight>
+      )}
     >
       <div style={{ lineHeight: 1.6 }}>
         <p>
           We have made updates to our Terms & Conditions and Privacy Policy. Please review our
           {' '}
-          <a
-            href="https://tokens.studio/terms/plugin"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={linkStyle()}
-          >
-            Terms & Conditions
-          </a>
+          <Link href="https://tokens.studio/terms/plugin">Terms & Conditions</Link>
           {' '}
           and our
           {' '}
-          <a
-            href="https://tokens.studio/privacy/plugin"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={linkStyle()}
-          >
-            Privacy Policy
-          </a>
-          , which will come into effect on
-          {' '}
+          <Link href="https://tokens.studio/privacy/plugin">Privacy Policy</Link>
+          {', which will come into effect on '}
           <b>15 January 2026</b>
           .
         </p>
