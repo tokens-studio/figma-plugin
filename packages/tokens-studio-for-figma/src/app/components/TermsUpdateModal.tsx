@@ -44,14 +44,14 @@ export default function TermsUpdateModal() {
     >
       <div style={{ lineHeight: 1.6 }}>
         <p>
-          We have made updates to our Terms & Conditions and Privacy Policy. Please review our
+          We have made updates to our
           {' '}
           <Link href="https://tokens.studio/terms/plugin">Terms & Conditions</Link>
           {' '}
           and our
           {' '}
           <Link href="https://tokens.studio/privacy/plugin">Privacy Policy</Link>
-          {', which will come into effect on '}
+          {', Please review these which will come into effect on '}
           <b>15 January 2026</b>
           .
         </p>
