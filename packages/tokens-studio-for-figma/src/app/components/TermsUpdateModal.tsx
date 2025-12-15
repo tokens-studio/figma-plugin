@@ -56,7 +56,7 @@ export default function TermsUpdateModal() {
           and our
           {' '}
           <Link href="https://tokens.studio/privacy/plugin">Privacy Policy</Link>
-          {', Please review these which will come into effect on '}
+          {', Please review these documents which will come into effect on '}
           <b>15 January 2026</b>
           .
         </p>
