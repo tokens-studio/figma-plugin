@@ -92,6 +92,7 @@ export type SavedSettings = {
   tokenFormat: TokenFormatOptions;
   autoApplyThemeOnDrop: boolean;
   seenGenericVersionedHeaderMigrationDialog?: boolean;
+  seenTermsUpdate2026?: boolean;
 };
 
 export function notifyUISettings(
@@ -126,6 +127,7 @@ export function notifyUISettings(
     renameExistingStylesAndVariables,
     removeStylesAndVariablesWithoutConnection,
     seenGenericVersionedHeaderMigrationDialog,
+    seenTermsUpdate2026,
   }: SavedSettings,
 ) {
   postToUI({
@@ -163,6 +165,7 @@ export function notifyUISettings(
       renameExistingStylesAndVariables,
       removeStylesAndVariablesWithoutConnection,
       seenGenericVersionedHeaderMigrationDialog,
+      seenTermsUpdate2026,
     },
   });
   postToUI({
