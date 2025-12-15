@@ -14,14 +14,17 @@ export const TERMS_UPDATE_MODAL_KEY = 'seenTermsUpdate2026';
 
 export default function TermsUpdateModal() {
   const dispatch = useDispatch();
-  const seenFlag = useSelector((state: any) => state.settings?.seenTermsUpdate2026 ?? false);
+  const seenFlag = useSelector((state: any) => state.settings?.seenTermsUpdate2026);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
     // Skip showing modal in Cypress tests
     const isCypress = typeof window !== 'undefined' && (window as any).Cypress;
-    if (!seenFlag && !isCypress) {
+    // Only show modal if settings have been loaded (seenFlag is not undefined) and it's false
+    if (seenFlag === false && !isCypress) {
       setOpen(true);
+    } else if (seenFlag === true) {
+      setOpen(false);
     }
   }, [seenFlag]);
 
