@@ -71,6 +71,7 @@ export type UiSettingsFromPluginMessage = {
     storeTokenIdInJsonEditor: boolean;
     tokenFormat: TokenFormatOptions;
     seenGenericVersionedHeaderMigrationDialog?: boolean;
+    seenTermsUpdate2026?: boolean;
   };
 };
 
