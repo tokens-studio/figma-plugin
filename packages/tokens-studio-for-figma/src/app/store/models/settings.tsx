@@ -56,6 +56,7 @@ export interface SettingsState {
   removeStylesAndVariablesWithoutConnection?: boolean;
   autoApplyThemeOnDrop?: boolean;
   seenGenericVersionedHeaderMigrationDialog?: boolean;
+  seenTermsUpdate2026?: boolean;
 }
 
 const setUI = (state: SettingsState) => {
@@ -73,6 +74,7 @@ export const settings = createModel<RootModel>()({
       isMinimized: false,
     },
     seenGenericVersionedHeaderMigrationDialog: false,
+    seenTermsUpdate2026: false,
     language: 'en',
     sessionRecording: false,
     updateMode: UpdateMode.SELECTION,
@@ -235,6 +237,12 @@ export const settings = createModel<RootModel>()({
       return {
         ...state,
         shouldSwapFigmaModes: payload,
+      };
+    },
+    setSeenTermsUpdate2026(state, payload: boolean) {
+      return {
+        ...state,
+        seenTermsUpdate2026: payload,
       };
     },
     setSeenGenericVersionedHeaderMigrationDialog(state, payload: boolean) {
