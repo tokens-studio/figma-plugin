@@ -665,6 +665,7 @@ describe('Initiator', () => {
       applyVariablesStylesOrRawValue: ApplyVariablesStylesOrRawValues.VARIABLES_STYLES,
       autoApplyThemeOnDrop: false,
       seenGenericVersionedHeaderMigrationDialog: false,
+      seenTermsUpdate2026: false,
     });
   });
 
