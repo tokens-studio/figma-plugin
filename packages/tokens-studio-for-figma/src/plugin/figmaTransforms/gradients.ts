@@ -35,6 +35,9 @@ function parseColorStops(parts: string[]): ColorStop[] {
       }
     }
 
+    // Strip quotes from color part if present
+    colorPart = colorPart.replace(/['"]/g, '');
+
     const { color, opacity } = convertToFigmaColor(colorPart);
     const gradientColor = color;
     gradientColor.a = opacity;
