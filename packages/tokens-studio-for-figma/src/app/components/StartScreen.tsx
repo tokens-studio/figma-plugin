@@ -4,12 +4,16 @@ import {
   BookmarkIcon, ReaderIcon, ChatBubbleIcon, GitHubLogoIcon,
 } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
-import { Button, Heading, Select, Label, Spinner } from '@tokens-studio/ui';
+import {
+  Button, Heading, Select, Label, Spinner,
+} from '@tokens-studio/ui';
 import TokensStudioLogo from '@/icons/tokensstudio-full.svg';
 import Text from './Text';
 import Callout from './Callout';
 import { Dispatch } from '../store';
-import { apiProvidersSelector, storageTypeSelector, lastErrorSelector, themeOptionsSelector, activeThemeSelector } from '@/selectors';
+import {
+  apiProvidersSelector, storageTypeSelector, lastErrorSelector, themeOptionsSelector, activeThemeSelector,
+} from '@/selectors';
 import Stack from './Stack';
 import { styled } from '@/stitches.config';
 import { Tabs } from '@/constants/Tabs';
@@ -87,21 +91,21 @@ function StartScreen() {
     const selectedProvider = apiProviders.find((provider) => provider.internalId === providerId);
     if (selectedProvider) {
       track('Start with sync provider', { provider: selectedProvider.provider });
-      
+
       // Clear any existing errors and set loading state
       dispatch.uiState.setLastError(null);
       setIsLoadingProvider(true);
-      
+
       try {
         await restoreProviderWithAutoPull(selectedProvider);
-        
+
         // Auto-select first themes if no themes are currently selected
         if (availableThemes.length > 0) {
           const newActiveTheme = autoSelectFirstThemesPerGroup(availableThemes, activeTheme);
           if (Object.keys(newActiveTheme).length > 0 && Object.keys(activeTheme).length === 0) {
-            dispatch.tokenState.setActiveTheme({ 
-              newActiveTheme, 
-              shouldUpdateNodes: true 
+            dispatch.tokenState.setActiveTheme({
+              newActiveTheme,
+              shouldUpdateNodes: true,
             });
             track('Auto-selected themes', { themes: newActiveTheme });
           }
@@ -142,12 +146,13 @@ function StartScreen() {
   }, [lastError, storageType?.provider, matchingProvider, t]);
 
   // Create provider options for the select dropdown
-  const providerOptions = React.useMemo(() => 
-    apiProviders.map((provider) => ({
+  const providerOptions = React.useMemo(
+    () => apiProviders.map((provider) => ({
       value: provider.internalId,
       label: `${provider.name} (${transformProviderName(provider.provider)})`,
-    }))
-  , [apiProviders]);
+    })),
+    [apiProviders],
+  );
 
   // Determine if we should show the provider selector
   const shouldShowProviderSelector = apiProviders.length > 0 && storageType?.provider === StorageProviderType.LOCAL;
@@ -197,12 +202,13 @@ function StartScreen() {
               </HelpfulLink>
             </Stack>
           </Stack>
-          {isLoadingProvider ? (
+          {isLoadingProvider && (
             <Stack direction="row" gap={3} align="center" css={{ padding: '$4' }}>
               <Spinner />
               <Text>{t('loadingTokens', { defaultValue: 'Loading tokens from sync provider...' })}</Text>
             </Stack>
-          ) : storageType?.provider !== StorageProviderType.LOCAL ? (
+          )}
+          {!isLoadingProvider && storageType?.provider !== StorageProviderType.LOCAL && (
             <Callout
               id="callout-action-setupsync"
               heading={getCalloutContent.heading}
@@ -219,7 +225,8 @@ function StartScreen() {
                 text: t('retry'),
               } : undefined}
             />
-          ) : (
+          )}
+          {!isLoadingProvider && storageType?.provider === StorageProviderType.LOCAL && (
             <Stack direction="column" gap={4}>
               {shouldShowProviderSelector && (
                 <Stack direction="column" gap={3}>
@@ -227,7 +234,7 @@ function StartScreen() {
                   <Stack direction="row" justify="between" align="center" gap={4} css={{ width: '100%' }}>
                     <Label>{t('selectProvider', { defaultValue: 'Select a provider' })}</Label>
                     <Select onValueChange={onProviderSelect} disabled={isLoadingProvider}>
-                      <Select.Trigger 
+                      <Select.Trigger
                         value={t('chooseProvider', { defaultValue: 'Choose a provider...' })}
                         data-testid="provider-selector"
                       />
