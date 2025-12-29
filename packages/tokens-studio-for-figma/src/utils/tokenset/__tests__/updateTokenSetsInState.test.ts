@@ -151,7 +151,7 @@ describe('updateTokenSetsInState', () => {
       activeTokenSet: 'global',
       usedTokenSet: {
         global: TokenSetStatus.ENABLED,
-        global_Copy: TokenSetStatus.DISABLED,
+        global_Copy: TokenSetStatus.ENABLED,
       },
       themes: [
         {
@@ -201,7 +201,7 @@ describe('updateTokenSetsInState', () => {
       activeTokenSet: 'global',
       usedTokenSet: {
         global: TokenSetStatus.ENABLED,
-        'global/light': TokenSetStatus.DISABLED,
+        'global/light': TokenSetStatus.ENABLED,
         dark: TokenSetStatus.DISABLED,
       },
       themes: [

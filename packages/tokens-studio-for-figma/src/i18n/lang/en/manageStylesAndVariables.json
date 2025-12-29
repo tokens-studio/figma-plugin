@@ -2,6 +2,10 @@
 "modalTitle": "Export to Figma",
 "buttonLabel": "Styles and Variables",
 "optionsModalTitle": "Export to Figma: Options",
+"searchThemes": "Search themes",
+"searchSets": "Search sets",
+"noThemesFound": "No themes found",
+"noSetsFound": "No sets found",
 "actions": {
   "export": "Export to Figma",
   "import": "Import from Figma",
@@ -65,7 +69,9 @@
   "introPro": "Combinations of token sets create themes. Use themes to create multiple collections of variables or styles for easy switching between design concepts like light or dark color modes, multiple brands, products or platforms. Or switch to Sets to export without using Themes",
   "introBasic": "Combinations of token sets create themes. Use themes to create multiple collections of variables or styles for easy switching between design concepts like light or dark color modes, multiple brands, products or platforms.",
   "confirmThemes": "Create styles or variables based on themes",
-  "combinationsOfSetsMakeThemes": "Choose which themes should be created or updated."
+  "combinationsOfSetsMakeThemes": "Choose which themes should be created or updated.",
+  "otherThemesSelected_one": "{{count}} other theme selected",
+  "otherThemesSelected_other": "{{count}} other themes selected"
 
 },
 "exportSetsTab": {

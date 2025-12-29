@@ -1,35 +1,24 @@
 import {
-  useEffect,
   useMemo,
 } from 'react';
 import { useDispatch, useStore } from 'react-redux';
-import { useLDClient } from 'launchdarkly-react-client-sdk';
-import { LDClient } from 'launchdarkly-js-client-sdk';
 import { StartupMessage } from '@/types/AsyncMessages';
 import { useProcess } from '@/hooks';
 import { ApplicationInitSteps } from './ApplicationInitSteps';
 import { Dispatch, RootState } from '@/app/store';
 import {
-  addLicenseFactory, savePluginDataFactory, getLdFlagsFactory, saveStorageInformationFactory, pullTokensFactory,
+  addLicenseFactory, savePluginDataFactory, saveStorageInformationFactory, pullTokensFactory, migrateRemoveAdditionalHeadersFactory,
 } from './startupProcessSteps';
 import useStorage from '@/app/store/useStorage';
-import { useFlags } from '../LaunchDarkly';
 import useConfirm from '@/app/hooks/useConfirm';
 import useRemoteTokens from '@/app/store/remoteTokens';
 
-let ldClientPromiseResolver: (client: LDClient) => void;
-const ldClientPromise = new Promise<LDClient>((resolve) => {
-  ldClientPromiseResolver = resolve;
-});
-
 export function useStartupProcess(params: StartupMessage) {
-  const ldClient = useLDClient();
   const store = useStore<RootState>();
   const dispatch = useDispatch<Dispatch>();
   const useStorageResult = useStorage();
   const useConfirmResult = useConfirm();
   const useRemoteTokensResult = useRemoteTokens();
-  const flags = useFlags();
 
   const startupProcess = useProcess<ApplicationInitSteps>(useMemo(() => ([
     {
@@ -41,8 +30,8 @@ export function useStartupProcess(params: StartupMessage) {
       fn: addLicenseFactory(dispatch, params),
     },
     {
-      key: ApplicationInitSteps.GET_LD_FLAGS,
-      fn: getLdFlagsFactory(store, ldClientPromise, params),
+      key: ApplicationInitSteps.MIGRATE_REMOVE_ADDITIONAL_HEADERS,
+      fn: migrateRemoveAdditionalHeadersFactory(dispatch, params),
     },
     {
       key: ApplicationInitSteps.SAVE_STORAGE_INFORMATION,
@@ -50,17 +39,11 @@ export function useStartupProcess(params: StartupMessage) {
     },
     {
       key: ApplicationInitSteps.PULL_TOKENS,
-      fn: pullTokensFactory(store, dispatch, flags, params, useConfirmResult, useRemoteTokensResult),
+      fn: pullTokensFactory(store, dispatch, params, useConfirmResult, useRemoteTokensResult),
     },
   // disabling as we don't want some of those deps to trigger the process
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  ]), [params, store, flags]));
-
-  useEffect(() => {
-    if (ldClient) {
-      ldClientPromiseResolver(ldClient);
-    }
-  }, [ldClient]);
+  ]), [params, store]));
 
   return startupProcess;
 }

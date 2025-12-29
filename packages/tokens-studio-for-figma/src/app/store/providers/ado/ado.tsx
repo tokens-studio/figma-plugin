@@ -1,6 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import React from 'react';
-import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
+import React, { useEffect } from 'react';
 import compact from 'just-compact';
 import { Dispatch } from '@/app/store';
 import useConfirm from '@/app/hooks/useConfirm';
@@ -42,6 +41,8 @@ export const useADO = () => {
     const storageClient = new ADOTokenStorage(context);
     if (context.filePath) storageClient.changePath(context.filePath);
     if (context.branch) storageClient.selectBranch(context.branch);
+    // Always check isProUser dynamically rather than capturing it in closure
+    // This ensures multi-file is enabled even if the license was validated after this callback was created
     if (isProUser) storageClient.enableMultiFile();
     return storageClient;
   }, [isProUser]);
@@ -136,21 +137,29 @@ export const useADO = () => {
     localApiState,
   ]);
 
-  const checkAndSetAccess = React.useCallback(async (context: AdoCredentials, receivedFeatureFlags?: LDProps['flags']) => {
+  const checkAndSetAccess = React.useCallback(async (context: AdoCredentials) => {
     const storage = storageClientFactory(context);
-    if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
+    if (isProUser) {
+      storage.enableMultiFile();
+    }
     const hasWriteAccess = await storage.canWrite();
     dispatch.tokenState.setEditProhibited(!hasWriteAccess);
-  }, [dispatch, storageClientFactory]);
+  }, [dispatch, storageClientFactory, isProUser]);
 
-  const pullTokensFromADO = React.useCallback(async (context: AdoCredentials, receivedFeatureFlags?: LDProps['flags']): Promise<RemoteResponseData | null> => {
+  // Re-check access when isProUser changes from false to true (license validation during startup)
+  useEffect(() => {
+    if (isProUser && localApiState && localApiState.id && localApiState.provider === 'ado') {
+      checkAndSetAccess(localApiState as AdoCredentials);
+    }
+  }, [isProUser, localApiState, checkAndSetAccess]);
+
+  const pullTokensFromADO = React.useCallback(async (context: AdoCredentials): Promise<RemoteResponseData | null> => {
     const storage = storageClientFactory(context);
     if (context.branch) {
       storage.setSource(context.branch);
     }
-    if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
 
-    await checkAndSetAccess(context, receivedFeatureFlags);
+    await checkAndSetAccess(context);
 
     try {
       const content = await storage.retrieve();

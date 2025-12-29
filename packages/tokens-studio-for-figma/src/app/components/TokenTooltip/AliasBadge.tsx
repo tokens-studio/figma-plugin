@@ -1,5 +1,7 @@
 import React from 'react';
 import { styled } from '@/stitches.config';
+import { useResolvedBaseFontSize } from '@/app/hooks/useResolvedBaseFontSize';
+import { formatTokenValueForDisplay } from '@/utils/displayTokenValue';
 
 const StyledAliasBadge = styled('div', {
   padding: '$1 $2',
@@ -15,7 +17,11 @@ type Props = {
 };
 
 export default function AliasBadge({ value }: Props) {
+  const currentBaseFontSize = useResolvedBaseFontSize();
+
   return (
-    <StyledAliasBadge>{value}</StyledAliasBadge>
+    <StyledAliasBadge>
+      {formatTokenValueForDisplay(value || '', currentBaseFontSize)}
+    </StyledAliasBadge>
   );
 }

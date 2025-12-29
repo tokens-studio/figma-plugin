@@ -32,21 +32,6 @@ jobs:
         name: ${{ inputs.environment }}
     runs-on: ubuntu-22.04
     steps:
-      # Pull secrets from vault
-      - name: Import Secrets
-        id: secrets
-        uses: hashicorp/vault-action@v2
-        with:
-          url: ${{ vars.VAULT_URL }}
-          role: ${{ vars.VAULT_ROLE }}_${{ inputs.environment  }}
-          method: jwt
-          namespace: admin
-          secrets: |
-            ${{ vars.VAULT_PATH }} MIXPANEL_ACCESS_TOKEN | MIXPANEL_ACCESS_TOKEN;
-            ${{ vars.VAULT_PATH }} STORYBLOK_ACCESS_TOKEN | STORYBLOK_ACCESS_TOKEN;
-            ${{ vars.VAULT_PATH }} SUPABASE_ANON_KEY | SUPABASE_ANON_KEY;
-            ${{ vars.VAULT_PATH }} SENTRY_AUTH_TOKEN | SENTRY_AUTH_TOKEN;    
-            ${{ vars.VAULT_PATH }} TOKENS_STUDIO_API_HOST | TOKENS_STUDIO_API_HOST;
       - name: Checkout
         uses: actions/checkout@v3
       - name: Setup Node.js environment
@@ -71,11 +56,11 @@ jobs:
           envkey_SENTRY_ORG: ${{ vars.SENTRY_ORG }}
           envkey_SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
           envkey_SUPABASE_URL: ${{ vars.SUPABASE_URL }}
-          envkey_MIXPANEL_ACCESS_TOKEN: ${{ steps.secrets.outputs.MIXPANEL_ACCESS_TOKEN }} 
-          envkey_STORYBLOK_ACCESS_TOKEN: ${{ steps.secrets.outputs.STORYBLOK_ACCESS_TOKEN }} 
-          envkey_SUPABASE_ANON_KEY: ${{ steps.secrets.outputs.SUPABASE_ANON_KEY }} 
-          envkey_SENTRY_AUTH_TOKEN: ${{ steps.secrets.outputs.SENTRY_AUTH_TOKEN }}
-          envkey_TOKENS_STUDIO_API_HOST: ${{ steps.secrets.outputs.TOKENS_STUDIO_API_HOST }}
+          envkey_MIXPANEL_ACCESS_TOKEN: ${{ secrets.MIXPANEL_ACCESS_TOKEN }} 
+          envkey_STORYBLOK_ACCESS_TOKEN: ${{ secrets.STORYBLOK_ACCESS_TOKEN }} 
+          envkey_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }} 
+          envkey_SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          envkey_TOKENS_STUDIO_API_HOST: ${{ secrets.TOKENS_STUDIO_API_HOST }}
  
       # Build the figma plugin package
       - name: Build Package

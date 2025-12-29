@@ -1,6 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { useCallback, useMemo } from 'react';
-import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
+import { useCallback, useMemo, useEffect } from 'react';
 import compact from 'just-compact';
 import { Dispatch } from '@/app/store';
 import useConfirm from '@/app/hooks/useConfirm';
@@ -151,19 +150,29 @@ export function useGitLab() {
   ]);
 
   const checkAndSetAccess = useCallback(async ({
-    context, receivedFeatureFlags,
-  }: { context: GitlabCredentials; receivedFeatureFlags?: LDProps['flags'] }) => {
+    context,
+  }: { context: GitlabCredentials }) => {
     const storage = await storageClientFactory(context, isProUser);
-    if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
+    if (isProUser) {
+      storage.enableMultiFile();
+    }
     const hasWriteAccess = await storage.canWrite();
     dispatch.tokenState.setEditProhibited(!hasWriteAccess);
   }, [dispatch, storageClientFactory, isProUser]);
 
-  const pullTokensFromGitLab = useCallback(async (context: GitlabCredentials, receivedFeatureFlags?: LDProps['flags']): Promise<RemoteResponseData | null> => {
+  // Re-check access when isProUser changes from false to true (license validation during startup)
+  useEffect(() => {
+    if (isProUser && localApiState && localApiState.id && localApiState.provider === 'gitlab') {
+      checkAndSetAccess({
+        context: localApiState as GitlabCredentials,
+      });
+    }
+  }, [isProUser, localApiState, checkAndSetAccess]);
+
+  const pullTokensFromGitLab = useCallback(async (context: GitlabCredentials): Promise<RemoteResponseData | null> => {
     const storage = await storageClientFactory(context, isProUser);
-    if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
     await checkAndSetAccess({
-      context, receivedFeatureFlags,
+      context,
     });
 
     try {
