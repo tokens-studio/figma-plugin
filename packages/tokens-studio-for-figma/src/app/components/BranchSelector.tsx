@@ -30,7 +30,7 @@ import { useChangedState } from '@/hooks/useChangedState';
 export default function BranchSelector() {
   const { confirm } = useConfirm();
   const {
-    pullTokens, pushTokens,
+    pullTokens,
   } = useRemoteTokens();
   const dispatch = useDispatch<Dispatch>();
   const { setStorageType } = useStorage();
@@ -91,13 +91,14 @@ export default function BranchSelector() {
       track('Create new branch from specific branch');
 
       if (hasChanges && (await askUserIfPushChanges())) {
-        await pushTokens();
+        // User chose to discard changes - clear local token state
+        dispatch.tokenState.setEmptyTokens();
       }
 
       setStartBranch(branch);
       setCreateBranchModalVisible(true);
     },
-    [hasChanges, askUserIfPushChanges, pushTokens],
+    [hasChanges, askUserIfPushChanges, dispatch],
   );
 
   const changeAndPull = React.useCallback(
@@ -108,6 +109,8 @@ export default function BranchSelector() {
           setCurrentBranch(branch);
           dispatch.uiState.setApiData({ ...apiData, branch });
           dispatch.uiState.setLocalApiState({ ...localApiState, branch });
+          // Clear local token state before pulling from new branch
+          dispatch.tokenState.setEmptyTokens();
           await pullTokens({
             context: { ...apiData, branch }, usedTokenSet, activeTheme, updateLocalTokens: true,
           });
@@ -121,7 +124,7 @@ export default function BranchSelector() {
         }
       }
     },
-    [apiData, localApiState, dispatch.uiState, pullTokens, usedTokenSet, activeTheme, setStorageType],
+    [apiData, localApiState, dispatch, pullTokens, usedTokenSet, activeTheme, setStorageType],
   );
 
   const onBranchSelected = React.useCallback(
