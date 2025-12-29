@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import {
+  Spinner, Stack, Heading,
+} from '@tokens-studio/ui';
+import {
   branchSelector,
   localApiStateBranchSelector,
   apiSelector,
@@ -19,6 +22,7 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { StorageTypeCredentials } from '@/types/StorageType';
 import { track } from '@/utils/analytics';
 import CreateBranchModal from './modals/CreateBranchModal';
+import Modal from './Modal';
 
 import { BranchSelectorPopover } from './BranchSelectorPopover';
 import { useChangedState } from '@/hooks/useChangedState';
@@ -44,9 +48,14 @@ export default function BranchSelector() {
   const [startBranch, setStartBranch] = useState<string | null>(null);
   const [createBranchModalVisible, setCreateBranchModalVisible] = useState(false);
   const [isCurrentChanges, setIsCurrentChanges] = useState(false);
+  const [isSwitchingBranch, setIsSwitchingBranch] = useState(false);
 
   const handleCloseModal = React.useCallback(() => {
     setCreateBranchModalVisible(false);
+  }, []);
+
+  const handleCloseSwitchingModal = React.useCallback(() => {
+    // Do nothing - prevent closing the modal during branch switch
   }, []);
 
   const handleOpenChangePopover = React.useCallback((open: boolean) => {
@@ -94,17 +103,22 @@ export default function BranchSelector() {
   const changeAndPull = React.useCallback(
     async (branch: string) => {
       if (isGitProvider(apiData) && isGitProvider(localApiState)) {
-        setCurrentBranch(branch);
-        dispatch.uiState.setApiData({ ...apiData, branch });
-        dispatch.uiState.setLocalApiState({ ...localApiState, branch });
-        await pullTokens({
-          context: { ...apiData, branch }, usedTokenSet, activeTheme, updateLocalTokens: true,
-        });
-        AsyncMessageChannel.ReactInstance.message({
-          type: AsyncMessageTypes.CREDENTIALS,
-          credential: { ...apiData, branch },
-        });
-        setStorageType({ provider: { ...apiData, branch } as StorageTypeCredentials, shouldSetInDocument: true });
+        setIsSwitchingBranch(true);
+        try {
+          setCurrentBranch(branch);
+          dispatch.uiState.setApiData({ ...apiData, branch });
+          dispatch.uiState.setLocalApiState({ ...localApiState, branch });
+          await pullTokens({
+            context: { ...apiData, branch }, usedTokenSet, activeTheme, updateLocalTokens: true,
+          });
+          AsyncMessageChannel.ReactInstance.message({
+            type: AsyncMessageTypes.CREDENTIALS,
+            credential: { ...apiData, branch },
+          });
+          setStorageType({ provider: { ...apiData, branch } as StorageTypeCredentials, shouldSetInDocument: true });
+        } finally {
+          setIsSwitchingBranch(false);
+        }
       }
     },
     [apiData, localApiState, dispatch.uiState, pullTokens, usedTokenSet, activeTheme, setStorageType],
@@ -156,6 +170,14 @@ export default function BranchSelector() {
           startBranch={startBranch}
           isCurrentChanges={isCurrentChanges}
         />
+      )}
+      {isSwitchingBranch && (
+        <Modal isOpen close={handleCloseSwitchingModal}>
+          <Stack direction="column" gap={4} justify="center" align="center" css={{ padding: '$4 0' }}>
+            <Spinner />
+            <Heading size="medium">{t('switchingBranch')}</Heading>
+          </Stack>
+        </Modal>
       )}
     </>
   ) : (

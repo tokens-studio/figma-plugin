@@ -54,32 +54,31 @@ export class BitbucketTokenStorage extends GitTokenStorage {
   // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-refs/#api-repositories-workspace-repo-slug-refs-get
   public async fetchBranches(): Promise<string[]> {
     try {
-      // Use direct HTTP call for API token authentication
       const authString = `${this.username || this.owner}:${this.apiToken}`;
       const authHeader = `Basic ${btoa(authString)}`;
-
-      const response = await fetch(`https://api.bitbucket.org/2.0/repositories/${this.owner}/${this.repository}/refs/branches`, {
-        headers: {
-          Authorization: authHeader,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        // Re-throw authentication errors instead of catching them
-        if (response.status === 401) {
-          throw new Error('BITBUCKET_UNAUTHORIZED');
+      const branches: string[] = [];
+      let url = `https://api.bitbucket.org/2.0/repositories/${this.owner}/${this.repository}/refs/branches?pagelen=50`;
+      while (url) {
+        const response = await fetch(url, {
+          headers: {
+            Authorization: authHeader,
+            'Content-Type': 'application/json',
+          },
+        });
+        if (!response.ok) {
+          if (response.status === 401) {
+            throw new Error('BITBUCKET_UNAUTHORIZED');
+          }
+          throw new Error(`Failed to fetch branches: ${response.status} ${response.statusText}`);
         }
-        throw new Error(`Failed to fetch branches: ${response.status} ${response.statusText}`);
+        const data = await response.json();
+        if (data.values && Array.isArray(data.values)) {
+          branches.push(...data.values.map((branch: any) => branch.name));
+        }
+        url = data.next || null;
       }
-
-      const data = await response.json();
-      if (!data.values) {
-        return [];
-      }
-      return data.values.map((branch: any) => branch.name) as string[];
+      return branches;
     } catch (error) {
-      // Re-throw authentication errors and other specific errors
       if (error instanceof Error && error.message === 'BITBUCKET_UNAUTHORIZED') {
         throw error;
       }
@@ -269,13 +268,44 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     return data;
   }
 
+  /**
+   * Get the commit SHA for a branch. For branches with slashes, we need to use the commit SHA
+   * instead of the branch name in the src endpoint due to Bitbucket API limitations.
+   */
+  private async getBranchCommitSha(branchName: string): Promise<string> {
+    try {
+      const authString = `${this.username || this.owner}:${this.apiToken}`;
+      const authHeader = `Basic ${btoa(authString)}`;
+
+      const response = await fetch(`https://api.bitbucket.org/2.0/repositories/${this.owner}/${this.repository}/refs/branches/${encodeURIComponent(branchName)}`, {
+        headers: {
+          Authorization: authHeader,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to get branch info: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data.target.hash;
+    } catch (error) {
+      console.warn(`Could not get commit SHA for branch ${branchName}, falling back to branch name:`, error);
+      return branchName;
+    }
+  }
+
   public async read(): Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage> {
     const normalizedPath = compact(this.path.split('/')).join('/');
 
     try {
-      const url = `https://api.bitbucket.org/2.0/repositories/${this.owner}/${this.repository}/src/${this.branch}/${normalizedPath}`;
+      // For branches with slashes, use commit SHA instead of branch name due to Bitbucket API limitations
+      const branchRef = this.branch.includes('/')
+        ? await this.getBranchCommitSha(this.branch)
+        : encodeURIComponent(this.branch);
+      const url = `https://api.bitbucket.org/2.0/repositories/${this.owner}/${this.repository}/src/${branchRef}/${normalizedPath}`;
 
-      // Single file
       if (this.path.endsWith('.json')) {
         const jsonFile = await this.fetchJsonFile(url);
 
@@ -315,7 +345,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
         const authString = `${this.username || this.owner}:${this.apiToken}`;
         const jsonFileContents = await Promise.allSettled(
           jsonFiles.map((file: any) => {
-            const fileUrl = `https://api.bitbucket.org/2.0/repositories/${this.owner}/${this.repository}/src/${this.branch}/${file.path}`;
+            const fileUrl = `https://api.bitbucket.org/2.0/repositories/${this.owner}/${this.repository}/src/${branchRef}/${file.path}`;
             return retryHttpRequest<Response>(
               () => fetch(fileUrl, {
                 headers: {
@@ -331,7 +361,6 @@ export class BitbucketTokenStorage extends GitTokenStorage {
             });
           }),
         );
-        // Process the content of each JSON file
         return jsonFileContents.map((result, index) => {
           const { path } = jsonFiles[index];
           const filePath = path.startsWith(this.path) ? path : `${this.path}/${path}`;
@@ -429,7 +458,10 @@ export class BitbucketTokenStorage extends GitTokenStorage {
 
     if (!normalizedPath.endsWith('.json') && this.flags.multiFileEnabled) {
       try {
-        const url = `https://api.bitbucket.org/2.0/repositories/${owner}/${repo}/src/${branch}/${normalizedPath}`;
+        const branchRef = branch.includes('/')
+          ? await this.getBranchCommitSha(branch)
+          : encodeURIComponent(branch);
+        const url = `https://api.bitbucket.org/2.0/repositories/${owner}/${repo}/src/${branchRef}/${normalizedPath}`;
         const existingFiles = await this.fetchJsonFilesFromDirectory(url);
 
         const existingTokenSets: Record<string, boolean> = {};

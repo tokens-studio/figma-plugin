@@ -89,4 +89,26 @@ describe('mergeVariableReferencesWithLocalVariables', () => {
     expect(variables.size).toBe(2);
     expect(variables.get('fg.muted')).toBe('V:012');
   });
+
+  it('should include all variable references even if not in validatedVariableCache', async () => {
+    const themes = [
+      {
+        $figmaVariableReferences: {
+          'colors.primary': 'VariableID:123:456',
+          'colors.secondary': 'remote-library-key-abc123',
+        },
+      },
+    ];
+
+    // Create a cache that only has one of the two variables
+    const validatedCache = new Map<string, Variable>();
+    validatedCache.set('VariableID:123:456', { id: 'VariableID:123:456', name: 'colors/primary' } as any);
+
+    const variables = await mergeVariableReferencesWithLocalVariables(themes, [], validatedCache);
+
+    // Both variables should be included, regardless of validation status
+    expect(variables.size).toBe(4); // 2 from themes + 2 local
+    expect(variables.get('colors.primary')).toBe('VariableID:123:456');
+    expect(variables.get('colors.secondary')).toBe('remote-library-key-abc123');
+  });
 });

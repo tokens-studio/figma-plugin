@@ -37,6 +37,7 @@ describe('Branch switcher', () => {
       updateOnChange: false,
       updateRemote: true,
       shouldUpdateStyles: true,
+      shouldSwapFigmaModes: false,
     },
     storageType: provider,
     user: {
@@ -130,12 +131,11 @@ describe('Branch switcher', () => {
     cy.startup(mockStartupParams);
     cy.get('[data-testid=branch-selector-menu-trigger]').click();
     cy.get('[data-testid=popover-item-development]').click();
-    
-    // Handle the error dialog that appears when GitHub connection fails during branch switching
-    // This is expected behavior when GitHub is unreachable in the test environment
-    cy.get('#pullDialog-button-cancel', { timeout: 5000 }).should('be.visible').click();
-    
-    cy.get('[data-testid=branch-selector-menu-trigger]').click();
+
+    // Wait for branch switch to complete by checking that the branch selector trigger contains "development"
+    cy.get('[data-testid=branch-selector-menu-trigger]', { timeout: 10000 }).should('contain', 'development');
+
+    cy.get('[data-testid=branch-selector-menu-trigger]', { timeout: 10000 }).click({ force: true });
     // Check that development branch is now selected (has checkmark)
     cy.get('[data-testid=popover-item-development]').should('contain', '✓');
   });
@@ -177,10 +177,10 @@ describe('Branch switcher', () => {
       ...mockStartupParams,
       licenseKey: null, // Remove license to make user non-pro
     };
-    
+
     cy.startup(nonProUserParams);
     cy.get('[data-testid=branch-selector-menu-trigger]').click();
-    
+
     // Should show pro upgrade modal
     cy.contains('Branching is a feature of the Pro subscription').should('be.visible');
     cy.contains('You can switch branches, create new ones from current changes or any other branch, easily find branches, and collaborate seamlessly with your team. Branching enables powerful version control and team collaboration workflows.').should('be.visible');

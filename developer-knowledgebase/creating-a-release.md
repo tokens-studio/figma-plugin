@@ -12,7 +12,6 @@ In order to release a new version, first make sure you have the correct `.env` v
 
 ```
 MIXPANEL_ACCESS_TOKEN=INSERT_MIXPANEL_ACCESS_TOKEN
-STORYBLOK_ACCESS_TOKEN=INSERT_STORYBLOK_ACCESS_TOKEN
 ENVIRONMENT=production
 LICENSE_API_URL=https://figmatokens-api.herokuapp.com
 LAUNCHDARKLY_SDK_CLIENT=626fb05d52e5c715abd11b5e

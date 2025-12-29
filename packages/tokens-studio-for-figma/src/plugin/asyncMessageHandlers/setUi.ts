@@ -34,8 +34,11 @@ export const setUi: AsyncMessageChannelHandlers[AsyncMessageTypes.SET_UI] = asyn
     sessionRecording: msg.sessionRecording,
     aliasBaseFontSize: msg.aliasBaseFontSize,
     shouldSwapStyles: msg.shouldSwapStyles,
+    shouldSwapFigmaModes: msg.shouldSwapFigmaModes,
     storeTokenIdInJsonEditor: msg.storeTokenIdInJsonEditor,
     autoApplyThemeOnDrop: msg.autoApplyThemeOnDrop,
+    seenGenericVersionedHeaderMigrationDialog: msg.seenGenericVersionedHeaderMigrationDialog,
+    seenTermsUpdate2026: msg.seenTermsUpdate2026,
   });
   figma.ui.resize(width, height);
   if (store.inspectDeep !== msg.inspectDeep) {

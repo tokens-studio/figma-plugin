@@ -29,6 +29,7 @@ import { Dispatch } from '@/app/store';
 import { StudioConfigurationService } from '@/storage/tokensStudio/StudioConfigurationService';
 import { shouldUseSecureConnection } from '@/utils/shouldUseSecureConnection';
 import { isJWTError, getErrorMessage } from '@/utils/jwtErrorUtils';
+import { track } from '@/utils/analytics';
 
 type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.TOKENS_STUDIO }>;
 type Props = {
@@ -83,6 +84,9 @@ export default function TokensStudioForm({
   );
 
   const handleStartTrial = React.useCallback(() => {
+    track('Start Free Trial Clicked', {
+      source: 'tokens-studio-form',
+    });
     window.open('https://app.prod.tokens.studio', '_blank');
   }, []);
 
@@ -147,13 +151,13 @@ export default function TokensStudioForm({
     }
   }, [debouncedSecret, fetchOrgData]);
 
-  const orgOptions = React.useMemo(
-    () => orgData?.map((org) => ({
+  const orgOptions = React.useMemo(() => {
+    const opts = (orgData ?? []).map((org) => ({
       label: org.name,
       value: org.id,
-    })),
-    [orgData],
-  );
+    }));
+    return opts.sort((a, b) => (a.label ?? '').trim().localeCompare((b.label ?? '').trim(), undefined, { sensitivity: 'base' }));
+  }, [orgData]);
 
   const onOrgChange = React.useCallback(
     (value: string) => {
@@ -166,7 +170,8 @@ export default function TokensStudioForm({
     if (!orgData) return [];
     const selectedOrgData = orgData.find((org) => org.id === values.orgId);
     if (!selectedOrgData) return [];
-    return selectedOrgData.projects.data.map((project) => ({
+    const sortedProjects = [...(selectedOrgData.projects?.data ?? [])].sort((a, b) => (a.name ?? '').trim().localeCompare((b.name ?? '').trim(), undefined, { sensitivity: 'base' }));
+    return sortedProjects.map((project) => ({
       label: project.name,
       value: project.id,
     }));

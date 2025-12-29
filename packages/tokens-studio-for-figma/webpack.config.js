@@ -98,14 +98,26 @@ module.exports = wrapper((env, argv) => {
           ],
         }]),
         // Enables including CSS by doing "import './file.css'" in your TypeScript code
-        { test: /\.css$/, use: [{ loader: 'style-loader' }, { loader: 'css-loader' }] },
+        { 
+          test: /\.css$/, 
+          use: [
+            { loader: 'style-loader' }, 
+            { 
+              loader: 'css-loader',
+              options: {
+                url: true,
+                import: true,
+              }
+            }
+          ] 
+        },
         // Imports webfonts
         {
           test: /\.(woff|woff2)$/,
           use: {
             loader: 'url-loader',
             options: {
-              name: '[name].[ext]',
+              limit: 1000000, // Inline files up to 1MB (all our fonts)
             },
           },
         },
@@ -130,10 +142,13 @@ module.exports = wrapper((env, argv) => {
         'react-redux': 'react-redux/dist/react-redux.js',
       },
       fallback: {
-        process:false,
-        "http": false,
-        https:false,
+        process: false,
+        http: false,
+        https: false,
         buffer: require.resolve('buffer/'),
+        crypto: require.resolve('crypto-browserify'),
+        stream: require.resolve('stream-browserify'),
+        vm: require.resolve('vm-browserify'),
       },
       extensions: ['.tsx', '.ts', '.jsx', '.js'],
     },
@@ -145,7 +160,7 @@ module.exports = wrapper((env, argv) => {
       concatenateModules: true
     },
     output: {
-      publicPath: '',
+      publicPath: '/',
       filename: '[name].js',
       sourceMapFilename: "[name].js.map",
       path: path.resolve(__dirname, argv.PREVIEW_ENV === 'browser' && !isDevServer ? 'preview' : 'dist'), // Compile into a folder called "dist"
@@ -197,7 +212,6 @@ module.exports = wrapper((env, argv) => {
       }),
       new webpack.DefinePlugin({
         'process.env.PREVIEW_ENV': JSON.stringify(argv.PREVIEW_ENV),
-        'process.env.LAUNCHDARKLY_FLAGS': JSON.stringify(process.env.LAUNCHDARKLY_FLAGS),
       }),
       new ForkTsCheckerWebpackPlugin({
         async: argv.mode === 'development',

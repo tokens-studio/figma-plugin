@@ -61,6 +61,8 @@ describe('uiSettings', () => {
       shouldSwapStyles: false,
       baseFontSize: '16',
       aliasBaseFontSize: '16',
+      seenGenericVersionedHeaderMigrationDialog: undefined,
+      seenTermsUpdate2026: undefined,
     }));
   });
 
@@ -94,11 +96,14 @@ describe('uiSettings', () => {
       inspectDeep: false,
       sessionRecording: false,
       shouldSwapStyles: false,
+      shouldSwapFigmaModes: false,
       storeTokenIdInJsonEditor: false,
       tokenFormat: TokenFormatOptions.Legacy,
       aliasBaseFontSize: '16',
       baseFontSize: '16',
       autoApplyThemeOnDrop: false,
+      seenGenericVersionedHeaderMigrationDialog: false,
+      seenTermsUpdate2026: false,
     });
   });
 
@@ -156,11 +161,14 @@ describe('uiSettings', () => {
       inspectDeep: false,
       sessionRecording: false,
       shouldSwapStyles: false,
+      shouldSwapFigmaModes: false,
       storeTokenIdInJsonEditor: false,
       tokenFormat: TokenFormatOptions.Legacy,
       aliasBaseFontSize: '16',
       baseFontSize: '16',
       autoApplyThemeOnDrop: false,
+      seenGenericVersionedHeaderMigrationDialog: false,
+      seenTermsUpdate2026: false,
     });
   });
 

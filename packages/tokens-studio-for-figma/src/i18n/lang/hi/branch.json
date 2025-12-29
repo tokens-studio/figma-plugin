@@ -9,5 +9,6 @@
   "search": "खोजें...",
   "noBranchesFound": "कोई शाखा नहीं मिली",
   "branchingProFeature": "शाखा प्रबंधन Pro सदस्यता की एक सुविधा है",
-  "upgradeToPro": "शाखाएं बनाने और बदलने के लिए Pro में अपग्रेड करें"
+  "upgradeToPro": "शाखाएं बनाने और बदलने के लिए Pro में अपग्रेड करें",
+  "switchingBranch": "शाखा बदल रहे हैं..."
 }
