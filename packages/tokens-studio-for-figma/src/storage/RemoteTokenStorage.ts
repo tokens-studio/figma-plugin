@@ -2,7 +2,7 @@ import { DeepTokensMap, ThemeObjectsList, ErrorCategory } from '@/types';
 import { RemoteResponseData } from '@/types/RemoteResponseData';
 import type { AnyTokenList, SingleToken } from '@/types/tokens';
 import convertTokensToObject from '@/utils/convertTokensToObject';
-import parseTokenValues from '@/utils/parseTokenValues';
+import parseTokenValues, { extractTokensOnly } from '@/utils/parseTokenValues';
 import { SystemFilenames } from '@/constants/SystemFilenames';
 import { categorizeError } from '@/utils/error/categorizeError';
 import { StorageProviderType } from '@/constants/StorageProviderType';
@@ -133,7 +133,7 @@ export abstract class RemoteTokenStorage<
         } else if (file.type === 'tokenSet') {
           data.tokens = {
             ...data.tokens,
-            ...parseTokenValues({ [file.name]: file.data }),
+            ...extractTokensOnly(parseTokenValues({ [file.name]: file.data })),
           };
         } else if (file.type === 'metadata') {
           data.metadata = {
