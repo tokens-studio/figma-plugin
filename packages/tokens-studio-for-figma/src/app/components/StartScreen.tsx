@@ -4,7 +4,7 @@ import {
   BookmarkIcon, ReaderIcon, ChatBubbleIcon, GitHubLogoIcon,
 } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
-import { Button, Heading, Select, Label } from '@tokens-studio/ui';
+import { Button, Heading, Select, Label, Spinner } from '@tokens-studio/ui';
 import TokensStudioLogo from '@/icons/tokensstudio-full.svg';
 import Text from './Text';
 import Callout from './Callout';
@@ -49,6 +49,9 @@ function StartScreen() {
   const availableThemes = useSelector(themeOptionsSelector);
   const activeTheme = useSelector(activeThemeSelector);
 
+  // Local loading state for provider selection
+  const [isLoadingProvider, setIsLoadingProvider] = React.useState(false);
+
   const onSetEmptyTokens = React.useCallback(() => {
     track('Start with empty set');
     dispatch.uiState.setLastError(null);
@@ -84,7 +87,10 @@ function StartScreen() {
     const selectedProvider = apiProviders.find((provider) => provider.internalId === providerId);
     if (selectedProvider) {
       track('Start with sync provider', { provider: selectedProvider.provider });
+      
+      // Clear any existing errors and set loading state
       dispatch.uiState.setLastError(null);
+      setIsLoadingProvider(true);
       
       try {
         await restoreProviderWithAutoPull(selectedProvider);
@@ -100,8 +106,10 @@ function StartScreen() {
             track('Auto-selected themes', { themes: newActiveTheme });
           }
         }
+        // Loading will be cleared when we navigate away to TOKENS tab
       } catch (error) {
         console.error('Error loading provider:', error);
+        setIsLoadingProvider(false);
         dispatch.uiState.setLastError({
           type: 'connectivity',
           header: 'Failed to load provider',
@@ -189,7 +197,12 @@ function StartScreen() {
               </HelpfulLink>
             </Stack>
           </Stack>
-          {storageType?.provider !== StorageProviderType.LOCAL ? (
+          {isLoadingProvider ? (
+            <Stack direction="row" gap={3} align="center" css={{ padding: '$4' }}>
+              <Spinner />
+              <Text>{t('loadingTokens', { defaultValue: 'Loading tokens from sync provider...' })}</Text>
+            </Stack>
+          ) : storageType?.provider !== StorageProviderType.LOCAL ? (
             <Callout
               id="callout-action-setupsync"
               heading={getCalloutContent.heading}
@@ -213,7 +226,7 @@ function StartScreen() {
                   <Heading size="medium">{t('loadFromProvider', { defaultValue: 'Load from sync provider' })}</Heading>
                   <Stack direction="row" justify="between" align="center" gap={4} css={{ width: '100%' }}>
                     <Label>{t('selectProvider', { defaultValue: 'Select a provider' })}</Label>
-                    <Select onValueChange={onProviderSelect}>
+                    <Select onValueChange={onProviderSelect} disabled={isLoadingProvider}>
                       <Select.Trigger 
                         value={t('chooseProvider', { defaultValue: 'Choose a provider...' })}
                         data-testid="provider-selector"
@@ -230,10 +243,10 @@ function StartScreen() {
                 </Stack>
               )}
               <Stack direction="row" gap={2}>
-                <Button data-testid="button-configure" size="small" variant="primary" onClick={onSetEmptyTokens}>
+                <Button data-testid="button-configure" size="small" variant="primary" onClick={onSetEmptyTokens} disabled={isLoadingProvider}>
                   {t('newEmptyFile')}
                 </Button>
-                <Button data-testid="button-configure-preset" size="small" variant="invisible" onClick={onSetDefaultTokens}>
+                <Button data-testid="button-configure-preset" size="small" variant="invisible" onClick={onSetDefaultTokens} disabled={isLoadingProvider}>
                   {t('loadExample')}
                 </Button>
               </Stack>

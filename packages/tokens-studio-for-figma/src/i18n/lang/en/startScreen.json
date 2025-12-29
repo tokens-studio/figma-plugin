@@ -18,5 +18,6 @@
   "unableToFetchRemoteWithCredentials": "Unable to fetch tokens from remote storage. This may be due to incorrect credentials, or the file might not exist or you don't have access to it.",
   "loadFromProvider": "Load from sync provider",
   "selectProvider": "Select a provider",
-  "chooseProvider": "Choose a provider..."
+  "chooseProvider": "Choose a provider...",
+  "loadingTokens": "Loading tokens from sync provider..."
 }
