@@ -10,6 +10,8 @@ export default function useFile() {
   const storageClientFactory = useCallback((files: FileList) => {
     const storageClient = new FileTokenStorage(files);
 
+    // Always check isProUser dynamically rather than capturing it in closure
+    // This ensures multi-file is enabled even if the license was validated after this callback was created
     if (isProUser) storageClient.enableMultiFile();
     return storageClient;
   }, [isProUser]);

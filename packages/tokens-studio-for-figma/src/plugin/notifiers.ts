@@ -86,11 +86,14 @@ export type SavedSettings = {
   removeStylesAndVariablesWithoutConnection: boolean;
   inspectDeep: boolean;
   shouldSwapStyles: boolean;
+  shouldSwapFigmaModes: boolean;
   baseFontSize: string;
   aliasBaseFontSize: string;
   storeTokenIdInJsonEditor: boolean;
   tokenFormat: TokenFormatOptions;
   autoApplyThemeOnDrop: boolean;
+  seenGenericVersionedHeaderMigrationDialog?: boolean;
+  seenTermsUpdate2026?: boolean;
 };
 
 export function notifyUISettings(
@@ -118,12 +121,15 @@ export function notifyUISettings(
     updateRemote = true,
     inspectDeep,
     shouldSwapStyles,
+    shouldSwapFigmaModes,
     baseFontSize,
     aliasBaseFontSize,
     storeTokenIdInJsonEditor,
     tokenFormat,
     renameExistingStylesAndVariables,
     removeStylesAndVariablesWithoutConnection,
+    seenGenericVersionedHeaderMigrationDialog,
+    seenTermsUpdate2026,
   }: SavedSettings,
 ) {
   postToUI({
@@ -154,12 +160,15 @@ export function notifyUISettings(
       prefixStylesWithThemeName,
       inspectDeep,
       shouldSwapStyles,
+      shouldSwapFigmaModes,
       baseFontSize,
       aliasBaseFontSize,
       storeTokenIdInJsonEditor,
       tokenFormat,
       renameExistingStylesAndVariables,
       removeStylesAndVariablesWithoutConnection,
+      seenGenericVersionedHeaderMigrationDialog,
+      seenTermsUpdate2026,
     },
   });
   postToUI({

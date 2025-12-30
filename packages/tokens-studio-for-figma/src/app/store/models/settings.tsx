@@ -30,6 +30,7 @@ export interface SettingsState {
   tokenType?: TokenModeType;
   inspectDeep: boolean;
   shouldSwapStyles: boolean;
+  shouldSwapFigmaModes: boolean;
   shouldUpdateStyles: boolean;
   baseFontSize: string;
   aliasBaseFontSize: string;
@@ -55,6 +56,8 @@ export interface SettingsState {
   renameExistingStylesAndVariables?: boolean;
   removeStylesAndVariablesWithoutConnection?: boolean;
   autoApplyThemeOnDrop?: boolean;
+  seenGenericVersionedHeaderMigrationDialog?: boolean;
+  seenTermsUpdate2026?: boolean;
 }
 
 const setUI = (state: SettingsState) => {
@@ -71,6 +74,8 @@ export const settings = createModel<RootModel>()({
       height: 600,
       isMinimized: false,
     },
+    seenGenericVersionedHeaderMigrationDialog: false,
+    seenTermsUpdate2026: false,
     language: 'en',
     sessionRecording: false,
     updateMode: UpdateMode.SELECTION,
@@ -86,6 +91,7 @@ export const settings = createModel<RootModel>()({
     autoApplyThemeOnDrop: false,
     inspectDeep: false,
     shouldSwapStyles: false,
+    shouldSwapFigmaModes: false,
     shouldUpdateStyles: false,
     baseFontSize: defaultBaseFontSize,
     aliasBaseFontSize: defaultBaseFontSize,
@@ -229,6 +235,24 @@ export const settings = createModel<RootModel>()({
         autoApplyThemeOnDrop: payload,
       };
     },
+    setShouldSwapFigmaModes(state, payload: boolean) {
+      return {
+        ...state,
+        shouldSwapFigmaModes: payload,
+      };
+    },
+    setSeenTermsUpdate2026(state, payload: boolean) {
+      return {
+        ...state,
+        seenTermsUpdate2026: payload,
+      };
+    },
+    setSeenGenericVersionedHeaderMigrationDialog(state, payload: boolean) {
+      return {
+        ...state,
+        seenGenericVersionedHeaderMigrationDialog: payload,
+      };
+    },
   },
   effects: () => ({
     setLanguage: (payload: string, rootState) => {
@@ -250,6 +274,9 @@ export const settings = createModel<RootModel>()({
       });
     },
     setShouldSwapStyles: (payload, rootState) => {
+      setUI(rootState.settings);
+    },
+    setShouldSwapFigmaModes: (payload, rootState) => {
       setUI(rootState.settings);
     },
     setShouldUpdateStyles: (payload, rootState) => {
@@ -286,6 +313,12 @@ export const settings = createModel<RootModel>()({
       setUI(rootState.settings);
     },
     setAutoApplyThemeOnDrop: (payload: boolean, rootState) => {
+      setUI(rootState.settings);
+    },
+    setSeenGenericVersionedHeaderMigrationDialog: (payload: boolean, rootState) => {
+      setUI(rootState.settings);
+    },
+    setSeenTermsUpdate2026: (payload: boolean, rootState) => {
       setUI(rootState.settings);
     },
     ...Object.fromEntries(

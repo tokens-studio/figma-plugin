@@ -98,13 +98,22 @@ export async function applySpacingValuesOnNode(
     && typeof data.itemSpacing !== 'undefined'
     && isPrimitiveValue(values.itemSpacing)
   ) {
-    if (String(values.itemSpacing) === 'AUTO') {
+    const itemSpacingValue = String(values.itemSpacing);
+
+    if (itemSpacingValue === 'AUTO') {
+      // Set alignment to SPACE_BETWEEN for AUTO spacing
       node.primaryAxisAlignItems = 'SPACE_BETWEEN';
-    } else if (node.primaryAxisAlignItems === 'SPACE_BETWEEN') {
-      node.primaryAxisAlignItems = 'MIN';
-    }
-    if (!(await tryApplyVariableId(node, 'itemSpacing', data.itemSpacing))) {
-      node.itemSpacing = transformValue(String(values.itemSpacing), 'spacing', baseFontSize);
+      // Don't set itemSpacing when using AUTO
+    } else {
+      // FIX: When switching from AUTO to a non-AUTO value, reset alignment to MIN
+      if (node.primaryAxisAlignItems === 'SPACE_BETWEEN') {
+        node.primaryAxisAlignItems = 'MIN';
+      }
+
+      // Apply the actual spacing value
+      if (!(await tryApplyVariableId(node, 'itemSpacing', data.itemSpacing))) {
+        node.itemSpacing = transformValue(itemSpacingValue, 'spacing', baseFontSize);
+      }
     }
   }
 

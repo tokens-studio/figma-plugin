@@ -12,7 +12,6 @@ export function savePluginDataFactory(dispatch: Dispatch, params: StartupMessage
         identify({
           userId: user.userId,
           figmaId: user.userId,
-          name: user.name,
         });
       }
       track('Launched', { version: pjs.version });
@@ -29,7 +28,6 @@ export function savePluginDataFactory(dispatch: Dispatch, params: StartupMessage
       };
       dispatch.userState.setUserId(user.figmaId);
       dispatch.userState.setUsedEmail(usedEmail ?? undefined);
-      dispatch.userState.setUserName(user.name);
       dispatch.uiState.setLastOpened(params.lastOpened);
       dispatch.uiState.setOnboardingExplainerSets(params.onboardingExplainer.sets);
       dispatch.uiState.setOnboardingExplainerExportSets(params.onboardingExplainer.exportSets);

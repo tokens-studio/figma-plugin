@@ -66,10 +66,13 @@ export type UiSettingsFromPluginMessage = {
     removeStylesAndVariablesWithoutConnection: boolean;
     inspectDeep: boolean;
     shouldSwapStyles: boolean;
+    shouldSwapFigmaModes: boolean;
     baseFontSize: string;
     aliasBaseFontSize: string;
     storeTokenIdInJsonEditor: boolean;
     tokenFormat: TokenFormatOptions;
+    seenGenericVersionedHeaderMigrationDialog?: boolean;
+    seenTermsUpdate2026?: boolean;
   };
 };
 

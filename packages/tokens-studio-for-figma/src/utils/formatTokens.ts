@@ -22,7 +22,7 @@ type Options = {
 export default function formatTokens({
   tokens,
   tokenSets,
-  resolvedTokens,
+  resolvedTokens: _resolvedTokens,
   includeAllTokens = false,
   includeParent = true,
   expandTypography = false,
@@ -32,6 +32,7 @@ export default function formatTokens({
   storeTokenIdInJsonEditor = false,
 }: Options) {
   const nestUnderParent = includeAllTokens ? true : includeParent;
+
   const tokenObj = {};
   tokenSets.forEach((tokenSet) => {
     tokens[tokenSet]?.forEach((token) => {
@@ -50,19 +51,11 @@ export default function formatTokens({
         || (token.type === TokenTypes.BORDER && expandBorder)
       ) {
         if (typeof token.value === 'string') {
-          const resolvedToken = resolvedTokens.find((t) => t.name === name);
-          if (resolvedToken) {
-            if (typeof resolvedToken.value === 'string') {
-              set(tokenObj, nestUnderParent ? [tokenSet, token.name].join('.') : token.name, convertedToFormat);
-            } else {
-              const expanded = expand(resolvedToken?.value);
-              const expandedToFormat = convertTokenToFormat(expanded, true);
-              set(tokenObj, nestUnderParent ? [tokenSet, token.name].join('.') : token.name, { ...expandedToFormat });
-            }
-          } else {
-            set(tokenObj, nestUnderParent ? [tokenSet, token.name].join('.') : token.name, convertedToFormat);
-          }
+          // If the original token value is a string (alias), keep it as an alias
+          // Do not resolve it even when expand options are enabled
+          set(tokenObj, nestUnderParent ? [tokenSet, token.name].join('.') : token.name, convertedToFormat);
         } else {
+          // For object values, expand them into individual properties
           const expanded = expand(tokenWithoutName.value);
           const expandedToFormat = convertTokenToFormat(expanded, true);
 
