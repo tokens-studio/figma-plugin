@@ -107,6 +107,9 @@ export default async function setValuesOnVariable(
           }
 
           if (variable) {
+            // Always add the variable to the key map, regardless of whether it needs updating
+            variableKeyMap[token.name] = variable.key;
+
             // First, rename all variables that should be renamed (if the user choose to do so)
             if (variable.name !== token.path && shouldRename) {
               renamedVariableKeys.push(variable.key);
@@ -121,8 +124,39 @@ export default async function setValuesOnVariable(
             }
             variable.description = token.description ?? '';
 
-            // Always add the variable to the key map, regardless of whether it needs updating
-            variableKeyMap[token.name] = variable.key;
+            // Set variable scopes if defined in token extensions
+            const figmaExtensions = token.$extensions?.['com.figma'];
+            if (figmaExtensions?.scopes && Array.isArray(figmaExtensions.scopes)) {
+              try {
+                variable.scopes = figmaExtensions.scopes as VariableScope[];
+              } catch (e) {
+                console.error('Failed to set variable scopes:', e);
+              }
+            }
+
+            // Set variable code syntax if defined in token extensions
+            if (figmaExtensions?.codeSyntax && typeof figmaExtensions.codeSyntax === 'object') {
+              try {
+                Object.entries(figmaExtensions.codeSyntax).forEach(([platform, syntax]) => {
+                  if (typeof syntax === 'string' && syntax.trim() && variable) {
+                    // Map our platform names to Figma's expected values
+                    let figmaPlatform: 'WEB' | 'ANDROID' | 'iOS';
+                    if (platform === 'Web') {
+                      figmaPlatform = 'WEB';
+                    } else if (platform === 'Android') {
+                      figmaPlatform = 'ANDROID';
+                    } else if (platform === 'iOS') {
+                      figmaPlatform = 'iOS';
+                    } else {
+                      figmaPlatform = platform as 'WEB' | 'ANDROID' | 'iOS';
+                    }
+                    variable.setVariableCodeSyntax(figmaPlatform, syntax);
+                  }
+                });
+              } catch (e) {
+                console.error('Failed to set variable code syntax:', e);
+              }
+            }
 
             // Check if the variable already has the correct alias reference before updating
             const existingVariableValue = variable.valuesByMode[mode];

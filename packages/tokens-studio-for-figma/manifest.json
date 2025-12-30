@@ -4,11 +4,20 @@
   "api": "1.0.0",
   "main": "dist/code.js",
   "ui": "dist/index.html",
-  "editorType": ["figma", "dev"],
-  "permissions": ["currentuser"],
-  "capabilities": ["codegen"],
+  "editorType": [
+    "figma",
+    "dev"
+  ],
+  "permissions": [
+    "currentuser"
+  ],
+  "capabilities": [
+    "codegen"
+  ],
   "networkAccess": {
-    "allowedDomains": ["*"],
+    "allowedDomains": [
+      "*"
+    ],
     "reasoning": "We use various external endpoints, read more: https://tokens.studio/figma-plugin-network-access"
   },
   "codegenLanguages": [
