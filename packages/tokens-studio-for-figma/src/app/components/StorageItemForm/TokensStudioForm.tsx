@@ -69,6 +69,7 @@ export default function TokensStudioForm({
         secret: zod.string(),
         internalId: zod.string().optional(),
         orgId: zod.string(),
+        projectName: zod.string().optional(),
         baseUrl: zod.string().optional(),
       });
       const validationResult = zodSchema.safeParse(values);
@@ -183,9 +184,13 @@ export default function TokensStudioForm({
 
   const onProjectChange = React.useCallback(
     (value: string) => {
+      const selectedProjectData = projectOptions.find((project) => project.value === value);
       onChange({ target: { name: 'id', value } });
+      if (selectedProjectData) {
+        onChange({ target: { name: 'projectName', value: selectedProjectData.label } });
+      }
     },
-    [onChange],
+    [onChange, projectOptions],
   );
 
   const handleBaseUrlBlur = React.useCallback(
