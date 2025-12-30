@@ -1,7 +1,7 @@
 /**
  * Check if two colors are approximately equal within a threshold
  * @param color1 First color to compare
- * @param color2 Second color to compare  
+ * @param color2 Second color to compare
  * @param threshold Threshold for comparison (default: 0.0001)
  * @returns true if colors are approximately equal
  */

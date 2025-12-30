@@ -207,14 +207,6 @@ const withOrWithoutLicense = (
 };
 // #endregion
 
-jest.mock('launchdarkly-react-client-sdk', () => ({
-  LDProvider: (props: React.PropsWithChildren<unknown>) => props.children,
-  useLDClient: () => ({
-    identify: () => Promise.resolve(),
-  }),
-  useFlags: () => ({}),
-}));
-
 describe('AppContainer (integration)', () => {
   beforeEach(resetSuite);
 

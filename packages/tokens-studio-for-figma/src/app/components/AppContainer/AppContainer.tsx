@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
+import TermsUpdateModal from '../TermsUpdateModal';
 import App from '../App';
 import FigmaLoading from '../FigmaLoading';
 import { AsyncMessageTypes, StartupMessage } from '@/types/AsyncMessages';
@@ -8,13 +9,11 @@ import { Tabs } from '@/constants/Tabs';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { useStartupProcess } from './useStartupProcess';
 import { ProcessStepStatus } from '@/hooks';
-import { withLDProviderWrapper } from '../LaunchDarkly';
 import { ApplicationInitSteps } from './ApplicationInitSteps';
 import ConfirmDialog from '../ConfirmDialog';
 import WindowResizer from '../WindowResizer';
 import ImportedTokensDialog from '../ImportedTokensDialog';
 import PushDialog from '../PushDialog';
-import Changelog from '../Changelog';
 import OnboardingFlow from '../OnboardingFlow';
 import { Initiator } from '../Initiator';
 import { globalStyles } from '../globalStyles';
@@ -26,6 +25,7 @@ import { useFigmaTheme } from '@/hooks/useFigmaTheme';
 import Box from '../Box';
 import { darkThemeMode, lightThemeMode } from '@/stitches.config';
 import BitbucketMigrationDialog from '../BitbucketMigrationDialog';
+import GenericVersionedHeaderMigrationDialog from '../GenericVersionedHeaderMigrationDialog';
 
 type Props = StartupMessage & {
   // @README only for unit testing purposes
@@ -35,12 +35,12 @@ type Props = StartupMessage & {
 const applicationInitStepLabels = {
   [ApplicationInitSteps.SAVE_PLUGIN_DATA]: 'Receiving local data',
   [ApplicationInitSteps.ADD_LICENSE]: 'Verifying license',
-  [ApplicationInitSteps.GET_LD_FLAGS]: 'Initializing LaunchDarkly',
   [ApplicationInitSteps.SAVE_STORAGE_INFORMATION]: 'Checking storage type',
   [ApplicationInitSteps.PULL_TOKENS]: 'Fetching (remote) tokens',
 };
 
-export const AppContainer = withLDProviderWrapper((params: Props) => {
+export const AppContainer = (params: Props) => {
+  const { authData } = params;
   const { isDarkTheme } = useFigmaTheme();
   const dispatch = useDispatch<Dispatch>();
   const startupProcess = useStartupProcess(params);
@@ -88,6 +88,7 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
 
   const appContent = (
     <Box css={{ backgroundColor: '$bgDefault', color: '$fgDefault' }}>
+      <TermsUpdateModal />
       <FigmaLoading
         isLoading={showLoadingScreen}
         label={startupProcess.currentStep ? applicationInitStepLabels[startupProcess.currentStep] : undefined}
@@ -104,12 +105,12 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
       }
       <WindowResizer />
       <OnboardingFlow />
-      <Changelog />
       <SecondScreenSync />
       <AuthModal />
       <BitbucketMigrationDialog />
+      <GenericVersionedHeaderMigrationDialog />
     </Box>
   );
 
-  return <AuthContextProvider authData={params.authData}>{appContent}</AuthContextProvider>;
-});
+  return <AuthContextProvider authData={authData}>{appContent}</AuthContextProvider>;
+};

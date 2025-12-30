@@ -645,6 +645,7 @@ describe('Initiator', () => {
       updateRemote: false,
       updateOnChange: false,
       sessionRecording: false,
+      shouldSwapFigmaModes: false,
       shouldUpdateStyles: false,
       variablesColor: true,
       variablesNumber: true,
@@ -663,6 +664,8 @@ describe('Initiator', () => {
       aliasBaseFontSize: '16',
       applyVariablesStylesOrRawValue: ApplyVariablesStylesOrRawValues.VARIABLES_STYLES,
       autoApplyThemeOnDrop: false,
+      seenGenericVersionedHeaderMigrationDialog: false,
+      seenTermsUpdate2026: false,
     });
   });
 

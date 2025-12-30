@@ -31,14 +31,14 @@ describe('TokenBottomBar', () => {
 
     const toolsButton = await result.findByLabelText('load_export');
     await userEvent.click(toolsButton);
-    const loadButton = await result.findByText('loadFromFileOrPreset');
+    const loadButton = await result.findByText('loadFromPreset');
     await userEvent.click(loadButton, { pointerEventsCheck: 0 });
-    expect(result.queryByText('Import')).toBeInTheDocument();
+    expect(result.queryByText('importFromPreset')).toBeInTheDocument();
 
     const closeButton = await result.findByTestId('close-button');
     closeButton.click();
     waitFor(() => {
-      expect(result.queryByText('Import')).toBeNull();
+      expect(result.queryByText('importFromPreset')).toBeNull();
     });
   });
 

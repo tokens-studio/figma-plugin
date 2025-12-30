@@ -70,9 +70,13 @@ export function updateTokenSetsInState(
     nextThemes = nextThemes.map((theme) => {
       let nextSelectedTokenSets = { ...theme.selectedTokenSets };
       renamedTokenSets.forEach((newName, originalName) => {
-        const tokenSetStatus = nextSelectedTokenSets[originalName] ?? TokenSetStatus.DISABLED;
+        const tokenSetStatus = nextSelectedTokenSets[originalName];
         nextSelectedTokenSets = omit(nextSelectedTokenSets, originalName);
-        nextSelectedTokenSets[newName] = tokenSetStatus;
+
+        // Only add to selectedTokenSets if it was previously enabled/source
+        if (tokenSetStatus !== undefined) {
+          nextSelectedTokenSets[newName] = tokenSetStatus;
+        }
       });
       return {
         ...theme,
@@ -83,7 +87,7 @@ export function updateTokenSetsInState(
 
   if (newTokenSets.length) {
     newTokenSets.forEach(([name]) => {
-      nextUsedTokenSet[name] = TokenSetStatus.DISABLED;
+      nextUsedTokenSet[name] = TokenSetStatus.ENABLED;
     });
   }
 

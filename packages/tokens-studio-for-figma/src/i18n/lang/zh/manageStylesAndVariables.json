@@ -68,7 +68,9 @@
     "introPro": "令牌集合的组合创建主题。使用主题创建多个变量或样式的集合，以便在设计概念之间轻松切换，如浅色或深色模式、多个品牌、产品或平台。或者切换到集合以在不使用主题的情况下导出",
     "introBasic": "令牌集合的组合创建主题。使用主题创建多个变量或样式的集合，以便在设计概念之间轻松切换，如浅色或深色模式、多个品牌、产品或平台。",
     "confirmThemes": "确认主题",
-    "combinationsOfSetsMakeThemes": "令牌集合的组合创建主题"
+    "combinationsOfSetsMakeThemes": "令牌集合的组合创建主题",
+    "otherThemesSelected_one": "已选择 {{count}} 个其他主题",
+    "otherThemesSelected_other": "已选择 {{count}} 个其他主题"
   },
   "exportSetsTab": {
     "changeSetsHeading": "启用的集合将导出到 Figma",

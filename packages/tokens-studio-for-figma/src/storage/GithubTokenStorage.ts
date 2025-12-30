@@ -14,6 +14,7 @@ import { ErrorMessages } from '@/constants/ErrorMessages';
 import { GitSyncOptimizer, ChangedState } from './GitSyncOptimizer';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { retryWithBackoff } from '@/utils/retryWithBackoff';
+import { isMissingFileError } from './utils/handleMissingFileError';
 
 type ExtendedOctokitClient = Omit<Octokit, 'repos'> & {
   repos: Octokit['repos'] & {
@@ -65,8 +66,30 @@ export class GithubTokenStorage extends GitTokenStorage {
     const ExtendedOctokitConstructor = Octokit.plugin(require('octokit-commit-multiple-files'));
     this.octokitClient = new ExtendedOctokitConstructor({
       auth: this.secret,
-      baseUrl: this.baseUrl || undefined,
+      baseUrl: this.normalizeGitHubEnterpriseBaseUrl(this.baseUrl),
     }) as ExtendedOctokitClient;
+  }
+
+  /**
+   * Normalizes the GitHub Enterprise base URL to ensure it has the /api/v3 suffix
+   * @param baseUrl - The base URL provided by the user
+   * @returns The normalized base URL with /api/v3 suffix, or undefined for GitHub.com
+   */
+  private normalizeGitHubEnterpriseBaseUrl(baseUrl?: string): string | undefined {
+    if (!baseUrl || baseUrl === '') {
+      return undefined; // Use default GitHub.com API
+    }
+
+    // Remove trailing slashes
+    const normalized = baseUrl.trim().replace(/\/+$/, '');
+
+    // If it already has /api/v3, return as-is
+    if (normalized.endsWith('/api/v3')) {
+      return normalized;
+    }
+
+    // Add /api/v3 for GitHub Enterprise Server
+    return `${normalized}/api/v3`;
   }
 
   public async listBranches() {
@@ -304,6 +327,10 @@ export class GithubTokenStorage extends GitTokenStorage {
       return [];
     } catch (e) {
       console.error('Error', e);
+      // For specific GitHub 404 errors (file/directory not found), return empty array to allow creation
+      if (isMissingFileError(e)) {
+        return [];
+      }
       return this.handleError(e, StorageProviderType.GITHUB);
     }
   }

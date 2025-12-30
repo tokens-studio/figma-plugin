@@ -1,5 +1,155 @@
 # @tokens-studio/figma-plugin
 
+## 2.10.9
+
+### Patch Changes
+
+- 8fbc48fe6: Fix: Bitbucket alphabetical reordering of token sets on sync, makes branch selection dropdown scrollable and searchable for all remote branches.
+- 5a6d25eb0: Adjusted generic versioned storage to store additional headers in clientStorage instead of sharedPluginData.
+
+## 2.10.8
+
+### Patch Changes
+
+- c49aa807b: Fix: Trigger document update when importing variables to ensure they persist in local storage
+- a65098248: Add search functionality to the Export to Figma dialog for filtering themes and sets
+- 0aa9dcf87: Add error handling for failure when writing to client Storage property in Figma
+- 0ecc24430: Switch to first imported token set when current set is not in imported sets after variable import
+
+## 2.10.7
+
+### Patch Changes
+
+- 5d39f05db: Fix variable export regression for external library variables introduced in v2.10.6. Removed overly strict validation that was filtering out remote/library variable references. Added fallback mechanism in `updateVariablesToReference` to find variables by name when import by key fails. This restores the ability to properly attach variable references from published libraries in non-local setups.
+- 5b8b9ce70: Fix bug where tokens were incorrectly resolved during export when expand options are enabled. When using "Export to JSON" with options like "Expand Typography" enabled, alias tokens (references like `{typography.heading.h1}`) will now keep their references instead of being resolved to actual values. This preserves the token relationships needed for downstream processing pipelines.
+- feff2515f: Fixed an issue with spacing tokens that are set to AUTO and switch back to a number/dimension value, which caused other token changes to be ignored. Contributed by lethxrgy1
+- ae37b3106: Remove Storyblok integration and changelog dialog feature. The changelog dialog functionality has been removed and can be brought back with a different system in the future.
+- a07afc516: Add support for vertical trim (cap to baseline) on boolean tokens. Boolean tokens can now be applied to text nodes to enable or disable leadingTrim (vertical trim) feature in Figma.
+
+## 2.10.6
+
+### Patch Changes
+
+- f92a70b74: Improve variable creation performance with batching, and tighten progress tracking; fix theme token-source handling.
+
+  - Added batching for variable creation to avoid memory-related issues.
+  - Faster alias linking and caching for imports.
+  - Clear progress phases and accurate counts.
+
+- f92a70b74: Fixed an issue that caused the plugin to stay in readonly mode
+
+## 2.10.5
+
+### Patch Changes
+
+- 96d1b6111: Fix letterSpacing value 0 being omitted from exported tokens. Changed truthy check to explicit undefined check in convertTokenToFormat to include falsy values like 0.
+
+## 2.10.4
+
+### Patch Changes
+
+- 3db28e694: Fixed an issue that caused the plugin to stay in readonly mode
+
+## 2.10.3
+
+### Patch Changes
+
+- 2dceaf0e3: Fix base URL for github enterprise API calls
+- d4140d9b8: Enhanced UI display for rem values to show pixel equivalents based on current theme baseline font size. Token tooltips and inspector now display rem values as "1rem (16px)" format.
+- d4140d9b8: Fix font size token export for different typography baselines across themes
+
+  When exporting tokens with expandTypography enabled, composite tokens (like typography tokens) now correctly use resolved values from the provided resolvedTokens array instead of the original unresolved token values. This ensures that font size tokens and other properties within typography tokens reflect the correct baseline values for each theme when tokens are resolved per theme.
+
+- d4140d9b8: Fixed multi-theme variable export to use correct base font size per theme for rem conversion. Previously, when exporting multiple themes simultaneously, all themes would use the base font size from the currently active theme due to shared TokenResolver state.
+
+## 2.10.2
+
+### Patch Changes
+
+- 8552d66ec: Revert all Pro access.
+
+## 2.10.1
+
+### Patch Changes
+
+- 993c27c67: Add feature flag to disable license key check
+
+## 2.10.0
+
+### Minor Changes
+
+- 630b06d29: **Swap Figma variable modes**
+
+  The plugin can now automatically switch Figma's native variable modes when you change themes, keeping your variables in sync with your active theme.
+
+  **What's new:**
+
+  - **Automatic mode switching**: When switching themes, the plugin updates Figma's variable modes to match the selected theme
+  - **Configurable setting**: Toggle "Swap Figma variable modes" in the plugin settings (bottom right) to enable/disable this behavior (enabled by default)
+  - Validates that collections and modes exist before switching, with helpful error notifications when something goes wrong
+  - Works with Selection, Page, and Document update modes
+
+### Patch Changes
+
+- 7ba4299e8: Add immediate loading indicator when switching Git branches to provide instant user feedback
+- c3c219ac0: Fix ESC key behavior in Manage Themes modal to only close the theme editor when editing a theme, not the entire modal
+- 043f08782: Show specific token name in delete token confirmation dialog instead of generic "this token" text
+- faaee7b58: Tokens that have a value of 100% will now apply as "fill container" for auto layout frames, or stretch the width of the parent for regular frames
+- aefd08dc3: Fix inconsistent variable reference behavior when not using theme groups
+
+  When exporting tokens to variables without theme groups, variable references now correctly prioritize variables from the same collection instead of always using the first match found globally. This ensures Theme B displays its own primary color rather than incorrectly showing Theme A's primary color.
+
+- 21bd14ef9: Fixes an issue where a non existent file is not created in Gitlab when setting up a sync.
+- b79391dbe: New token sets are now enabled by default instead of disabled when created
+- be28ebdcd: Separate "Load from preset" into its own action in the tools menu. Split the combined "Load from file or preset" dropdown into two distinct menu items: "Load from file/folder" and "Load from preset", each opening their own focused dialog.
+- 2b8f9393a: Fix text style import issues with Figma variables and font weight matching
+
+  - Fixed broken typography tokens showing {undefined} when importing text styles that use Figma variables
+  - Text styles with variables now properly create tokens with the variable's actual values instead of showing {undefined}
+  - Font sizes, line heights, and spacing values are now correctly imported as numbers instead of strings
+  - Typography tokens now fall back to raw values when referenced tokens don't exist, preventing undefined references
+
+- f0eed3004: Fix issue in Bitbucket where branch names with slash are not processed
+
+## 2.9.0
+
+### Minor Changes
+
+- be9927391: **🎯 Auto-apply theme on component drop**
+
+  Introducing an exciting new feature that streamlines your design workflow! You can now automatically apply the current theme when inserting component instances into your Figma designs.
+
+  **What's new:**
+  No more manual token application after dropping components - they instantly inherit your theme styling
+
+  - ✨ **Smart theme application**: Automatically applies tokens from your active theme to newly inserted component instances
+  - ⚙️ **Configurable setting**: Toggle "Auto-apply theme on drop" in the plugin settings (bottom right) to enable/disable this behavior
+
+### Patch Changes
+
+- d10481dcd: Add regex toggle to bulk remap feature. Users can now enable/disable regular expression matching in the bulk remap modal, with literal string matching as the default.
+- 3eca8b10a: fix: prevent unnecessary variable alias recreation
+
+  Add optimization to skip variable updates when alias already points to the correct target variable. This means your variablres should no longer show up as changed in Figma if their value stayed the same.
+
+- d10481dcd: Fix bulk remap breaking token connections when using special regex characters like ".." to "."
+- cc2ddc464: Add ability to create empty file, folders or branch in a repository when setting up a new sync provider
+- 2215180b6: Fix Enter key to submit rename forms by connecting input fields to their forms using the form attribute
+- aba049033: Fix token duplication bug where tokens were duplicated to source set even when deselected. Now tokens are only duplicated to explicitly selected token sets, allowing users to exclude the source set from duplication.
+- f40af0160: Fixed a bug that caused the blue dot to remain visible when renaming a token set
+- 3eca8b10a: fix: improve variable precision handling and prevent unnecessary updates
+
+  Changed color and number variable precision handling from rounding to clipping for more consistent behavior. Numbers now normalize to 6 decimal places and variables won't update unnecessarily when normalized values are identical. This reduces flickering and improves performance by preventing redundant Figma API calls.
+
+- 375c1eef1: Add support for radial and conic gradients in addition to linear gradients. The plugin now supports:
+  - `radial-gradient()` CSS syntax mapped to Figma's GRADIENT_RADIAL type
+  - `conic-gradient()` CSS syntax mapped to Figma's GRADIENT_ANGULAR type
+  - Backward compatibility with existing linear gradient functionality
+  - Updated reference token extraction to work with all gradient types
+- b984e5596: Add regex pattern support to Living Documentation feature. Users can now toggle between simple "starts with" matching and regex patterns for filtering tokens when generating documentation. The regex toggle is disabled by default to maintain backward compatibility.
+- d37d54baf: Change typography visual preview from "aA" to "Aa" in documentation and inspector components
+- aeaa957db: Fix bitbucket sync issue some users are facing with new API tokens
+
 ## 2.8.0
 
 ### Minor Changes

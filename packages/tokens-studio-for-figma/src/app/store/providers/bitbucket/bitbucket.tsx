@@ -1,6 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { useCallback, useMemo } from 'react';
-import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
+import { useCallback, useMemo, useEffect } from 'react';
 import compact from 'just-compact';
 import { Dispatch } from '@/app/store';
 import useConfirm from '@/app/hooks/useConfirm';
@@ -52,6 +51,8 @@ export function useBitbucket() {
       );
       if (context.filePath) storageClient.changePath(context.filePath);
       if (context.branch) storageClient.selectBranch(context.branch);
+      // Always check isProUser dynamically rather than capturing it in closure
+      // This ensures multi-file is enabled even if the license was validated after this callback was created
       if (isProUser) storageClient.enableMultiFile();
       return storageClient;
     },
@@ -148,10 +149,12 @@ export function useBitbucket() {
 
   const checkAndSetAccess = useCallback(
     async ({
-      context, owner, repo, receivedFeatureFlags,
-    }: { context: BitbucketCredentials; owner: string; repo: string, receivedFeatureFlags?: LDProps['flags'] }) => {
+      context, owner, repo,
+    }: { context: BitbucketCredentials; owner: string; repo: string }) => {
       const storage = storageClientFactory(context, owner, repo);
-      if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
+      if (isProUser) {
+        storage.enableMultiFile();
+      }
       try {
         const hasWriteAccess = await storage.canWrite();
         dispatch.tokenState.setEditProhibited(!hasWriteAccess);
@@ -162,20 +165,26 @@ export function useBitbucket() {
         dispatch.tokenState.setEditProhibited(true);
       }
     },
-    [dispatch, storageClientFactory],
+    [dispatch, storageClientFactory, isProUser],
   );
 
-  const pullTokensFromBitbucket = useCallback(
-    async (context: BitbucketCredentials, receivedFeatureFlags?: LDProps['flags']): Promise<RemoteResponseData | null> => {
-      const storage = storageClientFactory(context);
-      if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
-
-      const [owner, repo] = context.id.split('/');
-
-      await checkAndSetAccess({
-        context, owner, repo, receivedFeatureFlags,
+  // Re-check access when isProUser changes from false to true (license validation during startup)
+  useEffect(() => {
+    if (isProUser && localApiState && 'id' in localApiState && localApiState.id && localApiState.provider === 'bitbucket') {
+      const [owner, repo] = localApiState.id.split('/');
+      checkAndSetAccess({
+        context: localApiState as BitbucketCredentials,
+        owner,
+        repo,
       });
+    }
+  }, [isProUser, localApiState, checkAndSetAccess]);
 
+  const pullTokensFromBitbucket = useCallback(
+    async (context: BitbucketCredentials): Promise<RemoteResponseData | null> => {
+      const storage = storageClientFactory(context);
+      const [owner, repo] = context.id.split('/');
+      await checkAndSetAccess({ context, owner, repo });
       try {
         const content = await storage.retrieve();
         if (content?.status === 'failure') {
@@ -185,7 +194,12 @@ export function useBitbucket() {
           };
         }
         if (content) {
-          return content;
+          // Sort token sets using applyTokenSetOrder if metadata is present
+          const sortedTokens = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder);
+          return {
+            ...content,
+            tokens: sortedTokens,
+          };
         }
       } catch (e) {
         console.log('Error', e);

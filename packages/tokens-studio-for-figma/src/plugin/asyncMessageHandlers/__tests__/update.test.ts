@@ -10,9 +10,11 @@ import {
 } from '@/figmaStorage';
 import * as NodeManager from '../../NodeManager';
 import * as swapStyles from '../swapStyles';
+import * as swapFigmaModes from '../swapFigmaModes';
 import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
 import { ApplyVariablesStylesOrRawValues } from '@/constants/ApplyVariablesStyleOrder';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import { mockGetVariableCollectionByIdAsync } from '../../../../tests/__mocks__/figmaMock';
 
 describe('update', () => {
   const findNodesSpy = jest.spyOn(NodeManager.defaultNodeManager, 'findBaseNodesWithData');
@@ -22,6 +24,7 @@ describe('update', () => {
   const UpdatedAtPropertyWriteSpy = jest.spyOn(UpdatedAtProperty, 'write');
   const ActiveThemePropertyWriteSpy = jest.spyOn(ActiveThemeProperty, 'write');
   const mockSwapStyles = jest.spyOn(swapStyles, 'swapStyles');
+  const mockSwapFigmaModes = jest.spyOn(swapFigmaModes, 'swapFigmaModes');
 
   const mockUpdateMessage: UpdateAsyncMessage = {
     type: AsyncMessageTypes.UPDATE,
@@ -33,6 +36,8 @@ describe('update', () => {
         id: 'light',
         name: 'Light',
         selectedTokenSets: {},
+        $figmaCollectionId: 'collection-123',
+        $figmaModeId: 'mode-456',
       },
     ],
     tokenValues: {
@@ -59,6 +64,7 @@ describe('update', () => {
       updateOnChange: false,
       updateRemote: true,
       shouldSwapStyles: true,
+      shouldSwapFigmaModes: true,
       baseFontSize: '16',
       aliasBaseFontSize: '16',
       applyVariablesStylesOrRawValue: ApplyVariablesStylesOrRawValues.VARIABLES_STYLES,
@@ -85,6 +91,15 @@ describe('update', () => {
 
     findNodesSpy.mockResolvedValueOnce([]);
 
+    // Mock the collection for swapFigmaModes
+    mockGetVariableCollectionByIdAsync.mockResolvedValue({
+      id: 'collection-123',
+      name: 'Test Collection',
+      modes: [
+        { modeId: 'mode-456', name: 'Light' },
+      ],
+    });
+
     await update(mockUpdateMessage);
 
     expect(ThemesPropertyWriteSpy).toBeCalledWith(mockUpdateMessage.themes);
@@ -93,6 +108,38 @@ describe('update', () => {
     expect(UpdatedAtPropertyWriteSpy).toBeCalledWith(mockUpdateMessage.updatedAt);
     expect(ActiveThemePropertyWriteSpy).toBeCalledWith(mockUpdateMessage.activeTheme);
     expect(mockSwapStyles).toBeCalledWith(mockUpdateMessage.activeTheme, mockUpdateMessage.themes, mockUpdateMessage.settings.updateMode);
+    expect(mockSwapFigmaModes).toBeCalledWith(mockUpdateMessage.activeTheme, mockUpdateMessage.themes, mockUpdateMessage.settings.updateMode);
+
+    runAfter.forEach((fn) => fn());
+  });
+
+  it('should not call swapFigmaModes when shouldSwapFigmaModes is false', async () => {
+    const runAfter = [
+      AsyncMessageChannel.PluginInstance.connect(),
+      AsyncMessageChannel.ReactInstance.connect(),
+    ];
+
+    AsyncMessageChannel.ReactInstance.handle(AsyncMessageTypes.GET_THEME_INFO, async () => ({
+      type: AsyncMessageTypes.GET_THEME_INFO,
+      activeTheme: {},
+      themes: [],
+    }));
+
+    findNodesSpy.mockResolvedValueOnce([]);
+    mockSwapFigmaModes.mockClear();
+    mockGetVariableCollectionByIdAsync.mockClear();
+
+    const messageWithoutSwap = {
+      ...mockUpdateMessage,
+      settings: {
+        ...mockUpdateMessage.settings,
+        shouldSwapFigmaModes: false,
+      },
+    };
+
+    await update(messageWithoutSwap);
+
+    expect(mockSwapFigmaModes).not.toHaveBeenCalled();
 
     runAfter.forEach((fn) => fn());
   });
