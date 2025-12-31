@@ -654,6 +654,7 @@ describe('Initiator', () => {
       stylesEffect: true,
       stylesTypography: true,
       stylesColor: true,
+      stylesGradient: false,
       removeStylesAndVariablesWithoutConnection: false,
       renameExistingStylesAndVariables: false,
       createStylesWithVariableReferences: false,
