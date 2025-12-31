@@ -381,6 +381,7 @@ describe('updateStyles', () => {
       ]),
       false,
       undefined,
+      undefined,
     );
 
     colorSpy.mockClear();
@@ -398,6 +399,7 @@ describe('updateStyles', () => {
         expect.objectContaining({ name: 'gradient.primary' }),
       ]),
       false,
+      undefined,
       undefined,
     );
   });
