@@ -106,11 +106,11 @@ export default function BranchSelector() {
       if (isGitProvider(apiData) && isGitProvider(localApiState)) {
         setIsSwitchingBranch(true);
         try {
+          // Clear local token state BEFORE changing branch to prevent bleed
+          dispatch.tokenState.setEmptyTokens();
           setCurrentBranch(branch);
           dispatch.uiState.setApiData({ ...apiData, branch });
           dispatch.uiState.setLocalApiState({ ...localApiState, branch });
-          // Clear local token state before pulling from new branch
-          dispatch.tokenState.setEmptyTokens();
           await pullTokens({
             context: { ...apiData, branch }, usedTokenSet, activeTheme, updateLocalTokens: true,
           });
