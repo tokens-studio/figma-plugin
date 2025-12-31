@@ -112,7 +112,7 @@ export default function BranchSelector() {
           dispatch.uiState.setApiData({ ...apiData, branch });
           dispatch.uiState.setLocalApiState({ ...localApiState, branch });
           await pullTokens({
-            context: { ...apiData, branch }, usedTokenSet, activeTheme, updateLocalTokens: true,
+            context: { ...apiData, branch }, usedTokenSet, activeTheme, updateLocalTokens: true, skipConfirmation: true,
           });
           AsyncMessageChannel.ReactInstance.message({
             type: AsyncMessageTypes.CREDENTIALS,

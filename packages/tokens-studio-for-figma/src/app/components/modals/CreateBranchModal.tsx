@@ -76,7 +76,7 @@ export default function CreateBranchModal({
           // Clear local token state before pulling from new source branch
           dispatch.tokenState.setEmptyTokens();
           await pullTokens({
-            context: { ...apiData, branch }, usedTokenSet, activeTheme, updateLocalTokens: true,
+            context: { ...apiData, branch }, usedTokenSet, activeTheme, updateLocalTokens: true, skipConfirmation: true,
           });
         }
       } else {
