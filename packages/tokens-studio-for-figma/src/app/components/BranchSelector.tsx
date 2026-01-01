@@ -106,14 +106,16 @@ export default function BranchSelector() {
       if (isGitProvider(apiData) && isGitProvider(localApiState)) {
         setIsSwitchingBranch(true);
         try {
-          // Clear local token state BEFORE changing branch to prevent bleed
+          // Clear local token state BEFORE pulling to prevent bleed
           dispatch.tokenState.setEmptyTokens();
-          setCurrentBranch(branch);
-          dispatch.uiState.setApiData({ ...apiData, branch });
-          dispatch.uiState.setLocalApiState({ ...localApiState, branch });
+          // Pull tokens from new branch BEFORE switching UI state
           await pullTokens({
             context: { ...apiData, branch }, usedTokenSet, activeTheme, updateLocalTokens: true, skipConfirmation: true,
           });
+          // Now update UI state to show the new branch with already-loaded tokens
+          setCurrentBranch(branch);
+          dispatch.uiState.setApiData({ ...apiData, branch });
+          dispatch.uiState.setLocalApiState({ ...localApiState, branch });
           AsyncMessageChannel.ReactInstance.message({
             type: AsyncMessageTypes.CREDENTIALS,
             credential: { ...apiData, branch },
