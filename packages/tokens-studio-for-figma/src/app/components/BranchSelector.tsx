@@ -30,7 +30,7 @@ import { useChangedState } from '@/hooks/useChangedState';
 export default function BranchSelector() {
   const { confirm } = useConfirm();
   const {
-    pullTokens, pushTokens,
+    pullTokens,
   } = useRemoteTokens();
   const dispatch = useDispatch<Dispatch>();
   const { setStorageType } = useStorage();
@@ -91,13 +91,14 @@ export default function BranchSelector() {
       track('Create new branch from specific branch');
 
       if (hasChanges && (await askUserIfPushChanges())) {
-        await pushTokens();
+        // User chose to discard changes - clear local token state
+        dispatch.tokenState.setEmptyTokens();
       }
 
       setStartBranch(branch);
       setCreateBranchModalVisible(true);
     },
-    [hasChanges, askUserIfPushChanges, pushTokens],
+    [hasChanges, askUserIfPushChanges, dispatch],
   );
 
   const changeAndPull = React.useCallback(
@@ -105,12 +106,16 @@ export default function BranchSelector() {
       if (isGitProvider(apiData) && isGitProvider(localApiState)) {
         setIsSwitchingBranch(true);
         try {
+          // Clear local token state BEFORE pulling to prevent bleed
+          dispatch.tokenState.setEmptyTokens();
+          // Pull tokens from new branch BEFORE switching UI state
+          await pullTokens({
+            context: { ...apiData, branch }, usedTokenSet, activeTheme, updateLocalTokens: true, skipConfirmation: true,
+          });
+          // Now update UI state to show the new branch with already-loaded tokens
           setCurrentBranch(branch);
           dispatch.uiState.setApiData({ ...apiData, branch });
           dispatch.uiState.setLocalApiState({ ...localApiState, branch });
-          await pullTokens({
-            context: { ...apiData, branch }, usedTokenSet, activeTheme, updateLocalTokens: true,
-          });
           AsyncMessageChannel.ReactInstance.message({
             type: AsyncMessageTypes.CREDENTIALS,
             credential: { ...apiData, branch },
@@ -121,7 +126,7 @@ export default function BranchSelector() {
         }
       }
     },
-    [apiData, localApiState, dispatch.uiState, pullTokens, usedTokenSet, activeTheme, setStorageType],
+    [apiData, localApiState, dispatch, pullTokens, usedTokenSet, activeTheme, setStorageType],
   );
 
   const onBranchSelected = React.useCallback(
