@@ -234,4 +234,135 @@ describe('SetValuesOnVariable', () => {
     await setValuesOnVariable(variablesInFigma, tokens, collection, mode, baseFontSize);
     expect(mockCreateVariable).toBeCalledWith('global/fontWeight', collection, 'FLOAT');
   });
+
+  describe('extended collections', () => {
+    const parentCollectionId = 'VariableCollectionId:parent:100';
+    const childCollectionId = 'VariableCollectionId:child:200';
+
+    const inheritedVariable = {
+      id: 'VariableID:inherited:1',
+      key: 'inherited-key-1',
+      name: 'colors/primary',
+      variableCollectionId: parentCollectionId, // Belongs to parent
+      resolvedType: 'COLOR',
+      setValueForMode: jest.fn(),
+      valuesByMode: {
+        'child-mode-1': { r: 1, g: 0, b: 0, a: 1 },
+      },
+    } as unknown as Variable;
+
+    const extendedCollection = {
+      id: childCollectionId,
+      parentVariableCollectionId: parentCollectionId,
+      variableIds: ['VariableID:inherited:1'],
+    } as unknown as VariableCollection;
+
+    beforeEach(() => {
+      inheritedVariable.setValueForMode = jest.fn();
+    });
+
+    it('should not create new variables in extended collections', async () => {
+      const tokens = [
+        {
+          name: 'colors.newColor',
+          path: 'colors/newColor',
+          rawValue: '#00ff00',
+          value: '#00ff00',
+          type: TokenTypes.COLOR,
+        },
+      ] as SingleToken<true, { path: string; variableId: string }>[];
+
+      await setValuesOnVariable(
+        [inheritedVariable],
+        tokens,
+        extendedCollection,
+        'child-mode-1',
+        baseFontSize,
+      );
+
+      // Should NOT attempt to create a variable in extended collection
+      expect(mockCreateVariable).not.toHaveBeenCalled();
+    });
+
+    it('should set override values on inherited variables in extended collections', async () => {
+      const tokens = [
+        {
+          name: 'colors.primary',
+          path: 'colors/primary',
+          rawValue: '#00ff00',
+          value: '#00ff00',
+          type: TokenTypes.COLOR,
+          variableId: 'inherited-key-1',
+        },
+      ] as SingleToken<true, { path: string; variableId: string }>[];
+
+      await setValuesOnVariable(
+        [inheritedVariable],
+        tokens,
+        extendedCollection,
+        'child-mode-1',
+        baseFontSize,
+      );
+
+      // Should set override value on inherited variable
+      expect(inheritedVariable.setValueForMode).toHaveBeenCalledWith(
+        'child-mode-1',
+        { r: 0, g: 1, b: 0, a: 1 },
+      );
+    });
+
+    it('should not rename inherited variables in extended collections', async () => {
+      const tokens = [
+        {
+          name: 'colors.primaryRenamed',
+          path: 'colors/primaryRenamed',
+          rawValue: '#ff0000',
+          value: '#ff0000',
+          type: TokenTypes.COLOR,
+          variableId: 'inherited-key-1',
+        },
+      ] as SingleToken<true, { path: string; variableId: string }>[];
+
+      const result = await setValuesOnVariable(
+        [inheritedVariable],
+        tokens,
+        extendedCollection,
+        'child-mode-1',
+        baseFontSize,
+        true, // shouldRename = true
+      );
+
+      // Should NOT rename inherited variable
+      expect(result.renamedVariableKeys).not.toContain('inherited-key-1');
+      expect(inheritedVariable.name).toBe('colors/primary');
+    });
+
+    it('should not modify description on inherited variables', async () => {
+      const originalDescription = 'Original description';
+      inheritedVariable.description = originalDescription;
+
+      const tokens = [
+        {
+          name: 'colors.primary',
+          path: 'colors/primary',
+          rawValue: '#ff0000',
+          value: '#ff0000',
+          type: TokenTypes.COLOR,
+          variableId: 'inherited-key-1',
+          description: 'New description',
+        },
+      ] as SingleToken<true, { path: string; variableId: string }>[];
+
+      await setValuesOnVariable(
+        [inheritedVariable],
+        tokens,
+        extendedCollection,
+        'child-mode-1',
+        baseFontSize,
+      );
+
+      // Description should remain unchanged for inherited variables
+      expect(inheritedVariable.description).toBe(originalDescription);
+    });
+  });
 });

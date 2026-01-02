@@ -10,6 +10,7 @@ import { transformValue } from './helpers';
 import { variableWorker } from './Worker';
 import { ProgressTracker } from './ProgressTracker';
 import { checkVariableAliasEquality } from '@/utils/checkVariableAliasEquality';
+import { isExtendedCollection, getCollectionVariableIds } from './extendedCollectionHelpers';
 
 export type ReferenceVariableType = {
   variable: Variable;
@@ -33,6 +34,13 @@ export default async function setValuesOnVariable(
   // Use the passed-in global progress tracker to avoid double counting
   const promises: Set<Promise<void>> = new Set();
 
+  // Check if this is an extended collection (inherits from parent)
+  const isExtended = isExtendedCollection(collection);
+
+  // For extended collections, get all variable IDs (including inherited ones)
+  // and pre-fetch them since they may belong to the parent collection
+  const inheritedVariableIds = isExtended ? getCollectionVariableIds(collection) : [];
+
   // Pre-fetch all variables referenced by variableId to avoid individual async lookups
   // This is much more efficient than fetching one-by-one during token processing
   const variableIdCache = new Map<string, Variable>();
@@ -44,16 +52,25 @@ export default async function setValuesOnVariable(
     }
   });
 
+  // For extended collections, also fetch all inherited variables
+  inheritedVariableIds.forEach((id) => variableIdsToFetch.add(id));
+
   // Fetch all referenced variables in parallel
   await Promise.all(
     Array.from(variableIdsToFetch).map(async (variableId) => {
       try {
         const variable = await figma.variables.getVariableByIdAsync(variableId);
-        if (variable && variable.variableCollectionId === collection.id) {
-          variableIdCache.set(variableId, variable);
-          // Add to local cache if not already present
-          if (!variablesInFigma.some((v) => v.id === variable.id)) {
-            variablesInFigma.push(variable);
+        // For extended collections, accept variables from parent collection too
+        // For regular collections, only accept variables from this collection
+        if (variable) {
+          const belongsToCollection = variable.variableCollectionId === collection.id;
+          const isInheritedVariable = isExtended && inheritedVariableIds.includes(variable.id);
+          if (belongsToCollection || isInheritedVariable) {
+            variableIdCache.set(variableId, variable);
+            // Add to local cache if not already present
+            if (!variablesInFigma.some((v) => v.id === variable.id)) {
+              variablesInFigma.push(variable);
+            }
           }
         }
       } catch (e) {
@@ -82,11 +99,19 @@ export default async function setValuesOnVariable(
           }
 
           // If still no variable, try one more time to find by name in case it was just created
+          // For extended collections, also check inherited variables (which have parent's collectionId)
           if (!variable) {
-            variable = variablesInFigma.find((v) => v.name === token.path && v.variableCollectionId === collection.id);
+            variable = variablesInFigma.find((v) => v.name === token.path
+              && (v.variableCollectionId === collection.id || inheritedVariableIds.includes(v.id)));
           }
 
           if (!variable) {
+            // For extended collections, we cannot create new variables (they must exist in parent)
+            // Skip this token and continue - the variable should be created in the parent collection
+            if (isExtended) {
+              return;
+            }
+
             try {
               variable = figma.variables.createVariable(token.path, collection, variableType);
               // Add to local cache immediately
@@ -107,8 +132,12 @@ export default async function setValuesOnVariable(
           }
 
           if (variable) {
+            // For extended collections, don't rename inherited variables (they belong to parent)
+            const isInheritedVariable = isExtended && variable.variableCollectionId !== collection.id;
+
             // First, rename all variables that should be renamed (if the user choose to do so)
-            if (variable.name !== token.path && shouldRename) {
+            // But never rename inherited variables in extended collections
+            if (variable.name !== token.path && shouldRename && !isInheritedVariable) {
               renamedVariableKeys.push(variable.key);
               variable.name = token.path;
             }
@@ -119,7 +148,10 @@ export default async function setValuesOnVariable(
               // variable.remove();
               // variable = figma.variables.createVariable(t.path, collection.id, variableType);
             }
-            variable.description = token.description ?? '';
+            // Don't modify description on inherited variables (they belong to parent)
+            if (!isInheritedVariable) {
+              variable.description = token.description ?? '';
+            }
 
             // Always add the variable to the key map, regardless of whether it needs updating
             variableKeyMap[token.name] = variable.key;

@@ -5,6 +5,8 @@ export type VariableCollectionInfo = {
     modeId: string;
     name: string;
   }[];
+  parentCollectionId?: string;
+  isExtended?: boolean;
 };
 
 export type SelectedCollections = {

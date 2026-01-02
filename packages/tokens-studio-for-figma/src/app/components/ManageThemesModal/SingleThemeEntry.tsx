@@ -8,7 +8,7 @@ import { ThemeObject } from '@/types';
 import IconDiveInto from '@/icons/dive-into.svg';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { Dispatch } from '@/app/store';
-import { activeThemeSelector } from '@/selectors';
+import { activeThemeSelector, themesListSelector } from '@/selectors';
 
 type Props = {
   theme: ThemeObject
@@ -35,6 +35,9 @@ const StyledCountLabel = styled('span', {
       danger: {
         color: '$dangerFg',
       },
+      info: {
+        color: '$accentFg',
+      },
     },
   },
 });
@@ -43,6 +46,7 @@ export const SingleThemeEntry: React.FC<React.PropsWithChildren<React.PropsWithC
   theme, isActive, groupName, onOpen,
 }) => {
   const activeTheme = useSelector(activeThemeSelector);
+  const allThemes = useSelector(themesListSelector);
   const dispatch = useDispatch<Dispatch>();
 
   const tokenSetCount = useMemo(() => (
@@ -58,6 +62,14 @@ export const SingleThemeEntry: React.FC<React.PropsWithChildren<React.PropsWithC
   const variablesCount = useMemo(() => (
     Object.values(theme.$figmaVariableReferences ?? {}).length
   ), [theme]);
+
+  // Get parent theme name for display
+  const parentThemeName = useMemo(() => {
+    if (!theme.$extendsThemeId) return null;
+    const parentTheme = allThemes.find((t) => t.id === theme.$extendsThemeId);
+    if (!parentTheme) return null;
+    return parentTheme.group ? `${parentTheme.group}/${parentTheme.name}` : parentTheme.name;
+  }, [theme.$extendsThemeId, allThemes]);
 
   const handleOpenClick = useCallback(() => {
     onOpen(theme);
@@ -94,6 +106,13 @@ export const SingleThemeEntry: React.FC<React.PropsWithChildren<React.PropsWithC
       </Label>
 
       <Stack>
+        {parentThemeName && (
+          <StyledCountLabel variant="info">
+            extends
+            {' '}
+            {parentThemeName}
+          </StyledCountLabel>
+        )}
         {tokenSetCount > 0 ? (
           <StyledCountLabel>
             {tokenSetCount}
