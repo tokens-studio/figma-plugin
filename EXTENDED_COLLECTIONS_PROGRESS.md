@@ -10,8 +10,8 @@ This document tracks the progress of implementing Figma extended variable collec
 - [x] Phase 1 — Detect + surface extended collections in UI — **COMPLETED**
 - [x] Phase 2 — Pull variables from extended collections (read-path) — **COMPLETED**
 - [x] Phase 3 — Create extended collections from themes (write-path: collections) — **COMPLETED**
-- [ ] Phase 4 — Update variables for extended themes (write-path: values + overrides)
-- [ ] Phase 5 — UI: Theme inheritance controls
+- [x] Phase 4 — Update variables for extended themes (write-path: values + overrides) — **COMPLETED**
+- [x] Phase 5 — UI: Theme inheritance controls — **COMPLETED**
 - [ ] Phase 6 — Enterprise-only behavior verification & finalization
 
 ---
@@ -237,25 +237,103 @@ All tests passing:
 
 ## Phase 4 — Update variables for extended themes
 
-**Status:** Not Started
+**Status:** Completed  
+**Started:** 2026-01-02  
+**Completed:** 2026-01-02
 
-### Planned Work
+### Completed Items
 
-- Implement safe override writes
-- Handle revert-to-inherit
-- Never delete inherited variables
+- [x] Updated `setValuesOnVariable.ts` to handle extended collections:
+  - Pre-fetch inherited variables from parent collection
+  - Skip variable creation in extended collections (cannot create in child)
+  - Find inherited variables correctly (different collectionId)
+  - Don't rename inherited variables (they belong to parent)
+  - Don't modify description on inherited variables
+  - Can still set override values on inherited variables
+- [x] Updated `updateVariables.ts` to protect inherited variables:
+  - Never delete inherited variables (they belong to parent)
+  - Only delete orphaned variables that belong to the child collection
+- [x] Added 4 new tests for `setValuesOnVariable.test.ts`:
+  - Extended collection variable creation prevention
+  - Override value setting on inherited variables
+  - Inherited variable rename protection
+  - Inherited variable description protection
+- [x] Added 2 new tests for `updateVariables.test.ts`:
+  - Inherited variable deletion prevention
+  - Own variable deletion in extended collections
+- [x] All 1576 tests pass (no regressions)
+- [x] Build successful
+- [x] Changeset created
+
+### Files Modified
+
+- `src/plugin/setValuesOnVariable.ts` - Extended collection handling
+- `src/plugin/setValuesOnVariable.test.ts` - New tests for extended collections
+- `src/plugin/updateVariables.ts` - Inherited variable protection
+- `src/plugin/updateVariables.test.ts` - New tests for extended collections
+- `.changeset/swift-foxes-sleep.md` - Changeset for Phase 4
+
+### Key Behavior Changes
+
+1. **No variable creation in extended collections** - Variables must be created in the parent collection first
+2. **Override values work** - `setValueForMode()` on inherited variables creates overrides
+3. **Inherited variables protected** - Never renamed, never deleted, description not modified
+4. **Own variables still managed** - Child collection's own variables can still be deleted if orphaned
+
+### Test Results
+
+All tests passing:
+- ✅ 8 tests in `setValuesOnVariable.test.ts` (4 existing + 4 new)
+- ✅ 6 tests in `updateVariables.test.ts` (4 existing + 2 new)
+- ✅ All 1576 tests pass across the entire codebase
 
 ---
 
 ## Phase 5 — UI: Theme inheritance controls
 
-**Status:** Not Started
+**Status:** Completed  
+**Started:** 2026-01-02  
+**Completed:** 2026-01-02
 
-### Planned Work
+### Completed Items
 
-- Add "Extends theme" selector
-- Implement cycle detection
-- Update theme editor UI
+- [x] Added "Extends theme" dropdown to CreateOrEditThemeForm
+  - Dropdown only shows when editing existing themes
+  - Excludes current theme and themes that would create cycles
+  - Uses cycle detection to prevent circular inheritance
+- [x] Updated FormValues type to include `$extendsThemeId`
+- [x] Updated ManageThemesModal to handle $extendsThemeId in default values and submission
+- [x] Updated saveTheme reducer to persist $extendsThemeId
+- [x] Added inheritance indicator in theme list (SingleThemeEntry)
+  - Shows "extends ParentName" in blue text for extended themes
+- [x] Added translation keys for new UI elements
+- [x] Build successful
+- [x] Changeset created
+
+### Files Modified
+
+- `src/app/components/ManageThemesModal/CreateOrEditThemeForm.tsx` - Added extends dropdown
+- `src/app/components/ManageThemesModal/ManageThemesModal.tsx` - Handle $extendsThemeId
+- `src/app/components/ManageThemesModal/SingleThemeEntry.tsx` - Display inheritance indicator
+- `src/app/store/models/reducers/tokenState/saveTheme.ts` - Persist $extendsThemeId
+- `src/i18n/lang/en/tokens.json` - Added translation keys
+- `.changeset/happy-lions-glow.md` - Changeset for Phase 5
+
+### UI Changes
+
+**Theme Editor:**
+- "Extends theme" dropdown appears below name/group when editing an existing theme
+- Dropdown shows all themes except current theme and those that would create cycles
+- Selecting a theme sets `$extendsThemeId` on save
+
+**Theme List:**
+- Extended themes show "extends ParentName" indicator in blue
+- Indicator appears before set/style/variable counts
+
+### Test Results
+
+- ✅ 8 tests in ManageThemesModal tests pass
+- ✅ Build successful
 
 ---
 

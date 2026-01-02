@@ -9,6 +9,7 @@ import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
 type Payload = Omit<ThemeObject, 'id' | '$figmaStyleReferences'> & {
   id?: string,
   group?: string,
+  $extendsThemeId?: string,
   meta?: {
     oldName?: string,
     oldGroup?: string,
@@ -28,12 +29,13 @@ export function saveTheme(state: TokenState, data: Payload): TokenState {
 
   const updatedThemes = [...state.themes];
   updatedThemes.splice(startIndex, 1, {
-    ...omit(state.themes[themeObjectIndex], 'group'),
+    ...omit(state.themes[themeObjectIndex], 'group', '$extendsThemeId'),
     id: themeId,
     name: data.name,
     $figmaStyleReferences: state.themes[themeObjectIndex]?.$figmaStyleReferences ?? {},
     selectedTokenSets,
     ...(data?.group ? { group: data.group } : {}),
+    ...(data?.$extendsThemeId ? { $extendsThemeId: data.$extendsThemeId } : {}),
   });
 
   const newActiveTheme = state.activeTheme;
