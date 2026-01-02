@@ -9,7 +9,7 @@ This document tracks the progress of implementing Figma extended variable collec
 - [x] Phase 0 — Baseline + API wrappers (no behavior change) — **COMPLETED**
 - [x] Phase 1 — Detect + surface extended collections in UI — **COMPLETED**
 - [x] Phase 2 — Pull variables from extended collections (read-path) — **COMPLETED**
-- [ ] Phase 3 — Create extended collections from themes (write-path: collections)
+- [x] Phase 3 — Create extended collections from themes (write-path: collections) — **COMPLETED**
 - [ ] Phase 4 — Update variables for extended themes (write-path: values + overrides)
 - [ ] Phase 5 — UI: Theme inheritance controls
 - [ ] Phase 6 — Enterprise-only behavior verification & finalization
@@ -193,13 +193,45 @@ All tests passing:
 
 ## Phase 3 — Create extended collections from themes
 
-**Status:** Not Started
+**Status:** Completed  
+**Started:** 2026-01-02  
+**Completed:** 2026-01-02
 
-### Planned Work
+### Completed Items
 
-- Implement topological sort for theme dependencies
-- Update collection creation logic
-- Handle parent collection resolution
+- [x] Created `resolveThemeDependencies.ts` - topological sort helper
+  - Sorts themes so parents are processed before children
+  - Detects and throws on circular dependencies
+  - Handles missing parent themes gracefully
+- [x] Created `resolveThemeDependencies.test.ts` - 11 tests for dependency resolution
+- [x] Updated `createNecessaryVariableCollections.ts`
+  - Uses topological sort to process parents before children
+  - Creates extended collections using `.extend()` method for themes with `$extendsThemeId`
+  - Stores `$figmaParentCollectionId` on child themes
+  - Falls back to regular collection if `.extend()` not available
+  - Handles missing parent collection with warning
+- [x] Added 5 new tests for extended collection creation
+- [x] All 1570 tests pass (no regressions)
+- [x] Build successful
+- [x] Changeset created
+
+### Files Created
+
+- `src/plugin/resolveThemeDependencies.ts` - Topological sort for theme dependencies
+- `src/plugin/resolveThemeDependencies.test.ts` - Tests for dependency resolver
+- `.changeset/bright-birds-dance.md` - Changeset for Phase 3
+
+### Files Modified
+
+- `src/plugin/createNecessaryVariableCollections.ts` - Extended collection creation logic
+- `src/plugin/createNecessaryVariableCollections.test.ts` - Added extended collection tests
+
+### Test Results
+
+All tests passing:
+- ✅ 11 tests in `resolveThemeDependencies.test.ts`
+- ✅ 11 tests in `createNecessaryVariableCollections.test.ts` (6 existing + 5 new)
+- ✅ All 1570 tests pass across the entire codebase
 
 ---
 
