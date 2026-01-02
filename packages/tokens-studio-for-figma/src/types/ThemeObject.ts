@@ -15,4 +15,7 @@ export type ThemeObject = {
   $figmaCollectionId?: string;
   $figmaModeId?: string;
   $figmaVariableReferences?: Record<string, string>;
+  // Extended variable collections (inheritance)
+  $extendsThemeId?: string;
+  $figmaParentCollectionId?: string;
 };

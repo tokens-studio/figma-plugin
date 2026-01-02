@@ -11,6 +11,9 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 
 export default async function pullVariables(options: PullVariablesOptions, themes: ThemeObjectsList, proUser: boolean): Promise<void> {
+  console.log('🔍 pullVariables called');
+  console.log('Selected collections:', options.selectedCollections);
+  
   // @TODO should be specifically typed according to their type
   const colors: VariableToCreateToken[] = [];
   const booleans: VariableToCreateToken[] = [];
@@ -46,11 +49,34 @@ export default async function pullVariables(options: PullVariablesOptions, theme
     modes: { name: string, modeId: string }[]
   }>();
 
+  // PRE-POPULATE collections Map with selected collections
+  // This ensures extended collections appear even if they have no variables yet
+  if (options.selectedCollections) {
+    console.log('🔧 Pre-populating collections Map with selected collections...');
+    const selectedCollectionIds = Object.keys(options.selectedCollections);
+    
+    for (const collectionId of selectedCollectionIds) {
+      const collectionData = await figma.variables.getVariableCollectionByIdAsync(collectionId);
+      if (collectionData) {
+        const collectionInfo = {
+          id: collectionData.id,
+          name: collectionData.name,
+          modes: collectionData.modes.map((mode) => ({ name: mode.name, modeId: mode.modeId })),
+        };
+        collections.set(collectionData.name, collectionInfo);
+        collectionsCache.set(collectionId, collectionInfo);
+        console.log(`  ✅ Pre-populated: "${collectionData.name}" (${collectionId})`);
+      }
+    }
+    console.log(`Pre-populated ${collections.size} collections\n`);
+  }
+
   for (const variable of localVariables) {
     let collection = collectionsCache.get(variable.variableCollectionId);
     if (!collection) {
       const collectionData = await figma.variables.getVariableCollectionByIdAsync(variable.variableCollectionId);
       if (collectionData) {
+        console.log(`📦 Found collection for variable "${variable.name}":`, collectionData.name, 'ID:', collectionData.id);
         collection = {
           id: collectionData.id,
           name: collectionData.name,
@@ -64,8 +90,11 @@ export default async function pullVariables(options: PullVariablesOptions, theme
     if (options.selectedCollections && collection) {
       const selectedCollection = options.selectedCollections[collection.id];
       if (!selectedCollection) {
+        console.log(`❌ Skipping variable "${variable.name}" - collection "${collection.name}" (${collection.id}) not in selectedCollections`);
         // eslint-disable-next-line no-continue
         continue; // Skip this collection if it's not selected
+      } else {
+        console.log(`✅ Processing variable "${variable.name}" from collection "${collection.name}"`);
       }
     }
 
@@ -251,25 +280,40 @@ export default async function pullVariables(options: PullVariablesOptions, theme
       });
     });
 
+    console.log('\n📚 Collections Map contents:');
+    console.log('Total collections in Map:', collections.size);
+    Array.from(collections.values()).forEach(c => {
+      console.log(`  - "${c.name}" (${c.id})`);
+    });
+    console.log('');
+
     await Promise.all(Array.from(collections.values()).map(async (collection) => {
+      console.log(`\n🎨 Processing collection: "${collection.name}" (${collection.id})`);
+      
       // Filter collections based on selectedCollections option
       if (options.selectedCollections) {
         const selectedCollection = options.selectedCollections[collection.id];
         if (!selectedCollection) {
+          console.log(`  ⏭️  Skipping - not in selectedCollections`);
           return; // Skip this collection if it's not selected
         }
+        console.log(`  ✅ Collection is selected`);
       }
 
       await Promise.all(collection.modes.map(async (mode) => {
+        console.log(`    📋 Processing mode: "${mode.name}" (${mode.modeId})`);
+        
         // Filter modes based on selectedCollections option
         if (options.selectedCollections) {
           const selectedCollection = options.selectedCollections[collection.id];
           if (selectedCollection && !selectedCollection.selectedModes.includes(mode.modeId)) {
+            console.log(`      ⏭️  Skipping mode - not selected`);
             return; // Skip this mode if it's not selected
           }
         }
 
         const collectionVariables = localVariables.filter((v) => v.variableCollectionId === collection.id);
+        console.log(`      🔍 Found ${collectionVariables.length} variables with variableCollectionId === ${collection.id}`);
 
         const variableReferences = collectionVariables.reduce((acc, variable) => ({
           ...acc,
@@ -278,6 +322,8 @@ export default async function pullVariables(options: PullVariablesOptions, theme
 
         const tokenSetName = `${collection.name}/${mode.name}`;
         const themeId = `${collection.name.toLowerCase()}-${mode.name.toLowerCase()}`;
+
+        console.log(`      🎯 Creating theme: "${themeId}" with ${Object.keys(variableReferences).length} variable references`);
 
         processedThemes.add(`${collection.id}:${mode.modeId}`);
 
@@ -355,6 +401,18 @@ export default async function pullVariables(options: PullVariablesOptions, theme
       }
       return acc;
     }, {});
+    
+    console.log('\n📤 FINAL OUTPUT:');
+    console.log('Themes to create:', themesToCreate.length);
+    themesToCreate.forEach(theme => {
+      console.log(`  - Theme: "${theme.id}" (${theme.group}/${theme.name})`);
+      console.log(`    Collection: ${theme.$figmaCollectionId}`);
+      console.log(`    Mode: ${theme.$figmaModeId}`);
+      console.log(`    Variable refs: ${Object.keys(theme.$figmaVariableReferences || {}).length}`);
+    });
+    console.log('Processed token sets:', Object.keys(processedTokens));
+    console.log('');
+    
     notifyVariableValues(
       processedTokens,
       themesToCreate,
