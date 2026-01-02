@@ -1,6 +1,6 @@
 # Extended Variable Collections — Implementation Progress
 
-**Last Updated:** 2025-12-31
+**Last Updated:** 2026-01-02
 
 This document tracks the progress of implementing Figma extended variable collections (inheritance) support in Tokens Studio.
 
@@ -8,7 +8,7 @@ This document tracks the progress of implementing Figma extended variable collec
 
 - [x] Phase 0 — Baseline + API wrappers (no behavior change) — **COMPLETED**
 - [x] Phase 1 — Detect + surface extended collections in UI — **COMPLETED**
-- [ ] Phase 2 — Pull variables from extended collections (read-path)
+- [x] Phase 2 — Pull variables from extended collections (read-path) — **COMPLETED**
 - [ ] Phase 3 — Create extended collections from themes (write-path: collections)
 - [ ] Phase 4 — Update variables for extended themes (write-path: values + overrides)
 - [ ] Phase 5 — UI: Theme inheritance controls
@@ -143,29 +143,51 @@ The parent collection name is resolved dynamically from the collections array.
 
 ## Phase 2 — Pull variables from extended collections
 
-**Status:** Ready to Start  
-**Next Developer:** See `PHASE_0_1_HANDOVER.md` for complete handover
+**Status:** Completed  
+**Started:** 2026-01-02  
+**Completed:** 2026-01-02
 
-### Planned Work
+### Completed Items
 
-- Refactor `pullVariables` to be collection-driven
-- Implement override detection using `valuesByModeForCollectionAsync()`
-- Update theme metadata with parent info
-- Store `$figmaParentCollectionId` in themes
-- Map parent theme via `$extendsThemeId`
+- [x] Refactored `pullVariables.ts` to be collection-driven
+  - Changed from iterating over all variables to iterating over selected collections
+  - For each collection, get variable IDs using `getCollectionVariableIds()` (includes inherited)
+  - Use `valuesByModeForCollectionAsync()` for extended collections to get effective values
+- [x] Extended collections now import with correct override values
+- [x] Parent collection ID stored in themes via `$figmaParentCollectionId`
+- [x] Variable references populated correctly for inherited variables
+- [x] All 1554 existing tests pass (no regressions)
+- [x] Added 3 new tests for extended collections:
+  - `pulls variables from extended collection with effective values`
+  - `stores parent collection ID in themes for extended collections`
+  - `creates variable references for inherited variables in extended collections`
+- [x] Removed debug logging from Phase 1
+- [x] Changeset created
 
-### Key Files to Modify
+### Files Modified
 
-- `src/plugin/pullVariables.ts` - Main refactor
-- `src/plugin/pullVariables.test.ts` - Add extended collection tests
+**Modified:**
+- `src/plugin/pullVariables.ts` - Refactored to collection-driven approach
+- `src/plugin/pullVariables.test.ts` - Added extended collection tests, updated mocks
+- `src/plugin/asyncMessageHandlers/getAvailableVariableCollections.ts` - Removed debug logging
+- `src/app/components/ImportVariablesDialog.tsx` - Removed debug logging
+- `.changeset/curly-mangos-happen.md` - Changeset for Phase 2
 
-### Success Criteria
+### Key Changes in pullVariables.ts
 
-- Pull reads effective values from extended collections
-- Overrides applied automatically
-- Parent collection metadata stored
-- All existing functionality works
-- Comprehensive test coverage
+1. **Collection-driven iteration**: Instead of iterating all variables and filtering by collection, we now iterate selected collections and get their variables using `getCollectionVariableIds()`
+
+2. **Effective values for overrides**: For extended collections, we call `valuesByModeForCollectionAsync()` to get values with overrides applied
+
+3. **Theme metadata**: Themes for extended collections now include `$figmaParentCollectionId`
+
+4. **Variable references**: Uses collection's `variableIds` to build `$figmaVariableReferences` (works for both base and extended collections)
+
+### Test Results
+
+All tests passing:
+- ✅ 13 tests in `pullVariables.test.ts` (10 existing + 3 new)
+- ✅ All 1554 tests pass across the entire codebase
 
 ---
 

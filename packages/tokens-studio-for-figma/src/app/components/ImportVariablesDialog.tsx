@@ -196,12 +196,6 @@ export default function ImportVariablesDialog({
                 const isCollectionSelected = !!selectedCollections[collection.id];
                 const selectedModes = selectedCollections[collection.id]?.selectedModes || [];
 
-                // Debug logging for UI
-                console.log('UI rendering collection:', collection.name);
-                console.log('  - isExtended:', collection.isExtended);
-                console.log('  - parentCollectionId:', collection.parentCollectionId);
-                console.log('  - Full collection data:', collection);
-
                 return (
                   <Box key={collection.id} css={{ paddingLeft: '$3' }}>
                     <Stack direction="column" gap={2}>
@@ -213,23 +207,13 @@ export default function ImportVariablesDialog({
                         />
                         <Label htmlFor={`collection-${collection.id}`} css={{ color: '$fgDefault', fontWeight: 'bold', userSelect: 'none' }}>
                           {collection.name || `Collection ${collection.id.slice(0, 8)}`}
-                          {(() => {
-                            const shouldShow = collection.isExtended && collection.parentCollectionId;
-                            console.log(`Should show extends for ${collection.name}:`, shouldShow);
-                            console.log('  isExtended:', collection.isExtended);
-                            console.log('  parentCollectionId:', collection.parentCollectionId);
-                            console.log('  Both truthy:', !!collection.isExtended && !!collection.parentCollectionId);
-                            
-                            if (shouldShow) {
-                              const parent = collections.find((c) => c.id === collection.parentCollectionId);
-                              console.log('  Found parent:', parent?.name);
-                              return (
-                                <Box as="span" css={{ fontWeight: 'normal', color: '$fgMuted', marginLeft: '$2' }}>
-                                  (extends {parent?.name || 'parent'})
-                                </Box>
-                              );
-                            }
-                            return null;
+                          {collection.isExtended && collection.parentCollectionId && (() => {
+                            const parent = collections.find((c) => c.id === collection.parentCollectionId);
+                            return (
+                              <Box as="span" css={{ fontWeight: 'normal', color: '$fgMuted', marginLeft: '$2' }}>
+                                (extends {parent?.name || 'parent'})
+                              </Box>
+                            );
                           })()}
                         </Label>
                       </Stack>

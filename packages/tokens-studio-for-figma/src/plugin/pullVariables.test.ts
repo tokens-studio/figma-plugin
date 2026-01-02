@@ -122,9 +122,79 @@ global.figma = {
         { name: 'Light', modeId: '1:2' },
         { name: 'Custom', modeId: '1:3' },
       ],
+      variableIds: ['var-color', 'var-number1', 'var-number2', 'var-number3', 'var-string', 'var-boolean'],
     }),
     // Mock for getting a variable by ID (used for VARIABLE_ALIAS values)
     getVariableById: jest.fn().mockReturnValue({ name: 'AliasName', id: 'aliasId' }),
+    // Mock for async variable lookup
+    getVariableByIdAsync: jest.fn().mockImplementation((id) => {
+      const variableMap: Record<string, any> = {
+        'var-color': {
+          id: 'var-color',
+          key: 'color-key',
+          name: 'Color',
+          resolvedType: 'COLOR',
+          variableCollectionId: 'coll1',
+          valuesByMode: {
+            '1:0': { r: 1, g: 1, b: 1, a: 1 },
+            '1:1': { r: 0, g: 0, b: 0, a: 1 },
+            '1:2': { r: 1, g: 0, b: 0, a: 1 },
+            '1:3': { r: 0.729411780834198, g: 0.8549019694328308, b: 0.3333333432674408, a: 1 },
+          },
+        },
+        'var-number1': {
+          id: 'var-number1',
+          key: 'number1-key',
+          name: 'Number1',
+          resolvedType: 'FLOAT',
+          variableCollectionId: 'coll1',
+          valuesByMode: {
+            '1:0': 24, '1:1': 24, '1:2': 24, '1:3': 24,
+          },
+        },
+        'var-number2': {
+          id: 'var-number2',
+          key: 'number2-key',
+          name: 'Number2',
+          resolvedType: 'FLOAT',
+          variableCollectionId: 'coll1',
+          valuesByMode: {
+            '1:0': 16, '1:1': 16, '1:2': 16, '1:3': 16,
+          },
+        },
+        'var-number3': {
+          id: 'var-number3',
+          key: 'number3-key',
+          name: 'Number3',
+          resolvedType: 'FLOAT',
+          variableCollectionId: 'coll1',
+          valuesByMode: {
+            '1:0': 24.8, '1:1': 24.8, '1:2': 24.8, '1:3': 24.8,
+          },
+        },
+        'var-string': {
+          id: 'var-string',
+          key: 'string-key',
+          name: 'String',
+          resolvedType: 'STRING',
+          variableCollectionId: 'coll1',
+          valuesByMode: {
+            '1:0': 'Hello', '1:1': 'Hello', '1:2': 'Hello', '1:3': 'Hello',
+          },
+        },
+        'var-boolean': {
+          id: 'var-boolean',
+          key: 'boolean-key',
+          name: 'Boolean',
+          resolvedType: 'BOOLEAN',
+          variableCollectionId: 'coll1',
+          valuesByMode: {
+            '1:0': true, '1:1': true, '1:2': true, '1:3': true,
+          },
+        },
+      };
+      return Promise.resolve(variableMap[id] || null);
+    }),
   },
 };
 
@@ -977,5 +1047,215 @@ describe('pullStyles', () => {
         ['Old Collection/Old Mode', 'Collection 1/Default'],
       ]),
     );
+  });
+
+  describe('extended collections', () => {
+    it('pulls variables from extended collection with effective values', async () => {
+      // Mock extended collection
+      const mockBaseCollection = {
+        id: 'base-collection-id',
+        name: 'Base',
+        modes: [
+          { name: 'Light', modeId: 'base-light' },
+          { name: 'Dark', modeId: 'base-dark' },
+        ],
+        variableIds: ['var-primary-color'],
+      };
+
+      const mockExtendedCollection = {
+        id: 'brand-a-collection-id',
+        name: 'Brand A',
+        modes: [
+          { name: 'Light', modeId: 'brand-a-light' },
+          { name: 'Dark', modeId: 'brand-a-dark' },
+        ],
+        variableIds: ['var-primary-color'], // Inherited variable
+        parentVariableCollectionId: 'base-collection-id',
+      };
+
+      const mockPrimaryColorVariable = {
+        id: 'var-primary-color',
+        key: 'primary-color-key',
+        name: 'Primary Color',
+        resolvedType: 'COLOR',
+        variableCollectionId: 'base-collection-id',
+        // Base values
+        valuesByMode: {
+          'base-light': { r: 0, g: 0, b: 1, a: 1 }, // Blue
+          'base-dark': { r: 1, g: 1, b: 1, a: 1 }, // White
+        },
+        // Mock the async method for extended collections
+        valuesByModeForCollectionAsync: jest.fn().mockImplementation((collection) => {
+          if (collection.id === 'brand-a-collection-id') {
+            return Promise.resolve({
+              'brand-a-light': { r: 1, g: 0, b: 0, a: 1 }, // Red - override!
+              'brand-a-dark': { r: 1, g: 1, b: 1, a: 1 }, // White - inherited
+            });
+          }
+          return Promise.resolve({
+            'base-light': { r: 0, g: 0, b: 1, a: 1 },
+            'base-dark': { r: 1, g: 1, b: 1, a: 1 },
+          });
+        }),
+      };
+
+      // Setup mocks
+      global.figma.variables.getVariableCollectionByIdAsync = jest.fn().mockImplementation((id) => {
+        if (id === 'brand-a-collection-id') {
+          return Promise.resolve(mockExtendedCollection);
+        }
+        if (id === 'base-collection-id') {
+          return Promise.resolve(mockBaseCollection);
+        }
+        return Promise.resolve(null);
+      });
+
+      global.figma.variables.getVariableByIdAsync = jest.fn().mockImplementation((id) => {
+        if (id === 'var-primary-color') {
+          return Promise.resolve(mockPrimaryColorVariable);
+        }
+        return Promise.resolve(null);
+      });
+
+      const selectedCollections = {
+        'brand-a-collection-id': {
+          name: 'Brand A',
+          selectedModes: ['brand-a-light', 'brand-a-dark'],
+        },
+      };
+
+      await pullVariables({
+        useDimensions: false,
+        useRem: false,
+        selectedCollections,
+      }, [], false);
+
+      // Should have Brand A colors with override values
+      expect(notifyStyleValuesSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          colors: expect.arrayContaining([
+            expect.objectContaining({
+              name: 'Primary Color',
+              parent: 'Brand A/Light',
+              value: '#ff0000', // Red - override!
+            }),
+            expect.objectContaining({
+              name: 'Primary Color',
+              parent: 'Brand A/Dark',
+              value: '#ffffff', // White - inherited
+            }),
+          ]),
+        }),
+        [],
+      );
+    });
+
+    it('stores parent collection ID in themes for extended collections', async () => {
+      const mockExtendedCollection = {
+        id: 'brand-a-collection-id',
+        name: 'Brand A',
+        modes: [{ name: 'Light', modeId: 'brand-a-light' }],
+        variableIds: ['var-primary-color'],
+        parentVariableCollectionId: 'base-collection-id',
+      };
+
+      const mockPrimaryColorVariable = {
+        id: 'var-primary-color',
+        key: 'primary-color-key',
+        name: 'Primary Color',
+        resolvedType: 'COLOR',
+        variableCollectionId: 'base-collection-id',
+        valuesByMode: {
+          'brand-a-light': { r: 1, g: 0, b: 0, a: 1 },
+        },
+      };
+
+      global.figma.variables.getVariableCollectionByIdAsync = jest.fn().mockResolvedValue(mockExtendedCollection);
+      global.figma.variables.getVariableByIdAsync = jest.fn().mockResolvedValue(mockPrimaryColorVariable);
+
+      const selectedCollections = {
+        'brand-a-collection-id': {
+          name: 'Brand A',
+          selectedModes: ['brand-a-light'],
+        },
+      };
+
+      await pullVariables({
+        useDimensions: false,
+        useRem: false,
+        selectedCollections,
+      }, [], true);
+
+      // Check that theme includes parent collection ID
+      expect(notifyStyleValuesSpy).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.arrayContaining([
+          expect.objectContaining({
+            name: 'Light',
+            group: 'Brand A',
+            $figmaCollectionId: 'brand-a-collection-id',
+            $figmaParentCollectionId: 'base-collection-id',
+          }),
+        ]),
+      );
+    });
+
+    it('creates variable references for inherited variables in extended collections', async () => {
+      const mockExtendedCollection = {
+        id: 'brand-a-collection-id',
+        name: 'Brand A',
+        modes: [{ name: 'Light', modeId: 'brand-a-light' }],
+        variableIds: ['var-inherited-1', 'var-inherited-2'],
+        parentVariableCollectionId: 'base-collection-id',
+      };
+
+      const mockVariables = {
+        'var-inherited-1': {
+          id: 'var-inherited-1',
+          key: 'inherited-1-key',
+          name: 'Inherited Variable 1',
+          resolvedType: 'COLOR',
+          variableCollectionId: 'base-collection-id',
+          valuesByMode: { 'brand-a-light': { r: 1, g: 0, b: 0, a: 1 } },
+        },
+        'var-inherited-2': {
+          id: 'var-inherited-2',
+          key: 'inherited-2-key',
+          name: 'Inherited Variable 2',
+          resolvedType: 'COLOR',
+          variableCollectionId: 'base-collection-id',
+          valuesByMode: { 'brand-a-light': { r: 0, g: 1, b: 0, a: 1 } },
+        },
+      };
+
+      global.figma.variables.getVariableCollectionByIdAsync = jest.fn().mockResolvedValue(mockExtendedCollection);
+      global.figma.variables.getVariableByIdAsync = jest.fn().mockImplementation((id) => Promise.resolve(mockVariables[id] || null));
+
+      const selectedCollections = {
+        'brand-a-collection-id': {
+          name: 'Brand A',
+          selectedModes: ['brand-a-light'],
+        },
+      };
+
+      await pullVariables({
+        useDimensions: false,
+        useRem: false,
+        selectedCollections,
+      }, [], true);
+
+      // Check that themes have variable references for inherited variables
+      expect(notifyStyleValuesSpy).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.arrayContaining([
+          expect.objectContaining({
+            $figmaVariableReferences: {
+              'Inherited Variable 1': 'inherited-1-key',
+              'Inherited Variable 2': 'inherited-2-key',
+            },
+          }),
+        ]),
+      );
+    });
   });
 });
