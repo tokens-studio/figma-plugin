@@ -9,6 +9,6 @@ export function hashFigmaUserId(userId: string): string {
     return crypto.createHmac('sha256', secret).update(userId).digest('hex');
   } catch (error) {
     console.error('Error hashing Figma user ID:', error);
-    return null;
+    return '';
   }
 }

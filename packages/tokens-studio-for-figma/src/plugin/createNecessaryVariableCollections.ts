@@ -2,7 +2,6 @@ import { ThemeObjectsList } from '@/types';
 import createVariableMode from './createVariableMode';
 import { truncateCollectionName, truncateModeName } from '@/utils/truncateName';
 import { resolveThemeDependencies, getParentTheme } from './resolveThemeDependencies';
-import { isExtendedCollection, getParentVariableCollectionId } from './extendedCollectionHelpers';
 
 /**
  * Finds a parent collection for a theme that extends another theme.
@@ -15,13 +14,6 @@ function findParentCollection(
 ): VariableCollection | undefined {
   const parentCollectionName = truncateCollectionName(parentTheme.group ?? parentTheme.name);
   const originalParentName = parentTheme.group ?? parentTheme.name;
-
-  console.log('[DEBUG findParentCollection] Looking for parent collection:');
-  console.log('[DEBUG findParentCollection]   parentTheme.id:', parentTheme.id);
-  console.log('[DEBUG findParentCollection]   parentTheme.$figmaCollectionId:', parentTheme.$figmaCollectionId);
-  console.log('[DEBUG findParentCollection]   parentCollectionName:', parentCollectionName);
-  console.log('[DEBUG findParentCollection]   processedCollections:', processedCollections.map((c) => ({ id: c.id, name: c.name })));
-  console.log('[DEBUG findParentCollection]   allCollections:', allCollections.map((c) => ({ id: c.id, name: c.name })));
 
   // First look in already-processed collections (from current batch)
   let parentCollection = processedCollections.find(
@@ -39,7 +31,6 @@ function findParentCollection(
     );
   }
 
-  console.log('[DEBUG findParentCollection] Found parent collection:', parentCollection ? { id: parentCollection.id, name: parentCollection.name } : 'none');
   return parentCollection;
 }
 
@@ -51,69 +42,34 @@ function createExtendedCollection(
   parentCollection: VariableCollection,
   collectionName: string,
 ): VariableCollection {
-  console.log('[DEBUG createExtendedCollection] parentCollection:', parentCollection.name, 'id:', parentCollection.id);
-  console.log('[DEBUG createExtendedCollection] typeof parentCollection.extend:', typeof parentCollection.extend);
-
   // Check if .extend() method is available
   if (typeof parentCollection.extend === 'function') {
-    console.log('[DEBUG createExtendedCollection] Calling .extend() with name:', collectionName);
-    const extended = parentCollection.extend(collectionName);
-    console.log('[DEBUG createExtendedCollection] Extended collection created:', extended.name, 'id:', extended.id);
-    return extended;
+    return parentCollection.extend(collectionName);
   }
   // Fallback: create regular collection (without inheritance)
   // This handles cases where the Figma API doesn't support .extend()
-  console.log('[DEBUG createExtendedCollection] .extend() not available, creating regular collection');
   return figma.variables.createVariableCollection(collectionName);
 }
 
 // Takes a given theme input and creates required variable collections with modes, or updates existing ones and renames / adds modes
 export async function createNecessaryVariableCollections(themes: ThemeObjectsList, selectedThemes: string[]): Promise<VariableCollection[]> {
-  console.log('[DEBUG createNecessaryVariableCollections] Starting...');
-  console.log('[DEBUG createNecessaryVariableCollections] themes:', themes.map((t) => ({
-    id: t.id,
-    name: t.name,
-    group: t.group,
-    $extendsThemeId: t.$extendsThemeId,
-    $figmaCollectionId: t.$figmaCollectionId,
-  })));
-  console.log('[DEBUG createNecessaryVariableCollections] selectedThemes:', selectedThemes);
-
   const allCollections = await figma.variables.getLocalVariableCollectionsAsync();
-  console.log('[DEBUG createNecessaryVariableCollections] allCollections:', allCollections.map((c) => ({ id: c.id, name: c.name })));
-
   const collectionsToCreateOrUpdate = themes.filter((theme) => selectedThemes.includes(theme.id));
-  console.log('[DEBUG createNecessaryVariableCollections] collectionsToCreateOrUpdate:', collectionsToCreateOrUpdate.map((t) => ({
-    id: t.id,
-    name: t.name,
-    $extendsThemeId: t.$extendsThemeId,
-  })));
 
   // Sort themes so parents are processed before children
   const sortedThemes = resolveThemeDependencies(collectionsToCreateOrUpdate);
-  console.log('[DEBUG createNecessaryVariableCollections] sortedThemes (after dependency resolution):', sortedThemes.map((t) => ({
-    id: t.id,
-    name: t.name,
-    $extendsThemeId: t.$extendsThemeId,
-  })));
 
   return sortedThemes.reduce<VariableCollection[]>((acc, currentTheme) => {
-    console.log('[DEBUG createNecessaryVariableCollections] Processing theme:', currentTheme.name, 'id:', currentTheme.id, '$extendsThemeId:', currentTheme.$extendsThemeId);
-
-    const nameOfCollection = truncateCollectionName(currentTheme.group ?? currentTheme.name); // If there is a group, use that as the collection name, otherwise use the theme name (e.g. for when creating with sets we use the theme name)
-    const originalNameOfCollection = currentTheme.group ?? currentTheme.name; // Keep original for finding existing collections
+    const nameOfCollection = truncateCollectionName(currentTheme.group ?? currentTheme.name);
+    const originalNameOfCollection = currentTheme.group ?? currentTheme.name;
     const existingCollection = acc.find((collection) => collection.name === nameOfCollection || collection.name === originalNameOfCollection)
     || allCollections.find((vr) => vr.id === currentTheme.$figmaCollectionId
     || vr.name === nameOfCollection || vr.name === originalNameOfCollection);
 
     if (existingCollection) {
-      console.log('[DEBUG createNecessaryVariableCollections] Found existing collection:', existingCollection.name, 'id:', existingCollection.id);
-      // Check if we already have a collection with the same name, if not find one by the id of $themes or as a fallback by name
-      // We do this because we might've found the collection by id, but the name might've changed
       if (existingCollection.name !== nameOfCollection) {
         existingCollection.name = nameOfCollection;
       }
-      // If we found an existing collection, check if the mode exists, if not create it
       const truncatedModeName = truncateModeName(currentTheme.name);
       const mode = existingCollection.modes.find((m) => m.modeId === currentTheme.$figmaModeId || m.name === currentTheme.name || m.name === truncatedModeName);
 
@@ -134,37 +90,41 @@ export async function createNecessaryVariableCollections(themes: ThemeObjectsLis
       ? getParentTheme(currentTheme, themes)
       : undefined;
 
-    console.log('[DEBUG createNecessaryVariableCollections] No existing collection found');
-    console.log('[DEBUG createNecessaryVariableCollections] currentTheme.$extendsThemeId:', currentTheme.$extendsThemeId);
-    console.log('[DEBUG createNecessaryVariableCollections] parentTheme:', parentTheme ? { id: parentTheme.id, name: parentTheme.name } : 'none');
-
     let newCollection: VariableCollection;
 
     if (parentTheme) {
       // Theme extends another theme - try to create extended collection
-      console.log('[DEBUG createNecessaryVariableCollections] Theme extends another theme, looking for parent collection...');
       const parentCollection = findParentCollection(parentTheme, acc, allCollections);
 
       if (parentCollection) {
-        console.log('[DEBUG createNecessaryVariableCollections] Parent collection found, creating extended collection');
         newCollection = createExtendedCollection(parentCollection, nameOfCollection);
         // Store parent collection ID on theme for reference
-        // Note: This mutates the theme object - caller should persist this change
         // eslint-disable-next-line no-param-reassign
         currentTheme.$figmaParentCollectionId = parentCollection.id;
       } else {
         // Parent collection not found - create regular collection with warning
-        console.warn(`[DEBUG createNecessaryVariableCollections] Parent collection for theme "${currentTheme.name}" not found. Creating standalone collection.`);
+        console.warn(`Parent collection for theme "${currentTheme.name}" not found. Creating standalone collection.`);
         newCollection = figma.variables.createVariableCollection(nameOfCollection);
       }
     } else {
       // Regular theme (no inheritance) - create standard collection
-      console.log('[DEBUG createNecessaryVariableCollections] Regular theme (no inheritance), creating standard collection');
       newCollection = figma.variables.createVariableCollection(nameOfCollection);
     }
 
-    console.log('[DEBUG createNecessaryVariableCollections] Created collection:', newCollection.name, 'id:', newCollection.id);
-    newCollection.renameMode(newCollection.modes[0].modeId, truncateModeName(currentTheme.name));
+    // For extended collections, modes are inherited from parent and may already be named correctly
+    // Only rename if it's a regular collection or if renameMode is available
+    const truncatedModeName = truncateModeName(currentTheme.name);
+    if (typeof newCollection.renameMode === 'function' && newCollection.modes && newCollection.modes.length > 0) {
+      const firstMode = newCollection.modes[0];
+      if (firstMode && firstMode.modeId && firstMode.name !== truncatedModeName) {
+        try {
+          newCollection.renameMode(firstMode.modeId, truncatedModeName);
+        } catch (e) {
+          console.warn(`Failed to rename mode for collection "${newCollection.name}":`, e);
+        }
+      }
+    }
+
     acc.push(newCollection);
     return acc;
   }, []);

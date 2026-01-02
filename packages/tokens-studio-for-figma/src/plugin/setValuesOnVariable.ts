@@ -109,8 +109,6 @@ export default async function setValuesOnVariable(
             // For extended collections, we cannot create new variables (they must exist in parent)
             // Skip this token and continue - the variable should be created in the parent collection
             if (isExtended) {
-              // Variable doesn't exist in parent collection - skip silently
-              // This is expected when the token should only exist in base themes
               return;
             }
 

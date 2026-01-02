@@ -184,7 +184,6 @@ export default async function pullVariables(options: PullVariablesOptions, theme
   // COLLECTION-DRIVEN APPROACH: Iterate over selected collections
   if (options.selectedCollections) {
     const selectedCollectionIds = Object.keys(options.selectedCollections);
-    console.log('[DEBUG pullVariables] selectedCollectionIds:', selectedCollectionIds);
 
     for (const collectionId of selectedCollectionIds) {
       // Get the full collection data
@@ -197,10 +196,7 @@ export default async function pullVariables(options: PullVariablesOptions, theme
         }
       }
 
-      if (!collectionData) {
-        console.log('[DEBUG pullVariables] No collectionData for id:', collectionId);
-        continue;
-      }
+      if (!collectionData) continue;
 
       const targetIsExtended = isExtendedCollection(collectionData);
       const parentCollectionId = getParentVariableCollectionId(collectionData);
@@ -214,7 +210,6 @@ export default async function pullVariables(options: PullVariablesOptions, theme
         isExtended: targetIsExtended,
       };
       collections.set(collectionData.name, collectionInfo);
-      console.log('[DEBUG pullVariables] Added collection:', collectionData.name, 'id:', collectionData.id);
 
       // Get variable IDs for this collection (includes inherited variables for extended collections)
       const variableIds = getCollectionVariableIds(collectionData);
@@ -299,9 +294,6 @@ export default async function pullVariables(options: PullVariablesOptions, theme
   const themesToCreate: ThemeObjectsList = [];
   // Process themes if pro user
   if (proUser) {
-    console.log('[DEBUG pullVariables] proUser=true, collections.size=', collections.size);
-    console.log('[DEBUG pullVariables] collections:', Array.from(collections.entries()).map(([name, c]) => ({ name, id: c.id })));
-
     const themeInfo = await AsyncMessageChannel.PluginInstance.message({
       type: AsyncMessageTypes.GET_THEME_INFO,
     });
@@ -324,9 +316,7 @@ export default async function pullVariables(options: PullVariablesOptions, theme
       // Filter collections based on selectedCollections option
       if (options.selectedCollections) {
         const selectedCollection = options.selectedCollections[collection.id];
-        console.log('[DEBUG pullVariables] Checking collection.id:', collection.id, 'found in selectedCollections:', !!selectedCollection);
         if (!selectedCollection) {
-          console.log('[DEBUG pullVariables] Skipping collection:', collection.name, 'id:', collection.id);
           return; // Skip this collection if it's not selected
         }
       }
@@ -343,7 +333,6 @@ export default async function pullVariables(options: PullVariablesOptions, theme
 
       // Get variable IDs for this collection (includes inherited for extended collections)
       const variableIds = collectionData ? getCollectionVariableIds(collectionData) : [];
-      console.log('[DEBUG pullVariables] Processing collection:', collection.name, 'variableIds count:', variableIds.length);
 
       // Build variable references from variableIds (works for both base and extended collections)
       const variableReferencesPromises = variableIds.map(async (varId) => {
@@ -409,12 +398,9 @@ export default async function pullVariables(options: PullVariablesOptions, theme
           $figmaCollectionId: collection.id,
           ...(collection.parentCollectionId ? { $figmaParentCollectionId: collection.parentCollectionId } : {}),
         };
-        console.log('[DEBUG pullVariables] Creating theme:', themeToCreate.id, 'group:', themeToCreate.group, 'name:', themeToCreate.name);
         themesToCreate.push(themeToCreate);
       }));
     }));
-
-    console.log('[DEBUG pullVariables] Total themes to create:', themesToCreate.length);
 
     const currentTokenSets = new Set(themesToCreate.map((theme) => `${theme.group}/${theme.name}`));
     for (const existingSet of existingTokenSets) {

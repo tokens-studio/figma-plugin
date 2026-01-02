@@ -45,19 +45,16 @@ export function isExtendedCollection(collection: VariableCollection): boolean {
 export function getCollectionVariableIds(collection: VariableCollection): string[] {
   // Check if variableIds exists and is an array (getter or own property)
   if ('variableIds' in collection && Array.isArray(collection.variableIds)) {
-    console.log('[DEBUG getCollectionVariableIds] Found variableIds via in check, count:', collection.variableIds.length);
     return collection.variableIds;
   }
   // Try direct access as fallback (for getter properties)
   try {
     const ids = collection.variableIds;
     if (Array.isArray(ids)) {
-      console.log('[DEBUG getCollectionVariableIds] Found variableIds via direct access, count:', ids.length);
       return ids;
     }
-  } catch (e) {
-    console.log('[DEBUG getCollectionVariableIds] Property access failed:', e);
+  } catch {
+    // Property access failed
   }
-  console.log('[DEBUG getCollectionVariableIds] No variableIds found for collection:', collection.name);
   return [];
 }

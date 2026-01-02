@@ -309,6 +309,9 @@ All tests passing:
 - [x] Added translation keys for new UI elements
 - [x] Build successful
 - [x] Changeset created
+- [x] **Fixed critical bug:** Extended collections use different mode ID format (`VariableCollectionId:X/Y`)
+  - `setColorValuesOnVariable` now handles missing `valuesByMode[mode]` for extended modes
+  - Values are set directly via `setValueForMode` for inherited variables
 
 ### Files Modified
 
@@ -317,6 +320,7 @@ All tests passing:
 - `src/app/components/ManageThemesModal/SingleThemeEntry.tsx` - Display inheritance indicator
 - `src/app/store/models/reducers/tokenState/saveTheme.ts` - Persist $extendsThemeId
 - `src/i18n/lang/en/tokens.json` - Added translation keys
+- `src/plugin/setColorValuesOnVariable.ts` - Fixed for extended collection mode IDs
 - `.changeset/happy-lions-glow.md` - Changeset for Phase 5
 
 ### UI Changes
@@ -330,9 +334,20 @@ All tests passing:
 - Extended themes show "extends ParentName" indicator in blue
 - Indicator appears before set/style/variable counts
 
+### Key Technical Discovery
+
+Extended collections in Figma have a different mode ID format:
+- Base collection modes: `33:2`, `33:5` (simple format)
+- Extended collection modes: `VariableCollectionId:33:5/33:3` (compound format)
+
+The `variable.valuesByMode` object only contains entries for the base collection's mode IDs.
+For extended collections, we must call `setValueForMode(extendedModeId, value)` directly without
+checking `valuesByMode` first.
+
 ### Test Results
 
 - ✅ 8 tests in ManageThemesModal tests pass
+- ✅ All 1574 tests pass
 - ✅ Build successful
 
 ---
@@ -358,6 +373,7 @@ All tests passing:
 - `variable.valuesByModeForCollectionAsync(collection)` needed for effective values
 - `variable.setValueForMode(childModeId, value)` creates overrides
 - `collection.variableOverrides` exposes override map
+- **Extended collection modes have compound format:** `VariableCollectionId:X/Y` with `parentModeId` property
 - `collection.removeOverridesForVariable(variableNode)` expects Variable node, not ID
 - Calling `variable.remove()` on inherited variable removes from parent (dangerous!)
 - Mode IDs differ per collection (use names for mapping)
