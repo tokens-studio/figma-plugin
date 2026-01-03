@@ -33,6 +33,7 @@ type Props = {
   onSubmit: (values: ValidatedFormValues) => void;
   hasErrored?: boolean;
   errorMessage?: string;
+  isLoading?: boolean;
 };
 
 const zodSchema = zod.object({
@@ -56,6 +57,7 @@ export default function GenericVersionedForm({
   values,
   hasErrored,
   errorMessage,
+  isLoading = false,
 }: Props) {
   const { t } = useTranslation(['storage']);
   const [isMasked, setIsMasked] = React.useState(true);
@@ -225,7 +227,7 @@ export default function GenericVersionedForm({
           <Button variant="secondary" onClick={onCancel}>
             {t('cancel')}
           </Button>
-          <Button variant="primary" type="submit" disabled={!values.id}>
+          <Button variant="primary" type="submit" disabled={!values.id} loading={isLoading}>
             {t('save')}
           </Button>
         </Stack>

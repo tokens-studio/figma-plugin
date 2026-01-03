@@ -19,10 +19,11 @@ type Props = {
   onSubmit: (values: ValidatedFormValues) => void;
   hasErrored?: boolean;
   errorMessage?: string;
+  isLoading?: boolean;
 };
 
 export default function ADOForm({
-  onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
+  onChange, onSubmit, onCancel, values, hasErrored, errorMessage, isLoading = false,
 }: Props) {
   const { t } = useTranslation(['storage']);
   const [isMasked, setIsMasked] = React.useState(true);
@@ -129,7 +130,7 @@ export default function ADOForm({
             {t('cancel')}
           </Button>
 
-          <Button variant="primary" type="submit" disabled={!values.secret && !values.name}>
+          <Button variant="primary" type="submit" disabled={!values.secret && !values.name} loading={isLoading}>
             {t('save')}
           </Button>
         </Stack>
