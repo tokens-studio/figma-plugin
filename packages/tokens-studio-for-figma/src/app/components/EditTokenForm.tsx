@@ -38,6 +38,7 @@ import { StyleOptions } from '@/constants/StyleOptions';
 import BorderTokenForm from './BorderTokenForm';
 import Box from './Box';
 import ColorTokenForm from './ColorTokenForm';
+import BooleanTokenForm from './BooleanTokenForm';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { ColorModifier } from '@/types/Modifier';
 import { MultiSelectDropdown } from './MultiSelectDropdown';
@@ -85,6 +86,22 @@ function EditTokenForm({ resolvedTokens }: Props) {
     return true;
   }, [internalEditToken]);
 
+  const isValidBooleanToken = React.useMemo(() => {
+    if (internalEditToken.type === TokenTypes.BOOLEAN) {
+      const { value } = internalEditToken;
+      if (value === 'true' || value === 'false') {
+        return true;
+      }
+      // Check if it's a valid reference
+      if (typeof value === 'string') {
+        const isAliasFormat = /^(\{[^}]+\}|\$[a-zA-Z0-9._-]+)$/.test(value);
+        return isAliasFormat && checkIfAlias(value, resolvedTokens);
+      }
+      return false;
+    }
+    return true;
+  }, [internalEditToken, resolvedTokens]);
+
   const isValid = React.useMemo(() => {
     if (
       internalEditToken?.type === TokenTypes.COMPOSITION
@@ -99,8 +116,11 @@ function EditTokenForm({ resolvedTokens }: Props) {
     if (internalEditToken.type === TokenTypes.COLOR) {
       return isValidColorToken;
     }
+    if (internalEditToken.type === TokenTypes.BOOLEAN) {
+      return isValidBooleanToken && internalEditToken.name && !error;
+    }
     return internalEditToken?.value && internalEditToken.name && !error;
-  }, [internalEditToken, error, isValidColorToken, isValidDimensionToken]);
+  }, [internalEditToken, error, isValidColorToken, isValidDimensionToken, isValidBooleanToken]);
 
   const hasNameThatExistsAlready = React.useMemo(() => {
     const editToken = resolvedTokens
@@ -611,6 +631,17 @@ function EditTokenForm({ resolvedTokens }: Props) {
             handleBorderAliasValueChange={handleChange}
             handleDownShiftInputChange={handleDownShiftInputChange}
             setBorderValue={setBorderValue}
+            onSubmit={checkAndSubmitTokenValue}
+          />
+        );
+      }
+      case TokenTypes.BOOLEAN: {
+        return (
+          <BooleanTokenForm
+            internalEditToken={internalEditToken}
+            resolvedTokens={resolvedTokens}
+            handleBooleanChange={handleChange}
+            handleBooleanDownShiftInputChange={handleDownShiftInputChange}
             onSubmit={checkAndSubmitTokenValue}
           />
         );
