@@ -26,15 +26,23 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
   const isProUser = useIsProUser();
 
   const [showOptions, setShowOptions] = React.useState(true);
-  const [activeTab, setActiveTab] = React.useState<'useThemes' | 'useSets'>(isProUser ? 'useThemes' : 'useSets');
 
   const allSets = useSelector(allTokenSetsSelector);
   const themes = useSelector(themesListSelector);
   const dispatch = useDispatch<Dispatch>();
   const savedSelectedThemes = useSelector((state: any) => state.uiState.selectedExportThemes) || [];
+  const savedSelectedSets = useSelector((state: any) => state.uiState.selectedExportSets) || [];
+  const savedActiveTab = useSelector((state: any) => state.uiState.activeExportTab);
 
   // Validate saved themes to ensure they still exist
   const validatedSelectedThemes = savedSelectedThemes.filter((themeId) => themes.some((theme) => theme.id === themeId));
+
+  // Validate saved sets to ensure they still exist
+  const validatedSelectedSets = savedSelectedSets.filter((set) => allSets.some((s) => s === set.set));
+
+  // Determine initial active tab based on saved value or Pro status
+  const initialActiveTab = savedActiveTab || (isProUser ? 'useThemes' : 'useSets');
+  const [activeTab, setActiveTab] = React.useState<'useThemes' | 'useSets'>(initialActiveTab);
 
   // Default to using all themes if no valid saved themes are found
   const initialSelectedThemes = validatedSelectedThemes.length > 0
@@ -43,13 +51,18 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
 
   const [selectedThemes, setSelectedThemes] = React.useState<string[]>(initialSelectedThemes);
 
-  const [selectedSets, setSelectedSets] = React.useState<ExportTokenSet[]>(allSets.map((set) => {
-    const tokenSet = {
-      set,
-      status: TokenSetStatus.ENABLED,
-    };
-    return tokenSet;
-  }));
+  // Default to using all sets if no valid saved sets are found
+  const initialSelectedSets = validatedSelectedSets.length > 0
+    ? validatedSelectedSets
+    : allSets.map((set) => {
+      const tokenSet = {
+        set,
+        status: TokenSetStatus.ENABLED,
+      };
+      return tokenSet;
+    });
+
+  const [selectedSets, setSelectedSets] = React.useState<ExportTokenSet[]>(initialSelectedSets);
 
   const {
     createVariablesFromSets, createVariablesFromThemes, createStylesFromSelectedTokenSets, createStylesFromSelectedThemes,
@@ -62,6 +75,22 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
       dispatch.uiState.setSelectedExportThemes(selectedThemes);
     }
   }, [selectedThemes, dispatch.uiState]);
+
+  // Save selected sets when they change and update redux state
+  React.useEffect(() => {
+    if (selectedSets) {
+      // Update Redux state - this will trigger the effect to save to shared plugin data
+      dispatch.uiState.setSelectedExportSets(selectedSets);
+    }
+  }, [selectedSets, dispatch.uiState]);
+
+  // Save active tab when it changes and update redux state
+  React.useEffect(() => {
+    if (activeTab) {
+      // Update Redux state - this will trigger the effect to save to shared plugin data
+      dispatch.uiState.setActiveExportTab(activeTab);
+    }
+  }, [activeTab, dispatch.uiState]);
 
   const handleShowOptions = React.useCallback(() => {
     setShowOptions(true);

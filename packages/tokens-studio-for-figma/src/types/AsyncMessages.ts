@@ -63,6 +63,8 @@ export enum AsyncMessageTypes {
   REMOVE_RELAUNCH_DATA = 'async/remove-relaunch-data',
   SET_VARIABLE_EXPORT_SETTINGS = 'async/set-variable-export-settings',
   SET_SELECTED_EXPORT_THEMES = 'async/set-selected-export-themes',
+  SET_SELECTED_EXPORT_SETS = 'async/set-selected-export-sets',
+  SET_ACTIVE_EXPORT_TAB = 'async/set-active-export-tab',
   CREATE_LIVING_DOCUMENTATION = 'async/create-living-documentation',
   // the below messages are going from plugin to UI
   STARTUP = 'async/startup',
@@ -384,6 +386,16 @@ export type SetSelectedExportThemesMessage = AsyncMessage<AsyncMessageTypes.SET_
 }>;
 export type SetSelectedExportThemesMessageResult = AsyncMessage<AsyncMessageTypes.SET_SELECTED_EXPORT_THEMES>;
 
+export type SetSelectedExportSetsMessage = AsyncMessage<AsyncMessageTypes.SET_SELECTED_EXPORT_SETS, {
+  sets: string;
+}>;
+export type SetSelectedExportSetsMessageResult = AsyncMessage<AsyncMessageTypes.SET_SELECTED_EXPORT_SETS>;
+
+export type SetActiveExportTabMessage = AsyncMessage<AsyncMessageTypes.SET_ACTIVE_EXPORT_TAB, {
+  tab: string;
+}>;
+export type SetActiveExportTabMessageResult = AsyncMessage<AsyncMessageTypes.SET_ACTIVE_EXPORT_TAB>;
+
 export type PreviewRequestStartupAsyncMessage = AsyncMessage<AsyncMessageTypes.PREVIEW_REQUEST_STARTUP>;
 export type PreviewRequestStartupAsyncMessageResult = AsyncMessage<AsyncMessageTypes.PREVIEW_REQUEST_STARTUP>;
 
@@ -437,7 +449,9 @@ export type AsyncMessages =
   | RemoveRelaunchDataMessage
   | RemoveStylesWithoutConnectionMessage
   | SetVariableExportSettingsMessage
-  | SetSelectedExportThemesMessage;
+  | SetSelectedExportThemesMessage
+  | SetSelectedExportSetsMessage
+  | SetActiveExportTabMessage;
 
 export type AsyncMessageResults =
   CreateStylesAsyncMessageResult
@@ -489,7 +503,9 @@ export type AsyncMessageResults =
   | RemoveRelaunchDataMessageResult
   | RemoveStylesWithoutConnectionResult
   | SetVariableExportSettingsMessageResult
-  | SetSelectedExportThemesMessageResult;
+  | SetSelectedExportThemesMessageResult
+  | SetSelectedExportSetsMessageResult
+  | SetActiveExportTabMessageResult;
 
 export type AsyncMessagesMap = {
   [K in AsyncMessageTypes]: Extract<AsyncMessages, { type: K }>
