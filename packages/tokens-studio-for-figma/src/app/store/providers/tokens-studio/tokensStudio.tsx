@@ -101,6 +101,12 @@ export function useTokensStudio() {
     return confirmResult;
   }, [confirm, t]);
 
+  const checkAndSetAccess = useCallback(async (context: TokensStudioCredentials) => {
+    const storage = storageClientFactory(context);
+    const hasWriteAccess = await storage.canWrite();
+    dispatch.tokenState.setEditProhibited(!hasWriteAccess);
+  }, [dispatch, storageClientFactory]);
+
   const pushTokensToTokensStudio = useCallback(
     async (context: TokensStudioCredentials, overrides?: PushOverrides): Promise<RemoteResponseData> => {
       const storage = await storageClientFactory(context);
@@ -179,6 +185,8 @@ export function useTokensStudio() {
     async (context: TokensStudioCredentials): Promise<RemoteResponseData | null> => {
       const storage = storageClientFactory(context);
 
+      await checkAndSetAccess(context);
+
       try {
         const content = await storage.retrieve();
         if (content?.status === 'failure') {
@@ -205,13 +213,16 @@ export function useTokensStudio() {
       }
       return null;
     },
-    [storageClientFactory],
+    [storageClientFactory, checkAndSetAccess],
   );
 
   const syncTokensWithTokensStudio = useCallback(
     async (context: TokensStudioCredentials): Promise<RemoteResponseData> => {
       try {
         const storage = storageClientFactory(context);
+
+        await checkAndSetAccess(context);
+
         const data = await storage.retrieve();
 
         if (!data || data.status === 'failure') {
@@ -269,7 +280,7 @@ export function useTokensStudio() {
         };
       }
     },
-    [askUserIfPull, dispatch, activeTheme, tokens, themes, usedTokenSet, storageClientFactory],
+    [askUserIfPull, dispatch, activeTheme, tokens, themes, usedTokenSet, storageClientFactory, checkAndSetAccess],
   );
 
   const addNewTokensStudioCredentials = useCallback(
