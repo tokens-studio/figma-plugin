@@ -1,7 +1,7 @@
 /* eslint-disable no-continue */
 import { figmaRGBToHex } from '@figma-plugin/helpers';
 import { notifyVariableValues, notifyRenamedCollections } from './notifiers';
-import { PullVariablesOptions, ThemeObjectsList } from '@/types';
+import { PullVariablesOptions, ThemeObjectsList, ThemeObject } from '@/types';
 import { VariableToCreateToken } from '@/types/payloads';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { getVariablesWithoutZombies } from './getVariablesWithoutZombies';
@@ -36,14 +36,18 @@ export default async function pullVariables(options: PullVariablesOptions, theme
   const collections = new Map<string, {
     id: string,
     name: string,
-    modes: { name: string, modeId: string }[]
+    modes: { name: string, modeId: string, parentModeId?: string }[],
+    isExtension?: boolean,
+    parentCollectionId?: string
   }>();
 
   // Cache for collection lookups
   const collectionsCache = new Map<string, {
     id: string,
     name: string,
-    modes: { name: string, modeId: string }[]
+    modes: { name: string, modeId: string, parentModeId?: string }[],
+    isExtension?: boolean,
+    parentCollectionId?: string
   }>();
 
   for (const variable of localVariables) {
@@ -51,10 +55,20 @@ export default async function pullVariables(options: PullVariablesOptions, theme
     if (!collection) {
       const collectionData = await figma.variables.getVariableCollectionByIdAsync(variable.variableCollectionId);
       if (collectionData) {
+        // Type assertion for extended collection properties
+        const extendedCollection = collectionData as any;
         collection = {
           id: collectionData.id,
           name: collectionData.name,
-          modes: collectionData.modes.map((mode) => ({ name: mode.name, modeId: mode.modeId })),
+          modes: collectionData.modes.map((mode) => ({
+            name: mode.name,
+            modeId: mode.modeId,
+            parentModeId: (mode as any).parentModeId, // For extended collections
+          })),
+          isExtension: extendedCollection.isExtension || false,
+          parentCollectionId: extendedCollection.isExtension
+            ? extendedCollection.parentVariableCollectionId
+            : undefined,
         };
         collectionsCache.set(variable.variableCollectionId, collection);
       }
@@ -289,16 +303,16 @@ export default async function pullVariables(options: PullVariablesOptions, theme
           // Find token sets in this theme that are different from the current token set name
           Object.keys(matchingTheme.selectedTokenSets || {}).forEach((existingTokenSet) => {
             if (existingTokenSet !== tokenSetName
-                && existingTokenSet.includes('/')
-                && !renamedCollections.has(existingTokenSet)
-                && !Array.from(renamedCollections.values()).includes(tokenSetName)) {
+              && existingTokenSet.includes('/')
+              && !renamedCollections.has(existingTokenSet)
+              && !Array.from(renamedCollections.values()).includes(tokenSetName)) {
               renamedCollections.set(existingTokenSet, tokenSetName);
             }
           });
         }
 
         // Track this collection/mode combination
-        themesToCreate.push({
+        const themeObj: ThemeObject = {
           id: themeId,
           name: mode.name,
           group: collection.name,
@@ -309,7 +323,27 @@ export default async function pullVariables(options: PullVariablesOptions, theme
           $figmaVariableReferences: variableReferences,
           $figmaModeId: mode.modeId,
           $figmaCollectionId: collection.id,
-        });
+        };
+
+        // Handle extended collections
+        if (collection.isExtension && collection.parentCollectionId) {
+          themeObj.$figmaIsExtension = true;
+          themeObj.$figmaParentCollectionId = collection.parentCollectionId;
+
+          // Find parent theme ID - look for parent collection with matching mode
+          const parentTheme = themesToCreate.find(
+            (t) => t.$figmaCollectionId === collection.parentCollectionId
+              && t.$figmaModeId === mode.parentModeId,
+          );
+
+          if (parentTheme) {
+            themeObj.$figmaParentThemeId = parentTheme.id;
+            // Create hierarchical group name: "ParentCollection/ChildCollection"
+            themeObj.group = `${parentTheme.group}/${collection.name}`;
+          }
+        }
+
+        themesToCreate.push(themeObj);
       }));
     }));
 

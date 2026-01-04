@@ -15,4 +15,8 @@ export type ThemeObject = {
   $figmaCollectionId?: string;
   $figmaModeId?: string;
   $figmaVariableReferences?: Record<string, string>;
+  // Extended collection metadata
+  $figmaIsExtension?: boolean;
+  $figmaParentCollectionId?: string;
+  $figmaParentThemeId?: string; // Reference to parent theme for UI hierarchy
 };
