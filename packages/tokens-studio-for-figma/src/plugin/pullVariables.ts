@@ -9,6 +9,7 @@ import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { normalizeVariableName } from '@/utils/normalizeVariableName';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
+import { processExtendedCollectionImport, separateCollectionsByType } from './extendedCollections';
 
 export default async function pullVariables(options: PullVariablesOptions, themes: ThemeObjectsList, proUser: boolean): Promise<void> {
   // @TODO should be specifically typed according to their type
@@ -33,6 +34,13 @@ export default async function pullVariables(options: PullVariablesOptions, theme
 
   const localVariables = await getVariablesWithoutZombies();
 
+  // CRITICAL FIX: Fetch ALL collections upfront
+  // Extended collections don't have their own variables (only overrides),
+  // so we can't discover them by iterating through variables
+  const allFigmaCollections = await figma.variables.getLocalVariableCollectionsAsync();
+
+  console.log(`📚 Found ${allFigmaCollections.length} total collections in Figma`);
+
   const collections = new Map<string, {
     id: string,
     name: string,
@@ -41,38 +49,46 @@ export default async function pullVariables(options: PullVariablesOptions, theme
     parentCollectionId?: string
   }>();
 
-  // Cache for collection lookups
-  const collectionsCache = new Map<string, {
-    id: string,
-    name: string,
-    modes: { name: string, modeId: string, parentModeId?: string }[],
-    isExtension?: boolean,
-    parentCollectionId?: string
-  }>();
+  // Process all collections
+  for (const collectionData of allFigmaCollections) {
+    const extendedCollection = collectionData as any;
+
+    // DEBUG: Log all properties to see what Figma exposes
+    console.log(`🔍 Inspecting collection: "${collectionData.name}"`);
+    console.log('  isExtension:', extendedCollection.isExtension);
+    console.log('  parentVariableCollectionId:', extendedCollection.parentVariableCollectionId);
+
+    const collection = {
+      id: collectionData.id,
+      name: collectionData.name,
+      modes: collectionData.modes.map((mode) => ({
+        name: mode.name,
+        modeId: mode.modeId,
+        parentModeId: (mode as any).parentModeId,
+      })),
+      isExtension: extendedCollection.isExtension || false,
+      parentCollectionId: extendedCollection.isExtension
+        ? extendedCollection.parentVariableCollectionId
+        : undefined,
+    };
+
+    // Debug logging for extended collections
+    if (collection.isExtension) {
+      console.log(`✅ Extended collection detected: "${collection.name}" extends "${collection.parentCollectionId}"`);
+      console.log(`  Modes:`, collection.modes.map(m => `${m.name} (parent: ${m.parentModeId})`));
+    }
+
+    collections.set(collection.name, collection);
+  }
+
+  // Cache for collection lookups by ID
+  const collectionsCache = new Map<string, typeof collections extends Map<string, infer T> ? T : never>();
+  collections.forEach((collection) => {
+    collectionsCache.set(collection.id, collection);
+  });
 
   for (const variable of localVariables) {
-    let collection = collectionsCache.get(variable.variableCollectionId);
-    if (!collection) {
-      const collectionData = await figma.variables.getVariableCollectionByIdAsync(variable.variableCollectionId);
-      if (collectionData) {
-        // Type assertion for extended collection properties
-        const extendedCollection = collectionData as any;
-        collection = {
-          id: collectionData.id,
-          name: collectionData.name,
-          modes: collectionData.modes.map((mode) => ({
-            name: mode.name,
-            modeId: mode.modeId,
-            parentModeId: (mode as any).parentModeId, // For extended collections
-          })),
-          isExtension: extendedCollection.isExtension || false,
-          parentCollectionId: extendedCollection.isExtension
-            ? extendedCollection.parentVariableCollectionId
-            : undefined,
-        };
-        collectionsCache.set(variable.variableCollectionId, collection);
-      }
-    }
+    const collection = collectionsCache.get(variable.variableCollectionId);
 
     // Filter collections and modes based on selectedCollections option
     if (options.selectedCollections && collection) {
@@ -81,10 +97,6 @@ export default async function pullVariables(options: PullVariablesOptions, theme
         // eslint-disable-next-line no-continue
         continue; // Skip this collection if it's not selected
       }
-    }
-
-    if (collection) {
-      collections.set(collection.name, collection);
     }
 
     const variableName = normalizeVariableName(variable.name);
@@ -265,7 +277,17 @@ export default async function pullVariables(options: PullVariablesOptions, theme
       });
     });
 
-    await Promise.all(Array.from(collections.values()).map(async (collection) => {
+    // Process collections in two passes to ensure parent themes are created before child themes
+    const { regularCollections, extendedCollections } = separateCollectionsByType(
+      Array.from(collections.values()),
+    );
+
+    console.log(`📦 Processing ${regularCollections.length} regular collections and ${extendedCollections.length} extended collections`);
+    console.log('Regular collections:', regularCollections.map(c => c.name));
+    console.log('Extended collections:', extendedCollections.map(c => `${c.name} (extends ${c.parentCollectionId})`));
+
+    // Helper function to process a collection and create themes
+    const processCollection = async (collection: typeof regularCollections[0]) => {
       // Filter collections based on selectedCollections option
       if (options.selectedCollections) {
         const selectedCollection = options.selectedCollections[collection.id];
@@ -325,27 +347,20 @@ export default async function pullVariables(options: PullVariablesOptions, theme
           $figmaCollectionId: collection.id,
         };
 
-        // Handle extended collections
-        if (collection.isExtension && collection.parentCollectionId) {
-          themeObj.$figmaIsExtension = true;
-          themeObj.$figmaParentCollectionId = collection.parentCollectionId;
+        // Handle extended collections using helper function
+        processExtendedCollectionImport(themeObj, collection, mode, themesToCreate);
 
-          // Find parent theme ID - look for parent collection with matching mode
-          const parentTheme = themesToCreate.find(
-            (t) => t.$figmaCollectionId === collection.parentCollectionId
-              && t.$figmaModeId === mode.parentModeId,
-          );
-
-          if (parentTheme) {
-            themeObj.$figmaParentThemeId = parentTheme.id;
-            // Create hierarchical group name: "ParentCollection/ChildCollection"
-            themeObj.group = `${parentTheme.group}/${collection.name}`;
-          }
-        }
+        console.log(`🎨 Created theme: ${themeObj.group}/${themeObj.name}${themeObj.$figmaIsExtension ? ' (EXTENDED)' : ''}`);
 
         themesToCreate.push(themeObj);
       }));
-    }));
+    };
+
+    // Pass 1: Process all regular collections first
+    await Promise.all(regularCollections.map(processCollection));
+
+    // Pass 2: Process extended collections (parent themes now exist)
+    await Promise.all(extendedCollections.map(processCollection));
 
     const currentTokenSets = new Set(themesToCreate.map((theme) => `${theme.group}/${theme.name}`));
     for (const existingSet of existingTokenSets) {

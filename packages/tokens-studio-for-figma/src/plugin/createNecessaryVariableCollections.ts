@@ -1,6 +1,11 @@
 import { ThemeObjectsList } from '@/types';
 import createVariableMode from './createVariableMode';
 import { truncateCollectionName, truncateModeName } from '@/utils/truncateName';
+import {
+  createExtendedVariableCollection,
+  findParentCollection,
+  isExtendedCollectionTheme,
+} from './extendedCollections';
 
 // Takes a given theme input and creates required variable collections with modes, or updates existing ones and renames / adds modes
 export async function createNecessaryVariableCollections(themes: ThemeObjectsList, selectedThemes: string[]): Promise<VariableCollection[]> {
