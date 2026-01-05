@@ -112,6 +112,19 @@ global.figma = {
     }),
   },
   variables: {
+    // Mock for getting all local variable collections
+    getLocalVariableCollectionsAsync: jest.fn().mockResolvedValue([
+      {
+        id: 'VariableID:1:0',
+        name: 'Collection 1',
+        modes: [
+          { name: 'Default', modeId: '1:0' },
+          { name: 'Dark', modeId: '1:1' },
+          { name: 'Light', modeId: '1:2' },
+          { name: 'Custom', modeId: '1:3' },
+        ],
+      },
+    ]),
     // New async version returns a promise that resolves with the expected collection
     getVariableCollectionByIdAsync: jest.fn().mockResolvedValue({
       id: 'VariableID:1:0',
