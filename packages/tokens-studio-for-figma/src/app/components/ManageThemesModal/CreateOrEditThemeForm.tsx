@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useSelector, useStore } from 'react-redux';
 import {
-  Box, Button, IconButton, Stack,
+  Box, Button, IconButton, Stack, Select,
 } from '@tokens-studio/ui';
 import { NavArrowLeft } from 'iconoir-react';
 import { useTranslation } from 'react-i18next';
@@ -29,6 +29,7 @@ import { track } from '@/utils/analytics';
 export type FormValues = {
   name: string
   group?: string
+  parentThemeId?: string
   tokenSets: Record<string, TokenSetStatus>
 };
 
@@ -42,10 +43,12 @@ type Props = {
   defaultValues?: Partial<FormValues>
   onSubmit: (values: FormValues) => void
   onCancel: () => void
+  isExtendMode?: boolean
+  setIsExtendMode?: (value: boolean) => void
 };
 
 export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
-  id, defaultValues, onSubmit, onCancel,
+  id, defaultValues, onSubmit, onCancel, isExtendMode = false, setIsExtendMode,
 }) => {
   const store = useStore<RootState>();
   const [activeTab, setActiveTab] = useState(ThemeFormTabs.SETS);
@@ -59,6 +62,21 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
   const availableTokenSets = useSelector(allTokenSetsSelector);
   const themes = useSelector(themesListSelector);
   const groupNames = useMemo(() => ([...new Set(themes.filter((t) => t?.group).map((t) => t.group as string))]), [themes]);
+
+  // Available parent theme GROUPS (not individual themes)
+  const availableParentGroups = useMemo(() => {
+    // Get all groups that are NOT extensions
+    const nonExtensionGroups = new Set<string>();
+
+    themes.forEach((theme) => {
+      // Only include groups from non-extended themes
+      if (!theme.$figmaIsExtension && theme.group) {
+        nonExtensionGroups.add(theme.group);
+      }
+    });
+
+    return Array.from(nonExtensionGroups).sort();
+  }, [themes]);
   const { t } = useTranslation(['tokens', 'errors']);
 
   const treeOrListItems = useMemo(() => (
@@ -191,62 +209,148 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
               justifyContent: 'space-evenly',
             }}
           >
-            <Stack direction="row" gap={1} align="center">
-              {
-            showGroupInput ? (
-              <Input
-                full
-                autofocus
-                data-testid="create-or-edit-theme-form--group--name"
-                {...register('group')}
-                placeholder={t('addGroup')}
-                onKeyDown={handleGroupKeyDown}
-                css={{
-                  display: 'flex',
-                }}
-              />
-            ) : (
-              <Box css={{ width: '100%' }}>
-                {
-                  groupNames.length > 0 ? (
-                    <Controller
-                      name="group"
-                      control={control}
-                      // eslint-disable-next-line
-                      render={({ field }) => (
-                        <ThemeGroupDropDownMenu
-                          availableGroups={groupNames}
-                          selectedGroup={field.value}
-                          onChange={field.onChange}
-                          addGroup={handleAddGroup}
-                        />
-                      )}
-                    />
-                  ) : (
-                    <Button
-                      data-testid="button-manage-themes-modal-new-group"
-                      variant="secondary"
-                      icon={<IconPlus />}
-                      onClick={handleAddGroup}
-                      size="small"
-                    >
-                      {t('addGroup')}
-                    </Button>
-                  )
-                }
-              </Box>
-            )
-          }
-              <Box css={{ margin: '0 $3' }}>/</Box>
-            </Stack>
-            <Stack direction="row" gap={1} align="center" css={{ flexGrow: 1 }}>
-              <Input
-                full
-                data-testid="create-or-edit-theme-form--input--name"
-                {...register('name', { required: true })}
-                placeholder={t('themeName')}
-              />
-            </Stack>
+            {/* EXTEND MODE: Show parent selector + name only */}
+            {!id && isExtendMode && (
+              <Stack direction="column" gap={3} css={{ width: '100%', padding: '$4' }}>
+                <Stack direction="column" gap={1}>
+                  <Box css={{
+                    fontSize: '$xsmall',
+                    color: '$fgSubtle',
+                    fontWeight: '$sansMedium'
+                  }}>
+                    Extend from
+                  </Box>
+                  <Controller
+                    name="parentThemeId"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        data-testid="create-theme-form--select--parent"
+                        value={field.value || ''}
+                        onValueChange={field.onChange}
+                      >
+                        <Select.Trigger value={field.value || 'Select theme group'} />
+                        <Select.Content>
+                          {availableParentGroups.map((group) => (
+                            <Select.Item key={group} value={group}>
+                              {group}
+                            </Select.Item>
+                          ))}
+                        </Select.Content>
+                      </Select>
+                    )}
+                  />
+                </Stack>
+                <Stack direction="column" gap={1}>
+                  <Box css={{
+                    fontSize: '$xsmall',
+                    color: '$fgSubtle',
+                    fontWeight: '$sansMedium'
+                  }}>
+                    {t('themeName')}
+                  </Box>
+                  <Input
+                    full
+                    data-testid="create-or-edit-theme-form--input--name"
+                    {...register('name', { required: true })}
+                    placeholder={t('themeName')}
+                  />
+                </Stack>
+              </Stack>
+            )}
+
+            {/* DEFAULT MODE: Show original group + name inputs */}
+            {!id && !isExtendMode && (
+              <>
+                <Stack direction="row" gap={1} align="center">
+                  {
+                    showGroupInput ? (
+                      <Input
+                        full
+                        autofocus
+                        data-testid="create-or-edit-theme-form--group--name"
+                        {...register('group')}
+                        placeholder={t('addGroup')}
+                        onKeyDown={handleGroupKeyDown}
+                        css={{
+                          display: 'flex',
+                        }}
+                      />
+                    ) : (
+                      <Box css={{ width: '100%' }}>
+                        {
+                          groupNames.length > 0 ? (
+                            <Controller
+                              name="group"
+                              control={control}
+                              // eslint-disable-next-line
+                              render={({ field }) => (
+                                <ThemeGroupDropDownMenu
+                                  availableGroups={groupNames}
+                                  selectedGroup={field.value}
+                                  onChange={field.onChange}
+                                  addGroup={handleAddGroup}
+                                />
+                              )}
+                            />
+                          ) : (
+                            <Button
+                              data-testid="button-manage-themes-modal-new-group"
+                              variant="secondary"
+                              icon={<IconPlus />}
+                              onClick={handleAddGroup}
+                              size="small"
+                            >
+                              {t('addGroup')}
+                            </Button>
+                          )
+                        }
+                      </Box>
+                    )
+                  }
+                  <Box css={{ margin: '0 $3' }}>/</Box>
+                </Stack>
+                <Stack direction="row" gap={1} align="center" css={{ flexGrow: 1 }}>
+                  <Input
+                    full
+                    data-testid="create-or-edit-theme-form--input--name"
+                    {...register('name', { required: true })}
+                    placeholder={t('themeName')}
+                  />
+                </Stack>
+              </>
+            )}
+
+            {/* EDITING MODE: Show group dropdown + name input */}
+            {id && (
+              <>
+                <Stack direction="row" gap={1} align="center">
+                  <Controller
+                    name="group"
+                    control={control}
+                    // eslint-disable-next-line
+                    render={({ field }) => (
+                      <ThemeGroupDropDownMenu
+                        availableGroups={groupNames}
+                        selectedGroup={field.value}
+                        onChange={field.onChange}
+                        addGroup={handleAddGroup}
+                      />
+                    )}
+                  />
+                  <Box css={{ margin: '0 $3' }}>/</Box>
+                </Stack>
+                <Stack direction="row" gap={1} align="center" css={{ flexGrow: 1 }}>
+                  <Input
+                    full
+                    data-testid="create-or-edit-theme-form--input--name"
+                    {...register('name', { required: true })}
+                    placeholder={t('themeName')}
+                  />
+                </Stack>
+              </>
+            )}
+
           </Stack>
 
         </StyledCreateOrEditThemeFormHeaderFlex>
@@ -281,7 +385,7 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
           )}
         </>
       )}
-      {!id && (
+      {!id && !isExtendMode && (
         <Box css={{ padding: '$3 $4', borderBottom: '1px solid $borderSubtled' }}>
           <Stack direction="row" justify="between" align="center" gap={3}>
             <Box css={{ fontSize: '$small', fontWeight: '$sansMedium', color: '$fgDefault' }}>
@@ -300,10 +404,25 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
         </Box>
       )}
       <Stack direction="column" gap={1}>
-        {(id ? activeTab === ThemeFormTabs.SETS : true) && (
-        <Stack direction="column" gap={1} css={{ padding: '$3 $4 $3' }}>
-          {(() => {
-            if (filteredTreeOrListItems.length > 0) {
+        {(id ? activeTab === ThemeFormTabs.SETS : !isExtendMode) && (
+          <Stack direction="column" gap={1} css={{ padding: '$3 $4 $3' }}>
+            {(() => {
+              if (filteredTreeOrListItems.length > 0) {
+                return (
+                  <TokenSetTreeContent
+                    items={filteredTreeOrListItems}
+                    renderItemContent={TokenSetThemeItemInput}
+                    keyPosition="end"
+                  />
+                );
+              }
+              if (isSearchActive && searchTerm) {
+                return (
+                  <Box css={{ padding: '$4', textAlign: 'center', color: '$fgMuted' }}>
+                    No sets found
+                  </Box>
+                );
+              }
               return (
                 <TokenSetTreeContent
                   items={filteredTreeOrListItems}
@@ -311,31 +430,16 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
                   keyPosition="end"
                 />
               );
-            }
-            if (isSearchActive && searchTerm) {
-              return (
-                <Box css={{ padding: '$4', textAlign: 'center', color: '$fgMuted' }}>
-                  No sets found
-                </Box>
-              );
-            }
-            return (
-              <TokenSetTreeContent
-                items={filteredTreeOrListItems}
-                renderItemContent={TokenSetThemeItemInput}
-                keyPosition="end"
-              />
-            );
-          })()}
-        </Stack>
+            })()}
+          </Stack>
         )}
         {(activeTab === ThemeFormTabs.STYLES_VARIABLES && id) && (
-        <Box css={{ padding: '$3' }}>
-          <Box css={{ padding: '$1', marginBottom: '$2' }}>
-            {t('stylesVarMultiDimensionalThemesWarning')}
+          <Box css={{ padding: '$3' }}>
+            <Box css={{ padding: '$1', marginBottom: '$2' }}>
+              {t('stylesVarMultiDimensionalThemesWarning')}
+            </Box>
+            <ThemeStyleManagementForm id={id} />
           </Box>
-          <ThemeStyleManagementForm id={id} />
-        </Box>
         )}
       </Stack>
     </StyledForm>
