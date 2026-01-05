@@ -109,6 +109,13 @@ export default async function pullVariables(options: PullVariablesOptions, theme
     if (collection) {
       collections.forEach((extCollection) => {
         if (extCollection.isExtension && extCollection.parentCollectionId === collection.id) {
+          // BUGFIX: Only include extended collections if they are selected
+          if (options.selectedCollections) {
+            const isExtendedCollectionSelected = options.selectedCollections[extCollection.id];
+            if (!isExtendedCollectionSelected) {
+              return; // Skip this extended collection if it's not selected
+            }
+          }
           collectionsToProcess.push(extCollection);
         }
       });
