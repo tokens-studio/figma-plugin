@@ -52,6 +52,7 @@ export default function AuthModal() {
 
   return (
     <Modal
+      isOpen
       title={mode === AuthModes.LOGIN ? 'Log in' : 'Sign up'}
       showClose
     >
