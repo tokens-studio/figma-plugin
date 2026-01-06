@@ -18,7 +18,6 @@ import OnboardingFlow from '../OnboardingFlow';
 import { Initiator } from '../Initiator';
 import { globalStyles } from '../globalStyles';
 import { AuthContextProvider } from '@/context/AuthContext';
-import SecondScreenSync from '../SecondScreenSync';
 import AuthModal from '../AuthModal';
 import PullDialog from '../PullDialog';
 import { useFigmaTheme } from '@/hooks/useFigmaTheme';
@@ -105,7 +104,6 @@ export const AppContainer = (params: Props) => {
       }
       <WindowResizer />
       <OnboardingFlow />
-      <SecondScreenSync />
       <AuthModal />
       <BitbucketMigrationDialog />
       <GenericVersionedHeaderMigrationDialog />

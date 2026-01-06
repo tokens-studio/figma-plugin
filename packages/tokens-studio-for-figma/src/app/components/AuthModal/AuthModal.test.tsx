@@ -24,7 +24,6 @@ describe('Add license key', () => {
     const pass = 'pass';
     const mockStore = createMockStore({
       uiState: {
-        secondScreenEnabled: true,
       },
     });
     render(
@@ -55,7 +54,6 @@ describe('Add license key', () => {
   it('user can go to signup & initial mode is sign in', () => {
     const mockStore = createMockStore({
       uiState: {
-        secondScreenEnabled: true,
       },
     });
     render(
@@ -81,7 +79,6 @@ describe('Add license key', () => {
     const usedEmail = 'used@email.com';
     const mockStore = createMockStore({
       uiState: {
-        secondScreenEnabled: true,
       },
       userState: {
         usedEmail,
@@ -108,7 +105,6 @@ describe('Add license key', () => {
 
     const mockStore = createMockStore({
       uiState: {
-        secondScreenEnabled: true,
       },
     });
     render(
@@ -154,7 +150,6 @@ it('Displays signup error', async () => {
 
   const mockStore = createMockStore({
     uiState: {
-      secondScreenEnabled: true,
     },
   });
   render(

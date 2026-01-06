@@ -5,7 +5,6 @@ import {
 } from '@tokens-studio/ui';
 import { ChevronLeftIcon } from '@radix-ui/react-icons';
 import { useAuth } from '@/context/AuthContext';
-import { secondScreenSelector } from '@/selectors/secondScreenSelector';
 import Modal from '../Modal';
 import { Dispatch } from '@/app/store';
 import { usedEmailSelector } from '@/selectors/usedEmailSelector';
@@ -21,7 +20,6 @@ export default function AuthModal() {
   } = useAuth();
   const dispatch = useDispatch<Dispatch>();
   const [mode, setMode] = useState<AuthModes>(AuthModes.LOGIN);
-  const secondScreenEnabled = useSelector(secondScreenSelector);
   const usedEmail = useSelector(usedEmailSelector);
 
   const [values, setValues] = React.useState({
@@ -58,8 +56,6 @@ export default function AuthModal() {
     <Modal
       title={mode === AuthModes.LOGIN ? 'Log in' : 'Sign up'}
       showClose
-      close={dispatch.uiState.toggleSecondScreen}
-      isOpen={secondScreenEnabled && !user}
     >
       <Stack direction="column" align="start" gap={5}>
         <Label css={{ width: '100%' }}>
