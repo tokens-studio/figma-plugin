@@ -28,7 +28,7 @@ describe('Add license key', () => {
     });
     render(
       <Provider store={mockStore}>
-        <AuthModal />
+        <AuthModal isOpen />
       </Provider>,
     );
 
@@ -58,7 +58,7 @@ describe('Add license key', () => {
     });
     render(
       <Provider store={mockStore}>
-        <AuthModal />
+        <AuthModal isOpen />
       </Provider>,
     );
 
@@ -86,7 +86,7 @@ describe('Add license key', () => {
     });
     render(
       <Provider store={mockStore}>
-        <AuthModal />
+        <AuthModal isOpen />
       </Provider>,
     );
 
@@ -110,7 +110,7 @@ describe('Add license key', () => {
     render(
       <Provider store={mockStore}>
         <AuthContextProvider authData={null}>
-          <AuthModal />
+          <AuthModal isOpen />
         </AuthContextProvider>
       </Provider>,
     );
@@ -155,7 +155,7 @@ it('Displays signup error', async () => {
   render(
     <Provider store={mockStore}>
       <AuthContextProvider authData={null}>
-        <AuthModal />
+        <AuthModal isOpen />
       </AuthContextProvider>
     </Provider>,
   );

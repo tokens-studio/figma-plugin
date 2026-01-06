@@ -13,12 +13,16 @@ enum AuthModes {
   SIGNUP = 'signup',
 }
 
-export default function AuthModal() {
+export default function AuthModal({ isOpen: isOpenProp }: { isOpen?: boolean } = {}) {
   const {
     user, authInProgress, logIn, signUp, authError, setAuthError,
   } = useAuth();
   const [mode, setMode] = useState<AuthModes>(AuthModes.LOGIN);
   const usedEmail = useSelector(usedEmailSelector);
+
+  // Use prop if provided (for testing), otherwise default to closed
+  // The modal should be explicitly opened when needed (e.g., when second screen requires auth)
+  const isOpen = isOpenProp !== undefined ? isOpenProp : false;
 
   const [values, setValues] = React.useState({
     email: usedEmail || '',
@@ -52,7 +56,7 @@ export default function AuthModal() {
 
   return (
     <Modal
-      isOpen={!user}
+      isOpen={isOpen}
       title={mode === AuthModes.LOGIN ? 'Log in' : 'Sign up'}
       showClose
     >
