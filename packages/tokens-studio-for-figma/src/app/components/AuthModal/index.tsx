@@ -15,7 +15,7 @@ enum AuthModes {
 
 export default function AuthModal() {
   const {
-    authInProgress, logIn, signUp, authError, setAuthError,
+    user, authInProgress, logIn, signUp, authError, setAuthError,
   } = useAuth();
   const [mode, setMode] = useState<AuthModes>(AuthModes.LOGIN);
   const usedEmail = useSelector(usedEmailSelector);
@@ -52,7 +52,7 @@ export default function AuthModal() {
 
   return (
     <Modal
-      isOpen
+      isOpen={!user}
       title={mode === AuthModes.LOGIN ? 'Log in' : 'Sign up'}
       showClose
     >
