@@ -8,25 +8,16 @@ import Stack from './Stack';
 import { TabButton } from './TabButton';
 import { NavbarUndoButton } from './NavbarUndoButton';
 import Minimize from '@/icons/minimize.svg';
-import IconSecondScreenOn from '@/icons/second-screen-on.svg';
-import IconSecondScreenOff from '@/icons/second-screen-off.svg';
-import IconSecondScreenIndeterminate from '@/icons/second-screen-indeterminate.svg';
 import useMinimizeWindow from './useMinimizeWindow';
 import { activeTabSelector } from '@/selectors';
 import { Dispatch } from '../store';
 import TokenFlowButton from './TokenFlowButton';
-import { secondScreenSelector } from '@/selectors/secondScreenSelector';
-import { useAuth } from '@/context/AuthContext';
-import { useIsProUser } from '@/app/hooks/useIsProUser';
 
 const Navbar: React.FC<React.PropsWithChildren<React.PropsWithChildren<unknown>>> = () => {
-  const { user } = useAuth();
   const activeTab = useSelector(activeTabSelector);
   const dispatch = useDispatch<Dispatch>();
   const { handleResize } = useMinimizeWindow();
   const { t } = useTranslation(['navbar']);
-  const isProUser = useIsProUser();
-  const secondScreenisEnabled = useSelector(secondScreenSelector);
 
   const handleSwitch = useCallback(
     (tab: Tabs) => {
@@ -34,16 +25,6 @@ const Navbar: React.FC<React.PropsWithChildren<React.PropsWithChildren<unknown>>
     },
     [dispatch.uiState],
   );
-
-  const secondScreenIcon = useMemo(() => {
-    if (user && secondScreenisEnabled) return <IconSecondScreenOn />;
-    if (user && secondScreenisEnabled === false) return <IconSecondScreenOff />;
-    return <IconSecondScreenIndeterminate />;
-  }, [secondScreenisEnabled, user]);
-
-  const switchToSecondScreen = useCallback(() => {
-    dispatch.uiState.setActiveTab(Tabs.SECONDSCREEN);
-  }, [dispatch.uiState]);
 
   return (
     <Box
@@ -68,7 +49,7 @@ const Navbar: React.FC<React.PropsWithChildren<React.PropsWithChildren<unknown>>
         <NavbarUndoButton />
       </Stack>
       <Stack direction="row" align="center" justify="end" gap={1} css={{ paddingRight: '$2', flexBasis: 'min-content' }}>
-        { isProUser && <IconButton size="small" variant="invisible" icon={secondScreenIcon} tooltip="Second Screen" onClick={switchToSecondScreen} />}
+        {/* Second screen icon removed */}
         <TokenFlowButton />
         <IconButton size="small" variant="invisible" tooltip={t('minimize') as string} onClick={handleResize} icon={<Minimize />} />
       </Stack>
