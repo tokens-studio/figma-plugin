@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import {
   track, identify, setUserData, initializeAnalytics,
 } from './analytics';
@@ -5,7 +6,6 @@ import {
   mockTrack, mockInit, mockIdentify, mockPeopleSet,
 } from '../../tests/__mocks__/mixpanelMock';
 import pjs from '../../package.json';
-import crypto from 'crypto';
 
 describe('without mixpanel env', () => {
   it('should not track when mixpanel env isnt set', () => {

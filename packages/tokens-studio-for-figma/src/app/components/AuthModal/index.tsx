@@ -1,12 +1,11 @@
 import React, { ChangeEvent, useCallback, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import {
   Box, Button, Label, Stack, TextInput, Link, Text,
 } from '@tokens-studio/ui';
 import { ChevronLeftIcon } from '@radix-ui/react-icons';
 import { useAuth } from '@/context/AuthContext';
 import Modal from '../Modal';
-import { Dispatch } from '@/app/store';
 import { usedEmailSelector } from '@/selectors/usedEmailSelector';
 
 enum AuthModes {
@@ -14,13 +13,16 @@ enum AuthModes {
   SIGNUP = 'signup',
 }
 
-export default function AuthModal() {
+export default function AuthModal({ isOpen: isOpenProp }: { isOpen?: boolean } = {}) {
   const {
     user, authInProgress, logIn, signUp, authError, setAuthError,
   } = useAuth();
-  const dispatch = useDispatch<Dispatch>();
   const [mode, setMode] = useState<AuthModes>(AuthModes.LOGIN);
   const usedEmail = useSelector(usedEmailSelector);
+
+  // Use prop if provided (for testing), otherwise default to closed
+  // The modal should be explicitly opened when needed (e.g., when second screen requires auth)
+  const isOpen = isOpenProp !== undefined ? isOpenProp : false;
 
   const [values, setValues] = React.useState({
     email: usedEmail || '',
@@ -54,6 +56,7 @@ export default function AuthModal() {
 
   return (
     <Modal
+      isOpen={isOpen}
       title={mode === AuthModes.LOGIN ? 'Log in' : 'Sign up'}
       showClose
     >
