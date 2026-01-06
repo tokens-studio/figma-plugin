@@ -1,12 +1,11 @@
 import React, { ChangeEvent, useCallback, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import {
   Box, Button, Label, Stack, TextInput, Link, Text,
 } from '@tokens-studio/ui';
 import { ChevronLeftIcon } from '@radix-ui/react-icons';
 import { useAuth } from '@/context/AuthContext';
 import Modal from '../Modal';
-import { Dispatch } from '@/app/store';
 import { usedEmailSelector } from '@/selectors/usedEmailSelector';
 
 enum AuthModes {
@@ -16,9 +15,8 @@ enum AuthModes {
 
 export default function AuthModal() {
   const {
-    user, authInProgress, logIn, signUp, authError, setAuthError,
+    authInProgress, logIn, signUp, authError, setAuthError,
   } = useAuth();
-  const dispatch = useDispatch<Dispatch>();
   const [mode, setMode] = useState<AuthModes>(AuthModes.LOGIN);
   const usedEmail = useSelector(usedEmailSelector);
 
