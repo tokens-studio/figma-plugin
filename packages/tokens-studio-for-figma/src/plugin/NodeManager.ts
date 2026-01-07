@@ -78,12 +78,16 @@ export class NodeManager {
       for (let nodeIndex = 0; nodeIndex < relevantNodes.length; nodeIndex += 1) {
         promises.add(defaultWorker.schedule(async () => {
           const node = relevantNodes[nodeIndex];
+          const tokens = await tokensSharedDataHandler.getAll(node);
 
-          returnedNodes.push({
-            node: relevantNodes[nodeIndex],
-            tokens: await tokensSharedDataHandler.getAll(node),
-            id: node.id,
-          });
+          // Only include nodes that have tokens applied
+          if (Object.keys(tokens).length > 0) {
+            returnedNodes.push({
+              node: relevantNodes[nodeIndex],
+              tokens,
+              id: node.id,
+            });
+          }
           tracker.next();
           tracker.reportIfNecessary();
         }));
