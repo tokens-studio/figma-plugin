@@ -109,6 +109,10 @@ describe('update', () => {
     expect(ActiveThemePropertyWriteSpy).toBeCalledWith(mockUpdateMessage.activeTheme);
     expect(mockSwapStyles).toBeCalledWith(mockUpdateMessage.activeTheme, mockUpdateMessage.themes, mockUpdateMessage.settings.updateMode);
     expect(mockSwapFigmaModes).toBeCalledWith(mockUpdateMessage.activeTheme, mockUpdateMessage.themes, mockUpdateMessage.settings.updateMode);
+    expect(findNodesSpy).toBeCalledWith({
+      updateMode: mockUpdateMessage.settings.updateMode,
+      nodesWithoutPluginData: true,
+    });
 
     runAfter.forEach((fn) => fn());
   });
