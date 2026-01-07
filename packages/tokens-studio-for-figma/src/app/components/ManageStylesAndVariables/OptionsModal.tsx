@@ -24,6 +24,7 @@ import {
   stylesColorSelector,
   stylesEffectSelector,
   stylesTypographySelector,
+  exportExtendedCollectionsSelector,
 } from '@/selectors';
 import ignoreFirstPartImage from '@/app/assets/hints/ignoreFirstPartForStyles.png';
 import prefixStylesImage from '@/app/assets/hints/prefixStyles.png';
@@ -51,6 +52,7 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
   const stylesColor = useSelector(stylesColorSelector);
   const stylesTypography = useSelector(stylesTypographySelector);
   const stylesEffect = useSelector(stylesEffectSelector);
+  const exportExtendedCollections = useSelector(exportExtendedCollectionsSelector);
 
   const dispatch = useDispatch<Dispatch>();
 
@@ -85,6 +87,13 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
   const handleRemoveStylesAndVariablesWithoutConnectionChange = React.useCallback(
     (state: CheckedState) => {
       dispatch.settings.setRemoveStylesAndVariablesWithoutConnection(!!state);
+    },
+    [dispatch.settings],
+  );
+
+  const handleExportExtendedCollectionsChange = React.useCallback(
+    (state: CheckedState) => {
+      dispatch.settings.setExportExtendedCollections(!!state);
     },
     [dispatch.settings],
   );
@@ -167,7 +176,7 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
           </Button>
 
         </Stack>
-)}
+      )}
       stickyFooter
     >
       <Stack direction="column" align="start" gap={4}>
@@ -259,6 +268,17 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
               <Label css={{ fontWeight: '$sansRegular', fontSize: '$xsmall' }} htmlFor="removeWithoutConnection">{t('options.removeWithoutConnection')}</Label>
               <ExplainerModal title={t('options.removeWithoutConnection')}>
                 <Box>{t('options.removeWithoutConnectionExplanation')}</Box>
+              </ExplainerModal>
+              <Switch
+                data-testid="exportExtendedCollections"
+                id="exportExtendedCollections"
+                checked={!!exportExtendedCollections}
+                defaultChecked={exportExtendedCollections}
+                onCheckedChange={handleExportExtendedCollectionsChange}
+              />
+              <Label css={{ fontWeight: '$sansRegular', fontSize: '$xsmall' }} htmlFor="exportExtendedCollections">Export extended collections</Label>
+              <ExplainerModal title="Export extended collections">
+                <Box>When enabled, themes marked as "extended" will be exported as extended variable collections in Figma, inheriting from their parent collections. This is useful for creating brand variants or theme extensions. Requires Figma Enterprise plan.</Box>
               </ExplainerModal>
             </StyledCheckboxGrid>
           </Stack>

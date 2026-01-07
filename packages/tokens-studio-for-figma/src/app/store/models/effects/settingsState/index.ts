@@ -10,4 +10,5 @@ export * from './setCreateStylesWithVariableReferences';
 export * from './setIgnoreFirstPartForStyles';
 export * from './setRenameExistingStylesAndVariables';
 export * from './setRemoveStylesAndVariablesWithoutConnection';
+export * from './setExportExtendedCollections';
 export * from './saveVariableExportSettings';

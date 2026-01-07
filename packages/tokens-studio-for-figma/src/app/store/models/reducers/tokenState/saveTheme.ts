@@ -34,6 +34,14 @@ export function saveTheme(state: TokenState, data: Payload): TokenState {
     $figmaStyleReferences: state.themes[themeObjectIndex]?.$figmaStyleReferences ?? {},
     selectedTokenSets,
     ...(data?.group ? { group: data.group } : {}),
+    // Preserve extended collection metadata
+    ...(data.$figmaIsExtension !== undefined ? { $figmaIsExtension: data.$figmaIsExtension } : {}),
+    ...(data.$figmaParentCollectionId ? { $figmaParentCollectionId: data.$figmaParentCollectionId } : {}),
+    ...(data.$figmaParentThemeId ? { $figmaParentThemeId: data.$figmaParentThemeId } : {}),
+    // Preserve other Figma metadata
+    ...(data.$figmaCollectionId ? { $figmaCollectionId: data.$figmaCollectionId } : {}),
+    ...(data.$figmaModeId ? { $figmaModeId: data.$figmaModeId } : {}),
+    ...(data.$figmaVariableReferences ? { $figmaVariableReferences: data.$figmaVariableReferences } : {}),
   });
 
   const newActiveTheme = state.activeTheme;

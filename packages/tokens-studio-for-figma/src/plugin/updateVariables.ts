@@ -54,15 +54,23 @@ export default async function updateVariables({
     }
   }
 
-  // Do not use getVariablesWithoutZombies. It's not working.
-  // There seems to be a bug with getLocalVariablesAsync. It's not returning the variables in the collection - when they're being created.
-  // We could also get the current collection with figma.variables.getVariableCollectionByIdAsync(collection.id) and then fetch each variable,
-  // but that feels costly? We might need to double check this though.
-  // e.g. this wont work.
-  // const variablesInCollection = (await figma.variables.getLocalVariablesAsync()).filter((v) => v.variableCollectionId === collection.id);
-  const variablesInCollection = figma.variables
-    .getLocalVariables()
-    .filter((v) => v.variableCollectionId === collection.id);
+  // For extended collections, variables are inherited from the parent collection
+  // So we need to get the parent collection's variables, not the extended collection's
+  let variablesInCollection: Variable[];
+
+  if (theme.$figmaIsExtension && theme.$figmaParentCollectionId) {
+    // Extended collection: get variables from parent collection
+    console.log('Getting variables from parent collection for extended theme:', theme.name);
+    variablesInCollection = figma.variables
+      .getLocalVariables()
+      .filter((v) => v.variableCollectionId === theme.$figmaParentCollectionId);
+    console.log(`Found ${variablesInCollection.length} inherited variables from parent`);
+  } else {
+    // Regular collection: get variables from this collection
+    variablesInCollection = figma.variables
+      .getLocalVariables()
+      .filter((v) => v.variableCollectionId === collection.id);
+  }
 
   const variablesToCreate: VariableToken[] = [];
   tokensToCreate.forEach((token) => {

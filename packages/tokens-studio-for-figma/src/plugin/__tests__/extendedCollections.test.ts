@@ -3,9 +3,16 @@ import { createNecessaryVariableCollections } from '../createNecessaryVariableCo
 import * as notifiers from '../notifiers';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { ThemeObject } from '@/types';
+import { SettingsState } from '@/app/store/models/settings';
 
 jest.mock('../getVariablesWithoutZombies');
 jest.mock('@/AsyncMessageChannel');
+
+// Helper to create mock settings
+const createMockSettings = (overrides?: Partial<SettingsState>): SettingsState => ({
+    exportExtendedCollections: true, // Enable by default for tests
+    ...overrides,
+} as SettingsState);
 
 describe('Extended Collections', () => {
     let notifyVariableValuesSpy: jest.SpyInstance;
@@ -295,7 +302,7 @@ describe('Extended Collections', () => {
                 },
             ];
 
-            await createNecessaryVariableCollections(themes, ['parent-theme-id', 'extended-theme-id']);
+            await createNecessaryVariableCollections(themes, ['parent-theme-id', 'extended-theme-id'], createMockSettings());
 
             expect(parentCollection.extend).toHaveBeenCalledWith('Extended Collection');
         });
@@ -332,7 +339,7 @@ describe('Extended Collections', () => {
 
             // Should not throw
             await expect(
-                createNecessaryVariableCollections(themes, ['extended-theme-id'])
+                createNecessaryVariableCollections(themes, ['extended-theme-id'], createMockSettings())
             ).resolves.not.toThrow();
 
             expect(consoleSpy).toHaveBeenCalledWith(
@@ -375,7 +382,7 @@ describe('Extended Collections', () => {
                 },
             ];
 
-            const result = await createNecessaryVariableCollections(themes, ['extended-theme-id']);
+            const result = await createNecessaryVariableCollections(themes, ['extended-theme-id'], createMockSettings());
 
             expect(result[0].name).toBe('New Name');
         });
