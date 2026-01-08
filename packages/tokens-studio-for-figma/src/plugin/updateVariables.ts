@@ -54,17 +54,31 @@ export default async function updateVariables({
     }
   }
 
+  // Check if this collection is an extended collection using Figma's actual API properties
+  const isExtendedCollection = 'isExtension' in collection && (collection as any).isExtension;
+
+
+
+
+
   // For extended collections, variables are inherited from the parent collection
-  // So we need to get the parent collection's variables, not the extended collection's
+  // Extended collections have an 'isExtension' property and 'parentVariableCollectionId' pointing to their parent
   let variablesInCollection: Variable[];
 
-  if (theme.$figmaIsExtension && theme.$figmaParentCollectionId) {
-    // Extended collection: get variables from parent collection
-    console.log('Getting variables from parent collection for extended theme:', theme.name);
+  if (isExtendedCollection) {
+    // Extended collection: get variables from parent collection (where they're defined)
+    // We'll use extended mode IDs to create overrides
+    const parentCollectionId = (collection as any).parentVariableCollectionId;
+
+
+
+
     variablesInCollection = figma.variables
       .getLocalVariables()
-      .filter((v) => v.variableCollectionId === theme.$figmaParentCollectionId);
-    console.log(`Found ${variablesInCollection.length} inherited variables from parent`);
+      .filter((v) => v.variableCollectionId === parentCollectionId);
+
+
+
   } else {
     // Regular collection: get variables from this collection
     variablesInCollection = figma.variables
@@ -79,14 +93,17 @@ export default async function updateVariables({
     }
   });
 
+
+
   const variableObj = await setValuesOnVariable(
     variablesInCollection,
     variablesToCreate,
     collection,
-    mode,
+    mode, // Use extended collection's own mode ID
     themeBaseFontSize,
     settings.renameExistingStylesAndVariables,
     progressTracker,
+    isExtendedCollection,
   );
 
   const removedVariables: string[] = [];

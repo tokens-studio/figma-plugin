@@ -25,6 +25,7 @@ export default async function setValuesOnVariable(
   baseFontSize: string,
   shouldRename = false,
   progressTracker?: ProgressTracker | null,
+  isExtendedCollection = false,
 ) {
   const variableKeyMap: Record<string, string> = {};
   const referenceVariableCandidates: ReferenceVariableType[] = [];
@@ -49,11 +50,15 @@ export default async function setValuesOnVariable(
     Array.from(variableIdsToFetch).map(async (variableId) => {
       try {
         const variable = await figma.variables.getVariableByIdAsync(variableId);
-        if (variable && variable.variableCollectionId === collection.id) {
-          variableIdCache.set(variableId, variable);
-          // Add to local cache if not already present
-          if (!variablesInFigma.some((v) => v.id === variable.id)) {
-            variablesInFigma.push(variable);
+        if (variable) {
+          // For extended collections, skip collection ID check since inherited variables belong to parent
+          const belongsToCollection = isExtendedCollection || variable.variableCollectionId === collection.id;
+          if (belongsToCollection) {
+            variableIdCache.set(variableId, variable);
+            // Add to local cache if not already present
+            if (!variablesInFigma.some((v) => v.id === variable.id)) {
+              variablesInFigma.push(variable);
+            }
           }
         }
       } catch (e) {
@@ -68,6 +73,11 @@ export default async function setValuesOnVariable(
       promises.add(variableWorker.schedule(async () => {
         try {
           const variableType = convertTokenTypeToVariableType(token.type, token.value);
+
+          if (isExtendedCollection) {
+            console.log(`    Processing token: "${token.path}"`);
+          }
+
           // If id matches the variableId, or name matches the token path, we can use it to update the variable instead of re-creating.
           // Prioritize finding by variableId (key) when present, otherwise fall back to name matching
           // This has the nasty side-effect that if font weight changes from string to number, it will not update the variable given we cannot change type.
@@ -76,17 +86,36 @@ export default async function setValuesOnVariable(
             ? variablesInFigma.find((v) => v.key === token.variableId && !v.remote)
             : variablesInFigma.find((v) => v.name === token.path);
 
+
+
           // If not found in local collection, check the pre-fetched cache
           if (!variable && token.variableId) {
             variable = variableIdCache.get(token.variableId);
+
           }
 
           // If still no variable, try one more time to find by name in case it was just created
           if (!variable) {
-            variable = variablesInFigma.find((v) => v.name === token.path && v.variableCollectionId === collection.id);
+            // For extended collections, don't check collection ID since variables belong to parent
+            variable = isExtendedCollection
+              ? variablesInFigma.find((v) => v.name === token.path)
+              : variablesInFigma.find((v) => v.name === token.path && v.variableCollectionId === collection.id);
+
+
           }
 
           if (!variable) {
+            // For extended collections, variables should have been found from parent
+            if (isExtendedCollection) {
+              console.warn(
+                `⚠️  Variable "${token.path}" not found in extended collection "${collection.name}". ` +
+                `Extended collections can only update inherited variables from their parent collection. ` +
+                `Skipping this token.`
+              );
+              return; // Skip this token entirely
+            }
+
+            // Regular collection - create new variable
             try {
               variable = figma.variables.createVariable(token.path, collection, variableType);
               // Add to local cache immediately
@@ -128,10 +157,15 @@ export default async function setValuesOnVariable(
             const existingVariableValue = variable.valuesByMode[mode];
             const rawValue = typeof token.rawValue === 'string' ? token.rawValue : undefined;
 
+
+
             if (checkVariableAliasEquality(existingVariableValue, rawValue)) {
               // The alias already points to the correct variable, no update needed
+
               return;
             }
+
+
 
             switch (variableType) {
               case 'BOOLEAN':
