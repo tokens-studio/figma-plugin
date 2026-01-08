@@ -13,7 +13,6 @@ export default function SecondScreen() {
     <DeprecationDialog
       isOpen
       close={handleClose}
-      message="Second Screen has been deprecated and is no longer available."
     />
   );
 }
