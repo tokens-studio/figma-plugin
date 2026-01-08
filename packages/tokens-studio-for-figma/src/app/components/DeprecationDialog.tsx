@@ -24,7 +24,7 @@ export default function DeprecationDialog({
       footer={(
         <ModalFooterRight>
           <a
-            href="https://app.prod.tokens.studio"
+            href="https://tokens.studio/studio-platform"
             target="_blank"
             rel="noopener noreferrer"
             style={{
