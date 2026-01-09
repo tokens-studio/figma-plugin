@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@tokens-studio/ui';
 import { styled } from '@/stitches.config';
 import { ModalProps, Modal } from './Modal/Modal';
@@ -15,11 +16,13 @@ export default function SecondScreenDeprecationDialog({
   close,
   ...props
 }: SecondScreenDeprecationDialogProps) {
+  const { t } = useTranslation(['secondScreen']);
+
   return (
     <Modal
       isOpen={isOpen}
       close={close}
-      title="Second screen is being deprecated"
+      title={t('deprecationTitle')}
       showClose
       footer={(
         <ModalFooterRight>
@@ -40,7 +43,7 @@ export default function SecondScreenDeprecationDialog({
               style={{ display: 'flex', alignItems: 'center', gap: 8 }}
             >
               <span role="img" aria-label="point right" style={{ marginRight: 6 }}>👉</span>
-              <span>Learn more about the Studio platform</span>
+              <span>{t('learnMoreButton')}</span>
             </Button>
           </a>
         </ModalFooterRight>
@@ -49,10 +52,10 @@ export default function SecondScreenDeprecationDialog({
     >
       <div style={{ lineHeight: 1.6 }}>
         <p>
-          We&apos;ve moved this functionality into the Studio platform, where it now has a native home and can evolve faster alongside other Studio capabilities. This allows us to offer a more integrated, powerful, and future-proof experience.
+          {t('description1')}
         </p>
         <p>
-          If you’re currently using Second screen, we recommend switching to Studio to continue using this functionality.
+          {t('description2')}
         </p>
       </div>
     </Modal>
