@@ -80,8 +80,10 @@ export class NodeManager {
           const node = relevantNodes[nodeIndex];
           const tokens = await tokensSharedDataHandler.getAll(node);
 
-          // Only include nodes that have tokens applied
-          if (Object.keys(tokens).length > 0) {
+          // When nodesWithoutPluginData is true, include all nodes even if they don't have tokens
+          // This ensures that when switching themes, ALL nodes in the selection are processed
+          // When nodesWithoutPluginData is false, only include nodes with tokens (for efficiency)
+          if (opts.nodesWithoutPluginData || Object.keys(tokens).length > 0) {
             returnedNodes.push({
               node: relevantNodes[nodeIndex],
               tokens,
