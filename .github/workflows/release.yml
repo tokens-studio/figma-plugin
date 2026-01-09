@@ -56,11 +56,11 @@ jobs:
           envkey_SENTRY_ORG: ${{ vars.SENTRY_ORG }}
           envkey_SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
           envkey_SUPABASE_URL: ${{ vars.SUPABASE_URL }}
-          envkey_MIXPANEL_ACCESS_TOKEN: ${{ steps.secrets.outputs.MIXPANEL_ACCESS_TOKEN }} 
-          envkey_STORYBLOK_ACCESS_TOKEN: ${{ steps.secrets.outputs.STORYBLOK_ACCESS_TOKEN }} 
-          envkey_SUPABASE_ANON_KEY: ${{ steps.secrets.outputs.SUPABASE_ANON_KEY }} 
-          envkey_SENTRY_AUTH_TOKEN: ${{ steps.secrets.outputs.SENTRY_AUTH_TOKEN }}
-          envkey_TOKENS_STUDIO_API_HOST: ${{ steps.secrets.outputs.TOKENS_STUDIO_API_HOST }}
+          envkey_MIXPANEL_ACCESS_TOKEN: ${{ secrets.MIXPANEL_ACCESS_TOKEN }} 
+          envkey_STORYBLOK_ACCESS_TOKEN: ${{ secrets.STORYBLOK_ACCESS_TOKEN }} 
+          envkey_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }} 
+          envkey_SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          envkey_TOKENS_STUDIO_API_HOST: ${{ secrets.TOKENS_STUDIO_API_HOST }}
  
       # Build the figma plugin package
       - name: Build Package
