@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
-import DeprecationDialog from '../DeprecationDialog';
+import SecondScreenDeprecationDialog from '../SecondScreenDeprecationDialog';
 import { Tabs } from '@/constants/Tabs';
 import { Dispatch } from '../../store';
 
@@ -10,7 +10,7 @@ export default function SecondScreen() {
     dispatch.uiState.setActiveTab(Tabs.TOKENS);
   }, [dispatch]);
   return (
-    <DeprecationDialog
+    <SecondScreenDeprecationDialog
       isOpen
       close={handleClose}
     />

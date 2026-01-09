@@ -3,18 +3,18 @@ import { Button } from '@tokens-studio/ui';
 import { styled } from '@/stitches.config';
 import { ModalProps, Modal } from './Modal/Modal';
 
-export type DeprecationDialogProps = Omit<ModalProps, 'children' | 'title' | 'footer'>;
+export type SecondScreenDeprecationDialogProps = Omit<ModalProps, 'children' | 'title' | 'footer'>;
 
 const ModalFooterRight = styled('div', {
   display: 'flex',
   justifyContent: 'flex-end',
 });
 
-export default function DeprecationDialog({
+export default function SecondScreenDeprecationDialog({
   isOpen,
   close,
   ...props
-}: DeprecationDialogProps) {
+}: SecondScreenDeprecationDialogProps) {
   return (
     <Modal
       isOpen={isOpen}
