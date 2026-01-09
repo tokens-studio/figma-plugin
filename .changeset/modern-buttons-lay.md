@@ -2,4 +2,4 @@
 "@tokens-studio/figma-plugin": patch
 ---
 
-Fix Gradient Export with trailing spaces
+Fix Exporting of Gradient Tokens as styles when trailing spaces exist
