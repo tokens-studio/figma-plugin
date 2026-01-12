@@ -30,12 +30,13 @@ function parseColorStops(parts: string[]): ColorStop[] {
       const potentialPosition = stop.substring(lastSpaceIndex + 1);
       // Check if this looks like a percentage or numeric position
       if (potentialPosition.includes('%') || /^\d+(\.\d+)?$/.test(potentialPosition)) {
-        colorPart = stop.substring(0, lastSpaceIndex);
+        colorPart = stop.substring(0, lastSpaceIndex).trim();
         positionPart = potentialPosition;
       }
     }
 
-    const { color, opacity } = convertToFigmaColor(colorPart);
+    // Ensure colorPart is trimmed to avoid parsing errors from trailing/leading spaces
+    const { color, opacity } = convertToFigmaColor(colorPart.trim());
     const gradientColor = color;
     gradientColor.a = opacity;
     return {
