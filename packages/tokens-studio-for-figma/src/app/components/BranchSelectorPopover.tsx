@@ -27,6 +27,7 @@ interface BranchSelectorPopoverProps {
   onCreateBranchFromSelected: (branch: string) => void;
   onCreateBranchFromCurrentChanges: () => void;
   currentBranch: string;
+  onRefreshBranches?: () => void;
 }
 
 export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
@@ -37,6 +38,7 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
   onCreateBranchFromSelected,
   currentBranch,
   onCreateBranchFromCurrentChanges,
+  onRefreshBranches,
 }) => {
   const seed = useUIDSeed();
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -64,6 +66,13 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
       setMode('switch');
     }
   }, [isOpen]);
+
+  // Refresh branches when popover opens (stale-while-revalidate approach)
+  useEffect(() => {
+    if (isOpen && onRefreshBranches) {
+      onRefreshBranches();
+    }
+  }, [isOpen, onRefreshBranches]);
 
   // Filter branches based on search query
   const filteredBranches = React.useMemo(() => {
