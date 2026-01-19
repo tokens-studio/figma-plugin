@@ -203,7 +203,7 @@ function StartScreen() {
             </Stack>
           </Stack>
           {isLoadingProvider && (
-            <Stack direction="row" gap={3} align="center" css={{ padding: '$4' }}>
+            <Stack direction="row" gap={3} align="center">
               <Spinner />
               <Text>{t('loadingTokens', { defaultValue: 'Loading tokens from sync provider...' })}</Text>
             </Stack>
