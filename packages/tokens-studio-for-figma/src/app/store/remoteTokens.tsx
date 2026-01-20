@@ -207,14 +207,14 @@ export default function useRemoteTokens() {
         }
         if (activeTab === Tabs.LOADING || !isEqual(tokens, remoteData.tokens) || !isEqual(themes, remoteData.themes)) {
           let shouldOverride = false;
-          if (activeTab !== Tabs.LOADING) {
+          if (activeTab !== Tabs.LOADING && !skipConfirmation) {
             dispatch.tokenState.setChangedState({
               tokens: remoteData.tokens,
               themes: remoteData.themes,
             });
             shouldOverride = skipConfirmation ? true : !!(await showPullDialog());
           }
-          if (shouldOverride || activeTab === Tabs.LOADING) {
+          if (shouldOverride || activeTab === Tabs.LOADING || skipConfirmation) {
             switch (context.provider) {
               case StorageProviderType.JSONBIN: {
                 break;
