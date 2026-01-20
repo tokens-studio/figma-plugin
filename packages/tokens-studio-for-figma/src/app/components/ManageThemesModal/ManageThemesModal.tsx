@@ -46,10 +46,26 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
   const activeTheme = useSelector(activeThemeSelector);
   const { confirm } = useConfirm();
   const [themeEditorOpen, setThemeEditorOpen] = useState<boolean | string>(false);
+  const [isExtendMode, setIsExtendMode] = useState(false);
   const [themeListScrollPosition, setThemeListScrollPosition] = useState<number>(0);
   const themeListRef = useRef<HTMLDivElement>(null);
   const treeItems = themeListToTree(themes);
   const { t } = useTranslation(['tokens']);
+
+  // Available parent theme GROUPS (not individual themes)
+  const availableParentGroups = useMemo(() => {
+    // Get all groups that are NOT extensions
+    const nonExtensionGroups = new Set<string>();
+
+    themes.forEach((theme) => {
+      // Only include groups from non-extended themes
+      if (!theme.$figmaIsExtension && theme.group) {
+        nonExtensionGroups.add(theme.group);
+      }
+    });
+
+    return Array.from(nonExtensionGroups).sort();
+  }, [themes]);
 
   const themeEditorDefaultValues: Partial<ThemeObject> = useMemo(() => {
     const themeObject = themes.find(({ id }) => id === themeEditorOpen);
@@ -98,6 +114,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
 
   const handleCancelEdit = useCallback(() => {
     setThemeEditorOpen(false);
+    setIsExtendMode(false);
   }, []);
 
   const handleEscapeKeyDown = useCallback((event: KeyboardEvent) => {
@@ -111,23 +128,67 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
 
   const handleSubmit = useCallback((values: FormValues) => {
     const id = typeof themeEditorOpen === 'string' ? themeEditorOpen : undefined;
+
     if (id) {
+      // EDITING EXISTING THEME
       track('Edit theme', { id, values });
-    } else {
-      track('Create theme', { values });
+      dispatch.tokenState.saveTheme({
+        id,
+        name: values.name,
+        selectedTokenSets: values.tokenSets,
+        ...(values?.group ? { group: values.group } : {}),
+        meta: {
+          oldName: themeEditorDefaultValues?.name,
+          oldGroup: themeEditorDefaultValues?.group,
+        },
+      });
+      setThemeEditorOpen(false);
+      return;
     }
-    dispatch.tokenState.saveTheme({
-      id,
-      name: values.name,
-      selectedTokenSets: values.tokenSets,
-      ...(values?.group ? { group: values.group } : {}),
-      meta: {
-        oldName: themeEditorDefaultValues?.name,
-        oldGroup: themeEditorDefaultValues?.group,
-      },
-    });
+
+    // CREATING NEW THEME(S)
+    track('Create theme', { values });
+
+    const parentGroupName = values.parentThemeId; // Group name to extend from
+    const parentThemes = parentGroupName
+      ? themes.filter(t => t.group === parentGroupName && !t.$figmaIsExtension)
+      : [];
+
+    if (parentThemes.length > 0) {
+      // EXTENDING A GROUP: Create multiple themes (one for each mode in parent)
+      const newGroupName = values.name;
+
+      parentThemes.forEach((parentTheme) => {
+        const themeData: any = {
+          name: parentTheme.name, // Keep same mode name (Light, Dark, etc.)
+          group: `${parentGroupName}/${newGroupName}`, // Hierarchical group format: "ParentGroup/ExtendedGroup"
+          selectedTokenSets: {}, // Start empty - user will manually add token sets with overridden values
+          $figmaIsExtension: true,
+          $figmaParentThemeId: parentTheme.id,
+          $figmaParentCollectionId: parentTheme.$figmaCollectionId,
+        };
+
+        dispatch.tokenState.saveTheme(themeData);
+      });
+
+      track('Extended theme group created', {
+        parentGroup: parentGroupName,
+        newGroup: newGroupName,
+        themesCreated: parentThemes.length,
+      });
+    } else {
+      // REGULAR THEME: Create single theme
+      const themeData: any = {
+        name: values.name,
+        selectedTokenSets: values.tokenSets,
+        ...(values?.group ? { group: values.group } : {}),
+      };
+
+      dispatch.tokenState.saveTheme(themeData);
+    }
+
     setThemeEditorOpen(false);
-  }, [themeEditorOpen, dispatch.tokenState, themeEditorDefaultValues]);
+  }, [themeEditorOpen, dispatch.tokenState, themeEditorDefaultValues, themes]);
 
   const handleReorder = React.useCallback((reorderedItems: TreeItem[]) => {
     let currentGroup = '';
@@ -197,27 +258,41 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
       footer={(
         <Stack gap={2} direction="row" justify="end">
           {!themeEditorOpen && (
-            <Button
-              data-testid="button-manage-themes-modal-new-theme"
-              variant="secondary"
-              icon={<IconPlus />}
-              onClick={handleToggleOpenThemeEditor}
-            >
-              {t('newTheme')}
-            </Button>
+            <>
+              <Button
+                data-testid="button-manage-themes-modal-new-theme"
+                variant="secondary"
+                icon={<IconPlus />}
+                onClick={handleToggleOpenThemeEditor}
+              >
+                {t('newTheme')}
+              </Button>
+              {availableParentGroups.length > 0 && (
+                <Button
+                  data-testid="button-manage-themes-modal-extend-theme"
+                  variant="secondary"
+                  onClick={() => {
+                    setIsExtendMode(true);
+                    handleToggleOpenThemeEditor();
+                  }}
+                >
+                  Extend Theme
+                </Button>
+              )}
+            </>
           )}
           {themeEditorOpen && (
             <>
               <Box css={{ marginRight: 'auto' }}>
                 {typeof themeEditorOpen === 'string' && (
-                <Button
-                  data-testid="button-manage-themes-modal-delete-theme"
-                  variant="danger"
-                  type="submit"
-                  onClick={handleDeleteTheme}
-                >
-                  {t('delete')}
-                </Button>
+                  <Button
+                    data-testid="button-manage-themes-modal-delete-theme"
+                    variant="danger"
+                    type="submit"
+                    onClick={handleDeleteTheme}
+                  >
+                    {t('delete')}
+                  </Button>
                 )}
               </Box>
               <Stack direction="row" gap={4}>
@@ -264,31 +339,33 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
             checkReorder={handleCheckReorder as (order: ItemData<unknown>[], value: unknown, offset: number, velocity: number) => ItemData<unknown>[]}
           >
             {
-            treeItems.map((item) => (
-              <DragItem<TreeItem> key={item.key} item={item}>
-                {
-                  item.isLeaf && typeof item.value === 'object' ? (
-                    <ThemeListItemContent item={item.value} isActive={activeTheme?.[item.parent as string] === item.value.id} onOpen={handleToggleThemeEditor} groupName={item.parent as string} />
-                  ) : (
-                    <ThemeListGroupHeader
-                      label={item.value === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : item.value as string}
-                      groupName={item.value as string}
-                    />
-                  )
-                }
-              </DragItem>
-            ))
-          }
+              treeItems.map((item) => (
+                <DragItem<TreeItem> key={item.key} item={item}>
+                  {
+                    item.isLeaf && typeof item.value === 'object' ? (
+                      <ThemeListItemContent item={item.value} isActive={activeTheme?.[item.parent as string] === item.value.id} onOpen={handleToggleThemeEditor} groupName={item.parent as string} />
+                    ) : (
+                      <ThemeListGroupHeader
+                        label={item.value === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : item.value as string}
+                        groupName={item.value as string}
+                      />
+                    )
+                  }
+                </DragItem>
+              ))
+            }
           </StyledReorderGroup>
         </Box>
       )}
       {themeEditorOpen && (
-      <CreateOrEditThemeForm
-        id={typeof themeEditorOpen === 'string' ? themeEditorOpen : undefined}
-        defaultValues={themeEditorDefaultValues}
-        onSubmit={handleSubmit}
-        onCancel={handleCancelEdit}
-      />
+        <CreateOrEditThemeForm
+          id={typeof themeEditorOpen === 'string' ? themeEditorOpen : undefined}
+          defaultValues={themeEditorDefaultValues}
+          onSubmit={handleSubmit}
+          onCancel={handleCancelEdit}
+          isExtendMode={isExtendMode}
+          setIsExtendMode={setIsExtendMode}
+        />
       )}
     </Modal>
   );

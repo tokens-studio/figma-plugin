@@ -8,14 +8,23 @@ export const getAvailableVariableCollections: AsyncMessageChannelHandlers[AsyncM
   try {
     const allCollections = await figma.variables.getLocalVariableCollectionsAsync();
 
-    const collections: VariableCollectionInfo[] = allCollections.map((collection) => ({
-      id: collection.id,
-      name: collection.name || `Collection ${collection.id.slice(0, 8)}`,
-      modes: collection.modes.map((mode) => ({
-        modeId: mode.modeId,
-        name: mode.name || `Mode ${mode.modeId.slice(0, 8)}`,
-      })),
-    }));
+    const collections: VariableCollectionInfo[] = allCollections.map((collection) => {
+      // Type assertion for extended collection properties not yet in Figma type definitions
+      const extendedCollection = collection as any;
+      return {
+        id: collection.id,
+        name: collection.name || `Collection ${collection.id.slice(0, 8)}`,
+        isExtension: extendedCollection.isExtension || false,
+        parentCollectionId: extendedCollection.isExtension
+          ? extendedCollection.parentVariableCollectionId
+          : undefined,
+        modes: collection.modes.map((mode) => ({
+          modeId: mode.modeId,
+          name: mode.name || `Mode ${mode.modeId.slice(0, 8)}`,
+          parentModeId: (mode as any).parentModeId, // For extended collections
+        })),
+      };
+    });
 
     return { collections };
   } catch (error) {

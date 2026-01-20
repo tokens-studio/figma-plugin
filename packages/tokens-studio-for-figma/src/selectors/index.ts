@@ -72,6 +72,7 @@ export * from './stylesColorSelector';
 export * from './stylesTypographySelector';
 export * from './stylesEffectSelector';
 export * from './createStylesWithVariableReferencesSelector';
+export * from './exportExtendedCollectionsSelector';
 export * from './autoApplyThemeOnDropSelector';
 export * from './shouldSwapFigmaModesSelector';
 export * from './importedThemesSelector';

@@ -22,15 +22,11 @@ export default function setColorValuesOnVariable(variable: Variable, mode: strin
   try {
     const { color, opacity } = convertToFigmaColor(value);
     const existingVariableValue = variable.valuesByMode[mode];
-    if (
-      !existingVariableValue
-      || !(isFigmaColorObject(existingVariableValue) || isVariableWithAliasReference(existingVariableValue))
-    ) return;
 
     const newValue = { ...color, a: opacity };
 
-    // For direct color values, compare the actual color values using threshold
-    if (isFigmaColorObject(existingVariableValue)) {
+    // Only compare if there's an existing value (for extended collections, mode may not exist yet)
+    if (existingVariableValue && isFigmaColorObject(existingVariableValue)) {
       const existingValue = {
         ...existingVariableValue,
         a: 'a' in existingVariableValue ? existingVariableValue.a : 1,
