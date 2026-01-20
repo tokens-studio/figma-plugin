@@ -41,6 +41,7 @@ type PullTokensOptions = {
   activeTheme?: Record<string, string>;
   collapsedTokenSets?: string[] | null;
   updateLocalTokens?: boolean;
+  skipConfirmation?: boolean;
 };
 
 // @TODO typings and hooks
@@ -109,6 +110,7 @@ export default function useRemoteTokens() {
       activeTheme,
       collapsedTokenSets,
       updateLocalTokens = false,
+      skipConfirmation = false,
     }: PullTokensOptions) => {
       let remoteData: RemoteResponseData<unknown> | null = null;
 
@@ -205,14 +207,14 @@ export default function useRemoteTokens() {
         }
         if (activeTab === Tabs.LOADING || !isEqual(tokens, remoteData.tokens) || !isEqual(themes, remoteData.themes)) {
           let shouldOverride = false;
-          if (activeTab !== Tabs.LOADING) {
+          if (activeTab !== Tabs.LOADING && !skipConfirmation) {
             dispatch.tokenState.setChangedState({
               tokens: remoteData.tokens,
               themes: remoteData.themes,
             });
-            shouldOverride = !!(await showPullDialog());
+            shouldOverride = skipConfirmation ? true : !!(await showPullDialog());
           }
-          if (shouldOverride || activeTab === Tabs.LOADING) {
+          if (shouldOverride || activeTab === Tabs.LOADING || skipConfirmation) {
             switch (context.provider) {
               case StorageProviderType.JSONBIN: {
                 break;
@@ -699,9 +701,38 @@ export default function useRemoteTokens() {
     [api, checkRemoteChangeForGitHub, checkRemoteChangeForGitLab, dispatch.uiState],
   );
 
+  const restoreProviderWithAutoPull = useCallback(
+    async (context: StorageTypeCredentials) => {
+      track('restoreProviderWithAutoPull', { provider: context.provider });
+      dispatch.uiState.setLocalApiState(context);
+      dispatch.uiState.setApiData(context);
+      dispatch.tokenState.setEditProhibited(false);
+      setStorageType({ provider: context, shouldSetInDocument: true });
+      
+      // Pull tokens automatically without user confirmation
+      await pullTokens({ 
+        context, 
+        updateLocalTokens: true,
+        usedTokenSet: {},
+        activeTheme: {},
+        collapsedTokenSets: [],
+        skipConfirmation: true,
+      });
+      
+      // Switch to tokens tab after successful load
+      dispatch.uiState.setActiveTab(Tabs.TOKENS);
+      
+      return {
+        status: 'success',
+      };
+    },
+    [dispatch, setStorageType, pullTokens],
+  );
+
   return useMemo(
     () => ({
       restoreStoredProvider,
+      restoreProviderWithAutoPull,
       deleteProvider,
       pullTokens,
       pushTokens,
@@ -713,6 +744,7 @@ export default function useRemoteTokens() {
     }),
     [
       restoreStoredProvider,
+      restoreProviderWithAutoPull,
       deleteProvider,
       pullTokens,
       pushTokens,
