@@ -71,6 +71,7 @@ export * from './variablesBooleanSelector';
 export * from './stylesColorSelector';
 export * from './stylesTypographySelector';
 export * from './stylesEffectSelector';
+export * from './stylesGradientSelector';
 export * from './createStylesWithVariableReferencesSelector';
 export * from './autoApplyThemeOnDropSelector';
 export * from './shouldSwapFigmaModesSelector';
