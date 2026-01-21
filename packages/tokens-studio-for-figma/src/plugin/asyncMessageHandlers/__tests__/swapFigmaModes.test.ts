@@ -131,6 +131,12 @@ describe('swapFigmaModes', () => {
 
   it('should notify and return early when collection does not exist', async () => {
     mockGetVariableCollectionByIdAsync.mockResolvedValue(null);
+
+    // Mock teamLibrary to return empty array (no remote collections)
+    (global.figma as any).teamLibrary = {
+      getAvailableLibraryVariableCollectionsAsync: jest.fn().mockResolvedValue([]),
+    };
+
     const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
 
     await swapFigmaModes(activeTheme, themes, UpdateMode.PAGE);
@@ -141,7 +147,7 @@ describe('swapFigmaModes', () => {
     );
     expect(mockSetExplicitVariableModeForCollection).not.toHaveBeenCalled();
     expect(consoleSpy).toHaveBeenCalledWith(
-      expect.stringContaining('Variable collection with ID collection-123 no longer exists'),
+      expect.stringContaining('not found in local file or remote libraries'),
     );
 
     consoleSpy.mockRestore();
@@ -308,6 +314,11 @@ describe('swapFigmaModes', () => {
         return null; // Mode collection doesn't exist
       });
 
+      // Mock teamLibrary to return empty array (no remote collections)
+      (global.figma as any).teamLibrary = {
+        getAvailableLibraryVariableCollectionsAsync: jest.fn().mockResolvedValue([]),
+      };
+
       await swapFigmaModes(multiDimensionalActiveTheme, multiDimensionalThemes, UpdateMode.PAGE);
 
       // Should still call once for the valid brand collection
@@ -321,7 +332,7 @@ describe('swapFigmaModes', () => {
       );
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Variable collection with ID collection-mode no longer exists'),
+        expect.stringContaining('not found in local file or remote libraries'),
       );
 
       consoleSpy.mockRestore();
@@ -428,6 +439,260 @@ describe('swapFigmaModes', () => {
 
       expect(mockSetExplicitVariableModeForCollection).not.toHaveBeenCalled();
       expect(mockGetVariableCollectionByIdAsync).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('remote/external library collections', () => {
+    const mockImportVariableByKeyAsync = jest.fn();
+    const mockGetAvailableLibraryVariableCollectionsAsync = jest.fn();
+    const mockGetVariablesInLibraryCollectionAsync = jest.fn();
+
+    beforeEach(() => {
+      // Add team library methods to figma mock
+      (global.figma as any).teamLibrary = {
+        getAvailableLibraryVariableCollectionsAsync: mockGetAvailableLibraryVariableCollectionsAsync,
+        getVariablesInLibraryCollectionAsync: mockGetVariablesInLibraryCollectionAsync,
+      };
+      (global.figma as any).variables.importVariableByKeyAsync = mockImportVariableByKeyAsync;
+
+      mockImportVariableByKeyAsync.mockClear();
+      mockGetAvailableLibraryVariableCollectionsAsync.mockClear();
+      mockGetVariablesInLibraryCollectionAsync.mockClear();
+    });
+
+    const remoteCollection = {
+      id: 'remote-collection-123',
+      name: 'Remote Collection',
+      modes: [
+        { modeId: 'remote-mode-dark', name: 'Dark' },
+        { modeId: 'remote-mode-light', name: 'Light' },
+      ],
+    };
+
+    it('should import and use remote variable collection when local collection not found', async () => {
+      const remoteTheme = {
+        id: 'remote-dark',
+        name: 'Remote Dark',
+        selectedTokenSets: {},
+        $figmaCollectionId: 'remote-collection-123',
+        $figmaModeId: 'remote-mode-dark',
+      };
+      const remoteActiveTheme = { 'no-group': 'remote-dark' };
+
+      // First call returns null (not found locally)
+      // Second call (after import) returns the collection
+      mockGetVariableCollectionByIdAsync
+        .mockResolvedValueOnce(null)
+        .mockResolvedValueOnce(remoteCollection);
+
+      mockGetAvailableLibraryVariableCollectionsAsync.mockResolvedValue([
+        { key: 'lib-collection-key-1', name: 'Remote Collection' },
+      ]);
+
+      mockGetVariablesInLibraryCollectionAsync.mockResolvedValue([
+        { key: 'var-key-1', name: 'color/primary' },
+        { key: 'var-key-2', name: 'color/secondary' },
+      ]);
+
+      mockImportVariableByKeyAsync.mockResolvedValue({
+        key: 'var-key-1',
+        variableCollectionId: 'remote-collection-123',
+      });
+
+      await swapFigmaModes(remoteActiveTheme, [remoteTheme], UpdateMode.PAGE);
+
+      // Should attempt to import the remote collection
+      expect(mockGetAvailableLibraryVariableCollectionsAsync).toHaveBeenCalled();
+      expect(mockGetVariablesInLibraryCollectionAsync).toHaveBeenCalledWith('lib-collection-key-1');
+      expect(mockImportVariableByKeyAsync).toHaveBeenCalledWith('var-key-1');
+
+      // Should successfully set the mode
+      expect(mockSetExplicitVariableModeForCollection).toHaveBeenCalledWith(remoteCollection, 'remote-mode-dark');
+      expect(notifiers.notifyUI).not.toHaveBeenCalled();
+    });
+
+    it('should use cached remote collection on subsequent calls', async () => {
+      const remoteTheme = {
+        id: 'remote-dark',
+        name: 'Remote Dark',
+        selectedTokenSets: {},
+        $figmaCollectionId: 'remote-collection-456',
+        $figmaModeId: 'remote-mode-dark',
+      };
+      const remoteActiveTheme = { 'no-group': 'remote-dark' };
+
+      const cachedCollection = {
+        id: 'remote-collection-456',
+        name: 'Cached Remote Collection',
+        modes: [{ modeId: 'remote-mode-dark', name: 'Dark' }],
+      };
+
+      // Setup: First call to populate cache
+      mockGetVariableCollectionByIdAsync
+        .mockResolvedValueOnce(null) // Not found locally
+        .mockResolvedValueOnce(cachedCollection) // After import
+        .mockResolvedValueOnce(null); // Second invocation - still not local
+
+      mockGetAvailableLibraryVariableCollectionsAsync.mockResolvedValue([
+        { key: 'lib-collection-key-456', name: 'Cached Remote Collection' },
+      ]);
+
+      mockGetVariablesInLibraryCollectionAsync.mockResolvedValue([
+        { key: 'var-key-cache', name: 'color/primary' },
+      ]);
+
+      mockImportVariableByKeyAsync.mockResolvedValue({
+        key: 'var-key-cache',
+        variableCollectionId: 'remote-collection-456',
+      });
+
+      // First call - should import
+      await swapFigmaModes(remoteActiveTheme, [remoteTheme], UpdateMode.PAGE);
+
+      expect(mockImportVariableByKeyAsync).toHaveBeenCalledTimes(1);
+      expect(mockSetExplicitVariableModeForCollection).toHaveBeenCalledTimes(1);
+
+      // Reset mocks for second call
+      mockImportVariableByKeyAsync.mockClear();
+      mockGetAvailableLibraryVariableCollectionsAsync.mockClear();
+      mockGetVariablesInLibraryCollectionAsync.mockClear();
+
+      // Second call - should use cache without importing
+      await swapFigmaModes(remoteActiveTheme, [remoteTheme], UpdateMode.PAGE);
+
+      // Should NOT call import functions again (using cache)
+      expect(mockImportVariableByKeyAsync).not.toHaveBeenCalled();
+      expect(mockGetAvailableLibraryVariableCollectionsAsync).not.toHaveBeenCalled();
+      expect(mockGetVariablesInLibraryCollectionAsync).not.toHaveBeenCalled();
+
+      // Should still set the mode successfully
+      expect(mockSetExplicitVariableModeForCollection).toHaveBeenCalledTimes(2);
+    });
+
+    it('should handle remote collection not found in any library', async () => {
+      const remoteTheme = {
+        id: 'missing-remote',
+        name: 'Missing Remote',
+        selectedTokenSets: {},
+        $figmaCollectionId: 'non-existent-collection',
+        $figmaModeId: 'some-mode',
+      };
+      const remoteActiveTheme = { 'no-group': 'missing-remote' };
+
+      mockGetVariableCollectionByIdAsync.mockResolvedValue(null);
+      mockGetAvailableLibraryVariableCollectionsAsync.mockResolvedValue([]);
+
+      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
+
+      await swapFigmaModes(remoteActiveTheme, [remoteTheme], UpdateMode.PAGE);
+
+      expect(notifiers.notifyUI).toHaveBeenCalledWith(
+        'One of the variable collections linked to this theme no longer exists',
+        { error: true },
+      );
+      expect(mockSetExplicitVariableModeForCollection).not.toHaveBeenCalled();
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining('not found in local file or remote libraries'),
+      );
+
+      consoleSpy.mockRestore();
+    });
+
+    it('should handle remote collection with empty variables list', async () => {
+      const remoteTheme = {
+        id: 'empty-remote',
+        name: 'Empty Remote',
+        selectedTokenSets: {},
+        $figmaCollectionId: 'empty-collection',
+        $figmaModeId: 'some-mode',
+      };
+      const remoteActiveTheme = { 'no-group': 'empty-remote' };
+
+      mockGetVariableCollectionByIdAsync.mockResolvedValue(null);
+      mockGetAvailableLibraryVariableCollectionsAsync.mockResolvedValue([
+        { key: 'empty-lib-key', name: 'Empty Collection' },
+      ]);
+      mockGetVariablesInLibraryCollectionAsync.mockResolvedValue([]);
+
+      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
+
+      await swapFigmaModes(remoteActiveTheme, [remoteTheme], UpdateMode.PAGE);
+
+      expect(notifiers.notifyUI).toHaveBeenCalledWith(
+        'One of the variable collections linked to this theme no longer exists',
+        { error: true },
+      );
+      expect(mockImportVariableByKeyAsync).not.toHaveBeenCalled();
+      expect(mockSetExplicitVariableModeForCollection).not.toHaveBeenCalled();
+
+      consoleSpy.mockRestore();
+    });
+
+    it('should handle mixed local and remote collections in multi-dimensional theme', async () => {
+      const localCollection = {
+        id: 'local-collection-123',
+        name: 'Local Collection',
+        modes: [{ modeId: 'local-mode-brand', name: 'Brand A' }],
+      };
+
+      const mixedThemes = [
+        {
+          id: 'local-brand',
+          name: 'Local Brand',
+          selectedTokenSets: {},
+          group: 'brand',
+          $figmaCollectionId: 'local-collection-123',
+          $figmaModeId: 'local-mode-brand',
+        },
+        {
+          id: 'remote-mode',
+          name: 'Remote Mode',
+          selectedTokenSets: {},
+          group: 'mode',
+          $figmaCollectionId: 'remote-collection-789',
+          $figmaModeId: 'remote-mode-dark',
+        },
+      ];
+
+      const mixedActiveTheme = {
+        brand: 'local-brand',
+        mode: 'remote-mode',
+      };
+
+      const remoteCollectionObj = {
+        id: 'remote-collection-789',
+        name: 'Remote Mode Collection',
+        modes: [{ modeId: 'remote-mode-dark', name: 'Dark' }],
+      };
+
+      // First call for local collection succeeds
+      // Second call for remote collection fails locally
+      // Third call after import succeeds
+      mockGetVariableCollectionByIdAsync
+        .mockResolvedValueOnce(localCollection)
+        .mockResolvedValueOnce(null)
+        .mockResolvedValueOnce(remoteCollectionObj);
+
+      mockGetAvailableLibraryVariableCollectionsAsync.mockResolvedValue([
+        { key: 'remote-lib-key', name: 'Remote Mode Collection' },
+      ]);
+
+      mockGetVariablesInLibraryCollectionAsync.mockResolvedValue([
+        { key: 'remote-var-key', name: 'theme/dark' },
+      ]);
+
+      mockImportVariableByKeyAsync.mockResolvedValue({
+        key: 'remote-var-key',
+        variableCollectionId: 'remote-collection-789',
+      });
+
+      await swapFigmaModes(mixedActiveTheme, mixedThemes, UpdateMode.PAGE);
+
+      // Should set both local and remote modes
+      expect(mockSetExplicitVariableModeForCollection).toHaveBeenCalledTimes(2);
+      expect(mockSetExplicitVariableModeForCollection).toHaveBeenCalledWith(localCollection, 'local-mode-brand');
+      expect(mockSetExplicitVariableModeForCollection).toHaveBeenCalledWith(remoteCollectionObj, 'remote-mode-dark');
+      expect(notifiers.notifyUI).not.toHaveBeenCalled();
     });
   });
 });

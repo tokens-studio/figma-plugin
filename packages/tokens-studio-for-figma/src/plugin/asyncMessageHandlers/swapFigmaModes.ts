@@ -2,6 +2,9 @@ import { UpdateMode } from '@/constants/UpdateMode';
 import { ThemeObjectsList, ThemeObject } from '@/types';
 import { notifyUI, notifyException } from '../notifiers';
 
+// Cache for imported remote collections to avoid re-importing
+const remoteCollectionCache = new Map<string, VariableCollection>();
+
 // Type predicate to check for Figma theme with collection and mode IDs
 function isFigmaThemeWithCollectionAndMode(
   theme: ThemeObject | undefined,
@@ -11,6 +14,60 @@ function isFigmaThemeWithCollectionAndMode(
     && typeof theme.$figmaCollectionId === 'string'
     && typeof theme.$figmaModeId === 'string'
   );
+}
+
+/**
+ * Attempts to import a remote variable collection by finding and importing one of its variables.
+ * This is necessary for external/library collections that haven't been imported yet.
+ * @param collectionId The ID of the collection to import
+ * @returns The VariableCollection object if successfully imported, null otherwise
+ */
+async function importRemoteVariableCollection(collectionId: string): Promise<VariableCollection | null> {
+  // Check cache first
+  if (remoteCollectionCache.has(collectionId)) {
+    return remoteCollectionCache.get(collectionId)!;
+  }
+
+  try {
+    // Get all available remote library collections
+    const libraryCollections = await figma.teamLibrary.getAvailableLibraryVariableCollectionsAsync();
+
+    // Try each library collection to find the one with matching ID
+    for (const libraryCollection of libraryCollections) {
+      try {
+        // Get variables in this remote collection
+        const variables = await figma.teamLibrary.getVariablesInLibraryCollectionAsync(libraryCollection.key);
+
+        if (variables.length === 0) {
+          // eslint-disable-next-line no-continue
+          continue;
+        }
+
+        // Import the first variable to bring the collection into local context
+        const importedVariable = await figma.variables.importVariableByKeyAsync(variables[0].key);
+
+        // Check if this is the collection we're looking for
+        if (importedVariable.variableCollectionId === collectionId) {
+          // Get the full collection object
+          const collection = await figma.variables.getVariableCollectionByIdAsync(collectionId);
+          if (collection) {
+            // Cache the collection for future use
+            remoteCollectionCache.set(collectionId, collection);
+            return collection;
+          }
+        }
+      } catch (error) {
+        // If we can't import from this library collection, try the next one
+        // eslint-disable-next-line no-console
+        console.warn(`Failed to import variable from library collection ${libraryCollection.key}:`, error);
+      }
+    }
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.warn('Failed to access remote library collections:', error);
+  }
+
+  return null;
 }
 
 function getRootNode(updateMode: UpdateMode) {
@@ -53,11 +110,17 @@ export async function swapFigmaModes(activeTheme: Record<string, string>, themes
   for (const themeObject of activeThemeObjects) {
     const { $figmaCollectionId: collectionId, $figmaModeId: modeId } = themeObject;
 
-    // Validate that the collection exists and contains the mode
-    const collection = await figma.variables.getVariableCollectionByIdAsync(collectionId);
+    // Try to get the collection - first try as a local collection
+    let collection = await figma.variables.getVariableCollectionByIdAsync(collectionId);
+
+    // If not found locally, try to import it from remote libraries
+    if (!collection) {
+      collection = await importRemoteVariableCollection(collectionId);
+    }
+
     if (!collection) {
       // eslint-disable-next-line no-console
-      console.warn(`Variable collection with ID ${collectionId} no longer exists. Skipping this theme dimension.`);
+      console.warn(`Variable collection with ID ${collectionId} not found in local file or remote libraries. Skipping this theme dimension.`);
       notifyUI('One of the variable collections linked to this theme no longer exists', { error: true });
       // eslint-disable-next-line no-continue
       continue;
