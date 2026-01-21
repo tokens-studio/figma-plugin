@@ -1,8 +1,6 @@
 import { ValidNodeTypes } from '@/constants/ValidNodeTypes';
 
 export function findAll(nodes: readonly BaseNode[], includeSelf = false, nodesWithoutPluginData = false): BaseNode[] {
-
-
   const allNodesSet = new Set<BaseNode>(includeSelf ? nodes : []);
 
   nodes.forEach((node) => {
@@ -27,8 +25,6 @@ export function findAll(nodes: readonly BaseNode[], includeSelf = false, nodesWi
             types: ValidNodeTypes,
           }).forEach(n => allNodesSet.add(n));
         });
-
-
       } else {
         // Standard Discovery: Only nodes with local token data
         node.findAllWithCriteria({
