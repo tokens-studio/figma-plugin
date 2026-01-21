@@ -58,6 +58,7 @@ export type UiSettingsFromPluginMessage = {
     stylesColor: boolean;
     stylesTypography: boolean;
     stylesEffect: boolean;
+    stylesGradient: boolean;
     ignoreFirstPartForStyles: boolean;
     createStylesWithVariableReferences: boolean;
     prefixStylesWithThemeName: boolean;

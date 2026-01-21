@@ -348,4 +348,59 @@ describe('updateStyles', () => {
     expect(colorSpy).not.toHaveBeenCalled();
     expect(textSpy).not.toHaveBeenCalled();
   });
+
+  it('filters gradient tokens correctly based on stylesGradient setting', async () => {
+    const gradientToken = {
+      name: 'gradient.primary',
+      path: 'gradient/primary',
+      value: 'linear-gradient(90deg, #ff0000 0%, #00ff00 100%)',
+      type: TokenTypes.COLOR,
+      styleId: '5678',
+      internal__Parent: 'global',
+    };
+
+    const regularColorToken = {
+      name: 'color.primary',
+      path: 'color/primary',
+      value: '#ff0000',
+      type: TokenTypes.COLOR,
+      styleId: '1234',
+      internal__Parent: 'global',
+    };
+
+    // Test with stylesGradient disabled (default)
+    await updateStyles([gradientToken, regularColorToken], {
+      stylesColor: true,
+      stylesGradient: false,
+    } as SettingsState);
+
+    // Should only process regular color token
+    expect(colorSpy).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({ name: 'color.primary' }),
+      ]),
+      false,
+      undefined,
+      undefined,
+    );
+
+    colorSpy.mockClear();
+
+    // Test with stylesGradient enabled
+    await updateStyles([gradientToken, regularColorToken], {
+      stylesColor: true,
+      stylesGradient: true,
+    } as SettingsState);
+
+    // Should process both tokens
+    expect(colorSpy).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({ name: 'color.primary' }),
+        expect.objectContaining({ name: 'gradient.primary' }),
+      ]),
+      false,
+      undefined,
+      undefined,
+    );
+  });
 });
