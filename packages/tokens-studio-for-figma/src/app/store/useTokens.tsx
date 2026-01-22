@@ -35,6 +35,9 @@ import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { defaultTokenResolver } from '@/utils/TokenResolver';
 import { getFormat } from '@/plugin/TokenFormatStoreClass';
 import { ExportTokenSet } from '@/types/ExportTokenSet';
+import parseJson from '@/utils/parseJson';
+import parseTokenValues from '@/utils/parseTokenValues';
+import { detectTokenRenames } from '@/utils/detectTokenRenames';
 
 type ConfirmResult = ('textStyles' | 'colorStyles' | 'effectStyles' | string)[] | string;
 
@@ -127,15 +130,6 @@ export default function useTokens() {
     [tokens, activeTokenSet, storeTokenIdInJsonEditor, tokenFormat],
   );
 
-  // handles updating JSON
-  const handleJSONUpdate = useCallback(
-    (newTokens: string) => {
-      track('Update JSON');
-      dispatch.tokenState.setJSONData(newTokens);
-    },
-    [dispatch.tokenState],
-  );
-
   // Handles the update operation
   const handleUpdate = useCallback(() => {
     track('Update Tokens');
@@ -226,6 +220,89 @@ export default function useTokens() {
       }));
     },
     [],
+  );
+
+  // handles updating JSON
+  const handleJSONUpdate = useCallback(
+    async (newTokens: string) => {
+      track('Update JSON');
+
+      try {
+        // Parse the new tokens to compare with current state
+        const parsedTokens = parseJson(newTokens);
+        const parsedValues = parseTokenValues({ [activeTokenSet]: parsedTokens });
+        const newTokenState = parsedValues[activeTokenSet] || [];
+
+        // Get current tokens for the active token set
+        const currentTokenState = tokens[activeTokenSet] || [];
+
+        // Create comparable token states
+        const beforeTokens = { [activeTokenSet]: currentTokenState };
+        const afterTokens = { [activeTokenSet]: newTokenState };
+
+        // Detect potential token renames
+        const detectedRenames = detectTokenRenames(beforeTokens, afterTokens);
+
+        if (detectedRenames.length > 0) {
+          // Ask user if they want to remap the renamed tokens
+          const confirmData = await confirm({
+            text: `${detectedRenames.length} token name change${detectedRenames.length > 1 ? 's' : ''} detected`,
+            description: 'Do you want to update all layers that use the old token names? This will change all layers that used the old token names.',
+            choices: [
+              {
+                key: UpdateMode.SELECTION,
+                label: 'Selection',
+                unique: true,
+                enabled: UpdateMode.SELECTION === lastUsedRenameOption,
+              },
+              {
+                key: UpdateMode.PAGE,
+                label: 'Page',
+                unique: true,
+                enabled: UpdateMode.PAGE === lastUsedRenameOption,
+              },
+              {
+                key: UpdateMode.DOCUMENT,
+                label: 'Document',
+                unique: true,
+                enabled: UpdateMode.DOCUMENT === lastUsedRenameOption,
+              },
+              {
+                key: 'skip',
+                label: 'Skip remapping',
+                unique: true,
+              },
+            ],
+          });
+
+          if (confirmData && confirmData.result) {
+            // Apply the new JSON data first
+            dispatch.tokenState.setJSONData(newTokens);
+
+            // If user chose to remap, apply the remapping
+            if (confirmData.data && !confirmData.data.includes('skip')) {
+              const updateMode = confirmData.data[0] as UpdateMode;
+              lastUsedRenameOption = updateMode;
+
+              // Apply remapping for each detected rename
+              await Promise.all(
+                detectedRenames.map((rename) => (
+                  handleBulkRemap(rename.newName, rename.oldName, updateMode)
+                )),
+              );
+            }
+          }
+        } else {
+          // No renames detected, just apply the new JSON data
+          dispatch.tokenState.setJSONData(newTokens);
+        }
+      } catch (error) {
+        console.error('Error processing JSON update:', error);
+        // Fallback to original behavior if anything goes wrong
+        dispatch.tokenState.setJSONData(newTokens);
+      }
+    },
+    [dispatch.tokenState, activeTokenSet, tokens, confirm, handleBulkRemap],
   );
 
   // Calls Figma with an old name and new name and asks it to update all tokens that use the old name
