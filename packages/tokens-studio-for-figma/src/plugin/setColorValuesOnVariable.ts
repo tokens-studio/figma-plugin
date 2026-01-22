@@ -21,13 +21,23 @@ function isFigmaColorObject(obj: VariableValue): obj is RGBOrRGBA {
 export default function setColorValuesOnVariable(variable: Variable, mode: string, value: string) {
   try {
     const { color, opacity } = convertToFigmaColor(value);
-    const existingVariableValue = variable.valuesByMode[mode];
-    if (
-      !existingVariableValue
-      || !(isFigmaColorObject(existingVariableValue) || isVariableWithAliasReference(existingVariableValue))
-    ) return;
-
     const newValue = { ...color, a: opacity };
+
+    // For extended collections, the mode ID format is different (e.g., "VariableCollectionId:X/Y")
+    // The variable belongs to parent collection and uses parent mode IDs
+    // We need to try the mode directly first, then check if it's an extended mode
+    const existingVariableValue = variable.valuesByMode[mode];
+
+    // If not found, this might be an extended collection mode - just set the value directly
+    // Figma's API will handle the override correctly
+    if (!existingVariableValue) {
+      variable.setValueForMode(mode, newValue);
+      return;
+    }
+
+    if (!(isFigmaColorObject(existingVariableValue) || isVariableWithAliasReference(existingVariableValue))) {
+      return;
+    }
 
     // For direct color values, compare the actual color values using threshold
     if (isFigmaColorObject(existingVariableValue)) {
@@ -37,7 +47,6 @@ export default function setColorValuesOnVariable(variable: Variable, mode: strin
       };
 
       if (isColorApproximatelyEqual(existingValue, newValue)) {
-        // return if values are approximately equal
         return;
       }
     }

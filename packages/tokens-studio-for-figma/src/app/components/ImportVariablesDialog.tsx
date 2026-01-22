@@ -207,6 +207,14 @@ export default function ImportVariablesDialog({
                         />
                         <Label htmlFor={`collection-${collection.id}`} css={{ color: '$fgDefault', fontWeight: 'bold', userSelect: 'none' }}>
                           {collection.name || `Collection ${collection.id.slice(0, 8)}`}
+                          {collection.isExtended && collection.parentCollectionId && (() => {
+                            const parent = collections.find((c) => c.id === collection.parentCollectionId);
+                            return (
+                              <Box as="span" css={{ fontWeight: 'normal', color: '$fgMuted', marginLeft: '$2' }}>
+                                (extends {parent?.name || 'parent'})
+                              </Box>
+                            );
+                          })()}
                         </Label>
                       </Stack>
 

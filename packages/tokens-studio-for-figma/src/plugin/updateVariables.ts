@@ -7,6 +7,7 @@ import setValuesOnVariable from './setValuesOnVariable';
 import { mapTokensToVariableInfo } from '@/utils/mapTokensToVariableInfo';
 import { TokenResolver } from '@/utils/TokenResolver';
 import { getAliasValue } from '@/utils/alias';
+import { isExtendedCollection } from './extendedCollectionHelpers';
 
 import { ProgressTracker } from './ProgressTracker';
 
@@ -84,9 +85,24 @@ export default async function updateVariables({
   const removedVariables: string[] = [];
 
   // Remove variables not handled in the current theme
+  // IMPORTANT: Never remove inherited variables from extended collections
+  // Calling variable.remove() on an inherited variable removes it from the parent collection!
   if (settings.removeStylesAndVariablesWithoutConnection) {
+    const isExtended = isExtendedCollection(collection);
+
     variablesInCollection
-      .filter((variable) => !Object.values(variableObj.variableKeyMap).includes(variable.key))
+      .filter((variable) => {
+        // Don't remove if variable is in use
+        if (Object.values(variableObj.variableKeyMap).includes(variable.key)) {
+          return false;
+        }
+        // For extended collections, never remove inherited variables (they belong to parent)
+        // Inherited variables have a different variableCollectionId than the child collection
+        if (isExtended && variable.variableCollectionId !== collection.id) {
+          return false;
+        }
+        return true;
+      })
       .forEach((variable) => {
         removedVariables.push(variable.key);
         variable.remove();

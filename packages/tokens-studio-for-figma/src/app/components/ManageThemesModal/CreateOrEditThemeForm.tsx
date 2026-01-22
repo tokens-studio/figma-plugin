@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useSelector, useStore } from 'react-redux';
 import {
-  Box, Button, IconButton, Stack,
+  Box, Button, IconButton, Stack, DropdownMenu, Label,
 } from '@tokens-studio/ui';
 import { NavArrowLeft } from 'iconoir-react';
 import { useTranslation } from 'react-i18next';
@@ -30,6 +30,7 @@ export type FormValues = {
   name: string
   group?: string
   tokenSets: Record<string, TokenSetStatus>
+  $extendsThemeId?: string
 };
 
 export enum ThemeFormTabs {
@@ -60,6 +61,32 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
   const themes = useSelector(themesListSelector);
   const groupNames = useMemo(() => ([...new Set(themes.filter((t) => t?.group).map((t) => t.group as string))]), [themes]);
   const { t } = useTranslation(['tokens', 'errors']);
+
+  // Get available parent themes for extends dropdown
+  // Exclude current theme and any themes that would create a cycle
+  const availableParentThemes = useMemo(() => {
+    if (!id) return themes; // New theme can extend any existing theme
+
+    // Helper to check if selecting a theme as parent would create a cycle
+    const wouldCreateCycle = (potentialParentId: string, visitedIds = new Set<string>()): boolean => {
+      if (potentialParentId === id) return true; // Direct cycle
+      if (visitedIds.has(potentialParentId)) return false; // Already checked
+
+      const potentialParent = themes.find((t) => t.id === potentialParentId);
+      if (!potentialParent?.$extendsThemeId) return false;
+
+      visitedIds.add(potentialParentId);
+      return wouldCreateCycle(potentialParent.$extendsThemeId, visitedIds);
+    };
+
+    return themes.filter((theme) => {
+      // Exclude current theme
+      if (theme.id === id) return false;
+      // Exclude themes that would create a cycle
+      if (wouldCreateCycle(theme.id)) return false;
+      return true;
+    });
+  }, [themes, id]);
 
   const treeOrListItems = useMemo(() => (
     githubMfsEnabled
@@ -251,6 +278,54 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
 
         </StyledCreateOrEditThemeFormHeaderFlex>
       </StyledNameInputBox>
+      {/* Extends Theme Selector - only show when editing an existing theme and there are available parent themes */}
+      {id && availableParentThemes.length > 0 && (
+        <Box css={{ padding: '$3 $4', borderBottom: '1px solid $borderSubtle' }}>
+          <Stack direction="row" justify="between" align="center" gap={3}>
+            <Label css={{ fontSize: '$small', fontWeight: '$sansMedium', color: '$fgDefault' }}>
+              {t('extendsTheme')}
+            </Label>
+            <Controller
+              name="$extendsThemeId"
+              control={control}
+              render={({ field }) => (
+                <DropdownMenu>
+                  <DropdownMenu.Trigger asChild data-testid="extends-theme-dropdown-trigger">
+                    <Button variant="secondary" size="small">
+                      {field.value
+                        ? (() => {
+                          const parentTheme = themes.find((th) => th.id === field.value);
+                          return parentTheme
+                            ? `${parentTheme.group ? `${parentTheme.group}/` : ''}${parentTheme.name}`
+                            : t('selectTheme');
+                        })()
+                        : t('none')}
+                    </Button>
+                  </DropdownMenu.Trigger>
+                  <DropdownMenu.Portal>
+                    <DropdownMenu.Content side="bottom" align="end">
+                      <DropdownMenu.RadioGroup
+                        value={field.value || ''}
+                        onValueChange={(value) => field.onChange(value || undefined)}
+                      >
+                        <DropdownMenu.RadioItem value="">
+                          {t('none')}
+                        </DropdownMenu.RadioItem>
+                        <DropdownMenu.Separator />
+                        {availableParentThemes.map((theme) => (
+                          <DropdownMenu.RadioItem key={theme.id} value={theme.id}>
+                            {theme.group ? `${theme.group}/${theme.name}` : theme.name}
+                          </DropdownMenu.RadioItem>
+                        ))}
+                      </DropdownMenu.RadioGroup>
+                    </DropdownMenu.Content>
+                  </DropdownMenu.Portal>
+                </DropdownMenu>
+              )}
+            />
+          </Stack>
+        </Box>
+      )}
       {id && (
         <>
           <StyledCreateOrEditThemeFormTabsFlex>

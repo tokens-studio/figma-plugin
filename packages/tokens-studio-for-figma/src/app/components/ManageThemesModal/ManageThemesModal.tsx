@@ -58,6 +58,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
         name: themeObject.name,
         tokenSets: themeObject.selectedTokenSets,
         ...(themeObject?.group ? { group: themeObject.group } : {}),
+        ...(themeObject?.$extendsThemeId ? { $extendsThemeId: themeObject.$extendsThemeId } : {}),
       };
     }
     return {};
@@ -121,6 +122,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
       name: values.name,
       selectedTokenSets: values.tokenSets,
       ...(values?.group ? { group: values.group } : {}),
+      ...(values?.$extendsThemeId ? { $extendsThemeId: values.$extendsThemeId } : {}),
       meta: {
         oldName: themeEditorDefaultValues?.name,
         oldGroup: themeEditorDefaultValues?.group,

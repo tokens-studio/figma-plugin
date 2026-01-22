@@ -297,4 +297,115 @@ describe('updateVariables', () => {
     // Verify that 2rem was converted to 30px (2 * 15)
     expect(mockSetValueForMode).toHaveBeenCalledWith('1:1', 30);
   });
+
+  describe('extended collections', () => {
+    const parentCollectionId = 'VariableCollectionId:parent:100';
+    const childCollectionId = 'VariableCollectionId:child:200';
+
+    const inheritedVariable = {
+      name: 'colors/primary',
+      variableCollectionId: parentCollectionId, // Belongs to PARENT
+      resolvedType: 'COLOR',
+      setValueForMode: jest.fn(),
+      id: 'VariableID:inherited:1',
+      key: 'VariableID:inherited:1',
+      description: '',
+      valuesByMode: { 'child-mode-1': { r: 1, g: 0, b: 0, a: 1 } },
+      remove: jest.fn(),
+    };
+
+    const ownVariable = {
+      name: 'colors/orphaned',
+      variableCollectionId: childCollectionId, // Belongs to CHILD (own variable)
+      resolvedType: 'COLOR',
+      setValueForMode: jest.fn(),
+      id: 'VariableID:own:1',
+      key: 'VariableID:own:1',
+      description: '',
+      valuesByMode: { 'child-mode-1': { r: 0, g: 1, b: 0, a: 1 } },
+      remove: jest.fn(),
+    };
+
+    const extendedCollection = {
+      id: childCollectionId,
+      parentVariableCollectionId: parentCollectionId,
+      variableIds: ['VariableID:inherited:1'],
+    };
+
+    const extendedTheme: ThemeObject = {
+      id: 'ThemeId:extended',
+      name: 'Brand A Light',
+      group: 'Brand A',
+      $extendsThemeId: 'ThemeId:base',
+      $figmaParentCollectionId: parentCollectionId,
+      selectedTokenSets: { core: TokenSetStatus.ENABLED },
+    };
+
+    beforeEach(() => {
+      inheritedVariable.remove = jest.fn();
+      ownVariable.remove = jest.fn();
+
+      // Mock to return both inherited and own variables
+      figma.variables.getLocalVariables = jest.fn().mockReturnValue([
+        inheritedVariable,
+        ownVariable,
+      ]);
+
+      figma.variables.getLocalVariablesAsync = jest.fn().mockResolvedValue([
+        inheritedVariable,
+        ownVariable,
+      ]);
+    });
+
+    it('should NOT remove inherited variables from extended collections', async () => {
+      const emptyTokens = {
+        core: [], // No tokens - would normally trigger removal
+      };
+
+      await updateVariables({
+        collection: extendedCollection,
+        mode: 'child-mode-1',
+        theme: extendedTheme,
+        tokens: emptyTokens,
+        settings: {
+          variablesColor: true,
+          variablesNumber: true,
+          variablesString: true,
+          variablesBoolean: true,
+          renameExistingStylesAndVariables: true,
+          removeStylesAndVariablesWithoutConnection: true, // This setting is ON
+        },
+        overallConfig: { core: TokenSetStatus.ENABLED },
+      });
+
+      // Inherited variable should NOT be removed (it belongs to parent)
+      expect(inheritedVariable.remove).not.toHaveBeenCalled();
+    });
+
+    it('should remove own variables from extended collections when orphaned', async () => {
+      const emptyTokens = {
+        core: [], // No tokens - would normally trigger removal
+      };
+
+      const result = await updateVariables({
+        collection: extendedCollection,
+        mode: 'child-mode-1',
+        theme: extendedTheme,
+        tokens: emptyTokens,
+        settings: {
+          variablesColor: true,
+          variablesNumber: true,
+          variablesString: true,
+          variablesBoolean: true,
+          renameExistingStylesAndVariables: true,
+          removeStylesAndVariablesWithoutConnection: true,
+        },
+        overallConfig: { core: TokenSetStatus.ENABLED },
+      });
+
+      // Own variable SHOULD be removed (it belongs to child collection)
+      expect(ownVariable.remove).toHaveBeenCalled();
+      expect(result.removedVariables).toContain('VariableID:own:1');
+    });
+  });
 });
