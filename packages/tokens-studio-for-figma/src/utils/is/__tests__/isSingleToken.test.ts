@@ -3,16 +3,16 @@ import { isSingleTokenValueObject } from '../isSingleTokenValueObject';
 describe('isSingleTokenValueObject', () => {
   const correctToken = {
     objectString: {
-      value: 'foo',
+      $value: 'foo',
     },
     objectNumber: {
-      value: 3,
+      $value: 3,
     },
     objectZero: {
-      value: 0,
+      $value: 0,
     },
     // objectNull: {
-    //   value: null,
+    //   $value: null,
     // },
   };
   const incorrectToken = {
