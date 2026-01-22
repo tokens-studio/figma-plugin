@@ -16,6 +16,9 @@ packages/tokens-studio-for-figma/benchmark/build
 packages/tokens-studio-for-figma/preview
 # Temporary flamegraphs between builds
 packages/tokens-studio-for-figma/benchmark/flamegraphs
+packages/tokens-studio-for-figma/preview
+packages/tokens-studio-for-figma/test-results
+packages/tokens-studio-for-figma/playwright-report
 **.0x
 techdocs/
 .turbo
