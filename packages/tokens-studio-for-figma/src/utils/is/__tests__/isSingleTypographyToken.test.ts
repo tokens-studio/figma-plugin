@@ -5,12 +5,12 @@ import { isSingleTypographyToken } from '../isSingleTypographyToken';
 describe('isSingleTypographyToken', () => {
   it('should validate correct values', () => {
     expect(isSingleTypographyToken({
-      type: TokenTypes.TYPOGRAPHY,
-      value: 'alias-typography',
+      $type: TokenTypes.TYPOGRAPHY,
+      $value: 'alias-typography',
     })).toBe(true);
     expect(isSingleTypographyToken({
-      type: TokenTypes.TYPOGRAPHY,
-      value: {
+      $type: TokenTypes.TYPOGRAPHY,
+      $value: {
         fontFamily: 'Roboto',
       },
     })).toBe(true);
@@ -28,20 +28,20 @@ describe('isSingleTypographyToken', () => {
       color: '#000000',
     })).toBe(false);
     expect(isSingleTypographyToken({
-      type: TokenTypes.TYPOGRAPHY,
+      $type: TokenTypes.TYPOGRAPHY,
       fontFamily: 'Roboto',
     })).toBe(false);
     expect(isSingleTypographyToken({
-      type: TokenTypes.TYPOGRAPHY,
+      $type: TokenTypes.TYPOGRAPHY,
       font: {
         fontFamily: 'Roboto',
       },
     })).toBe(false);
     expect(isSingleTypographyToken({
-      type: TokenTypes.TYPOGRAPHY,
-      value: {
+      $type: TokenTypes.TYPOGRAPHY,
+      $value: {
         fontFamily: 'Roboto',
-        value: '15px',
+        $value: '15px',
       },
     })).toBe(false);
   });

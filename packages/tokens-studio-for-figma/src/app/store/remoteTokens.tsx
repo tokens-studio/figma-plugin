@@ -708,20 +708,20 @@ export default function useRemoteTokens() {
       dispatch.uiState.setApiData(context);
       dispatch.tokenState.setEditProhibited(false);
       setStorageType({ provider: context, shouldSetInDocument: true });
-      
+
       // Pull tokens automatically without user confirmation
-      await pullTokens({ 
-        context, 
+      await pullTokens({
+        context,
         updateLocalTokens: true,
         usedTokenSet: {},
         activeTheme: {},
         collapsedTokenSets: [],
         skipConfirmation: true,
       });
-      
+
       // Switch to tokens tab after successful load
       dispatch.uiState.setActiveTab(Tabs.TOKENS);
-      
+
       return {
         status: 'success',
       };

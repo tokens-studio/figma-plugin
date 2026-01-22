@@ -118,7 +118,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
       shouldSwapFigmaModes = typeof data.shouldSwapFigmaModes === 'undefined' ? false : data.shouldSwapFigmaModes;
       sessionRecording = typeof data.sessionRecording === 'undefined' ? false : data.sessionRecording;
       storeTokenIdInJsonEditor = typeof data.storeTokenIdInJsonEditor === 'undefined' ? false : data.storeTokenIdInJsonEditor;
-      tokenFormat = data.tokenFormat || TokenFormatOptions.Legacy;
+      tokenFormat = data.tokenFormat || TokenFormatOptions.DTCG;
       autoApplyThemeOnDrop = typeof data.autoApplyThemeOnDrop === 'undefined' ? false : data.autoApplyThemeOnDrop;
       seenGenericVersionedHeaderMigrationDialog = typeof data.seenGenericVersionedHeaderMigrationDialog === 'undefined' ? false : data.seenGenericVersionedHeaderMigrationDialog;
       seenTermsUpdate2026 = typeof data.seenTermsUpdate2026 === 'undefined' ? false : data.seenTermsUpdate2026;
