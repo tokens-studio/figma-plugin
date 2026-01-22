@@ -102,6 +102,7 @@ export function ThemeListGroupHeader({
               size="small"
               variant="invisible"
               tooltip="Rename group"
+              disabled={editProhibited}
             />
           </>
         ) : (
