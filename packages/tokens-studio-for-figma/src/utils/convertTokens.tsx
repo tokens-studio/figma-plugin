@@ -1,5 +1,6 @@
 import { TokenTypes } from '@/constants/TokenTypes';
 import { SingleToken } from '@/types/tokens';
+import { TokenSetMetadata, GroupMetadata } from '@/types/tokens/TokenSetMetadata';
 import {
   isSingleBorderToken,
   isSingleBoxShadowToken,
@@ -45,6 +46,13 @@ export type Tokens =
     $description?: string;
   };
 
+// Metadata keys that should not be treated as tokens
+const METADATA_KEYS = ['$description', '$extensions', 'description', 'extensions'];
+
+function isMetadataKey(key: string): boolean {
+  return METADATA_KEYS.includes(key);
+}
+
 // @TODO fix typings
 function checkForTokens({
   obj,
@@ -58,6 +66,7 @@ function checkForTokens({
   inheritType,
   groupLevel = 0,
   currentTypeLevel = 0,
+  metadata = {},
 }: {
   obj: SingleToken<true>[];
   token: Tokens | TokenGroupInJSON;
@@ -70,6 +79,7 @@ function checkForTokens({
   inheritType?: string;
   groupLevel?: number;
   currentTypeLevel?: number;
+  metadata?: Record<string, GroupMetadata>;
 }): [(SingleToken & SingleToken & OptionalDTCGKeys)[], SingleToken & OptionalDTCGKeys | undefined] {
   let returnValue:
   | Pick<SingleToken<false>, 'name' | 'value' | 'type' | 'description' | 'inheritTypeLevel'>
@@ -118,9 +128,24 @@ function checkForTokens({
     }
   } else if (typeof token === 'object') {
     // We dont have a single token value key yet, so it's likely a group which we need to iterate over
-    // This would be where we push a `group` entity to the array, once we do want to tackle group descriptions or group metadata
+    // Capture group-level metadata before processing tokens
     let tokenToCheck = token;
     groupLevel += 1;
+    
+    // Collect metadata for this group
+    const groupMetadata: GroupMetadata = {};
+    if (TokenFormat.tokenDescriptionKey in token && typeof token[TokenFormat.tokenDescriptionKey] === 'string') {
+      groupMetadata.$description = token[TokenFormat.tokenDescriptionKey] as string;
+    }
+    if ('$extensions' in token && typeof token.$extensions === 'object') {
+      groupMetadata.$extensions = token.$extensions;
+    }
+    
+    // Store metadata if this is a group (not a token) and has metadata
+    if (root && Object.keys(groupMetadata).length > 0) {
+      metadata[root] = groupMetadata;
+    }
+    
     // When token groups are typed, we need to inherit the type to their children
     if (isTokenGroupWithType(token)) {
       const { [TokenFormat.tokenTypeKey]: groupType, ...tokenValues } = token;
@@ -131,6 +156,10 @@ function checkForTokens({
 
     if (typeof tokenToCheck !== 'undefined' || tokenToCheck !== null) {
       Object.entries(tokenToCheck).forEach(([key, value]) => {
+        // Skip metadata keys like $description and $extensions at group level
+        if (isMetadataKey(key)) {
+          return;
+        }
         const [, result] = checkForTokens({
           obj,
           token: value as TokenGroupInJSON,
@@ -143,6 +172,7 @@ function checkForTokens({
           inheritType,
           groupLevel,
           currentTypeLevel,
+          metadata,
         });
         if (root && result) {
           obj.push({ ...result, name: [root, key].join('.') });
@@ -166,18 +196,40 @@ function checkForTokens({
   return [obj, returnValue as SingleToken | undefined];
 }
 
-export default function convertToTokenArray({ tokens }: { tokens: Tokens }) {
+export default function convertToTokenArray({ tokens }: { tokens: Tokens }): {
+  tokens: SingleToken<true>[];
+  metadata: TokenSetMetadata;
+} {
+  const metadata: Record<string, GroupMetadata> = {};
   const [result] = checkForTokens({
     obj: [],
     root: null,
     token: tokens,
+    metadata,
   });
 
+  // Capture root-level metadata
+  const rootMetadata: GroupMetadata = {};
+  if (TokenFormat.tokenDescriptionKey in tokens && typeof tokens[TokenFormat.tokenDescriptionKey] === 'string') {
+    rootMetadata.$description = tokens[TokenFormat.tokenDescriptionKey] as string;
+  }
+  if ('$extensions' in tokens && typeof tokens.$extensions === 'object') {
+    rootMetadata.$extensions = tokens.$extensions;
+  }
+
   // Internally we dont care about $value or value, we always use value, so remove it
-  return Object.values(result).map((token) => {
+  const processedTokens = Object.values(result).map((token) => {
     if ('$value' in token) delete token.$value;
     if ('$description' in token) delete token.$description;
     if ('$type' in token) delete token.$type;
     return token;
   });
+
+  return {
+    tokens: processedTokens,
+    metadata: {
+      root: Object.keys(rootMetadata).length > 0 ? rootMetadata : undefined,
+      groups: Object.keys(metadata).length > 0 ? metadata : undefined,
+    },
+  };
 }
