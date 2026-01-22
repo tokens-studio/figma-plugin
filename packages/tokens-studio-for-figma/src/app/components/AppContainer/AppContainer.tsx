@@ -84,6 +84,42 @@ export const AppContainer = (params: Props) => {
     }
   }, [isDarkTheme]);
 
+  // Listen for token data changes from other users
+  useEffect(() => {
+    let unsubscribe: (() => void) | null = null;
+
+    if (!showLoadingScreen && startupProcess.isComplete) {
+      const handleTokenDataChanged = (msg: { type: string; updatedAt: string }) => {
+        if (msg.type === AsyncMessageTypes.TOKEN_DATA_CHANGED) {
+          // When token data changes from another user, reload the local token data
+          AsyncMessageChannel.ReactInstance.message({
+            type: AsyncMessageTypes.RELOAD_TOKEN_DATA,
+          }).then((tokenData) => {
+            // Update the token state with the new data
+            dispatch.tokenState.setTokenData({
+              values: tokenData.values,
+              themes: tokenData.themes || [],
+              activeTheme: tokenData.activeTheme,
+            });
+            if (tokenData.usedTokenSet) {
+              dispatch.tokenState.setUsedTokenSet(tokenData.usedTokenSet);
+            }
+          }).catch((err) => {
+            console.error('Failed to reload token data:', err);
+          });
+        }
+      };
+
+      unsubscribe = AsyncMessageChannel.ReactInstance.attachMessageListener(handleTokenDataChanged);
+    }
+
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
+  }, [showLoadingScreen, startupProcess.isComplete, dispatch]);
+
   globalStyles();
 
   const appContent = (
