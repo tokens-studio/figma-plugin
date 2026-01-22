@@ -6,6 +6,86 @@ export function convertDegreeToNumber(degreeString: string): number {
   return parseFloat(degreeString.split('deg').join(''));
 }
 
+// Helper function to parse position values
+function parsePosition(positionStr: string): { x: number; y: number } {
+  // Default to center
+  let x = 0.5;
+  let y = 0.5;
+
+  // Handle keywords and percentages
+  const keywords = positionStr.toLowerCase().trim().split(/\s+/);
+
+  // If we have exactly one keyword, apply logic based on what it is
+  if (keywords.length === 1) {
+    const keyword = keywords[0];
+    switch (keyword) {
+      case 'left':
+        x = 0;
+        break;
+      case 'right':
+        x = 1;
+        break;
+      case 'top':
+        y = 0;
+        break;
+      case 'bottom':
+        y = 1;
+        break;
+      case 'center':
+        // Already default
+        break;
+      default:
+        // Check if it's a percentage - assume it's x coordinate
+        if (keyword.endsWith('%')) {
+          const value = parseFloat(keyword.slice(0, -1)) / 100;
+          if (!isNaN(value)) {
+            x = value;
+            // y stays at center (0.5)
+          }
+        }
+        break;
+    }
+  } else if (keywords.length >= 2) {
+    // Handle two or more values
+    for (let i = 0; i < keywords.length; i += 1) {
+      const keyword = keywords[i];
+      switch (keyword) {
+        case 'left':
+          x = 0;
+          break;
+        case 'right':
+          x = 1;
+          break;
+        case 'top':
+          y = 0;
+          break;
+        case 'bottom':
+          y = 1;
+          break;
+        case 'center':
+          // Context-dependent, skip for now
+          break;
+        default:
+          // Check if it's a percentage
+          if (keyword.endsWith('%')) {
+            const value = parseFloat(keyword.slice(0, -1)) / 100;
+            if (!isNaN(value)) {
+              // First percentage is x, second is y
+              if (i === 0) {
+                x = value;
+              } else if (i === 1) {
+                y = value;
+              }
+            }
+          }
+          break;
+      }
+    }
+  }
+
+  return { x, y };
+}
+
 // Helper function to parse color stops from gradient parts
 function parseColorStops(parts: string[]): ColorStop[] {
   return parts.map((stop, i, arr) => {
@@ -213,23 +293,32 @@ function convertRadialGradient(parts: string[]): {
   type: 'GRADIENT_RADIAL';
 } {
   // Parse radial gradient syntax: radial-gradient([shape size] [at position], color-stops)
-  // For Figma, we'll use a basic radial transform centered at 0.5, 0.5
-  // More complex positioning and sizing could be added later
 
-  // Skip shape/size/position parameters for now and focus on color stops
   let colorStopsStart = 0;
+  let position = { x: 0.5, y: 0.5 }; // Default to center
+
+  // Look for position syntax in the first part
   if (parts.length > 0 && !parts[0].includes('#') && !parts[0].includes('rgb') && !parts[0].includes('hsl')) {
-    // First part might be shape/size/position, skip it
+    const firstPart = parts[0];
+
+    // Check for "at position" syntax
+    const atIndex = firstPart.indexOf(' at ');
+    if (atIndex !== -1) {
+      const positionPart = firstPart.substring(atIndex + 4); // Skip " at "
+      position = parsePosition(positionPart);
+    }
+
     colorStopsStart = 1;
   }
 
   const colorStopParts = parts.slice(colorStopsStart);
   const gradientStops = parseColorStops(colorStopParts);
 
-  // Create identity transform for basic radial gradient centered at 0.5, 0.5
+  // Create transform matrix for radial gradient with position offset
+  // Figma's radial gradient uses the transform to position the center
   const gradientTransform: Transform = [
-    [1, 0, 0],
-    [0, 1, 0],
+    [1, 0, position.x - 0.5],
+    [0, 1, position.y - 0.5],
   ];
 
   return {
@@ -245,34 +334,50 @@ function convertConicGradient(parts: string[]): {
   type: 'GRADIENT_ANGULAR';
 } {
   // Parse conic gradient syntax: conic-gradient([from angle] [at position], color-stops)
-  // For Figma GRADIENT_ANGULAR, we'll use a basic angular transform
 
   let colorStopsStart = 0;
   let startAngle = 0;
+  let position = { x: 0.5, y: 0.5 }; // Default to center
 
   // Check if first part specifies angle or position
   if (parts.length > 0 && (parts[0].includes('from') || parts[0].includes('at'))) {
-    if (parts[0].includes('from') && parts[0].includes('deg')) {
-      // Extract angle from "from Xdeg" syntax
-      const angleMatch = parts[0].match(/from\s+(\d+(?:\.\d+)?)deg/);
+    const firstPart = parts[0];
+
+    // Extract angle from "from Xdeg" syntax
+    if (firstPart.includes('from') && firstPart.includes('deg')) {
+      const angleMatch = firstPart.match(/from\s+(\d+(?:\.\d+)?)deg/);
       if (angleMatch) {
         startAngle = parseFloat(angleMatch[1]);
       }
     }
+
+    // Extract position from "at position" syntax
+    const atIndex = firstPart.indexOf(' at ');
+    if (atIndex !== -1) {
+      const positionPart = firstPart.substring(atIndex + 4); // Skip " at "
+      position = parsePosition(positionPart);
+    } else if (firstPart.startsWith('at ')) {
+      // Handle case where there's only "at position" without "from angle"
+      const positionPart = firstPart.substring(3); // Skip "at "
+      position = parsePosition(positionPart);
+    }
+
     colorStopsStart = 1;
   }
 
   const colorStopParts = parts.slice(colorStopsStart);
   const gradientStops = parseColorStops(colorStopParts);
 
-  // Create transform matrix for angular gradient with optional rotation
+  // Create transform matrix for angular gradient with optional rotation and position
   const rad = (startAngle * Math.PI) / 180;
   const cos = Math.cos(rad);
   const sin = Math.sin(rad);
 
+  // Apply both rotation and position offset
+  // For angular gradients, we need to adjust the center position
   const gradientTransform: Transform = [
-    [cos, -sin, 0.5 - 0.5 * cos + 0.5 * sin],
-    [sin, cos, 0.5 - 0.5 * sin - 0.5 * cos],
+    [cos, -sin, position.x - 0.5 * cos + 0.5 * sin],
+    [sin, cos, position.y - 0.5 * sin - 0.5 * cos],
   ];
 
   return {
