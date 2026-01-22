@@ -133,6 +133,7 @@ export const ThemeVariableManagement: React.FC<React.PropsWithChildren<React.Pro
         <Button
           size="small"
           disabled={isAttachingLocalVariables}
+          loading={isAttachingLocalVariables}
           onClick={handleAttachLocalVariables}
         >
           Attach local variables
