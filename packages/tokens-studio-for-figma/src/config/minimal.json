@@ -1,0 +1,68 @@
+{
+  "core": {
+    "colors": {
+      "primary": {
+        "$value": "#007AFF",
+        "$type": "color"
+      },
+      "secondary": {
+        "$value": "#34C759",
+        "$type": "color"
+      },
+      "neutral": {
+        "50": {
+          "$value": "#F9FAFB",
+          "$type": "color"
+        },
+        "100": {
+          "$value": "#F3F4F6",
+          "$type": "color"
+        },
+        "500": {
+          "$value": "#6B7280",
+          "$type": "color"
+        },
+        "900": {
+          "$value": "#111827",
+          "$type": "color"
+        }
+      }
+    },
+    "spacing": {
+      "xs": {
+        "$value": "4",
+        "$type": "spacing"
+      },
+      "sm": {
+        "$value": "8",
+        "$type": "spacing"
+      },
+      "md": {
+        "$value": "16",
+        "$type": "spacing"
+      },
+      "lg": {
+        "$value": "24",
+        "$type": "spacing"
+      }
+    },
+    "fontSizes": {
+      "sm": {
+        "$value": "14",
+        "$type": "fontSizes"
+      },
+      "base": {
+        "$value": "16",
+        "$type": "fontSizes"
+      },
+      "lg": {
+        "$value": "18",
+        "$type": "fontSizes"
+      },
+      "xl": {
+        "$value": "20",
+        "$type": "fontSizes"
+      }
+    }
+  }
+}
