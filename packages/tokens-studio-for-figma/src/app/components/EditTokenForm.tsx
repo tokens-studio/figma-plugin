@@ -43,6 +43,7 @@ import { ColorModifier } from '@/types/Modifier';
 import { MultiSelectDropdown } from './MultiSelectDropdown';
 import { tokenTypesToCreateVariable } from '@/constants/VariableTypes';
 import { ModalOptions } from '@/constants/ModalOptions';
+import { ReferencedVariableSection } from './ReferencedVariableSection';
 
 let lastUsedRenameOption: UpdateMode = UpdateMode.SELECTION;
 let lastUsedRenameStyles = false;
@@ -712,6 +713,9 @@ function EditTokenForm({ resolvedTokens }: Props) {
               handleSelectedItemChange={handleSelectedItemChange}
             />
           </Box>
+        )}
+        {internalEditToken?.name && (
+          <ReferencedVariableSection tokenName={internalEditToken.name} />
         )}
         <Stack direction="row" justify="end" gap={3}>
           <Button variant="secondary" type="button" onClick={handleReset}>
