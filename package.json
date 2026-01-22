@@ -19,7 +19,7 @@
     "glob": "^10.3.10",
     "prettier": "^3.0.3",
     "ts-node": "^10.8.1",
-    "turbo": "latest"
+    "turbo": "^2.5.3"
   },
   "name": "tokens-studio-plugin-monorepo",
   "packageManager": "yarn@1.22.19",
