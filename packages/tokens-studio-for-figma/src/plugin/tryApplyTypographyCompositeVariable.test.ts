@@ -199,4 +199,31 @@ describe('tryApplyTypographyCompositeVariable', () => {
 
     expect(target.letterSpacing).toEqual({ unit: 'PIXELS', value: 8 });
   });
+
+  it('should correctly apply values in reference mode when value is a string', async () => {
+    target = {
+      fontName: {
+        family: 'Arial',
+        style: 'Regular',
+      },
+    } as TextNode | TextStyle;
+    // In reference mode, the value is a string referring to another typography token
+    value = '{baseTypography.copy.default.mobile}' as any;
+    // But we still get the resolved object in resolvedValue
+    resolvedValue = {
+      fontFamily: 'Roboto',
+      fontWeight: 'Medium',
+      fontSize: '16px',
+      lineHeight: '1.5',
+    };
+
+    await tryApplyTypographyCompositeVariable({
+      target, value, resolvedValue, baseFontSize,
+    });
+
+    // The function should use the resolvedValue object to set the properties
+    expect(target.fontName).toEqual({ family: 'Roboto', style: 'Medium' });
+    expect(target.fontSize).toEqual(16);
+    expect(target.lineHeight).toEqual({ unit: 'PIXELS', value: 1.5 });
+  });
 });
