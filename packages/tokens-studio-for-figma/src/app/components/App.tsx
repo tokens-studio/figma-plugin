@@ -4,6 +4,7 @@ import { IconoirProvider } from 'iconoir-react';
 import Settings from './Settings';
 import Inspector from './Inspector';
 import Tokens from './Tokens';
+import { Subscription } from './Subscription';
 import StartScreen from './StartScreen';
 import Navbar from './Navbar';
 import FigmaLoading from './FigmaLoading';
@@ -53,6 +54,7 @@ function App() {
               <Tokens isActive={activeTab === 'tokens'} />
               {activeTab === 'inspector' && <Inspector />}
               {activeTab === 'secondscreen' && <SecondSceen />}
+              {activeTab === 'subscription' && <Subscription />}
               {activeTab === 'settings' && <Settings />}
             </Box>
             {activeTab !== 'loading' && activeTab !== 'start' && <Footer />}
