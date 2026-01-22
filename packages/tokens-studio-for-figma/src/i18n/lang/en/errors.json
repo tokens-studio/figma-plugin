@@ -9,5 +9,6 @@
   "valueMustIncludePxOrRem": "Value must include either px or rem",
   "tokenNamesCantStartWithDollar": "Can't start with a dollar ($) sign",
   "tokenNamesCantContainCurlyBraces": "Can't contain braces '{}'",
-  "tokenNamesCantContainEmptyGroups": "Token names cannot contain empty groups"
+  "tokenNamesCantContainEmptyGroups": "Token names cannot contain empty groups",
+  "invalidBooleanValue": "Value must be true, false, or a valid reference"
 }
