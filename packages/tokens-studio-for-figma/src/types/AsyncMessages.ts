@@ -24,6 +24,7 @@ import { UpdateTokenVariablePayload } from './payloads/UpdateTokenVariablePayloa
 import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 import { ExportTokenSet } from './ExportTokenSet';
 import type { VariableCollectionInfo } from './VariableCollectionSelection';
+import type { FileExportPreferences } from '@/figmaStorage/FileExportPreferencesProperty';
 
 export enum AsyncMessageTypes {
   // the below messages are going from UI to plugin
@@ -63,6 +64,8 @@ export enum AsyncMessageTypes {
   REMOVE_RELAUNCH_DATA = 'async/remove-relaunch-data',
   SET_VARIABLE_EXPORT_SETTINGS = 'async/set-variable-export-settings',
   SET_SELECTED_EXPORT_THEMES = 'async/set-selected-export-themes',
+  GET_FILE_EXPORT_PREFERENCES = 'async/get-file-export-preferences',
+  SET_FILE_EXPORT_PREFERENCES = 'async/set-file-export-preferences',
   CREATE_LIVING_DOCUMENTATION = 'async/create-living-documentation',
   // the below messages are going from plugin to UI
   STARTUP = 'async/startup',
@@ -384,6 +387,14 @@ export type SetSelectedExportThemesMessage = AsyncMessage<AsyncMessageTypes.SET_
 }>;
 export type SetSelectedExportThemesMessageResult = AsyncMessage<AsyncMessageTypes.SET_SELECTED_EXPORT_THEMES>;
 
+export type GetFileExportPreferencesMessage = AsyncMessage<AsyncMessageTypes.GET_FILE_EXPORT_PREFERENCES>;
+export type GetFileExportPreferencesMessageResult = AsyncMessage<AsyncMessageTypes.GET_FILE_EXPORT_PREFERENCES, FileExportPreferences>;
+
+export type SetFileExportPreferencesMessage = AsyncMessage<AsyncMessageTypes.SET_FILE_EXPORT_PREFERENCES, {
+  preferences: FileExportPreferences;
+}>;
+export type SetFileExportPreferencesMessageResult = AsyncMessage<AsyncMessageTypes.SET_FILE_EXPORT_PREFERENCES>;
+
 export type PreviewRequestStartupAsyncMessage = AsyncMessage<AsyncMessageTypes.PREVIEW_REQUEST_STARTUP>;
 export type PreviewRequestStartupAsyncMessageResult = AsyncMessage<AsyncMessageTypes.PREVIEW_REQUEST_STARTUP>;
 
@@ -437,7 +448,9 @@ export type AsyncMessages =
   | RemoveRelaunchDataMessage
   | RemoveStylesWithoutConnectionMessage
   | SetVariableExportSettingsMessage
-  | SetSelectedExportThemesMessage;
+  | SetSelectedExportThemesMessage
+  | GetFileExportPreferencesMessage
+  | SetFileExportPreferencesMessage;
 
 export type AsyncMessageResults =
   CreateStylesAsyncMessageResult
@@ -489,7 +502,9 @@ export type AsyncMessageResults =
   | RemoveRelaunchDataMessageResult
   | RemoveStylesWithoutConnectionResult
   | SetVariableExportSettingsMessageResult
-  | SetSelectedExportThemesMessageResult;
+  | SetSelectedExportThemesMessageResult
+  | GetFileExportPreferencesMessageResult
+  | SetFileExportPreferencesMessageResult;
 
 export type AsyncMessagesMap = {
   [K in AsyncMessageTypes]: Extract<AsyncMessages, { type: K }>

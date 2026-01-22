@@ -6,7 +6,7 @@ import {
 import {
   ChevronLeftIcon, SlidersIcon,
 } from '@primer/octicons-react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { StyledProBadge } from '../ProBadge';
 import Modal from '../Modal';
 import { useIsProUser } from '@/app/hooks/useIsProUser';
@@ -18,7 +18,9 @@ import ExportThemesTab from './ExportThemesTab';
 import { allTokenSetsSelector, themesListSelector } from '@/selectors';
 import { ExportTokenSet } from '@/types/ExportTokenSet';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
-import { Dispatch } from '@/app/store';
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { AsyncMessageTypes } from '@/types/AsyncMessages';
+import { FileExportPreferences } from '@/figmaStorage/FileExportPreferencesProperty';
 
 export default function ManageStylesAndVariables({ showModal, setShowModal }: { showModal: boolean, setShowModal: (show: boolean) => void }) {
   const { t } = useTranslation(['manageStylesAndVariables']);
@@ -30,18 +32,10 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
 
   const allSets = useSelector(allTokenSetsSelector);
   const themes = useSelector(themesListSelector);
-  const dispatch = useDispatch<Dispatch>();
-  const savedSelectedThemes = useSelector((state: any) => state.uiState.selectedExportThemes) || [];
 
-  // Validate saved themes to ensure they still exist
-  const validatedSelectedThemes = savedSelectedThemes.filter((themeId) => themes.some((theme) => theme.id === themeId));
-
-  // Default to using all themes if no valid saved themes are found
-  const initialSelectedThemes = validatedSelectedThemes.length > 0
-    ? validatedSelectedThemes
-    : themes.map((theme) => theme.id);
-
-  const [selectedThemes, setSelectedThemes] = React.useState<string[]>(initialSelectedThemes);
+  // State for per-file preferences
+  const [selectedThemes, setSelectedThemes] = React.useState<string[]>([]);
+  const [preferencesLoaded, setPreferencesLoaded] = React.useState(false);
 
   const [selectedSets, setSelectedSets] = React.useState<ExportTokenSet[]>(allSets.map((set) => {
     const tokenSet = {
@@ -55,13 +49,46 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
     createVariablesFromSets, createVariablesFromThemes, createStylesFromSelectedTokenSets, createStylesFromSelectedThemes,
   } = useTokens();
 
-  // Save selected themes when they change and update redux state
+  // Load file-specific export preferences when modal opens
   React.useEffect(() => {
-    if (selectedThemes) {
-      // Update Redux state - this will trigger the effect to save to shared plugin data
-      dispatch.uiState.setSelectedExportThemes(selectedThemes);
+    if (showModal && !preferencesLoaded) {
+      AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.GET_FILE_EXPORT_PREFERENCES,
+      }).then((result) => {
+        const preferences = result as FileExportPreferences;
+        if (preferences.selectedExportThemes && preferences.selectedExportThemes.length > 0) {
+          // Validate that the saved themes still exist
+          const validThemes = preferences.selectedExportThemes.filter((themeId) => themes.some((theme) => theme.id === themeId));
+          setSelectedThemes(validThemes);
+        } else {
+          // Default to empty selection instead of all themes
+          setSelectedThemes([]);
+        }
+        setPreferencesLoaded(true);
+      }).catch((error) => {
+        console.warn('Failed to load file export preferences:', error);
+        // Fallback to empty selection
+        setSelectedThemes([]);
+        setPreferencesLoaded(true);
+      });
     }
-  }, [selectedThemes, dispatch.uiState]);
+  }, [showModal, themes, preferencesLoaded]);
+
+  // Save file-specific preferences when selectedThemes changes (but only after initial load)
+  React.useEffect(() => {
+    if (preferencesLoaded && selectedThemes) {
+      const preferences: FileExportPreferences = {
+        selectedExportThemes: selectedThemes,
+      };
+
+      AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.SET_FILE_EXPORT_PREFERENCES,
+        preferences,
+      }).catch((error) => {
+        console.warn('Failed to save file export preferences:', error);
+      });
+    }
+  }, [selectedThemes, preferencesLoaded]);
 
   const handleShowOptions = React.useCallback(() => {
     setShowOptions(true);
@@ -93,6 +120,8 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
       setShowOptions(false);
     } else {
       setShowModal(false);
+      // Reset preferences loaded state when modal closes
+      setPreferencesLoaded(false);
     }
   }, [setShowModal, showOptions]);
 
