@@ -18,6 +18,7 @@ import {
   updateModeSelector,
   themesListSelector,
 } from '@/selectors';
+import { groupMetadataSelector } from '@/app/store/selectors/groupMetadataSelector';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { isEqual } from '@/utils/isEqual';
@@ -64,6 +65,7 @@ export default function useTokens() {
   const themes = useSelector(themesListSelector);
   const settings = useSelector(settingsStateSelector, isEqual);
   const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
+  const groupMetadata = useSelector(groupMetadataSelector);
   const { confirm } = useConfirm<ConfirmResult>();
   const store = useStore<RootState>();
   const tokensContext = useContext(TokensContext);
@@ -112,19 +114,20 @@ export default function useTokens() {
         expandComposition,
         expandBorder,
         storeTokenIdInJsonEditor,
+        groupMetadata,
       });
     },
     // Adding tokenFormat as a dependency to cause a change when format changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [tokens, activeTokenSet, storeTokenIdInJsonEditor, tokensContext.resolvedTokens, tokenFormat],
+    [tokens, activeTokenSet, storeTokenIdInJsonEditor, tokensContext.resolvedTokens, tokenFormat, groupMetadata],
   );
 
   // Returns stringified tokens for the JSON editor
   const getStringTokens = useCallback(
-    () => stringifyTokens(tokens, activeTokenSet, storeTokenIdInJsonEditor),
+    () => stringifyTokens(tokens, activeTokenSet, storeTokenIdInJsonEditor, groupMetadata),
     // Adding tokenFormat as a dependency to cause a change when format changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [tokens, activeTokenSet, storeTokenIdInJsonEditor, tokenFormat],
+    [tokens, activeTokenSet, storeTokenIdInJsonEditor, tokenFormat, groupMetadata],
   );
 
   // handles updating JSON

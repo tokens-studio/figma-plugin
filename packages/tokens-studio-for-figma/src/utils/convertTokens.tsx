@@ -58,6 +58,7 @@ function checkForTokens({
   inheritType,
   groupLevel = 0,
   currentTypeLevel = 0,
+  groups = [],
 }: {
   obj: SingleToken<true>[];
   token: Tokens | TokenGroupInJSON;
@@ -70,6 +71,7 @@ function checkForTokens({
   inheritType?: string;
   groupLevel?: number;
   currentTypeLevel?: number;
+  groups?: GroupDescription[];
 }): [(SingleToken & SingleToken & OptionalDTCGKeys)[], SingleToken & OptionalDTCGKeys | undefined] {
   let returnValue:
   | Pick<SingleToken<false>, 'name' | 'value' | 'type' | 'description' | 'inheritTypeLevel'>
@@ -117,6 +119,19 @@ function checkForTokens({
       returnValue.type = token[TokenFormat.tokenTypeKey] as TokenTypes;
     }
   } else if (typeof token === 'object') {
+    // Check if this is a group description (has $description but no $value or $type)
+    const hasDescription = TokenFormat.tokenDescriptionKey in token && typeof token[TokenFormat.tokenDescriptionKey] === 'string';
+    const hasValue = TokenFormat.tokenValueKey in token;
+    const hasType = TokenFormat.tokenTypeKey in token;
+    
+    if (hasDescription && !hasValue && !hasType && root) {
+      // This is a group description, add it to groups array
+      groups.push({
+        path: root,
+        description: token[TokenFormat.tokenDescriptionKey] as string,
+      });
+    }
+
     // We dont have a single token value key yet, so it's likely a group which we need to iterate over
     // This would be where we push a `group` entity to the array, once we do want to tackle group descriptions or group metadata
     let tokenToCheck = token;
@@ -143,6 +158,7 @@ function checkForTokens({
           inheritType,
           groupLevel,
           currentTypeLevel,
+          groups,
         });
         if (root && result) {
           obj.push({ ...result, name: [root, key].join('.') });
@@ -166,18 +182,38 @@ function checkForTokens({
   return [obj, returnValue as SingleToken | undefined];
 }
 
-export default function convertToTokenArray({ tokens }: { tokens: Tokens }) {
+export type GroupDescription = {
+  path: string;
+  description: string;
+};
+
+export function convertToTokenArrayWithGroups({ tokens }: { tokens: Tokens }): { tokens: SingleToken<true>[]; groups: GroupDescription[] } {
+  const groups: GroupDescription[] = [];
   const [result] = checkForTokens({
     obj: [],
     root: null,
     token: tokens,
+    groups,
   });
 
+  // Filter out group descriptions from tokens (they have names ending with .$description)
+  const filteredTokens = result.filter((token) => !token.name.endsWith('.$description'));
+
   // Internally we dont care about $value or value, we always use value, so remove it
-  return Object.values(result).map((token) => {
+  const cleanedTokens = filteredTokens.map((token) => {
     if ('$value' in token) delete token.$value;
     if ('$description' in token) delete token.$description;
     if ('$type' in token) delete token.$type;
     return token;
   });
+
+  return {
+    tokens: cleanedTokens,
+    groups,
+  };
+}
+
+export default function convertToTokenArray({ tokens }: { tokens: Tokens }): SingleToken<true>[] {
+  const result = convertToTokenArrayWithGroups({ tokens });
+  return result.tokens;
 }

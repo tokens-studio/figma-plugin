@@ -1,7 +1,7 @@
 import { mergeTokenGroups } from '@/utils/tokenHelpers';
 import { TransformerOptions } from './types';
 import convertTokensToGroupedObject from './convertTokensToGroupedObject';
-import parseTokenValues from './parseTokenValues';
+import parseTokenValues, { extractTokensOnly } from './parseTokenValues';
 import { SetTokenDataPayload } from '@/types/payloads';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { defaultTokenResolver } from './TokenResolver';
@@ -21,7 +21,7 @@ export default function convertTokensObjectToResolved(
   },
 ) {
   // Parse tokens into array structure
-  const parsed = parseTokenValues(tokens);
+  const parsed = extractTokensOnly(parseTokenValues(tokens));
   // Merge to one giant array
   const merged = mergeTokenGroups(
     parsed,

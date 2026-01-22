@@ -1,11 +1,12 @@
 import set from 'set-value';
 import { appendTypeToToken } from '@/app/components/createTokenObj';
-import { AnyTokenList } from '@/types/tokens';
+import { AnyTokenList, GroupMetadataMap } from '@/types/tokens';
 import removeTokenId from './removeTokenId';
 import { TokenFormat, TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 import { TokenInJSON } from './convertTokens';
 import { processNumberValue } from './processNumberValue';
 import { TokenTypes } from '@/constants/TokenTypes';
+import { injectGroupDescriptions } from './injectGroupDescriptions';
 
 export function getGroupTypeName(tokenName: string, groupLevel: number): string {
   if (tokenName.includes('.')) {
@@ -26,6 +27,7 @@ export default function stringifyTokens(
   tokens: Record<string, AnyTokenList>,
   activeTokenSet: string,
   storeTokenIdInJsonEditor?: boolean,
+  groupMetadata?: GroupMetadataMap,
 ): string {
   const tokenObj = {};
   tokens[activeTokenSet]?.forEach((token) => {
@@ -58,6 +60,9 @@ export default function stringifyTokens(
       set(tokenObj, token.name, tokenInJSON, { merge: true });
     }
   });
+
+  // Inject group descriptions using central utility
+  injectGroupDescriptions(tokenObj, activeTokenSet, groupMetadata);
 
   return JSON.stringify(tokenObj, null, 2);
 }
