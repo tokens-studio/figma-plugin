@@ -31,7 +31,7 @@ export class NodeManager {
 
   public async getNode(id: string): Promise<NodeManagerNode | null> {
     await this.waitForUpdating();
-    const node = figma.getNodeById(id);
+    const node = await figma.getNodeByIdAsync(id);
     if (!node) return null;
     return {
       node,
@@ -61,6 +61,8 @@ export class NodeManager {
     } else if (updateMode === UpdateMode.SELECTION) {
       relevantNodes = findAll(figma.currentPage.selection, true, opts.nodesWithoutPluginData);
     } else {
+      // Load all pages first to ensure they're available for document-wide operations
+      await figma.loadAllPagesAsync();
       relevantNodes = findAll([figma.root], false, opts.nodesWithoutPluginData);
     }
 

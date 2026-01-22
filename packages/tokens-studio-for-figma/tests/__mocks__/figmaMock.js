@@ -71,7 +71,9 @@ module.exports.mockParentPostMessage = jest.fn((data) => {
     .forEach(([,handler]) => handler(data.pluginMessage))
 });
 module.exports.mockGetNodeById = jest.fn();
+module.exports.mockGetNodeByIdAsync = jest.fn();
 module.exports.mockScrollAndZoomIntoView = jest.fn();
+module.exports.mockLoadAllPagesAsync = jest.fn(() => Promise.resolve());
 module.exports.mockCreateImage = jest.fn();
 module.exports.mockGetLocalVariables = jest.fn(() => ([]));
 module.exports.mockGetLocalVariablesAsync = jest.fn(() => Promise.resolve([]));
@@ -143,6 +145,8 @@ module.exports.figma = {
   createEffectStyle: module.exports.mockCreateEffectStyle,
   importStyleByKeyAsync: module.exports.mockImportStyleByKeyAsync,
   getNodeById: module.exports.mockGetNodeById,
+  getNodeByIdAsync: module.exports.mockGetNodeByIdAsync,
+  loadAllPagesAsync: module.exports.mockLoadAllPagesAsync,
   createImage: module.exports.mockCreateImage,
   listAvailableFontsAsync: module.exports.mockListAvailableFontsAsync,
 };

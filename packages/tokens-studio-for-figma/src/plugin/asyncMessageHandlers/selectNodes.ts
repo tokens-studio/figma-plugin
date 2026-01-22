@@ -5,5 +5,5 @@ import {
 } from '../node';
 
 export const selectNodes: AsyncMessageChannelHandlers[AsyncMessageTypes.SELECT_NODES] = async (msg) => {
-  selectNodesFn(msg.ids);
+  await selectNodesFn(msg.ids);
 };
