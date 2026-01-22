@@ -56,8 +56,31 @@ export function validateRenameGroupName(tokensInParent, type, oldName, newName) 
     return token;
   });
 
-  let possibleDuplicates = newTokensAfterRename.filter((a) => (newTokensAfterRename.filter((b) => a.name === b.name).length > 1) && existingTokensAfterRename.some((t) => t.name === a.name && t.type === a.type && t.value === a.value));
-  possibleDuplicates = [...new Map(possibleDuplicates.map((item) => [item.name, item])).values()];
+  // Optimize duplicate detection: Use Map to count occurrences in O(n) instead of nested filter O(n²)
+  const nameCounts = new Map<string, number>();
+  newTokensAfterRename.forEach((token) => {
+    nameCounts.set(token.name, (nameCounts.get(token.name) || 0) + 1);
+  });
+
+  // Create a Map for faster lookup of existing tokens
+  const existingTokensMap = new Map<string, typeof existingTokensAfterRename[0]>();
+  existingTokensAfterRename.forEach((token) => {
+    const key = `${token.name}|${token.type}|${JSON.stringify(token.value)}`;
+    existingTokensMap.set(key, token);
+  });
+
+  // Find duplicates that exist in both arrays
+  const duplicatesMap = new Map<string, typeof newTokensAfterRename[0]>();
+  newTokensAfterRename.forEach((token) => {
+    if (nameCounts.get(token.name)! > 1) {
+      const key = `${token.name}|${token.type}|${JSON.stringify(token.value)}`;
+      if (existingTokensMap.has(key)) {
+        duplicatesMap.set(token.name, token);
+      }
+    }
+  });
+
+  const possibleDuplicates = Array.from(duplicatesMap.values());
 
   const foundOverlappingTokens = (newName !== oldName) && tokensInParent.filter((token) => [newName, ...renamedChildGroupNames].includes(token.name));
 
@@ -111,8 +134,31 @@ export function validateDuplicateGroupName(tokens, selectedTokenSets, activeToke
       const newTokensAfterDuplicate = newTokens[setKey];
       const existingTokensAfterRename = tokens[setKey];
 
-      let overlappingTokens = newTokensAfterDuplicate.filter((a) => (newTokensAfterDuplicate.filter((b) => a.name === b.name).length > 1) && existingTokensAfterRename.some((t) => t.name === a.name && t.type === a.type && t.value === a.value));
-      overlappingTokens = [...new Map(overlappingTokens?.map((item) => [item.name, item])).values()];
+      // Optimize duplicate detection: Use Map to count occurrences in O(n) instead of nested filter O(n²)
+      const nameCounts = new Map<string, number>();
+      newTokensAfterDuplicate.forEach((token) => {
+        nameCounts.set(token.name, (nameCounts.get(token.name) || 0) + 1);
+      });
+
+      // Create a Map for faster lookup of existing tokens
+      const existingTokensMap = new Map<string, typeof existingTokensAfterRename[0]>();
+      existingTokensAfterRename.forEach((token) => {
+        const key = `${token.name}|${token.type}|${JSON.stringify(token.value)}`;
+        existingTokensMap.set(key, token);
+      });
+
+      // Find duplicates that exist in both arrays
+      const duplicatesMap = new Map<string, typeof newTokensAfterDuplicate[0]>();
+      newTokensAfterDuplicate.forEach((token) => {
+        if (nameCounts.get(token.name)! > 1) {
+          const key = `${token.name}|${token.type}|${JSON.stringify(token.value)}`;
+          if (existingTokensMap.has(key)) {
+            duplicatesMap.set(token.name, token);
+          }
+        }
+      });
+
+      const overlappingTokens = Array.from(duplicatesMap.values());
       if (overlappingTokens?.length > 0) {
         acc[setKey] = overlappingTokens;
       }

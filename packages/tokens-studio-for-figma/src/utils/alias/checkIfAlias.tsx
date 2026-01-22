@@ -19,7 +19,16 @@ export function checkIfAlias(token: SingleToken | string, allTokens: SingleToken
         aliasToken = Boolean(String(token.value).match(AliasRegex));
       } else {
         const arrayValue = Array.isArray(token.value) ? token.value : [token.value];
-        aliasToken = arrayValue.some((value) => Object.values(value).some((singleValue) => Boolean(singleValue?.toString().match(AliasRegex))));
+        // Optimize: Flatten the nested some operations for better performance
+        aliasToken = arrayValue.some((value) => {
+          const values = Object.values(value);
+          for (let i = 0; i < values.length; i += 1) {
+            if (values[i]?.toString().match(AliasRegex)) {
+              return true;
+            }
+          }
+          return false;
+        });
       }
     } else if (token.type === TokenTypes.COMPOSITION) {
       return true;

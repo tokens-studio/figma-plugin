@@ -146,7 +146,11 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
       );
     });
 
-    fontFamilies = [...new Set(uniqueFontCombinations.map((font) => font.family))].map((fontFamily, idx) => {
+    // Optimize: Use Set and reduce to avoid double iteration
+    const uniqueFamilies = new Set<string>();
+    uniqueFontCombinations.forEach((font) => uniqueFamilies.add(font.family));
+
+    fontFamilies = Array.from(uniqueFamilies).map((fontFamily, idx) => {
       const matchingStyle = figmaTextStyles.find((style) => style.fontName.family === fontFamily);
 
       if (!matchingStyle) {

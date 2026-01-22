@@ -9,6 +9,7 @@ import * as tokenStateEffects from './effects/tokenState';
 import parseTokenValues from '@/utils/parseTokenValues';
 import { notifyToUI } from '@/plugin/notifiers';
 import parseJson from '@/utils/parseJson';
+import { deepClone } from '@/utils/deepClone';
 import { TokenData } from '@/types/SecondScreen';
 import updateTokensOnSources from '../updateSources';
 import {
@@ -288,7 +289,7 @@ export const tokenState = createModel<RootModel>()({
     },
     createMultipleTokens: (state, data: CreateSingleTokenData[]) => {
       // This is a deep clone of the tokens so that we force an update in the UI even if just the value changes
-      const newTokens: TokenStore['values'] = JSON.parse(JSON.stringify(state.tokens));
+      const newTokens: TokenStore['values'] = deepClone(state.tokens);
       data.forEach((token) => {
         if (!newTokens[token.parent]) {
           newTokens[token.parent] = [];
@@ -306,7 +307,7 @@ export const tokenState = createModel<RootModel>()({
     },
     editMultipleTokens: (state, data: EditSingleTokenData[]) => {
       // This is a deep clone of the tokens so that we force an update in the UI even if just the value changes
-      const newTokens: TokenStore['values'] = JSON.parse(JSON.stringify(state.tokens));
+      const newTokens: TokenStore['values'] = deepClone(state.tokens);
       data.forEach((token) => {
         const existingTokenIndex = newTokens[token.parent].findIndex((n) => n.name === token.name);
         if (existingTokenIndex > -1) {
