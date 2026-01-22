@@ -24,6 +24,8 @@ describe('startup', () => {
       user: null,
       usedEmail: null,
       selectedExportThemes: [],
+      selectedExportSets: [],
+      activeExportTab: null,
     });
   });
 
@@ -82,6 +84,8 @@ describe('startup', () => {
       user: null,
       usedEmail: null,
       selectedExportThemes: [],
+      selectedExportSets: [],
+      activeExportTab: null,
     });
   });
 });
