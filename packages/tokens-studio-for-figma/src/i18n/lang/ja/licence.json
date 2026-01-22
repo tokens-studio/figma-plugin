@@ -1,0 +1,12 @@
+{
+  "pro": "Pro",
+  "getPro": "Proを取得",
+  "removeKey": "キーを削除",
+  "licenseKey": "ライセンスキー",
+  "upgradeToPro": "Proにアップグレード",
+  "manageSubscription": "サブスクリプションを管理",
+  "addLicenseKey": "ライセンスキーを追加",
+  "keepLicenseSafe": "削除後はこのデバイスに保存されないため、ライセンスキーのコピーをどこかに保存したことを確認してください。",
+  "confirmRemove": "ライセンスキーを削除してもよろしいですか？",
+  "removeLicenseKey": "キーを削除"
+}

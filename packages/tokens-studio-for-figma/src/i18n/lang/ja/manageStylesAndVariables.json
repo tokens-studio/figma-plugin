@@ -1,0 +1,78 @@
+{
+"modalTitle": "Figmaにエクスポート",
+"buttonLabel": "スタイルと変数",
+"optionsModalTitle": "Figmaにエクスポート: オプション",
+"actions": {
+  "export": "Figmaにエクスポート",
+  "import": "Figmaからインポート",
+  "options": "オプション",
+  "cancel": "キャンセル",
+  "confirm": "確認",
+  "createThemes": "テーマを作成",
+  "getPRO": "PROを取得",
+  "manageThemes": "テーマを管理",
+  "changeSets": "セットを変更"
+},
+"docs": {
+  "exportToFigmaOptions": "Figmaにエクスポート: オプション",
+  "stylesAndVariables": "スタイルと変数",
+  "referenceOnlyMode": "有効 vs 参照のみモード"
+},
+"generic": {
+  "learnMore": "詳しく学ぶ",
+  "themes": "テーマ", 
+  "noGroup": "グループなし",
+  "selectAll": "すべて選択",
+  "variables": "変数",
+  "styles": "スタイル"
+},
+"tabs": {
+  "exportThemes": "テーマ",
+  "exportSets": "トークンセット"
+},
+"options": {
+  "title": "オプション",
+  "intro": "テーマやトークンセットに基づいてスタイルや変数を作成します。まず、どのタイプのトークンをスタイルまたは変数として作成するかを選択してください。",
+  "createAndUpdate": "作成と更新",
+  "tokensExportedToFigmaShould": "Figmaにエクスポートされるトークンは:",
+  "ignorePrefix": "スタイル用にトークン名の最初の部分を無視",
+  "ignorePrefixExplanation": "スタイルで'colors.blue.500'というトークンの'colors'を無視したい場合に便利",
+  "prefixStyles": "アクティブなテーマ名でスタイルにプレフィックスを付ける",
+  "prefixStylesExplanation": "作成されるスタイルにアクティブなテーマ名を追加します。注意：多次元テーマでこれを使用すると予期しない結果になります。",
+  "renameExisting": "既存のスタイルと変数名を更新",
+  "renameExistingExplanation": "既存のスタイルと変数はトークン名に合わせて名前が変更されます",
+  "scopeVariablesByTokenType": "Scope Variables by token type",
+  "scopeVariablesByTokenTypeExplanation": "Variable scopes will be inferred from the token type and intended usage",
+  "createStylesWithVariableReferences": "Create styles with variable references",
+  "createStylesWithVariableReferencesExplanation": "Styles will be created containing references to variables",
+  "removeWithoutConnection": "Remove styles and variables without connection to a token",
+  "removeWithoutConnectionExplanation": "Styles and variables that are not connected to a token will be removed"
+},
+"variables": {
+  "color": "Color",
+  "number": "Number",
+  "boolean": "Boolean",
+  "string": "String"
+},
+"styles": {
+  "color": "Color",
+  "typography": "Typography",
+  "effects": "Effects"
+},
+"exportThemesTab": {
+  "headingPro": "Create themes to get started",
+  "headingBasic": "Creating themes is a pro Feature",
+  "introPro": "Combinations of token sets create themes. Use themes to create multiple collections of variables or styles for easy switching between design concepts like light or dark color modes, multiple brands, products or platforms. Or switch to Sets to export without using Themes",
+  "introBasic": "Combinations of token sets create themes. Use themes to create multiple collections of variables or styles for easy switching between design concepts like light or dark color modes, multiple brands, products or platforms.",
+  "confirmThemes": "Create styles or variables based on themes",
+  "combinationsOfSetsMakeThemes": "Choose which themes should be created or updated."
+
+},
+"exportSetsTab": {
+  "changeSetsHeading": "Enabled sets will export to Figma",
+  "confirmSets": "Create styles or variables based on token sets",
+  "intro": "You can use token sets to manage your styles, and variables. Use themes (Pro) to create multiple collections of variables or styles for easy switching between design concepts.",
+  "setsSelectedForExport": "Sets selected for export"
+}
+}
+
