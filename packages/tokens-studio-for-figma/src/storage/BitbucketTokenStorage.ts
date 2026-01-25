@@ -57,7 +57,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
       const authString = `${this.username || this.owner}:${this.apiToken}`;
       const authHeader = `Basic ${btoa(authString)}`;
       const branches: string[] = [];
-      let url = `https://api.bitbucket.org/2.0/repositories/${this.owner}/${this.repository}/refs/branches?pagelen=50`;
+      let url = `https://api.bitbucket.org/2.0/repositories/${this.owner}/${this.repository}/refs/branches?pagelen=100`;
       while (url) {
         const response = await fetch(url, {
           headers: {
@@ -104,6 +104,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
       const originBranch = await this.bitbucketClient.repositories.listRefs({
         workspace: this.owner,
         repo_slug: this.repository,
+        pagelen: 100,
       });
 
       const sourceBranchName = source || this.branch;

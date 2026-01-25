@@ -16,7 +16,7 @@ import useRemoteTokens from '../store/remoteTokens';
 import { StorageTypeCredentials } from '@/types/StorageType';
 import LocalStorageItem from './LocalStorageItem';
 import { getProviderIcon } from '@/utils/getProviderIcon';
-import { StyledBetaBadge } from './SecondScreen';
+import { StyledBetaBadge } from './StyledBetaBadge';
 
 const SyncSettings = () => {
   const localApiState = useSelector(localApiStateSelector);

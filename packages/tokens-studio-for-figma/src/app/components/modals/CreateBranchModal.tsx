@@ -1,5 +1,5 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { Button, Stack } from '@tokens-studio/ui';
 import Modal from '../Modal';
 import Input from '../Input';
@@ -10,6 +10,7 @@ import {
 import { isGitProvider } from '@/utils/is';
 import type { StorageTypeCredentials } from '@/types/StorageType';
 import { ErrorMessage } from '../ErrorMessage';
+import { Dispatch } from '../../store';
 
 type Props = {
   isOpen: boolean;
@@ -30,6 +31,7 @@ export default function CreateBranchModal({
     addNewBranch, pushTokens, fetchBranches, pullTokens,
   } = useRemoteTokens();
 
+  const dispatch = useDispatch<Dispatch>();
   const localApiState = useSelector(localApiStateSelector);
   const apiData = useSelector(apiSelector);
   const activeTheme = useSelector(activeThemeSelector);
@@ -71,8 +73,10 @@ export default function CreateBranchModal({
       if (response) {
         onSuccess(branch, branches ?? []);
         if (!isCurrentChanges) {
+          // Clear local token state before pulling from new source branch
+          dispatch.tokenState.setEmptyTokens();
           await pullTokens({
-            context: { ...apiData, branch }, usedTokenSet, activeTheme, updateLocalTokens: true,
+            context: { ...apiData, branch }, usedTokenSet, activeTheme, updateLocalTokens: true, skipConfirmation: true,
           });
         }
       } else {
@@ -96,6 +100,7 @@ export default function CreateBranchModal({
     activeTheme,
     pullTokens,
     usedTokenSet,
+    dispatch,
   ]);
 
   const handleModalClose = React.useCallback(() => onClose(false), [onClose]);
