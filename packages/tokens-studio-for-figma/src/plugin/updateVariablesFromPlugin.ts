@@ -77,7 +77,9 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
 
           // Update variable metadata (scopes and code syntax) if present in token $extensions
           const figmaExtensions = payload.$extensions?.['com.figma'];
+          console.log('[UPDATE-VAR-PLUGIN] Checking metadata update for variable:', variable?.name, 'figmaExtensions:', figmaExtensions);
           if (figmaExtensions && variable) {
+            console.log('[UPDATE-VAR-PLUGIN] Updating metadata for variable:', variable.name);
             // Update scopes
             if (figmaExtensions.scopes && Array.isArray(figmaExtensions.scopes)) {
               let newScopes = figmaExtensions.scopes as VariableScope[];
@@ -92,11 +94,13 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
               if (newScopes.includes('ALL_STROKES' as VariableScope)) {
                 newScopes = newScopes.filter((s) => s !== 'STROKE_COLOR');
               }
+              console.log('[UPDATE-VAR-PLUGIN] Setting scopes to:', newScopes);
               variable.scopes = newScopes;
             }
 
             // Update code syntax
             if (figmaExtensions.codeSyntax && typeof figmaExtensions.codeSyntax === 'object') {
+              console.log('[UPDATE-VAR-PLUGIN] Updating code syntax, current:', (variable as any).codeSyntax, 'new:', figmaExtensions.codeSyntax);
               const platformsToCheck = [
                 { key: 'Web', figma: 'WEB' },
                 { key: 'Android', figma: 'ANDROID' },
@@ -115,24 +119,32 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
                 const currentSyntaxValue = (variable as any).codeSyntax?.[figmaPlatform] || '';
                 const valueToSet = (typeof syntaxValue === 'string') ? syntaxValue.trim() : '';
 
+                console.log(`[UPDATE-VAR-PLUGIN] ${key}: keyExists=${keyExists}, current="${currentSyntaxValue}", new="${valueToSet}"`);
+
                 if (keyExists && syntaxValue !== undefined) {
                   // Platform is explicitly provided in token
                   if (currentSyntaxValue !== valueToSet) {
                     try {
                       if (valueToSet === '') {
                         if (currentSyntaxValue) {
+                          console.log(`[UPDATE-VAR-PLUGIN] Removing ${key} code syntax`);
                           variable.removeVariableCodeSyntax(figmaPlatform);
                         }
                       } else {
+                        console.log(`[UPDATE-VAR-PLUGIN] Setting ${key} code syntax to "${valueToSet}"`);
                         variable.setVariableCodeSyntax(figmaPlatform, valueToSet);
+                        console.log(`[UPDATE-VAR-PLUGIN] ${key} code syntax set successfully`);
                       }
                     } catch (apiError) {
                       console.error(`Failed to set code syntax for ${key}:`, apiError);
                     }
+                  } else {
+                    console.log(`[UPDATE-VAR-PLUGIN] ${key} unchanged (both are "${valueToSet}")`);
                   }
                 } else if (currentSyntaxValue) {
                   // Platform is missing from token, remove orphaned code syntax
                   try {
+                    console.log(`[UPDATE-VAR-PLUGIN] Removing orphan ${key} code syntax`);
                     variable.removeVariableCodeSyntax(figmaPlatform);
                   } catch (apiError) {
                     const errorMsg = String(apiError);
