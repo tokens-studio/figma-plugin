@@ -209,7 +209,8 @@ export default async function setValuesOnVariable(
             if (variable) {
               const currentVar: Variable = variable;
               // Avoid redundant metadata updates for the same variable in the same run (e.g. across multiple modes)
-              if (!codeSyntaxUpdateTracker[currentVar.id]) {
+              // BUT allow updates if there are new changes detected (hasMetadataNeedsChange)
+              if (!codeSyntaxUpdateTracker[currentVar.id] || hasMetadataNeedsChange) {
                 try {
                   // Update Scopes
                   if (figmaExtensions && figmaExtensions.scopes && Array.isArray(figmaExtensions.scopes)) {
