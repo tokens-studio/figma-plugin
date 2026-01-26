@@ -134,6 +134,7 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
                         console.log(`[UPDATE-VAR-PLUGIN] Setting ${key} code syntax to "${valueToSet}"`);
                         variable.setVariableCodeSyntax(figmaPlatform, valueToSet);
                         console.log(`[UPDATE-VAR-PLUGIN] ${key} code syntax set successfully`);
+                        console.log(`[UPDATE-VAR-PLUGIN] Verifying ${key}: variable.codeSyntax after API call:`, (variable as any).codeSyntax?.[figmaPlatform]);
                       }
                     } catch (apiError) {
                       console.error(`Failed to set code syntax for ${key}:`, apiError);
