@@ -37,7 +37,6 @@ export default async function updateVariables({
   metadataUpdateTracker,
   providedPlatformsByVariable,
 }: CreateVariableTypes) {
-  console.log(`=== updateVariables CALLED === Collection: ${collection.name}, Mode: ${mode}`);
   // Create a separate TokenResolver instance for this theme to avoid interference
   // when multiple themes are processed concurrently
   const themeTokenResolver = new TokenResolver([]);

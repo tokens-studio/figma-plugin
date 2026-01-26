@@ -260,12 +260,9 @@ export default async function setValuesOnVariable(
                         try {
                           if (valueToSet === '') {
                             if (currentSyntaxValue) {
-                              console.log(`[TRACE-BULK] Removing ${key} from ${currentVar.name} in ${collection.name}. Current syntax:`, JSON.stringify(currentVar.codeSyntax));
                               currentVar.removeVariableCodeSyntax(figmaPlatform);
-                              console.log(`[TRACE-BULK] Result for ${currentVar.name}:`, JSON.stringify(currentVar.codeSyntax));
                             }
                           } else {
-                            console.log(`[TRACE-BULK] Setting ${key} for ${currentVar.name} to "${valueToSet}"`);
                             currentVar.setVariableCodeSyntax(figmaPlatform, valueToSet);
                           }
                           codeSyntaxUpdateTracker[currentVar.id] = true;
