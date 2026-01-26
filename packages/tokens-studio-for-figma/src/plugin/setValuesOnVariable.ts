@@ -243,8 +243,8 @@ export default async function setValuesOnVariable(
                   const newCodeSyntax = figmaExtensions?.codeSyntax || {};
                   platformsToCheck.forEach(({ key, figma: figmaPlatform }) => {
                     // Check if the key exists in the object (using case-insensitive lookup)
-                    const hasKey = Object.hasOwn(newCodeSyntax as any, key);
-                    const hasKeyLowercase = Object.hasOwn(newCodeSyntax as any, key.toLowerCase());
+                    const hasKey = Object.prototype.hasOwnProperty.call(newCodeSyntax, key);
+                    const hasKeyLowercase = Object.prototype.hasOwnProperty.call(newCodeSyntax, key.toLowerCase());
                     const keyExists = hasKey || hasKeyLowercase;
 
                     const syntaxValue = hasKey
