@@ -19,6 +19,8 @@ export type CreateVariableTypes = {
   filterByTokenSet?: string;
   overallConfig: UsedTokenSetsMap;
   progressTracker?: ProgressTracker | null;
+  metadataUpdateTracker?: Record<string, boolean>;
+  providedPlatformsByVariable?: Record<string, Set<string>>;
 };
 
 export type VariableToken = SingleToken<true, { path: string; variableId: string }>;
@@ -32,7 +34,10 @@ export default async function updateVariables({
   filterByTokenSet,
   overallConfig,
   progressTracker,
+  metadataUpdateTracker,
+  providedPlatformsByVariable,
 }: CreateVariableTypes) {
+  console.log(`=== updateVariables CALLED === Collection: ${collection.name}, Mode: ${mode}`);
   // Create a separate TokenResolver instance for this theme to avoid interference
   // when multiple themes are processed concurrently
   const themeTokenResolver = new TokenResolver([]);
@@ -54,21 +59,30 @@ export default async function updateVariables({
     }
   }
 
-  // Do not use getVariablesWithoutZombies. It's not working.
-  // There seems to be a bug with getLocalVariablesAsync. It's not returning the variables in the collection - when they're being created.
-  // We could also get the current collection with figma.variables.getVariableCollectionByIdAsync(collection.id) and then fetch each variable,
-  // but that feels costly? We might need to double check this though.
-  // e.g. this wont work.
-  // const variablesInCollection = (await figma.variables.getLocalVariablesAsync()).filter((v) => v.variableCollectionId === collection.id);
-  const variablesInCollection = figma.variables
-    .getLocalVariables()
+  // Use getLocalVariablesAsync for FRESHER data, especially important when running multiple themed updates
+  // in a single export run.
+  const variablesInCollection = (await figma.variables.getLocalVariablesAsync())
     .filter((v) => v.variableCollectionId === collection.id);
 
   const variablesToCreate: VariableToken[] = [];
+  const seenPaths = new Set<string>();
+  // Reverse iterate to keep the last occurrence (override)
+  // But we need to filter, so maybe a Map is better?
+  const uniqueTokensMap = new Map<string, typeof tokensToCreate[0]>();
+
   tokensToCreate.forEach((token) => {
+    // If we have duplicates, the last one visited (in standard set iteration) usually wins in the UI
+    // But checking for duplicates is important
     if (checkIfTokenCanCreateVariable(token, settings)) {
-      variablesToCreate.push(mapTokensToVariableInfo(token, theme, settings, themeBaseFontSize));
+      if (uniqueTokensMap.has(token.name)) {
+        console.warn(`Duplicate token found for path: ${token.name}. Using the latest definition.`);
+      }
+      uniqueTokensMap.set(token.name, token);
     }
+  });
+
+  Array.from(uniqueTokensMap.values()).forEach((token) => {
+    variablesToCreate.push(mapTokensToVariableInfo(token, theme, settings, themeBaseFontSize));
   });
 
   const variableObj = await setValuesOnVariable(
@@ -79,6 +93,8 @@ export default async function updateVariables({
     themeBaseFontSize,
     settings.renameExistingStylesAndVariables,
     progressTracker,
+    metadataUpdateTracker,
+    providedPlatformsByVariable,
   );
 
   const removedVariables: string[] = [];

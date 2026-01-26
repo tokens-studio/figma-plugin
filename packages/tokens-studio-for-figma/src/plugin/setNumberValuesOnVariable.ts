@@ -9,7 +9,7 @@ function isNumberApproximatelyEqual(
   return Math.abs(num1 - num2) < threshold;
 }
 
-export default function setNumberValuesOnVariable(variable: Variable, mode: string, value: number) {
+export default function setNumberValuesOnVariable(variable: Variable, mode: string, value: number, forceUpdate = false) {
   try {
     if (isNaN(value)) {
       throw new Error(`Skipping due to invalid value: ${value}`);
@@ -22,11 +22,12 @@ export default function setNumberValuesOnVariable(variable: Variable, mode: stri
 
     // For direct number values, compare using threshold
     if (typeof existingVariableValue === 'number') {
-      if (isNumberApproximatelyEqual(existingVariableValue, value)) {
-        // return if values are approximately equal
+      if (!forceUpdate && isNumberApproximatelyEqual(existingVariableValue, value)) {
+        // return if values are approximately equal and not forcing update
         return;
       }
     }
+
 
     variable.setValueForMode(mode, value);
   } catch (e) {

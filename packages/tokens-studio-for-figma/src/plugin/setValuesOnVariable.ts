@@ -25,6 +25,8 @@ export default async function setValuesOnVariable(
   baseFontSize: string,
   shouldRename = false,
   progressTracker?: ProgressTracker | null,
+  metadataUpdateTracker?: Record<string, boolean>,
+  providedPlatformsByVariable?: Record<string, Set<string>>,
 ) {
   const variableKeyMap: Record<string, string> = {};
   const referenceVariableCandidates: ReferenceVariableType[] = [];
@@ -33,8 +35,10 @@ export default async function setValuesOnVariable(
   // Use the passed-in global progress tracker to avoid double counting
   const promises: Set<Promise<void>> = new Set();
 
+  // Use the passed-in metadata tracker or a local one if not provided
+  const codeSyntaxUpdateTracker = metadataUpdateTracker || {};
+
   // Pre-fetch all variables referenced by variableId to avoid individual async lookups
-  // This is much more efficient than fetching one-by-one during token processing
   const variableIdCache = new Map<string, Variable>();
   const variableIdsToFetch = new Set<string>();
 
@@ -51,7 +55,6 @@ export default async function setValuesOnVariable(
         const variable = await figma.variables.getVariableByIdAsync(variableId);
         if (variable && variable.variableCollectionId === collection.id) {
           variableIdCache.set(variableId, variable);
-          // Add to local cache if not already present
           if (!variablesInFigma.some((v) => v.id === variable.id)) {
             variablesInFigma.push(variable);
           }
@@ -68,20 +71,14 @@ export default async function setValuesOnVariable(
       promises.add(variableWorker.schedule(async () => {
         try {
           const variableType = convertTokenTypeToVariableType(token.type, token.value);
-          // If id matches the variableId, or name matches the token path, we can use it to update the variable instead of re-creating.
-          // Prioritize finding by variableId (key) when present, otherwise fall back to name matching
-          // This has the nasty side-effect that if font weight changes from string to number, it will not update the variable given we cannot change type.
-          // In that case, we should delete the variable and re-create it.
           let variable = token.variableId
             ? variablesInFigma.find((v) => v.key === token.variableId && !v.remote)
             : variablesInFigma.find((v) => v.name === token.path);
 
-          // If not found in local collection, check the pre-fetched cache
           if (!variable && token.variableId) {
             variable = variableIdCache.get(token.variableId);
           }
 
-          // If still no variable, try one more time to find by name in case it was just created
           if (!variable) {
             variable = variablesInFigma.find((v) => v.name === token.path && v.variableCollectionId === collection.id);
           }
@@ -89,11 +86,8 @@ export default async function setValuesOnVariable(
           if (!variable) {
             try {
               variable = figma.variables.createVariable(token.path, collection, variableType);
-              // Add to local cache immediately
               variablesInFigma.push(variable);
             } catch (e) {
-              // If creation fails (e.g., duplicate name), try to find the existing variable by name one more time
-              // This can happen if the variable was created in a previous run but the reference wasn't saved
               const existingVariable = figma.variables.getLocalVariables().find(
                 (v) => v.name === token.path && v.variableCollectionId === collection.id,
               );
@@ -101,109 +95,210 @@ export default async function setValuesOnVariable(
                 variable = existingVariable;
                 variablesInFigma.push(variable);
               } else {
-                throw e; // Re-throw if we still can't find/create the variable
+                throw e;
               }
             }
           }
 
           if (variable) {
-            // Always add the variable to the key map, regardless of whether it needs updating
             variableKeyMap[token.name] = variable.key;
 
-            // First, rename all variables that should be renamed (if the user choose to do so)
             if (variable.name !== token.path && shouldRename) {
               renamedVariableKeys.push(variable.key);
               variable.name = token.path;
             }
-            if (variableType !== variable?.resolvedType) {
-              // TODO: There's an edge case where the user had created a variable based on a numerical weight leading to a float variable,
-              // if they later change it to a string, we cannot update the variable type. Theoretically we should remove and recreate, but that would lead to broken variables?
-              // If we decide to remove, the following would work.
-              // variable.remove();
-              // variable = figma.variables.createVariable(t.path, collection.id, variableType);
-            }
+
             variable.description = token.description ?? '';
 
-            // Set variable scopes if defined in token extensions
+            // Track whether metadata (scopes or codeSyntax) has changed in Figma compared to token
+            let hasMetadataNeedsChange = false;
+
+            // 1. Detect scope changes
             const figmaExtensions = token.$extensions?.['com.figma'];
             if (figmaExtensions?.scopes && Array.isArray(figmaExtensions.scopes)) {
-              try {
-                variable.scopes = figmaExtensions.scopes as VariableScope[];
-              } catch (e) {
-                console.error('Failed to set variable scopes:', e);
+              const currentScopes = variable.scopes || [];
+              let newScopes = figmaExtensions.scopes as VariableScope[];
+
+              // ALL_SCOPES normalization: Figma uses an empty array [] to represent all/unrestricted scopes.
+              if (newScopes.includes('ALL_SCOPES' as VariableScope)) {
+                newScopes = [];
+              }
+
+              // Figma constraint normalization
+              if (newScopes.includes('ALL_FILLS' as VariableScope)) {
+                newScopes = newScopes.filter((s) => !['FRAME_FILL', 'SHAPE_FILL', 'TEXT_FILL'].includes(s));
+              }
+              if (newScopes.includes('ALL_STROKES' as VariableScope)) {
+                newScopes = newScopes.filter((s) => s !== 'STROKE_COLOR');
+              }
+
+              const isScopesSame = newScopes.length === currentScopes.length
+                && newScopes.every((scope) => currentScopes.includes(scope));
+
+              if (!isScopesSame) {
+                hasMetadataNeedsChange = true;
               }
             }
 
-            // Set variable code syntax if defined in token extensions
+            // 2. Detect code syntax changes
             if (figmaExtensions?.codeSyntax && typeof figmaExtensions.codeSyntax === 'object') {
-              try {
-                Object.entries(figmaExtensions.codeSyntax).forEach(([platform, syntax]) => {
-                  if (typeof syntax === 'string' && syntax.trim() && variable) {
-                    // Map our platform names to Figma's expected values
-                    let figmaPlatform: 'WEB' | 'ANDROID' | 'iOS';
-                    if (platform === 'Web') {
-                      figmaPlatform = 'WEB';
-                    } else if (platform === 'Android') {
-                      figmaPlatform = 'ANDROID';
-                    } else if (platform === 'iOS') {
-                      figmaPlatform = 'iOS';
-                    } else {
-                      figmaPlatform = platform as 'WEB' | 'ANDROID' | 'iOS';
-                    }
-                    variable.setVariableCodeSyntax(figmaPlatform, syntax);
+              const newCodeSyntax = figmaExtensions.codeSyntax;
+              const currentCodeSyntax = (variable as any).codeSyntax || {};
+              const platformsToCheck = [
+                { key: 'Web', figma: 'WEB' },
+                { key: 'Android', figma: 'ANDROID' },
+                { key: 'iOS', figma: 'iOS' },
+              ] as const;
+
+              platformsToCheck.forEach(({ key, figma: figmaPlatform }) => {
+                const syntax = (newCodeSyntax as any)[key] !== undefined
+                  ? (newCodeSyntax as any)[key]
+                  : (newCodeSyntax as any)[key.toLowerCase()];
+
+                // Aggregation: Only skip if strictly undefined. Empty string "" means explicit clearing.
+                if (syntax !== undefined) {
+                  const valueToSet = (typeof syntax === 'string') ? syntax.trim() : '';
+                  const currentVal = currentCodeSyntax[figmaPlatform] || '';
+                  if (currentVal !== valueToSet) {
+                    hasMetadataNeedsChange = true;
                   }
-                });
-              } catch (e) {
-                console.error('Failed to set variable code syntax:', e);
-              }
+                }
+              });
             }
 
-            // Check if the variable already has the correct alias reference before updating
+            const hasMetadataChanged = hasMetadataNeedsChange || !!codeSyntaxUpdateTracker[variable.id];
+
             const existingVariableValue = variable.valuesByMode[mode];
             const rawValue = typeof token.rawValue === 'string' ? token.rawValue : undefined;
 
-            if (checkVariableAliasEquality(existingVariableValue, rawValue)) {
-              // The alias already points to the correct variable, no update needed
+            if (!hasMetadataChanged && checkVariableAliasEquality(existingVariableValue, rawValue)) {
               return;
             }
 
             switch (variableType) {
               case 'BOOLEAN':
                 if (typeof token.value === 'string' && !token.value.includes('{')) {
-                  setBooleanValuesOnVariable(variable, mode, token.value);
+                  setBooleanValuesOnVariable(variable, mode, token.value, hasMetadataChanged);
                 }
                 break;
               case 'COLOR':
                 if (typeof token.value === 'string' && !token.value.includes('{')) {
-                  setColorValuesOnVariable(variable, mode, token.value);
+                  setColorValuesOnVariable(variable, mode, token.value, hasMetadataChanged);
                 }
                 break;
               case 'FLOAT': {
                 const value = String(token.value);
                 if (typeof value === 'string' && !value.includes('{')) {
                   const transformedValue = transformValue(value, token.type, baseFontSize, true);
-                  setNumberValuesOnVariable(variable, mode, Number(transformedValue));
+                  setNumberValuesOnVariable(variable, mode, Number(transformedValue), hasMetadataChanged);
                 }
                 break;
               }
               case 'STRING':
                 if (typeof token.value === 'string' && !token.value.includes('{')) {
-                  setStringValuesOnVariable(variable, mode, token.value);
-                  // Given we cannot determine the combined family of a variable, we cannot use fallback weights from our estimates.
-                  // This is not an issue because users can set numerical font weights with variables, so we opt-out of the guesswork and just apply the numerical weight.
+                  setStringValuesOnVariable(variable, mode, token.value, hasMetadataChanged);
                 } else if (token.type === TokenTypes.FONT_WEIGHTS && Array.isArray(token.value)) {
-                  setStringValuesOnVariable(variable, mode, token.value[0]);
+                  setStringValuesOnVariable(variable, mode, token.value[0], hasMetadataChanged);
                 }
                 break;
               default:
                 break;
             }
+
+            // Atomic metadata update
+            if (variable) {
+              const currentVar: Variable = variable;
+              // Avoid redundant metadata updates for the same variable in the same run (e.g. across multiple modes)
+              if (!codeSyntaxUpdateTracker[currentVar.id]) {
+                try {
+                  // Update Scopes
+                  if (figmaExtensions && figmaExtensions.scopes && Array.isArray(figmaExtensions.scopes)) {
+                    let newScopes = figmaExtensions.scopes as VariableScope[];
+                    if (newScopes.includes('ALL_SCOPES' as VariableScope)) {
+                      newScopes = [];
+                    }
+                    if (newScopes.includes('ALL_FILLS' as VariableScope)) {
+                      newScopes = newScopes.filter((s) => !['FRAME_FILL', 'SHAPE_FILL', 'TEXT_FILL'].includes(s));
+                    }
+                    if (newScopes.includes('ALL_STROKES' as VariableScope)) {
+                      newScopes = newScopes.filter((s) => s !== 'STROKE_COLOR');
+                    }
+                    const currentScopes = currentVar.scopes || [];
+                    const isScopesSame = newScopes.length === currentScopes.length
+                      && newScopes.every((s) => currentScopes.includes(s));
+
+                    if (!isScopesSame) {
+                      currentVar.scopes = newScopes;
+                      codeSyntaxUpdateTracker[currentVar.id] = true;
+                    }
+                  }
+
+                  // Update Code Syntax & Purge Orphans (Always run if variable matched)
+                  const platformsToCheck = [
+                    { key: 'Web', figma: 'WEB' },
+                    { key: 'Android', figma: 'ANDROID' },
+                    { key: 'iOS', figma: 'iOS' },
+                  ] as const;
+
+                  const newCodeSyntax = figmaExtensions?.codeSyntax || {};
+                  platformsToCheck.forEach(({ key, figma: figmaPlatform }) => {
+                    const syntaxValue = (newCodeSyntax as any)[key] !== undefined
+                      ? (newCodeSyntax as any)[key]
+                      : (newCodeSyntax as any)[key.toLowerCase()];
+
+                    const currentSyntaxValue = (currentVar as any).codeSyntax?.[figmaPlatform] || '';
+                    const valueToSet = (typeof syntaxValue === 'string') ? syntaxValue.trim() : '';
+
+                    if (syntaxValue !== undefined) {
+                      // Platform is EXPLICITLY provided in this token (could be a value or empty string)
+                      if (currentSyntaxValue !== valueToSet) {
+                        try {
+                          if (valueToSet === '') {
+                            if (currentSyntaxValue) {
+                              console.log(`[TRACE-BULK] Removing ${key} from ${currentVar.name} in ${collection.name}. Current syntax:`, JSON.stringify(currentVar.codeSyntax));
+                              currentVar.removeVariableCodeSyntax(figmaPlatform);
+                              console.log(`[TRACE-BULK] Result for ${currentVar.name}:`, JSON.stringify(currentVar.codeSyntax));
+                            }
+                          } else {
+                            console.log(`[TRACE-BULK] Setting ${key} for ${currentVar.name} to "${valueToSet}"`);
+                            currentVar.setVariableCodeSyntax(figmaPlatform, valueToSet);
+                          }
+                          codeSyntaxUpdateTracker[currentVar.id] = true;
+                        } catch (apiError) {
+                          console.error(`Failed to set code syntax for ${key}:`, apiError);
+                        }
+                      }
+                    } else if (currentSyntaxValue) {
+                      // Platform is MISSING from this token
+                      const providedPlatforms = providedPlatformsByVariable?.[token.name];
+                      if (!providedPlatforms || !providedPlatforms.has(key.toLowerCase())) {
+                        try {
+                          console.log(`[TRACE-BULK] Orphan Purge: Removing ${key} from ${currentVar.name} in ${collection.name}. Current syntax:`, JSON.stringify(currentVar.codeSyntax));
+                          currentVar.removeVariableCodeSyntax(figmaPlatform);
+                          console.log(`[TRACE-BULK] Result for ${currentVar.name}:`, JSON.stringify(currentVar.codeSyntax));
+                          codeSyntaxUpdateTracker[currentVar.id] = true;
+                        } catch (apiError) {
+                          const errorMsg = String(apiError);
+                          if (!errorMsg.includes('Code syntax field not found')) {
+                            console.error(`[TRACE-BULK] Failed to purge orphan ${key} for ${currentVar.name}:`, apiError);
+                          }
+                        }
+                      }
+                    }
+                  });
+                } catch (e) {
+                  console.error('Failed to update metadata:', e);
+                }
+              }
+            }
+
             let referenceTokenName: string = '';
             if (token.rawValue && token.rawValue?.toString().startsWith('{')) {
               referenceTokenName = token.rawValue?.toString().slice(1, token.rawValue.toString().length - 1);
             } else {
-              referenceTokenName = token.rawValue!.toString().substring(1);
+              referenceTokenName = (token.rawValue ?? '').toString().substring(1);
             }
+
             if (token && checkCanReferenceVariable(token)) {
               referenceVariableCandidates.push({
                 variable,
@@ -215,7 +310,6 @@ export default async function setValuesOnVariable(
         } catch (e) {
           console.error('Error processing variable token:', e);
         } finally {
-          // Use global progress tracker if available
           if (progressTracker) {
             progressTracker.next();
             progressTracker.reportIfNecessary();
@@ -225,9 +319,6 @@ export default async function setValuesOnVariable(
     });
 
     await Promise.all(promises);
-
-    // Ensure variableWorker completes all batched work before returning
-    // Critical for sequential theme/mode processing to prevent value mixing
     await variableWorker.flush();
   } catch (e) {
     console.error('Setting values on variable failed', e);
