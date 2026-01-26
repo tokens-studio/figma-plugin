@@ -209,8 +209,10 @@ export default async function setValuesOnVariable(
             if (variable) {
               const currentVar: Variable = variable;
               // Avoid redundant metadata updates for the same variable in the same run (e.g. across multiple modes)
-              // BUT allow updates if there are new changes detected (hasMetadataNeedsChange)
-              if (!codeSyntaxUpdateTracker[currentVar.id] || hasMetadataNeedsChange) {
+              // Mark as processed FIRST to prevent re-entry if the same variable is processed multiple times
+              const alreadyProcessed = codeSyntaxUpdateTracker[currentVar.id];
+              if (!alreadyProcessed && hasMetadataNeedsChange) {
+                codeSyntaxUpdateTracker[currentVar.id] = true; // Mark immediately to prevent re-entry
                 try {
                   // Update Scopes
                   if (figmaExtensions && figmaExtensions.scopes && Array.isArray(figmaExtensions.scopes)) {
@@ -230,7 +232,6 @@ export default async function setValuesOnVariable(
 
                     if (!isScopesSame) {
                       currentVar.scopes = newScopes;
-                      codeSyntaxUpdateTracker[currentVar.id] = true;
                     }
                   }
 
@@ -269,7 +270,6 @@ export default async function setValuesOnVariable(
                             console.log(`[TRACE-BULK] Setting ${key} for ${currentVar.name} to "${valueToSet}"`);
                             currentVar.setVariableCodeSyntax(figmaPlatform, valueToSet);
                           }
-                          codeSyntaxUpdateTracker[currentVar.id] = true;
                         } catch (apiError) {
                           console.error(`Failed to set code syntax for ${key}:`, apiError);
                         }
@@ -285,7 +285,6 @@ export default async function setValuesOnVariable(
                           console.log(`[TRACE-BULK] Orphan Purge: Removing ${key} from ${currentVar.name} in ${collection.name}. Current syntax:`, JSON.stringify(currentVar.codeSyntax));
                           currentVar.removeVariableCodeSyntax(figmaPlatform);
                           console.log(`[TRACE-BULK] Result for ${currentVar.name}:`, JSON.stringify(currentVar.codeSyntax));
-                          codeSyntaxUpdateTracker[currentVar.id] = true;
                         } catch (apiError) {
                           const errorMsg = String(apiError);
                           if (!errorMsg.includes('Code syntax field not found')) {
