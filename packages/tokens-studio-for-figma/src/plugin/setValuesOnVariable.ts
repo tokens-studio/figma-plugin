@@ -208,11 +208,10 @@ export default async function setValuesOnVariable(
             // Atomic metadata update
             if (variable) {
               const currentVar: Variable = variable;
-              // Avoid redundant metadata updates for the same variable in the same run (e.g. across multiple modes)
-              // Mark as processed FIRST to prevent re-entry if the same variable is processed multiple times
-              const alreadyProcessed = codeSyntaxUpdateTracker[currentVar.id];
-              if (!alreadyProcessed && hasMetadataNeedsChange) {
-                codeSyntaxUpdateTracker[currentVar.id] = true; // Mark immediately to prevent re-entry
+              // Only update metadata once per variable per export run to avoid redundant processing
+              if (!codeSyntaxUpdateTracker[currentVar.id]) {
+                // Mark immediately to prevent re-entry if this variable is encountered again
+                codeSyntaxUpdateTracker[currentVar.id] = true;
                 try {
                   // Update Scopes
                   if (figmaExtensions && figmaExtensions.scopes && Array.isArray(figmaExtensions.scopes)) {
