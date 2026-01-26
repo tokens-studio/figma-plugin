@@ -242,15 +242,20 @@ export default async function setValuesOnVariable(
 
                   const newCodeSyntax = figmaExtensions?.codeSyntax || {};
                   platformsToCheck.forEach(({ key, figma: figmaPlatform }) => {
-                    const syntaxValue = (newCodeSyntax as any)[key] !== undefined
+                    // Check if the key exists in the object (using case-insensitive lookup)
+                    const hasKey = Object.hasOwn(newCodeSyntax as any, key);
+                    const hasKeyLowercase = Object.hasOwn(newCodeSyntax as any, key.toLowerCase());
+                    const keyExists = hasKey || hasKeyLowercase;
+                    
+                    const syntaxValue = hasKey
                       ? (newCodeSyntax as any)[key]
                       : (newCodeSyntax as any)[key.toLowerCase()];
 
                     const currentSyntaxValue = (currentVar as any).codeSyntax?.[figmaPlatform] || '';
                     const valueToSet = (typeof syntaxValue === 'string') ? syntaxValue.trim() : '';
 
-                    if (syntaxValue !== undefined) {
-                      // Platform is EXPLICITLY provided in this token (could be a value or empty string)
+                    if (keyExists && syntaxValue !== undefined) {
+                      // Platform is EXPLICITLY provided in this token with a defined value (could be a value or empty string)
                       if (currentSyntaxValue !== valueToSet) {
                         try {
                           if (valueToSet === '') {
@@ -268,8 +273,11 @@ export default async function setValuesOnVariable(
                           console.error(`Failed to set code syntax for ${key}:`, apiError);
                         }
                       }
+                    } else if (keyExists && syntaxValue === undefined) {
+                      // Platform is EXPLICITLY set to undefined - skip this platform (do nothing)
+                      // This is used for token aggregation scenarios where we want to leave the platform as-is
                     } else if (currentSyntaxValue) {
-                      // Platform is MISSING from this token
+                      // Platform is MISSING from this token (key doesn't exist at all)
                       const providedPlatforms = providedPlatformsByVariable?.[token.name];
                       if (!providedPlatforms || !providedPlatforms.has(key.toLowerCase())) {
                         try {
