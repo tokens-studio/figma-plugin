@@ -208,10 +208,10 @@ export default async function setValuesOnVariable(
             // Atomic metadata update
             if (variable) {
               const currentVar: Variable = variable;
-              // Only update metadata once per variable per export run to avoid redundant processing
+              // Avoid redundant metadata updates for the same variable in the same run (e.g. across multiple modes)
+              console.log(`[METADATA-UPDATE] Processing ${currentVar.name}, tracker status:`, !!codeSyntaxUpdateTracker[currentVar.id], 'figmaExtensions:', figmaExtensions);
               if (!codeSyntaxUpdateTracker[currentVar.id]) {
-                // Mark immediately to prevent re-entry if this variable is encountered again
-                codeSyntaxUpdateTracker[currentVar.id] = true;
+                console.log(`[METADATA-UPDATE] Entering update block for ${currentVar.name}`);
                 try {
                   // Update Scopes
                   if (figmaExtensions && figmaExtensions.scopes && Array.isArray(figmaExtensions.scopes)) {
@@ -231,6 +231,7 @@ export default async function setValuesOnVariable(
 
                     if (!isScopesSame) {
                       currentVar.scopes = newScopes;
+                      codeSyntaxUpdateTracker[currentVar.id] = true;
                     }
                   }
 
@@ -255,6 +256,8 @@ export default async function setValuesOnVariable(
                     const currentSyntaxValue = (currentVar as any).codeSyntax?.[figmaPlatform] || '';
                     const valueToSet = (typeof syntaxValue === 'string') ? syntaxValue.trim() : '';
 
+                    console.log(`[METADATA-UPDATE] ${key} for ${currentVar.name}: keyExists=${keyExists}, syntaxValue=${syntaxValue}, current="${currentSyntaxValue}", new="${valueToSet}"`);
+
                     if (keyExists && syntaxValue !== undefined) {
                       // Platform is EXPLICITLY provided in this token with a defined value (could be a value or empty string)
                       if (currentSyntaxValue !== valueToSet) {
@@ -268,10 +271,14 @@ export default async function setValuesOnVariable(
                           } else {
                             console.log(`[TRACE-BULK] Setting ${key} for ${currentVar.name} to "${valueToSet}"`);
                             currentVar.setVariableCodeSyntax(figmaPlatform, valueToSet);
+                            console.log(`[TRACE-BULK] Code syntax set successfully`);
                           }
+                          codeSyntaxUpdateTracker[currentVar.id] = true;
                         } catch (apiError) {
                           console.error(`Failed to set code syntax for ${key}:`, apiError);
                         }
+                      } else {
+                        console.log(`[METADATA-UPDATE] ${key} unchanged for ${currentVar.name} (both are "${valueToSet}")`);
                       }
                     } else if (keyExists && syntaxValue === undefined) {
                       // Platform is EXPLICITLY set to undefined - skip this platform (do nothing)
@@ -284,6 +291,7 @@ export default async function setValuesOnVariable(
                           console.log(`[TRACE-BULK] Orphan Purge: Removing ${key} from ${currentVar.name} in ${collection.name}. Current syntax:`, JSON.stringify(currentVar.codeSyntax));
                           currentVar.removeVariableCodeSyntax(figmaPlatform);
                           console.log(`[TRACE-BULK] Result for ${currentVar.name}:`, JSON.stringify(currentVar.codeSyntax));
+                          codeSyntaxUpdateTracker[currentVar.id] = true;
                         } catch (apiError) {
                           const errorMsg = String(apiError);
                           if (!errorMsg.includes('Code syntax field not found')) {
