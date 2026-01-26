@@ -278,9 +278,7 @@ export default async function setValuesOnVariable(
                       const providedPlatforms = providedPlatformsByVariable?.[token.name];
                       if (!providedPlatforms || !providedPlatforms.has(key.toLowerCase())) {
                         try {
-                          console.log(`[TRACE-BULK] Orphan Purge: Removing ${key} from ${currentVar.name} in ${collection.name}. Current syntax:`, JSON.stringify(currentVar.codeSyntax));
                           currentVar.removeVariableCodeSyntax(figmaPlatform);
-                          console.log(`[TRACE-BULK] Result for ${currentVar.name}:`, JSON.stringify(currentVar.codeSyntax));
                           codeSyntaxUpdateTracker[currentVar.id] = true;
                         } catch (apiError) {
                           const errorMsg = String(apiError);
