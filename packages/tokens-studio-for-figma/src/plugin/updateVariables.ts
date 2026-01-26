@@ -65,7 +65,6 @@ export default async function updateVariables({
     .filter((v) => v.variableCollectionId === collection.id);
 
   const variablesToCreate: VariableToken[] = [];
-  const seenPaths = new Set<string>();
   // Reverse iterate to keep the last occurrence (override)
   // But we need to filter, so maybe a Map is better?
   const uniqueTokensMap = new Map<string, typeof tokensToCreate[0]>();
