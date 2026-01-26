@@ -364,7 +364,9 @@ describe('SetValuesOnVariable', () => {
         ...testVariable,
         resolvedType: 'COLOR',
         valuesByMode: {
-          309: { r: 0, g: 0, b: 0, a: 1 },
+          309: {
+            r: 0, g: 0, b: 0, a: 1,
+          },
         },
       } as unknown as Variable;
 
@@ -391,7 +393,9 @@ describe('SetValuesOnVariable', () => {
       expect(mockSetVariableCodeSyntax).toHaveBeenCalledWith('WEB', 'red');
       expect(mockSetVariableCodeSyntax).toHaveBeenCalledWith('iOS', 'UIColor.red');
       // Verify value was updated to new color
-      expect(mockSetValueForMode).toHaveBeenCalledWith(mode, { r: 1, g: 0, b: 0, a: 1 });
+      expect(mockSetValueForMode).toHaveBeenCalledWith(mode, {
+        r: 1, g: 0, b: 0, a: 1,
+      });
     });
 
     it('should not update when scopes remain the same', async () => {

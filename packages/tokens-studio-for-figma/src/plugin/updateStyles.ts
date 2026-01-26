@@ -51,15 +51,15 @@ export default async function updateStyles(
     return settings.stylesColor ?? true;
   }) as Extract<
     typeof styleTokens[number],
-    { type: TokenTypes.COLOR }
+  { type: TokenTypes.COLOR }
   >[];
   const textTokens = styleTokens.filter((n) => [TokenTypes.TYPOGRAPHY].includes(n.type) && (settings.stylesTypography ?? true)) as Extract<
     typeof styleTokens[number],
-    { type: TokenTypes.TYPOGRAPHY }
+  { type: TokenTypes.TYPOGRAPHY }
   >[];
   const effectTokens = styleTokens.filter((n) => [TokenTypes.BOX_SHADOW].includes(n.type) && (settings.stylesEffect ?? true)) as Extract<
     typeof styleTokens[number],
-    { type: TokenTypes.BOX_SHADOW }
+  { type: TokenTypes.BOX_SHADOW }
   >[];
 
   if (!colorTokens && !textTokens && !effectTokens) return {};

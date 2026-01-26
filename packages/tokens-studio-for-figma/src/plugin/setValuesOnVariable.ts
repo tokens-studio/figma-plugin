@@ -246,7 +246,7 @@ export default async function setValuesOnVariable(
                     const hasKey = Object.hasOwn(newCodeSyntax as any, key);
                     const hasKeyLowercase = Object.hasOwn(newCodeSyntax as any, key.toLowerCase());
                     const keyExists = hasKey || hasKeyLowercase;
-                    
+
                     const syntaxValue = hasKey
                       ? (newCodeSyntax as any)[key]
                       : (newCodeSyntax as any)[key.toLowerCase()];

@@ -14,7 +14,6 @@ export default function setBooleanValuesOnVariable(variable: Variable, mode: str
       console.log('Setting boolean value on variable', variable.name, variable.valuesByMode[mode], newValue);
       variable.setValueForMode(mode, newValue);
     }
-
   } catch (e) {
     console.error('Error setting booleanVariable', e);
   }

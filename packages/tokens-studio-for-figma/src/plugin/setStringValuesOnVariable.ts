@@ -12,7 +12,6 @@ export default function setStringValuesOnVariable(variable: Variable, mode: stri
       console.log('Setting string value on variable', variable.name, existingVariableValue, value, existingVariableValue === value ? 'match' : 'no match');
       variable.setValueForMode(mode, value);
     }
-
   } catch (e) {
     console.error('Error setting stringVariable', e);
   }
