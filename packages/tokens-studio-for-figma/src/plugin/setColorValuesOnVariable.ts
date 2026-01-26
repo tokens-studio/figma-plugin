@@ -42,7 +42,6 @@ export default function setColorValuesOnVariable(variable: Variable, mode: strin
       }
     }
 
-
     variable.setValueForMode(mode, newValue);
   } catch (e) {
     console.error('Error setting colorVariable', e);

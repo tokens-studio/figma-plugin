@@ -28,7 +28,6 @@ export default function setNumberValuesOnVariable(variable: Variable, mode: stri
       }
     }
 
-
     variable.setValueForMode(mode, value);
   } catch (e) {
     console.error('Error setting numberVariable on variable', variable.name, e);
