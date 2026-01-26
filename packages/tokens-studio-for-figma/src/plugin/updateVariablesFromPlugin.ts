@@ -74,6 +74,76 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
                 break;
             }
           }
+
+          // Update variable metadata (scopes and code syntax) if present in token $extensions
+          const figmaExtensions = payload.$extensions?.['com.figma'];
+          if (figmaExtensions && variable) {
+            // Update scopes
+            if (figmaExtensions.scopes && Array.isArray(figmaExtensions.scopes)) {
+              let newScopes = figmaExtensions.scopes as VariableScope[];
+              // ALL_SCOPES normalization: Figma uses an empty array [] to represent all/unrestricted scopes
+              if (newScopes.includes('ALL_SCOPES' as VariableScope)) {
+                newScopes = [];
+              }
+              // Figma constraint normalization
+              if (newScopes.includes('ALL_FILLS' as VariableScope)) {
+                newScopes = newScopes.filter((s) => !['FRAME_FILL', 'SHAPE_FILL', 'TEXT_FILL'].includes(s));
+              }
+              if (newScopes.includes('ALL_STROKES' as VariableScope)) {
+                newScopes = newScopes.filter((s) => s !== 'STROKE_COLOR');
+              }
+              variable.scopes = newScopes;
+            }
+
+            // Update code syntax
+            if (figmaExtensions.codeSyntax && typeof figmaExtensions.codeSyntax === 'object') {
+              const platformsToCheck = [
+                { key: 'Web', figma: 'WEB' },
+                { key: 'Android', figma: 'ANDROID' },
+                { key: 'iOS', figma: 'iOS' },
+              ] as const;
+
+              platformsToCheck.forEach(({ key, figma: figmaPlatform }) => {
+                const hasKey = Object.prototype.hasOwnProperty.call(figmaExtensions.codeSyntax, key);
+                const hasKeyLowercase = Object.prototype.hasOwnProperty.call(figmaExtensions.codeSyntax, key.toLowerCase());
+                const keyExists = hasKey || hasKeyLowercase;
+
+                const syntaxValue = hasKey
+                  ? (figmaExtensions.codeSyntax as any)[key]
+                  : (figmaExtensions.codeSyntax as any)[key.toLowerCase()];
+
+                const currentSyntaxValue = (variable as any).codeSyntax?.[figmaPlatform] || '';
+                const valueToSet = (typeof syntaxValue === 'string') ? syntaxValue.trim() : '';
+
+                if (keyExists && syntaxValue !== undefined) {
+                  // Platform is explicitly provided in token
+                  if (currentSyntaxValue !== valueToSet) {
+                    try {
+                      if (valueToSet === '') {
+                        if (currentSyntaxValue) {
+                          variable.removeVariableCodeSyntax(figmaPlatform);
+                        }
+                      } else {
+                        variable.setVariableCodeSyntax(figmaPlatform, valueToSet);
+                      }
+                    } catch (apiError) {
+                      console.error(`Failed to set code syntax for ${key}:`, apiError);
+                    }
+                  }
+                } else if (currentSyntaxValue) {
+                  // Platform is missing from token, remove orphaned code syntax
+                  try {
+                    variable.removeVariableCodeSyntax(figmaPlatform);
+                  } catch (apiError) {
+                    const errorMsg = String(apiError);
+                    if (!errorMsg.includes('Code syntax field not found')) {
+                      console.error(`Failed to remove orphan code syntax for ${key}:`, apiError);
+                    }
+                  }
+                }
+              });
+            }
+          }
         }
       }
     }

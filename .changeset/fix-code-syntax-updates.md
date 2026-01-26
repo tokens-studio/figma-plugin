@@ -2,12 +2,8 @@
 "@tokens-studio/figma-plugin": patch
 ---
 
-Add diagnostic logging to investigate code syntax update issue
+Fix code syntax not updating when editing tokens
 
-Reverted to original code and added detailed console logging to help diagnose why code syntax updates aren't working. The logs will show:
-- When metadata update block is entered
-- Token extension data
-- Current vs new code syntax values for each platform
-- Whether updates are being applied
+The root cause was identified: when editing a token in the UI, the code syntax values were saved to the token's `$extensions['com.figma'].codeSyntax`, but the `updateVariablesFromPlugin` function only updated the variable's value, not its metadata (scopes and code syntax).
 
-This will help identify if the issue is with change detection, the tracker, or the actual update calls.
+Now when a token is edited, both the variable value AND metadata are updated, ensuring code syntax changes are immediately reflected in the linked Figma variable.

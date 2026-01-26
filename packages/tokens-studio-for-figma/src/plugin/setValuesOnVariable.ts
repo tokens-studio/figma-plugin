@@ -271,7 +271,7 @@ export default async function setValuesOnVariable(
                           } else {
                             console.log(`[TRACE-BULK] Setting ${key} for ${currentVar.name} to "${valueToSet}"`);
                             currentVar.setVariableCodeSyntax(figmaPlatform, valueToSet);
-                            console.log(`[TRACE-BULK] Code syntax set successfully`);
+                            console.log('[TRACE-BULK] Code syntax set successfully');
                           }
                           codeSyntaxUpdateTracker[currentVar.id] = true;
                         } catch (apiError) {
