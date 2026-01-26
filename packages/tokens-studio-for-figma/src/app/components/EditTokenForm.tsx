@@ -443,7 +443,15 @@ function EditTokenForm({ resolvedTokens }: Props) {
           value: trimmedValue as SingleToken['value'],
           ...($extensions ? { $extensions } : {}),
         });
+        console.log('[EDIT-TOKEN] Token saved:', {
+          themesLength: themes.length,
+          tokenType: internalEditToken.type,
+          canCreateVariable: tokenTypesToCreateVariable.includes(internalEditToken.type),
+          hasExtensions: !!$extensions,
+          extensions: $extensions,
+        });
         if (themes.length > 0 && tokenTypesToCreateVariable.includes(internalEditToken.type)) {
+          console.log('[EDIT-TOKEN] Calling updateVariablesFromToken');
           updateVariablesFromToken({
             parent: activeTokenSet,
             name: internalEditToken.initialName ?? name,
@@ -452,6 +460,8 @@ function EditTokenForm({ resolvedTokens }: Props) {
             rawValue: internalEditToken.value,
             ...($extensions ? { $extensions } : {}),
           });
+        } else {
+          console.log('[EDIT-TOKEN] Skipping updateVariablesFromToken - condition not met');
         }
         // When users change token names the applied tokens on layers are still pointing to the old name, ask user to remap
         if (oldName && oldName !== newName) {
