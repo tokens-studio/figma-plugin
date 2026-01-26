@@ -1,6 +1,13 @@
 // @ts-ignore This is due to weird @types/node issues based on hoistng
 require('dotenv').config();
 
+// Set default environment variables for testing if not already set
+// @ts-ignore
+if (!process.env.LICENSE_API_URL) {
+  // @ts-ignore
+  process.env.LICENSE_API_URL = 'https://licence.tokens.studio';
+}
+
 /*
  * For a detailed explanation regarding each configuration property and type check, visit:
  * https://jestjs.io/docs/en/configuration.html
