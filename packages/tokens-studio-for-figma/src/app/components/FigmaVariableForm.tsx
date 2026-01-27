@@ -8,7 +8,6 @@ import { EditTokenObject } from '@/types/tokens';
 import Box from './Box';
 import Input from './Input';
 import { tokenTypesToCreateVariable } from '@/constants/VariableTypes';
-import { TokenTypes } from '@/constants/TokenTypes';
 
 import { VariableScope, CodeSyntaxPlatform } from '@/types/tokens';
 import {

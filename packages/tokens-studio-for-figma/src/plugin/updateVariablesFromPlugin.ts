@@ -8,7 +8,7 @@ import setBooleanValuesOnVariable from './setBooleanValuesOnVariable';
 import setNumberValuesOnVariable from './setNumberValuesOnVariable';
 import setStringValuesOnVariable from './setStringValuesOnVariable';
 import { UpdateTokenVariablePayload } from '@/types/payloads/UpdateTokenVariablePayload';
-import { CodeSyntax, FigmaExtensions } from '@/types/tokens';
+import { FigmaExtensions } from '@/types/tokens';
 import { FIGMA_PLATFORMS, normalizeVariableScopes, getCodeSyntaxValue } from '@/utils/figma';
 import { checkCanReferenceVariable } from '@/utils/alias/checkCanReferenceVariable';
 
