@@ -4,8 +4,8 @@ import { isSingleCompositionToken } from '../isSingleCompositionToken';
 describe('isSingleCompositionToken', () => {
   it('should validate correct values', () => {
     expect(isSingleCompositionToken({
-      type: TokenTypes.COMPOSITION,
-      value: {
+      $type: TokenTypes.COMPOSITION,
+      $value: {
         fontFamily: 'Roboto',
       },
     })).toBe(true);
@@ -15,18 +15,18 @@ describe('isSingleCompositionToken', () => {
     expect(isSingleCompositionToken(100)).toBe(false);
     expect(isSingleCompositionToken('value')).toBe(false);
     expect(isSingleCompositionToken({
-      type: TokenTypes.COMPOSITION,
-      value: {
+      $type: TokenTypes.COMPOSITION,
+      $value: {
         fontFamily: 'Roboto',
-        value: 'value',
+        $value: 'value',
       },
     })).toBe(false);
     expect(isSingleCompositionToken({
-      type: TokenTypes.COMPOSITION,
+      $type: TokenTypes.COMPOSITION,
       fontFamily: 'Roboto',
     })).toBe(false);
     expect(isSingleCompositionToken({
-      value: {
+      $value: {
         fontFamily: 'Roboto',
         value: 'value',
       },

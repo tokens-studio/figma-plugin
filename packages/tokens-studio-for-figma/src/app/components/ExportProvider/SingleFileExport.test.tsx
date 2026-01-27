@@ -47,18 +47,18 @@ describe('SingleFileExport', () => {
       JSON.stringify({
         global: {
           white: {
-            value: '#ffffff',
-            type: 'color',
+            $value: '#ffffff',
+            $type: 'color',
           },
           headline: {
-            value: {
+            $value: {
               fontFamily: 'Inter',
               fontWeight: 'Bold',
             },
-            type: 'typography',
+            $type: 'typography',
           },
           shadow: {
-            value: {
+            $value: {
               blur: '2',
               color: '#000000',
               spread: '0',
@@ -66,20 +66,20 @@ describe('SingleFileExport', () => {
               x: '2',
               y: '2',
             },
-            type: 'boxShadow',
+            $type: 'boxShadow',
           },
           composition: {
-            value: {
+            $value: {
               fill: '$white',
             },
-            type: 'composition',
+            $type: 'composition',
           },
           border: {
-            value: {
+            $value: {
               color: '$white',
               width: '5px',
             },
-            type: 'border',
+            $type: 'border',
           },
         },
       }, null, 2),
@@ -100,18 +100,18 @@ describe('SingleFileExport', () => {
       JSON.stringify({
         global: {
           white: {
-            value: '#ffffff',
-            type: 'color',
+            $value: '#ffffff',
+            $type: 'color',
           },
           headline: {
-            value: {
+            $value: {
               fontFamily: 'Inter',
               fontWeight: 'Bold',
             },
-            type: 'typography',
+            $type: 'typography',
           },
           shadow: {
-            value: {
+            $value: {
               blur: '2',
               color: '#000000',
               spread: '0',
@@ -119,27 +119,27 @@ describe('SingleFileExport', () => {
               x: '2',
               y: '2',
             },
-            type: 'boxShadow',
+            $type: 'boxShadow',
           },
           composition: {
-            value: {
+            $value: {
               fill: '$white',
             },
-            type: 'composition',
+            $type: 'composition',
           },
           border: {
-            value: {
+            $value: {
               color: '$white',
               width: '5px',
             },
-            type: 'border',
+            $type: 'border',
           },
         },
         light: {
           bg: {
             default: {
-              value: '#ffffff',
-              type: 'color',
+              $value: '#ffffff',
+              $type: 'color',
             },
           },
         },
@@ -185,17 +185,17 @@ describe('SingleFileExport', () => {
         global: {
           headline: {
             fontFamily: {
-              value: 'Inter',
-              type: 'fontFamilies',
+              $value: 'Inter',
+              $type: 'fontFamilies',
             },
             fontWeight: {
-              value: 'Bold',
-              type: 'fontWeights',
+              $value: 'Bold',
+              $type: 'fontWeights',
             },
           },
           alias: {
-            value: '$headline',
-            type: 'typography',
+            $value: '$headline',
+            $type: 'typography',
           },
         },
       }, null, 2),
@@ -241,87 +241,87 @@ describe('SingleFileExport', () => {
         global: {
           shadow: {
             blur: {
-              value: '2',
-              type: 'blur',
+              $value: '2',
+              $type: 'blur',
             },
             color: {
-              value: '#000000',
-              type: 'color',
+              $value: '#000000',
+              $type: 'color',
             },
             spread: {
-              value: '0',
-              type: 'spread',
+              $value: '0',
+              $type: 'spread',
             },
             type: {
-              value: 'innerShadow',
-              type: 'type',
+              $value: 'innerShadow',
+              $type: 'type',
             },
             x: {
-              value: '2',
-              type: 'x',
+              $value: '2',
+              $type: 'x',
             },
             y: {
-              value: '2',
-              type: 'y',
+              $value: '2',
+              $type: 'y',
             },
           },
           multiShadow: {
             0: {
               blur: {
-                value: '2',
-                type: 'blur',
+                $value: '2',
+                $type: 'blur',
               },
               color: {
-                value: '#000000',
-                type: 'color',
+                $value: '#000000',
+                $type: 'color',
               },
               spread: {
-                value: '0',
-                type: 'spread',
+                $value: '0',
+                $type: 'spread',
               },
               type: {
-                value: 'innerShadow',
-                type: 'type',
+                $value: 'innerShadow',
+                $type: 'type',
               },
               x: {
-                value: '2',
-                type: 'x',
+                $value: '2',
+                $type: 'x',
               },
               y: {
-                value: '2',
-                type: 'y',
+                $value: '2',
+                $type: 'y',
               },
             },
             1: {
               blur: {
-                value: '4',
-                type: 'blur',
+                $value: '4',
+                $type: 'blur',
               },
               color: {
-                value: '#000000',
-                type: 'color',
+                $value: '#000000',
+                $type: 'color',
               },
               spread: {
-                value: '0',
-                type: 'spread',
+                $value: '0',
+                $type: 'spread',
               },
               type: {
-                value: 'innerShadow',
-                type: 'type',
+                $value: 'innerShadow',
+                $type: 'type',
               },
               x: {
-                value: '4',
-                type: 'x',
+                $value: '4',
+                $type: 'x',
               },
               y: {
-                value: '4',
-                type: 'y',
+                $value: '4',
+                $type: 'y',
               },
             },
           },
           alias: {
-            value: '$shadow',
-            type: 'boxShadow',
+            $value: '$shadow',
+            $type: 'boxShadow',
           },
         },
       }, null, 2),
@@ -342,18 +342,18 @@ describe('SingleFileExport', () => {
       JSON.stringify({
         global: {
           white: {
-            value: '#ffffff',
-            type: 'color',
+            $value: '#ffffff',
+            $type: 'color',
           },
           headline: {
-            value: {
+            $value: {
               fontFamily: 'Inter',
               fontWeight: 'Bold',
             },
-            type: 'typography',
+            $type: 'typography',
           },
           shadow: {
-            value: {
+            $value: {
               blur: '2',
               color: '#000000',
               spread: '0',
@@ -361,20 +361,20 @@ describe('SingleFileExport', () => {
               x: '2',
               y: '2',
             },
-            type: 'boxShadow',
+            $type: 'boxShadow',
           },
           composition: {
             fill: {
-              value: '$white',
-              type: 'fill',
+              $value: '$white',
+              $type: 'fill',
             },
           },
           border: {
-            value: {
+            $value: {
               color: '$white',
               width: '5px',
             },
-            type: 'border',
+            $type: 'border',
           },
         },
       }, null, 2),
@@ -395,18 +395,18 @@ describe('SingleFileExport', () => {
       JSON.stringify({
         global: {
           white: {
-            value: '#ffffff',
-            type: 'color',
+            $value: '#ffffff',
+            $type: 'color',
           },
           headline: {
-            value: {
+            $value: {
               fontFamily: 'Inter',
               fontWeight: 'Bold',
             },
-            type: 'typography',
+            $type: 'typography',
           },
           shadow: {
-            value: {
+            $value: {
               blur: '2',
               color: '#000000',
               spread: '0',
@@ -414,22 +414,22 @@ describe('SingleFileExport', () => {
               x: '2',
               y: '2',
             },
-            type: 'boxShadow',
+            $type: 'boxShadow',
           },
           composition: {
-            value: {
+            $value: {
               fill: '$white',
             },
-            type: 'composition',
+            $type: 'composition',
           },
           border: {
             color: {
-              value: '$white',
-              type: 'color',
+              $value: '$white',
+              $type: 'color',
             },
             width: {
-              value: '5px',
-              type: 'dimension',
+              $value: '5px',
+              $type: 'dimension',
             },
           },
         },

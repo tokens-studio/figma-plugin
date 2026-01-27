@@ -99,7 +99,7 @@ describe('uiSettings', () => {
       shouldSwapStyles: false,
       shouldSwapFigmaModes: false,
       storeTokenIdInJsonEditor: false,
-      tokenFormat: TokenFormatOptions.Legacy,
+      tokenFormat: TokenFormatOptions.DTCG,
       aliasBaseFontSize: '16',
       baseFontSize: '16',
       autoApplyThemeOnDrop: false,

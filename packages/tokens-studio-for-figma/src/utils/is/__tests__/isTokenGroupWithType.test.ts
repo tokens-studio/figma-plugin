@@ -3,43 +3,43 @@ import { isTokenGroupWithType } from '../isTokenGroupWithType';
 describe('isTokenGroupWithType', () => {
   const tokenGroupsWithType = [
     {
-      type: 'color',
+      $type: 'color',
       default: {
-        value: 'colors.black',
+        $value: 'colors.black',
       },
       subtle: {
-        value: 'colors.gray.500',
+        $value: 'colors.gray.500',
       },
     },
     {
-      type: 'color',
+      $type: 'color',
       default: {
-        value: 'colors.black',
+        $value: 'colors.black',
       },
       subtle: {
-        value: 'colors.gray.500',
-        type: 'dimension',
+        $value: 'colors.gray.500',
+        $type: 'dimension',
       },
     },
     {
-      type: 'color',
-      value: {
-        value: 'colors.black',
+      $type: 'color',
+      $value: {
+        $value: 'colors.black',
       },
       subtle: {
-        value: 'colors.gray.500',
-        type: 'dimension',
+        $value: 'colors.gray.500',
+        $type: 'dimension',
       },
     },
     {
-      type: 'typography',
-      value: {
-        value: {
+      $type: 'typography',
+      $value: {
+        $value: {
           fontFamily: 'Roboto',
         },
       },
       subtle: {
-        value: {
+        $value: {
           fontFamily: 'aria',
         },
       },
@@ -49,24 +49,24 @@ describe('isTokenGroupWithType', () => {
   const tokenGroupsWithOutType = [
     {
       default: {
-        value: 'colors.black',
+        $value: 'colors.black',
       },
       subtle: {
-        value: 'colors.gray.500',
+        $value: 'colors.gray.500',
       },
     },
     {
-      value: 'colors.gray.500',
-      type: 'color',
+      $value: 'colors.gray.500',
+      $type: 'color',
     },
     {
-      value: {
+      $value: {
         fontFamily: 'Roboto',
       },
       subtle: {
         fontFamily: 'aria',
       },
-      type: {
+      $type: {
         fontFamily: 'Roboto',
       },
     },

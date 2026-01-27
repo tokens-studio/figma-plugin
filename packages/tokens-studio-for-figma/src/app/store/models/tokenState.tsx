@@ -123,7 +123,7 @@ export const tokenState = createModel<RootModel>()({
       themes: [],
       metadata: null,
     },
-    tokenFormat: TokenFormatOptions.Legacy,
+    tokenFormat: TokenFormatOptions.DTCG,
     tokenSetMetadata: {},
     importedThemes: {
       newThemes: [],
@@ -688,8 +688,8 @@ export const tokenState = createModel<RootModel>()({
         if (existingTheme) {
           // Check if anything has changed that requires an update
           const needsUpdate = !isEqual(existingTheme.selectedTokenSets, theme.selectedTokenSets)
-                              || !isEqual(existingTheme.name, theme.name)
-                              || !isEqual(existingTheme.group, theme.group);
+            || !isEqual(existingTheme.name, theme.name)
+            || !isEqual(existingTheme.group, theme.group);
 
           if (needsUpdate) {
             updatedThemes.push({
@@ -1107,7 +1107,7 @@ export const tokenState = createModel<RootModel>()({
       if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO) {
         for (const [oldName, newName] of renamedCollections) {
           if (oldName in rootState.tokenState.tokens
-              || Object.keys(updatedTokens).some((key) => key === newName)) {
+            || Object.keys(updatedTokens).some((key) => key === newName)) {
             updateTokenSetInTokensStudio({
               rootState,
               data: { oldName, newName },
