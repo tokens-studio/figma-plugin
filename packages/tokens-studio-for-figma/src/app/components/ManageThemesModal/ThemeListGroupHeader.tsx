@@ -20,14 +20,14 @@ type Props = React.PropsWithChildren<{
   groupName: string
   label: string
   onExtendThemeGroup: (groupName: string) => void
-  isExtended?: boolean
+  indentationDepth?: number
 }>;
 
 export function ThemeListGroupHeader({
   groupName,
   label,
   onExtendThemeGroup,
-  isExtended = false,
+  indentationDepth = 0,
 }: Props) {
   const dispatch = useDispatch<Dispatch>();
   const dragContext = useContext(DragControlsContext);
@@ -78,7 +78,8 @@ export function ThemeListGroupHeader({
         display: 'flex',
         cursor: 'inherit',
         '&:not(:first-of-type)': { marginTop: '$4' },
-        ...(isExtended ? { paddingLeft: '$6' } : {}),
+        // Progressive indentation based on depth level (each level adds $6 padding)
+        ...(indentationDepth > 0 ? { paddingLeft: `calc($6 * ${indentationDepth})` } : {}),
       }}
     >
       <DragGrabber

@@ -55,17 +55,17 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
 
   // Available parent theme GROUPS (not individual themes)
   const availableParentGroups = useMemo(() => {
-    // Get all groups that are NOT extensions
-    const nonExtensionGroups = new Set<string>();
+    // Get all unique theme groups (including extended ones for multi-level extension)
+    const allGroups = new Set<string>();
 
     themes.forEach((theme) => {
-      // Only include groups from non-extended themes
-      if (!theme.$figmaIsExtension && theme.group) {
-        nonExtensionGroups.add(theme.group);
+      // Include all groups, allowing extended themes to also be parents
+      if (theme.group) {
+        allGroups.add(theme.group);
       }
     });
 
-    return Array.from(nonExtensionGroups).sort();
+    return Array.from(allGroups).sort();
   }, [themes]);
 
   const themeEditorDefaultValues: Partial<FormValues> = useMemo(() => {
@@ -159,7 +159,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
 
     const parentGroupName = values.parentThemeId; // Group name to extend from
     const parentThemes = parentGroupName
-      ? themes.filter(t => t.group === parentGroupName && !t.$figmaIsExtension)
+      ? themes.filter(t => t.group === parentGroupName) // Include all themes in the parent group, even if already extended
       : [];
 
     if (parentThemes.length > 0) {
@@ -344,13 +344,13 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
                         isActive={activeTheme?.[item.parent as string] === item.value.id}
                         onOpen={handleToggleThemeEditor}
                         groupName={item.parent as string}
-                        isExtended={typeof item.parent === 'string' && item.parent.includes('/')}
+                        indentationDepth={typeof item.parent === 'string' ? (item.parent.match(/\//g) || []).length : 0}
                       />
                     ) : (
                       <ThemeListGroupHeader
                         label={item.value === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : item.value as string}
                         groupName={item.value as string}
-                        isExtended={typeof item.value === 'string' && item.value.includes('/')}
+                        indentationDepth={typeof item.value === 'string' ? (item.value.match(/\//g) || []).length : 0}
                         onExtendThemeGroup={(groupName) => {
                           setSelectedParentGroup(groupName);
                           setIsExtendMode(true);

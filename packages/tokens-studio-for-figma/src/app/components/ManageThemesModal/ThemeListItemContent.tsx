@@ -15,7 +15,7 @@ type Props = React.PropsWithChildren<{
   isActive: boolean
   groupName: string
   onOpen: (theme?: ThemeObject) => void;
-  isExtended?: boolean
+  indentationDepth?: number
 }>;
 
 const StyledDragGrabber = styled(DragGrabber, {
@@ -27,7 +27,7 @@ export function ThemeListItemContent({
   isActive,
   groupName,
   onOpen,
-  isExtended = false,
+  indentationDepth = 0,
 }: Props) {
   const dragContext = useContext(DragControlsContext);
   const editProhibited = useSelector(editProhibitedSelector);
@@ -45,7 +45,8 @@ export function ThemeListItemContent({
         width: '100%',
         display: 'inherit',
         cursor: 'inherit',
-        ...(isExtended ? { paddingLeft: '$6' } : {}),
+        // Progressive indentation based on depth level (each level adds $6 padding)
+        ...(indentationDepth > 0 ? { paddingLeft: `calc($6 * ${indentationDepth})` } : {}),
       }}
     >
       <StyledDragGrabber<ThemeObject>

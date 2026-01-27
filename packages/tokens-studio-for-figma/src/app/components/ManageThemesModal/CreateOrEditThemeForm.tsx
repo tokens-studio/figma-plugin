@@ -65,17 +65,17 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
 
   // Available parent theme GROUPS (not individual themes)
   const availableParentGroups = useMemo(() => {
-    // Get all groups that are NOT extensions
-    const nonExtensionGroups = new Set<string>();
+    // Get all unique theme groups (including extended ones for multi-level extension)
+    const allGroups = new Set<string>();
 
     themes.forEach((theme) => {
-      // Only include groups from non-extended themes
-      if (!theme.$figmaIsExtension && theme.group) {
-        nonExtensionGroups.add(theme.group);
+      // Include all groups, allowing extended themes to also be parents
+      if (theme.group) {
+        allGroups.add(theme.group);
       }
     });
 
-    return Array.from(nonExtensionGroups).sort();
+    return Array.from(allGroups).sort();
   }, [themes]);
   const { t } = useTranslation(['tokens', 'errors']);
 
