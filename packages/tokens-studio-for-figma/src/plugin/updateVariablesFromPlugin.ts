@@ -8,6 +8,8 @@ import setBooleanValuesOnVariable from './setBooleanValuesOnVariable';
 import setNumberValuesOnVariable from './setNumberValuesOnVariable';
 import setStringValuesOnVariable from './setStringValuesOnVariable';
 import { UpdateTokenVariablePayload } from '@/types/payloads/UpdateTokenVariablePayload';
+import { FigmaExtensions } from '@/types/tokens';
+import { FIGMA_PLATFORMS, normalizeVariableScopes, getCodeSyntaxValue } from '@/utils/figma';
 import { checkCanReferenceVariable } from '@/utils/alias/checkCanReferenceVariable';
 
 export default async function updateVariablesFromPlugin(payload: UpdateTokenVariablePayload) {
@@ -20,6 +22,8 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
     return acc;
   }, {});
 
+  const metadataUpdateTracker: Record<string, boolean> = {};
+
   themeInfo.themes.forEach((theme) => {
     if (
       Object.entries(theme.selectedTokenSets).some(
@@ -30,6 +34,42 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
       if (theme.$figmaVariableReferences?.[payload.name] && theme.$figmaModeId) {
         const variable = variableMap[theme?.$figmaVariableReferences?.[payload.name]];
         if (Object.values(themeInfo.activeTheme).includes(theme.id)) {
+          if (variable && !metadataUpdateTracker[variable.id]) {
+            // Update metadata once per variable
+            variable.description = payload.description ?? '';
+
+            const figmaExtensions = payload.$extensions?.['com.figma'] as FigmaExtensions;
+
+            // Update Scopes
+            if (figmaExtensions?.scopes && Array.isArray(figmaExtensions.scopes)) {
+              variable.scopes = normalizeVariableScopes(figmaExtensions.scopes);
+            }
+
+            // Update Code Syntax & Purge Removed Platforms
+            const newCodeSyntax = figmaExtensions?.codeSyntax || {};
+            FIGMA_PLATFORMS.forEach(({ key, figma: figmaPlatform }) => {
+              const syntaxValue = getCodeSyntaxValue(newCodeSyntax, key);
+
+              if (syntaxValue !== undefined) {
+                const valueToSet = (typeof syntaxValue === 'string') ? syntaxValue.trim() : '';
+                if (valueToSet === '') {
+                  variable.removeVariableCodeSyntax(figmaPlatform);
+                } else {
+                  variable.setVariableCodeSyntax(figmaPlatform, valueToSet);
+                }
+              } else {
+                // Platform removed from token -> remove from Figma
+                try {
+                  variable.removeVariableCodeSyntax(figmaPlatform);
+                } catch (e) {
+                  // Ignore
+                }
+              }
+            });
+
+            metadataUpdateTracker[variable.id] = true;
+          }
+
           if (checkCanReferenceVariable(payload)) {
             // If new token reference to another token, we update the variable to reference to another variable
             let referenceTokenName: string = '';

@@ -1,6 +1,6 @@
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
-import { AnyTokenList } from '@/types/tokens';
+import { AnyTokenList, CodeSyntax, FigmaExtensions } from '@/types/tokens';
 import { SettingsState } from '@/app/store/models/settings';
 import updateVariables from './updateVariables';
 import { ReferenceVariableType } from './setValuesOnVariable';
@@ -12,6 +12,7 @@ import { mergeVariableReferencesWithLocalVariables } from './mergeVariableRefere
 import { findCollectionAndModeIdForTheme } from './findCollectionAndModeIdForTheme';
 import { createNecessaryVariableCollections } from './createNecessaryVariableCollections';
 import { getVariablesWithoutZombies } from './getVariablesWithoutZombies';
+import { getCodeSyntaxValue } from '@/utils/figma';
 import { getOverallConfig } from '@/utils/tokenHelpers';
 import { generateTokensToCreate } from './generateTokensToCreate';
 import checkIfTokenCanCreateVariable from '@/utils/checkIfTokenCanCreateVariable';
@@ -74,6 +75,9 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
 
     // Create a single global progress tracker for all variable creation
     let globalProgressTracker: ProgressTracker | null = null;
+    const metadataUpdateTracker: Record<string, boolean> = {};
+    const providedPlatformsByVariable: Record<string, Set<string>> = {};
+
     if (totalVariableTokens > 10) {
       // First, ensure any previous job is completed to avoid UI counter accumulation
       postToUI({
@@ -96,6 +100,31 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
       });
     }
 
+    /**
+     * We perform a pre-flight scan across ALL selected themes. We build a global map 
+     * (`providedPlatformsByVariable`) of every platform that HAS a value defined 
+     * for a given variable name.
+     * During the actual update (in setValuesOnVariable), we use this map:
+     * 1. If a platform is missing in the current mode BUT exists globally, we skip it (Aggregation mode).
+     * 2. If a platform is missing in the current mode AND doesn't exist anywhere, we safely remove it from Figma (Orphan Purging).
+     */
+    selectedThemeObjects.forEach((theme) => {
+      const { tokensToCreate } = generateTokensToCreate({ theme, tokens, overallConfig });
+      tokensToCreate.forEach((token) => {
+        const figmaExtensions = token.$extensions?.['com.figma'] as FigmaExtensions;
+        if (figmaExtensions?.codeSyntax) {
+          const platforms = providedPlatformsByVariable[token.name] || new Set();
+          Object.keys(figmaExtensions.codeSyntax).forEach((key) => {
+            const syntax = getCodeSyntaxValue(figmaExtensions.codeSyntax as CodeSyntax, key);
+            if (syntax !== undefined) {
+              platforms.add(key.toLowerCase());
+            }
+          });
+          providedPlatformsByVariable[token.name] = platforms;
+        }
+      });
+    });
+
     // Process themes sequentially
     for (const theme of selectedThemeObjects) {
       const { collection, modeId } = findCollectionAndModeIdForTheme(theme.group ?? theme.name, theme.name, collections);
@@ -103,7 +132,15 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
       if (collection && modeId) {
         // Use overallConfig to allow cross-theme token references
         const allVariableObj = await updateVariables({
-          collection, mode: modeId, theme, tokens, settings, overallConfig, progressTracker: globalProgressTracker,
+          collection,
+          mode: modeId,
+          theme,
+          tokens,
+          settings,
+          overallConfig,
+          progressTracker: globalProgressTracker,
+          metadataUpdateTracker,
+          providedPlatformsByVariable,
         });
 
         figmaVariablesAfterCreate += allVariableObj.removedVariables.length;

@@ -19,6 +19,8 @@ export type CreateVariableTypes = {
   filterByTokenSet?: string;
   overallConfig: UsedTokenSetsMap;
   progressTracker?: ProgressTracker | null;
+  metadataUpdateTracker?: Record<string, boolean>;
+  providedPlatformsByVariable?: Record<string, Set<string>>;
 };
 
 export type VariableToken = SingleToken<true, { path: string; variableId: string }>;
@@ -32,6 +34,8 @@ export default async function updateVariables({
   filterByTokenSet,
   overallConfig,
   progressTracker,
+  metadataUpdateTracker,
+  providedPlatformsByVariable,
 }: CreateVariableTypes) {
   // Create a separate TokenResolver instance for this theme to avoid interference
   // when multiple themes are processed concurrently
@@ -60,15 +64,27 @@ export default async function updateVariables({
   // but that feels costly? We might need to double check this though.
   // e.g. this wont work.
   // const variablesInCollection = (await figma.variables.getLocalVariablesAsync()).filter((v) => v.variableCollectionId === collection.id);
-  const variablesInCollection = figma.variables
-    .getLocalVariables()
+  const variablesInCollection = figma.variables.getLocalVariables()
     .filter((v) => v.variableCollectionId === collection.id);
 
   const variablesToCreate: VariableToken[] = [];
+  // Reverse iterate to keep the last occurrence (override)
+  // But we need to filter, so maybe a Map is better?
+  const uniqueTokensMap = new Map<string, typeof tokensToCreate[0]>();
+
   tokensToCreate.forEach((token) => {
+    // If we have duplicates, the last one visited (in standard set iteration) usually wins in the UI
+    // But checking for duplicates is important
     if (checkIfTokenCanCreateVariable(token, settings)) {
-      variablesToCreate.push(mapTokensToVariableInfo(token, theme, settings, themeBaseFontSize));
+      if (uniqueTokensMap.has(token.name)) {
+        console.warn(`Duplicate token found for path: ${token.name}. Using the latest definition.`);
+      }
+      uniqueTokensMap.set(token.name, token);
     }
+  });
+
+  Array.from(uniqueTokensMap.values()).forEach((token) => {
+    variablesToCreate.push(mapTokensToVariableInfo(token, theme, settings, themeBaseFontSize));
   });
 
   const variableObj = await setValuesOnVariable(
@@ -79,6 +95,8 @@ export default async function updateVariables({
     themeBaseFontSize,
     settings.renameExistingStylesAndVariables,
     progressTracker,
+    metadataUpdateTracker,
+    providedPlatformsByVariable,
   );
 
   const removedVariables: string[] = [];

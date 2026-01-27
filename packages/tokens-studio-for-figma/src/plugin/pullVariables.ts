@@ -1,6 +1,8 @@
 /* eslint-disable no-continue */
+import { FigmaExtensions } from '@/types/tokens';
+import { FIGMA_PLATFORMS } from '@/utils/figma';
 import { figmaRGBToHex } from '@figma-plugin/helpers';
-import { notifyVariableValues, notifyRenamedCollections } from './notifiers';
+import { notifyVariableValues, notifyRenamedCollections, notifyException } from './notifiers';
 import { PullVariablesOptions, ThemeObjectsList } from '@/types';
 import { VariableToCreateToken } from '@/types/payloads';
 import { TokenTypes } from '@/constants/TokenTypes';
@@ -45,6 +47,37 @@ export default async function pullVariables(options: PullVariablesOptions, theme
     name: string,
     modes: { name: string, modeId: string }[]
   }>();
+
+  const createFigmaExtensions = (variable: Variable) => {
+    const extensions: FigmaExtensions = {};
+
+    // Add scopes if they exist and are not default
+    if (variable.scopes && variable.scopes.length > 0) {
+      extensions.scopes = variable.scopes;
+    }
+
+    // Add code syntax if it exists
+    const codeSyntax: Record<string, string> = {};
+    try {
+      // Check if variable has code syntax for each platform
+      FIGMA_PLATFORMS.forEach(({ key, figma: figmaPlatform }) => {
+        const syntax = variable.codeSyntax?.[figmaPlatform];
+        if (syntax) {
+          codeSyntax[key] = syntax;
+        }
+      });
+
+      if (Object.keys(codeSyntax).length > 0) {
+        extensions.codeSyntax = codeSyntax;
+      }
+    } catch (e) {
+      if (e instanceof Error) {
+        notifyException(e.message);
+      }
+    }
+
+    return Object.keys(extensions).length > 0 ? { 'com.figma': extensions } : undefined;
+  };
 
   for (const variable of localVariables) {
     let collection = collectionsCache.get(variable.variableCollectionId);
@@ -97,13 +130,16 @@ export default async function pullVariables(options: PullVariablesOptions, theme
 
             const modeName = collection?.modes.find((m) => m.modeId === mode)?.name;
             if (tokenValue) {
-              colors.push({
+              const figmaExtensions = createFigmaExtensions(variable);
+              const token = {
                 name: variableName,
                 value: tokenValue as string,
                 type: TokenTypes.COLOR,
                 parent: `${collection?.name}/${modeName}`,
                 ...(variable.description ? { description: variable.description } : {}),
-              });
+                ...(figmaExtensions ? { $extensions: figmaExtensions } : {}),
+              };
+              colors.push(token);
             }
           });
           break;
@@ -126,13 +162,16 @@ export default async function pullVariables(options: PullVariablesOptions, theme
               tokenValue = JSON.stringify(value);
             }
 
-            booleans.push({
+            const figmaExtensions = createFigmaExtensions(variable);
+            const token = {
               name: variableName,
               value: tokenValue,
               type: TokenTypes.BOOLEAN,
               parent: `${collection?.name}/${modeName}`,
               ...(variable.description ? { description: variable.description } : {}),
-            });
+              ...(figmaExtensions ? { $extensions: figmaExtensions } : {}),
+            };
+            booleans.push(token);
           });
           break;
         case 'STRING':
@@ -154,12 +193,14 @@ export default async function pullVariables(options: PullVariablesOptions, theme
               tokenValue = value;
             }
 
+            const figmaExtensions = createFigmaExtensions(variable);
             strings.push({
               name: variableName,
               value: tokenValue as string,
               type: TokenTypes.TEXT,
               parent: `${collection?.name}/${modeName}`,
               ...(variable.description ? { description: variable.description } : {}),
+              ...(figmaExtensions ? { $extensions: figmaExtensions } : {}),
             });
           });
           break;
@@ -188,6 +229,7 @@ export default async function pullVariables(options: PullVariablesOptions, theme
             }
             const modeName = collection?.modes.find((m) => m.modeId === mode)?.name;
 
+            const figmaExtensions = createFigmaExtensions(variable);
             if (options.useDimensions || options.useRem) {
               dimensions.push({
                 name: variableName,
@@ -195,6 +237,7 @@ export default async function pullVariables(options: PullVariablesOptions, theme
                 type: TokenTypes.DIMENSION,
                 parent: `${collection?.name}/${modeName}`,
                 ...(variable.description ? { description: variable.description } : {}),
+                ...(figmaExtensions ? { $extensions: figmaExtensions } : {}),
               });
             } else {
               numbers.push({
@@ -203,6 +246,7 @@ export default async function pullVariables(options: PullVariablesOptions, theme
                 type: TokenTypes.NUMBER,
                 parent: `${collection?.name}/${modeName}`,
                 ...(variable.description ? { description: variable.description } : {}),
+                ...(figmaExtensions ? { $extensions: figmaExtensions } : {}),
               });
             }
           });
@@ -289,9 +333,9 @@ export default async function pullVariables(options: PullVariablesOptions, theme
           // Find token sets in this theme that are different from the current token set name
           Object.keys(matchingTheme.selectedTokenSets || {}).forEach((existingTokenSet) => {
             if (existingTokenSet !== tokenSetName
-                && existingTokenSet.includes('/')
-                && !renamedCollections.has(existingTokenSet)
-                && !Array.from(renamedCollections.values()).includes(tokenSetName)) {
+              && existingTokenSet.includes('/')
+              && !renamedCollections.has(existingTokenSet)
+              && !Array.from(renamedCollections.values()).includes(tokenSetName)) {
               renamedCollections.set(existingTokenSet, tokenSetName);
             }
           });
