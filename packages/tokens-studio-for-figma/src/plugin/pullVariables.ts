@@ -1,7 +1,7 @@
 /* eslint-disable no-continue */
 import { FigmaExtensions } from '@/types/tokens';
 import { figmaRGBToHex } from '@figma-plugin/helpers';
-import { notifyVariableValues, notifyRenamedCollections } from './notifiers';
+import { notifyVariableValues, notifyRenamedCollections, notifyException } from './notifiers';
 import { PullVariablesOptions, ThemeObjectsList } from '@/types';
 import { VariableToCreateToken } from '@/types/payloads';
 import { TokenTypes } from '@/constants/TokenTypes';
@@ -71,7 +71,9 @@ export default async function pullVariables(options: PullVariablesOptions, theme
         extensions.codeSyntax = codeSyntax;
       }
     } catch (e) {
-      // Ignore errors accessing codeSyntax - it might not be available
+      if (e instanceof Error) {
+        notifyException(e.message);
+      }
     }
 
     return Object.keys(extensions).length > 0 ? { 'com.figma': extensions } : undefined;
