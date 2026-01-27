@@ -88,6 +88,7 @@ describe('updateVariablesFromPlugin', () => {
     await updateVariablesFromPlugin(payload);
     expect(setColorValuesOnVariableSpy).toBeCalledWith(
       {
+        description: '',
         id: 'VariableID:1234',
         key: '12345',
         variableCollectionId: 'VariableCollectionId:12:12345',
