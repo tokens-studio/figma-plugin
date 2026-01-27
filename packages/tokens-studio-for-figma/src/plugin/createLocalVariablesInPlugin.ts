@@ -99,8 +99,14 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
       });
     }
 
-    // Pre-calculate which variables have which platforms across ALL themes/modes
-    // to enable intelligent orphan purging in setValuesOnVariable
+    /**
+     * We perform a pre-flight scan across ALL selected themes. We build a global map 
+     * (`providedPlatformsByVariable`) of every platform that HAS a value defined 
+     * for a given variable name.
+     * During the actual update (in setValuesOnVariable), we use this map:
+     * 1. If a platform is missing in the current mode BUT exists globally, we skip it (Aggregation mode).
+     * 2. If a platform is missing in the current mode AND doesn't exist anywhere, we safely remove it from Figma (Orphan Purging).
+     */
     selectedThemeObjects.forEach((theme) => {
       const { tokensToCreate } = generateTokensToCreate({ theme, tokens, overallConfig });
       tokensToCreate.forEach((token) => {
