@@ -47,6 +47,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
   const { confirm } = useConfirm();
   const [themeEditorOpen, setThemeEditorOpen] = useState<boolean | string>(false);
   const [isExtendMode, setIsExtendMode] = useState(false);
+  const [selectedParentGroup, setSelectedParentGroup] = useState<string | undefined>(undefined);
   const [themeListScrollPosition, setThemeListScrollPosition] = useState<number>(0);
   const themeListRef = useRef<HTMLDivElement>(null);
   const treeItems = themeListToTree(themes);
@@ -67,7 +68,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
     return Array.from(nonExtensionGroups).sort();
   }, [themes]);
 
-  const themeEditorDefaultValues: Partial<ThemeObject> = useMemo(() => {
+  const themeEditorDefaultValues: Partial<FormValues> = useMemo(() => {
     const themeObject = themes.find(({ id }) => id === themeEditorOpen);
     if (themeObject) {
       return {
@@ -76,8 +77,14 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
         ...(themeObject?.group ? { group: themeObject.group } : {}),
       };
     }
+    // If in extend mode, pre-populate parentThemeId with selected group
+    if (isExtendMode && selectedParentGroup) {
+      return {
+        parentThemeId: selectedParentGroup,
+      };
+    }
     return {};
-  }, [themes, themeEditorOpen]);
+  }, [themes, themeEditorOpen, isExtendMode, selectedParentGroup]);
 
   const handleClose = useCallback(() => {
     dispatch.uiState.setManageThemesModalOpen(false);
@@ -115,6 +122,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
   const handleCancelEdit = useCallback(() => {
     setThemeEditorOpen(false);
     setIsExtendMode(false);
+    setSelectedParentGroup(undefined);
   }, []);
 
   const handleEscapeKeyDown = useCallback((event: KeyboardEvent) => {
@@ -267,18 +275,6 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
               >
                 {t('newTheme')}
               </Button>
-              {availableParentGroups.length > 0 && (
-                <Button
-                  data-testid="button-manage-themes-modal-extend-theme"
-                  variant="secondary"
-                  onClick={() => {
-                    setIsExtendMode(true);
-                    handleToggleOpenThemeEditor();
-                  }}
-                >
-                  Extend Theme
-                </Button>
-              )}
             </>
           )}
           {themeEditorOpen && (
@@ -348,6 +344,11 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
                       <ThemeListGroupHeader
                         label={item.value === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : item.value as string}
                         groupName={item.value as string}
+                        onExtendThemeGroup={(groupName) => {
+                          setSelectedParentGroup(groupName);
+                          setIsExtendMode(true);
+                          setThemeEditorOpen(true);
+                        }}
                       />
                     )
                   }

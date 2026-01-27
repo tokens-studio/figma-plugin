@@ -212,35 +212,38 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
             {/* EXTEND MODE: Show parent selector + name only */}
             {!id && isExtendMode && (
               <Stack direction="column" gap={3} css={{ width: '100%', padding: '$4' }}>
-                <Stack direction="column" gap={1}>
-                  <Box css={{
-                    fontSize: '$xsmall',
-                    color: '$fgSubtle',
-                    fontWeight: '$sansMedium'
-                  }}>
-                    Extend from
-                  </Box>
-                  <Controller
-                    name="parentThemeId"
-                    control={control}
-                    render={({ field }) => (
-                      <Select
-                        data-testid="create-theme-form--select--parent"
-                        value={field.value || ''}
-                        onValueChange={field.onChange}
-                      >
-                        <Select.Trigger value={field.value || 'Select theme group'} />
-                        <Select.Content>
-                          {availableParentGroups.map((group) => (
-                            <Select.Item key={group} value={group}>
-                              {group}
-                            </Select.Item>
-                          ))}
-                        </Select.Content>
-                      </Select>
-                    )}
-                  />
-                </Stack>
+                {/* Only show parent selector if not already provided in defaultValues */}
+                {!defaultValues?.parentThemeId && (
+                  <Stack direction="column" gap={1}>
+                    <Box css={{
+                      fontSize: '$xsmall',
+                      color: '$fgSubtle',
+                      fontWeight: '$sansMedium'
+                    }}>
+                      Extend from
+                    </Box>
+                    <Controller
+                      name="parentThemeId"
+                      control={control}
+                      render={({ field }) => (
+                        <Select
+                          data-testid="create-theme-form--select--parent"
+                          value={field.value || ''}
+                          onValueChange={field.onChange}
+                        >
+                          <Select.Trigger value={field.value || 'Select theme group'} />
+                          <Select.Content>
+                            {availableParentGroups.map((group) => (
+                              <Select.Item key={group} value={group}>
+                                {group}
+                              </Select.Item>
+                            ))}
+                          </Select.Content>
+                        </Select>
+                      )}
+                    />
+                  </Stack>
+                )}
                 <Stack direction="column" gap={1}>
                   <Box css={{
                     fontSize: '$xsmall',

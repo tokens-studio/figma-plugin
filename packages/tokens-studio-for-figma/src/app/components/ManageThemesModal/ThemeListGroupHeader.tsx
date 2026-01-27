@@ -2,8 +2,8 @@ import React, {
   useCallback, useContext, useState,
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { IconButton } from '@tokens-studio/ui';
-import { Xmark, Check } from 'iconoir-react';
+import { IconButton, DropdownMenu } from '@tokens-studio/ui';
+import { Xmark, Check, MoreVert } from 'iconoir-react';
 import { editProhibitedSelector } from '@/selectors';
 import { DragControlsContext } from '@/context';
 import { StyledDragButton } from '../StyledDragger/StyledDragButton';
@@ -18,11 +18,13 @@ import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
 type Props = React.PropsWithChildren<{
   groupName: string
   label: string
+  onExtendThemeGroup: (groupName: string) => void
 }>;
 
 export function ThemeListGroupHeader({
   groupName,
   label,
+  onExtendThemeGroup,
 }: Props) {
   const dispatch = useDispatch<Dispatch>();
   const dragContext = useContext(DragControlsContext);
@@ -58,6 +60,10 @@ export function ThemeListGroupHeader({
   const handleGroupNameChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     setCurrentGroupName(event.target.value);
   }, []);
+
+  const handleExtendGroup = useCallback(() => {
+    onExtendThemeGroup(groupName);
+  }, [groupName, onExtendThemeGroup]);
 
   return (
     <StyledDragButton
@@ -96,13 +102,30 @@ export function ThemeListGroupHeader({
             >
               {label}
             </Text>
-            <IconButton
-              onClick={handleEditButtonClick}
-              icon={<IconPencil />}
-              size="small"
-              variant="invisible"
-              tooltip="Rename group"
-            />
+            <DropdownMenu>
+              <DropdownMenu.Trigger asChild>
+                <IconButton
+                  icon={<MoreVert />}
+                  size="small"
+                  variant="invisible"
+                  tooltip="More options"
+                />
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Portal>
+                <DropdownMenu.Content side="bottom">
+                  <DropdownMenu.Item onSelect={handleEditButtonClick}>
+                    <span>Rename Theme Group</span>
+                  </DropdownMenu.Item>
+                  {groupName !== INTERNAL_THEMES_NO_GROUP && (
+                    <DropdownMenu.Item onSelect={handleExtendGroup}>
+                      <Box css={{ display: 'flex', alignItems: 'center', gap: '$2' }}>
+                        <span>Extend Theme Group</span>
+                      </Box>
+                    </DropdownMenu.Item>
+                  )}
+                </DropdownMenu.Content>
+              </DropdownMenu.Portal>
+            </DropdownMenu>
           </>
         ) : (
           <>
