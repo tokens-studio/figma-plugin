@@ -12,6 +12,7 @@ import { mergeVariableReferencesWithLocalVariables } from './mergeVariableRefere
 import { findCollectionAndModeIdForTheme } from './findCollectionAndModeIdForTheme';
 import { createNecessaryVariableCollections } from './createNecessaryVariableCollections';
 import { getVariablesWithoutZombies } from './getVariablesWithoutZombies';
+import { getCodeSyntaxValue } from '@/utils/figma';
 import { getOverallConfig } from '@/utils/tokenHelpers';
 import { generateTokensToCreate } from './generateTokensToCreate';
 import checkIfTokenCanCreateVariable from '@/utils/checkIfTokenCanCreateVariable';
@@ -114,7 +115,7 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
         if (figmaExtensions?.codeSyntax) {
           const platforms = providedPlatformsByVariable[token.name] || new Set();
           Object.keys(figmaExtensions.codeSyntax).forEach((key) => {
-            const syntax = (figmaExtensions.codeSyntax as CodeSyntax)[key];
+            const syntax = getCodeSyntaxValue(figmaExtensions.codeSyntax as CodeSyntax, key);
             if (syntax !== undefined) {
               platforms.add(key.toLowerCase());
             }

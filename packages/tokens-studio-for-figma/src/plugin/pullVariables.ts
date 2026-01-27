@@ -1,5 +1,6 @@
 /* eslint-disable no-continue */
 import { FigmaExtensions } from '@/types/tokens';
+import { FIGMA_PLATFORMS } from '@/utils/figma';
 import { figmaRGBToHex } from '@figma-plugin/helpers';
 import { notifyVariableValues, notifyRenamedCollections, notifyException } from './notifiers';
 import { PullVariablesOptions, ThemeObjectsList } from '@/types';
@@ -59,13 +60,12 @@ export default async function pullVariables(options: PullVariablesOptions, theme
     const codeSyntax: Record<string, string> = {};
     try {
       // Check if variable has code syntax for each platform
-      const webSyntax = variable.codeSyntax?.WEB;
-      const androidSyntax = variable.codeSyntax?.ANDROID;
-      const iosSyntax = variable.codeSyntax?.iOS;
-
-      if (webSyntax) codeSyntax.Web = webSyntax;
-      if (androidSyntax) codeSyntax.Android = androidSyntax;
-      if (iosSyntax) codeSyntax.iOS = iosSyntax;
+      FIGMA_PLATFORMS.forEach(({ key, figma: figmaPlatform }) => {
+        const syntax = variable.codeSyntax?.[figmaPlatform];
+        if (syntax) {
+          codeSyntax[key] = syntax;
+        }
+      });
 
       if (Object.keys(codeSyntax).length > 0) {
         extensions.codeSyntax = codeSyntax;

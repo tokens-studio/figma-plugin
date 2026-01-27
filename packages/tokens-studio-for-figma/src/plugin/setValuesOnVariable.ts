@@ -1,4 +1,5 @@
 import { SingleToken, CodeSyntax, FigmaExtensions } from '@/types/tokens';
+import { FIGMA_PLATFORMS, normalizeVariableScopes, getCodeSyntaxValue } from '@/utils/figma';
 import setBooleanValuesOnVariable from './setBooleanValuesOnVariable';
 import setColorValuesOnVariable from './setColorValuesOnVariable';
 import setNumberValuesOnVariable from './setNumberValuesOnVariable';
@@ -141,20 +142,7 @@ export default async function setValuesOnVariable(
             const figmaExtensions = token.$extensions?.['com.figma'] as FigmaExtensions;
             if (figmaExtensions?.scopes && Array.isArray(figmaExtensions.scopes) && !codeSyntaxUpdateTracker[variable.id]) {
               const currentScopes = variable.scopes || [];
-              let newScopes = figmaExtensions.scopes as VariableScope[];
-
-              // ALL_SCOPES normalization: Figma uses an empty array [] to represent all/unrestricted scopes.
-              if (newScopes.includes('ALL_SCOPES' as VariableScope)) {
-                newScopes = [];
-              }
-
-              // Figma constraint normalization
-              if (newScopes.includes('ALL_FILLS' as VariableScope)) {
-                newScopes = newScopes.filter((s) => !['FRAME_FILL', 'SHAPE_FILL', 'TEXT_FILL'].includes(s));
-              }
-              if (newScopes.includes('ALL_STROKES' as VariableScope)) {
-                newScopes = newScopes.filter((s) => s !== 'STROKE_COLOR');
-              }
+              const newScopes = normalizeVariableScopes(figmaExtensions.scopes);
 
               const isScopesSame = newScopes.length === currentScopes.length
                 && newScopes.every((scope) => currentScopes.includes(scope));
@@ -168,16 +156,9 @@ export default async function setValuesOnVariable(
             if (figmaExtensions?.codeSyntax && typeof figmaExtensions.codeSyntax === 'object' && !codeSyntaxUpdateTracker[variable.id]) {
               const newCodeSyntax = figmaExtensions.codeSyntax;
               const currentCodeSyntax = variable.codeSyntax || {};
-              const platformsToCheck = [
-                { key: 'Web', figma: 'WEB' },
-                { key: 'Android', figma: 'ANDROID' },
-                { key: 'iOS', figma: 'iOS' },
-              ] as const;
 
-              platformsToCheck.forEach(({ key, figma: figmaPlatform }) => {
-                const syntax = (newCodeSyntax as CodeSyntax)[key] !== undefined
-                  ? (newCodeSyntax as CodeSyntax)[key]
-                  : (newCodeSyntax as CodeSyntax)[key.toLowerCase()];
+              FIGMA_PLATFORMS.forEach(({ key, figma: figmaPlatform }) => {
+                const syntax = getCodeSyntaxValue(newCodeSyntax, key);
 
                 // Aggregation: Only skip if strictly undefined. Empty string "" means explicit clearing.
                 if (syntax !== undefined) {

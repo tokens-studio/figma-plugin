@@ -9,6 +9,7 @@ import setNumberValuesOnVariable from './setNumberValuesOnVariable';
 import setStringValuesOnVariable from './setStringValuesOnVariable';
 import { UpdateTokenVariablePayload } from '@/types/payloads/UpdateTokenVariablePayload';
 import { CodeSyntax, FigmaExtensions } from '@/types/tokens';
+import { FIGMA_PLATFORMS, normalizeVariableScopes, getCodeSyntaxValue } from '@/utils/figma';
 import { checkCanReferenceVariable } from '@/utils/alias/checkCanReferenceVariable';
 
 export default async function updateVariablesFromPlugin(payload: UpdateTokenVariablePayload) {
@@ -41,31 +42,13 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
 
             // Update Scopes
             if (figmaExtensions?.scopes && Array.isArray(figmaExtensions.scopes)) {
-              let newScopes = figmaExtensions.scopes as VariableScope[];
-              if (newScopes.includes('ALL_SCOPES' as VariableScope)) {
-                newScopes = [];
-              }
-              if (newScopes.includes('ALL_FILLS' as VariableScope)) {
-                newScopes = newScopes.filter((s) => !['FRAME_FILL', 'SHAPE_FILL', 'TEXT_FILL'].includes(s));
-              }
-              if (newScopes.includes('ALL_STROKES' as VariableScope)) {
-                newScopes = newScopes.filter((s) => s !== 'STROKE_COLOR');
-              }
-              variable.scopes = newScopes;
+              variable.scopes = normalizeVariableScopes(figmaExtensions.scopes);
             }
 
             // Update Code Syntax & Purge Removed Platforms
-            const platformsToCheck = [
-              { key: 'Web', figma: 'WEB' },
-              { key: 'Android', figma: 'ANDROID' },
-              { key: 'iOS', figma: 'iOS' },
-            ] as const;
-
             const newCodeSyntax = figmaExtensions?.codeSyntax || {};
-            platformsToCheck.forEach(({ key, figma: figmaPlatform }) => {
-              const syntaxValue = (newCodeSyntax as CodeSyntax)[key] !== undefined
-                ? (newCodeSyntax as CodeSyntax)[key]
-                : (newCodeSyntax as CodeSyntax)[key.toLowerCase()];
+            FIGMA_PLATFORMS.forEach(({ key, figma: figmaPlatform }) => {
+              const syntaxValue = getCodeSyntaxValue(newCodeSyntax, key);
 
               if (syntaxValue !== undefined) {
                 const valueToSet = (typeof syntaxValue === 'string') ? syntaxValue.trim() : '';
