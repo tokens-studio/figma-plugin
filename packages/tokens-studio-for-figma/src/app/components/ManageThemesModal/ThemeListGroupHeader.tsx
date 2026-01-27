@@ -3,7 +3,8 @@ import React, {
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { IconButton, DropdownMenu } from '@tokens-studio/ui';
-import { Xmark, Check, MoreVert } from 'iconoir-react';
+import { Xmark, Check } from 'iconoir-react';
+import { DotsVerticalIcon } from '@radix-ui/react-icons';
 import { editProhibitedSelector } from '@/selectors';
 import { DragControlsContext } from '@/context';
 import { StyledDragButton } from '../StyledDragger/StyledDragButton';
@@ -105,7 +106,7 @@ export function ThemeListGroupHeader({
             <DropdownMenu>
               <DropdownMenu.Trigger asChild>
                 <IconButton
-                  icon={<MoreVert />}
+                  icon={<Box css={{ transform: 'scale(0.75)' }}><DotsVerticalIcon /></Box>}
                   size="small"
                   variant="invisible"
                   tooltip="More options"
