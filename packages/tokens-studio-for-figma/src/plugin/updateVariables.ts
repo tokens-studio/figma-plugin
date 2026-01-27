@@ -58,9 +58,13 @@ export default async function updateVariables({
     }
   }
 
-  // Use getLocalVariablesAsync for FRESHER data, especially important when running multiple themed updates
-  // in a single export run.
-  const variablesInCollection = (await figma.variables.getLocalVariablesAsync())
+  // Do not use getVariablesWithoutZombies. It's not working.
+  // There seems to be a bug with getLocalVariablesAsync. It's not returning the variables in the collection - when they're being created.
+  // We could also get the current collection with figma.variables.getVariableCollectionByIdAsync(collection.id) and then fetch each variable,
+  // but that feels costly? We might need to double check this though.
+  // e.g. this wont work.
+  // const variablesInCollection = (await figma.variables.getLocalVariablesAsync()).filter((v) => v.variableCollectionId === collection.id);
+  const variablesInCollection = figma.variables.getLocalVariables()
     .filter((v) => v.variableCollectionId === collection.id);
 
   const variablesToCreate: VariableToken[] = [];
