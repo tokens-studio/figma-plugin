@@ -424,13 +424,12 @@ describe('SetValuesOnVariable', () => {
     });
 
     it('should remove codeSyntax when it is cleared in token extensions', async () => {
-      // Setup current syntax
       (testVariable as any).codeSyntax = {
         WEB: 'oldWebCode',
         ANDROID: 'oldAndroidCode',
       };
       const mockRemoveVariableCodeSyntax = jest.fn();
-      testVariable.removeVariableCodeSyntax = mockRemoveVariableCodeSyntax;
+      (testVariable as any).removeVariableCodeSyntax = mockRemoveVariableCodeSyntax;
 
       const tokens = [{
         name: 'test.variable',
@@ -458,6 +457,78 @@ describe('SetValuesOnVariable', () => {
       expect(mockRemoveVariableCodeSyntax).not.toHaveBeenCalledWith('ANDROID');
       // Verify set call
       expect(mockSetVariableCodeSyntax).toHaveBeenCalledWith('iOS', 'newIOSCode');
+    });
+
+    it('should preserve codeSyntax when providedPlatformsByVariable indicates it is provided elsewhere', async () => {
+      // Setup current syntax
+      (testVariable as any).codeSyntax = {
+        WEB: 'preservedWebCode',
+      };
+      const mockRemoveVariableCodeSyntax = jest.fn();
+      (testVariable as any).removeVariableCodeSyntax = mockRemoveVariableCodeSyntax;
+
+      const tokens = [{
+        name: 'test.variable',
+        path: 'test/variable',
+        rawValue: '16',
+        value: '16',
+        type: TokenTypes.SIZING,
+        variableId: 'test-key-1',
+        $extensions: {
+          'com.figma': {
+            codeSyntax: {
+              Android: 'androidCode',
+            },
+          },
+        },
+      }] as SingleToken<true, { path: string; variableId: string }>[];
+
+      const providedPlatformsByVariable = {
+        'test.variable': new Set(['web', 'android']),
+      };
+
+      await setValuesOnVariable([testVariable], tokens, collection, mode, baseFontSize, false, null, {}, providedPlatformsByVariable);
+
+      // Web should NOT be removed because it's in providedPlatformsByVariable
+      expect(mockRemoveVariableCodeSyntax).not.toHaveBeenCalledWith('WEB');
+      // Android should be set
+      expect(mockSetVariableCodeSyntax).toHaveBeenCalledWith('ANDROID', 'androidCode');
+    });
+
+    it('should purge codeSyntax when NOT in providedPlatformsByVariable', async () => {
+      // Setup current syntax
+      (testVariable as any).codeSyntax = {
+        WEB: 'oldWebCode',
+      };
+      const mockRemoveVariableCodeSyntax = jest.fn();
+      (testVariable as any).removeVariableCodeSyntax = mockRemoveVariableCodeSyntax;
+
+      const tokens = [{
+        name: 'test.variable',
+        path: 'test/variable',
+        rawValue: '16',
+        value: '16',
+        type: TokenTypes.SIZING,
+        variableId: 'test-key-1',
+        $extensions: {
+          'com.figma': {
+            codeSyntax: {
+              Android: 'androidCode',
+            },
+          },
+        },
+      }] as SingleToken<true, { path: string; variableId: string }>[];
+
+      const providedPlatformsByVariable = {
+        'test.variable': new Set(['android']), // Web is missing!
+      };
+
+      await setValuesOnVariable([testVariable], tokens, collection, mode, baseFontSize, false, null, {}, providedPlatformsByVariable);
+
+      // Web SHOULD be removed
+      expect(mockRemoveVariableCodeSyntax).toHaveBeenCalledWith('WEB');
+      // Android should be set
+      expect(mockSetVariableCodeSyntax).toHaveBeenCalledWith('ANDROID', 'androidCode');
     });
   });
 });

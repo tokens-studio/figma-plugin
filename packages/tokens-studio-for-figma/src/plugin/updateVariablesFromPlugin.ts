@@ -20,6 +20,8 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
     return acc;
   }, {});
 
+  const metadataUpdateTracker: Record<string, boolean> = {};
+
   themeInfo.themes.forEach((theme) => {
     if (
       Object.entries(theme.selectedTokenSets).some(
@@ -30,6 +32,60 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
       if (theme.$figmaVariableReferences?.[payload.name] && theme.$figmaModeId) {
         const variable = variableMap[theme?.$figmaVariableReferences?.[payload.name]];
         if (Object.values(themeInfo.activeTheme).includes(theme.id)) {
+          if (variable && !metadataUpdateTracker[variable.id]) {
+            // Update metadata once per variable
+            variable.description = payload.description ?? '';
+
+            const figmaExtensions = payload.$extensions?.['com.figma'];
+
+            // Update Scopes
+            if (figmaExtensions?.scopes && Array.isArray(figmaExtensions.scopes)) {
+              let newScopes = figmaExtensions.scopes as VariableScope[];
+              if (newScopes.includes('ALL_SCOPES' as VariableScope)) {
+                newScopes = [];
+              }
+              if (newScopes.includes('ALL_FILLS' as VariableScope)) {
+                newScopes = newScopes.filter((s) => !['FRAME_FILL', 'SHAPE_FILL', 'TEXT_FILL'].includes(s));
+              }
+              if (newScopes.includes('ALL_STROKES' as VariableScope)) {
+                newScopes = newScopes.filter((s) => s !== 'STROKE_COLOR');
+              }
+              variable.scopes = newScopes;
+            }
+
+            // Update Code Syntax & Purge Removed Platforms
+            const platformsToCheck = [
+              { key: 'Web', figma: 'WEB' },
+              { key: 'Android', figma: 'ANDROID' },
+              { key: 'iOS', figma: 'iOS' },
+            ] as const;
+
+            const newCodeSyntax = figmaExtensions?.codeSyntax || {};
+            platformsToCheck.forEach(({ key, figma: figmaPlatform }) => {
+              const syntaxValue = (newCodeSyntax as any)[key] !== undefined
+                ? (newCodeSyntax as any)[key]
+                : (newCodeSyntax as any)[key.toLowerCase()];
+
+              if (syntaxValue !== undefined) {
+                const valueToSet = (typeof syntaxValue === 'string') ? syntaxValue.trim() : '';
+                if (valueToSet === '') {
+                  variable.removeVariableCodeSyntax(figmaPlatform);
+                } else {
+                  variable.setVariableCodeSyntax(figmaPlatform, valueToSet);
+                }
+              } else {
+                // Platform removed from token -> remove from Figma
+                try {
+                  variable.removeVariableCodeSyntax(figmaPlatform);
+                } catch (e) {
+                  // Ignore
+                }
+              }
+            });
+
+            metadataUpdateTracker[variable.id] = true;
+          }
+
           if (checkCanReferenceVariable(payload)) {
             // If new token reference to another token, we update the variable to reference to another variable
             let referenceTokenName: string = '';

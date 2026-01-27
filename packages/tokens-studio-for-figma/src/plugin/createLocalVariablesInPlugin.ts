@@ -74,6 +74,9 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
 
     // Create a single global progress tracker for all variable creation
     let globalProgressTracker: ProgressTracker | null = null;
+    const metadataUpdateTracker: Record<string, boolean> = {};
+    const providedPlatformsByVariable: Record<string, Set<string>> = {};
+
     if (totalVariableTokens > 10) {
       // First, ensure any previous job is completed to avoid UI counter accumulation
       postToUI({
@@ -96,6 +99,25 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
       });
     }
 
+    // Pre-calculate which variables have which platforms across ALL themes/modes
+    // to enable intelligent orphan purging in setValuesOnVariable
+    selectedThemeObjects.forEach((theme) => {
+      const { tokensToCreate } = generateTokensToCreate({ theme, tokens, overallConfig });
+      tokensToCreate.forEach((token) => {
+        const figmaExtensions = token.$extensions?.['com.figma'];
+        if (figmaExtensions?.codeSyntax) {
+          const platforms = providedPlatformsByVariable[token.name] || new Set();
+          Object.keys(figmaExtensions.codeSyntax).forEach((key) => {
+            const syntax = (figmaExtensions.codeSyntax as any)[key];
+            if (syntax !== undefined) {
+              platforms.add(key.toLowerCase());
+            }
+          });
+          providedPlatformsByVariable[token.name] = platforms;
+        }
+      });
+    });
+
     // Process themes sequentially
     for (const theme of selectedThemeObjects) {
       const { collection, modeId } = findCollectionAndModeIdForTheme(theme.group ?? theme.name, theme.name, collections);
@@ -103,7 +125,15 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
       if (collection && modeId) {
         // Use overallConfig to allow cross-theme token references
         const allVariableObj = await updateVariables({
-          collection, mode: modeId, theme, tokens, settings, overallConfig, progressTracker: globalProgressTracker,
+          collection,
+          mode: modeId,
+          theme,
+          tokens,
+          settings,
+          overallConfig,
+          progressTracker: globalProgressTracker,
+          metadataUpdateTracker,
+          providedPlatformsByVariable,
         });
 
         figmaVariablesAfterCreate += allVariableObj.removedVariables.length;

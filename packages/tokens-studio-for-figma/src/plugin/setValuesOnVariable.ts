@@ -108,14 +108,19 @@ export default async function setValuesOnVariable(
               variable.name = token.path;
             }
 
-            variable.description = token.description ?? '';
+            const currentDescription = variable.description ?? '';
+            const newDescription = token.description ?? '';
 
-            // Track whether metadata (scopes or codeSyntax) has changed in Figma compared to token
-            let hasMetadataNeedsChange = false;
+            // Track whether metadata (scopes, codeSyntax or description) has changed in Figma compared to token
+            let hasMetadataNeedsChange = (newDescription !== '') && (newDescription !== currentDescription);
+
+            if (hasMetadataNeedsChange && !codeSyntaxUpdateTracker[variable.id]) {
+              variable.description = newDescription;
+            }
 
             // 1. Detect scope changes
             const figmaExtensions = token.$extensions?.['com.figma'];
-            if (figmaExtensions?.scopes && Array.isArray(figmaExtensions.scopes)) {
+            if (figmaExtensions?.scopes && Array.isArray(figmaExtensions.scopes) && !codeSyntaxUpdateTracker[variable.id]) {
               const currentScopes = variable.scopes || [];
               let newScopes = figmaExtensions.scopes as VariableScope[];
 
@@ -141,7 +146,7 @@ export default async function setValuesOnVariable(
             }
 
             // 2. Detect code syntax changes
-            if (figmaExtensions?.codeSyntax && typeof figmaExtensions.codeSyntax === 'object') {
+            if (figmaExtensions?.codeSyntax && typeof figmaExtensions.codeSyntax === 'object' && !codeSyntaxUpdateTracker[variable.id]) {
               const newCodeSyntax = figmaExtensions.codeSyntax;
               const currentCodeSyntax = (variable as any).codeSyntax || {};
               const platformsToCheck = [
@@ -211,53 +216,51 @@ export default async function setValuesOnVariable(
               // Avoid redundant metadata updates for the same variable in the same run (e.g. across multiple modes)
               if (!codeSyntaxUpdateTracker[currentVar.id]) {
                 try {
-                  // Update Scopes
-                  if (figmaExtensions && figmaExtensions.scopes && Array.isArray(figmaExtensions.scopes)) {
-                    let newScopes = figmaExtensions.scopes as VariableScope[];
-                    if (newScopes.includes('ALL_SCOPES' as VariableScope)) {
-                      newScopes = [];
+                  // If we have actual metadata, prioritize updating everything once
+                  if (figmaExtensions) {
+                    // Update Scopes
+                    if (figmaExtensions.scopes && Array.isArray(figmaExtensions.scopes)) {
+                      let newScopes = figmaExtensions.scopes as VariableScope[];
+                      if (newScopes.includes('ALL_SCOPES' as VariableScope)) {
+                        newScopes = [];
+                      }
+                      if (newScopes.includes('ALL_FILLS' as VariableScope)) {
+                        newScopes = newScopes.filter((s) => !['FRAME_FILL', 'SHAPE_FILL', 'TEXT_FILL'].includes(s));
+                      }
+                      if (newScopes.includes('ALL_STROKES' as VariableScope)) {
+                        newScopes = newScopes.filter((s) => s !== 'STROKE_COLOR');
+                      }
+                      const currentScopes = currentVar.scopes || [];
+                      const isScopesSame = newScopes.length === currentScopes.length
+                        && newScopes.every((s) => currentScopes.includes(s));
+
+                      if (!isScopesSame) {
+                        currentVar.scopes = newScopes;
+                      }
                     }
-                    if (newScopes.includes('ALL_FILLS' as VariableScope)) {
-                      newScopes = newScopes.filter((s) => !['FRAME_FILL', 'SHAPE_FILL', 'TEXT_FILL'].includes(s));
-                    }
-                    if (newScopes.includes('ALL_STROKES' as VariableScope)) {
-                      newScopes = newScopes.filter((s) => s !== 'STROKE_COLOR');
-                    }
-                    const currentScopes = currentVar.scopes || [];
-                    const isScopesSame = newScopes.length === currentScopes.length
-                      && newScopes.every((s) => currentScopes.includes(s));
 
-                    if (!isScopesSame) {
-                      currentVar.scopes = newScopes;
-                      codeSyntaxUpdateTracker[currentVar.id] = true;
-                    }
-                  }
+                    // Update Code Syntax & Purge Orphans (Always run if variable matched)
+                    const platformsToCheck = [
+                      { key: 'Web', figma: 'WEB' },
+                      { key: 'Android', figma: 'ANDROID' },
+                      { key: 'iOS', figma: 'iOS' },
+                    ] as const;
 
-                  // Update Code Syntax & Purge Orphans (Always run if variable matched)
-                  const platformsToCheck = [
-                    { key: 'Web', figma: 'WEB' },
-                    { key: 'Android', figma: 'ANDROID' },
-                    { key: 'iOS', figma: 'iOS' },
-                  ] as const;
+                    const newCodeSyntax = figmaExtensions?.codeSyntax || {};
+                    platformsToCheck.forEach(({ key, figma: figmaPlatform }) => {
+                      const hasKey = Object.prototype.hasOwnProperty.call(newCodeSyntax, key);
+                      const hasKeyLowercase = Object.prototype.hasOwnProperty.call(newCodeSyntax, key.toLowerCase());
+                      const keyExists = hasKey || hasKeyLowercase;
 
-                  const newCodeSyntax = figmaExtensions?.codeSyntax || {};
-                  platformsToCheck.forEach(({ key, figma: figmaPlatform }) => {
-                    // Check if the key exists in the object (using case-insensitive lookup)
-                    const hasKey = Object.prototype.hasOwnProperty.call(newCodeSyntax, key);
-                    const hasKeyLowercase = Object.prototype.hasOwnProperty.call(newCodeSyntax, key.toLowerCase());
-                    const keyExists = hasKey || hasKeyLowercase;
+                      const syntaxValue = hasKey
+                        ? (newCodeSyntax as any)[key]
+                        : (newCodeSyntax as any)[key.toLowerCase()];
 
-                    const syntaxValue = hasKey
-                      ? (newCodeSyntax as any)[key]
-                      : (newCodeSyntax as any)[key.toLowerCase()];
+                      const currentSyntaxValue = (currentVar as any).codeSyntax?.[figmaPlatform] || '';
+                      const valueToSet = (typeof syntaxValue === 'string') ? syntaxValue.trim() : '';
 
-                    const currentSyntaxValue = (currentVar as any).codeSyntax?.[figmaPlatform] || '';
-                    const valueToSet = (typeof syntaxValue === 'string') ? syntaxValue.trim() : '';
-
-                    if (keyExists && syntaxValue !== undefined) {
-                      // Platform is EXPLICITLY provided in this token with a defined value (could be a value or empty string)
-                      if (currentSyntaxValue !== valueToSet) {
-                        try {
+                      if (keyExists && syntaxValue !== undefined) {
+                        if (currentSyntaxValue !== valueToSet) {
                           if (valueToSet === '') {
                             if (currentSyntaxValue) {
                               currentVar.removeVariableCodeSyntax(figmaPlatform);
@@ -265,30 +268,36 @@ export default async function setValuesOnVariable(
                           } else {
                             currentVar.setVariableCodeSyntax(figmaPlatform, valueToSet);
                           }
-                          codeSyntaxUpdateTracker[currentVar.id] = true;
-                        } catch (apiError) {
-                          console.error(`Failed to set code syntax for ${key}:`, apiError);
                         }
-                      }
-                    } else if (keyExists && syntaxValue === undefined) {
-                      // Platform is EXPLICITLY set to undefined - skip this platform (do nothing)
-                      // This is used for token aggregation scenarios where we want to leave the platform as-is
-                    } else if (currentSyntaxValue) {
-                      // Platform is MISSING from this token (key doesn't exist at all)
-                      const providedPlatforms = providedPlatformsByVariable?.[token.name];
-                      if (!providedPlatforms || !providedPlatforms.has(key.toLowerCase())) {
-                        try {
+                      } else if (keyExists && syntaxValue === undefined) {
+                        // Skip platform (Aggregation mode)
+                      } else if (currentSyntaxValue) {
+                        // Orphan Purge: Platform missing from this token, check if it exists globally
+                        const providedPlatforms = providedPlatformsByVariable?.[token.name];
+                        if (!providedPlatforms || !providedPlatforms.has(key.toLowerCase())) {
                           currentVar.removeVariableCodeSyntax(figmaPlatform);
-                          codeSyntaxUpdateTracker[currentVar.id] = true;
-                        } catch (apiError) {
-                          const errorMsg = String(apiError);
-                          if (!errorMsg.includes('Code syntax field not found')) {
-                            console.error(`[TRACE-BULK] Failed to purge orphan ${key} for ${currentVar.name}:`, apiError);
-                          }
                         }
                       }
-                    }
-                  });
+                    });
+
+                    // Mark as fully updated because we had the extensions data
+                    codeSyntaxUpdateTracker[currentVar.id] = true;
+                  } else if (providedPlatformsByVariable) {
+                    // We don't have extension data for this specific token/mode,
+                    // but we can still perform a global orphan purge to remove legacy syntaxes.
+                    const platformsToCheck = ['WEB', 'ANDROID', 'iOS'] as const;
+                    platformsToCheck.forEach((figmaPlatform) => {
+                      const currentSyntaxValue = (currentVar as any).codeSyntax?.[figmaPlatform] || '';
+                      if (currentSyntaxValue) {
+                        const providedPlatforms = providedPlatformsByVariable[token.name];
+                        const platformKey = figmaPlatform.toLowerCase() === 'web' ? 'web' : figmaPlatform.toLowerCase();
+                        if (!providedPlatforms || !providedPlatforms.has(platformKey)) {
+                          currentVar.removeVariableCodeSyntax(figmaPlatform);
+                        }
+                      }
+                    });
+                    // DO NOT set the tracker to true, so that a later mode with extension data can still apply it.
+                  }
                 } catch (e) {
                   console.error('Failed to update metadata:', e);
                 }
