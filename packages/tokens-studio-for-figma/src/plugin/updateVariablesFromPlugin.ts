@@ -8,6 +8,7 @@ import setBooleanValuesOnVariable from './setBooleanValuesOnVariable';
 import setNumberValuesOnVariable from './setNumberValuesOnVariable';
 import setStringValuesOnVariable from './setStringValuesOnVariable';
 import { UpdateTokenVariablePayload } from '@/types/payloads/UpdateTokenVariablePayload';
+import { CodeSyntax, FigmaExtensions } from '@/types/tokens';
 import { checkCanReferenceVariable } from '@/utils/alias/checkCanReferenceVariable';
 
 export default async function updateVariablesFromPlugin(payload: UpdateTokenVariablePayload) {
@@ -36,7 +37,7 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
             // Update metadata once per variable
             variable.description = payload.description ?? '';
 
-            const figmaExtensions = payload.$extensions?.['com.figma'];
+            const figmaExtensions = payload.$extensions?.['com.figma'] as FigmaExtensions;
 
             // Update Scopes
             if (figmaExtensions?.scopes && Array.isArray(figmaExtensions.scopes)) {
@@ -62,9 +63,9 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
 
             const newCodeSyntax = figmaExtensions?.codeSyntax || {};
             platformsToCheck.forEach(({ key, figma: figmaPlatform }) => {
-              const syntaxValue = (newCodeSyntax as any)[key] !== undefined
-                ? (newCodeSyntax as any)[key]
-                : (newCodeSyntax as any)[key.toLowerCase()];
+              const syntaxValue = (newCodeSyntax as CodeSyntax)[key] !== undefined
+                ? (newCodeSyntax as CodeSyntax)[key]
+                : (newCodeSyntax as CodeSyntax)[key.toLowerCase()];
 
               if (syntaxValue !== undefined) {
                 const valueToSet = (typeof syntaxValue === 'string') ? syntaxValue.trim() : '';

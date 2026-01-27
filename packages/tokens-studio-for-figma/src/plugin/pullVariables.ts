@@ -1,4 +1,5 @@
 /* eslint-disable no-continue */
+import { FigmaExtensions } from '@/types/tokens';
 import { figmaRGBToHex } from '@figma-plugin/helpers';
 import { notifyVariableValues, notifyRenamedCollections } from './notifiers';
 import { PullVariablesOptions, ThemeObjectsList } from '@/types';
@@ -47,7 +48,7 @@ export default async function pullVariables(options: PullVariablesOptions, theme
   }>();
 
   const createFigmaExtensions = (variable: Variable) => {
-    const extensions: any = {};
+    const extensions: FigmaExtensions = {};
 
     // Add scopes if they exist and are not default
     if (variable.scopes && variable.scopes.length > 0) {
@@ -58,10 +59,9 @@ export default async function pullVariables(options: PullVariablesOptions, theme
     const codeSyntax: Record<string, string> = {};
     try {
       // Check if variable has code syntax for each platform
-      const variableAny = variable as any;
-      const webSyntax = variableAny.codeSyntax?.WEB;
-      const androidSyntax = variableAny.codeSyntax?.ANDROID;
-      const iosSyntax = variableAny.codeSyntax?.iOS;
+      const webSyntax = variable.codeSyntax?.WEB;
+      const androidSyntax = variable.codeSyntax?.ANDROID;
+      const iosSyntax = variable.codeSyntax?.iOS;
 
       if (webSyntax) codeSyntax.Web = webSyntax;
       if (androidSyntax) codeSyntax.Android = androidSyntax;
@@ -331,9 +331,9 @@ export default async function pullVariables(options: PullVariablesOptions, theme
           // Find token sets in this theme that are different from the current token set name
           Object.keys(matchingTheme.selectedTokenSets || {}).forEach((existingTokenSet) => {
             if (existingTokenSet !== tokenSetName
-                && existingTokenSet.includes('/')
-                && !renamedCollections.has(existingTokenSet)
-                && !Array.from(renamedCollections.values()).includes(tokenSetName)) {
+              && existingTokenSet.includes('/')
+              && !renamedCollections.has(existingTokenSet)
+              && !Array.from(renamedCollections.values()).includes(tokenSetName)) {
               renamedCollections.set(existingTokenSet, tokenSetName);
             }
           });

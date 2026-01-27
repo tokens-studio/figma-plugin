@@ -1,4 +1,4 @@
-import { SingleToken } from '@/types/tokens';
+import { SingleToken, CodeSyntax, FigmaExtensions } from '@/types/tokens';
 import setBooleanValuesOnVariable from './setBooleanValuesOnVariable';
 import setColorValuesOnVariable from './setColorValuesOnVariable';
 import setNumberValuesOnVariable from './setNumberValuesOnVariable';
@@ -138,7 +138,7 @@ export default async function setValuesOnVariable(
             }
 
             // 1. Detect scope changes
-            const figmaExtensions = token.$extensions?.['com.figma'];
+            const figmaExtensions = token.$extensions?.['com.figma'] as FigmaExtensions;
             if (figmaExtensions?.scopes && Array.isArray(figmaExtensions.scopes) && !codeSyntaxUpdateTracker[variable.id]) {
               const currentScopes = variable.scopes || [];
               let newScopes = figmaExtensions.scopes as VariableScope[];
@@ -167,7 +167,7 @@ export default async function setValuesOnVariable(
             // 2. Detect code syntax changes
             if (figmaExtensions?.codeSyntax && typeof figmaExtensions.codeSyntax === 'object' && !codeSyntaxUpdateTracker[variable.id]) {
               const newCodeSyntax = figmaExtensions.codeSyntax;
-              const currentCodeSyntax = (variable as any).codeSyntax || {};
+              const currentCodeSyntax = variable.codeSyntax || {};
               const platformsToCheck = [
                 { key: 'Web', figma: 'WEB' },
                 { key: 'Android', figma: 'ANDROID' },
@@ -175,9 +175,9 @@ export default async function setValuesOnVariable(
               ] as const;
 
               platformsToCheck.forEach(({ key, figma: figmaPlatform }) => {
-                const syntax = (newCodeSyntax as any)[key] !== undefined
-                  ? (newCodeSyntax as any)[key]
-                  : (newCodeSyntax as any)[key.toLowerCase()];
+                const syntax = (newCodeSyntax as CodeSyntax)[key] !== undefined
+                  ? (newCodeSyntax as CodeSyntax)[key]
+                  : (newCodeSyntax as CodeSyntax)[key.toLowerCase()];
 
                 // Aggregation: Only skip if strictly undefined. Empty string "" means explicit clearing.
                 if (syntax !== undefined) {
@@ -276,10 +276,10 @@ export default async function setValuesOnVariable(
                       const keyExists = hasKey || hasKeyLowercase;
 
                       const syntaxValue = hasKey
-                        ? (newCodeSyntax as any)[key]
-                        : (newCodeSyntax as any)[key.toLowerCase()];
+                        ? (newCodeSyntax as CodeSyntax)[key]
+                        : (newCodeSyntax as CodeSyntax)[key.toLowerCase()];
 
-                      const currentSyntaxValue = (currentVar as any).codeSyntax?.[figmaPlatform] || '';
+                      const currentSyntaxValue = currentVar.codeSyntax?.[figmaPlatform] || '';
                       const valueToSet = (typeof syntaxValue === 'string') ? syntaxValue.trim() : '';
 
                       if (keyExists && syntaxValue !== undefined) {
@@ -310,7 +310,7 @@ export default async function setValuesOnVariable(
                     // but we can still perform a global orphan purge to remove legacy syntaxes.
                     const platformsToCheck = ['WEB', 'ANDROID', 'iOS'] as const;
                     platformsToCheck.forEach((figmaPlatform) => {
-                      const currentSyntaxValue = (currentVar as any).codeSyntax?.[figmaPlatform] || '';
+                      const currentSyntaxValue = currentVar.codeSyntax?.[figmaPlatform] || '';
                       if (currentSyntaxValue) {
                         const providedPlatforms = providedPlatformsByVariable[token.name];
                         const platformKey = figmaPlatform.toLowerCase() === 'web' ? 'web' : figmaPlatform.toLowerCase();

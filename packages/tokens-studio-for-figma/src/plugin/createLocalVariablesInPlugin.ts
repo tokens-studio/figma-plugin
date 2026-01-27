@@ -1,6 +1,6 @@
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
-import { AnyTokenList } from '@/types/tokens';
+import { AnyTokenList, CodeSyntax, FigmaExtensions } from '@/types/tokens';
 import { SettingsState } from '@/app/store/models/settings';
 import updateVariables from './updateVariables';
 import { ReferenceVariableType } from './setValuesOnVariable';
@@ -110,11 +110,11 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
     selectedThemeObjects.forEach((theme) => {
       const { tokensToCreate } = generateTokensToCreate({ theme, tokens, overallConfig });
       tokensToCreate.forEach((token) => {
-        const figmaExtensions = token.$extensions?.['com.figma'];
+        const figmaExtensions = token.$extensions?.['com.figma'] as FigmaExtensions;
         if (figmaExtensions?.codeSyntax) {
           const platforms = providedPlatformsByVariable[token.name] || new Set();
           Object.keys(figmaExtensions.codeSyntax).forEach((key) => {
-            const syntax = (figmaExtensions.codeSyntax as any)[key];
+            const syntax = (figmaExtensions.codeSyntax as CodeSyntax)[key];
             if (syntax !== undefined) {
               platforms.add(key.toLowerCase());
             }
