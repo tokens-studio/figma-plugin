@@ -339,11 +339,18 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
                 <DragItem<TreeItem> key={item.key} item={item}>
                   {
                     item.isLeaf && typeof item.value === 'object' ? (
-                      <ThemeListItemContent item={item.value} isActive={activeTheme?.[item.parent as string] === item.value.id} onOpen={handleToggleThemeEditor} groupName={item.parent as string} />
+                      <ThemeListItemContent
+                        item={item.value}
+                        isActive={activeTheme?.[item.parent as string] === item.value.id}
+                        onOpen={handleToggleThemeEditor}
+                        groupName={item.parent as string}
+                        isExtended={typeof item.parent === 'string' && item.parent.includes('/')}
+                      />
                     ) : (
                       <ThemeListGroupHeader
                         label={item.value === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : item.value as string}
                         groupName={item.value as string}
+                        isExtended={typeof item.value === 'string' && item.value.includes('/')}
                         onExtendThemeGroup={(groupName) => {
                           setSelectedParentGroup(groupName);
                           setIsExtendMode(true);

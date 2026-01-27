@@ -15,6 +15,7 @@ type Props = React.PropsWithChildren<{
   isActive: boolean
   groupName: string
   onOpen: (theme?: ThemeObject) => void;
+  isExtended?: boolean
 }>;
 
 const StyledDragGrabber = styled(DragGrabber, {
@@ -26,6 +27,7 @@ export function ThemeListItemContent({
   isActive,
   groupName,
   onOpen,
+  isExtended = false,
 }: Props) {
   const dragContext = useContext(DragControlsContext);
   const editProhibited = useSelector(editProhibitedSelector);
@@ -39,7 +41,11 @@ export function ThemeListItemContent({
       type="button"
       canReorder={!editProhibited}
       css={{
-        padding: 0, width: '100%', display: 'inherit', cursor: 'inherit',
+        padding: 0,
+        width: '100%',
+        display: 'inherit',
+        cursor: 'inherit',
+        ...(isExtended ? { paddingLeft: '$6' } : {}),
       }}
     >
       <StyledDragGrabber<ThemeObject>

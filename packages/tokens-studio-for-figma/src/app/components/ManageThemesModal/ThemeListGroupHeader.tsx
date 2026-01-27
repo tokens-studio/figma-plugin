@@ -20,12 +20,14 @@ type Props = React.PropsWithChildren<{
   groupName: string
   label: string
   onExtendThemeGroup: (groupName: string) => void
+  isExtended?: boolean
 }>;
 
 export function ThemeListGroupHeader({
   groupName,
   label,
   onExtendThemeGroup,
+  isExtended = false,
 }: Props) {
   const dispatch = useDispatch<Dispatch>();
   const dragContext = useContext(DragControlsContext);
@@ -76,6 +78,7 @@ export function ThemeListGroupHeader({
         display: 'flex',
         cursor: 'inherit',
         '&:not(:first-of-type)': { marginTop: '$4' },
+        ...(isExtended ? { paddingLeft: '$6' } : {}),
       }}
     >
       <DragGrabber
