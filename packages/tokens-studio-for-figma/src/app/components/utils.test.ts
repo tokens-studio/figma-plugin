@@ -54,8 +54,8 @@ describe('isSingleToken', () => {
 describe('isSingleTypographyToken', () => {
   it('checks if type is typography', () => {
     const correctToken = {
-      type: 'typography',
-      value: {
+      $type: 'typography',
+      $value: {
         fontFamily: 'foo',
         fontWeight: 'normal',
         fontSize: '32',

@@ -94,7 +94,7 @@ describe('StartScreen Provider Selector', () => {
     // Should not show the provider selector section
     expect(screen.queryByText('loadFromProvider')).not.toBeInTheDocument();
     expect(screen.queryByTestId('provider-selector')).not.toBeInTheDocument();
-    
+
     // Should still show the regular buttons
     expect(screen.getByText('newEmptyFile')).toBeInTheDocument();
     expect(screen.getByText('loadExample')).toBeInTheDocument();
@@ -178,7 +178,7 @@ describe('StartScreen Provider Selector', () => {
     // Should render the Select component with proper structure
     const selectTrigger = screen.getByTestId('provider-selector');
     expect(selectTrigger).toBeInTheDocument();
-    
+
     // Should have the correct button structure for provider selection
     expect(screen.getByText('newEmptyFile')).toBeInTheDocument();
     expect(screen.getByText('loadExample')).toBeInTheDocument();
