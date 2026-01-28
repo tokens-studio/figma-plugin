@@ -30,6 +30,7 @@ const StorageItem = ({ item, onEdit, onMigrate }: Props) => {
   const storageType = useSelector(storageTypeSelector);
   const { provider, id, name } = item;
   const branch = isGitProvider(item) ? item.branch : null;
+  const projectName = provider === StorageProviderType.TOKENS_STUDIO && 'projectName' in item ? item.projectName : null;
   const { restoreStoredProvider, deleteProvider } = useRemoteTokens();
   const { confirm } = useConfirm();
   const { setStorageType } = useStorage();
@@ -119,7 +120,7 @@ const StorageItem = ({ item, onEdit, onMigrate }: Props) => {
                   maxWidth: '100%',
                 }}
               >
-                {id}
+                {projectName || id}
                 {' '}
                 {branch && ` (${branch})`}
               </Box>
