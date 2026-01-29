@@ -21,6 +21,7 @@ type Props = React.PropsWithChildren<{
   label: string
   onExtendThemeGroup: (groupName: string) => void
   indentationDepth?: number
+  isExtendedGroup?: boolean
 }>;
 
 export function ThemeListGroupHeader({
@@ -28,6 +29,7 @@ export function ThemeListGroupHeader({
   label,
   onExtendThemeGroup,
   indentationDepth = 0,
+  isExtendedGroup = false,
 }: Props) {
   const dispatch = useDispatch<Dispatch>();
   const dragContext = useContext(DragControlsContext);
@@ -122,8 +124,16 @@ export function ThemeListGroupHeader({
                     <span>Rename Theme Group</span>
                   </DropdownMenu.Item>
                   {groupName !== INTERNAL_THEMES_NO_GROUP && (
-                    <DropdownMenu.Item onSelect={handleExtendGroup}>
-                      <Box css={{ display: 'flex', alignItems: 'center', gap: '$2' }}>
+                    <DropdownMenu.Item
+                      onSelect={isExtendedGroup ? undefined : handleExtendGroup}
+                      disabled={isExtendedGroup}
+                    >
+                      <Box css={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '$2',
+                        ...(isExtendedGroup ? { color: '$fgDisabled', cursor: 'not-allowed' } : {})
+                      }}>
                         <span>Extend Theme Group</span>
                       </Box>
                     </DropdownMenu.Item>

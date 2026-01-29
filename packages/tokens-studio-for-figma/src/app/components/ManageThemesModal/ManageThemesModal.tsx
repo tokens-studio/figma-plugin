@@ -222,6 +222,17 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
     dispatch.tokenState.replaceThemes(updatedThemes);
   }, [dispatch.tokenState, activeTheme]);
 
+  // Helper to check if a theme group is extended (child theme)
+  const isExtendedGroup = useCallback((groupName: string) => {
+    // Check if group name contains "/" (hierarchical format like "Parent/Extended")
+    if (groupName.includes('/')) {
+      return true;
+    }
+    // Also check if any theme in this group has $figmaParentThemeId
+    const themesInGroup = themes.filter(t => t.group === groupName);
+    return themesInGroup.some(t => t.$figmaParentThemeId);
+  }, [themes]);
+
   const handleCheckReorder = React.useCallback((
     order: ItemData<typeof treeItems[number]>[],
     value: typeof treeItems[number],
@@ -351,6 +362,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
                         label={item.value === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : item.value as string}
                         groupName={item.value as string}
                         indentationDepth={typeof item.value === 'string' ? (item.value.match(/\//g) || []).length : 0}
+                        isExtendedGroup={typeof item.value === 'string' ? isExtendedGroup(item.value) : false}
                         onExtendThemeGroup={(groupName) => {
                           setSelectedParentGroup(groupName);
                           setIsExtendMode(true);
