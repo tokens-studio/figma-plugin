@@ -20,6 +20,7 @@ type Props = React.PropsWithChildren<{
   groupName: string
   label: string
   onExtendThemeGroup: (groupName: string) => void
+  onDeleteThemeGroup: (groupName: string) => void
   indentationDepth?: number
   isExtendedGroup?: boolean
 }>;
@@ -28,6 +29,7 @@ export function ThemeListGroupHeader({
   groupName,
   label,
   onExtendThemeGroup,
+  onDeleteThemeGroup,
   indentationDepth = 0,
   isExtendedGroup = false,
 }: Props) {
@@ -69,6 +71,10 @@ export function ThemeListGroupHeader({
   const handleExtendGroup = useCallback(() => {
     onExtendThemeGroup(groupName);
   }, [groupName, onExtendThemeGroup]);
+
+  const handleDeleteGroup = useCallback(() => {
+    onDeleteThemeGroup(groupName);
+  }, [groupName, onDeleteThemeGroup]);
 
   return (
     <StyledDragButton
@@ -136,6 +142,11 @@ export function ThemeListGroupHeader({
                       }}>
                         <span>Extend Theme Group</span>
                       </Box>
+                    </DropdownMenu.Item>
+                  )}
+                  {isExtendedGroup && groupName !== INTERNAL_THEMES_NO_GROUP && (
+                    <DropdownMenu.Item onSelect={handleDeleteGroup}>
+                      <span>Delete Theme Group</span>
                     </DropdownMenu.Item>
                   )}
                 </DropdownMenu.Content>

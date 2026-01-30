@@ -119,6 +119,22 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
     }
   }, [confirm, dispatch.tokenState, t, themeEditorOpen]);
 
+  const handleDeleteThemeGroup = useCallback(async (groupName: string) => {
+    const themesInGroup = themes.filter((t) => t.group === groupName);
+    const confirmText = `Delete theme group "${groupName}" with ${themesInGroup.length} theme(s)?`;
+
+    const confirmDelete = await confirm({
+      text: confirmText,
+      confirmAction: t('delete'),
+      variant: 'danger',
+    });
+
+    if (confirmDelete) {
+      track('Delete theme group', { groupName, themeCount: themesInGroup.length });
+      dispatch.tokenState.deleteThemeGroup(groupName);
+    }
+  }, [themes, confirm, dispatch, t]);
+
   const handleCancelEdit = useCallback(() => {
     setThemeEditorOpen(false);
     setIsExtendMode(false);
@@ -291,16 +307,21 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
           {themeEditorOpen && (
             <>
               <Box css={{ marginRight: 'auto' }}>
-                {typeof themeEditorOpen === 'string' && (
-                  <Button
-                    data-testid="button-manage-themes-modal-delete-theme"
-                    variant="danger"
-                    type="submit"
-                    onClick={handleDeleteTheme}
-                  >
-                    {t('delete')}
-                  </Button>
-                )}
+                {typeof themeEditorOpen === 'string' && (() => {
+                  const currentTheme = themes.find((t) => t.id === themeEditorOpen);
+                  const isExtendedTheme = currentTheme?.$figmaIsExtension;
+
+                  return !isExtendedTheme ? (
+                    <Button
+                      data-testid="button-manage-themes-modal-delete-theme"
+                      variant="danger"
+                      type="submit"
+                      onClick={handleDeleteTheme}
+                    >
+                      {t('delete')}
+                    </Button>
+                  ) : null;
+                })()}
               </Box>
               <Stack direction="row" gap={4}>
                 <Button
@@ -368,6 +389,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
                           setIsExtendMode(true);
                           setThemeEditorOpen(true);
                         }}
+                        onDeleteThemeGroup={handleDeleteThemeGroup}
                       />
                     )
                   }
