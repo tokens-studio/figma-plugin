@@ -186,7 +186,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
         const themeData: any = {
           name: parentTheme.name, // Keep same mode name (Light, Dark, etc.)
           group: `${parentGroupName}/${newGroupName}`, // Hierarchical group format: "ParentGroup/ExtendedGroup"
-          selectedTokenSets: {}, // Start empty - user will manually add token sets with overridden values
+          selectedTokenSets: parentTheme.selectedTokenSets, // Copy parent's token sets
           $figmaIsExtension: true,
           $figmaParentThemeId: parentTheme.id,
           $figmaParentCollectionId: parentTheme.$figmaCollectionId,
