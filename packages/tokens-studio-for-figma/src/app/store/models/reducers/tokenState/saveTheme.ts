@@ -15,6 +15,30 @@ type Payload = Omit<ThemeObject, 'id' | '$figmaStyleReferences'> & {
   }
 };
 
+/**
+ * Find all extended child groups of a parent group
+ * @param parentGroup - The parent group name
+ * @param allThemes - All themes to search through
+ * @returns Array of immediate child group names
+ */
+function findExtendedChildGroups(parentGroup: string, allThemes: ThemeObject[]): string[] {
+  const childGroups = new Set<string>();
+
+  allThemes.forEach((theme) => {
+    if (theme.group && theme.group.startsWith(`${parentGroup}/`)) {
+      // Extract the immediate child group (not grandchildren)
+      const parts = theme.group.split('/');
+      const parentParts = parentGroup.split('/');
+      // Only include direct children (one level deeper)
+      if (parts.length === parentParts.length + 1) {
+        childGroups.add(theme.group);
+      }
+    }
+  });
+
+  return Array.from(childGroups);
+}
+
 export function saveTheme(state: TokenState, data: Payload): TokenState {
   const isNewTheme = !data.id;
   const themeId = data.id || hash([Date.now(), data]);
@@ -44,6 +68,28 @@ export function saveTheme(state: TokenState, data: Payload): TokenState {
     ...(data.$figmaVariableReferences ? { $figmaVariableReferences: data.$figmaVariableReferences } : {}),
   });
 
+  let finalThemes = updatedThemes;
+
+  // If this is a new theme in a parent group (not an extended theme), cascade to children
+  if (isNewTheme && data.group && !data.$figmaIsExtension) {
+    const extendedChildGroups = findExtendedChildGroups(data.group, updatedThemes);
+
+    extendedChildGroups.forEach((childGroup) => {
+      const childThemeId = hash([Date.now(), childGroup, data.name, Math.random()]);
+      const childTheme: ThemeObject = {
+        id: childThemeId,
+        name: data.name,
+        group: childGroup,
+        selectedTokenSets: data.selectedTokenSets || {},
+        $figmaStyleReferences: {},
+        $figmaIsExtension: true,
+        $figmaParentThemeId: themeId,
+      };
+
+      finalThemes.push(childTheme);
+    });
+  }
+
   const newActiveTheme = state.activeTheme;
   if (!isActiveTheme) {
     Object.keys(newActiveTheme).forEach((group) => {
@@ -56,7 +102,7 @@ export function saveTheme(state: TokenState, data: Payload): TokenState {
   }
   const nextState: TokenState = {
     ...state,
-    themes: updatedThemes,
+    themes: finalThemes,
   };
 
   if (isActiveTheme || isNewTheme) {
