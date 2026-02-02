@@ -51,9 +51,6 @@ export default async function pullVariables(options: PullVariablesOptions, theme
   const createFigmaExtensions = (variable: Variable) => {
     const extensions: Record<string, any> = {};
 
-    // Add variable ID
-    extensions['com.figma.variableId'] = variable.key;
-
     // Add scopes if they exist and are not default
     if (variable.scopes && variable.scopes.length > 0) {
       extensions['com.figma.scopes'] = variable.scopes;
@@ -78,9 +75,6 @@ export default async function pullVariables(options: PullVariablesOptions, theme
         notifyException(e.message);
       }
     }
-
-    // Mark as override (pulled from Figma)
-    extensions['com.figma.isOverride'] = true;
 
     return Object.keys(extensions).length > 0 ? extensions : undefined;
   };
