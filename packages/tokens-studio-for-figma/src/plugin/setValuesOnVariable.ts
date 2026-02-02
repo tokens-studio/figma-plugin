@@ -1,4 +1,4 @@
-import { SingleToken, CodeSyntax, FigmaExtensions } from '@/types/tokens';
+import { SingleToken, CodeSyntax, VariableScope } from '@/types/tokens';
 import { FIGMA_PLATFORMS, normalizeVariableScopes, getCodeSyntaxValue } from '@/utils/figma';
 import setBooleanValuesOnVariable from './setBooleanValuesOnVariable';
 import setColorValuesOnVariable from './setColorValuesOnVariable';
