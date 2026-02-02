@@ -367,34 +367,40 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
             checkReorder={handleCheckReorder as (order: ItemData<unknown>[], value: unknown, offset: number, velocity: number) => ItemData<unknown>[]}
           >
             {
-              treeItems.map((item) => (
-                <DragItem<TreeItem> key={item.key} item={item}>
-                  {
-                    item.isLeaf && typeof item.value === 'object' ? (
-                      <ThemeListItemContent
-                        item={item.value}
-                        isActive={activeTheme?.[item.parent as string] === item.value.id}
-                        onOpen={handleToggleThemeEditor}
-                        groupName={item.parent as string}
-                        indentationDepth={typeof item.parent === 'string' ? (item.parent.match(/\//g) || []).length : 0}
-                      />
-                    ) : (
-                      <ThemeListGroupHeader
-                        label={item.value === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : item.value as string}
-                        groupName={item.value as string}
-                        indentationDepth={typeof item.value === 'string' ? (item.value.match(/\//g) || []).length : 0}
-                        isExtendedGroup={typeof item.value === 'string' ? isExtendedGroup(item.value) : false}
-                        onExtendThemeGroup={(groupName) => {
-                          setSelectedParentGroup(groupName);
-                          setIsExtendMode(true);
-                          setThemeEditorOpen(true);
-                        }}
-                        onDeleteThemeGroup={handleDeleteThemeGroup}
-                      />
-                    )
-                  }
-                </DragItem>
-              ))
+              treeItems.map((item) => {
+                const isExtended = !item.isLeaf && typeof item.value === 'string' ? isExtendedGroup(item.value) : false;
+                const parentIsExtended = item.parent && typeof item.parent === 'string' && isExtendedGroup(item.parent);
+
+                return (
+                  <DragItem<TreeItem> key={item.key} item={item}>
+                    {
+                      item.isLeaf && typeof item.value === 'object' ? (
+                        <ThemeListItemContent
+                          item={item.value}
+                          isActive={activeTheme?.[item.parent as string] === item.value.id}
+                          onOpen={handleToggleThemeEditor}
+                          groupName={item.parent as string}
+                          indentationDepth={typeof item.parent === 'string' ? (item.parent.match(/\//g) || []).length : 0}
+                          isUnderExtendedGroup={!!parentIsExtended}
+                        />
+                      ) : (
+                        <ThemeListGroupHeader
+                          label={item.value === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : item.value as string}
+                          groupName={item.value as string}
+                          indentationDepth={typeof item.value === 'string' ? (item.value.match(/\//g) || []).length : 0}
+                          isExtendedGroup={isExtended}
+                          onExtendThemeGroup={(groupName) => {
+                            setSelectedParentGroup(groupName);
+                            setIsExtendMode(true);
+                            setThemeEditorOpen(true);
+                          }}
+                          onDeleteThemeGroup={handleDeleteThemeGroup}
+                        />
+                      )
+                    }
+                  </DragItem>
+                );
+              })
             }
           </StyledReorderGroup>
         </Box>

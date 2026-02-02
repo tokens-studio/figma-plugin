@@ -16,6 +16,7 @@ type Props = React.PropsWithChildren<{
   groupName: string
   onOpen: (theme?: ThemeObject) => void;
   indentationDepth?: number
+  isUnderExtendedGroup?: boolean // NEW: indicates if this theme belongs to an extended group
 }>;
 
 const StyledDragGrabber = styled(DragGrabber, {
@@ -28,6 +29,7 @@ export function ThemeListItemContent({
   groupName,
   onOpen,
   indentationDepth = 0,
+  isUnderExtendedGroup = false,
 }: Props) {
   const dragContext = useContext(DragControlsContext);
   const editProhibited = useSelector(editProhibitedSelector);
@@ -45,8 +47,29 @@ export function ThemeListItemContent({
         width: '100%',
         display: 'inherit',
         cursor: 'inherit',
+        position: 'relative',
         // Progressive indentation based on depth level (each level adds $6 padding)
         ...(indentationDepth > 0 ? { paddingLeft: `calc($6 * ${indentationDepth})` } : {}),
+        // Visual hierarchy line for extended groups
+        ...(isUnderExtendedGroup ? {
+          '&::before': {
+            content: '',
+            position: 'absolute',
+            left: '12px',
+            top: 0,
+            bottom: 0,
+            width: '1px',
+            backgroundColor: '$borderMuted',
+          },
+          '&:last-of-type::before': {
+            bottom: '50%',
+            borderBottomLeftRadius: '$medium',
+            borderBottom: '1px solid $borderMuted',
+            borderLeft: '1px solid $borderMuted',
+            width: '4px',
+            backgroundColor: 'transparent',
+          },
+        } : {}),
       }}
     >
       <StyledDragGrabber<ThemeObject>
