@@ -1,5 +1,4 @@
 /* eslint-disable no-continue */
-import { VariableScope } from '@/types/tokens';
 import { FIGMA_PLATFORMS } from '@/utils/figma';
 import { figmaRGBToHex } from '@figma-plugin/helpers';
 import { notifyVariableValues, notifyRenamedCollections, notifyException } from './notifiers';
