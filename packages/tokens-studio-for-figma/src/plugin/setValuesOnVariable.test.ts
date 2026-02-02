@@ -266,9 +266,7 @@ describe('SetValuesOnVariable', () => {
         type: TokenTypes.SIZING,
         variableId: 'test-key-1',
         $extensions: {
-          'com.figma': {
-            scopes: ['CORNER_RADIUS'],
-          },
+          'com.figma.scopes': ['CORNER_RADIUS'],
         },
       }] as SingleToken<true, { path: string; variableId: string }>[];
 
@@ -299,11 +297,9 @@ describe('SetValuesOnVariable', () => {
         type: TokenTypes.COLOR,
         variableId: 'test-key-1',
         $extensions: {
-          'com.figma': {
-            codeSyntax: {
-              Web: 'red',
-              iOS: 'UIColor.red',
-            },
+          'com.figma.codeSyntax': {
+            Web: 'red',
+            iOS: 'UIColor.red',
           },
         },
       }] as SingleToken<true, { path: string; variableId: string }>[];
@@ -330,9 +326,7 @@ describe('SetValuesOnVariable', () => {
         type: TokenTypes.SIZING,
         variableId: 'test-key-1',
         $extensions: {
-          'com.figma': {
-            scopes: ['WIDTH_HEIGHT', 'GAP'], // Same as current
-          },
+          'com.figma.scopes': ['WIDTH_HEIGHT', 'GAP'], // Same as current
         },
       }] as SingleToken<true, { path: string; variableId: string }>[];
 
@@ -360,12 +354,10 @@ describe('SetValuesOnVariable', () => {
         type: TokenTypes.SIZING,
         variableId: 'test-key-1',
         $extensions: {
-          'com.figma': {
-            codeSyntax: {
-              Web: '', // Cleared
-              Android: undefined, // Also cleared
-              iOS: 'newIOSCode', // Added
-            },
+          'com.figma.codeSyntax': {
+            Web: '', // Cleared
+            Android: undefined, // Also cleared
+            iOS: 'newIOSCode', // Added
           },
         },
       }] as SingleToken<true, { path: string; variableId: string }>[];
@@ -396,10 +388,8 @@ describe('SetValuesOnVariable', () => {
         type: TokenTypes.SIZING,
         variableId: 'test-key-1',
         $extensions: {
-          'com.figma': {
-            codeSyntax: {
-              Android: 'androidCode',
-            },
+          'com.figma.codeSyntax': {
+            Android: 'androidCode',
           },
         },
       }] as SingleToken<true, { path: string; variableId: string }>[];
@@ -432,10 +422,8 @@ describe('SetValuesOnVariable', () => {
         type: TokenTypes.SIZING,
         variableId: 'test-key-1',
         $extensions: {
-          'com.figma': {
-            codeSyntax: {
-              Android: 'androidCode',
-            },
+          'com.figma.codeSyntax': {
+            Android: 'androidCode',
           },
         },
       }] as SingleToken<true, { path: string; variableId: string }>[];

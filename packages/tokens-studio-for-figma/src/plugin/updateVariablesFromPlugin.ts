@@ -8,7 +8,7 @@ import setBooleanValuesOnVariable from './setBooleanValuesOnVariable';
 import setNumberValuesOnVariable from './setNumberValuesOnVariable';
 import setStringValuesOnVariable from './setStringValuesOnVariable';
 import { UpdateTokenVariablePayload } from '@/types/payloads/UpdateTokenVariablePayload';
-import { FigmaExtensions } from '@/types/tokens';
+import { FigmaExtensions, CodeSyntax, VariableScope } from '@/types/tokens';
 import { FIGMA_PLATFORMS, normalizeVariableScopes, getCodeSyntaxValue } from '@/utils/figma';
 import { checkCanReferenceVariable } from '@/utils/alias/checkCanReferenceVariable';
 
@@ -38,15 +38,16 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
             // Update metadata once per variable
             variable.description = payload.description ?? '';
 
-            const figmaExtensions = payload.$extensions?.['com.figma'] as FigmaExtensions;
+            const flatScopes = payload.$extensions?.['com.figma.scopes'] as VariableScope[] | undefined;
+            const flatCodeSyntax = payload.$extensions?.['com.figma.codeSyntax'] as CodeSyntax | undefined;
 
             // Update Scopes
-            if (figmaExtensions?.scopes && Array.isArray(figmaExtensions.scopes)) {
-              variable.scopes = normalizeVariableScopes(figmaExtensions.scopes);
+            if (flatScopes && Array.isArray(flatScopes)) {
+              variable.scopes = normalizeVariableScopes(flatScopes);
             }
 
             // Update Code Syntax & Purge Removed Platforms
-            const newCodeSyntax = figmaExtensions?.codeSyntax || {};
+            const newCodeSyntax = flatCodeSyntax || {};
             FIGMA_PLATFORMS.forEach(({ key, figma: figmaPlatform }) => {
               const syntaxValue = getCodeSyntaxValue(newCodeSyntax, key);
 

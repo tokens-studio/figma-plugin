@@ -49,11 +49,14 @@ export default async function pullVariables(options: PullVariablesOptions, theme
   }>();
 
   const createFigmaExtensions = (variable: Variable) => {
-    const extensions: FigmaExtensions = {};
+    const extensions: Record<string, any> = {};
+
+    // Add variable ID
+    extensions['com.figma.variableId'] = variable.key;
 
     // Add scopes if they exist and are not default
     if (variable.scopes && variable.scopes.length > 0) {
-      extensions.scopes = variable.scopes;
+      extensions['com.figma.scopes'] = variable.scopes;
     }
 
     // Add code syntax if it exists
@@ -68,7 +71,7 @@ export default async function pullVariables(options: PullVariablesOptions, theme
       });
 
       if (Object.keys(codeSyntax).length > 0) {
-        extensions.codeSyntax = codeSyntax;
+        extensions['com.figma.codeSyntax'] = codeSyntax;
       }
     } catch (e) {
       if (e instanceof Error) {
@@ -76,7 +79,10 @@ export default async function pullVariables(options: PullVariablesOptions, theme
       }
     }
 
-    return Object.keys(extensions).length > 0 ? { 'com.figma': extensions } : undefined;
+    // Mark as override (pulled from Figma)
+    extensions['com.figma.isOverride'] = true;
+
+    return Object.keys(extensions).length > 0 ? extensions : undefined;
   };
 
   for (const variable of localVariables) {

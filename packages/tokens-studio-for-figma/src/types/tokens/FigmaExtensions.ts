@@ -7,4 +7,6 @@ export type CodeSyntaxPlatform = 'Web' | 'Android' | 'iOS';
 export type FigmaExtensions = {
     scopes?: VariableScope[];
     codeSyntax?: CodeSyntax;
+    variableId?: string;
+    isOverride?: boolean;
 };

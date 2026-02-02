@@ -25,9 +25,9 @@ export default function FigmaVariableForm({
 }) {
   const [figmaVariableVisible, setFigmaVariableVisible] = React.useState(false);
 
-  const currentScopes = useMemo(() => internalEditToken?.$extensions?.['com.figma']?.scopes as VariableScope[] || [], [internalEditToken]);
+  const currentScopes = useMemo(() => internalEditToken?.$extensions?.['com.figma.scopes'] as VariableScope[] || [], [internalEditToken]);
 
-  const currentCodeSyntax = useMemo(() => internalEditToken?.$extensions?.['com.figma']?.codeSyntax as Partial<Record<CodeSyntaxPlatform, string>> || {}, [internalEditToken]);
+  const currentCodeSyntax = useMemo(() => internalEditToken?.$extensions?.['com.figma.codeSyntax'] as Partial<Record<CodeSyntaxPlatform, string>> || {}, [internalEditToken]);
 
   const shouldShowFigmaVariableSection = useMemo(() => tokenTypesToCreateVariable.includes(internalEditToken.type), [internalEditToken.type]);
 
@@ -38,7 +38,7 @@ export default function FigmaVariableForm({
   }, [internalEditToken.type]);
 
   React.useEffect(() => {
-    if (internalEditToken?.$extensions?.['com.figma']?.scopes || internalEditToken?.$extensions?.['com.figma']?.codeSyntax) {
+    if (internalEditToken?.$extensions?.['com.figma.scopes'] || internalEditToken?.$extensions?.['com.figma.codeSyntax']) {
       setFigmaVariableVisible(true);
     }
   }, [internalEditToken]);

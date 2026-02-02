@@ -349,30 +349,37 @@ function EditTokenForm({ resolvedTokens }: Props) {
   );
 
   const removeFigmaVariable = React.useCallback(() => {
-    const newValue = { ...internalEditToken.$extensions?.['com.figma'] };
-    delete newValue?.scopes;
-    delete newValue?.codeSyntax;
+    const newExtensions = { ...internalEditToken.$extensions };
+    delete newExtensions['com.figma.scopes'];
+    delete newExtensions['com.figma.codeSyntax'];
+    // Keep variableId and isOverride if they exist
     setInternalEditToken({
       ...internalEditToken,
-      $extensions: {
-        ...internalEditToken.$extensions,
-        'com.figma': Object.keys(newValue).length > 0 ? newValue : undefined,
-      } as SingleToken['$extensions'],
+      $extensions: newExtensions as SingleToken['$extensions'],
     });
   }, [internalEditToken]);
 
   const handleFigmaVariableChange = React.useCallback(
     (scopes: string[], codeSyntax: Partial<Record<string, string>>) => {
+      const newExtensions = { ...internalEditToken.$extensions };
+
+      // Set or remove scopes in flat format
+      if (scopes.length > 0) {
+        newExtensions['com.figma.scopes'] = scopes;
+      } else {
+        delete newExtensions['com.figma.scopes'];
+      }
+
+      // Set or remove codeSyntax in flat format
+      if (Object.keys(codeSyntax).length > 0) {
+        newExtensions['com.figma.codeSyntax'] = codeSyntax;
+      } else {
+        delete newExtensions['com.figma.codeSyntax'];
+      }
+
       setInternalEditToken({
         ...internalEditToken,
-        $extensions: {
-          ...internalEditToken.$extensions,
-          'com.figma': {
-            ...internalEditToken.$extensions?.['com.figma'],
-            scopes: scopes.length > 0 ? scopes : undefined,
-            codeSyntax: Object.keys(codeSyntax).length > 0 ? codeSyntax : undefined,
-          },
-        } as SingleToken['$extensions'],
+        $extensions: newExtensions as SingleToken['$extensions'],
       });
     },
     [internalEditToken],

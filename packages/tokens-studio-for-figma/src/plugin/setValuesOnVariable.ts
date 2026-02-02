@@ -139,10 +139,10 @@ export default async function setValuesOnVariable(
             }
 
             // 1. Detect scope changes
-            const figmaExtensions = token.$extensions?.['com.figma'] as FigmaExtensions;
-            if (figmaExtensions?.scopes && Array.isArray(figmaExtensions.scopes) && !codeSyntaxUpdateTracker[variable.id]) {
+            const flatScopes = token.$extensions?.['com.figma.scopes'] as VariableScope[] | undefined;
+            if (flatScopes && Array.isArray(flatScopes) && !codeSyntaxUpdateTracker[variable.id]) {
               const currentScopes = variable.scopes || [];
-              const newScopes = normalizeVariableScopes(figmaExtensions.scopes);
+              const newScopes = normalizeVariableScopes(flatScopes);
 
               const isScopesSame = newScopes.length === currentScopes.length
                 && newScopes.every((scope) => currentScopes.includes(scope));
@@ -153,8 +153,9 @@ export default async function setValuesOnVariable(
             }
 
             // 2. Detect code syntax changes
-            if (figmaExtensions?.codeSyntax && typeof figmaExtensions.codeSyntax === 'object' && !codeSyntaxUpdateTracker[variable.id]) {
-              const newCodeSyntax = figmaExtensions.codeSyntax;
+            const flatCodeSyntax = token.$extensions?.['com.figma.codeSyntax'];
+            if (flatCodeSyntax && typeof flatCodeSyntax === 'object' && !codeSyntaxUpdateTracker[variable.id]) {
+              const newCodeSyntax = flatCodeSyntax;
               const currentCodeSyntax = variable.codeSyntax || {};
 
               FIGMA_PLATFORMS.forEach(({ key, figma: figmaPlatform }) => {
@@ -220,11 +221,11 @@ export default async function setValuesOnVariable(
               // Avoid redundant metadata updates for the same variable in the same run (e.g. across multiple modes)
               if (!codeSyntaxUpdateTracker[currentVar.id]) {
                 try {
-                  // If we have actual metadata, prioritize updating everything once
-                  if (figmaExtensions) {
-                    // Update Scopes
-                    if (figmaExtensions.scopes && Array.isArray(figmaExtensions.scopes)) {
-                      let newScopes = figmaExtensions.scopes as VariableScope[];
+                  // Only update Figma metadata such as scopes, code syntax, and description if we're updating the value as well  
+                  if (hasMetadataChanged) {
+                    // Update scopes
+                    if (flatScopes && Array.isArray(flatScopes)) {
+                      let newScopes = normalizeVariableScopes(flatScopes);
                       if (newScopes.includes('ALL_SCOPES' as VariableScope)) {
                         newScopes = [];
                       }
@@ -250,7 +251,7 @@ export default async function setValuesOnVariable(
                       { key: 'iOS', figma: 'iOS' },
                     ] as const;
 
-                    const newCodeSyntax = figmaExtensions?.codeSyntax || {};
+                    const newCodeSyntax = flatCodeSyntax || {};
                     platformsToCheck.forEach(({ key, figma: figmaPlatform }) => {
                       const hasKey = Object.prototype.hasOwnProperty.call(newCodeSyntax, key);
                       const hasKeyLowercase = Object.prototype.hasOwnProperty.call(newCodeSyntax, key.toLowerCase());
