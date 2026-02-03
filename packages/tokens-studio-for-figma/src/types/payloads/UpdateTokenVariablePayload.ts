@@ -15,5 +15,7 @@ export type UpdateTokenVariablePayload = {
       id?: string;
       modify?: ColorModifier
     }
-  }
+  };
+  description?: string;
+  initialName?: string;
 };

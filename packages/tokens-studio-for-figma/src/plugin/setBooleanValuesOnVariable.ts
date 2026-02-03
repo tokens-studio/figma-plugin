@@ -1,6 +1,6 @@
 import { isVariableWithAliasReference } from '@/utils/isAliasReference';
 
-export default function setBooleanValuesOnVariable(variable: Variable, mode: string, value: string) {
+export default function setBooleanValuesOnVariable(variable: Variable, mode: string, value: string, forceUpdate = false) {
   try {
     const existingVariableValue = variable.valuesByMode[mode];
     if (
@@ -10,7 +10,7 @@ export default function setBooleanValuesOnVariable(variable: Variable, mode: str
 
     const newValue = value === 'true';
 
-    if (existingVariableValue !== newValue) {
+    if (forceUpdate || existingVariableValue !== newValue) {
       console.log('Setting boolean value on variable', variable.name, variable.valuesByMode[mode], newValue);
       variable.setValueForMode(mode, newValue);
     }

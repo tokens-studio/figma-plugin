@@ -43,6 +43,7 @@ import { ColorModifier } from '@/types/Modifier';
 import { MultiSelectDropdown } from './MultiSelectDropdown';
 import { tokenTypesToCreateVariable } from '@/constants/VariableTypes';
 import { ModalOptions } from '@/constants/ModalOptions';
+import FigmaVariableForm from './FigmaVariableForm';
 
 let lastUsedRenameOption: UpdateMode = UpdateMode.SELECTION;
 let lastUsedRenameStyles = false;
@@ -342,6 +343,43 @@ function EditTokenForm({ resolvedTokens }: Props) {
             modify: newModify,
           },
         } as SingleToken['$extensions'],
+      });
+    },
+    [internalEditToken],
+  );
+
+  const removeFigmaVariable = React.useCallback(() => {
+    const newExtensions = { ...internalEditToken.$extensions };
+    delete newExtensions['com.figma.scopes'];
+    delete newExtensions['com.figma.codeSyntax'];
+    // Keep variableId and isOverride if they exist
+    setInternalEditToken({
+      ...internalEditToken,
+      $extensions: newExtensions as SingleToken['$extensions'],
+    });
+  }, [internalEditToken]);
+
+  const handleFigmaVariableChange = React.useCallback(
+    (scopes: string[], codeSyntax: Partial<Record<string, string>>) => {
+      const newExtensions = { ...internalEditToken.$extensions };
+
+      // Set or remove scopes in flat format
+      if (scopes.length > 0) {
+        newExtensions['com.figma.scopes'] = scopes;
+      } else {
+        delete newExtensions['com.figma.scopes'];
+      }
+
+      // Set or remove codeSyntax in flat format
+      if (Object.keys(codeSyntax).length > 0) {
+        newExtensions['com.figma.codeSyntax'] = codeSyntax;
+      } else {
+        delete newExtensions['com.figma.codeSyntax'];
+      }
+
+      setInternalEditToken({
+        ...internalEditToken,
+        $extensions: newExtensions as SingleToken['$extensions'],
       });
     },
     [internalEditToken],
@@ -703,6 +741,11 @@ function EditTokenForm({ resolvedTokens }: Props) {
             css={{ fontSize: '$xsmall', padding: '$3' }}
           />
         </Box>
+        <FigmaVariableForm
+          internalEditToken={internalEditToken}
+          handleFigmaVariableChange={handleFigmaVariableChange}
+          handleRemoveFigmaVariable={removeFigmaVariable}
+        />
         {internalEditToken.status === EditTokenFormStatus.DUPLICATE && (
           <Box>
             <Label>{t('set', { ns: 'general' })}</Label>
