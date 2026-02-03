@@ -85,6 +85,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
         name: themeObject.name,
         tokenSets: themeObject.selectedTokenSets,
         ...(themeObject?.group ? { group: themeObject.group } : {}),
+        $figmaMirrorParentSets: themeObject.$figmaMirrorParentSets,
       };
     }
     // If in extend mode, pre-populate parentThemeId with selected group
@@ -166,11 +167,25 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
     if (id) {
       // EDITING EXISTING THEME
       track('Edit theme', { id, values });
+
+      // If this is an extended theme with mirror enabled, use parent's token sets
+      const currentTheme = themes.find(t => t.id === id);
+      const shouldMirror = values.$figmaMirrorParentSets ?? currentTheme?.$figmaMirrorParentSets ?? false;
+      let tokenSetsToUse = values.tokenSets;
+
+      if (shouldMirror && currentTheme?.$figmaParentThemeId) {
+        const parentTheme = themes.find(t => t.id === currentTheme.$figmaParentThemeId);
+        if (parentTheme) {
+          tokenSetsToUse = parentTheme.selectedTokenSets;
+        }
+      }
+
       dispatch.tokenState.saveTheme({
         id,
         name: values.name,
-        selectedTokenSets: values.tokenSets,
+        selectedTokenSets: tokenSetsToUse,
         ...(values?.group ? { group: values.group } : {}),
+        $figmaMirrorParentSets: values.$figmaMirrorParentSets,
         meta: {
           oldName: themeEditorDefaultValues?.name,
           oldGroup: themeEditorDefaultValues?.group,
@@ -200,6 +215,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
           $figmaIsExtension: true,
           $figmaParentThemeId: parentTheme.id,
           $figmaParentCollectionId: parentTheme.$figmaCollectionId,
+          $figmaMirrorParentSets: true, // Enable mirroring by default
         };
 
         dispatch.tokenState.saveTheme(themeData);

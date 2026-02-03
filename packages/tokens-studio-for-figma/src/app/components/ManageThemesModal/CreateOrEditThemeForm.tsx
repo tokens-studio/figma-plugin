@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useSelector, useStore } from 'react-redux';
 import {
-  Box, Button, IconButton, Stack, Select,
+  Box, Button, IconButton, Stack, Select, Switch,
 } from '@tokens-studio/ui';
 import { NavArrowLeft } from 'iconoir-react';
 import { useTranslation } from 'react-i18next';
@@ -31,6 +31,7 @@ export type FormValues = {
   group?: string
   parentThemeId?: string
   tokenSets: Record<string, TokenSetStatus>
+  $figmaMirrorParentSets?: boolean
 };
 
 export enum ThemeFormTabs {
@@ -101,6 +102,19 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
   }, [themes]);
   const { t } = useTranslation(['tokens', 'errors']);
 
+  // Get current theme if editing
+  const currentTheme = useMemo(() => {
+    if (!id) return null;
+    return themes.find(t => t.id === id);
+  }, [id, themes]);
+
+  // Check if current theme is extended and find parent
+  const isExtendedTheme = useMemo(() => !!currentTheme?.$figmaParentThemeId, [currentTheme]);
+  const parentTheme = useMemo(() => {
+    if (!isExtendedTheme || !currentTheme?.$figmaParentThemeId) return null;
+    return themes.find(t => t.id === currentTheme.$figmaParentThemeId);
+  }, [isExtendedTheme, currentTheme, themes]);
+
   const treeOrListItems = useMemo(() => (
     githubMfsEnabled
       ? tokenSetListToTree(availableTokenSets)
@@ -146,13 +160,22 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
   }, [treeOrListItems, searchTerm, isSearchActive]);
 
   const {
-    register, handleSubmit, control, resetField,
+    register, handleSubmit, control, resetField, watch, setValue,
   } = useForm<FormValues>({
     defaultValues: {
       tokenSets: { ...selectedTokenSets },
       ...defaultValues,
     },
   });
+
+  // Watch mirror toggle and update token sets when it changes
+  const mirrorEnabled = watch('$figmaMirrorParentSets');
+  React.useEffect(() => {
+    // If mirror is enabled and we have a parent theme, sync token sets
+    if (mirrorEnabled && parentTheme) {
+      setValue('tokenSets', parentTheme.selectedTokenSets);
+    }
+  }, [mirrorEnabled, parentTheme, setValue]);
 
   const handleGroupKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Escape') {
@@ -173,10 +196,11 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
           {...props}
           value={field.value}
           onChange={field.onChange}
+          disabled={mirrorEnabled ?? false}
         />
       )}
     />
-  ), [control]);
+  ), [control, mirrorEnabled]);
 
   const handleAddGroup = React.useCallback(() => [
     setShowGroupInput(true),
@@ -429,6 +453,31 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
         </Box>
       )}
       <Stack direction="column" gap={1}>
+        {/* Mirror Parent Theme Toggle - only for extended themes */}
+        {id && isExtendedTheme && parentTheme && (
+          <Box css={{ padding: '$3 $4', borderBottom: '1px solid $borderMuted' }}>
+            <Controller
+              name="$figmaMirrorParentSets"
+              control={control}
+              render={({ field }) => (
+                <Stack direction="row" justify="between" align="center">
+                  <Stack direction="column" gap={1}>
+                    <Box css={{ fontSize: '$small', fontWeight: '$sansMedium', color: '$fgDefault' }}>
+                      Mirror Parent Theme
+                    </Box>
+                    <Box css={{ fontSize: '$xsmall', color: '$fgMuted' }}>
+                      Automatically sync token sets from {parentTheme.group ? `${parentTheme.group}/` : ''}{parentTheme.name}
+                    </Box>
+                  </Stack>
+                  <Switch
+                    checked={field.value ?? true}
+                    onCheckedChange={field.onChange}
+                  />
+                </Stack>
+              )}
+            />
+          </Box>
+        )}
         {(id ? activeTab === ThemeFormTabs.SETS : !isExtendMode) && (
           <Stack direction="column" gap={1} css={{ padding: '$3 $4 $3' }}>
             {(() => {

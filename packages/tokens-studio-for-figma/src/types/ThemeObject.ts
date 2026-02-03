@@ -19,4 +19,7 @@ export type ThemeObject = {
   $figmaIsExtension?: boolean;
   $figmaParentCollectionId?: string;
   $figmaParentThemeId?: string; // Reference to parent theme for UI hierarchy
+  $figmaMirrorParentSets?: boolean; // If true, automatically mirror parent theme's selectedTokenSets
 };
+
+export type ThemeStyleReferences = Record<string, string>;

@@ -62,6 +62,7 @@ export function saveTheme(state: TokenState, data: Payload): TokenState {
     ...(data.$figmaIsExtension !== undefined ? { $figmaIsExtension: data.$figmaIsExtension } : {}),
     ...(data.$figmaParentCollectionId ? { $figmaParentCollectionId: data.$figmaParentCollectionId } : {}),
     ...(data.$figmaParentThemeId ? { $figmaParentThemeId: data.$figmaParentThemeId } : {}),
+    ...(data.$figmaMirrorParentSets !== undefined ? { $figmaMirrorParentSets: data.$figmaMirrorParentSets } : {}),
     // Preserve other Figma metadata
     ...(data.$figmaCollectionId ? { $figmaCollectionId: data.$figmaCollectionId } : {}),
     ...(data.$figmaModeId ? { $figmaModeId: data.$figmaModeId } : {}),
@@ -84,6 +85,7 @@ export function saveTheme(state: TokenState, data: Payload): TokenState {
         $figmaStyleReferences: {},
         $figmaIsExtension: true,
         $figmaParentThemeId: themeId,
+        $figmaMirrorParentSets: true, // Enable mirroring by default
       };
 
       finalThemes.push(childTheme);
