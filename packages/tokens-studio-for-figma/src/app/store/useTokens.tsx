@@ -77,6 +77,14 @@ export default function useTokens() {
   ];
   const tokenFormat = getFormat();
 
+  // Helper function to detect if a token value is a gradient
+  const isGradientValue = useCallback((value: any): boolean => {
+    if (typeof value !== 'string') return false;
+    return value.startsWith('linear-gradient')
+      || value.startsWith('radial-gradient')
+      || value.startsWith('conic-gradient');
+  }, []);
+
   // Gets value of token
   const getTokenValue = useCallback(
     (name: string, resolved: AnyTokenList) => resolved.find((t) => t.name === name),
@@ -345,7 +353,7 @@ export default function useTokens() {
   // Asks user which styles to create, then calls Figma with all tokens to create styles
   const createStylesFromSelectedTokenSets = useCallback(
     async (selectedSets: ExportTokenSet[]) => {
-      const shouldCreateStyles = (settings.stylesTypography || settings.stylesColor || settings.stylesEffect) && selectedSets.length > 0;
+      const shouldCreateStyles = (settings.stylesTypography || settings.stylesColor || settings.stylesGradient || settings.stylesEffect) && selectedSets.length > 0;
       if (!shouldCreateStyles) return;
 
       dispatch.uiState.startJob({
@@ -375,9 +383,12 @@ export default function useTokens() {
       );
 
       const tokensToCreate = withoutSourceTokens.reduce((acc: SingleToken[], curr) => {
+        const isGradient = curr.type === TokenTypes.COLOR && isGradientValue(curr.value);
+
         const shouldCreate = [
           settings.stylesTypography && curr.type === TokenTypes.TYPOGRAPHY,
-          settings.stylesColor && curr.type === TokenTypes.COLOR,
+          settings.stylesColor && curr.type === TokenTypes.COLOR && !isGradient,
+          settings.stylesGradient && isGradient,
           settings.stylesEffect && curr.type === TokenTypes.BOX_SHADOW,
         ].some((isEnabled) => isEnabled);
         if (shouldCreate) {
@@ -414,7 +425,7 @@ export default function useTokens() {
 
   const createStylesFromSelectedThemes = useCallback(
     async (selectedThemes: string[]) => {
-      const shouldCreateStyles = (settings.stylesTypography || settings.stylesColor || settings.stylesEffect) && selectedThemes.length > 0;
+      const shouldCreateStyles = (settings.stylesTypography || settings.stylesColor || settings.stylesGradient || settings.stylesEffect) && selectedThemes.length > 0;
       if (!shouldCreateStyles) return;
 
       dispatch.uiState.startJob({
@@ -455,9 +466,12 @@ export default function useTokens() {
             );
 
             const tokensToCreate = tokensFromEnabledSets.reduce((acc: SingleToken[], curr) => {
+              const isGradient = curr.type === TokenTypes.COLOR && isGradientValue(curr.value);
+
               const shouldCreate = [
                 settings.stylesTypography && curr.type === TokenTypes.TYPOGRAPHY,
-                settings.stylesColor && curr.type === TokenTypes.COLOR,
+                settings.stylesColor && curr.type === TokenTypes.COLOR && !isGradient,
+                settings.stylesGradient && isGradient,
                 settings.stylesEffect && curr.type === TokenTypes.BOX_SHADOW,
               ].some((isEnabled) => isEnabled);
               if (shouldCreate && !acc.find((token) => curr.name === token.name)) {
@@ -555,9 +569,9 @@ export default function useTokens() {
       const tokensToSet = uiState.selectionValues
         .filter((v) => inspectState.selectedTokens.includes(`${v.category}-${v.value}`))
         .map((v) => ({ nodes: v.nodes, property: v.type })) as {
-        property: Properties;
-        nodes: NodeInfo[];
-      }[];
+          property: Properties;
+          nodes: NodeInfo[];
+        }[];
 
       track('setNoneValuesOnNode', tokensToSet);
 
@@ -625,9 +639,9 @@ export default function useTokens() {
   const createVariablesFromSets = useCallback(
     async (selectedSets: ExportTokenSet[]) => {
       const shouldCreateVariables = (settings.variablesBoolean
-          || settings.variablesColor
-          || settings.variablesNumber
-          || settings.variablesString)
+        || settings.variablesColor
+        || settings.variablesNumber
+        || settings.variablesString)
         && selectedSets.length > 0;
       if (!shouldCreateVariables) return;
 
@@ -672,9 +686,9 @@ export default function useTokens() {
   const createVariablesFromThemes = useCallback(
     async (selectedThemes: string[]) => {
       const shouldCreateVariables = (settings.variablesBoolean
-          || settings.variablesColor
-          || settings.variablesNumber
-          || settings.variablesString)
+        || settings.variablesColor
+        || settings.variablesNumber
+        || settings.variablesString)
         && selectedThemes.length > 0;
       if (!shouldCreateVariables) return;
 
