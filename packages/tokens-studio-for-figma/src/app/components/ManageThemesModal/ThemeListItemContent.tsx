@@ -34,6 +34,10 @@ export function ThemeListItemContent({
   const dragContext = useContext(DragControlsContext);
   const editProhibited = useSelector(editProhibitedSelector);
 
+  // Disable reordering for extended themes (they should follow parent theme order)
+  const isExtendedTheme = !!item.$figmaParentThemeId;
+  const canReorder = !editProhibited && !isExtendedTheme;
+
   const handleDragStart = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
     dragContext.controls?.start(event);
   }, [dragContext.controls]);
@@ -41,7 +45,7 @@ export function ThemeListItemContent({
   return (
     <StyledDragButton
       type="button"
-      canReorder={!editProhibited}
+      canReorder={canReorder}
       css={{
         padding: 0,
         width: '100%',
@@ -74,7 +78,7 @@ export function ThemeListItemContent({
     >
       <StyledDragGrabber<ThemeObject>
         item={item}
-        canReorder={!editProhibited}
+        canReorder={canReorder}
         onDragStart={handleDragStart}
       />
       <SingleThemeEntry

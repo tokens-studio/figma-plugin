@@ -228,14 +228,55 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
       }
       return acc;
     }, []);
+
+    // Cascade parent theme order to child themes
+    // Build a map of parent theme ID -> new index position
+    const parentThemeOrderMap = new Map<string, number>();
+    updatedThemes.forEach((theme, index) => {
+      // Only track non-extended themes (parent themes)
+      if (!theme.$figmaParentThemeId) {
+        parentThemeOrderMap.set(theme.id, index);
+      }
+    });
+
+    // Sort extended themes based on their parent's new order
+    const finalThemes = updatedThemes.sort((a, b) => {
+      const aIsExtended = !!a.$figmaParentThemeId;
+      const bIsExtended = !!b.$figmaParentThemeId;
+
+      // If neither is extended, keep original order
+      if (!aIsExtended && !bIsExtended) {
+        return updatedThemes.indexOf(a) - updatedThemes.indexOf(b);
+      }
+
+      // If only one is extended, prioritize parent themes first
+      if (aIsExtended && !bIsExtended) {
+        return 1;
+      }
+      if (!aIsExtended && bIsExtended) {
+        return -1;
+      }
+
+      // Both are extended - sort by parent theme order
+      const aParentOrder = parentThemeOrderMap.get(a.$figmaParentThemeId!) ?? Infinity;
+      const bParentOrder = parentThemeOrderMap.get(b.$figmaParentThemeId!) ?? Infinity;
+
+      if (aParentOrder !== bParentOrder) {
+        return aParentOrder - bParentOrder;
+      }
+
+      // Same parent order, maintain original relative order
+      return updatedThemes.indexOf(a) - updatedThemes.indexOf(b);
+    });
+
     const newActiveTheme = activeTheme;
     Object.keys(newActiveTheme).forEach((group) => {
       // check whether the activeTheme is still belong to the group
-      if (updatedThemes.findIndex((theme) => theme.id === activeTheme?.[group] && theme.group === group) < 0) {
+      if (finalThemes.findIndex((theme) => theme.id === activeTheme?.[group] && theme.group === group) < 0) {
         delete newActiveTheme[group];
       }
     });
-    dispatch.tokenState.replaceThemes(updatedThemes);
+    dispatch.tokenState.replaceThemes(finalThemes);
   }, [dispatch.tokenState, activeTheme]);
 
   // Helper to check if a theme group is extended (child theme)
