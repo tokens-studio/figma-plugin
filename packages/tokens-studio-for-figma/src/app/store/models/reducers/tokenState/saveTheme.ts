@@ -92,6 +92,20 @@ export function saveTheme(state: TokenState, data: Payload): TokenState {
     });
   }
 
+  // If updating an existing parent theme, update all mirrored child themes
+  if (!isNewTheme && !data.$figmaIsExtension) {
+    finalThemes = finalThemes.map((theme) => {
+      // Check if this theme is a child of the current theme and has mirroring enabled
+      if (theme.$figmaParentThemeId === themeId && theme.$figmaMirrorParentSets) {
+        return {
+          ...theme,
+          selectedTokenSets: selectedTokenSets,
+        };
+      }
+      return theme;
+    });
+  }
+
   const newActiveTheme = state.activeTheme;
   if (!isActiveTheme) {
     Object.keys(newActiveTheme).forEach((group) => {
