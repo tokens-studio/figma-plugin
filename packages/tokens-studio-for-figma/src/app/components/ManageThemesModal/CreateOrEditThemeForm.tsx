@@ -61,21 +61,43 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
   ), [store]);
   const availableTokenSets = useSelector(allTokenSetsSelector);
   const themes = useSelector(themesListSelector);
-  const groupNames = useMemo(() => ([...new Set(themes.filter((t) => t?.group).map((t) => t.group as string))]), [themes]);
+  // Filter out extended theme groups from the group selector
+  const groupNames = useMemo(() => {
+    const allGroups = [...new Set(themes.filter((t) => t?.group).map((t) => t.group as string))];
+    return allGroups.filter((group) => {
+      // Exclude groups with "/" (hierarchical extended format)
+      if (group.includes('/')) {
+        return false;
+      }
+      // Exclude groups where any theme has $figmaParentThemeId
+      const themesInGroup = themes.filter(t => t.group === group);
+      return !themesInGroup.some(t => t.$figmaParentThemeId);
+    });
+  }, [themes]);
 
   // Available parent theme GROUPS (not individual themes)
   const availableParentGroups = useMemo(() => {
-    // Get all unique theme groups (including extended ones for multi-level extension)
+    // Get all unique theme groups, excluding extended ones
     const allGroups = new Set<string>();
 
     themes.forEach((theme) => {
-      // Include all groups, allowing extended themes to also be parents
       if (theme.group) {
         allGroups.add(theme.group);
       }
     });
 
-    return Array.from(allGroups).sort();
+    // Filter out extended theme groups
+    return Array.from(allGroups)
+      .filter((group) => {
+        // Exclude groups with "/" (hierarchical extended format like "Parent/Extended")
+        if (group.includes('/')) {
+          return false;
+        }
+        // Exclude groups where any theme has $figmaParentThemeId (extended theme)
+        const themesInGroup = themes.filter(t => t.group === group);
+        return !themesInGroup.some(t => t.$figmaParentThemeId);
+      })
+      .sort();
   }, [themes]);
   const { t } = useTranslation(['tokens', 'errors']);
 
