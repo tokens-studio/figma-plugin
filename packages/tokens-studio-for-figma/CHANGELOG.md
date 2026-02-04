@@ -1,5 +1,30 @@
 # @tokens-studio/figma-plugin
 
+## 2.11.0
+
+### Minor Changes
+
+- ce30e3776: Add Support for Figma Variable Scopes and Code Syntaxes
+
+  - Added support for Figma Variable Scopes and Code Syntax (Android, iOS, Web).
+  - Enabled seamless export and import of variable metadata across themes.
+
+### Patch Changes
+
+- 2307b3ba0: Add gradient export as styles option - users can now export color tokens with linear-gradient values as Figma styles by enabling the "Gradients" checkbox in the Styles section of the export options.
+- f25568be0: Increase Bitbucket branches API request to 100 so that more number of branches fit in the list of branches.
+- 666ca15e7: Fix token changes bleeding between branches when creating new branch from different source or switching branches
+- 0809774db: Fix Exporting of Gradient Tokens as styles when trailing spaces exist
+- d8b120e3d: Add provider selector to StartScreen with automatic token pulling and theme selection
+
+  - Added Select dropdown to StartScreen showing saved sync providers when available
+  - Providers can be selected directly from the start screen without navigating to Settings
+  - Selected providers automatically pull tokens without confirmation dialogs
+  - Auto-selects first theme from each theme group when no prior theme selections exist
+  - Maintains backward compatibility with existing error handling and retry mechanisms
+
+- f9a3f61de: Set default format of the plugin to DTCG
+
 ## 2.10.9
 
 ### Patch Changes
