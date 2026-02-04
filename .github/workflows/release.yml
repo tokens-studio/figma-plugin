@@ -61,6 +61,7 @@ jobs:
           envkey_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }} 
           envkey_SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           envkey_TOKENS_STUDIO_API_HOST: ${{ secrets.TOKENS_STUDIO_API_HOST }}
+          envkey_FIGMA_ID_HASH_SECRET: ${{ secrets.FIGMA_ID_HASH_SECRET }}
  
       # Build the figma plugin package
       - name: Build Package
