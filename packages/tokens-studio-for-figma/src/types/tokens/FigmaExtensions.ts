@@ -5,6 +5,6 @@ export type VariableScope = 'ALL_SCOPES' | 'TEXT_CONTENT' | 'CORNER_RADIUS' | 'W
 export type CodeSyntaxPlatform = 'Web' | 'Android' | 'iOS';
 
 export type FigmaExtensions = {
-    scopes?: VariableScope[];
-    codeSyntax?: CodeSyntax;
+  scopes?: VariableScope[];
+  codeSyntax?: CodeSyntax;
 };

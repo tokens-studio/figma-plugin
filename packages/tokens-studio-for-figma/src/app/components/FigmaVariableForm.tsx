@@ -1,15 +1,15 @@
 import React, { useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   IconButton, Heading, Checkbox, Text, Stack, Label,
 } from '@tokens-studio/ui';
 import IconPlus from '@/icons/plus.svg';
 import IconMinus from '@/icons/minus.svg';
-import { EditTokenObject } from '@/types/tokens';
+import { EditTokenObject, VariableScope, CodeSyntaxPlatform } from '@/types/tokens';
 import Box from './Box';
 import Input from './Input';
 import { tokenTypesToCreateVariable } from '@/constants/VariableTypes';
 
-import { VariableScope, CodeSyntaxPlatform } from '@/types/tokens';
 import {
   VARIABLE_SCOPE_OPTIONS, TOKEN_TYPE_TO_SCOPES_MAP, CODE_SYNTAX_PLATFORM_OPTIONS,
 } from '@/constants/FigmaVariableMetaData';
@@ -20,14 +20,17 @@ export default function FigmaVariableForm({
   handleRemoveFigmaVariable,
 }: {
   internalEditToken: EditTokenObject;
-  handleFigmaVariableChange: (scopes: VariableScope[], codeSyntax: Partial<Record<CodeSyntaxPlatform, string>>) => void;
+  handleFigmaVariableChange: (scopes: VariableScope[], codeSyntax: Partial<Record<CodeSyntaxPlatform, string>>, hideFromPublishing?: boolean) => void;
   handleRemoveFigmaVariable: () => void;
 }) {
+  const { t } = useTranslation(['tokens']);
   const [figmaVariableVisible, setFigmaVariableVisible] = React.useState(false);
 
   const currentScopes = useMemo(() => internalEditToken?.$extensions?.['com.figma.scopes'] as VariableScope[] || [], [internalEditToken]);
 
   const currentCodeSyntax = useMemo(() => internalEditToken?.$extensions?.['com.figma.codeSyntax'] as Partial<Record<CodeSyntaxPlatform, string>> || {}, [internalEditToken]);
+
+  const currentHideFromPublishing = useMemo(() => internalEditToken?.$extensions?.['studio.tokens']?.hideFromPublishing as boolean | undefined, [internalEditToken]);
 
   const shouldShowFigmaVariableSection = useMemo(() => tokenTypesToCreateVariable.includes(internalEditToken.type), [internalEditToken.type]);
 
@@ -38,14 +41,16 @@ export default function FigmaVariableForm({
   }, [internalEditToken.type]);
 
   React.useEffect(() => {
-    if (internalEditToken?.$extensions?.['com.figma.scopes'] || internalEditToken?.$extensions?.['com.figma.codeSyntax']) {
+    if (internalEditToken?.$extensions?.['com.figma.scopes']
+        || internalEditToken?.$extensions?.['com.figma.codeSyntax']
+        || internalEditToken?.$extensions?.['studio.tokens']?.hideFromPublishing !== undefined) {
       setFigmaVariableVisible(true);
     }
   }, [internalEditToken]);
 
   const addFigmaVariable = useCallback(() => {
     setFigmaVariableVisible(true);
-    handleFigmaVariableChange([], {});
+    handleFigmaVariableChange([], {}, undefined);
   }, [handleFigmaVariableChange]);
 
   const removeFigmaVariable = useCallback(() => {
@@ -68,8 +73,8 @@ export default function FigmaVariableForm({
       newScopes = currentScopes.filter((s) => s !== scope);
     }
 
-    handleFigmaVariableChange(newScopes, currentCodeSyntax);
-  }, [currentScopes, currentCodeSyntax, handleFigmaVariableChange]);
+    handleFigmaVariableChange(newScopes, currentCodeSyntax, currentHideFromPublishing);
+  }, [currentScopes, currentCodeSyntax, currentHideFromPublishing, handleFigmaVariableChange]);
 
   const handleCodeSyntaxPlatformChange = useCallback((platform: CodeSyntaxPlatform, checked: boolean) => {
     const newCodeSyntax = { ...currentCodeSyntax };
@@ -78,14 +83,14 @@ export default function FigmaVariableForm({
     } else {
       delete newCodeSyntax[platform];
     }
-    handleFigmaVariableChange(currentScopes, newCodeSyntax);
-  }, [currentScopes, currentCodeSyntax, handleFigmaVariableChange]);
+    handleFigmaVariableChange(currentScopes, newCodeSyntax, currentHideFromPublishing);
+  }, [currentScopes, currentCodeSyntax, currentHideFromPublishing, handleFigmaVariableChange]);
 
   const handleCodeSyntaxValueChange = useCallback((platform: CodeSyntaxPlatform, value: string) => {
     const newCodeSyntax = { ...currentCodeSyntax };
     newCodeSyntax[platform] = value;
-    handleFigmaVariableChange(currentScopes, newCodeSyntax);
-  }, [currentScopes, currentCodeSyntax, handleFigmaVariableChange]);
+    handleFigmaVariableChange(currentScopes, newCodeSyntax, currentHideFromPublishing);
+  }, [currentScopes, currentCodeSyntax, currentHideFromPublishing, handleFigmaVariableChange]);
 
   const handleScopeCheckedChange = useCallback((scope: VariableScope) => (checked: boolean | string) => {
     handleScopeChange(scope, !!checked);
@@ -98,6 +103,26 @@ export default function FigmaVariableForm({
   const handleCodeSyntaxInputChange = useCallback((platform: CodeSyntaxPlatform) => (e: React.ChangeEvent<HTMLInputElement>) => {
     handleCodeSyntaxValueChange(platform, e.target.value);
   }, [handleCodeSyntaxValueChange]);
+
+  const handleHideFromPublishingChange = useCallback((checked: boolean | string) => {
+    // Handle three-way checkbox: true, false, or 'indeterminate' (which we treat as undefined)
+    let newValue: boolean | undefined;
+    if (checked === 'indeterminate' || checked === false) {
+      // If currently checked (true) -> click -> unchecked (false)
+      // If currently unchecked (false) -> click -> indeterminate (undefined)
+      // If currently indeterminate (undefined) -> click -> checked (true)
+      if (currentHideFromPublishing === true) {
+        newValue = false;
+      } else if (currentHideFromPublishing === false) {
+        newValue = undefined;
+      } else {
+        newValue = true;
+      }
+    } else if (checked === true) {
+      newValue = true;
+    }
+    handleFigmaVariableChange(currentScopes, currentCodeSyntax, newValue);
+  }, [currentScopes, currentCodeSyntax, currentHideFromPublishing, handleFigmaVariableChange]);
 
   if (!shouldShowFigmaVariableSection) {
     return null;
@@ -133,7 +158,7 @@ export default function FigmaVariableForm({
             {relevantScopeOptions.length > 0 && (
               <Box>
                 <Text muted size="small" css={{ marginBottom: '$2' }}>
-                  Variable scopes
+                  {t('variableScopes')}
                 </Text>
                 <Stack gap={3} direction="column">
                   {relevantScopeOptions.map((option) => {
@@ -165,7 +190,7 @@ export default function FigmaVariableForm({
 
             <Box>
               <Text muted size="small" css={{ marginBottom: '$2' }}>
-                Code syntax
+                {t('codeSyntax')}
               </Text>
               <Stack gap={3} direction="column">
                 {CODE_SYNTAX_PLATFORM_OPTIONS.map((option) => (
@@ -193,6 +218,22 @@ export default function FigmaVariableForm({
                     )}
                   </Box>
                 ))}
+              </Stack>
+            </Box>
+
+            <Box>
+              <Text muted size="small" css={{ marginBottom: '$2' }}>
+                {t('publishing')}
+              </Text>
+              <Stack direction="row" gap={2} css={{ alignItems: 'center' }}>
+                <Checkbox
+                  id="hide-from-publishing"
+                  checked={currentHideFromPublishing === undefined ? 'indeterminate' : currentHideFromPublishing}
+                  onCheckedChange={handleHideFromPublishingChange}
+                />
+                <Label css={{ fontWeight: '$sansRegular', fontSize: '$small' }} htmlFor="hide-from-publishing">
+                  {t('hideFromPublishing')}
+                </Label>
               </Stack>
             </Box>
           </Stack>

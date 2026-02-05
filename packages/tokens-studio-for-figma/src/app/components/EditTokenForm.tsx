@@ -352,6 +352,16 @@ function EditTokenForm({ resolvedTokens }: Props) {
     const newExtensions = { ...internalEditToken.$extensions };
     delete newExtensions['com.figma.scopes'];
     delete newExtensions['com.figma.codeSyntax'];
+    // Also remove hideFromPublishing from studio.tokens
+    if (newExtensions['studio.tokens']) {
+      const studioTokens = { ...newExtensions['studio.tokens'] };
+      delete studioTokens.hideFromPublishing;
+      if (Object.keys(studioTokens).length === 0) {
+        delete newExtensions['studio.tokens'];
+      } else {
+        newExtensions['studio.tokens'] = studioTokens;
+      }
+    }
     // Keep variableId and isOverride if they exist
     setInternalEditToken({
       ...internalEditToken,
@@ -360,7 +370,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
   }, [internalEditToken]);
 
   const handleFigmaVariableChange = React.useCallback(
-    (scopes: string[], codeSyntax: Partial<Record<string, string>>) => {
+    (scopes: string[], codeSyntax: Partial<Record<string, string>>, hideFromPublishing?: boolean) => {
       const newExtensions = { ...internalEditToken.$extensions };
 
       // Set or remove scopes in flat format
@@ -375,6 +385,23 @@ function EditTokenForm({ resolvedTokens }: Props) {
         newExtensions['com.figma.codeSyntax'] = codeSyntax;
       } else {
         delete newExtensions['com.figma.codeSyntax'];
+      }
+
+      // Set or remove hideFromPublishing in studio.tokens
+      if (hideFromPublishing !== undefined) {
+        if (!newExtensions['studio.tokens']) {
+          newExtensions['studio.tokens'] = {};
+        }
+        newExtensions['studio.tokens'].hideFromPublishing = hideFromPublishing;
+      } else if (newExtensions['studio.tokens']) {
+        // Remove hideFromPublishing if undefined
+        const studioTokens = { ...newExtensions['studio.tokens'] };
+        delete studioTokens.hideFromPublishing;
+        if (Object.keys(studioTokens).length === 0) {
+          delete newExtensions['studio.tokens'];
+        } else {
+          newExtensions['studio.tokens'] = studioTokens;
+        }
       }
 
       setInternalEditToken({

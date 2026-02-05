@@ -256,7 +256,6 @@ describe('SetValuesOnVariable', () => {
       } as unknown as Variable;
     });
 
-
     it('should update scopes with value change', async () => {
       const tokens = [{
         name: 'test.variable',
