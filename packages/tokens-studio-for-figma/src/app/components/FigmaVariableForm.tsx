@@ -104,7 +104,7 @@ export default function FigmaVariableForm({
     handleCodeSyntaxValueChange(platform, e.target.value);
   }, [handleCodeSyntaxValueChange]);
 
-  const handleHideFromPublishingChange = useCallback((_checked: boolean | string) => {
+  const handleHideFromPublishingChange = useCallback(() => {
     // Handle three-way checkbox cycling:
     // indeterminate (undefined) -> checked (true) -> unchecked (false) -> indeterminate (undefined)
     let newValue: boolean | undefined;
