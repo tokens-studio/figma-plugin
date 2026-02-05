@@ -4,6 +4,8 @@ export type VariableScope = 'ALL_SCOPES' | 'TEXT_CONTENT' | 'CORNER_RADIUS' | 'W
 
 export type CodeSyntaxPlatform = 'Web' | 'Android' | 'iOS';
 
+// FigmaExtensions only covers properties in the 'com.figma' namespace
+// For studio.tokens properties (like hideFromPublishing), see SingleGenericToken type
 export type FigmaExtensions = {
   scopes?: VariableScope[];
   codeSyntax?: CodeSyntax;

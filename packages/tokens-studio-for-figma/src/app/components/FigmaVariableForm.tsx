@@ -104,23 +104,22 @@ export default function FigmaVariableForm({
     handleCodeSyntaxValueChange(platform, e.target.value);
   }, [handleCodeSyntaxValueChange]);
 
-  const handleHideFromPublishingChange = useCallback((checked: boolean | string) => {
-    // Handle three-way checkbox: true, false, or 'indeterminate' (which we treat as undefined)
+  const handleHideFromPublishingChange = useCallback((_checked: boolean | string) => {
+    // Handle three-way checkbox cycling:
+    // indeterminate (undefined) -> checked (true) -> unchecked (false) -> indeterminate (undefined)
     let newValue: boolean | undefined;
-    if (checked === 'indeterminate' || checked === false) {
-      // If currently checked (true) -> click -> unchecked (false)
-      // If currently unchecked (false) -> click -> indeterminate (undefined)
-      // If currently indeterminate (undefined) -> click -> checked (true)
-      if (currentHideFromPublishing === true) {
-        newValue = false;
-      } else if (currentHideFromPublishing === false) {
-        newValue = undefined;
-      } else {
-        newValue = true;
-      }
-    } else if (checked === true) {
+
+    if (currentHideFromPublishing === undefined) {
+      // Currently indeterminate, user clicked -> set to checked (true)
       newValue = true;
+    } else if (currentHideFromPublishing === true) {
+      // Currently checked, user clicked -> set to unchecked (false)
+      newValue = false;
+    } else {
+      // Currently unchecked (false), user clicked -> set to indeterminate (undefined)
+      newValue = undefined;
     }
+
     handleFigmaVariableChange(currentScopes, currentCodeSyntax, newValue);
   }, [currentScopes, currentCodeSyntax, currentHideFromPublishing, handleFigmaVariableChange]);
 
