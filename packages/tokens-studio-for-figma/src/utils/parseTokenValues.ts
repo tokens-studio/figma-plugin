@@ -26,7 +26,7 @@ export default function parseTokenValues(tokens: SetTokenDataPayload['values']):
     if (typeof parsedGroup === 'object') {
       detectFormat(parsedGroup, true);
 
-      const convertedToArray = convertToTokenArray({ tokens: parsedGroup });
+      const { tokens: convertedToArray } = convertToTokenArray({ tokens: parsedGroup });
       prev.push([group[0], convertedToArray]);
       return prev;
     }

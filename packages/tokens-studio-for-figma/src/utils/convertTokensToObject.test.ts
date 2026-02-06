@@ -202,4 +202,47 @@ describe('convertTokensToObject', () => {
     TokenFormat.setFormat(TokenFormatOptions.Legacy);
     expect(convertTokensToObject(output as unknown as Record<string, AnyTokenList>, true)).toEqual(input);
   });
+
+  it('should preserve group-level and root-level descriptions when metadata is provided', () => {
+    TokenFormat.setFormat(TokenFormatOptions.DTCG);
+    
+    const tokensWithMetadata: Record<string, AnyTokenList> = {
+      base: [
+        {
+          name: 'colors.primary.10',
+          type: 'color',
+          value: '#061724',
+        },
+        {
+          name: 'colors.primary.20',
+          type: 'color',
+          value: '#0a2540',
+        },
+      ],
+    };
+    
+    const metadata = {
+      base: {
+        root: {
+          $description: 'Root level description',
+        },
+        groups: {
+          colors: {
+            $description: 'All color tokens',
+          },
+          'colors.primary': {
+            $description: 'Primary brand colors',
+          },
+        },
+      },
+    };
+    
+    const result = convertTokensToObject(tokensWithMetadata, true, metadata);
+    
+    expect(result.base.$description).toBe('Root level description');
+    expect(result.base.colors.$description).toBe('All color tokens');
+    expect(result.base.colors.primary.$description).toBe('Primary brand colors');
+    expect(result.base.colors.primary['10'].$value).toBe('#061724');
+    expect(result.base.colors.primary['20'].$value).toBe('#0a2540');
+  });
 });
