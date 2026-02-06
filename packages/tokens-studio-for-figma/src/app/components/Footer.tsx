@@ -103,9 +103,11 @@ export default function Footer() {
                 size="small"
                 tooltipSide="top"
                 tooltip={
-                  t('pullFrom', {
-                    provider: transformProviderName(storageType.provider),
-                  }) as string
+                  editProhibited
+                    ? t('readOnly')
+                    : (t('pullFrom', {
+                      provider: transformProviderName(storageType.provider),
+                    }) as string)
                 }
               />
             </DirtyStateBadgeWrapper>
