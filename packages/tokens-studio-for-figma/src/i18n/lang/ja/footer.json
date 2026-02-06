@@ -1,0 +1,8 @@
+{
+  "sync": "同期",
+  "docs": "ドキュメント",
+  "feedback": "フィードバック",
+  "pullFrom": "{{provider}}から取得",
+  "pushTo": "{{provider}}にプッシュ",
+  "goTo": "{{provider}}に移動"
+}
