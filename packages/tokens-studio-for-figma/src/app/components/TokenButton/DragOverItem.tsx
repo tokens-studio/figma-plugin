@@ -34,14 +34,8 @@ export const DragOverItem: React.FC<React.PropsWithChildren<React.PropsWithChild
       && isDraggable
       && draggedToken.type === dragOverToken.type
     ) {
-      const draggedItemName = draggedToken?.name.split('.');
-      const dragOverName = dragOverToken?.name.split('.');
-      const draggedItemNameArray = draggedItemName.slice(0, draggedItemName.length - 1);
-      const dragOverNameArray = dragOverName.slice(0, dragOverName.length - 1);
-
-      if (draggedItemNameArray.toString() === dragOverNameArray.toString()) {
-        return true;
-      }
+      // Allow dragging tokens to any location as long as they have the same type
+      return true;
     }
 
     return false;
