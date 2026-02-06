@@ -43,7 +43,18 @@ function NewOrExistingToken({
 
   const importedTokens = useSelector(importedTokensSelector);
 
-  const allParents = [...new Set([...importedTokens.newTokens.map((newToken: ImportToken) => newToken.parent), ...importedTokens.updatedTokens.map((updatedToken) => updatedToken.parent)])];
+  // Optimize: Memoize the parent calculation to avoid recalculating on every render
+  const allParents = React.useMemo(() => {
+    const parentSet = new Set<string>();
+    importedTokens.newTokens.forEach((newToken) => {
+      if (newToken.parent) parentSet.add(newToken.parent);
+    });
+    importedTokens.updatedTokens.forEach((updatedToken) => {
+      if (updatedToken.parent) parentSet.add(updatedToken.parent);
+    });
+    return Array.from(parentSet);
+  }, [importedTokens.newTokens, importedTokens.updatedTokens]);
+
   const isMultiParent = allParents.length > 1;
 
   return (

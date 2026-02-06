@@ -96,8 +96,18 @@ export default function TokenSetTree({
 
   React.useEffect(() => {
     // Compare saved tokenSet order with GUI tokenSet order and update the tokenSet if there is a difference
-    if (!isEqual(Object.keys(tokens), externalItems.filter(({ isLeaf }) => isLeaf).map(({ path }) => path))) {
-      debouncedOnReorder(filteredSetItems.filter(({ isLeaf }) => isLeaf).map(({ path }) => path));
+    // Optimize: extract leaf paths once instead of filtering twice
+    const externalLeafPaths = externalItems.reduce<string[]>((acc, item) => {
+      if (item.isLeaf) acc.push(item.path);
+      return acc;
+    }, []);
+
+    if (!isEqual(Object.keys(tokens), externalLeafPaths)) {
+      const filteredLeafPaths = filteredSetItems.reduce<string[]>((acc, item) => {
+        if (item.isLeaf) acc.push(item.path);
+        return acc;
+      }, []);
+      debouncedOnReorder(filteredLeafPaths);
     }
     // Filter externalItems based on tokenFilter. Filter on the children as well as the name of the set
     setItems(filteredSetItems);
@@ -111,7 +121,13 @@ export default function TokenSetTree({
       return usedTokenSet?.[item.path] === TokenSetStatus.ENABLED;
     }
 
-    const itemPaths = items.filter((i) => i.path.startsWith(item.path) && i.path !== item.path).map((i) => i.path);
+    // Optimize: combine filter and map into single pass
+    const itemPaths = items.reduce<string[]>((acc, i) => {
+      if (i.path.startsWith(item.path) && i.path !== item.path) {
+        acc.push(i.path);
+      }
+      return acc;
+    }, []);
     const childTokenSetStatuses = Object.entries(usedTokenSet)
       .filter(([tokenSet]) => itemPaths.includes(tokenSet))
       .map(([, tokenSetStatus]) => tokenSetStatus);
