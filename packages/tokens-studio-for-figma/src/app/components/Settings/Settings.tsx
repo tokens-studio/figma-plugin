@@ -10,7 +10,7 @@ import { Dispatch } from '../../store';
 import {
   uiStateSelector,
 } from '@/selectors';
-import AddLicenseKey from '../AddLicenseKey/AddLicenseKey';
+
 import { Divider } from '../Divider';
 import OnboardingExplainer from '../OnboardingExplainer';
 import RemConfiguration from '../RemConfiguration';
@@ -91,8 +91,6 @@ function Settings() {
   return (
     <Box className="content scroll-container">
       <Stack direction="column" gap={4} css={{ padding: '$3 0' }}>
-        <AddLicenseKey />
-        <Divider />
         {uiState.onboardingExplainerSyncProviders && (
           <Stack direction="column" gap={2} css={{ padding: '$4' }}>
             <OnboardingExplainer data={onboardingData} closeOnboarding={closeOnboarding} />
