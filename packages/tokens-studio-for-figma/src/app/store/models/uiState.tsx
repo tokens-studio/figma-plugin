@@ -13,6 +13,7 @@ import { EditTokenObject } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
 import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
+import { ExportTokenSet } from '@/types/ExportTokenSet';
 import { PushOverrides } from '../remoteTokens';
 
 type DisplayType = 'GRID' | 'LIST';
@@ -90,6 +91,8 @@ export interface UIState {
   sidebarWidth: number;
   hasRemoteChange: boolean;
   selectedExportThemes?: string[];
+  selectedExportSets?: ExportTokenSet[];
+  activeExportTab?: 'useThemes' | 'useSets' | null;
   lastError?: {
     type: ErrorCategory;
     message: string;
@@ -157,6 +160,8 @@ export const uiState = createModel<RootModel>()({
     sidebarWidth: 150,
     hasRemoteChange: false,
     selectedExportThemes: [],
+    selectedExportSets: [],
+    activeExportTab: null,
     lastError: null,
     showBitbucketMigrationDialog: false,
     triggerMigrationEdit: null,
@@ -428,6 +433,14 @@ export const uiState = createModel<RootModel>()({
       ...state,
       selectedExportThemes: data,
     }),
+    setSelectedExportSets: (state, data: ExportTokenSet[]) => ({
+      ...state,
+      selectedExportSets: data,
+    }),
+    setActiveExportTab: (state, data: 'useThemes' | 'useSets' | null) => ({
+      ...state,
+      activeExportTab: data,
+    }),
     setLastError: (state, data: { type: ErrorCategory; message: string; header?: string } | null) => ({
       ...state,
       lastError: data,
@@ -484,6 +497,18 @@ export const uiState = createModel<RootModel>()({
       AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.SET_SELECTED_EXPORT_THEMES,
         themes: JSON.stringify(payload),
+      });
+    },
+    setSelectedExportSets: (payload: ExportTokenSet[]) => {
+      AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.SET_SELECTED_EXPORT_SETS,
+        sets: JSON.stringify(payload),
+      });
+    },
+    setActiveExportTab: (payload: 'useThemes' | 'useSets' | null) => {
+      AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.SET_ACTIVE_EXPORT_TAB,
+        tab: payload || '',
       });
     },
   }),
