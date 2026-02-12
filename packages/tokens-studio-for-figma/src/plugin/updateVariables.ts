@@ -67,23 +67,16 @@ export default async function updateVariables({
 
   if (isExtendedCollection) {
     // Extended collection: get variables from parent collection (where they're defined)
-    // We'll use extended mode IDs to create overrides
     const parentCollectionId = (collection as any).parentVariableCollectionId;
 
-
-
-
-    variablesInCollection = figma.variables
-      .getLocalVariables()
-      .filter((v) => v.variableCollectionId === parentCollectionId);
-
-
-
+    // Use getLocalVariablesAsync to avoid issues with stale/deleted variables (Figma bug)
+    // Synchronous getLocalVariables() can sometimes return empty arrays in certain contexts
+    const allVariables = await figma.variables.getLocalVariablesAsync();
+    variablesInCollection = allVariables.filter((v) => v.variableCollectionId === parentCollectionId);
   } else {
     // Regular collection: get variables from this collection
-    variablesInCollection = figma.variables
-      .getLocalVariables()
-      .filter((v) => v.variableCollectionId === collection.id);
+    const allVariables = await figma.variables.getLocalVariablesAsync();
+    variablesInCollection = allVariables.filter((v) => v.variableCollectionId === collection.id);
   }
 
   const variablesToCreate: VariableToken[] = [];
@@ -92,8 +85,6 @@ export default async function updateVariables({
       variablesToCreate.push(mapTokensToVariableInfo(token, theme, settings, themeBaseFontSize));
     }
   });
-
-
 
   const variableObj = await setValuesOnVariable(
     variablesInCollection,
@@ -109,7 +100,10 @@ export default async function updateVariables({
   const removedVariables: string[] = [];
 
   // Remove variables not handled in the current theme
-  if (settings.removeStylesAndVariablesWithoutConnection) {
+  // CRITICAL: NEVER remove variables for extended collections!
+  // Extended collections only override a SUBSET of parent variables.
+  // Removing non-matches would delete the parent's variables!
+  if (!isExtendedCollection && settings.removeStylesAndVariablesWithoutConnection) {
     variablesInCollection
       .filter((variable) => !Object.values(variableObj.variableKeyMap).includes(variable.key))
       .forEach((variable) => {

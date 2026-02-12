@@ -69,6 +69,19 @@ export async function createNecessaryVariableCollections(themes: ThemeObjectsLis
           const extendedCollection = await (parentCollection as any).extend(truncatedChildName);
           console.log('✅ Extended collection created successfully via extend()!');
           console.log('Extended collection:', { id: extendedCollection.id, name: extendedCollection.name, modesCount: extendedCollection.modes?.length });
+
+          // CRITICAL: Set metadata on theme object for UI mutual exclusivity
+          // This enables ThemeSelector to prevent selecting both parent and extended themes
+          currentTheme.$figmaIsExtension = true;
+          currentTheme.$figmaParentCollectionId = parentCollection.id;
+          currentTheme.$figmaCollectionId = extendedCollection.id;
+
+          console.log(`✓ Set extension metadata on theme "${currentTheme.name}":`, {
+            isExtension: currentTheme.$figmaIsExtension,
+            parentCollectionId: currentTheme.$figmaParentCollectionId,
+            ownCollectionId: currentTheme.$figmaCollectionId,
+          });
+
           // Extended collections inherit modes from parent - don't rename them
           acc.push(extendedCollection);
           continue;

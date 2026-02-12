@@ -36,14 +36,6 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
     const selectedTheme = allThemes.find((theme) => theme.id === themeId);
     const nextTheme = { ...activeTheme };
 
-    console.log('=== THEME SELECTION DEBUG ===');
-    console.log('Selected theme ID:', themeId);
-    console.log('Selected theme object:', selectedTheme);
-    console.log('Is extension?', selectedTheme?.$figmaIsExtension);
-    console.log('Parent collection ID:', selectedTheme?.$figmaParentCollectionId);
-    console.log('Own collection ID:', selectedTheme?.$figmaCollectionId);
-    console.log('Current active themes:', activeTheme);
-
     // Check if we're toggling off the theme
     const isTogglingOff = typeof nextTheme[groupOfTheme] !== 'undefined' && nextTheme[groupOfTheme] === themeId;
 
@@ -54,44 +46,46 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
       nextTheme[groupOfTheme] = themeId;
 
       // If this is an extended theme, deactivate its parent collection's themes
-      if (selectedTheme?.$figmaIsExtension && selectedTheme.$figmaParentCollectionId) {
-        console.log('This is an EXTENDED theme, looking for parent themes to deactivate...');
-        // Find all themes with the parent collection ID
-        const parentThemes = allThemes.filter(
-          (t) => t.$figmaCollectionId === selectedTheme.$figmaParentCollectionId && !t.$figmaIsExtension
-        );
-        console.log('Found parent themes:', parentThemes.map(t => ({ id: t.id, name: t.name, collectionId: t.$figmaCollectionId })));
+      // Extended themes have hierarchical group names like "ParentGroup/ExtendedGroup"
+      // If this is an extended theme, deactivate its parent collection's themes
+      // Extended themes have hierarchical group names like "ParentGroup/ExtendedGroup"
+      if (selectedTheme?.$figmaIsExtension || (selectedTheme?.group && selectedTheme.group.includes('/'))) {
+        const parentGroupName = selectedTheme.group?.split('/')[0];
+
+        // Find parent themes by group name (more reliable than collection IDs which can become stale)
+        const parentThemes = allThemes.filter((t) => {
+          // Parent theme has the parent group name and is NOT an extension
+          const matchesByGroup = t.group === parentGroupName && !t.group?.includes('/');
+          const matchesByMetadata = !t.$figmaIsExtension && t.group === parentGroupName;
+          return matchesByGroup || matchesByMetadata;
+        });
 
         // Deactivate all parent collection themes from any group
         for (const [group, activeThemeId] of Object.entries(nextTheme)) {
           if (parentThemes.some((pt) => pt.id === activeThemeId)) {
-            console.log(`Deactivating parent theme ${activeThemeId} from group ${group}`);
             delete nextTheme[group];
           }
         }
       }
 
       // If this is a parent theme, deactivate any active extended collection themes that extend it
-      if (selectedTheme?.$figmaCollectionId && !selectedTheme.$figmaIsExtension) {
-        console.log('This is a PARENT theme, looking for extended themes to deactivate...');
-        // Find all extended themes that have this as their parent
-        const extendedThemes = allThemes.filter(
-          (t) => t.$figmaIsExtension && t.$figmaParentCollectionId === selectedTheme.$figmaCollectionId
-        );
-        console.log('Found extended themes:', extendedThemes.map(t => ({ id: t.id, name: t.name, parentCollectionId: t.$figmaParentCollectionId })));
+      if (selectedTheme && !selectedTheme.$figmaIsExtension && selectedTheme.group && !selectedTheme.group.includes('/')) {
+        // Find all extended themes by checking if their group starts with "ParentGroup/"
+        const extendedThemes = allThemes.filter((t) => {
+          // Extended theme group format: "ParentGroup/ExtendedGroup"
+          const matchesByGroup = selectedTheme.group && t.group?.startsWith(`${selectedTheme.group}/`);
+          const matchesByMetadata = t.$figmaIsExtension && selectedTheme.$figmaCollectionId && t.$figmaParentCollectionId === selectedTheme.$figmaCollectionId;
+          return matchesByGroup || matchesByMetadata;
+        });
 
         // Deactivate all extended themes from any group
         for (const [group, activeThemeId] of Object.entries(nextTheme)) {
           if (extendedThemes.some((et) => et.id === activeThemeId)) {
-            console.log(`Deactivating extended theme ${activeThemeId} from group ${group}`);
             delete nextTheme[group];
           }
         }
       }
     }
-
-    console.log('Final active themes:', nextTheme);
-    console.log('=== END DEBUG ===');
 
     if (Object.keys(nextTheme).length > 0) {
       track('Apply theme', { id: nextTheme });
