@@ -777,6 +777,40 @@ describe('resolveTokenValues deep nested', () => {
     expect(resolvedTokens).toEqual(output);
   });
 
+  it('preserves original reference in rawValue for chained border radius tokens', () => {
+    // Test scenario: chained border radius references
+    // radii.1 -> components.textInput.base.borderRadius -> components.textInput.medium.borderRadius
+    const chainedTokens = [
+      {
+        name: 'radii.1',
+        value: '8px',
+        type: TokenTypes.BORDER_RADIUS,
+      },
+      {
+        name: 'components.textInput.base.borderRadius',
+        value: '{radii.1}',
+        type: TokenTypes.BORDER_RADIUS,
+      },
+      {
+        name: 'components.textInput.medium.borderRadius',
+        value: '{components.textInput.base.borderRadius}',
+        type: TokenTypes.BORDER_RADIUS,
+      },
+    ];
+
+    const resolvedTokens = defaultTokenResolver.setTokens(chainedTokens);
+
+    // All tokens should resolve to '8px'
+    expect(resolvedTokens[0].value).toBe('8px');
+    expect(resolvedTokens[1].value).toBe('8px');
+    expect(resolvedTokens[2].value).toBe('8px');
+
+    // But rawValue should preserve the ORIGINAL reference from each token
+    expect(resolvedTokens[0].rawValue).toBe('8px');
+    expect(resolvedTokens[1].rawValue).toBe('{radii.1}');
+    expect(resolvedTokens[2].rawValue).toBe('{components.textInput.base.borderRadius}'); // NOT '{radii.1}'!
+  });
+
   const deepTokens = [{
     name: '1',
     value: '#ff0000',
