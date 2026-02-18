@@ -252,6 +252,36 @@ describe('MoreButton', () => {
     }, []);
   });
 
+  it('should deselect correct child property for dimension tokens', async () => {
+    // Test case for dimension tokens with child properties
+    const dimensionToken: SingleToken = {
+      value: '16px',
+      name: 'dimension-token',
+      type: TokenTypes.DIMENSION,
+    };
+    const mockStore = createMockStore({
+      uiState: {
+        mainNodeSelectionValues: {
+          itemSpacing: dimensionToken.name,
+        },
+      },
+    });
+
+    const result = render(
+      <Provider store={mockStore}>
+        <MoreButton
+          type={TokenTypes.DIMENSION}
+          showForm={mockShowForm}
+          token={dimensionToken}
+        />
+      </Provider>,
+    );
+    await fireEvent.click(result.getByText(dimensionToken.name));
+    expect(mockSetNodeData).toHaveBeenCalledWith({
+      itemSpacing: 'delete',
+    }, []);
+  });
+
   it('show all properties about dimension token', async () => {
     const dimensionToken: SingleToken = {
       value: '16px',
