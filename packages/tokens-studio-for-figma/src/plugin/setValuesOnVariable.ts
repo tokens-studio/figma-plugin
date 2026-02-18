@@ -221,7 +221,7 @@ export default async function setValuesOnVariable(
               // Avoid redundant metadata updates for the same variable in the same run (e.g. across multiple modes)
               if (!codeSyntaxUpdateTracker[currentVar.id]) {
                 try {
-                  // Only update Figma metadata such as scopes, code syntax, and description if we're updating the value as well  
+                  // Only update Figma metadata such as scopes, code syntax, and description if we're updating the value as well
                   if (hasMetadataChanged) {
                     // Update scopes
                     if (flatScopes && Array.isArray(flatScopes)) {

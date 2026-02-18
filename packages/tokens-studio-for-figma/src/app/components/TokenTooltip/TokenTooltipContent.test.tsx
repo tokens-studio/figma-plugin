@@ -22,6 +22,34 @@ const tokens: SingleToken[] = [
     description: 'alias size token',
   },
   {
+    name: 'spacing.none',
+    type: TokenTypes.SPACING,
+    value: 0,
+    rawValue: 0,
+    description: 'zero spacing token',
+  },
+  {
+    name: 'spacing.alias',
+    type: TokenTypes.SPACING,
+    value: 0,
+    rawValue: '{spacing.none}',
+    description: 'alias zero spacing token',
+  },
+  {
+    name: 'dimension.zero',
+    type: TokenTypes.DIMENSION,
+    value: '0',
+    rawValue: '0',
+    description: 'zero dimension token',
+  },
+  {
+    name: 'dimension.alias',
+    type: TokenTypes.DIMENSION,
+    value: '0',
+    rawValue: '{dimension.zero}',
+    description: 'alias zero dimension token',
+  },
+  {
     name: 'color.slate.50',
     type: TokenTypes.COLOR,
     value: '#f8fafc',
@@ -419,5 +447,66 @@ describe('TokenTooltip alias', () => {
 
     expect(getByText(String('brokentoken'))).toBeInTheDocument();
     expect(getByTestId('not-found-badge')).toBeInTheDocument();
+  });
+
+  it('displays zero value correctly for numeric token', () => {
+    const { getByText } = render(
+      <TokensContext.Provider value={customStore}>
+        <TokenTooltipContent
+          token={{
+            name: 'spacing.none',
+            type: TokenTypes.SPACING,
+            value: 0,
+            rawValue: 0,
+            description: 'zero spacing token',
+          }}
+        />
+      </TokensContext.Provider>,
+    );
+
+    expect(getByText('zero spacing token')).toBeInTheDocument();
+    expect(getByText('0')).toBeInTheDocument();
+  });
+
+  it('displays zero value correctly for alias token', () => {
+    const { getByText } = render(
+      <TokensContext.Provider value={customStore}>
+        <TokenTooltipContent
+          token={{
+            name: 'spacing.alias',
+            type: TokenTypes.SPACING,
+            value: '{spacing.none}',
+            rawValue: '{spacing.none}',
+            description: 'alias zero spacing token',
+          }}
+        />
+      </TokensContext.Provider>,
+    );
+
+    expect(getByText('alias zero spacing token')).toBeInTheDocument();
+    // Should display both the alias reference and the resolved value of 0
+    expect(getByText('{spacing.none}')).toBeInTheDocument();
+    expect(getByText('0')).toBeInTheDocument();
+  });
+
+  it('displays string zero value correctly for dimension token', () => {
+    const { getByText } = render(
+      <TokensContext.Provider value={customStore}>
+        <TokenTooltipContent
+          token={{
+            name: 'dimension.alias',
+            type: TokenTypes.DIMENSION,
+            value: '{dimension.zero}',
+            rawValue: '{dimension.zero}',
+            description: 'alias zero dimension token',
+          }}
+        />
+      </TokensContext.Provider>,
+    );
+
+    expect(getByText('alias zero dimension token')).toBeInTheDocument();
+    expect(getByText('{dimension.zero}')).toBeInTheDocument();
+    // The resolved value should show '0'
+    expect(getByText('0')).toBeInTheDocument();
   });
 });

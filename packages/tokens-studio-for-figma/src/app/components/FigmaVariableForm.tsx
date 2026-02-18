@@ -4,12 +4,11 @@ import {
 } from '@tokens-studio/ui';
 import IconPlus from '@/icons/plus.svg';
 import IconMinus from '@/icons/minus.svg';
-import { EditTokenObject } from '@/types/tokens';
+import { EditTokenObject, VariableScope, CodeSyntaxPlatform } from '@/types/tokens';
 import Box from './Box';
 import Input from './Input';
 import { tokenTypesToCreateVariable } from '@/constants/VariableTypes';
 
-import { VariableScope, CodeSyntaxPlatform } from '@/types/tokens';
 import {
   VARIABLE_SCOPE_OPTIONS, TOKEN_TYPE_TO_SCOPES_MAP, CODE_SYNTAX_PLATFORM_OPTIONS,
 } from '@/constants/FigmaVariableMetaData';

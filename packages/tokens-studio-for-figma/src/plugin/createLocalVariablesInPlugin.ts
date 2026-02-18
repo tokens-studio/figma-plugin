@@ -101,8 +101,8 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
     }
 
     /**
-     * We perform a pre-flight scan across ALL selected themes. We build a global map 
-     * (`providedPlatformsByVariable`) of every platform that HAS a value defined 
+     * We perform a pre-flight scan across ALL selected themes. We build a global map
+     * (`providedPlatformsByVariable`) of every platform that HAS a value defined
      * for a given variable name.
      * During the actual update (in setValuesOnVariable), we use this map:
      * 1. If a platform is missing in the current mode BUT exists globally, we skip it (Aggregation mode).

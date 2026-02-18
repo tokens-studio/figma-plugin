@@ -45,7 +45,7 @@ export const TokenTooltipContentValue: React.FC<React.PropsWithChildren<React.Pr
   }
 
   if (
-    (resolvedValue || ignoreResolvedValue)
+    (resolvedValue !== undefined || ignoreResolvedValue)
     && typeof resolvedValue !== 'string'
     && !Array.isArray(resolvedValue)
     && isSingleCompositionToken(token, true)
@@ -124,7 +124,7 @@ export const TokenTooltipContentValue: React.FC<React.PropsWithChildren<React.Pr
     return <TooltipProperty value={JSON.stringify(token.value, null, 2)} />;
   }
 
-  if (resolvedValue && typeof resolvedValue !== 'string' && typeof resolvedValue !== 'number') {
+  if (resolvedValue !== undefined && typeof resolvedValue !== 'string' && typeof resolvedValue !== 'number') {
     return <TooltipProperty value={token.value} resolvedValue={JSON.stringify(resolvedValue, null, 2)} />;
   }
 
