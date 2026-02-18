@@ -309,14 +309,24 @@ export default async function setValuesOnVariable(
               }
             }
 
+            // Extract reference token name from rawValue
+            // rawValue should be in the format "{token.name}" for alias references
             let referenceTokenName: string = '';
-            if (token.rawValue && token.rawValue?.toString().startsWith('{')) {
-              referenceTokenName = token.rawValue?.toString().slice(1, token.rawValue.toString().length - 1);
+            const rawValueStr = token.rawValue?.toString() || '';
+            
+            if (rawValueStr.startsWith('{') && rawValueStr.endsWith('}')) {
+              // Standard case: "{token.name}" -> "token.name"
+              referenceTokenName = rawValueStr.slice(1, -1);
+            } else if (rawValueStr.startsWith('{')) {
+              // Edge case: "{token.name" (missing closing brace)
+              referenceTokenName = rawValueStr.slice(1);
             } else {
-              referenceTokenName = token.rawValue!.toString().substring(1);
+              // Fallback: rawValue doesn't have braces (shouldn't normally happen)
+              // Only use it if checkCanReferenceVariable would return true
+              referenceTokenName = rawValueStr;
             }
 
-            if (token && checkCanReferenceVariable(token)) {
+            if (token && checkCanReferenceVariable(token) && referenceTokenName) {
               referenceVariableCandidates.push({
                 variable,
                 modeId: mode,

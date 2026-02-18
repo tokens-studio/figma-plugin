@@ -73,18 +73,30 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
 
           if (checkCanReferenceVariable(payload)) {
             // If new token reference to another token, we update the variable to reference to another variable
+            // Extract reference token name from rawValue
+            // rawValue should be in the format "{token.name}" for alias references
             let referenceTokenName: string = '';
-            if (payload.rawValue && payload.rawValue?.toString().startsWith('{')) {
-              referenceTokenName = payload.rawValue?.toString().slice(1, payload.rawValue.toString().length - 1);
+            const rawValueStr = payload.rawValue?.toString() || '';
+            
+            if (rawValueStr.startsWith('{') && rawValueStr.endsWith('}')) {
+              // Standard case: "{token.name}" -> "token.name"
+              referenceTokenName = rawValueStr.slice(1, -1);
+            } else if (rawValueStr.startsWith('{')) {
+              // Edge case: "{token.name" (missing closing brace)
+              referenceTokenName = rawValueStr.slice(1);
             } else {
-              referenceTokenName = payload.rawValue!.toString().substring(1);
+              // Fallback: rawValue doesn't have braces (shouldn't normally happen)
+              referenceTokenName = rawValueStr;
             }
-            const referenceVariable = nameToVariableMap[referenceTokenName.split('.').join('/')];
-            if (referenceVariable) {
-              variable.setValueForMode(theme.$figmaModeId, {
-                type: 'VARIABLE_ALIAS',
-                id: referenceVariable.id,
-              });
+            
+            if (referenceTokenName) {
+              const referenceVariable = nameToVariableMap[referenceTokenName.split('.').join('/')];
+              if (referenceVariable) {
+                variable.setValueForMode(theme.$figmaModeId, {
+                  type: 'VARIABLE_ALIAS',
+                  id: referenceVariable.id,
+                });
+              }
             }
           } else {
             switch (payload.type) {
