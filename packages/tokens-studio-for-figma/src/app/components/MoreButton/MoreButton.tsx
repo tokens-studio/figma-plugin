@@ -8,7 +8,9 @@ import copy from 'copy-to-clipboard';
 
 import { ContextMenu } from '@tokens-studio/ui';
 import { styled } from '@/stitches.config';
-import { activeTokenSetReadOnlySelector, activeTokenSetSelector, editProhibitedSelector } from '@/selectors';
+import {
+  activeTokenSetReadOnlySelector, activeTokenSetSelector, editProhibitedSelector, mainNodeSelectionValuesSelector,
+} from '@/selectors';
 import { PropertyObject } from '@/types/properties';
 import { MoreButtonProperty } from './MoreButtonProperty';
 import { DocumentationProperties } from '@/constants/DocumentationProperties';
@@ -54,6 +56,7 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
   const editProhibited = useSelector(editProhibitedSelector);
   const activeTokenSetReadOnly = useSelector(activeTokenSetReadOnlySelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
+  const mainNodeSelectionValues = useSelector(mainNodeSelectionValuesSelector);
   const { deleteSingleToken } = useManageTokens();
 
   const canEdit = !editProhibited && !activeTokenSetReadOnly;
@@ -132,10 +135,31 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
       if (canEdit && ((isMacBrowser && event.metaKey) || (!isMacBrowser && event.ctrlKey))) {
         handleEditClick();
       } else {
-        handleClick(properties[0]);
+        // Find which property actually has this token applied
+        // Check all properties including child properties
+        const allProperties: PropertyObject[] = [];
+        properties.forEach((property) => {
+          if (typeof property !== 'string') {
+            allProperties.push(property);
+            if (property.childProperties) {
+              allProperties.push(...property.childProperties);
+            }
+          }
+        });
+
+        // Find the property that currently has this token
+        const activeProperty = allProperties.find((prop) => mainNodeSelectionValues[prop.name] === token.name);
+
+        if (activeProperty) {
+          // If token is active on a specific property, toggle that property
+          handleClick(activeProperty, true);
+        } else {
+          // If token is not active, apply it to the first property
+          handleClick(properties[0]);
+        }
       }
     },
-    [canEdit, handleEditClick, handleClick, properties],
+    [canEdit, handleEditClick, handleClick, properties, mainNodeSelectionValues, token.name],
   );
 
   return (
