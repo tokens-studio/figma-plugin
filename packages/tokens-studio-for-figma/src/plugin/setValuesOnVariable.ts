@@ -73,7 +73,8 @@ export default async function setValuesOnVariable(
     tokens.forEach((token) => {
       promises.add(variableWorker.schedule(async () => {
         try {
-          const variableType = convertTokenTypeToVariableType(token.type, token.value);
+          const flatScopes = token.$extensions?.['com.figma.scopes'] as VariableScope[] | undefined;
+          const variableType = convertTokenTypeToVariableType(token.type, token.value, flatScopes);
           // If id matches the variableId, or name matches the token path, we can use it to update the variable instead of re-creating.
           // Prioritize finding by variableId (key) when present, otherwise fall back to name matching
           // This has the nasty side-effect that if font weight changes from string to number, it will not update the variable given we cannot change type.
@@ -138,8 +139,16 @@ export default async function setValuesOnVariable(
               variable.description = newDescription;
             }
 
+            // 0. Detect hiddenFromPublishing changes
+            const hiddenFromPublishing = token.$extensions?.['com.figma.hiddenFromPublishing'] as boolean | undefined;
+            if (typeof hiddenFromPublishing === 'boolean' && !codeSyntaxUpdateTracker[variable.id]) {
+              if (variable.hiddenFromPublishing !== hiddenFromPublishing) {
+                variable.hiddenFromPublishing = hiddenFromPublishing;
+                hasMetadataNeedsChange = true;
+              }
+            }
+
             // 1. Detect scope changes
-            const flatScopes = token.$extensions?.['com.figma.scopes'] as VariableScope[] | undefined;
             if (flatScopes && Array.isArray(flatScopes) && !codeSyntaxUpdateTracker[variable.id]) {
               const currentScopes = variable.scopes || [];
               const newScopes = normalizeVariableScopes(flatScopes);
@@ -223,6 +232,11 @@ export default async function setValuesOnVariable(
                 try {
                   // Only update Figma metadata such as scopes, code syntax, and description if we're updating the value as well  
                   if (hasMetadataChanged) {
+                    // Update hiddenFromPublishing
+                    if (typeof hiddenFromPublishing === 'boolean') {
+                      currentVar.hiddenFromPublishing = hiddenFromPublishing;
+                    }
+
                     // Update scopes
                     if (flatScopes && Array.isArray(flatScopes)) {
                       let newScopes = normalizeVariableScopes(flatScopes);

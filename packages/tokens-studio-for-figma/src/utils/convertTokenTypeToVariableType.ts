@@ -1,9 +1,14 @@
 import { TokenTypes } from '@/constants/TokenTypes';
-import { SingleToken } from '@/types/tokens';
+import { SingleToken, VariableScope } from '@/types/tokens';
 
-export function convertTokenTypeToVariableType(type: TokenTypes, value: SingleToken['value']): VariableResolvedDataType {
+export function convertTokenTypeToVariableType(type: TokenTypes, value: SingleToken['value'], scopes?: VariableScope[]): VariableResolvedDataType {
   // For numerical font weights we want to create a float variable
   if (type === TokenTypes.FONT_WEIGHTS && parseFloat(String(value))) {
+    return 'FLOAT';
+  }
+
+  // If the token is a string token but has a font weight scope, we want to create a float variable if the value is a number
+  if (scopes && scopes.includes('FONT_WEIGHT') && parseFloat(String(value))) {
     return 'FLOAT';
   }
 

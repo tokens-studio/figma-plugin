@@ -70,7 +70,7 @@ export const TOKEN_TYPE_TO_SCOPES_MAP: Record<string, VariableScope[]> = {
         'ALL_SCOPES', 'PARAGRAPH_INDENT',
     ],
     [TokenTypes.TEXT]: [
-        'ALL_SCOPES', 'TEXT_CONTENT', 'FONT_FAMILY', 'FONT_STYLE',
+        'ALL_SCOPES', 'TEXT_CONTENT', 'FONT_FAMILY', 'FONT_STYLE', 'FONT_WEIGHT',
     ],
     [TokenTypes.BOOLEAN]: [],
     [TokenTypes.NUMBER]: [

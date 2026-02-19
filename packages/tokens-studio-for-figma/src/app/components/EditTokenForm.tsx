@@ -352,6 +352,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     const newExtensions = { ...internalEditToken.$extensions };
     delete newExtensions['com.figma.scopes'];
     delete newExtensions['com.figma.codeSyntax'];
+    delete newExtensions['com.figma.hiddenFromPublishing'];
     // Keep variableId and isOverride if they exist
     setInternalEditToken({
       ...internalEditToken,
@@ -360,7 +361,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
   }, [internalEditToken]);
 
   const handleFigmaVariableChange = React.useCallback(
-    (scopes: string[], codeSyntax: Partial<Record<string, string>>) => {
+    (scopes: string[], codeSyntax: Partial<Record<string, string>>, hiddenFromPublishing?: boolean) => {
       const newExtensions = { ...internalEditToken.$extensions };
 
       // Set or remove scopes in flat format
@@ -376,6 +377,17 @@ function EditTokenForm({ resolvedTokens }: Props) {
       } else {
         delete newExtensions['com.figma.codeSyntax'];
       }
+
+      if (typeof hiddenFromPublishing === 'boolean') {
+        newExtensions['com.figma.hiddenFromPublishing'] = hiddenFromPublishing;
+      } else {
+        delete newExtensions['com.figma.hiddenFromPublishing'];
+      }
+
+      setInternalEditToken({
+        ...internalEditToken,
+        ...newExtensions,
+      });
 
       setInternalEditToken({
         ...internalEditToken,
