@@ -13,6 +13,7 @@ import { VariableScope, CodeSyntaxPlatform } from '@/types/tokens';
 import {
   VARIABLE_SCOPE_OPTIONS, TOKEN_TYPE_TO_SCOPES_MAP, CODE_SYNTAX_PLATFORM_OPTIONS,
 } from '@/constants/FigmaVariableMetaData';
+import { track } from '@/utils/analytics';
 
 export default function FigmaVariableForm({
   internalEditToken,
@@ -20,7 +21,7 @@ export default function FigmaVariableForm({
   handleRemoveFigmaVariable,
 }: {
   internalEditToken: EditTokenObject;
-  handleFigmaVariableChange: (scopes: VariableScope[], codeSyntax: Partial<Record<CodeSyntaxPlatform, string>>) => void;
+  handleFigmaVariableChange: (scopes: VariableScope[], codeSyntax: Partial<Record<CodeSyntaxPlatform, string>>, hiddenFromPublishing?: boolean) => void;
   handleRemoveFigmaVariable: () => void;
 }) {
   const [figmaVariableVisible, setFigmaVariableVisible] = React.useState(false);
@@ -28,6 +29,8 @@ export default function FigmaVariableForm({
   const currentScopes = useMemo(() => internalEditToken?.$extensions?.['com.figma.scopes'] as VariableScope[] || [], [internalEditToken]);
 
   const currentCodeSyntax = useMemo(() => internalEditToken?.$extensions?.['com.figma.codeSyntax'] as Partial<Record<CodeSyntaxPlatform, string>> || {}, [internalEditToken]);
+
+  const currentHiddenFromPublishing = useMemo(() => internalEditToken?.$extensions?.['com.figma.hiddenFromPublishing'] as boolean || false, [internalEditToken]);
 
   const shouldShowFigmaVariableSection = useMemo(() => tokenTypesToCreateVariable.includes(internalEditToken.type), [internalEditToken.type]);
 
@@ -38,14 +41,14 @@ export default function FigmaVariableForm({
   }, [internalEditToken.type]);
 
   React.useEffect(() => {
-    if (internalEditToken?.$extensions?.['com.figma.scopes'] || internalEditToken?.$extensions?.['com.figma.codeSyntax']) {
+    if (internalEditToken?.$extensions?.['com.figma.scopes'] || internalEditToken?.$extensions?.['com.figma.codeSyntax'] || typeof internalEditToken?.$extensions?.['com.figma.hiddenFromPublishing'] === 'boolean') {
       setFigmaVariableVisible(true);
     }
   }, [internalEditToken]);
 
   const addFigmaVariable = useCallback(() => {
     setFigmaVariableVisible(true);
-    handleFigmaVariableChange([], {});
+    handleFigmaVariableChange([], {}, false);
   }, [handleFigmaVariableChange]);
 
   const removeFigmaVariable = useCallback(() => {
@@ -55,6 +58,7 @@ export default function FigmaVariableForm({
 
   const handleScopeChange = useCallback((scope: VariableScope, checked: boolean) => {
     let newScopes: VariableScope[];
+    track('Select variable scope', { scope, checked });
 
     if (scope === 'ALL_SCOPES') {
       // If selecting ALL_SCOPES, clear all other scopes
@@ -68,7 +72,12 @@ export default function FigmaVariableForm({
       newScopes = currentScopes.filter((s) => s !== scope);
     }
 
-    handleFigmaVariableChange(newScopes, currentCodeSyntax);
+    handleFigmaVariableChange(newScopes, currentCodeSyntax, currentHiddenFromPublishing);
+  }, [currentScopes, currentCodeSyntax, currentHiddenFromPublishing, handleFigmaVariableChange]);
+
+  const handleHiddenFromPublishingChange = useCallback((checked: boolean) => {
+    track('Set hidden from publishing', { checked });
+    handleFigmaVariableChange(currentScopes, currentCodeSyntax, checked);
   }, [currentScopes, currentCodeSyntax, handleFigmaVariableChange]);
 
   const handleCodeSyntaxPlatformChange = useCallback((platform: CodeSyntaxPlatform, checked: boolean) => {
@@ -78,14 +87,14 @@ export default function FigmaVariableForm({
     } else {
       delete newCodeSyntax[platform];
     }
-    handleFigmaVariableChange(currentScopes, newCodeSyntax);
-  }, [currentScopes, currentCodeSyntax, handleFigmaVariableChange]);
+    handleFigmaVariableChange(currentScopes, newCodeSyntax, currentHiddenFromPublishing);
+  }, [currentScopes, currentCodeSyntax, currentHiddenFromPublishing, handleFigmaVariableChange]);
 
   const handleCodeSyntaxValueChange = useCallback((platform: CodeSyntaxPlatform, value: string) => {
     const newCodeSyntax = { ...currentCodeSyntax };
     newCodeSyntax[platform] = value;
-    handleFigmaVariableChange(currentScopes, newCodeSyntax);
-  }, [currentScopes, currentCodeSyntax, handleFigmaVariableChange]);
+    handleFigmaVariableChange(currentScopes, newCodeSyntax, currentHiddenFromPublishing);
+  }, [currentScopes, currentCodeSyntax, currentHiddenFromPublishing, handleFigmaVariableChange]);
 
   const handleScopeCheckedChange = useCallback((scope: VariableScope) => (checked: boolean | string) => {
     handleScopeChange(scope, !!checked);
@@ -98,6 +107,10 @@ export default function FigmaVariableForm({
   const handleCodeSyntaxInputChange = useCallback((platform: CodeSyntaxPlatform) => (e: React.ChangeEvent<HTMLInputElement>) => {
     handleCodeSyntaxValueChange(platform, e.target.value);
   }, [handleCodeSyntaxValueChange]);
+
+  const handleHiddenFromPublishingCheckedChange = useCallback((checked: boolean | string) => {
+    handleHiddenFromPublishingChange(!!checked);
+  }, [handleHiddenFromPublishingChange]);
 
   if (!shouldShowFigmaVariableSection) {
     return null;
@@ -162,6 +175,22 @@ export default function FigmaVariableForm({
                 </Stack>
               </Box>
             )}
+
+            <Box>
+              <Text muted size="small" css={{ marginBottom: '$2' }}>
+                Variable settings
+              </Text>
+              <Stack direction="row" gap={2} css={{ alignItems: 'center' }}>
+                <Checkbox
+                  id="hiddenFromPublishing"
+                  checked={currentHiddenFromPublishing}
+                  onCheckedChange={handleHiddenFromPublishingCheckedChange}
+                />
+                <Label css={{ fontWeight: '$sansRegular', fontSize: '$small' }} htmlFor="hiddenFromPublishing">
+                  Hidden from publishing
+                </Label>
+              </Stack>
+            </Box>
 
             <Box>
               <Text muted size="small" css={{ marginBottom: '$2' }}>
