@@ -315,6 +315,42 @@ describe('SetValuesOnVariable', () => {
       });
     });
 
+    it('should update hiddenFromPublishing with value change', async () => {
+      const tokens = [{
+        name: 'test.variable',
+        path: 'test/variable',
+        rawValue: '24',
+        value: '24',
+        type: TokenTypes.SIZING,
+        variableId: 'test-key-1',
+        $extensions: {
+          'com.figma.hiddenFromPublishing': true,
+        },
+      }] as SingleToken<true, { path: string; variableId: string }>[];
+
+      await setValuesOnVariable([testVariable], tokens, collection, mode, baseFontSize);
+
+      expect(testVariable.hiddenFromPublishing).toEqual(true);
+      expect(mockSetValueForMode).toHaveBeenCalledWith(mode, 24);
+    });
+
+    it('should set hiddenFromPublishing to false when not present', async () => {
+      testVariable.hiddenFromPublishing = true;
+      const tokens = [{
+        name: 'test.variable',
+        path: 'test/variable',
+        rawValue: '24',
+        value: '24',
+        type: TokenTypes.SIZING,
+        variableId: 'test-key-1',
+      }] as SingleToken<true, { path: string; variableId: string }>[];
+
+      await setValuesOnVariable([testVariable], tokens, collection, mode, baseFontSize);
+
+      expect(testVariable.hiddenFromPublishing).toEqual(false);
+      expect(mockSetValueForMode).toHaveBeenCalledWith(mode, 24);
+    });
+
     it('should not update when scopes remain the same', async () => {
       testVariable.scopes = ['WIDTH_HEIGHT', 'GAP'] as VariableScope[];
 
