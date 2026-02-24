@@ -245,16 +245,7 @@ export default async function setValuesOnVariable(
 
                     // Update scopes
                     if (flatScopes && Array.isArray(flatScopes)) {
-                      let newScopes = normalizeVariableScopes(flatScopes);
-                      if (newScopes.includes('ALL_SCOPES' as VariableScope)) {
-                        newScopes = [];
-                      }
-                      if (newScopes.includes('ALL_FILLS' as VariableScope)) {
-                        newScopes = newScopes.filter((s) => !['FRAME_FILL', 'SHAPE_FILL', 'TEXT_FILL'].includes(s));
-                      }
-                      if (newScopes.includes('ALL_STROKES' as VariableScope)) {
-                        newScopes = newScopes.filter((s) => s !== 'STROKE_COLOR');
-                      }
+                      const newScopes = normalizeVariableScopes(flatScopes);
                       const currentScopes = currentVar.scopes || [];
                       const isScopesSame = newScopes.length === currentScopes.length
                         && newScopes.every((s) => currentScopes.includes(s));

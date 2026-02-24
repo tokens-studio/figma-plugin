@@ -62,11 +62,13 @@ export default function FigmaVariableForm({
 
     if (scope === 'ALL_SCOPES') {
       // If selecting ALL_SCOPES, clear all other scopes
-      // If deselecting ALL_SCOPES, keep other scopes as they are
-      newScopes = checked ? ['ALL_SCOPES'] : currentScopes.filter((s) => s !== 'ALL_SCOPES');
+      newScopes = checked ? ['ALL_SCOPES'] : [];
+    } else if (scope === 'NONE') {
+      // If selecting NONE, clear all other scopes
+      newScopes = checked ? ['NONE'] : [];
     } else if (checked) {
-      // If selecting any other scope, add it and remove ALL_SCOPES
-      newScopes = [...currentScopes.filter((s) => s !== 'ALL_SCOPES'), scope];
+      // If selecting any other scope, add it and remove ALL_SCOPES and NONE
+      newScopes = [...currentScopes.filter((s) => s !== 'ALL_SCOPES' && s !== 'NONE'), scope];
     } else {
       // If deselecting, just remove the specific scope
       newScopes = currentScopes.filter((s) => s !== scope);
@@ -74,6 +76,7 @@ export default function FigmaVariableForm({
 
     handleFigmaVariableChange(newScopes, currentCodeSyntax, currentHiddenFromPublishing);
   }, [currentScopes, currentCodeSyntax, currentHiddenFromPublishing, handleFigmaVariableChange]);
+
 
   const handleHiddenFromPublishingChange = useCallback((checked: boolean) => {
     track('Set hidden from publishing', { checked });
