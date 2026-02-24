@@ -156,9 +156,19 @@ export default async function setValuesOnVariable(
             }
 
             // 1. Detect scope changes
-            if (flatScopes && Array.isArray(flatScopes) && !codeSyntaxUpdateTracker[variable.id]) {
+            if (!codeSyntaxUpdateTracker[variable.id]) {
               const currentScopes = variable.scopes || [];
-              const newScopes = normalizeVariableScopes(flatScopes);
+              let newScopes: any[] = currentScopes;
+
+              if (flatScopes && Array.isArray(flatScopes)) {
+                newScopes = normalizeVariableScopes(flatScopes);
+              } else if (token.type === TokenTypes.FONT_WEIGHTS && variable.resolvedType === 'STRING') {
+                newScopes = ['FONT_STYLE'];
+              }
+
+              if (variable.resolvedType === 'STRING') {
+                newScopes = newScopes.map((scope) => (scope === 'FONT_WEIGHT' ? 'FONT_STYLE' : scope));
+              }
 
               const isScopesSame = newScopes.length === currentScopes.length
                 && newScopes.every((scope) => currentScopes.includes(scope));
@@ -244,8 +254,22 @@ export default async function setValuesOnVariable(
                     currentVar.hiddenFromPublishing = typeof hiddenFromPublishingExt === 'boolean' ? hiddenFromPublishingExt : false;
 
                     // Update scopes
+                    let newScopes: any[] = [];
+                    let shouldUpdateScopes = false;
+
                     if (flatScopes && Array.isArray(flatScopes)) {
-                      const newScopes = normalizeVariableScopes(flatScopes);
+                      newScopes = normalizeVariableScopes(flatScopes);
+                      shouldUpdateScopes = true;
+                    } else if (token.type === TokenTypes.FONT_WEIGHTS && variable.resolvedType === 'STRING') {
+                      newScopes = ['FONT_STYLE'];
+                      shouldUpdateScopes = true;
+                    }
+
+                    if (variable.resolvedType === 'STRING' && shouldUpdateScopes) {
+                      newScopes = newScopes.map((scope) => (scope === 'FONT_WEIGHT' ? 'FONT_STYLE' : scope));
+                    }
+
+                    if (shouldUpdateScopes) {
                       const currentScopes = currentVar.scopes || [];
                       const isScopesSame = newScopes.length === currentScopes.length
                         && newScopes.every((s) => currentScopes.includes(s));
