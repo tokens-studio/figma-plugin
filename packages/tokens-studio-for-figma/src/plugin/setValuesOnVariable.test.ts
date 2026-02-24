@@ -278,6 +278,26 @@ describe('SetValuesOnVariable', () => {
       expect(mockSetValueForMode).toHaveBeenCalledWith(mode, 24);
     });
 
+    it('should update scopes to empty array when NONE is passed', async () => {
+      const tokens = [{
+        name: 'test.variable',
+        path: 'test/variable',
+        rawValue: '24',
+        value: '24',
+        type: TokenTypes.SIZING,
+        variableId: 'test-key-1',
+        $extensions: {
+          'com.figma.scopes': ['NONE'],
+        },
+      }] as SingleToken<true, { path: string; variableId: string }>[];
+
+      await setValuesOnVariable([testVariable], tokens, collection, mode, baseFontSize);
+
+      // Verify scopes were updated to empty array (meaning no scopes selected in Figma)
+      expect(testVariable.scopes).toEqual([]);
+      expect(mockSetValueForMode).toHaveBeenCalledWith(mode, 24);
+    });
+
     it('should update codeSyntax with value change', async () => {
       const colorVariable = {
         ...testVariable,
