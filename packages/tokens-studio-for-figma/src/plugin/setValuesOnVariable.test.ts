@@ -235,6 +235,36 @@ describe('SetValuesOnVariable', () => {
     expect(mockCreateVariable).toHaveBeenCalledWith('global/fontWeight', collection, 'FLOAT');
   });
 
+  it('should apply fontWeight token with string value and FONT_STYLE scope', async () => {
+    const mockSetValueForModeLocal = jest.fn();
+    const testStringVariable = {
+      id: 'VariableID:stringfw:1',
+      key: 'stringfw-key-1',
+      name: 'global/fontWeightStr',
+      resolvedType: 'STRING',
+      description: '',
+      variableCollectionId: collection.id,
+      valuesByMode: { 309: 'Regular' },
+      scopes: ['ALL_SCOPES'] as VariableScope[],
+      setValueForMode: mockSetValueForModeLocal,
+      setVariableCodeSyntax: jest.fn(),
+      remove: jest.fn(),
+    } as unknown as Variable;
+
+    const tokens = [{
+      name: 'global.fontWeightStr',
+      path: 'global/fontWeightStr',
+      value: 'Bold',
+      rawValue: 'Bold',
+      type: TokenTypes.FONT_WEIGHTS,
+      variableId: 'stringfw-key-1',
+    }];
+
+    await setValuesOnVariable([testStringVariable], tokens as any, collection, mode, baseFontSize);
+    expect(testStringVariable.scopes).toEqual(['FONT_STYLE']);
+    expect(mockSetValueForModeLocal).toHaveBeenCalledWith(mode, 'Bold');
+  });
+
   describe('Variable Scopes and Code Syntax Updates', () => {
     const mockSetVariableCodeSyntax = jest.fn();
     let testVariable: Variable;
