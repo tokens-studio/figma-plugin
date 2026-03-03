@@ -140,17 +140,12 @@ export default async function setValuesOnVariable(
             }
 
             // 0. Detect hiddenFromPublishing changes
+            // Only act when the extension key is explicitly set — never default to false, as that would silently overwrite whatever the user had configured in Figma.
             const hiddenFromPublishingExt = token.$extensions?.['com.figma.hiddenFromPublishing'];
-            const hiddenFromPublishing = typeof hiddenFromPublishingExt === 'boolean' ? hiddenFromPublishingExt : false;
 
-            if (!codeSyntaxUpdateTracker[variable.id]) {
-              // Only trigger a metadata change if either the variable already has it set, or if we're turning it on.
-              // This prevents old variables from triggering an update just to explicitly set it to false when it was undefined before.
-              if (
-                variable.hiddenFromPublishing !== hiddenFromPublishing &&
-                (variable.hiddenFromPublishing !== undefined || hiddenFromPublishing === true)
-              ) {
-                variable.hiddenFromPublishing = hiddenFromPublishing;
+            if (!codeSyntaxUpdateTracker[variable.id] && typeof hiddenFromPublishingExt === 'boolean') {
+              if (variable.hiddenFromPublishing !== hiddenFromPublishingExt) {
+                variable.hiddenFromPublishing = hiddenFromPublishingExt;
                 hasMetadataNeedsChange = true;
               }
             }
@@ -249,9 +244,11 @@ export default async function setValuesOnVariable(
                 try {
                   // Only update Figma metadata such as scopes, code syntax, and description if we're updating the value as well  
                   if (hasMetadataChanged) {
-                    // Update hiddenFromPublishing
+                    // Update hiddenFromPublishing — only write when explicitly set in token extensions.
                     const hiddenFromPublishingExt = token.$extensions?.['com.figma.hiddenFromPublishing'];
-                    currentVar.hiddenFromPublishing = typeof hiddenFromPublishingExt === 'boolean' ? hiddenFromPublishingExt : false;
+                    if (typeof hiddenFromPublishingExt === 'boolean') {
+                      currentVar.hiddenFromPublishing = hiddenFromPublishingExt;
+                    }
 
                     // Update scopes
                     let newScopes: any[] = [];

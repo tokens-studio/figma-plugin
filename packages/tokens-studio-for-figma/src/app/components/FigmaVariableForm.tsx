@@ -30,7 +30,7 @@ export default function FigmaVariableForm({
 
   const currentCodeSyntax = useMemo(() => internalEditToken?.$extensions?.['com.figma.codeSyntax'] as Partial<Record<CodeSyntaxPlatform, string>> || {}, [internalEditToken]);
 
-  const currentHiddenFromPublishing = useMemo(() => internalEditToken?.$extensions?.['com.figma.hiddenFromPublishing'] as boolean || false, [internalEditToken]);
+  const currentHiddenFromPublishing = useMemo(() => internalEditToken?.$extensions?.['com.figma.hiddenFromPublishing'] as boolean | undefined, [internalEditToken]);
 
   const shouldShowFigmaVariableSection = useMemo(() => tokenTypesToCreateVariable.includes(internalEditToken.type), [internalEditToken.type]);
 
@@ -48,7 +48,7 @@ export default function FigmaVariableForm({
 
   const addFigmaVariable = useCallback(() => {
     setFigmaVariableVisible(true);
-    handleFigmaVariableChange([], {}, false);
+    handleFigmaVariableChange([], {}, undefined);
   }, [handleFigmaVariableChange]);
 
   const removeFigmaVariable = useCallback(() => {
@@ -78,11 +78,6 @@ export default function FigmaVariableForm({
   }, [currentScopes, currentCodeSyntax, currentHiddenFromPublishing, handleFigmaVariableChange]);
 
 
-  const handleHiddenFromPublishingChange = useCallback((checked: boolean) => {
-    track('Set hidden from publishing', { checked });
-    handleFigmaVariableChange(currentScopes, currentCodeSyntax, checked);
-  }, [currentScopes, currentCodeSyntax, handleFigmaVariableChange]);
-
   const handleCodeSyntaxPlatformChange = useCallback((platform: CodeSyntaxPlatform, checked: boolean) => {
     const newCodeSyntax = { ...currentCodeSyntax };
     if (checked) {
@@ -111,9 +106,19 @@ export default function FigmaVariableForm({
     handleCodeSyntaxValueChange(platform, e.target.value);
   }, [handleCodeSyntaxValueChange]);
 
-  const handleHiddenFromPublishingCheckedChange = useCallback((checked: boolean | string) => {
-    handleHiddenFromPublishingChange(!!checked);
-  }, [handleHiddenFromPublishingChange]);
+  // Three-state cycle: indeterminate (undefined) → true → false → indeterminate (undefined)
+  const handleHiddenFromPublishingCheckedChange = useCallback(() => {
+    let nextValue: boolean | undefined;
+    if (currentHiddenFromPublishing === undefined) {
+      nextValue = true;
+    } else if (currentHiddenFromPublishing === true) {
+      nextValue = false;
+    } else {
+      nextValue = undefined; // back to indeterminate — removes the extension key
+    }
+    track('Set hidden from publishing', { checked: nextValue });
+    handleFigmaVariableChange(currentScopes, currentCodeSyntax, nextValue);
+  }, [currentHiddenFromPublishing, currentScopes, currentCodeSyntax, handleFigmaVariableChange]);
 
   if (!shouldShowFigmaVariableSection) {
     return null;
@@ -186,7 +191,7 @@ export default function FigmaVariableForm({
               <Stack direction="row" gap={2} css={{ alignItems: 'center' }}>
                 <Checkbox
                   id="hiddenFromPublishing"
-                  checked={currentHiddenFromPublishing}
+                  checked={currentHiddenFromPublishing === undefined ? 'indeterminate' : currentHiddenFromPublishing}
                   onCheckedChange={handleHiddenFromPublishingCheckedChange}
                 />
                 <Label css={{ fontWeight: '$sansRegular', fontSize: '$small' }} htmlFor="hiddenFromPublishing">

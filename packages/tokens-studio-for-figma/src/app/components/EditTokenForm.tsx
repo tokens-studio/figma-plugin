@@ -386,11 +386,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
 
       setInternalEditToken({
         ...internalEditToken,
-        ...newExtensions,
-      });
-
-      setInternalEditToken({
-        ...internalEditToken,
         $extensions: newExtensions as SingleToken['$extensions'],
       });
     },

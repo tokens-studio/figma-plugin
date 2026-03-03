@@ -384,7 +384,8 @@ describe('SetValuesOnVariable', () => {
       expect(mockSetValueForMode).toHaveBeenCalledWith(mode, 24);
     });
 
-    it('should set hiddenFromPublishing to false when not present', async () => {
+    it('should NOT overwrite hiddenFromPublishing when the extension key is absent', async () => {
+      // Simulate a variable that already has hiddenFromPublishing set to true in Figma
       testVariable.hiddenFromPublishing = true;
       const tokens = [{
         name: 'test.variable',
@@ -393,11 +394,59 @@ describe('SetValuesOnVariable', () => {
         value: '24',
         type: TokenTypes.SIZING,
         variableId: 'test-key-1',
+        // No com.figma.hiddenFromPublishing in $extensions — indeterminate state
+      }] as SingleToken<true, { path: string; variableId: string }>[];
+
+      await setValuesOnVariable([testVariable], tokens, collection, mode, baseFontSize);
+
+      // hiddenFromPublishing must be left untouched — NOT reset to false
+      expect(testVariable.hiddenFromPublishing).toEqual(true);
+      expect(mockSetValueForMode).toHaveBeenCalledWith(mode, 24);
+    });
+
+    it('should set hiddenFromPublishing to false when extension key is explicitly false', async () => {
+      testVariable.hiddenFromPublishing = true;
+      const tokens = [{
+        name: 'test.variable',
+        path: 'test/variable',
+        rawValue: '24',
+        value: '24',
+        type: TokenTypes.SIZING,
+        variableId: 'test-key-1',
+        $extensions: {
+          'com.figma.hiddenFromPublishing': false, // explicitly set to false
+        },
       }] as SingleToken<true, { path: string; variableId: string }>[];
 
       await setValuesOnVariable([testVariable], tokens, collection, mode, baseFontSize);
 
       expect(testVariable.hiddenFromPublishing).toEqual(false);
+      expect(mockSetValueForMode).toHaveBeenCalledWith(mode, 24);
+    });
+
+    it('should not stamp hiddenFromPublishing when only scopes change and extension key is absent', async () => {
+      // Variable exists in Figma but was never given a hiddenFromPublishing value via token
+      // (hiddenFromPublishing is undefined — the indeterminate state)
+      const initialHiddenFromPublishing = testVariable.hiddenFromPublishing; // undefined
+
+      const tokens = [{
+        name: 'test.variable',
+        path: 'test/variable',
+        rawValue: '24',
+        value: '24',
+        type: TokenTypes.SIZING,
+        variableId: 'test-key-1',
+        $extensions: {
+          'com.figma.scopes': ['CORNER_RADIUS'], // only scopes changed — no hiddenFromPublishing key
+        },
+      }] as SingleToken<true, { path: string; variableId: string }>[];
+
+      await setValuesOnVariable([testVariable], tokens, collection, mode, baseFontSize);
+
+      // Scopes should have been updated
+      expect(testVariable.scopes).toEqual(['CORNER_RADIUS']);
+      // hiddenFromPublishing must remain exactly as it was — NOT set to false
+      expect(testVariable.hiddenFromPublishing).toEqual(initialHiddenFromPublishing);
       expect(mockSetValueForMode).toHaveBeenCalledWith(mode, 24);
     });
 
