@@ -128,7 +128,6 @@ export default function removeValuesFromNode(node: BaseNode, prop: Properties) {
         node.paddingRight = 0;
         node.paddingTop = 0;
         node.paddingBottom = 0;
-        node.itemSpacing = 0;
       }
       break;
     case 'paddingTop':
