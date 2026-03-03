@@ -21,7 +21,7 @@ export default function AliasBadge({ value }: Props) {
 
   return (
     <StyledAliasBadge>
-      {formatTokenValueForDisplay(value || '', currentBaseFontSize)}
+      {formatTokenValueForDisplay(value ?? '', currentBaseFontSize)}
     </StyledAliasBadge>
   );
 }

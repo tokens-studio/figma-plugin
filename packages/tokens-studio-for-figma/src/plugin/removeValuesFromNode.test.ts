@@ -205,13 +205,13 @@ describe('removeTokensByValue', () => {
     expect(mockNode.strokeLeftWeight).toEqual(0);
   });
 
-  it('should set all spacings as 0', () => {
+  it('should set all padding values as 0 but not itemSpacing', () => {
     removeValuesFromNode(mockNode, Properties.spacing);
     expect(mockNode.paddingLeft).toBe(0);
     expect(mockNode.paddingRight).toBe(0);
     expect(mockNode.paddingTop).toBe(0);
     expect(mockNode.paddingBottom).toBe(0);
-    expect(mockNode.itemSpacing).toBe(0);
+    expect(mockNode.itemSpacing).toBe(10); // itemSpacing should NOT be affected
   });
 
   it('should set paddingTop as 0', () => {
