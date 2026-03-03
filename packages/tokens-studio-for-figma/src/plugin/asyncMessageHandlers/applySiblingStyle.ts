@@ -78,7 +78,12 @@ export async function applySiblingStyleId(node: BaseNode, styleIds: StyleIdMap, 
             node.effectStyleId = newEffectStyleId;
           }
           if (['COMPONENT', 'COMPONENT_SET', 'SECTION', 'INSTANCE', 'FRAME', 'BOOLEAN_OPERATION'].includes(node.type) && 'children' in node) {
-            await Promise.all(node.children.map((child) => applySiblingStyleId(child, styleIds, styleMap, activeThemes)));
+            await Promise.all(node.children.map((child) => {
+              if ((node.type === 'COMPONENT' || node.type === 'COMPONENT_SET') && child.type === 'INSTANCE') {
+                return Promise.resolve();
+              }
+              return applySiblingStyleId(child, styleIds, styleMap, activeThemes);
+            }));
           }
         }
         break;
