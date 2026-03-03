@@ -135,20 +135,10 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
       if (canEdit && ((isMacBrowser && event.metaKey) || (!isMacBrowser && event.ctrlKey))) {
         handleEditClick();
       } else {
-        // Find which property actually has this token applied
-        // Check all properties including child properties
-        const allProperties: PropertyObject[] = [];
-        properties.forEach((property) => {
-          if (typeof property !== 'string') {
-            allProperties.push(property);
-            if (property.childProperties) {
-              allProperties.push(...property.childProperties);
-            }
-          }
-        });
-
         // Find the property that currently has this token
-        const activeProperty = allProperties.find((prop) => mainNodeSelectionValues[prop.name] === token.name);
+        const activeProperty = activeStateProperties.find(
+          (prop) => mainNodeSelectionValues[prop.name] === token.name,
+        );
 
         if (activeProperty) {
           // If token is active on a specific property, toggle that property
@@ -159,7 +149,7 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
         }
       }
     },
-    [canEdit, handleEditClick, handleClick, properties, mainNodeSelectionValues, token.name],
+    [canEdit, handleEditClick, handleClick, properties, activeStateProperties, mainNodeSelectionValues, token.name],
   );
 
   return (
