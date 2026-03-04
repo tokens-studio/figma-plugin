@@ -121,6 +121,15 @@ export default function FigmaVariableForm({
     handleFigmaVariableChange(currentScopes, currentCodeSyntax, nextValue);
   }, [currentHiddenFromPublishing, currentScopes, currentCodeSyntax, handleFigmaVariableChange]);
 
+  let hiddenFromPublishingTooltip: string;
+  if (currentHiddenFromPublishing === true) {
+    hiddenFromPublishingTooltip = 'Hidden from publishing: ON — this variable will be hidden in published libraries';
+  } else if (currentHiddenFromPublishing === false) {
+    hiddenFromPublishingTooltip = 'Hidden from publishing: OFF — this variable will be visible in published libraries';
+  } else {
+    hiddenFromPublishingTooltip = 'Hidden from publishing: not set — the variable\'s current Figma setting will be preserved';
+  }
+
   if (!shouldShowFigmaVariableSection) {
     return null;
   }
@@ -191,13 +200,7 @@ export default function FigmaVariableForm({
               </Text>
               <Box css={{ display: 'inline-flex', alignItems: 'center', gap: '$2' }}>
                 <Tooltip
-                  label={
-                    currentHiddenFromPublishing === true
-                      ? 'Hidden from publishing: ON — this variable will be hidden in published libraries'
-                      : currentHiddenFromPublishing === false
-                        ? 'Hidden from publishing: OFF — this variable will be visible in published libraries'
-                        : 'Hidden from publishing: not set — the variable\'s current Figma setting will be preserved'
-                  }
+                  label={hiddenFromPublishingTooltip}
                   side="top"
                 >
                   <span>
