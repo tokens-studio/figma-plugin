@@ -2,6 +2,7 @@ import React, { useCallback, useMemo } from 'react';
 import {
   IconButton, Heading, Checkbox, Text, Stack, Label,
 } from '@tokens-studio/ui';
+import Tooltip from './Tooltip';
 import IconPlus from '@/icons/plus.svg';
 import IconMinus from '@/icons/minus.svg';
 import { EditTokenObject } from '@/types/tokens';
@@ -188,16 +189,29 @@ export default function FigmaVariableForm({
               <Text muted size="small" css={{ marginBottom: '$2' }}>
                 Variable settings
               </Text>
-              <Stack direction="row" gap={2} css={{ alignItems: 'center' }}>
-                <Checkbox
-                  id="hiddenFromPublishing"
-                  checked={currentHiddenFromPublishing === undefined ? 'indeterminate' : currentHiddenFromPublishing}
-                  onCheckedChange={handleHiddenFromPublishingCheckedChange}
-                />
+              <Box css={{ display: 'inline-flex', alignItems: 'center', gap: '$2' }}>
+                <Tooltip
+                  label={
+                    currentHiddenFromPublishing === true
+                      ? 'Hidden from publishing: ON — this variable will be hidden in published libraries'
+                      : currentHiddenFromPublishing === false
+                        ? 'Hidden from publishing: OFF — this variable will be visible in published libraries'
+                        : 'Hidden from publishing: not set — the variable\'s current Figma setting will be preserved'
+                  }
+                  side="top"
+                >
+                  <span>
+                    <Checkbox
+                      id="hiddenFromPublishing"
+                      checked={currentHiddenFromPublishing === undefined ? 'indeterminate' : currentHiddenFromPublishing}
+                      onCheckedChange={handleHiddenFromPublishingCheckedChange}
+                    />
+                  </span>
+                </Tooltip>
                 <Label css={{ fontWeight: '$sansRegular', fontSize: '$small' }} htmlFor="hiddenFromPublishing">
                   Hidden from publishing
                 </Label>
-              </Stack>
+              </Box>
             </Box>
 
             <Box>
