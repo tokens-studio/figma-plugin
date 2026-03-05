@@ -1,4 +1,4 @@
-import { CodeSyntax } from '@/types/tokens';
+import { CodeSyntax, VariableScope as TokenVariableScope } from '@/types/tokens';
 
 export const FIGMA_PLATFORMS = [
     { key: 'Web', figma: 'WEB' },
@@ -10,22 +10,26 @@ export const FIGMA_PLATFORMS = [
  * Normalizes variable scopes by handling 'ALL_SCOPES' and platform-specific constraints.
  * Figma uses an empty array [] to represent all/unrestricted scopes.
  */
-export function normalizeVariableScopes(scopes: string[]): VariableScope[] {
-    let newScopes = [...scopes] as VariableScope[];
-
-    if (newScopes.includes('ALL_SCOPES' as VariableScope)) {
+export function normalizeVariableScopes(scopes: TokenVariableScope[]): VariableScope[] {
+    if (scopes.includes('NONE')) {
         return [];
     }
 
-    if (newScopes.includes('ALL_FILLS' as VariableScope)) {
+    if (scopes.includes('ALL_SCOPES')) {
+        return ['ALL_SCOPES'];
+    }
+
+    let newScopes = [...scopes];
+
+    if (newScopes.includes('ALL_FILLS')) {
         newScopes = newScopes.filter((s) => !['FRAME_FILL', 'SHAPE_FILL', 'TEXT_FILL'].includes(s));
     }
 
-    if (newScopes.includes('ALL_STROKES' as VariableScope)) {
+    if (newScopes.includes('ALL_STROKES')) {
         newScopes = newScopes.filter((s) => s !== 'STROKE_COLOR');
     }
 
-    return newScopes;
+    return newScopes.filter((s): s is VariableScope => s !== 'NONE' && s !== 'ALL_STROKES');
 }
 
 /**
