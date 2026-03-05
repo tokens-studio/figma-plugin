@@ -87,7 +87,7 @@ export default function TokensStudioForm({
     track('Start Free Trial Clicked', {
       source: 'tokens-studio-form',
     });
-    window.open('https://app.prod.tokens.studio', '_blank');
+    window.open('https://tokens.studio/trial', '_blank');
   }, []);
 
   const validateBaseUrl = React.useCallback(async (baseUrl: string) => {
