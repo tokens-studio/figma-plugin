@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   IconButton, Heading, Checkbox, Text, Stack, Label,
 } from '@tokens-studio/ui';
@@ -25,6 +26,7 @@ export default function FigmaVariableForm({
   handleFigmaVariableChange: (scopes: VariableScope[], codeSyntax: Partial<Record<CodeSyntaxPlatform, string>>, hiddenFromPublishing?: boolean) => void;
   handleRemoveFigmaVariable: () => void;
 }) {
+  const { t } = useTranslation(['tokens']);
   const [figmaVariableVisible, setFigmaVariableVisible] = React.useState(false);
 
   const currentScopes = useMemo(() => internalEditToken?.$extensions?.['com.figma.scopes'] as VariableScope[] || [], [internalEditToken]);
@@ -123,11 +125,11 @@ export default function FigmaVariableForm({
 
   let hiddenFromPublishingTooltip: string;
   if (currentHiddenFromPublishing === true) {
-    hiddenFromPublishingTooltip = 'Hidden from publishing: ON — this variable will be hidden in published libraries';
+    hiddenFromPublishingTooltip = t('figmaVariable.hiddenFromPublishing.tooltipOn');
   } else if (currentHiddenFromPublishing === false) {
-    hiddenFromPublishingTooltip = 'Hidden from publishing: OFF — this variable will be visible in published libraries';
+    hiddenFromPublishingTooltip = t('figmaVariable.hiddenFromPublishing.tooltipOff');
   } else {
-    hiddenFromPublishingTooltip = 'Hidden from publishing: not set — the variable\'s current Figma setting will be preserved';
+    hiddenFromPublishingTooltip = t('figmaVariable.hiddenFromPublishing.tooltipNotSet');
   }
 
   if (!shouldShowFigmaVariableSection) {
@@ -212,7 +214,7 @@ export default function FigmaVariableForm({
                   </span>
                 </Tooltip>
                 <Label css={{ fontWeight: '$sansRegular', fontSize: '$small' }} htmlFor="hiddenFromPublishing">
-                  Hidden from publishing
+                  {t('figmaVariable.hiddenFromPublishing.label')}
                 </Label>
               </Box>
             </Box>
