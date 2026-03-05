@@ -1,6 +1,6 @@
 {
   "name": "@tokens-studio/figma-plugin",
-  "version": "2.11.0",
+  "version": "2.11.1",
   "description": "Tokens Studio plugin for Figma",
   "license": "MIT",
   "private": true,
