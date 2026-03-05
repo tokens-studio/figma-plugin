@@ -1,5 +1,19 @@
 # @tokens-studio/figma-plugin
 
+## 2.11.1
+
+### Patch Changes
+
+- bbad7157d: Fix gap token deselection when left-clicking. Previously, left-clicking a gap token to deselect it would incorrectly attempt to remove the first property instead of the property that actually has the token applied. This caused the gap value to disappear from Figma's side panel while the token remained active in the inspect panel. The fix ensures that the correct property is toggled when deselecting tokens.
+- c3f4d248b: Variable scoping enhancements -
+
+  - Add support for hiddenFromPublishing
+  - Add support for selecting no scopes in a token
+  - Fix font weight token scoping bug when weight is set to a string
+
+- 9f504f99e: Fix bug where deselecting padding tokens via "All" option incorrectly removes gap from Figma side panel
+- 4ca80838e: Fix tooltip display when token resolved value is 0
+
 ## 2.11.0
 
 ### Minor Changes
