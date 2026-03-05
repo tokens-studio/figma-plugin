@@ -235,6 +235,36 @@ describe('SetValuesOnVariable', () => {
     expect(mockCreateVariable).toHaveBeenCalledWith('global/fontWeight', collection, 'FLOAT');
   });
 
+  it('should apply fontWeight token with string value and FONT_STYLE scope', async () => {
+    const mockSetValueForModeLocal = jest.fn();
+    const testStringVariable = {
+      id: 'VariableID:stringfw:1',
+      key: 'stringfw-key-1',
+      name: 'global/fontWeightStr',
+      resolvedType: 'STRING',
+      description: '',
+      variableCollectionId: collection.id,
+      valuesByMode: { 309: 'Regular' },
+      scopes: ['ALL_SCOPES'] as VariableScope[],
+      setValueForMode: mockSetValueForModeLocal,
+      setVariableCodeSyntax: jest.fn(),
+      remove: jest.fn(),
+    } as unknown as Variable;
+
+    const tokens = [{
+      name: 'global.fontWeightStr',
+      path: 'global/fontWeightStr',
+      value: 'Bold',
+      rawValue: 'Bold',
+      type: TokenTypes.FONT_WEIGHTS,
+      variableId: 'stringfw-key-1',
+    }];
+
+    await setValuesOnVariable([testStringVariable], tokens as any, collection, mode, baseFontSize);
+    expect(testStringVariable.scopes).toEqual(['FONT_STYLE']);
+    expect(mockSetValueForModeLocal).toHaveBeenCalledWith(mode, 'Bold');
+  });
+
   describe('Variable Scopes and Code Syntax Updates', () => {
     const mockSetVariableCodeSyntax = jest.fn();
     let testVariable: Variable;
@@ -277,6 +307,26 @@ describe('SetValuesOnVariable', () => {
       expect(mockSetValueForMode).toHaveBeenCalledWith(mode, 24);
     });
 
+    it('should update scopes to empty array when NONE is passed', async () => {
+      const tokens = [{
+        name: 'test.variable',
+        path: 'test/variable',
+        rawValue: '24',
+        value: '24',
+        type: TokenTypes.SIZING,
+        variableId: 'test-key-1',
+        $extensions: {
+          'com.figma.scopes': ['NONE'],
+        },
+      }] as SingleToken<true, { path: string; variableId: string }>[];
+
+      await setValuesOnVariable([testVariable], tokens, collection, mode, baseFontSize);
+
+      // Verify scopes were updated to empty array (meaning no scopes selected in Figma)
+      expect(testVariable.scopes).toEqual([]);
+      expect(mockSetValueForMode).toHaveBeenCalledWith(mode, 24);
+    });
+
     it('should update codeSyntax with value change', async () => {
       const colorVariable = {
         ...testVariable,
@@ -312,6 +362,91 @@ describe('SetValuesOnVariable', () => {
       expect(mockSetValueForMode).toHaveBeenCalledWith(mode, {
         r: 1, g: 0, b: 0, a: 1,
       });
+    });
+
+    it('should update hiddenFromPublishing with value change', async () => {
+      const tokens = [{
+        name: 'test.variable',
+        path: 'test/variable',
+        rawValue: '24',
+        value: '24',
+        type: TokenTypes.SIZING,
+        variableId: 'test-key-1',
+        $extensions: {
+          'com.figma.hiddenFromPublishing': true,
+        },
+      }] as SingleToken<true, { path: string; variableId: string }>[];
+
+      await setValuesOnVariable([testVariable], tokens, collection, mode, baseFontSize);
+
+      expect(testVariable.hiddenFromPublishing).toEqual(true);
+      expect(mockSetValueForMode).toHaveBeenCalledWith(mode, 24);
+    });
+
+    it('should NOT overwrite hiddenFromPublishing when the extension key is absent', async () => {
+      // Simulate a variable that already has hiddenFromPublishing set to true in Figma
+      testVariable.hiddenFromPublishing = true;
+      const tokens = [{
+        name: 'test.variable',
+        path: 'test/variable',
+        rawValue: '24',
+        value: '24',
+        type: TokenTypes.SIZING,
+        variableId: 'test-key-1',
+        // No com.figma.hiddenFromPublishing in $extensions — indeterminate state
+      }] as SingleToken<true, { path: string; variableId: string }>[];
+
+      await setValuesOnVariable([testVariable], tokens, collection, mode, baseFontSize);
+
+      // hiddenFromPublishing must be left untouched — NOT reset to false
+      expect(testVariable.hiddenFromPublishing).toEqual(true);
+      expect(mockSetValueForMode).toHaveBeenCalledWith(mode, 24);
+    });
+
+    it('should set hiddenFromPublishing to false when extension key is explicitly false', async () => {
+      testVariable.hiddenFromPublishing = true;
+      const tokens = [{
+        name: 'test.variable',
+        path: 'test/variable',
+        rawValue: '24',
+        value: '24',
+        type: TokenTypes.SIZING,
+        variableId: 'test-key-1',
+        $extensions: {
+          'com.figma.hiddenFromPublishing': false, // explicitly set to false
+        },
+      }] as SingleToken<true, { path: string; variableId: string }>[];
+
+      await setValuesOnVariable([testVariable], tokens, collection, mode, baseFontSize);
+
+      expect(testVariable.hiddenFromPublishing).toEqual(false);
+      expect(mockSetValueForMode).toHaveBeenCalledWith(mode, 24);
+    });
+
+    it('should not stamp hiddenFromPublishing when only scopes change and extension key is absent', async () => {
+      // Variable exists in Figma but was never given a hiddenFromPublishing value via token
+      // (hiddenFromPublishing is undefined — the indeterminate state)
+      const initialHiddenFromPublishing = testVariable.hiddenFromPublishing; // undefined
+
+      const tokens = [{
+        name: 'test.variable',
+        path: 'test/variable',
+        rawValue: '24',
+        value: '24',
+        type: TokenTypes.SIZING,
+        variableId: 'test-key-1',
+        $extensions: {
+          'com.figma.scopes': ['CORNER_RADIUS'], // only scopes changed — no hiddenFromPublishing key
+        },
+      }] as SingleToken<true, { path: string; variableId: string }>[];
+
+      await setValuesOnVariable([testVariable], tokens, collection, mode, baseFontSize);
+
+      // Scopes should have been updated
+      expect(testVariable.scopes).toEqual(['CORNER_RADIUS']);
+      // hiddenFromPublishing must remain exactly as it was — NOT set to false
+      expect(testVariable.hiddenFromPublishing).toEqual(initialHiddenFromPublishing);
+      expect(mockSetValueForMode).toHaveBeenCalledWith(mode, 24);
     });
 
     it('should not update when scopes remain the same', async () => {

@@ -2,6 +2,7 @@ import { TokenTypes } from './TokenTypes';
 import { VariableScope, CodeSyntaxPlatform } from '@/types/tokens';
 
 export const VARIABLE_SCOPE_OPTIONS: { value: VariableScope; label: string }[] = [
+  { value: 'NONE', label: 'None' },
   { value: 'ALL_SCOPES', label: 'Show in all supported properties' },
   { value: 'TEXT_CONTENT', label: 'Text content' },
   { value: 'CORNER_RADIUS', label: 'Corner radius' },
@@ -28,53 +29,53 @@ export const VARIABLE_SCOPE_OPTIONS: { value: VariableScope; label: string }[] =
 
 export const TOKEN_TYPE_TO_SCOPES_MAP: Record<string, VariableScope[]> = {
   [TokenTypes.COLOR]: [
-    'ALL_SCOPES', 'ALL_FILLS', 'FRAME_FILL', 'SHAPE_FILL', 'TEXT_FILL', 'STROKE_COLOR', 'EFFECT_COLOR',
+    'NONE', 'ALL_SCOPES', 'ALL_FILLS', 'FRAME_FILL', 'SHAPE_FILL', 'TEXT_FILL', 'STROKE_COLOR', 'EFFECT_COLOR',
   ],
   [TokenTypes.BORDER_RADIUS]: [
-    'ALL_SCOPES', 'CORNER_RADIUS',
+    'NONE', 'ALL_SCOPES', 'CORNER_RADIUS',
   ],
   [TokenTypes.SIZING]: [
-    'ALL_SCOPES', 'WIDTH_HEIGHT', 'GAP',
+    'NONE', 'ALL_SCOPES', 'WIDTH_HEIGHT', 'GAP',
   ],
   [TokenTypes.SPACING]: [
-    'ALL_SCOPES', 'WIDTH_HEIGHT', 'GAP',
+    'NONE', 'ALL_SCOPES', 'WIDTH_HEIGHT', 'GAP',
   ],
   [TokenTypes.DIMENSION]: [
-    'ALL_SCOPES', 'WIDTH_HEIGHT', 'GAP', 'CORNER_RADIUS',
+    'NONE', 'ALL_SCOPES', 'WIDTH_HEIGHT', 'GAP', 'CORNER_RADIUS',
   ],
   [TokenTypes.BORDER_WIDTH]: [
-    'ALL_SCOPES', 'STROKE_FLOAT',
+    'NONE', 'ALL_SCOPES', 'STROKE_FLOAT',
   ],
   [TokenTypes.OPACITY]: [
-    'ALL_SCOPES', 'OPACITY',
+    'NONE', 'ALL_SCOPES', 'OPACITY',
   ],
   [TokenTypes.FONT_FAMILIES]: [
-    'ALL_SCOPES', 'FONT_FAMILY',
+    'NONE', 'ALL_SCOPES', 'FONT_FAMILY',
   ],
   [TokenTypes.FONT_WEIGHTS]: [
-    'ALL_SCOPES', 'FONT_WEIGHT',
+    'NONE', 'ALL_SCOPES', 'FONT_WEIGHT',
   ],
   [TokenTypes.FONT_SIZES]: [
-    'ALL_SCOPES', 'FONT_SIZE',
+    'NONE', 'ALL_SCOPES', 'FONT_SIZE',
   ],
   [TokenTypes.LINE_HEIGHTS]: [
-    'ALL_SCOPES', 'LINE_HEIGHT',
+    'NONE', 'ALL_SCOPES', 'LINE_HEIGHT',
   ],
   [TokenTypes.LETTER_SPACING]: [
-    'ALL_SCOPES', 'LETTER_SPACING',
+    'NONE', 'ALL_SCOPES', 'LETTER_SPACING',
   ],
   [TokenTypes.PARAGRAPH_SPACING]: [
-    'ALL_SCOPES', 'PARAGRAPH_SPACING',
+    'NONE', 'ALL_SCOPES', 'PARAGRAPH_SPACING',
   ],
   [TokenTypes.PARAGRAPH_INDENT]: [
-    'ALL_SCOPES', 'PARAGRAPH_INDENT',
+    'NONE', 'ALL_SCOPES', 'PARAGRAPH_INDENT',
   ],
   [TokenTypes.TEXT]: [
-    'ALL_SCOPES', 'TEXT_CONTENT', 'FONT_FAMILY', 'FONT_STYLE',
+    'NONE', 'ALL_SCOPES', 'TEXT_CONTENT', 'FONT_FAMILY', 'FONT_STYLE', 'FONT_WEIGHT',
   ],
-  [TokenTypes.BOOLEAN]: [],
+  [TokenTypes.BOOLEAN]: ['NONE'],
   [TokenTypes.NUMBER]: [
-    'ALL_SCOPES', 'TEXT_CONTENT', 'WIDTH_HEIGHT', 'GAP', 'CORNER_RADIUS', 'STROKE_FLOAT', 'EFFECT_FLOAT', 'OPACITY', 'FONT_WEIGHT', 'FONT_SIZE', 'LINE_HEIGHT', 'LETTER_SPACING', 'PARAGRAPH_SPACING', 'PARAGRAPH_INDENT',
+    'NONE', 'ALL_SCOPES', 'TEXT_CONTENT', 'WIDTH_HEIGHT', 'GAP', 'CORNER_RADIUS', 'STROKE_FLOAT', 'EFFECT_FLOAT', 'OPACITY', 'FONT_WEIGHT', 'FONT_SIZE', 'LINE_HEIGHT', 'LETTER_SPACING', 'PARAGRAPH_SPACING', 'PARAGRAPH_INDENT',
   ],
 };
 
