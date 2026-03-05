@@ -5,7 +5,7 @@ export type VariableScope = 'NONE' | 'ALL_SCOPES' | 'TEXT_CONTENT' | 'CORNER_RAD
 export type CodeSyntaxPlatform = 'Web' | 'Android' | 'iOS';
 
 export type FigmaExtensions = {
-    scopes?: VariableScope[];
-    codeSyntax?: CodeSyntax;
-    hiddenFromPublishing?: boolean;
+  scopes?: VariableScope[];
+  codeSyntax?: CodeSyntax;
+  hiddenFromPublishing?: boolean;
 };

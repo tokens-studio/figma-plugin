@@ -200,6 +200,88 @@ describe('MoreButton', () => {
     expect(mockSetNodeData).toBeCalledTimes(0);
   });
 
+  it('should deselect the correct property when token is applied to specific property', async () => {
+    // Test case for the bug fix: when a spacing token is applied to gap (itemSpacing),
+    // left-clicking should toggle gap, not the first property
+    const mockStore = createMockStore({
+      uiState: {
+        mainNodeSelectionValues: {
+          itemSpacing: token.name,
+        },
+      },
+    });
+
+    const result = render(
+      <Provider store={mockStore}>
+        <MoreButton
+          type={TokenTypes.SPACING}
+          showForm={mockShowForm}
+          token={token}
+        />
+      </Provider>,
+    );
+    await fireEvent.click(result.getByText(token.name));
+    expect(mockSetNodeData).toHaveBeenCalledWith({
+      itemSpacing: 'delete',
+    }, []);
+  });
+
+  it('should deselect paddingLeft when token is applied to paddingLeft, not gap', async () => {
+    // Test case for the bug fix: when a spacing token is applied to paddingLeft,
+    // left-clicking should toggle paddingLeft, not gap
+    const mockStore = createMockStore({
+      uiState: {
+        mainNodeSelectionValues: {
+          paddingLeft: token.name,
+        },
+      },
+    });
+
+    const result = render(
+      <Provider store={mockStore}>
+        <MoreButton
+          type={TokenTypes.SPACING}
+          showForm={mockShowForm}
+          token={token}
+        />
+      </Provider>,
+    );
+    await fireEvent.click(result.getByText(token.name));
+    expect(mockSetNodeData).toHaveBeenCalledWith({
+      paddingLeft: 'delete',
+    }, []);
+  });
+
+  it('should deselect correct child property for dimension tokens', async () => {
+    // Test case for dimension tokens with child properties
+    const dimensionToken: SingleToken = {
+      value: '16px',
+      name: 'dimension-token',
+      type: TokenTypes.DIMENSION,
+    };
+    const mockStore = createMockStore({
+      uiState: {
+        mainNodeSelectionValues: {
+          itemSpacing: dimensionToken.name,
+        },
+      },
+    });
+
+    const result = render(
+      <Provider store={mockStore}>
+        <MoreButton
+          type={TokenTypes.DIMENSION}
+          showForm={mockShowForm}
+          token={dimensionToken}
+        />
+      </Provider>,
+    );
+    await fireEvent.click(result.getByText(dimensionToken.name));
+    expect(mockSetNodeData).toHaveBeenCalledWith({
+      itemSpacing: 'delete',
+    }, []);
+  });
+
   it('show all properties about dimension token', async () => {
     const dimensionToken: SingleToken = {
       value: '16px',

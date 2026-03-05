@@ -1,6 +1,6 @@
 /* eslint-disable no-continue */
-import { FIGMA_PLATFORMS } from '@/utils/figma';
 import { figmaRGBToHex } from '@figma-plugin/helpers';
+import { FIGMA_PLATFORMS } from '@/utils/figma';
 import { notifyVariableValues, notifyRenamedCollections, notifyException } from './notifiers';
 import { PullVariablesOptions, ThemeObjectsList } from '@/types';
 import { VariableToCreateToken } from '@/types/payloads';
