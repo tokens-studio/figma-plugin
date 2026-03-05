@@ -73,7 +73,8 @@ export default async function setValuesOnVariable(
     tokens.forEach((token) => {
       promises.add(variableWorker.schedule(async () => {
         try {
-          const variableType = convertTokenTypeToVariableType(token.type, token.value);
+          const flatScopes = token.$extensions?.['com.figma.scopes'] as VariableScope[] | undefined;
+          const variableType = convertTokenTypeToVariableType(token.type, token.value, flatScopes);
           // If id matches the variableId, or name matches the token path, we can use it to update the variable instead of re-creating.
           // Prioritize finding by variableId (key) when present, otherwise fall back to name matching
           // This has the nasty side-effect that if font weight changes from string to number, it will not update the variable given we cannot change type.
@@ -138,11 +139,31 @@ export default async function setValuesOnVariable(
               variable.description = newDescription;
             }
 
+            // 0. Detect hiddenFromPublishing changes
+            // Only act when the extension key is explicitly set — never default to false, as that would silently overwrite whatever the user had configured in Figma.
+            const hiddenFromPublishingExt = token.$extensions?.['com.figma.hiddenFromPublishing'];
+
+            if (!codeSyntaxUpdateTracker[variable.id] && typeof hiddenFromPublishingExt === 'boolean') {
+              if (variable.hiddenFromPublishing !== hiddenFromPublishingExt) {
+                variable.hiddenFromPublishing = hiddenFromPublishingExt;
+                hasMetadataNeedsChange = true;
+              }
+            }
+
             // 1. Detect scope changes
-            const flatScopes = token.$extensions?.['com.figma.scopes'] as VariableScope[] | undefined;
-            if (flatScopes && Array.isArray(flatScopes) && !codeSyntaxUpdateTracker[variable.id]) {
+            if (!codeSyntaxUpdateTracker[variable.id]) {
               const currentScopes = variable.scopes || [];
-              const newScopes = normalizeVariableScopes(flatScopes);
+              let newScopes: any[] = currentScopes;
+
+              if (flatScopes && Array.isArray(flatScopes)) {
+                newScopes = normalizeVariableScopes(flatScopes);
+              } else if (token.type === TokenTypes.FONT_WEIGHTS && variable.resolvedType === 'STRING') {
+                newScopes = ['FONT_STYLE'];
+              }
+
+              if (variable.resolvedType === 'STRING') {
+                newScopes = newScopes.map((scope) => (scope === 'FONT_WEIGHT' ? 'FONT_STYLE' : scope));
+              }
 
               const isScopesSame = newScopes.length === currentScopes.length
                 && newScopes.every((scope) => currentScopes.includes(scope));
@@ -223,18 +244,29 @@ export default async function setValuesOnVariable(
                 try {
                   // Only update Figma metadata such as scopes, code syntax, and description if we're updating the value as well  
                   if (hasMetadataChanged) {
+                    // Update hiddenFromPublishing — only write when explicitly set in token extensions.
+                    const hiddenFromPublishingExt = token.$extensions?.['com.figma.hiddenFromPublishing'];
+                    if (typeof hiddenFromPublishingExt === 'boolean') {
+                      currentVar.hiddenFromPublishing = hiddenFromPublishingExt;
+                    }
+
                     // Update scopes
+                    let newScopes: any[] = [];
+                    let shouldUpdateScopes = false;
+
                     if (flatScopes && Array.isArray(flatScopes)) {
-                      let newScopes = normalizeVariableScopes(flatScopes);
-                      if (newScopes.includes('ALL_SCOPES' as VariableScope)) {
-                        newScopes = [];
-                      }
-                      if (newScopes.includes('ALL_FILLS' as VariableScope)) {
-                        newScopes = newScopes.filter((s) => !['FRAME_FILL', 'SHAPE_FILL', 'TEXT_FILL'].includes(s));
-                      }
-                      if (newScopes.includes('ALL_STROKES' as VariableScope)) {
-                        newScopes = newScopes.filter((s) => s !== 'STROKE_COLOR');
-                      }
+                      newScopes = normalizeVariableScopes(flatScopes);
+                      shouldUpdateScopes = true;
+                    } else if (token.type === TokenTypes.FONT_WEIGHTS && variable.resolvedType === 'STRING') {
+                      newScopes = ['FONT_STYLE'];
+                      shouldUpdateScopes = true;
+                    }
+
+                    if (variable.resolvedType === 'STRING' && shouldUpdateScopes) {
+                      newScopes = newScopes.map((scope) => (scope === 'FONT_WEIGHT' ? 'FONT_STYLE' : scope));
+                    }
+
+                    if (shouldUpdateScopes) {
                       const currentScopes = currentVar.scopes || [];
                       const isScopesSame = newScopes.length === currentScopes.length
                         && newScopes.every((s) => currentScopes.includes(s));

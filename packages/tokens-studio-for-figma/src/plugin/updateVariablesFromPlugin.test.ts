@@ -119,4 +119,90 @@ describe('updateVariablesFromPlugin', () => {
       id: 'VariableID:2345',
     });
   });
+
+  describe('hiddenFromPublishing handling', () => {
+    let variablesWithHidden: any[];
+
+    beforeEach(() => {
+      variablesWithHidden = [
+        {
+          id: 'VariableID:1234',
+          key: '12345',
+          variableCollectionId: 'VariableCollectionId:12:12345',
+          name: 'fg/default',
+          hiddenFromPublishing: undefined as boolean | undefined,
+          valuesByMode: { 123: '#ffffff' },
+          setValueForMode: mockSetValueForMode,
+          setVariableCodeSyntax: jest.fn(),
+          removeVariableCodeSyntax: jest.fn(),
+        },
+      ];
+      mockGetLocalVariablesAsync.mockImplementation(() => Promise.resolve(variablesWithHidden));
+      mockGetLocalVariableCollectionsAsync.mockImplementation(() => Promise.resolve(mockLocalVariableCollections));
+    });
+
+    it('should set hiddenFromPublishing to true when extension key is true', async () => {
+      const payload = {
+        name: 'fg.default',
+        parent: 'global',
+        rawValue: '#000000',
+        type: TokenTypes.COLOR,
+        value: '#000000',
+        $extensions: {
+          'com.figma.hiddenFromPublishing': true,
+        },
+      };
+      await updateVariablesFromPlugin(payload);
+      expect(variablesWithHidden[0].hiddenFromPublishing).toBe(true);
+    });
+
+    it('should set hiddenFromPublishing to false when extension key is explicitly false', async () => {
+      variablesWithHidden[0].hiddenFromPublishing = true; // simulates value set in Figma
+      const payload = {
+        name: 'fg.default',
+        parent: 'global',
+        rawValue: '#000000',
+        type: TokenTypes.COLOR,
+        value: '#000000',
+        $extensions: {
+          'com.figma.hiddenFromPublishing': false,
+        },
+      };
+      await updateVariablesFromPlugin(payload);
+      expect(variablesWithHidden[0].hiddenFromPublishing).toBe(false);
+    });
+
+    it('should NOT overwrite hiddenFromPublishing when extension key is absent (indeterminate state)', async () => {
+      variablesWithHidden[0].hiddenFromPublishing = true; // simulates value previously set in Figma
+      const payload = {
+        name: 'fg.default',
+        parent: 'global',
+        rawValue: '#000000',
+        type: TokenTypes.COLOR,
+        value: '#000000',
+        // No com.figma.hiddenFromPublishing in $extensions
+      };
+      await updateVariablesFromPlugin(payload);
+      // Must remain true — not reset to false
+      expect(variablesWithHidden[0].hiddenFromPublishing).toBe(true);
+    });
+
+    it('should NOT stamp hiddenFromPublishing when only scopes change and extension key is absent', async () => {
+      // Variable has no hiddenFromPublishing set
+      const initialValue = variablesWithHidden[0].hiddenFromPublishing; // undefined
+      const payload = {
+        name: 'fg.default',
+        parent: 'global',
+        rawValue: '#ffffff',
+        type: TokenTypes.COLOR,
+        value: '#ffffff', // same value — only metadata changes
+        $extensions: {
+          'com.figma.scopes': ['ALL_FILLS'], // scope change only, no hiddenFromPublishing key
+        },
+      };
+      await updateVariablesFromPlugin(payload);
+      expect(variablesWithHidden[0].hiddenFromPublishing).toBe(initialValue);
+    });
+  });
 });
+

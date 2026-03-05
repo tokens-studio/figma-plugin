@@ -40,6 +40,11 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
 
             const flatScopes = payload.$extensions?.['com.figma.scopes'] as VariableScope[] | undefined;
             const flatCodeSyntax = payload.$extensions?.['com.figma.codeSyntax'] as CodeSyntax | undefined;
+            const hiddenFromPublishing = payload.$extensions?.['com.figma.hiddenFromPublishing'] as boolean | undefined;
+
+            if (typeof hiddenFromPublishing === 'boolean') {
+              variable.hiddenFromPublishing = hiddenFromPublishing;
+            }
 
             // Update Scopes
             if (flatScopes && Array.isArray(flatScopes)) {

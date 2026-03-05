@@ -55,6 +55,10 @@ export default async function pullVariables(options: PullVariablesOptions, theme
       extensions['com.figma.scopes'] = variable.scopes;
     }
 
+    if (typeof variable.hiddenFromPublishing === 'boolean') {
+      extensions['com.figma.hiddenFromPublishing'] = variable.hiddenFromPublishing;
+    }
+
     // Add code syntax if it exists
     const codeSyntax: Record<string, string> = {};
     try {
