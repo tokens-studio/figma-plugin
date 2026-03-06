@@ -1,6 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import Editor, { useMonaco } from '@monaco-editor/react';
+import type { editor as MonacoEditor } from 'monaco-editor';
 import Box from './Box';
 import { useShortcut } from '@/hooks/useShortcut';
 import { activeApiProviderSelector, activeTokenSetReadOnlySelector, editProhibitedSelector } from '@/selectors';
@@ -25,6 +26,8 @@ function JSONEditor({
   const { handleJSONUpdate } = useTokens();
   const { isDarkTheme } = useFigmaTheme();
   const monaco = useMonaco();
+  const editorRef = React.useRef<MonacoEditor.IStandaloneCodeEditor | null>(null);
+  const isReadOnly = Boolean(editProhibited || activeTokenSetReadOnly || isTokensStudioProvider);
 
   monaco?.languages.json.jsonDefaults.setDiagnosticsOptions({
     schemas: [{
@@ -44,6 +47,15 @@ function JSONEditor({
     }
   }, [handleJSONUpdate, stringTokens]);
 
+  const handleEditorMount = React.useCallback((editor: MonacoEditor.IStandaloneCodeEditor) => {
+    editorRef.current = editor;
+    editor.updateOptions({ readOnly: isReadOnly });
+  }, [isReadOnly]);
+
+  React.useEffect(() => {
+    editorRef.current?.updateOptions({ readOnly: isReadOnly });
+  }, [isReadOnly]);
+
   useShortcut(['KeyS'], handleSaveShortcut);
 
   return (
@@ -58,6 +70,7 @@ function JSONEditor({
     >
       <Editor
         language="json"
+        onMount={handleEditorMount}
         onChange={handleJsonEditChange}
         value={stringTokens}
         theme={isDarkTheme ? 'vs-dark' : 'vs-light'}
@@ -69,7 +82,7 @@ function JSONEditor({
           fontSize: 11,
           wordWrap: 'on',
           contextmenu: false,
-          readOnly: editProhibited || activeTokenSetReadOnly || isTokensStudioProvider,
+          readOnly: isReadOnly,
         }}
       />
     </Box>
