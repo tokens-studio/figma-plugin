@@ -15,6 +15,7 @@ import PluginResizerWrapper from './PluginResizer';
 import LoadingBar from './LoadingBar';
 import { ConvertToDTCGModal } from './ConvertToDTCGModal';
 import Subscription from './Subscription';
+import { OAuthDeviceCodeModal } from './Login/OAuthDeviceCodeModal';
 
 function App() {
   const activeTab = useSelector(activeTabSelector);
@@ -62,6 +63,7 @@ function App() {
 
         </PluginResizerWrapper>
         <ConvertToDTCGModal />
+        <OAuthDeviceCodeModal />
       </IconoirProvider>
     </Box>
   );
