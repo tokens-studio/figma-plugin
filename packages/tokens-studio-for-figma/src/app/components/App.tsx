@@ -14,6 +14,7 @@ import { activeTabSelector } from '@/selectors';
 import PluginResizerWrapper from './PluginResizer';
 import LoadingBar from './LoadingBar';
 import { ConvertToDTCGModal } from './ConvertToDTCGModal';
+import Subscription from './Subscription';
 
 function App() {
   const activeTab = useSelector(activeTabSelector);
@@ -54,6 +55,7 @@ function App() {
               {activeTab === 'inspector' && <Inspector />}
               {activeTab === 'secondscreen' && <SecondSceen />}
               {activeTab === 'settings' && <Settings />}
+              {activeTab === 'subscription' && <Subscription />}
             </Box>
             {activeTab !== 'loading' && activeTab !== 'start' && <Footer />}
           </Box>

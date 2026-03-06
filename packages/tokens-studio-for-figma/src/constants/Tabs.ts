@@ -6,4 +6,5 @@ export enum Tabs {
   SETTINGS = 'settings',
   LOADING = 'loading',
   SECONDSCREEN = 'secondscreen',
+  SUBSCRIPTION = 'subscription',
 }
