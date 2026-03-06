@@ -21,6 +21,27 @@ import { ExplainerModal } from '../ExplainerModal';
 // TODO: expose types from @tokens-studio/ui/checkbox
 type CheckedState = boolean | 'indeterminate';
 
+async function getReplayIdWithRetry({
+  attempts = 10,
+  delayMs = 200,
+}: {
+  attempts?: number;
+  delayMs?: number;
+} = {}) {
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    const replayId = replay.getReplayId();
+    if (replayId) {
+      return replayId;
+    }
+    if (attempt < attempts - 1) {
+      await new Promise<void>((resolve) => {
+        setTimeout(resolve, delayMs);
+      });
+    }
+  }
+  return '';
+}
+
 function Settings() {
   const { t } = useTranslation(['settings']);
 
@@ -44,37 +65,36 @@ function Settings() {
     if (checked) {
       // Display the info to the user
       try {
-        let id = await replay.getReplayId();
-        if (!id) {
-          // Force start the replay functionality
-          replay.start();
-          id = await replay.getReplayId();
-        }
-        setDebugSession(id || '');
+        replay.start();
+        const id = await getReplayIdWithRetry({ attempts: 15, delayMs: 300 });
+        setDebugSession(id);
       } catch (err) {
         console.warn('Replay is likely in progress already', err);
       }
     } else {
       try {
         replay.stop();
+        setDebugSession('');
       } catch (err) {
         console.warn('Replay is likely stopped already', err);
       }
     }
-  }, []);
+  }, [dispatch.settings]);
 
   // Load once on mount.
   useEffect(() => {
     async function getSessionId() {
       try {
-        const id = replay.getReplayId();
-        setDebugSession(id || '');
+        const id = await getReplayIdWithRetry();
+        setDebugSession(id);
       } catch (err) {
         // Silently fail
       }
     }
-    getSessionId();
-  });
+    if (debugMode) {
+      getSessionId();
+    }
+  }, [debugMode]);
 
   const closeOnboarding = React.useCallback(() => {
     dispatch.uiState.setOnboardingExplainerSyncProviders(false);
