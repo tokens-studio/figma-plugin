@@ -9,15 +9,18 @@ import { Dispatch } from '@/app/store';
 import { AddLicenseSource } from '@/app/store/models/userState';
 import { addLicenseKey } from '@/utils/addLicenseKey';
 import useConfirm from '@/app/hooks/useConfirm';
+import { OAuthLogin } from '../Login/OAuthLogin';
+import { useAuthStore } from '@/app/store/useAuthStore';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@radix-ui/react-dropdown-menu';
+import { CaretDownIcon } from '@radix-ui/react-icons';
 import { ErrorMessage } from '../ErrorMessage';
-
 // ─── Styled ──────────────────────────────────────────────────────────
 
 const ContentBox = styled('div', {
     padding: '$3',
     display: 'flex',
     flexDirection: 'column',
-    gap: '$3',
+    gap: '$4', // increased gap between cards
     overflowY: 'auto',
     flex: 1,
 });
@@ -87,6 +90,119 @@ const InputRow = styled('div', {
     alignItems: 'flex-start',
 });
 
+const UserProfileCard = styled('div', {
+    display: 'flex',
+    alignItems: 'center',
+    padding: '$4',
+    border: '1px solid $borderSubtle',
+    borderRadius: '$medium',
+});
+
+const Avatar = styled('img', {
+    width: 40,
+    height: 40,
+    borderRadius: '$full',
+    objectFit: 'cover',
+});
+
+const AvatarFallback = styled('div', {
+    width: 40,
+    height: 40,
+    borderRadius: '$full',
+    backgroundColor: '$bgSubtle',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: '$fgMuted',
+    fontSize: '$large',
+});
+
+const UserDataStack = styled('div', {
+    display: 'flex',
+    flexDirection: 'column',
+});
+
+const SectionTitle = styled('div', {
+    fontSize: '$small',
+    fontWeight: '$sansMedium',
+    color: '$fgDefault',
+    marginBottom: '$3',
+});
+
+const ItemCard = styled('div', {
+    backgroundColor: '$bgSubtle',
+    borderRadius: '$medium',
+    border: '1px solid $borderSubtle',
+    padding: '$3 $4',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+});
+
+const FlexGrid = styled('div', {
+    display: 'flex',
+    gap: '40px',
+});
+
+const ItemCardColumn = styled('div', {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '4px',
+});
+
+const ItemCardLabel = styled('span', {
+    fontSize: '12px',
+    color: '$fgMuted',
+});
+
+const ItemCardValue = styled('span', {
+    fontSize: '$small',
+    color: '$fgDefault',
+});
+
+const OrgDropdownTriggerBtn = styled('button', {
+    all: 'unset',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    cursor: 'pointer',
+    fontSize: '$small',
+    backgroundColor: '$bgDefault',
+    padding: '4px 12px 4px 4px',
+    borderRadius: '$medium',
+    border: '1px solid $borderSubtle',
+    color: '$fgDefault',
+    '&:hover': {
+        backgroundColor: '$bgSubtle',
+    }
+});
+
+const StyledDropdownContent = styled(DropdownMenuContent, {
+    minWidth: 200,
+    backgroundColor: '$bgDefault',
+    borderRadius: '$medium',
+    padding: '$2',
+    boxShadow: '$default',
+    border: '1px solid $borderSubtle',
+    zIndex: 10,
+});
+
+const StyledDropdownItem = styled(DropdownMenuItem, {
+    fontSize: '$small',
+    padding: '$2 $3',
+    borderRadius: '$small',
+    cursor: 'pointer',
+    outline: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '$2',
+    color: '$fgDefault',
+    '&:hover, &:focus': {
+        backgroundColor: '$interaction',
+        color: '$onInteraction',
+    },
+});
+
 // ─── Component ───────────────────────────────────────────────────────
 
 export default function SubscriptionAccount() {
@@ -94,6 +210,10 @@ export default function SubscriptionAccount() {
     const existingKey = useSelector(licenseKeySelector);
     const licenseKeyError = useSelector(licenseKeyErrorSelector);
     const userId = useSelector(userIdSelector);
+
+    // OAuth Auth store
+    const { isAuthenticated, user, organizations, activeOrganization, setActiveOrganization, logout } = useAuthStore();
+
     const { confirm } = useConfirm();
 
     const [newKey, setNewKey] = useState(existingKey ?? '');
@@ -137,75 +257,164 @@ export default function SubscriptionAccount() {
         }
     }, [existingKey]);
 
-    const handleLogIn = useCallback(() => {
-        window.open('https://account.tokens.studio/email-login', '_blank');
-    }, []);
-
     return (
         <ContentBox>
-            <Card>
-                {/* Log in row */}
-                <CardSection>
-                    <SectionRow>
-                        <SectionLabel>Already have an account?</SectionLabel>
-                        <Button variant="secondary" size="small" onClick={handleLogIn}>
-                            Log In
-                        </Button>
-                    </SectionRow>
-                </CardSection>
-
-                <CardDivider />
-
-                {/* License key section */}
-                <CardSection>
-                    <SectionRow>
-                        <SectionLabel>License key</SectionLabel>
-                        {existingKey && (
-                            <CopyIconButton type="button" onClick={handleCopyKey} aria-label="Copy license key">
-                                {/* Copy icon — two overlapping squares */}
-                                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <rect x="4.5" y="4.5" width="8" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.2" />
-                                    <path d="M9.5 4.5V3a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v5.5a1 1 0 0 0 1 1h1.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-                                </svg>
-                            </CopyIconButton>
-                        )}
-                    </SectionRow>
-                    <SectionCaption>
-                        To activate plan go through registration process and then check your email or this link{' '}
-                        <InlineLink href="https://account.tokens.studio/email-login" target="_blank" rel="noreferrer">
-                            https://account.tokens.studio/email-login
-                        </InlineLink>{' '}
-                        to grab license key
-                    </SectionCaption>
-
-                    <InputRow>
-                        <TextInput
-                            css={{ flex: 1 }}
-                            name="license-key"
-                            placeholder="Enter license key"
-                            value={newKey}
-                            onChange={handleKeyChange}
-                            validationStatus={licenseKeyError ? 'error' : undefined}
-                        />
-                        {!existingKey ? (
-                            <Button
-                                variant="secondary"
-                                onClick={handleAddKey}
-                                disabled={!newKey}
-                            >
-                                Add license key
-                            </Button>
+            {/* Authenticated Dashboard */}
+            {isAuthenticated && user ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                    <UserProfileCard>
+                        {user.avatar ? (
+                            <Avatar src={user.avatar} alt="User avatar" />
                         ) : (
-                            <Button variant="secondary" onClick={handleRemoveKey}>
-                                Remove key
-                            </Button>
+                            <AvatarFallback>{user.fullName?.[0] || 'U'}</AvatarFallback>
                         )}
-                    </InputRow>
-                    {licenseKeyError && (
-                        <ErrorMessage>{licenseKeyError}</ErrorMessage>
+                        <UserDataStack css={{ marginLeft: '$3' }}>
+                            <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--colors-fgDefault)' }}>{user.fullName || 'Studio User'}</span>
+                            <span style={{ fontSize: '12px', color: 'var(--colors-fgMuted)' }}>{user.email}</span>
+                        </UserDataStack>
+                        <Button variant="secondary" css={{ marginLeft: 'auto' }} onClick={logout}>
+                            Log out
+                        </Button>
+                    </UserProfileCard>
+
+                    {organizations.length > 0 && activeOrganization && (
+                        <>
+                            <div>
+                                <SectionTitle>Organisation</SectionTitle>
+                                <ItemCard>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <OrgDropdownTriggerBtn>
+                                                {activeOrganization.avatarUrl ? (
+                                                    <Avatar src={activeOrganization.avatarUrl} style={{ width: 24, height: 24, borderRadius: '4px' }} alt="" />
+                                                ) : (
+                                                    <AvatarFallback style={{ width: 24, height: 24, fontSize: '12px', borderRadius: '4px' }}>
+                                                        {activeOrganization.name[0]}
+                                                    </AvatarFallback>
+                                                )}
+                                                {activeOrganization.name}
+                                                <CaretDownIcon style={{ marginLeft: '4px', color: 'var(--colors-fgMuted)' }} />
+                                            </OrgDropdownTriggerBtn>
+                                        </DropdownMenuTrigger>
+                                        <StyledDropdownContent>
+                                            {organizations.map((org) => (
+                                                <StyledDropdownItem
+                                                    key={org.id}
+                                                    onClick={() => setActiveOrganization(org.id)}
+                                                >
+                                                    {org.avatarUrl && (
+                                                        <Avatar src={org.avatarUrl} alt="" css={{ width: 16, height: 16, borderRadius: '2px' }} />
+                                                    )}
+                                                    {org.name}
+                                                </StyledDropdownItem>
+                                            ))}
+                                        </StyledDropdownContent>
+                                    </DropdownMenu>
+                                    <Button variant="secondary">Manage Org</Button>
+                                </ItemCard>
+                            </div>
+
+                            <div>
+                                <SectionTitle>Current plan</SectionTitle>
+                                <ItemCard>
+                                    <FlexGrid>
+                                        <ItemCardColumn>
+                                            <ItemCardLabel>Plan</ItemCardLabel>
+                                            <ItemCardValue>{activeOrganization.subscription?.plan?.name || "Starter"}</ItemCardValue>
+                                        </ItemCardColumn>
+                                        <ItemCardColumn>
+                                            <ItemCardLabel>Price</ItemCardLabel>
+                                            <ItemCardValue>{activeOrganization.subscription?.price || "Free"}</ItemCardValue>
+                                        </ItemCardColumn>
+                                        <ItemCardColumn>
+                                            <ItemCardLabel>Billing date</ItemCardLabel>
+                                            <ItemCardValue>{activeOrganization.subscription?.billingDate || "Endless"}</ItemCardValue>
+                                        </ItemCardColumn>
+                                    </FlexGrid>
+                                    <Button variant="secondary">Manage Plan</Button>
+                                </ItemCard>
+                            </div>
+
+                            <div>
+                                <SectionTitle>Seats</SectionTitle>
+                                <ItemCard>
+                                    <FlexGrid>
+                                        <ItemCardColumn>
+                                            <ItemCardLabel>Editor</ItemCardLabel>
+                                            <ItemCardValue>1 of 1</ItemCardValue>
+                                        </ItemCardColumn>
+                                        <ItemCardColumn>
+                                            <ItemCardLabel>Viewer</ItemCardLabel>
+                                            <ItemCardValue>1 of 1</ItemCardValue>
+                                        </ItemCardColumn>
+                                    </FlexGrid>
+                                    <Button variant="secondary">Add Seats</Button>
+                                </ItemCard>
+                            </div>
+                        </>
                     )}
-                </CardSection>
-            </Card>
+                </div>
+            ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    {/* If Not Authenticated, Show Login Component */}
+                    <Card>
+                        <CardSection>
+                            <OAuthLogin />
+                        </CardSection>
+                    </Card>
+
+                    <Card>
+                        {/* License key section */}
+                        <CardSection>
+                            <SectionRow>
+                                <SectionLabel>License key</SectionLabel>
+                                {existingKey && (
+                                    <CopyIconButton type="button" onClick={handleCopyKey} aria-label="Copy license key">
+                                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <rect x="4.5" y="4.5" width="8" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.2" />
+                                            <path d="M9.5 4.5V3a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v5.5a1 1 0 0 0 1 1h1.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+                                        </svg>
+                                    </CopyIconButton>
+                                )}
+                            </SectionRow>
+                            <SectionCaption>
+                                To activate plan go through registration process and then check your email or this link{' '}
+                                <InlineLink href="https://account.tokens.studio/email-login" target="_blank" rel="noreferrer">
+                                    https://account.tokens.studio/email-login
+                                </InlineLink>{' '}
+                                to grab license key
+                            </SectionCaption>
+
+                            <InputRow>
+                                <TextInput
+                                    css={{ flex: 1 }}
+                                    name="license-key"
+                                    placeholder="Enter license key"
+                                    value={newKey}
+                                    onChange={handleKeyChange}
+                                    validationStatus={licenseKeyError ? 'error' : undefined}
+                                />
+                                {!existingKey ? (
+                                    <Button
+                                        variant="secondary"
+                                        onClick={handleAddKey}
+                                        disabled={!newKey}
+                                    >
+                                        Add license key
+                                    </Button>
+                                ) : (
+                                    <Button variant="secondary" onClick={handleRemoveKey}>
+                                        Remove key
+                                    </Button>
+                                )}
+                            </InputRow>
+                            {licenseKeyError && (
+                                <ErrorMessage>{licenseKeyError}</ErrorMessage>
+                            )}
+                        </CardSection>
+                    </Card>
+                </div>
+            )}
         </ContentBox>
     );
 }

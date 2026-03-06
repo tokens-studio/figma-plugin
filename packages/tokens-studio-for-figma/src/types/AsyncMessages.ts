@@ -24,6 +24,7 @@ import { UpdateTokenVariablePayload } from './payloads/UpdateTokenVariablePayloa
 import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 import { ExportTokenSet } from './ExportTokenSet';
 import type { VariableCollectionInfo } from './VariableCollectionSelection';
+import { OAuthTokens } from './oauth';
 
 export enum AsyncMessageTypes {
   // the below messages are going from UI to plugin
@@ -64,6 +65,7 @@ export enum AsyncMessageTypes {
   SET_VARIABLE_EXPORT_SETTINGS = 'async/set-variable-export-settings',
   SET_SELECTED_EXPORT_THEMES = 'async/set-selected-export-themes',
   CREATE_LIVING_DOCUMENTATION = 'async/create-living-documentation',
+  SET_OAUTH_TOKENS = 'async/set-oauth-tokens',
   // the below messages are going from plugin to UI
   STARTUP = 'async/startup',
   GET_THEME_INFO = 'async/get-theme-info',
@@ -286,7 +288,9 @@ export type GetThemeInfoMessageResult = AsyncMessage<AsyncMessageTypes.GET_THEME
 
 export type StartupMessage = AsyncMessage<AsyncMessageTypes.STARTUP, (
   ReturnType<typeof startup> extends Promise<infer V> ? V : unknown
-)>;
+) & {
+  oauthTokens?: OAuthTokens | null;
+}>;
 export type StartupMessageResult = AsyncMessage<AsyncMessageTypes.STARTUP>;
 
 export type GetFigmaFontsMessage = AsyncMessage<AsyncMessageTypes.GET_FIGMA_FONTS>;
@@ -309,6 +313,11 @@ export type SetAuthDataMessage = AsyncMessage<AsyncMessageTypes.SET_AUTH_DATA, {
   auth: AuthData | null
 }>;
 export type SetAuthDataMessageResult = AsyncMessage<AsyncMessageTypes.SET_AUTH_DATA>;
+
+export type SetOAuthTokensMessage = AsyncMessage<AsyncMessageTypes.SET_OAUTH_TOKENS, {
+  oauthTokens: OAuthTokens | null;
+}>;
+export type SetOAuthTokensMessageResult = AsyncMessage<AsyncMessageTypes.SET_OAUTH_TOKENS>;
 
 export type SetUsedEmailMessage = AsyncMessage<AsyncMessageTypes.SET_USED_EMAIL, {
   email: string | undefined
@@ -367,10 +376,10 @@ export type UpdateVariablesAsyncMessage = AsyncMessage<AsyncMessageTypes.UPDATE_
 export type UpdateVariablesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.UPDATE_VARIABLES>;
 
 export type RemoveRelaunchDataMessage = AsyncMessage<
-AsyncMessageTypes.REMOVE_RELAUNCH_DATA,
-{
-  area: UpdateMode;
-}
+  AsyncMessageTypes.REMOVE_RELAUNCH_DATA,
+  {
+    area: UpdateMode;
+  }
 >;
 export type RemoveRelaunchDataMessageResult = AsyncMessage<AsyncMessageTypes.REMOVE_RELAUNCH_DATA>;
 
@@ -437,7 +446,8 @@ export type AsyncMessages =
   | RemoveRelaunchDataMessage
   | RemoveStylesWithoutConnectionMessage
   | SetVariableExportSettingsMessage
-  | SetSelectedExportThemesMessage;
+  | SetSelectedExportThemesMessage
+  | SetOAuthTokensMessage;
 
 export type AsyncMessageResults =
   CreateStylesAsyncMessageResult
@@ -489,7 +499,8 @@ export type AsyncMessageResults =
   | RemoveRelaunchDataMessageResult
   | RemoveStylesWithoutConnectionResult
   | SetVariableExportSettingsMessageResult
-  | SetSelectedExportThemesMessageResult;
+  | SetSelectedExportThemesMessageResult
+  | SetOAuthTokensMessageResult;
 
 export type AsyncMessagesMap = {
   [K in AsyncMessageTypes]: Extract<AsyncMessages, { type: K }>

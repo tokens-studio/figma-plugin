@@ -1,5 +1,5 @@
 import {
-  ApiProvidersProperty, AuthDataProperty, LicenseKeyProperty, InitialLoadProperty,
+  ApiProvidersProperty, AuthDataProperty, LicenseKeyProperty, InitialLoadProperty, OAuthTokensProperty,
 } from '@/figmaStorage';
 import { getActiveTheme } from '@/utils/getActiveTheme';
 import { getSelectedExportThemes } from '@/utils/getSelectedExportThemes';
@@ -27,6 +27,7 @@ export async function startup() {
     initialLoad,
     localTokenData,
     authData,
+    oauthTokens,
     usedEmail,
     variableExportSettings,
     selectedExportThemes,
@@ -43,6 +44,7 @@ export async function startup() {
     InitialLoadProperty.read(),
     getTokenData(),
     AuthDataProperty.read(),
+    OAuthTokensProperty.read(),
     UsedEmailProperty.read(),
     getVariableExportSettings(),
     getSelectedExportThemes(),
@@ -76,6 +78,7 @@ export async function startup() {
       name: figma.currentUser.name,
     } : null,
     authData,
+    oauthTokens,
     usedEmail,
     selectedExportThemes,
   };

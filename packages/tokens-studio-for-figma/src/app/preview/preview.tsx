@@ -86,6 +86,7 @@ const mockStartupParams: Omit<StartupMessage, 'licenseKey'> = {
     version: '91',
   },
   selectedExportThemes: [],
+  oauthTokens: null,
 };
 
 const mockActions = {
@@ -380,16 +381,16 @@ function PreviewApp({ children }: { children: ReactNode }) {
             className="content scroll-container"
           >
             {
-            Object.keys(themes).map((type) => (
-              <DropdownMenu.Item
-                key={type}
-                onSelect={onThemeSelected(type)}
-                css={{ display: 'flex', gap: '$3' }}
-              >
-                {themes[type]}
-              </DropdownMenu.Item>
-            ))
-          }
+              Object.keys(themes).map((type) => (
+                <DropdownMenu.Item
+                  key={type}
+                  onSelect={onThemeSelected(type)}
+                  css={{ display: 'flex', gap: '$3' }}
+                >
+                  {themes[type]}
+                </DropdownMenu.Item>
+              ))
+            }
           </DropdownMenu.Content>
         </DropdownMenu.Portal>
       </DropdownMenu>
@@ -405,16 +406,16 @@ function PreviewApp({ children }: { children: ReactNode }) {
             className="content scroll-container"
           >
             {
-            [{ type: 'STARTUP' }, { type: 'CUSTOM' }].map((mockAction) => (
-              <DropdownMenu.Item
-                key={mockAction.type}
-                onSelect={onActionSelected(mockAction.type)}
-                css={{ display: 'flex', gap: '$3' }}
-              >
-                {mockAction.type}
-              </DropdownMenu.Item>
-            ))
-          }
+              [{ type: 'STARTUP' }, { type: 'CUSTOM' }].map((mockAction) => (
+                <DropdownMenu.Item
+                  key={mockAction.type}
+                  onSelect={onActionSelected(mockAction.type)}
+                  css={{ display: 'flex', gap: '$3' }}
+                >
+                  {mockAction.type}
+                </DropdownMenu.Item>
+              ))
+            }
           </DropdownMenu.Content>
         </DropdownMenu.Portal>
       </DropdownMenu>

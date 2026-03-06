@@ -1,6 +1,7 @@
 import type { Dispatch } from '@/app/store';
 import type { StartupMessage } from '@/types/AsyncMessages';
 import { identify, track } from '@/utils/analytics';
+import { useAuthStore } from '@/app/store/useAuthStore';
 import pjs from '../../../../../package.json';
 
 export function savePluginDataFactory(dispatch: Dispatch, params: StartupMessage) {
@@ -38,6 +39,12 @@ export function savePluginDataFactory(dispatch: Dispatch, params: StartupMessage
       // Store the selected export themes in the UI state
       if (params.selectedExportThemes) {
         dispatch.uiState.setSelectedExportThemes(params.selectedExportThemes);
+      }
+
+      // Restore OAuth tokens
+      if (params.oauthTokens) {
+        useAuthStore.getState().setOAuthTokens(params.oauthTokens);
+        useAuthStore.getState().fetchUserData(params.oauthTokens);
       }
     } else {
       throw new Error('User not found');
