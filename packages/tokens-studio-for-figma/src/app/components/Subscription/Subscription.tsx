@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { styled } from '@/stitches.config';
 import SubscriptionPlans from './SubscriptionPlans';
+import SubscriptionAccount from './SubscriptionAccount';
 
 type SubscriptionTab = 'plans' | 'account';
 
@@ -84,9 +85,8 @@ export default function Subscription() {
             </TabRow>
 
             {activeTab === 'plans' && <SubscriptionPlans />}
-            {activeTab === 'account' && (
-                <PlaceholderContent>Account details coming soon</PlaceholderContent>
-            )}
+            {activeTab === 'account' && <SubscriptionAccount />}
         </Wrapper>
     );
 }
+
