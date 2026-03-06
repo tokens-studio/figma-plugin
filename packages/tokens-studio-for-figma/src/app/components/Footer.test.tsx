@@ -1,11 +1,31 @@
 import React from 'react';
-import { render, waitFor } from '../../../tests/config/setupTest';
+import { render, resetStore, waitFor } from '../../../tests/config/setupTest';
 import { store } from '../store';
 import Footer from './Footer';
 import pjs from '../../../package.json';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 
+jest.mock('@/hooks/useChangedState', () => ({
+  useChangedState: () => ({
+    changedPushState: {},
+    changedPullState: {},
+    hasChanges: true,
+  }),
+}));
+
+jest.mock('./DirtyStateBadgeWrapper', () => ({
+  DirtyStateBadgeWrapper: ({ badge, children }: { badge: boolean; children: React.ReactNode }) => (
+    <div data-testid={badge ? 'dirty-badge-visible' : 'dirty-badge-hidden'}>
+      {children}
+    </div>
+  ),
+}));
+
 describe('Footer', () => {
+  beforeEach(() => {
+    resetStore();
+  });
+
   it('displays current version number', () => {
     const { getByText } = render(<Footer />, { store });
     expect(getByText(`V ${pjs.version}`)).toBeInTheDocument();
@@ -53,5 +73,18 @@ describe('Footer', () => {
       expect(pullButton).toBeInTheDocument();
       expect(pullButton).not.toBeDisabled();
     });
+  });
+
+  it('hides push badge when push is disabled', async () => {
+    const { getByTestId, queryByTestId } = render(<Footer />, { store });
+    store.dispatch.uiState.setLocalApiState({ provider: StorageProviderType.GITHUB, branch: 'test-branch' });
+    store.dispatch.tokenState.setEditProhibited(true);
+
+    await waitFor(() => {
+      const pushButton = getByTestId('footer-push-button');
+      expect(pushButton).toBeDisabled();
+    });
+
+    expect(queryByTestId('dirty-badge-visible')).toBeNull();
   });
 });
