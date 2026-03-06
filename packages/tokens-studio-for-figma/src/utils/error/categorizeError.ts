@@ -91,6 +91,31 @@ export function categorizeError(error: any, context?: {
     };
   }
 
+  // Check for token format/schema validation errors
+  const validationKeywords = [
+    "doesn't pass schema validation",
+    'schema validation',
+    'validation error',
+    'invalid token format',
+    'token format is invalid',
+  ];
+
+  const hasValidationError = validationKeywords.some((keyword) => (
+    errorMessage.toLowerCase().includes(keyword)
+  ));
+
+  if (hasValidationError) {
+    const header = context?.provider
+      ? `Could not load tokens from ${transformProviderName(context.provider)}`
+      : 'Validation Error';
+
+    return {
+      type: 'parsing',
+      message: `${ErrorMessages.VALIDATION_ERROR}: ${errorMessage}`,
+      header,
+    };
+  }
+
   // Check for connectivity/network errors
   const connectivityKeywords = [
     'Network',
@@ -141,7 +166,9 @@ export function categorizeError(error: any, context?: {
     'credential',
     'authentication',
     'Authentication',
-    'permission',
+    'permission denied',
+    'insufficient permission',
+    'write access denied',
   ];
 
   const hasCredentialError = credentialKeywords.some((keyword) => errorMessage.includes(keyword));

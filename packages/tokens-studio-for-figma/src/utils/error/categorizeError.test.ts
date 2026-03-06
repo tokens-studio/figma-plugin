@@ -54,6 +54,14 @@ describe('categorizeError', () => {
       expect(result.type).toBe('credential');
       expect(result.message).toBe('Authentication failed');
     });
+
+    it('should categorize explicit permission denied errors', () => {
+      const error = new Error('permission denied for repository');
+      const result = categorizeError(error);
+
+      expect(result.type).toBe('credential');
+      expect(result.message).toBe('permission denied for repository');
+    });
   });
 
   describe('connectivity errors', () => {
@@ -99,6 +107,22 @@ describe('categorizeError', () => {
   });
 
   describe('other errors', () => {
+    it('should classify schema validation errors as parsing errors', () => {
+      const error = new Error("Contents don't pass schema validation: token set format is invalid");
+      const result = categorizeError(error);
+
+      expect(result.type).toBe('parsing');
+      expect(result.message).toContain(ErrorMessages.VALIDATION_ERROR);
+    });
+
+    it('should not classify generic permission wording as credential error', () => {
+      const error = new Error('Token has invalid permission field shape');
+      const result = categorizeError(error);
+
+      expect(result.type).toBe('other');
+      expect(result.message).toBe('Token has invalid permission field shape');
+    });
+
     it('should handle string errors', () => {
       const error = 'Something went wrong';
       const result = categorizeError(error);
