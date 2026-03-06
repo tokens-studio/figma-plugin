@@ -32,18 +32,22 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
 
   const handleSelectTheme = useCallback((themeId: string) => {
     const groupOfTheme = availableThemes.find((theme) => theme.value === themeId)?.group ?? INTERNAL_THEMES_NO_GROUP;
-    const nextTheme = activeTheme;
+    const nextTheme = { ...activeTheme };
     if (typeof nextTheme[groupOfTheme] !== 'undefined' && nextTheme[groupOfTheme] === themeId) {
       delete nextTheme[groupOfTheme];
     } else {
       nextTheme[groupOfTheme] = themeId;
     }
-    if (nextTheme) {
-      track('Apply theme', { id: nextTheme });
+
+    const sanitizedNextTheme = Object.fromEntries(
+      Object.entries(nextTheme).filter(([, selectedThemeId]) => Boolean(selectedThemeId)),
+    );
+    if (Object.keys(sanitizedNextTheme).length > 0) {
+      track('Apply theme', { id: sanitizedNextTheme });
     } else {
       track('Reset theme');
     }
-    dispatch.tokenState.setActiveTheme({ newActiveTheme: nextTheme, shouldUpdateNodes: true });
+    dispatch.tokenState.setActiveTheme({ newActiveTheme: sanitizedNextTheme, shouldUpdateNodes: true });
   }, [dispatch, activeTheme, availableThemes]);
 
   const handleManageThemes = useCallback(() => {
@@ -52,12 +56,13 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
 
   const activeThemeLabel = useMemo(() => {
     if (activeTheme) {
-      if (Object.keys(activeTheme).length === 0) return 'None';
-      if (Object.keys(activeTheme).length === 1) {
-        const themeOption = availableThemes.find(({ value }) => value === Object.values(activeTheme)[0]);
+      const activeThemeIds = Object.values(activeTheme).filter((themeId) => Boolean(themeId));
+      if (activeThemeIds.length === 0) return 'None';
+      if (activeThemeIds.length === 1) {
+        const themeOption = availableThemes.find(({ value }) => value === activeThemeIds[0]);
         return themeOption ? themeOption.label : 'Unknown';
       }
-      return `${Object.keys(activeTheme).length} active`;
+      return `${activeThemeIds.length} active`;
     }
     return 'None';
   }, [activeTheme, availableThemes]);

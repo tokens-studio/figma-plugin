@@ -54,6 +54,27 @@ describe('ThemeSelector', () => {
     expect(component.queryByTestId('themeselector-dropdown')?.textContent).toEqual('theme:Unknown');
   });
 
+  it('should ignore empty theme entries when showing active count', () => {
+    const mockStore = createMockStore({
+      tokenState: {
+        activeTheme: {
+          [INTERNAL_THEMES_NO_GROUP]: '',
+          groupA: 'light',
+        },
+        themes: [{
+          id: 'light', name: 'Light', selectedTokenSets: {}, $figmaStyleReferences: {},
+        }],
+      },
+    });
+    const component = render(
+      <Provider store={mockStore}>
+        <ThemeSelector />
+      </Provider>,
+    );
+
+    expect(component.queryByTestId('themeselector-dropdown')?.textContent).toEqual('theme:Light');
+  });
+
   it('be possible to select a theme', async () => {
     const mockStore = createMockStore({
       tokenState: {
