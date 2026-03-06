@@ -109,7 +109,7 @@ export default function Footer() {
                 }
               />
             </DirtyStateBadgeWrapper>
-            <DirtyStateBadgeWrapper badge={hasLocalChange}>
+            <DirtyStateBadgeWrapper badge={hasLocalChange && !editProhibited}>
               <IconButton
                 data-testid="footer-push-button"
                 icon={<UploadIcon />}
