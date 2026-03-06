@@ -48,6 +48,16 @@ describe('LoadingBar', () => {
     result.unmount();
   });
 
+  it('should stay visible while a job is active even without estimated time', () => {
+    store.dispatch.uiState.startJob({
+      name: BackgroundJobs.NODEMANAGER_UPDATE,
+    });
+
+    const result = render(<LoadingBar />);
+    expect(result.queryByTestId('loadingBar')).not.toBeNull();
+    result.unmount();
+  });
+
   it('should be able to cancel', async () => {
     const asyncMessageChannelSpy = jest.spyOn(AsyncMessageChannel.ReactInstance, 'message');
 

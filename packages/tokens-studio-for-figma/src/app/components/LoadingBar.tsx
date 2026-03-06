@@ -35,7 +35,6 @@ export default function LoadingBar() {
   const backgroundJobs = useSelector(backgroundJobsSelector);
   const windowSize = useSelector(windowSizeSelector);
 
-  const hasInfiniteJobs = React.useMemo(() => backgroundJobs.some((job) => job.isInfinite), [backgroundJobs]);
   const expectedWaitTime = React.useMemo(() => backgroundJobs.reduce((time, job) => (
     time + (job.totalTasks ? (
       (job.totalTasks - (job.completedTasks ?? 0)) * (job.timePerTask ?? 0)
@@ -46,10 +45,7 @@ export default function LoadingBar() {
   ), [expectedWaitTime]);
     // Only delay showing the loading bar, hide immediately when jobs are cleared
   const shouldShow = useDelayedFlag(
-    !(
-      (!backgroundJobs.length || expectedWaitTime < 100)
-        && !hasInfiniteJobs
-    ),
+    backgroundJobs.length > 0,
     200,
     true,
     false,
