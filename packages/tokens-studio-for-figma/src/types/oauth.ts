@@ -68,6 +68,12 @@ export type UserData = {
     fullName: string;
 };
 
+export type Project = {
+    id: string;
+    name: string;
+    slug?: string;
+};
+
 export type Organization = {
     name: string;
     avatarUrl?: string;
@@ -84,11 +90,7 @@ export type Organization = {
         billingDate?: string;
     };
     projects: {
-        data: Array<{
-            id: string;
-            name: string;
-            slug?: string;
-        }>;
+        data: Project[];
     };
 };
 

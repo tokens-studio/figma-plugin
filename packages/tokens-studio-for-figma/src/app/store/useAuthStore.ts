@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { OAuthService } from '../services/OAuthService';
 import { OAuthError } from '@/types/OAuthError';
-import type { OAuthTokens, UserData, Organization } from '@/types/oauth';
+import type { OAuthTokens, UserData, Organization, Project } from '@/types/oauth';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 
@@ -17,6 +17,7 @@ interface AuthState {
     user: UserData | null;
     organizations: Organization[];
     activeOrganization: Organization | null;
+    activeProject: Project | null;
     error: string | null;
     isLoading: boolean;
     deviceCode: DeviceCodeState | null; // Device code info for UI display
@@ -25,8 +26,10 @@ interface AuthState {
     logout: () => Promise<void>;
     setError: (error: string | null) => void;
     setActiveOrganization: (orgId: string) => void;
+    setActiveProject: (projectId: string) => void;
     setOAuthTokens: (tokens: OAuthTokens | null) => Promise<void>;
     fetchUserData: (tokens: OAuthTokens) => Promise<void>;
+    fetchProjects: (orgId: string) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -35,6 +38,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     user: null,
     organizations: [],
     activeOrganization: null,
+    activeProject: null,
     error: null,
     isLoading: false,
     deviceCode: null,
@@ -126,6 +130,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             user: null,
             organizations: [],
             activeOrganization: null,
+            activeProject: null,
             deviceCode: null,
             error: null,
         });
@@ -148,7 +153,19 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     setActiveOrganization: (orgId: string) => {
         set((state) => {
             const org = state.organizations.find(o => o.id === orgId) || null;
-            return { activeOrganization: org };
+            return {
+                activeOrganization: org,
+                activeProject: org?.projects?.data?.[0] || null,
+            };
+        });
+        // Fetch projects if needed
+        get().fetchProjects(orgId);
+    },
+
+    setActiveProject: (projectId: string) => {
+        set((state) => {
+            const project = state.activeOrganization?.projects?.data?.find(p => p.id === projectId) || null;
+            return { activeProject: project };
         });
     },
 
@@ -228,23 +245,88 @@ export const useAuthStore = create<AuthState>((set, get) => ({
                         slug: org.type && org.attributes ? (org.attributes.slug || '') : (org.slug || ''),
                         avatarUrl: org.type && org.attributes ? (org.attributes.logo_url || org.attributes.avatar_url || '') : (org.avatar_url || org.avatar || org.logo_url || ''),
                         subscription: org.type && org.attributes ? org.attributes.subscription : org.subscription,
-                        projects: { data: [] },
+                        projects: (org.type && org.attributes ? org.attributes.projects : org.projects) || { data: [] },
                     }));
                 }
             } catch (err) {
                 console.warn('Could not fetch organizations via new backend, fallback missing depending on API.', err);
             }
 
+            const activeOrganization = organizations.length > 0 ? organizations[0] : null;
+
             set({
                 user,
                 organizations,
-                activeOrganization: organizations.length > 0 ? organizations[0] : null,
+                activeOrganization,
+                activeProject: activeOrganization?.projects?.data?.[0] || null,
                 isLoading: false,
                 isAuthenticated: true,
             });
+
+            if (activeOrganization) {
+                await get().fetchProjects(activeOrganization.id);
+            }
         } catch (error) {
             console.error('Error fetching user data:', error);
             set({ error: (error as Error).message, isLoading: false, isAuthenticated: false });
+        }
+    },
+
+    fetchProjects: async (orgId: string) => {
+        const { oauthTokens } = get();
+        if (!oauthTokens) return;
+
+        const studioUrl = 'production.tokens.studio';
+        const apiBaseUrl = OAuthService.getApiBaseUrl(studioUrl);
+
+        try {
+            const response = await fetch(`${apiBaseUrl}/api/v1/projects?organization_id=${orgId}`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `Bearer ${oauthTokens.accessToken}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (response.ok) {
+                const projectsDataRaw = await response.json();
+                let projectsArray: any[] = [];
+                if (Array.isArray(projectsDataRaw)) {
+                    projectsArray = projectsDataRaw;
+                } else if (projectsDataRaw.data) {
+                    projectsArray = Array.isArray(projectsDataRaw.data) ? projectsDataRaw.data : [];
+                }
+
+                const projects: Project[] = projectsArray.map((p: any) => ({
+                    id: p.id || p.uuid || '',
+                    name: p.name || (p.attributes?.name) || '',
+                    slug: p.slug || (p.attributes?.slug) || '',
+                }));
+
+                console.log('Fetched projects:', projects); // Add debug log
+
+                set((state) => {
+                    // Update the organization in the list and active organization if it matches
+                    const updatedOrganizations = state.organizations.map((org) => {
+                        if (org.id === orgId) {
+                            return { ...org, projects: { data: projects } };
+                        }
+                        return org;
+                    });
+
+                    const updatedActiveOrg = state.activeOrganization?.id === orgId
+                        ? { ...state.activeOrganization, projects: { data: projects } }
+                        : state.activeOrganization;
+
+                    return {
+                        organizations: updatedOrganizations,
+                        activeOrganization: updatedActiveOrg,
+                        activeProject: (state.activeOrganization?.id === orgId) ? (projects[0] || null) : state.activeProject,
+                    };
+                });
+            }
+        } catch (err) {
+            console.warn('Failed to fetch projects:', err);
         }
     }
 }));

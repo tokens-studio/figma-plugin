@@ -212,7 +212,16 @@ export default function SubscriptionAccount() {
     const userId = useSelector(userIdSelector);
 
     // OAuth Auth store
-    const { isAuthenticated, user, organizations, activeOrganization, setActiveOrganization, logout } = useAuthStore();
+    const {
+        isAuthenticated,
+        user,
+        organizations,
+        activeOrganization,
+        setActiveOrganization,
+        activeProject,
+        setActiveProject,
+        logout,
+    } = useAuthStore();
 
     const { confirm } = useConfirm();
 
@@ -311,6 +320,36 @@ export default function SubscriptionAccount() {
                                         </StyledDropdownContent>
                                     </DropdownMenu>
                                     <Button variant="secondary">Manage Org</Button>
+                                </ItemCard>
+                            </div>
+
+                            <div>
+                                <SectionTitle>Project</SectionTitle>
+                                <ItemCard>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild disabled={!activeOrganization.projects?.data?.length}>
+                                            <OrgDropdownTriggerBtn disabled={!activeOrganization.projects?.data?.length}>
+                                                <AvatarFallback style={{ width: 24, height: 24, fontSize: '12px', borderRadius: '4px' }}>
+                                                    {activeProject?.name[0] || 'P'}
+                                                </AvatarFallback>
+                                                {activeProject?.name || (!activeOrganization.projects?.data?.length ? 'No projects found' : 'Select Project')}
+                                                <CaretDownIcon style={{ marginLeft: '4px', color: 'var(--colors-fgMuted)' }} />
+                                            </OrgDropdownTriggerBtn>
+                                        </DropdownMenuTrigger>
+                                        {activeOrganization.projects?.data?.length > 0 && (
+                                            <StyledDropdownContent>
+                                                {activeOrganization.projects.data.map((project) => (
+                                                    <StyledDropdownItem
+                                                        key={project.id}
+                                                        onClick={() => setActiveProject(project.id)}
+                                                    >
+                                                        {project.name}
+                                                    </StyledDropdownItem>
+                                                ))}
+                                            </StyledDropdownContent>
+                                        )}
+                                    </DropdownMenu>
+                                    <Button variant="secondary">Manage Project</Button>
                                 </ItemCard>
                             </div>
 
