@@ -17,6 +17,7 @@ import { StorageTypeCredentials } from '@/types/StorageType';
 import LocalStorageItem from './LocalStorageItem';
 import { getProviderIcon } from '@/utils/getProviderIcon';
 import { StyledBetaBadge } from './StyledBetaBadge';
+import { useAuthStore } from '@/app/store/useAuthStore';
 
 const SyncSettings = () => {
   const localApiState = useSelector(localApiStateSelector);
@@ -66,6 +67,25 @@ const SyncSettings = () => {
 
   const apiProviders = useSelector(apiProvidersSelector);
   const dispatch = useDispatch<Dispatch>();
+
+  const { isAuthenticated, activeOrganization, activeProject } = useAuthStore();
+
+  const renderedProviders = React.useMemo(() => {
+    let list = [...apiProviders];
+    if (isAuthenticated && activeOrganization) {
+      list = [
+        {
+          provider: StorageProviderType.TOKENS_STUDIO,
+          internalId: `tokens-studio-${activeOrganization.id}`,
+          name: activeOrganization.name,
+          orgId: activeOrganization.id,
+          id: activeProject?.id || '',
+        } as StorageTypeCredentials,
+        ...list,
+      ];
+    }
+    return list;
+  }, [apiProviders, isAuthenticated, activeOrganization, activeProject]);
 
   const [open, setOpen] = React.useState(false);
 
@@ -173,30 +193,30 @@ const SyncSettings = () => {
 
                   <Stack direction="column" gap={4}>
                     {
-                    providers.map((provider) => (
-                      <Stack direction="row" justify="between" align="center" key={provider.text}>
-                        <Stack direction="column">
-                          <Box css={{
-                            color: '$fgDefault', display: 'inline-flex', gap: '$2', alignItems: 'center',
-                          }}
+                      providers.map((provider) => (
+                        <Stack direction="row" justify="between" align="center" key={provider.text}>
+                          <Stack direction="column">
+                            <Box css={{
+                              color: '$fgDefault', display: 'inline-flex', gap: '$2', alignItems: 'center',
+                            }}
+                            >
+                              <Box css={{ color: '$fgMuted' }}>{getProviderIcon(provider.type)}</Box>
+                              {provider.text}
+                              {provider.beta && <StyledBetaBadge>BETA</StyledBetaBadge>}
+                            </Box>
+                          </Stack>
+                          <Button
+                            key={provider.type}
+                            onClick={handleProviderClick(provider.type)}
+                            variant="secondary"
+                            size="small"
+                            data-testid={`add-${provider.text}-credential`}
                           >
-                            <Box css={{ color: '$fgMuted' }}>{getProviderIcon(provider.type)}</Box>
-                            {provider.text}
-                            {provider.beta && <StyledBetaBadge>BETA</StyledBetaBadge>}
-                          </Box>
+                            {t('choose')}
+                          </Button>
                         </Stack>
-                        <Button
-                          key={provider.type}
-                          onClick={handleProviderClick(provider.type)}
-                          variant="secondary"
-                          size="small"
-                          data-testid={`add-${provider.text}-credential`}
-                        >
-                          {t('choose')}
-                        </Button>
-                      </Stack>
-                    ))
-                  }
+                      ))
+                    }
                   </Stack>
                 </Dialog.Content>
               </Dialog.Portal>
@@ -205,12 +225,13 @@ const SyncSettings = () => {
 
           <Stack direction="column" gap={2} width="full" align="start">
             <LocalStorageItem />
-            {apiProviders.length > 0 && apiProviders.map((item) => (
+            {renderedProviders.length > 0 && renderedProviders.map((item) => (
               <StorageItem
                 key={item?.internalId || `${item.provider}-${item.id}`}
                 onEdit={handleEditClick(item)}
                 onMigrate={handleEditClick(item, true)}
                 item={item}
+                isOAuthApp={item.provider === StorageProviderType.TOKENS_STUDIO && item.internalId?.startsWith('tokens-studio-')}
               />
             ))}
           </Stack>

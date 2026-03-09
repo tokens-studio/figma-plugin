@@ -17,14 +17,16 @@ import useStorage from '../store/useStorage';
 import { Dispatch } from '../store';
 import { TokenFormatBadge } from './TokenFormatBadge';
 import { isUsingAppPassword } from '@/utils/bitbucketMigration';
-
+import { StudioProjectSelector } from './Subscription/StudioProjectSelector';
+import { useAuthStore } from '@/app/store/useAuthStore';
 type Props = {
   item: StorageTypeCredentials;
   onEdit: () => void;
   onMigrate?: () => void;
+  isOAuthApp?: boolean;
 };
 
-const StorageItem = ({ item, onEdit, onMigrate }: Props) => {
+const StorageItem = ({ item, onEdit, onMigrate, isOAuthApp }: Props) => {
   const [hasErrored, setHasErrored] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState<string>();
   const storageType = useSelector(storageTypeSelector);
@@ -36,6 +38,7 @@ const StorageItem = ({ item, onEdit, onMigrate }: Props) => {
   const dispatch = useDispatch<Dispatch>();
 
   const { t } = useTranslation(['storage']);
+  const { loadProjectTokens, activeProject } = useAuthStore();
 
   // Check if this is a Bitbucket item using app password
   const isBitbucketWithAppPassword = React.useMemo(() => (
@@ -64,6 +67,24 @@ const StorageItem = ({ item, onEdit, onMigrate }: Props) => {
   }, [deleteProvider, item, askUserIfDelete, setStorageType, dispatch.uiState, dispatch.tokenState]);
 
   const handleRestore = React.useCallback(async () => {
+    if (isOAuthApp) {
+      if (activeProject?.id) {
+        try {
+          await loadProjectTokens(activeProject.id);
+          dispatch.uiState.setLocalApiState(item);
+          setStorageType({
+            provider: item,
+            shouldSetInDocument: true,
+          });
+          setHasErrored(false);
+        } catch (e: any) {
+          setHasErrored(true);
+          setErrorMessage(e.message || 'Failed to load project tokens');
+        }
+      }
+      return;
+    }
+
     const response = await restoreStoredProvider(item);
     if (response.status === 'success') {
       setHasErrored(false);
@@ -71,7 +92,7 @@ const StorageItem = ({ item, onEdit, onMigrate }: Props) => {
       setHasErrored(true);
       setErrorMessage(response?.errorMessage);
     }
-  }, [item, restoreStoredProvider]);
+  }, [item, restoreStoredProvider, isOAuthApp, activeProject, loadProjectTokens, dispatch.uiState, setStorageType]);
 
   return (
     <StyledStorageItem data-testid={`storageitem-${provider}-${id}`} key={`${provider}-${id}`} active={isActive()} hasError={isBitbucketWithAppPassword}>
@@ -126,50 +147,59 @@ const StorageItem = ({ item, onEdit, onMigrate }: Props) => {
             </Stack>
           </Stack>
           {hasErrored && isActive() && (
-          <Box
-            css={{
-              display: 'flex',
-              flexDirection: 'row',
-              color: '$dangerFg',
-              gap: '$3',
-              marginTop: '$3',
-            }}
-            data-testid="error-message"
-          >
-            <ExclamationTriangleIcon />
-            {errorMessage}
-          </Box>
+            <Box
+              css={{
+                display: 'flex',
+                flexDirection: 'row',
+                color: '$dangerFg',
+                gap: '$3',
+                marginTop: '$3',
+              }}
+              data-testid="error-message"
+            >
+              <ExclamationTriangleIcon />
+              {errorMessage}
+            </Box>
           )}
         </Stack>
         <Box css={{ marginRight: '$1' }}>
           {isActive() ? (
             <Stack gap={2} align="center">
               {storageType.provider !== StorageProviderType.TOKENS_STUDIO && (
-              <TokenFormatBadge extended />
+                <TokenFormatBadge extended />
               )}
-              <Badge>{t('active')}</Badge>
+              {isOAuthApp ? (
+                <StudioProjectSelector />
+              ) : (
+                <Badge>{t('active')}</Badge>
+              )}
             </Stack>
           ) : (
-            <Button data-testid="button-storage-item-apply" variant="secondary" size="small" onClick={handleRestore}>
-              {t('apply')}
-            </Button>
+            <Stack gap={2} align="center">
+              {isOAuthApp && <StudioProjectSelector />}
+              <Button data-testid="button-storage-item-apply" variant="secondary" size="small" onClick={handleRestore}>
+                {t('apply')}
+              </Button>
+            </Stack>
           )}
         </Box>
-        <DropdownMenu>
-          <DropdownMenu.Trigger asChild data-testid="storage-item-tools-dropdown">
-            <IconButton icon={<DotsVerticalIcon />} variant="invisible" size="small" />
-          </DropdownMenu.Trigger>
-          <DropdownMenu.Portal>
-            <DropdownMenu.Content>
-              <DropdownMenu.Item textValue={t('edit')} onSelect={onEdit}>
-                {t('edit')}
-              </DropdownMenu.Item>
-              <DropdownMenu.Item textValue={t('delete')} onSelect={handleDelete} css={{ color: '$dangerFg' }}>
-                {t('delete')}
-              </DropdownMenu.Item>
-            </DropdownMenu.Content>
-          </DropdownMenu.Portal>
-        </DropdownMenu>
+        {!isOAuthApp && (
+          <DropdownMenu>
+            <DropdownMenu.Trigger asChild data-testid="storage-item-tools-dropdown">
+              <IconButton icon={<DotsVerticalIcon />} variant="invisible" size="small" />
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Portal>
+              <DropdownMenu.Content>
+                <DropdownMenu.Item textValue={t('edit')} onSelect={onEdit}>
+                  {t('edit')}
+                </DropdownMenu.Item>
+                <DropdownMenu.Item textValue={t('delete')} onSelect={handleDelete} css={{ color: '$dangerFg' }}>
+                  {t('delete')}
+                </DropdownMenu.Item>
+              </DropdownMenu.Content>
+            </DropdownMenu.Portal>
+          </DropdownMenu>
+        )}
       </div>
       {isBitbucketWithAppPassword && (
         <Box
@@ -209,12 +239,12 @@ const StorageItem = ({ item, onEdit, onMigrate }: Props) => {
             </Box>
           </Box>
           {onMigrate && (
-          <Button
-            size="small"
-            onClick={onMigrate}
-          >
-            {t('providers.bitbucketMigration.migrate')}
-          </Button>
+            <Button
+              size="small"
+              onClick={onMigrate}
+            >
+              {t('providers.bitbucketMigration.migrate')}
+            </Button>
           )}
         </Box>
       )}

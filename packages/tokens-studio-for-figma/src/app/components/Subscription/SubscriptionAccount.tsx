@@ -1,7 +1,14 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { styled } from '@/stitches.config';
-import { Button, TextInput } from '@tokens-studio/ui';
+import {
+    Box,
+    Button,
+    Heading,
+    Text,
+    TextInput,
+    DropdownMenu,
+} from '@tokens-studio/ui';
 import { licenseKeySelector } from '@/selectors/licenseKeySelector';
 import { licenseKeyErrorSelector } from '@/selectors/licenseKeyErrorSelector';
 import { userIdSelector } from '@/selectors/userIdSelector';
@@ -11,9 +18,9 @@ import { addLicenseKey } from '@/utils/addLicenseKey';
 import useConfirm from '@/app/hooks/useConfirm';
 import { OAuthLogin } from '../Login/OAuthLogin';
 import { useAuthStore } from '@/app/store/useAuthStore';
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@radix-ui/react-dropdown-menu';
 import { CaretDownIcon } from '@radix-ui/react-icons';
 import { ErrorMessage } from '../ErrorMessage';
+import { StudioProjectSelector } from './StudioProjectSelector';
 // ─── Styled ──────────────────────────────────────────────────────────
 
 const ContentBox = styled('div', {
@@ -177,7 +184,7 @@ const OrgDropdownTriggerBtn = styled('button', {
     }
 });
 
-const StyledDropdownContent = styled(DropdownMenuContent, {
+const StyledDropdownContent = styled(DropdownMenu.Content, {
     minWidth: 200,
     backgroundColor: '$bgDefault',
     borderRadius: '$medium',
@@ -187,7 +194,7 @@ const StyledDropdownContent = styled(DropdownMenuContent, {
     zIndex: 10,
 });
 
-const StyledDropdownItem = styled(DropdownMenuItem, {
+const StyledDropdownItem = styled(DropdownMenu.Item, {
     fontSize: '$small',
     padding: '$2 $3',
     borderRadius: '$small',
@@ -293,7 +300,7 @@ export default function SubscriptionAccount() {
                                 <SectionTitle>Organisation</SectionTitle>
                                 <ItemCard>
                                     <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
+                                        <DropdownMenu.Trigger asChild>
                                             <OrgDropdownTriggerBtn>
                                                 {activeOrganization.avatarUrl ? (
                                                     <Avatar src={activeOrganization.avatarUrl} style={{ width: 24, height: 24, borderRadius: '4px' }} alt="" />
@@ -305,7 +312,7 @@ export default function SubscriptionAccount() {
                                                 {activeOrganization.name}
                                                 <CaretDownIcon style={{ marginLeft: '4px', color: 'var(--colors-fgMuted)' }} />
                                             </OrgDropdownTriggerBtn>
-                                        </DropdownMenuTrigger>
+                                        </DropdownMenu.Trigger>
                                         <StyledDropdownContent>
                                             {organizations.map((org) => (
                                                 <StyledDropdownItem
@@ -327,32 +334,7 @@ export default function SubscriptionAccount() {
                             <div>
                                 <SectionTitle>Project</SectionTitle>
                                 <ItemCard>
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild disabled={!activeOrganization.projects?.data?.length}>
-                                            <OrgDropdownTriggerBtn disabled={!activeOrganization.projects?.data?.length}>
-                                                <AvatarFallback style={{ width: 24, height: 24, fontSize: '12px', borderRadius: '4px' }}>
-                                                    {activeProject?.name[0] || 'P'}
-                                                </AvatarFallback>
-                                                {activeProject?.name || (!activeOrganization.projects?.data?.length ? 'No projects found' : 'Select Project')}
-                                                <CaretDownIcon style={{ marginLeft: '4px', color: 'var(--colors-fgMuted)' }} />
-                                            </OrgDropdownTriggerBtn>
-                                        </DropdownMenuTrigger>
-                                        {activeOrganization.projects?.data?.length > 0 && (
-                                            <StyledDropdownContent>
-                                                {activeOrganization.projects.data.map((project) => (
-                                                    <StyledDropdownItem
-                                                        key={project.id}
-                                                        onClick={() => {
-                                                            setActiveProject(project.id);
-                                                            loadProjectTokens(project.id);
-                                                        }}
-                                                    >
-                                                        {project.name}
-                                                    </StyledDropdownItem>
-                                                ))}
-                                            </StyledDropdownContent>
-                                        )}
-                                    </DropdownMenu>
+                                    <StudioProjectSelector />
                                     <Button variant="secondary">Manage Project</Button>
                                 </ItemCard>
                             </div>
@@ -424,8 +406,8 @@ export default function SubscriptionAccount() {
                                 To activate plan go through registration process and then check your email or this link{' '}
                                 <InlineLink href="https://account.tokens.studio/email-login" target="_blank" rel="noreferrer">
                                     https://account.tokens.studio/email-login
-                                </InlineLink>{' '}
-                                to grab license key
+                                </InlineLink>
+                                {' '}to grab license key
                             </SectionCaption>
 
                             <InputRow>
