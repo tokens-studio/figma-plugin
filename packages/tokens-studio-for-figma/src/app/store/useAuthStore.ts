@@ -4,6 +4,11 @@ import { OAuthError } from '@/types/OAuthError';
 import type { OAuthTokens, UserData, Organization, Project } from '@/types/oauth';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
+import { fetchProjectDataRest } from '@/utils/tokensStudio/fetchProjectDataRest';
+import { store } from '@/app/store';
+import { notifyToUI } from '@/plugin/notifiers';
+import compact from 'just-compact';
+import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 
 interface DeviceCodeState {
     userCode: string;
@@ -30,6 +35,7 @@ interface AuthState {
     setOAuthTokens: (tokens: OAuthTokens | null) => Promise<void>;
     fetchUserData: (tokens: OAuthTokens) => Promise<void>;
     fetchProjects: (orgId: string) => Promise<void>;
+    loadProjectTokens: (projectId: string) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -327,6 +333,54 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             }
         } catch (err) {
             console.warn('Failed to fetch projects:', err);
+        }
+    },
+
+    loadProjectTokens: async (projectId: string) => {
+        const { oauthTokens, activeOrganization } = get();
+        if (!oauthTokens || !activeOrganization) return;
+
+        set({ isLoading: true });
+
+        const studioUrl = 'production.tokens.studio';
+        const apiBaseUrl = OAuthService.getApiBaseUrl(studioUrl);
+
+        try {
+            const projectData = await fetchProjectDataRest(
+                oauthTokens.accessToken,
+                apiBaseUrl,
+                projectId
+            );
+
+            if (projectData && projectData.tokens) {
+                // Apply token set order and dispatch to Redux store
+                const { tokens, themes, tokenSetOrder } = projectData;
+
+                store.dispatch.tokenState.setTokenData({
+                    values: tokens as any,
+                    themes: themes,
+                    activeTheme: {},
+                    hasChangedRemote: false,
+                });
+
+                store.dispatch.tokenState.setRemoteData({
+                    tokens: tokens as any,
+                    themes,
+                    metadata: { tokenSetOrder },
+                });
+
+                const stringifiedRemoteTokens = JSON.stringify(compact([tokens, themes, TokenFormat.format]), null, 2);
+                store.dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
+
+                notifyToUI('Successfully loaded project tokens', { error: false });
+            } else {
+                notifyToUI('Project has no tokens or could not load tokens.', { error: true });
+            }
+        } catch (error) {
+            console.error('Failed to load project tokens:', error);
+            notifyToUI('Failed to load project tokens', { error: true });
+        } finally {
+            set({ isLoading: false });
         }
     }
 }));

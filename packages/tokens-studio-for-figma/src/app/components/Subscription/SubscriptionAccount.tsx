@@ -220,6 +220,7 @@ export default function SubscriptionAccount() {
         setActiveOrganization,
         activeProject,
         setActiveProject,
+        loadProjectTokens,
         logout,
     } = useAuthStore();
 
@@ -341,7 +342,10 @@ export default function SubscriptionAccount() {
                                                 {activeOrganization.projects.data.map((project) => (
                                                     <StyledDropdownItem
                                                         key={project.id}
-                                                        onClick={() => setActiveProject(project.id)}
+                                                        onClick={() => {
+                                                            setActiveProject(project.id);
+                                                            loadProjectTokens(project.id);
+                                                        }}
                                                     >
                                                         {project.name}
                                                     </StyledDropdownItem>
