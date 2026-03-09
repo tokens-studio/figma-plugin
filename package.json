@@ -37,7 +37,9 @@
   },
   "resolutions": {
     "react": "^18",
-    "@radix-ui/react-dismissable-layer": "1.0.5"
+    "@radix-ui/react-dismissable-layer": "1.0.5",
+    "react-remove-scroll": "2.5.5",
+    "react-style-singleton": "2.2.1"
   },
   "dependencies": {
     "@changesets/cli": "^2.26.2",
