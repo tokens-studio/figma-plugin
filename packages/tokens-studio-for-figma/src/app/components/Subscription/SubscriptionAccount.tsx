@@ -331,13 +331,6 @@ export default function SubscriptionAccount() {
                                 </ItemCard>
                             </div>
 
-                            <div>
-                                <SectionTitle>Project</SectionTitle>
-                                <ItemCard>
-                                    <StudioProjectSelector />
-                                    <Button variant="secondary" onClick={() => window.open(`https://production.tokens.studio/projects/${activeProject?.id}`, '_blank')} disabled={!activeProject}>Manage Project</Button>
-                                </ItemCard>
-                            </div>
 
                             <div>
                                 <SectionTitle>Current plan</SectionTitle>
