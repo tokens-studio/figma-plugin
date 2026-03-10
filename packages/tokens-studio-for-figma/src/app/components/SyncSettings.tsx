@@ -75,7 +75,7 @@ const SyncSettings = () => {
     if (isAuthenticated && activeOrganization) {
       list = [
         {
-          provider: StorageProviderType.TOKENS_STUDIO,
+          provider: StorageProviderType.TOKENS_STUDIO_OAUTH,
           internalId: `tokens-studio-${activeOrganization.id}`,
           name: activeOrganization.name,
           orgId: activeOrganization.id,
@@ -231,7 +231,6 @@ const SyncSettings = () => {
                 onEdit={handleEditClick(item)}
                 onMigrate={handleEditClick(item, true)}
                 item={item}
-                isOAuthApp={item.provider === StorageProviderType.TOKENS_STUDIO && item.internalId?.startsWith('tokens-studio-')}
               />
             ))}
           </Stack>

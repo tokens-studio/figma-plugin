@@ -3,6 +3,12 @@ import { CaretDownIcon } from '@radix-ui/react-icons';
 import { DropdownMenu } from '@tokens-studio/ui';
 import { styled } from '@/stitches.config';
 import { useAuthStore } from '@/app/store/useAuthStore';
+import { useDispatch, useSelector } from 'react-redux';
+import { storageTypeSelector } from '@/selectors';
+import { StorageProviderType } from '@/constants/StorageProviderType';
+import { TokensStudioStorageType } from '@/types/StorageType';
+import useStorage from '@/app/store/useStorage';
+import { Dispatch } from '@/app/store';
 
 const Avatar = styled('img', {
     width: 16,
@@ -72,6 +78,9 @@ const StyledDropdownItem = styled(DropdownMenu.Item, {
 
 export const StudioProjectSelector = () => {
     const { activeOrganization, activeProject, setActiveProject, loadProjectTokens } = useAuthStore();
+    const storageType = useSelector(storageTypeSelector);
+    const dispatch = useDispatch<Dispatch>();
+    const { setStorageType } = useStorage();
 
     if (!activeOrganization) return null;
 
@@ -93,8 +102,26 @@ export const StudioProjectSelector = () => {
                     {activeOrganization.projects.data.map((project) => (
                         <StyledDropdownItem
                             key={project.id}
-                            onClick={() => {
+                            onClick={async () => {
                                 setActiveProject(project.id);
+
+                                // Auto-load tokens if Provider is currently active
+                                if (
+                                    storageType.provider === StorageProviderType.TOKENS_STUDIO_OAUTH &&
+                                    (storageType as any).internalId?.startsWith('tokens-studio-')
+                                ) {
+                                    try {
+                                        await loadProjectTokens(project.id);
+                                        const newProviderData = {
+                                            ...storageType,
+                                            id: project.id,
+                                        };
+                                        dispatch.uiState.setLocalApiState(newProviderData as any);
+                                        setStorageType({ provider: newProviderData as any, shouldSetInDocument: true });
+                                    } catch (e) {
+                                        console.error('Failed to load project tokens for active provider', e);
+                                    }
+                                }
                             }}
                         >
                             {project.name}

@@ -5,7 +5,7 @@ import type { StartupMessage } from '@/types/AsyncMessages';
 import type { Dispatch, RootState } from '@/app/store';
 import { Tabs } from '@/constants/Tabs';
 import { storageTypeSelector } from '@/selectors';
-import { StorageProviderType } from '@/constants/StorageProviderType';
+import { StorageProviderType, StorageTypeCredentials } from '@/types/StorageType';
 import useConfirm from '@/app/hooks/useConfirm';
 import isSameCredentials from '@/utils/isSameCredentials';
 import { track } from '@/utils/analytics';
@@ -38,9 +38,25 @@ export function pullTokensFactory(
     const storageType = storageTypeSelector(state);
 
     if (isRemoteStorage) {
-      const matchingSet = params.localApiProviders?.find((provider) => (
+      let matchingSet = params.localApiProviders?.find((provider) => (
         isSameCredentials(provider, storageType)
       ));
+
+      // If no matching set found but we are authenticated via Tokens Studio OAuth, create a synthetic matching set
+      if (
+        !matchingSet
+        && (
+          storageType.provider === StorageProviderType.TOKENS_STUDIO_OAUTH
+          || (storageType.provider === StorageProviderType.TOKENS_STUDIO && (storageType as any).internalId?.startsWith('tokens-studio-'))
+        )
+        && params.oauthTokens
+      ) {
+        matchingSet = {
+          ...storageType,
+          provider: StorageProviderType.TOKENS_STUDIO_OAUTH,
+          secret: params.oauthTokens.accessToken,
+        } as StorageTypeCredentials;
+      }
 
       if (matchingSet) {
         // found API credentials
@@ -149,10 +165,11 @@ export function pullTokensFactory(
       StorageProviderType.URL,
       StorageProviderType.SUPERNOVA,
       StorageProviderType.TOKENS_STUDIO,
+      StorageProviderType.TOKENS_STUDIO_OAUTH,
     ].includes(storageType.provider);
 
     const hasLocalData = params.localTokenData
-                         && Object.values(params.localTokenData?.values ?? {}).some((value) => value.length > 0);
+      && Object.values(params.localTokenData?.values ?? {}).some((value) => value.length > 0);
 
     // Check if storage is remote and local data is empty
     if (isRemoteStorage && !hasLocalData) {

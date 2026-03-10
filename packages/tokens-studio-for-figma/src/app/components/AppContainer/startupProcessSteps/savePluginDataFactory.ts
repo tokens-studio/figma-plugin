@@ -43,8 +43,8 @@ export function savePluginDataFactory(dispatch: Dispatch, params: StartupMessage
 
       // Restore OAuth tokens
       if (params.oauthTokens) {
-        useAuthStore.getState().setOAuthTokens(params.oauthTokens);
-        useAuthStore.getState().fetchUserData(params.oauthTokens);
+        await useAuthStore.getState().setOAuthTokens(params.oauthTokens);
+        await useAuthStore.getState().fetchUserData(params.oauthTokens);
       }
     } else {
       throw new Error('User not found');

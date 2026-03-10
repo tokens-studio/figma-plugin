@@ -37,6 +37,7 @@ interface AuthState {
     fetchUserData: (tokens: OAuthTokens) => Promise<void>;
     fetchProjects: (orgId: string) => Promise<void>;
     loadProjectTokens: (projectId: string) => Promise<void>;
+    refreshTokens: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -187,6 +188,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     },
 
     fetchUserData: async (tokens: OAuthTokens) => {
+        let currentTokens = tokens;
+        if (OAuthService.needsRefresh(currentTokens)) {
+            try {
+                await get().refreshTokens();
+                currentTokens = get().oauthTokens!;
+            } catch (err) {
+                console.error('Failed to refresh tokens during fetchUserData', err);
+                // Continue with old tokens, might fail but we already have an error handler
+            }
+        }
         const studioUrl = 'production.tokens.studio';
         const apiBaseUrl = OAuthService.getApiBaseUrl(studioUrl);
 
@@ -392,6 +403,22 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             notifyToUI('Failed to load project tokens', { error: true });
         } finally {
             set({ isLoading: false });
+        }
+    },
+
+    refreshTokens: async () => {
+        const { oauthTokens } = get();
+        if (!oauthTokens || !oauthTokens.refreshToken) return;
+
+        try {
+            const studioUrl = 'production.tokens.studio';
+            const newTokens = await OAuthService.refreshTokens(null, oauthTokens.refreshToken, studioUrl);
+            await get().setOAuthTokens(newTokens);
+        } catch (error) {
+            console.error('Failed to refresh tokens:', error);
+            // If refresh fails, we might want to logout or show error
+            // set({ isAuthenticated: false, oauthTokens: null });
+            throw error;
         }
     }
 }));

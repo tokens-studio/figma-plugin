@@ -15,6 +15,6 @@ export function useIsProUser() {
   const { isPro } = useAuthStore();
 
   return useMemo(() => (
-    Boolean(existingKey && !licenseKeyError) || Boolean(validPAT && storageType?.provider === StorageProviderType.TOKENS_STUDIO) || isPro
+    Boolean(existingKey && !licenseKeyError) || Boolean(validPAT && (storageType?.provider === StorageProviderType.TOKENS_STUDIO || storageType?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH)) || isPro
   ), [existingKey, licenseKeyError, validPAT, storageType, isPro]);
 }

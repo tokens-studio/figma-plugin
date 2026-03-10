@@ -39,6 +39,7 @@ const StorageItem = ({ item, onEdit, onMigrate, isOAuthApp }: Props) => {
 
   const { t } = useTranslation(['storage']);
   const { loadProjectTokens, activeProject } = useAuthStore();
+  const isOAuth = React.useMemo(() => item.provider === StorageProviderType.TOKENS_STUDIO_OAUTH, [item]);
 
   // Check if this is a Bitbucket item using app password
   const isBitbucketWithAppPassword = React.useMemo(() => (
@@ -67,7 +68,7 @@ const StorageItem = ({ item, onEdit, onMigrate, isOAuthApp }: Props) => {
   }, [deleteProvider, item, askUserIfDelete, setStorageType, dispatch.uiState, dispatch.tokenState]);
 
   const handleRestore = React.useCallback(async () => {
-    if (isOAuthApp) {
+    if (isOAuth) {
       if (activeProject?.id) {
         try {
           await loadProjectTokens(activeProject.id);
@@ -165,10 +166,10 @@ const StorageItem = ({ item, onEdit, onMigrate, isOAuthApp }: Props) => {
         <Box css={{ marginRight: '$1' }}>
           {isActive() ? (
             <Stack gap={2} align="center">
-              {storageType.provider !== StorageProviderType.TOKENS_STUDIO && (
+              {storageType.provider !== StorageProviderType.TOKENS_STUDIO && storageType.provider !== StorageProviderType.TOKENS_STUDIO_OAUTH && (
                 <TokenFormatBadge extended />
               )}
-              {isOAuthApp ? (
+              {isOAuth ? (
                 <StudioProjectSelector />
               ) : (
                 <Badge>{t('active')}</Badge>
@@ -176,14 +177,14 @@ const StorageItem = ({ item, onEdit, onMigrate, isOAuthApp }: Props) => {
             </Stack>
           ) : (
             <Stack gap={2} align="center">
-              {isOAuthApp && <StudioProjectSelector />}
+              {isOAuth && <StudioProjectSelector />}
               <Button data-testid="button-storage-item-apply" variant="secondary" size="small" onClick={handleRestore}>
                 {t('apply')}
               </Button>
             </Stack>
           )}
         </Box>
-        {!isOAuthApp && (
+        {!isOAuth && (
           <DropdownMenu>
             <DropdownMenu.Trigger asChild data-testid="storage-item-tools-dropdown">
               <IconButton icon={<DotsVerticalIcon />} variant="invisible" size="small" />
