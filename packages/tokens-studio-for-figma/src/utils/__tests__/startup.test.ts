@@ -8,7 +8,6 @@ describe('startup', () => {
     expect(result).toEqual({
       settings: {},
       activeTheme: {},
-      authData: null,
       lastOpened: 0,
       onboardingExplainer: {
         exportSets: true,
@@ -22,6 +21,8 @@ describe('startup', () => {
       initialLoad: false,
       localTokenData: null,
       user: null,
+      authData: null,
+      oauthTokens: null,
       usedEmail: null,
       selectedExportThemes: [],
     });
@@ -48,7 +49,6 @@ describe('startup', () => {
     expect(result).toEqual({
       settings: {},
       activeTheme: {},
-      authData: null,
       lastOpened: 0,
       onboardingExplainer: {
         exportSets: true,
@@ -80,6 +80,8 @@ describe('startup', () => {
         },
       },
       user: null,
+      authData: null,
+      oauthTokens: null,
       usedEmail: null,
       selectedExportThemes: [],
     });
