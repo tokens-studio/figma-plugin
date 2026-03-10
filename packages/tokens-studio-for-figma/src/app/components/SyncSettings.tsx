@@ -173,30 +173,30 @@ const SyncSettings = () => {
 
                   <Stack direction="column" gap={4}>
                     {
-                      providers.map((provider) => (
-                        <Stack direction="row" justify="between" align="center" key={provider.text}>
-                          <Stack direction="column">
-                            <Box css={{
-                              color: '$fgDefault', display: 'inline-flex', gap: '$2', alignItems: 'center',
-                            }}
-                            >
-                              <Box css={{ color: '$fgMuted' }}>{getProviderIcon(provider.type)}</Box>
-                              {provider.text}
-                              {provider.beta && <StyledBetaBadge>BETA</StyledBetaBadge>}
-                            </Box>
-                          </Stack>
-                          <Button
-                            key={provider.type}
-                            onClick={handleProviderClick(provider.type)}
-                            variant="secondary"
-                            size="small"
-                            data-testid={`add-${provider.text}-credential`}
+                    providers.map((provider) => (
+                      <Stack direction="row" justify="between" align="center" key={provider.text}>
+                        <Stack direction="column">
+                          <Box css={{
+                            color: '$fgDefault', display: 'inline-flex', gap: '$2', alignItems: 'center',
+                          }}
                           >
-                            {t('choose')}
-                          </Button>
+                            <Box css={{ color: '$fgMuted' }}>{getProviderIcon(provider.type)}</Box>
+                            {provider.text}
+                            {provider.beta && <StyledBetaBadge>BETA</StyledBetaBadge>}
+                          </Box>
                         </Stack>
-                      ))
-                    }
+                        <Button
+                          key={provider.type}
+                          onClick={handleProviderClick(provider.type)}
+                          variant="secondary"
+                          size="small"
+                          data-testid={`add-${provider.text}-credential`}
+                        >
+                          {t('choose')}
+                        </Button>
+                      </Stack>
+                    ))
+                  }
                   </Stack>
                 </Dialog.Content>
               </Dialog.Portal>

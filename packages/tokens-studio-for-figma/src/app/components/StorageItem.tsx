@@ -126,26 +126,26 @@ const StorageItem = ({ item, onEdit, onMigrate }: Props) => {
             </Stack>
           </Stack>
           {hasErrored && isActive() && (
-            <Box
-              css={{
-                display: 'flex',
-                flexDirection: 'row',
-                color: '$dangerFg',
-                gap: '$3',
-                marginTop: '$3',
-              }}
-              data-testid="error-message"
-            >
-              <ExclamationTriangleIcon />
-              {errorMessage}
-            </Box>
+          <Box
+            css={{
+              display: 'flex',
+              flexDirection: 'row',
+              color: '$dangerFg',
+              gap: '$3',
+              marginTop: '$3',
+            }}
+            data-testid="error-message"
+          >
+            <ExclamationTriangleIcon />
+            {errorMessage}
+          </Box>
           )}
         </Stack>
         <Box css={{ marginRight: '$1' }}>
           {isActive() ? (
             <Stack gap={2} align="center">
               {storageType.provider !== StorageProviderType.TOKENS_STUDIO && (
-                <TokenFormatBadge extended />
+              <TokenFormatBadge extended />
               )}
               <Badge>{t('active')}</Badge>
             </Stack>
@@ -209,12 +209,12 @@ const StorageItem = ({ item, onEdit, onMigrate }: Props) => {
             </Box>
           </Box>
           {onMigrate && (
-            <Button
-              size="small"
-              onClick={onMigrate}
-            >
-              {t('providers.bitbucketMigration.migrate')}
-            </Button>
+          <Button
+            size="small"
+            onClick={onMigrate}
+          >
+            {t('providers.bitbucketMigration.migrate')}
+          </Button>
           )}
         </Box>
       )}

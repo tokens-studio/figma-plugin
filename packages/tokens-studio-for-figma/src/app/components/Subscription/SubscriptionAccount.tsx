@@ -20,7 +20,6 @@ import { OAuthLogin } from '../Login/OAuthLogin';
 import { useAuthStore } from '@/app/store/useAuthStore';
 import { CaretDownIcon } from '@radix-ui/react-icons';
 import { ErrorMessage } from '../ErrorMessage';
-import { StudioProjectSelector } from './StudioProjectSelector';
 // ─── Styled ──────────────────────────────────────────────────────────
 
 const ContentBox = styled('div', {
@@ -225,9 +224,6 @@ export default function SubscriptionAccount() {
         organizations,
         activeOrganization,
         setActiveOrganization,
-        activeProject,
-        setActiveProject,
-        loadProjectTokens,
         logout,
     } = useAuthStore();
 

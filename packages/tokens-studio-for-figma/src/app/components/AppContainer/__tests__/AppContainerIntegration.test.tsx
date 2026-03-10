@@ -42,7 +42,6 @@ const mockUser = {
   name: 'Jan Six',
 };
 
-// @ts-ignore
 const mockSettings: SavedSettings = {
   language: 'en',
   width: 800,
@@ -121,7 +120,6 @@ const mockStartupParams: Omit<StartupMessage, 'licenseKey'> = {
   lastOpened: Date.now(),
   onboardingExplainer: {
     sets: true,
-    exportSets: true,
     inspect: true,
     syncProviders: true,
   },
@@ -138,15 +136,8 @@ const mockStartupParams: Omit<StartupMessage, 'licenseKey'> = {
     usedTokenSet: {},
     updatedAt: new Date().toISOString(),
     values: {},
-    collapsedTokenSets: null,
-    tokenFormat: null,
     version: '91',
   },
-  oauthTokens: null,
-  initialLoad: true,
-  usedEmail: null,
-  authData: null,
-  selectedExportThemes: [],
 };
 
 // #region helpers
@@ -225,69 +216,69 @@ describe('AppContainer (integration)', () => {
 
   it(
     'shows the start screen in a blank file', (
-    withOrWithoutLicense({
-      ...mockStartupParams,
-      localTokenData: null,
-      lastOpened: 1,
-    }, async (params) => {
-      const mockStore = createMockStore({});
-      const result = render(
-        <Provider store={mockStore}>
-          <AppContainer {...params} />
-        </Provider>,
-      );
-      waitFor(async () => {
-        expect(await result.findByText('Getting started')).not.toBeUndefined();
-        result.unmount();
-      }, { timeout: 10000 });
-    })
-  ),
+      withOrWithoutLicense({
+        ...mockStartupParams,
+        localTokenData: null,
+        lastOpened: 1,
+      }, async (params) => {
+        const mockStore = createMockStore({});
+        const result = render(
+          <Provider store={mockStore}>
+            <AppContainer {...params} />
+          </Provider>,
+        );
+        waitFor(async () => {
+          expect(await result.findByText('Getting started')).not.toBeUndefined();
+          result.unmount();
+        }, { timeout: 10000 });
+      })
+    ),
   );
 
   it(
     'shows the onboarding flow modal', (
-    withOrWithoutLicense({
-      ...mockStartupParams,
-      localTokenData: null,
-      lastOpened: 0,
-    }, async (params) => {
-      const mockStore = createMockStore({});
-      const result = render(
-        <Provider store={mockStore}>
-          <AppContainer {...params} />
-        </Provider>,
-      );
-      waitFor(async () => {
-        expect(await result.findByText('Getting started')).not.toBeUndefined();
-        result.unmount();
-      }, { timeout: 10000 });
-    })
-  ),
+      withOrWithoutLicense({
+        ...mockStartupParams,
+        localTokenData: null,
+        lastOpened: 0,
+      }, async (params) => {
+        const mockStore = createMockStore({});
+        const result = render(
+          <Provider store={mockStore}>
+            <AppContainer {...params} />
+          </Provider>,
+        );
+        waitFor(async () => {
+          expect(await result.findByText('Getting started')).not.toBeUndefined();
+          result.unmount();
+        }, { timeout: 10000 });
+      })
+    ),
   );
 
   it(
     'shows the tokens screen if local tokens are found', (
-    withOrWithoutLicense({
-      ...mockStartupParams,
-      localTokenData: {
-        ...mockStartupParams.localTokenData,
-        checkForChanges: false,
-        values: mockValues,
-      } as StartupMessage['localTokenData'],
-    }, async (params) => {
-      const mockStore = createMockStore({});
+      withOrWithoutLicense({
+        ...mockStartupParams,
+        localTokenData: {
+          ...mockStartupParams.localTokenData,
+          checkForChanges: false,
+          values: mockValues,
+        } as StartupMessage['localTokenData'],
+      }, async (params) => {
+        const mockStore = createMockStore({});
 
-      const result = render(
-        <Provider store={mockStore}>
-          <AppContainer {...params} />
-        </Provider>,
-      );
-      waitFor(async () => {
-        expect(await result.findAllByText('global')).toHaveLength(1);
-        result.unmount();
-      }, { timeout: 10000 });
-    })
-  ),
+        const result = render(
+          <Provider store={mockStore}>
+            <AppContainer {...params} />
+          </Provider>,
+        );
+        waitFor(async () => {
+          expect(await result.findAllByText('global')).toHaveLength(1);
+          result.unmount();
+        }, { timeout: 10000 });
+      })
+    ),
   );
 
   it('shows pull dialog if there are local changes with a remote storage provider', withOrWithoutLicense({
