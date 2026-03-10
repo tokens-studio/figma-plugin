@@ -205,4 +205,3 @@ describe('updateVariablesFromPlugin', () => {
     });
   });
 });
-

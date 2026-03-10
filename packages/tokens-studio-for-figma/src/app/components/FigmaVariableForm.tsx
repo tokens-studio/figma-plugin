@@ -79,7 +79,6 @@ export default function FigmaVariableForm({
     handleFigmaVariableChange(newScopes, currentCodeSyntax, currentHiddenFromPublishing);
   }, [currentScopes, currentCodeSyntax, currentHiddenFromPublishing, handleFigmaVariableChange]);
 
-
   const handleCodeSyntaxPlatformChange = useCallback((platform: CodeSyntaxPlatform, checked: boolean) => {
     const newCodeSyntax = { ...currentCodeSyntax };
     if (checked) {
