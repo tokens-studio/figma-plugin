@@ -17,7 +17,6 @@ import { StorageTypeCredentials } from '@/types/StorageType';
 import LocalStorageItem from './LocalStorageItem';
 import { getProviderIcon } from '@/utils/getProviderIcon';
 import { StyledBetaBadge } from './StyledBetaBadge';
-import { useAuthStore } from '@/app/store/useAuthStore';
 
 const SyncSettings = () => {
   const localApiState = useSelector(localApiStateSelector);
@@ -67,25 +66,6 @@ const SyncSettings = () => {
 
   const apiProviders = useSelector(apiProvidersSelector);
   const dispatch = useDispatch<Dispatch>();
-
-  const { isAuthenticated, activeOrganization, activeProject } = useAuthStore();
-
-  const renderedProviders = React.useMemo(() => {
-    let list = [...apiProviders];
-    if (isAuthenticated && activeOrganization) {
-      list = [
-        {
-          provider: StorageProviderType.TOKENS_STUDIO,
-          internalId: `tokens-studio-${activeOrganization.id}`,
-          name: activeOrganization.name,
-          orgId: activeOrganization.id,
-          id: activeProject?.id || '',
-        } as StorageTypeCredentials,
-        ...list,
-      ];
-    }
-    return list;
-  }, [apiProviders, isAuthenticated, activeOrganization, activeProject]);
 
   const [open, setOpen] = React.useState(false);
 
@@ -225,13 +205,12 @@ const SyncSettings = () => {
 
           <Stack direction="column" gap={2} width="full" align="start">
             <LocalStorageItem />
-            {renderedProviders.length > 0 && renderedProviders.map((item) => (
+            {apiProviders.length > 0 && apiProviders.map((item) => (
               <StorageItem
                 key={item?.internalId || `${item.provider}-${item.id}`}
                 onEdit={handleEditClick(item)}
                 onMigrate={handleEditClick(item, true)}
                 item={item}
-                isOAuthApp={item.provider === StorageProviderType.TOKENS_STUDIO && item.internalId?.startsWith('tokens-studio-')}
               />
             ))}
           </Stack>
