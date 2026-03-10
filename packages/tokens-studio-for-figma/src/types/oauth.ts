@@ -81,7 +81,7 @@ export type Organization = {
     slug?: string;
     subscription?: {
         id: string;
-        status: string;
+        subscription_status?: string;
         plan: {
             id: string;
             name: string;

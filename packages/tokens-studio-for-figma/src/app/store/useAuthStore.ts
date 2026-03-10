@@ -25,6 +25,7 @@ interface AuthState {
     activeProject: Project | null;
     error: string | null;
     isLoading: boolean;
+    isPro: boolean;
     deviceCode: DeviceCodeState | null; // Device code info for UI display
     _deviceCodeAbortController: AbortController | null;
     loginWithOAuth: () => Promise<void>;
@@ -47,6 +48,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     activeProject: null,
     error: null,
     isLoading: false,
+    isPro: false,
     deviceCode: null,
     _deviceCodeAbortController: null,
 
@@ -137,6 +139,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             organizations: [],
             activeOrganization: null,
             activeProject: null,
+            isPro: false,
             deviceCode: null,
             error: null,
         });
@@ -253,6 +256,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
                         subscription: org.type && org.attributes ? org.attributes.subscription : org.subscription,
                         projects: (org.type && org.attributes ? org.attributes.projects : org.projects) || { data: [] },
                     }));
+                    console.log('useAuthStore: fetched organizations', organizations);
                 }
             } catch (err) {
                 console.warn('Could not fetch organizations via new backend, fallback missing depending on API.', err);
@@ -260,11 +264,18 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
             const activeOrganization = organizations.length > 0 ? organizations[0] : null;
 
+            const isPro = organizations.some(org => {
+                const status = org.subscription?.subscription_status;
+                return status === 'active' || status === 'trialing' || status === 'past_due';
+            });
+            console.log('useAuthStore: isPro calculation', { isPro, subscriptionStatuses: organizations.map(o => o.subscription?.subscription_status) });
+
             set({
                 user,
                 organizations,
                 activeOrganization,
                 activeProject: activeOrganization?.projects?.data?.[0] || null,
+                isPro,
                 isLoading: false,
                 isAuthenticated: true,
             });
