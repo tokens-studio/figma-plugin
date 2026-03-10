@@ -196,7 +196,7 @@ const PLANS: PlanConfig[] = [
         monthlyNote: 'No billing details required',
         ctaLabel: 'Create an Account',
         ctaVariant: 'outline',
-        ctaHref: 'https://tokens.studio/signup',
+        ctaHref: 'https://tokens.studio/trial',
     },
     {
         name: 'Starter Plus',
@@ -207,9 +207,9 @@ const PLANS: PlanConfig[] = [
         monthlyPrice: '€49',
         yearlyNote: 'per month, billed annually',
         monthlyNote: 'per month',
-        ctaLabel: 'Try for Free 30 days',
+        ctaLabel: 'Try for Free 14 days',
         ctaVariant: 'pink',
-        ctaHref: 'https://tokens.studio/signup?plan=starter-plus',
+        ctaHref: 'https://tokens.studio/trial',
     },
     {
         name: 'Essential',
@@ -220,9 +220,9 @@ const PLANS: PlanConfig[] = [
         monthlyPrice: '€199',
         yearlyNote: 'No billing details required',
         monthlyNote: 'per month',
-        ctaLabel: 'Try for Free 30 days',
+        ctaLabel: 'Try for Free 14 days',
         ctaVariant: 'orange',
-        ctaHref: 'https://tokens.studio/signup?plan=essential',
+        ctaHref: 'https://tokens.studio/trial',
     },
     {
         name: 'Organization',
@@ -233,9 +233,9 @@ const PLANS: PlanConfig[] = [
         monthlyPrice: '€599',
         yearlyNote: 'No billing details required',
         monthlyNote: 'per month',
-        ctaLabel: 'Try for Free 30 days',
+        ctaLabel: 'Try for Free 14 days',
         ctaVariant: 'purple',
-        ctaHref: 'https://tokens.studio/signup?plan=organization',
+        ctaHref: 'https://tokens.studio/trial',
     },
 ];
 
