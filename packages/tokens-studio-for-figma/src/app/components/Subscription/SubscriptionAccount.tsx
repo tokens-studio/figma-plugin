@@ -327,7 +327,7 @@ export default function SubscriptionAccount() {
                                             ))}
                                         </StyledDropdownContent>
                                     </DropdownMenu>
-                                    <Button variant="secondary">Manage Org</Button>
+                                    <Button variant="secondary" onClick={() => window.open(`https://production.tokens.studio/organizations/${activeOrganization.id}`, '_blank')}>Manage Org</Button>
                                 </ItemCard>
                             </div>
 
@@ -335,7 +335,7 @@ export default function SubscriptionAccount() {
                                 <SectionTitle>Project</SectionTitle>
                                 <ItemCard>
                                     <StudioProjectSelector />
-                                    <Button variant="secondary">Manage Project</Button>
+                                    <Button variant="secondary" onClick={() => window.open(`https://production.tokens.studio/projects/${activeProject?.id}`, '_blank')} disabled={!activeProject}>Manage Project</Button>
                                 </ItemCard>
                             </div>
 
@@ -356,7 +356,7 @@ export default function SubscriptionAccount() {
                                             <ItemCardValue>{activeOrganization.subscription?.billingDate || "Endless"}</ItemCardValue>
                                         </ItemCardColumn>
                                     </FlexGrid>
-                                    <Button variant="secondary">Manage Plan</Button>
+                                    <Button variant="secondary" onClick={() => window.open(`https://production.tokens.studio/organizations/${activeOrganization.id}/subscription`, '_blank')}>Manage Plan</Button>
                                 </ItemCard>
                             </div>
 
@@ -373,7 +373,7 @@ export default function SubscriptionAccount() {
                                             <ItemCardValue>1 of 1</ItemCardValue>
                                         </ItemCardColumn>
                                     </FlexGrid>
-                                    <Button variant="secondary">Add Seats</Button>
+                                    <Button variant="secondary" onClick={() => window.open(`https://production.tokens.studio/organizations/${activeOrganization.id}/members`, '_blank')}>Add Seats</Button>
                                 </ItemCard>
                             </div>
                         </>
