@@ -75,7 +75,7 @@ export const OAuthLogin = ({ onSuccess }: OAuthLoginProps) => {
   return (
     <div style={{ width: '100%' }}>
       <LoginRow>
-        <LoginLabel>Already have an account?</LoginLabel>
+        <LoginLabel>Already have a Studio Platform account?</LoginLabel>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           {isLoading && !deviceCode && (
             <Text muted css={{ fontSize: '$small' }}>Loading...</Text>

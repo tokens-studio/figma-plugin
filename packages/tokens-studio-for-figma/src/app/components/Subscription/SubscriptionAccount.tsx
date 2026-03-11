@@ -18,6 +18,7 @@ import { OAuthLogin } from '../Login/OAuthLogin';
 import { useAuthStore } from '@/app/store/useAuthStore';
 import { ErrorMessage } from '../ErrorMessage';
 import { Divider } from '../Divider';
+
 // ─── Styled ──────────────────────────────────────────────────────────
 
 const ContentBox = styled('div', {
@@ -49,12 +50,6 @@ const SectionRow = styled('div', {
   gap: '$3',
 });
 
-const SectionLabel = styled('span', {
-  fontSize: '$small',
-  fontWeight: '$sansBold',
-  color: '$fgDefault',
-});
-
 const SectionCaption = styled('p', {
   fontSize: '$xsmall',
   color: '$fgMuted',
@@ -66,21 +61,6 @@ const InlineLink = styled('a', {
   color: '#5ba4f5',
   textDecoration: 'none',
   '&:hover': { textDecoration: 'underline' },
-});
-
-const CopyIconButton = styled('button', {
-  width: 28,
-  height: 28,
-  flexShrink: 0,
-  border: '1px solid $borderMuted',
-  borderRadius: '$medium',
-  background: 'transparent',
-  cursor: 'pointer',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  color: '$fgMuted',
-  '&:hover': { color: '$fgDefault' },
 });
 
 const InputRow = styled('div', {
@@ -116,8 +96,8 @@ const UserDataStack = styled('div', {
 });
 
 const SectionTitle = styled('div', {
-  fontSize: '$small',
-  fontWeight: '$sansMedium',
+  fontSize: '13px',
+  fontWeight: 600,
   color: '$fgDefault',
   marginBottom: '$3',
 });
@@ -251,12 +231,6 @@ export default function SubscriptionAccount() {
     }
   }, [licenseKeyError, confirm, dispatch]);
 
-  const handleCopyKey = useCallback(() => {
-    if (existingKey) {
-      navigator.clipboard.writeText(existingKey);
-    }
-  }, [existingKey]);
-
   const handleManageOrg = useCallback(() => {
     if (activeOrganization) {
       window.open(`https://production.tokens.studio/organizations/${activeOrganization.id}`, '_blank');
@@ -375,67 +349,57 @@ export default function SubscriptionAccount() {
           </CardSection>
         </Card>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <Card>
           {/* If Not Authenticated, Show Login Component */}
-          <Card>
-            <CardSection>
-              <OAuthLogin />
-            </CardSection>
-          </Card>
+          <CardSection>
+            <OAuthLogin />
+          </CardSection>
 
-          <Card>
-            {/* License key section */}
-            <CardSection>
-              <SectionRow>
-                <SectionLabel>License key</SectionLabel>
-                {existingKey && (
-                <CopyIconButton onClick={handleCopyKey}>
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="4.5" y="4.5" width="8" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.2" />
-                    <path d="M9.5 4.5V3a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v5.5a1 1 0 0 0 1 1h1.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-                  </svg>
-                </CopyIconButton>
-                )}
-              </SectionRow>
-              <SectionCaption>
-                To activate plan go through registration process and then check your email or this link
-                {' '}
-                <InlineLink href="https://account.tokens.studio/email-login" target="_blank" rel="noreferrer">
-                  https://account.tokens.studio/email-login
-                </InlineLink>
-                {' '}
-                to grab license key
-              </SectionCaption>
+          <Divider css={{ margin: '0 -$4' }} />
 
-              <InputRow>
-                <TextInput
-                  css={{ flex: 1 }}
-                  name="license-key"
-                  placeholder="Enter license key"
-                  value={newKey}
-                  onChange={handleKeyChange}
-                  validationStatus={licenseKeyError ? 'error' : undefined}
-                />
-                {!existingKey ? (
-                  <Button
-                    variant="secondary"
-                    onClick={handleAddKey}
-                    disabled={!newKey}
-                  >
-                    Add license key
-                  </Button>
-                ) : (
-                  <Button variant="secondary" onClick={handleRemoveKey}>
-                    Remove key
-                  </Button>
-                )}
-              </InputRow>
-              {licenseKeyError && (
-                <ErrorMessage>{licenseKeyError}</ErrorMessage>
+          {/* License key section */}
+          <CardSection>
+            <div style={{ marginBottom: '8px' }}>
+              <SectionTitle style={{ marginBottom: 0, fontSize: '12px' }}>License key</SectionTitle>
+            </div>
+            <SectionCaption style={{ marginBottom: '12px' }}>
+              To activate plan go through registration process and then check your email or this link
+              {' '}
+              <InlineLink href="https://account.tokens.studio/email-login" target="_blank" rel="noreferrer">
+                https://account.tokens.studio/email-login
+              </InlineLink>
+              {' '}
+              to grab license key
+            </SectionCaption>
+
+            <InputRow>
+              <TextInput
+                css={{ flex: 1 }}
+                name="license-key"
+                placeholder="Enter license key"
+                value={newKey}
+                onChange={handleKeyChange}
+                validationStatus={licenseKeyError ? 'error' : undefined}
+              />
+              {!existingKey ? (
+                <Button
+                  variant="secondary"
+                  onClick={handleAddKey}
+                  disabled={!newKey}
+                >
+                  Add license key
+                </Button>
+              ) : (
+                <Button variant="secondary" onClick={handleRemoveKey}>
+                  Remove key
+                </Button>
               )}
-            </CardSection>
-          </Card>
-        </div>
+            </InputRow>
+            {licenseKeyError && (
+            <ErrorMessage>{licenseKeyError}</ErrorMessage>
+            )}
+          </CardSection>
+        </Card>
       )}
     </ContentBox>
   );
