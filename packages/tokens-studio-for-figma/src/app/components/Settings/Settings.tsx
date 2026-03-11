@@ -10,7 +10,6 @@ import { Dispatch } from '../../store';
 import {
   uiStateSelector,
 } from '@/selectors';
-import AddLicenseKey from '../AddLicenseKey/AddLicenseKey';
 import { Divider } from '../Divider';
 import OnboardingExplainer from '../OnboardingExplainer';
 import RemConfiguration from '../RemConfiguration';
@@ -96,24 +95,23 @@ function Settings() {
   return (
     <Box className="content scroll-container">
       <Stack direction="column" gap={4} css={{ padding: '$3 0' }}>
-        <Stack direction="column" gap={2} css={{ padding: '$4' }}>
-          <Text css={{ color: '$fgMuted', lineHeight: 1.5 }}>
+        <Stack direction="column" gap={2} css={{ padding: '$3 $4' }}>
+          <Text size="xsmall" css={{ color: '$fgMuted', lineHeight: 1.5 }}>
             Looking for your license key? It has been moved to the
             {' '}
-            <Link
-              as="button"
+            <button
+              type="button"
               onClick={handleGoToSubscription}
-              css={{
+              style={{
                 all: 'unset',
                 cursor: 'pointer',
-                color: '$accentDefault',
-                fontWeight: '$sansBold',
+                color: 'var(--colors-accentDefault)',
+                fontWeight: 'var(--fontWeights-sansBold)',
                 textDecoration: 'underline',
-                '&:hover': { color: '$accentEmphasis' },
               }}
             >
               Subscription
-            </Link>
+            </button>
             {' '}
             tab.
           </Text>

@@ -17,6 +17,7 @@ import useConfirm from '@/app/hooks/useConfirm';
 import { OAuthLogin } from '../Login/OAuthLogin';
 import { useAuthStore } from '@/app/store/useAuthStore';
 import { ErrorMessage } from '../ErrorMessage';
+import { Divider } from '../Divider';
 // ─── Styled ──────────────────────────────────────────────────────────
 
 const ContentBox = styled('div', {
@@ -38,7 +39,7 @@ const CardSection = styled('div', {
   padding: '$4',
   display: 'flex',
   flexDirection: 'column',
-  gap: '$3',
+  gap: '$4',
 });
 
 const SectionRow = styled('div', {
@@ -88,14 +89,6 @@ const InputRow = styled('div', {
   alignItems: 'flex-start',
 });
 
-const UserProfileCard = styled('div', {
-  display: 'flex',
-  alignItems: 'center',
-  padding: '$4',
-  border: '1px solid $borderSubtle',
-  borderRadius: '$medium',
-});
-
 const Avatar = styled('img', {
   width: 40,
   height: 40,
@@ -118,6 +111,8 @@ const AvatarFallback = styled('div', {
 const UserDataStack = styled('div', {
   display: 'flex',
   flexDirection: 'column',
+  justifyContent: 'center',
+  gap: '2px',
 });
 
 const SectionTitle = styled('div', {
@@ -278,86 +273,107 @@ export default function SubscriptionAccount() {
     <ContentBox>
       {/* Authenticated Dashboard */}
       {isAuthenticated && user ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          <UserProfileCard>
-            {user.avatar ? (
-              <Avatar src={user.avatar} alt="User avatar" />
-            ) : (
-              <AvatarFallback>{user.fullName?.[0] || 'U'}</AvatarFallback>
-            )}
-            <UserDataStack css={{ marginLeft: '$3' }}>
-              <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--colors-fgDefault)' }}>{user.fullName || 'Studio User'}</span>
-              <span style={{ fontSize: '12px', color: 'var(--colors-fgMuted)' }}>{user.email}</span>
-            </UserDataStack>
-            <Button variant="secondary" css={{ marginLeft: 'auto' }} onClick={logout}>
-              Log out
-            </Button>
-          </UserProfileCard>
-
-          {organizations.length > 0 && activeOrganization && (
-            <>
-              <div>
-                <SectionTitle>Organisation</SectionTitle>
-                <ItemCard>
-                  <DropdownMenu>
-                    <DropdownMenu.Trigger asChild>
-                      <OrgDropdownTriggerBtn>
-                        {activeOrganization.avatarUrl ? (
-                          <Avatar src={activeOrganization.avatarUrl} style={{ width: 24, height: 24, borderRadius: '4px' }} alt="" />
-                        ) : (
-                          <AvatarFallback style={{
-                            width: 24, height: 24, fontSize: '12px', borderRadius: '4px',
-                          }}
-                          >
-                            {activeOrganization.name[0]}
-                          </AvatarFallback>
-                        )}
-                        {activeOrganization.name}
-                        <CaretDownIcon style={{ marginLeft: '4px', color: 'var(--colors-fgMuted)' }} />
-                      </OrgDropdownTriggerBtn>
-                    </DropdownMenu.Trigger>
-                    <StyledDropdownContent>
-                      {organizations.map((org) => (
-                        <StyledDropdownItem
-                          key={org.id}
-                                                    // eslint-disable-next-line react/jsx-no-bind
-                          onClick={() => setActiveOrganization(org.id)}
-                        >
-                          {org.avatarUrl && (
-                          <Avatar src={org.avatarUrl} alt="" css={{ width: 16, height: 16, borderRadius: '2px' }} />
-                          )}
-                          {org.name}
-                        </StyledDropdownItem>
-                      ))}
-                    </StyledDropdownContent>
-                  </DropdownMenu>
-                  <Button variant="secondary" onClick={handleManageOrg}>Manage Org</Button>
-                </ItemCard>
+        <Card>
+          <CardSection>
+            {/* User Profile Header */}
+            <SectionRow>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                {user.avatar ? (
+                  <Avatar src={user.avatar} alt="User avatar" />
+                ) : (
+                  <AvatarFallback>{user.fullName?.[0] || 'U'}</AvatarFallback>
+                )}
+                <UserDataStack>
+                  <span style={{
+                    fontSize: '13px', fontWeight: 600, color: 'var(--colors-fgDefault)', lineHeight: 1.2,
+                  }}
+                  >
+                    {user.fullName || 'Studio User'}
+                  </span>
+                  <span style={{
+                    fontSize: '12px', color: 'var(--colors-fgMuted)', lineHeight: 1.2,
+                  }}
+                  >
+                    {user.email}
+                  </span>
+                </UserDataStack>
               </div>
+              <Button variant="secondary" onClick={logout}>
+                Log out
+              </Button>
+            </SectionRow>
 
-              <div>
-                <SectionTitle>Current plan</SectionTitle>
-                <ItemCard>
-                  <FlexGrid>
-                    <ItemCardColumn>
-                      <ItemCardLabel>Plan</ItemCardLabel>
-                      <ItemCardValue>{activeOrganization.subscription?.plan?.name || 'Starter'}</ItemCardValue>
-                    </ItemCardColumn>
-                    <ItemCardColumn>
-                      <ItemCardLabel>Price</ItemCardLabel>
-                      <ItemCardValue>{activeOrganization.subscription?.price || 'Free'}</ItemCardValue>
-                    </ItemCardColumn>
-                    <ItemCardColumn>
-                      <ItemCardLabel>Billing date</ItemCardLabel>
-                      <ItemCardValue>{activeOrganization.subscription?.billingDate || 'Endless'}</ItemCardValue>
-                    </ItemCardColumn>
-                  </FlexGrid>
-                  <Button variant="secondary" onClick={handleManagePlan}>Manage Plan</Button>
-                </ItemCard>
+            {organizations.length > 0 && activeOrganization && (
+            <>
+              <Divider css={{ margin: '0 -$4' }} />
+              <div style={{
+                display: 'flex', flexDirection: 'column', gap: '24px',
+              }}
+              >
+                <div>
+                  <SectionTitle>Organisation</SectionTitle>
+                  <ItemCard>
+                    <DropdownMenu>
+                      <DropdownMenu.Trigger asChild>
+                        <OrgDropdownTriggerBtn>
+                          {activeOrganization.avatarUrl ? (
+                            <Avatar src={activeOrganization.avatarUrl} style={{ width: 24, height: 24, borderRadius: '4px' }} alt="" />
+                          ) : (
+                            <AvatarFallback style={{
+                              width: 24, height: 24, fontSize: '12px', borderRadius: '4px',
+                            }}
+                            >
+                              {activeOrganization.name[0]}
+                            </AvatarFallback>
+                          )}
+                          {activeOrganization.name}
+                          <CaretDownIcon style={{ marginLeft: '4px', color: 'var(--colors-fgMuted)' }} />
+                        </OrgDropdownTriggerBtn>
+                      </DropdownMenu.Trigger>
+                      <StyledDropdownContent>
+                        {organizations.map((org) => (
+                          <StyledDropdownItem
+                            key={org.id}
+                                                            // eslint-disable-next-line react/jsx-no-bind
+                            onClick={() => setActiveOrganization(org.id)}
+                          >
+                            {org.avatarUrl && (
+                            <Avatar src={org.avatarUrl} alt="" css={{ width: 16, height: 16, borderRadius: '2px' }} />
+                            )}
+                            {org.name}
+                          </StyledDropdownItem>
+                        ))}
+                      </StyledDropdownContent>
+                    </DropdownMenu>
+                    <Button variant="secondary" onClick={handleManageOrg}>Manage Org</Button>
+                  </ItemCard>
+                </div>
+
+                <div>
+                  <SectionTitle>Current plan</SectionTitle>
+                  <ItemCard>
+                    <FlexGrid>
+                      <ItemCardColumn>
+                        <ItemCardLabel>Plan</ItemCardLabel>
+                        <ItemCardValue>{activeOrganization.subscription?.plan?.name || 'Starter'}</ItemCardValue>
+                      </ItemCardColumn>
+                      <ItemCardColumn>
+                        <ItemCardLabel>Price</ItemCardLabel>
+                        <ItemCardValue>{activeOrganization.subscription?.price || 'Free'}</ItemCardValue>
+                      </ItemCardColumn>
+                      <ItemCardColumn>
+                        <ItemCardLabel>Billing date</ItemCardLabel>
+                        <ItemCardValue>{activeOrganization.subscription?.billingDate || 'Endless'}</ItemCardValue>
+                      </ItemCardColumn>
+                    </FlexGrid>
+                    <Button variant="secondary" onClick={handleManagePlan}>Manage Plan</Button>
+                  </ItemCard>
+                </div>
               </div>
             </>
-          )}
-        </div>
+            )}
+          </CardSection>
+        </Card>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           {/* If Not Authenticated, Show Login Component */}

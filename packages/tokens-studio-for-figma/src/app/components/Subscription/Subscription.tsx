@@ -50,15 +50,11 @@ const PillTab = styled('button', {
 });
 
 export default function Subscription() {
-  const [activeTab, setActiveTab] = useState<SubscriptionTab>('plans');
+  const [activeTab, setActiveTab] = useState<SubscriptionTab>('account');
 
   const handleTabSwitch = useCallback((tab: SubscriptionTab) => {
     setActiveTab(tab);
   }, []);
-
-  const handleSwitchPlans = useCallback(() => {
-    handleTabSwitch('plans');
-  }, [handleTabSwitch]);
 
   const handleSwitchAccount = useCallback(() => {
     handleTabSwitch('account');
@@ -67,13 +63,6 @@ export default function Subscription() {
   return (
     <Wrapper className="content">
       <TabRow>
-        <PillTab
-          type="button"
-          active={activeTab === 'plans'}
-          onClick={handleSwitchPlans}
-        >
-          Plans
-        </PillTab>
         <PillTab
           type="button"
           active={activeTab === 'account'}
