@@ -274,12 +274,6 @@ export default function SubscriptionAccount() {
     }
   }, [activeOrganization]);
 
-  const handleAddSeats = useCallback(() => {
-    if (activeOrganization) {
-      window.open(`https://production.tokens.studio/organizations/${activeOrganization.id}/members`, '_blank');
-    }
-  }, [activeOrganization]);
-
   return (
     <ContentBox>
       {/* Authenticated Dashboard */}
@@ -359,23 +353,6 @@ export default function SubscriptionAccount() {
                     </ItemCardColumn>
                   </FlexGrid>
                   <Button variant="secondary" onClick={handleManagePlan}>Manage Plan</Button>
-                </ItemCard>
-              </div>
-
-              <div>
-                <SectionTitle>Seats</SectionTitle>
-                <ItemCard>
-                  <FlexGrid>
-                    <ItemCardColumn>
-                      <ItemCardLabel>Editor</ItemCardLabel>
-                      <ItemCardValue>{`${activeOrganization.subscription?.editor_seats_used || 0} of ${activeOrganization.subscription?.editor_seats_total || 0}`}</ItemCardValue>
-                    </ItemCardColumn>
-                    <ItemCardColumn>
-                      <ItemCardLabel>Viewer</ItemCardLabel>
-                      <ItemCardValue>{`${activeOrganization.subscription?.viewer_seats_used || 0} of ${activeOrganization.subscription?.viewer_seats_total || 0}`}</ItemCardValue>
-                    </ItemCardColumn>
-                  </FlexGrid>
-                  <Button variant="secondary" onClick={handleAddSeats}>Add Seats</Button>
                 </ItemCard>
               </div>
             </>
