@@ -236,7 +236,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
         if (orgsResponse.ok) {
           const orgsDataRaw = await orgsResponse.json();
-          console.log('useAuthStore: raw orgsDataRaw', JSON.stringify(orgsDataRaw, null, 2));
 
           let orgsArray: any[] = [];
           if (Array.isArray(orgsDataRaw)) {
@@ -308,7 +307,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
               projects: (org.type && org.attributes ? org.attributes.projects : org.projects) || { data: [] },
             };
           });
-          console.log('useAuthStore: mapped organizations', JSON.stringify(organizations, null, 2));
         }
       } catch (err) {
         console.warn('Could not fetch organizations via new backend, fallback missing depending on API.', err);
@@ -318,7 +316,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const activeOrganization = organizations.find((o) => o.id === storedId) || (organizations.length > 0 ? organizations[0] : null);
 
       const isPro = activeOrganization?.subscription?.access?.includes('figma_plugin') || false;
-      console.log('useAuthStore: isPro calculation (active org only)', { isPro, activeOrg: activeOrganization?.name, access: activeOrganization?.subscription?.access });
 
       set({
         user,
@@ -376,8 +373,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           name: p.name || (p.attributes?.name) || '',
           slug: p.slug || (p.attributes?.slug) || '',
         }));
-
-        console.log('Fetched projects:', projects); // Add debug log
 
         set((state) => {
           // Update the organization in the list and active organization if it matches
