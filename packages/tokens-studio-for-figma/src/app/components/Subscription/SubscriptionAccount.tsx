@@ -1,22 +1,13 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useCallback } from 'react';
 import {
   Button,
-  TextInput,
   DropdownMenu,
 } from '@tokens-studio/ui';
 import { CaretDownIcon } from '@radix-ui/react-icons';
 import { styled } from '@/stitches.config';
-import { licenseKeySelector } from '@/selectors/licenseKeySelector';
-import { licenseKeyErrorSelector } from '@/selectors/licenseKeyErrorSelector';
-import { userIdSelector } from '@/selectors/userIdSelector';
-import { Dispatch } from '@/app/store';
-import { AddLicenseSource } from '@/app/store/models/userState';
-import { addLicenseKey } from '@/utils/addLicenseKey';
-import useConfirm from '@/app/hooks/useConfirm';
+import { AddLicenseKey } from '../AddLicenseKey';
 import { OAuthLogin } from '../Login/OAuthLogin';
 import { useAuthStore } from '@/app/store/useAuthStore';
-import { ErrorMessage } from '../ErrorMessage';
 import { Divider } from '../Divider';
 
 // ─── Styled ──────────────────────────────────────────────────────────
@@ -48,25 +39,6 @@ const SectionRow = styled('div', {
   alignItems: 'center',
   justifyContent: 'space-between',
   gap: '$3',
-});
-
-const SectionCaption = styled('p', {
-  fontSize: '$xsmall',
-  color: '$fgMuted',
-  lineHeight: 1.5,
-  margin: 0,
-});
-
-const InlineLink = styled('a', {
-  color: '#5ba4f5',
-  textDecoration: 'none',
-  '&:hover': { textDecoration: 'underline' },
-});
-
-const InputRow = styled('div', {
-  display: 'flex',
-  gap: '$2',
-  alignItems: 'flex-start',
 });
 
 const Avatar = styled('img', {
@@ -179,11 +151,6 @@ const StyledDropdownItem = styled(DropdownMenu.Item, {
 // ─── Component ───────────────────────────────────────────────────────
 
 export default function SubscriptionAccount() {
-  const dispatch = useDispatch<Dispatch>();
-  const existingKey = useSelector(licenseKeySelector);
-  const licenseKeyError = useSelector(licenseKeyErrorSelector);
-  const userId = useSelector(userIdSelector);
-
   // OAuth Auth store
   const {
     isAuthenticated,
@@ -193,43 +160,6 @@ export default function SubscriptionAccount() {
     setActiveOrganization,
     logout,
   } = useAuthStore();
-
-  const { confirm } = useConfirm();
-
-  const [newKey, setNewKey] = useState(existingKey ?? '');
-
-  useEffect(() => {
-    setNewKey(existingKey ?? '');
-  }, [existingKey]);
-
-  const handleKeyChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewKey(e.target.value.trim());
-  }, []);
-
-  const handleAddKey = useCallback(async () => {
-    if (newKey) {
-      await addLicenseKey(
-        dispatch,
-        { key: newKey, source: AddLicenseSource.UI },
-        { userId },
-      );
-    }
-  }, [newKey, dispatch, userId]);
-
-  const handleRemoveKey = useCallback(async () => {
-    if (licenseKeyError) {
-      dispatch.userState.removeLicenseKey(undefined);
-    } else {
-      const confirmed = await confirm({
-        text: 'Remove license key?',
-        description: 'Keep your license key somewhere safe.',
-        confirmAction: 'Remove key',
-      });
-      if (confirmed) {
-        dispatch.userState.removeLicenseKey(undefined);
-      }
-    }
-  }, [licenseKeyError, confirm, dispatch]);
 
   const handleManageOrg = useCallback(() => {
     if (activeOrganization) {
@@ -245,9 +175,9 @@ export default function SubscriptionAccount() {
 
   return (
     <ContentBox>
-      {/* Authenticated Dashboard */}
-      {isAuthenticated && user ? (
-        <Card>
+      <Card>
+        {/* Authenticated Dashboard */}
+        {isAuthenticated && user ? (
           <CardSection>
             {/* User Profile Header */}
             <SectionRow>
@@ -259,13 +189,18 @@ export default function SubscriptionAccount() {
                 )}
                 <UserDataStack>
                   <span style={{
-                    fontSize: '13px', fontWeight: 600, color: 'var(--colors-fgDefault)', lineHeight: 1.2,
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    color: 'var(--colors-fgDefault)',
+                    lineHeight: 1.2,
                   }}
                   >
                     {user.fullName || 'Studio User'}
                   </span>
                   <span style={{
-                    fontSize: '12px', color: 'var(--colors-fgMuted)', lineHeight: 1.2,
+                    fontSize: '12px',
+                    color: 'var(--colors-fgMuted)',
+                    lineHeight: 1.2,
                   }}
                   >
                     {user.email}
@@ -281,7 +216,9 @@ export default function SubscriptionAccount() {
             <>
               <Divider css={{ margin: '0 -$4' }} />
               <div style={{
-                display: 'flex', flexDirection: 'column', gap: '24px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '24px',
               }}
               >
                 <div>
@@ -294,7 +231,10 @@ export default function SubscriptionAccount() {
                             <Avatar src={activeOrganization.avatarUrl} style={{ width: 24, height: 24, borderRadius: '4px' }} alt="" />
                           ) : (
                             <AvatarFallback style={{
-                              width: 24, height: 24, fontSize: '12px', borderRadius: '4px',
+                              width: 24,
+                              height: 24,
+                              fontSize: '12px',
+                              borderRadius: '4px',
                             }}
                             >
                               {activeOrganization.name[0]}
@@ -347,60 +287,21 @@ export default function SubscriptionAccount() {
             </>
             )}
           </CardSection>
-        </Card>
-      ) : (
-        <Card>
-          {/* If Not Authenticated, Show Login Component */}
-          <CardSection>
-            <OAuthLogin />
-          </CardSection>
+        ) : (
+          <>
+            {/* If Not Authenticated, Show Login Component */}
+            <CardSection>
+              <OAuthLogin />
+            </CardSection>
 
-          <Divider css={{ margin: '0 -$4' }} />
-
-          {/* License key section */}
-          <CardSection>
-            <div style={{ marginBottom: '8px' }}>
-              <SectionTitle style={{ marginBottom: 0, fontSize: '12px' }}>License key</SectionTitle>
-            </div>
-            <SectionCaption style={{ marginBottom: '12px' }}>
-              To activate plan go through registration process and then check your email or this link
-              {' '}
-              <InlineLink href="https://account.tokens.studio/email-login" target="_blank" rel="noreferrer">
-                https://account.tokens.studio/email-login
-              </InlineLink>
-              {' '}
-              to grab license key
-            </SectionCaption>
-
-            <InputRow>
-              <TextInput
-                css={{ flex: 1 }}
-                name="license-key"
-                placeholder="Enter license key"
-                value={newKey}
-                onChange={handleKeyChange}
-                validationStatus={licenseKeyError ? 'error' : undefined}
-              />
-              {!existingKey ? (
-                <Button
-                  variant="secondary"
-                  onClick={handleAddKey}
-                  disabled={!newKey}
-                >
-                  Add license key
-                </Button>
-              ) : (
-                <Button variant="secondary" onClick={handleRemoveKey}>
-                  Remove key
-                </Button>
-              )}
-            </InputRow>
-            {licenseKeyError && (
-            <ErrorMessage>{licenseKeyError}</ErrorMessage>
-            )}
-          </CardSection>
-        </Card>
-      )}
+            {/* License key section - visible ONLY when NOT authenticated */}
+            <Divider css={{ margin: '0 -$4' }} />
+            <CardSection>
+              <AddLicenseKey isCompact />
+            </CardSection>
+          </>
+        )}
+      </Card>
     </ContentBox>
   );
 }
