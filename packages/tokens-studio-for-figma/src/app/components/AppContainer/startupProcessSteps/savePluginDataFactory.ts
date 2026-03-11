@@ -43,6 +43,9 @@ export function savePluginDataFactory(dispatch: Dispatch, params: StartupMessage
 
       // Restore OAuth tokens
       if (params.oauthTokens) {
+        if (params.activeOrganizationId) {
+          useAuthStore.setState({ activeOrganizationId: params.activeOrganizationId });
+        }
         useAuthStore.getState().setOAuthTokens(params.oauthTokens);
         useAuthStore.getState().fetchUserData(params.oauthTokens);
       }

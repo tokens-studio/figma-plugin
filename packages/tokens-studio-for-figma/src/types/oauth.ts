@@ -88,6 +88,10 @@ export type Organization = {
     };
     price?: string;
     billingDate?: string;
+    editor_seats_total?: number;
+    editor_seats_used?: number;
+    viewer_seats_total?: number;
+    viewer_seats_used?: number;
   };
   projects: {
     data: Project[];

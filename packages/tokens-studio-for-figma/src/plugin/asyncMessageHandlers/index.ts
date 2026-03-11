@@ -45,4 +45,5 @@ export * from './removeStylesWithoutConnection';
 export * from './setVariableExportSettings';
 export * from './setSelectedExportThemes';
 export * from './setOAuthTokens';
+export * from './setActiveOrganizationId';
 export * from '../livingDocumentation';

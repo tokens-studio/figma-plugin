@@ -368,11 +368,11 @@ export default function SubscriptionAccount() {
                   <FlexGrid>
                     <ItemCardColumn>
                       <ItemCardLabel>Editor</ItemCardLabel>
-                      <ItemCardValue>1 of 1</ItemCardValue>
+                      <ItemCardValue>{`${activeOrganization.subscription?.editor_seats_used || 0} of ${activeOrganization.subscription?.editor_seats_total || 0}`}</ItemCardValue>
                     </ItemCardColumn>
                     <ItemCardColumn>
                       <ItemCardLabel>Viewer</ItemCardLabel>
-                      <ItemCardValue>1 of 1</ItemCardValue>
+                      <ItemCardValue>{`${activeOrganization.subscription?.viewer_seats_used || 0} of ${activeOrganization.subscription?.viewer_seats_total || 0}`}</ItemCardValue>
                     </ItemCardColumn>
                   </FlexGrid>
                   <Button variant="secondary" onClick={handleAddSeats}>Add Seats</Button>
@@ -396,7 +396,7 @@ export default function SubscriptionAccount() {
               <SectionRow>
                 <SectionLabel>License key</SectionLabel>
                 {existingKey && (
-                <CopyIconButton type="button" onClick={handleCopyKey} aria-label="Copy license key">
+                <CopyIconButton onClick={handleCopyKey}>
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <rect x="4.5" y="4.5" width="8" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.2" />
                     <path d="M9.5 4.5V3a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v5.5a1 1 0 0 0 1 1h1.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />

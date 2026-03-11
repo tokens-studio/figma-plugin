@@ -25,6 +25,7 @@ describe('startup', () => {
       oauthTokens: null,
       usedEmail: null,
       selectedExportThemes: [],
+      activeOrganizationId: null,
     });
   });
 
@@ -84,6 +85,7 @@ describe('startup', () => {
       oauthTokens: null,
       usedEmail: null,
       selectedExportThemes: [],
+      activeOrganizationId: null,
     });
   });
 });

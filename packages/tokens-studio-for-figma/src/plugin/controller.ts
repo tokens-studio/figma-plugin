@@ -78,6 +78,10 @@ AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.PREVIEW_REQUEST_STAR
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_VARIABLE_EXPORT_SETTINGS, asyncHandlers.setVariableExportSettings);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_SELECTED_EXPORT_THEMES, asyncHandlers.setSelectedExportThemes);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_OAUTH_TOKENS, asyncHandlers.setOAuthTokens);
+AsyncMessageChannel.PluginInstance.handle(
+  AsyncMessageTypes.SET_ACTIVE_ORGANIZATION_ID,
+  asyncHandlers.setActiveOrganizationId,
+);
 
 figma.on('close', () => {
   defaultWorker.stop();
