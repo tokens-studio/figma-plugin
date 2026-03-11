@@ -82,6 +82,9 @@ export type Organization = {
   subscription?: {
     id: string;
     subscription_status?: string;
+    current_plan?: string | null;
+    plan_status?: string | null;
+    access?: string[];
     plan: {
       id: string;
       name: string;

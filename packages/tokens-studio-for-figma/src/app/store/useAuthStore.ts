@@ -158,8 +158,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   setActiveOrganization: (orgId: string) => {
     set((state) => {
       const org = state.organizations.find((o) => o.id === orgId) || null;
-      const status = org?.subscription?.subscription_status;
-      const isPro = status === 'active' || status === 'trialing' || status === 'past_due';
+      const isPro = org?.subscription?.access?.includes('figma_plugin') || false;
 
       if (org) {
         AsyncMessageChannel.ReactInstance.message({
@@ -255,7 +254,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             const rawPlanName = sub.current_plan || sub.plan?.name || 'Starter';
             // Capitalize first letter
             let planName = rawPlanName.charAt(0).toUpperCase() + rawPlanName.slice(1);
-            if (sub.subscription_status === 'trialing') {
+            if (sub.plan_status === 'trialing' || sub.subscription_status === 'trialing') {
               planName = `${planName} Trial`;
             }
 
@@ -318,9 +317,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const storedId = get().activeOrganizationId;
       const activeOrganization = organizations.find((o) => o.id === storedId) || (organizations.length > 0 ? organizations[0] : null);
 
-      const subscriptionStatus = activeOrganization?.subscription?.subscription_status;
-      const isPro = subscriptionStatus === 'active' || subscriptionStatus === 'trialing' || subscriptionStatus === 'past_due';
-      console.log('useAuthStore: isPro calculation (active org only)', { isPro, activeOrg: activeOrganization?.name, subscriptionStatus });
+      const isPro = activeOrganization?.subscription?.access?.includes('figma_plugin') || false;
+      console.log('useAuthStore: isPro calculation (active org only)', { isPro, activeOrg: activeOrganization?.name, access: activeOrganization?.subscription?.access });
 
       set({
         user,
