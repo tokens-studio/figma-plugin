@@ -96,7 +96,7 @@ export const OAuthDeviceCodeModal = () => {
         <Button
           variant="primary"
           onClick={handleOpenVerificationUrl}
-          css={{ width: '100%' }}
+          css={{ width: '100%', justifyContent: 'center' }}
         >
           Open Authorization Page
         </Button>

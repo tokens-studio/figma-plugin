@@ -271,14 +271,6 @@ export default function SubscriptionAccount() {
                         <ItemCardLabel>Plan</ItemCardLabel>
                         <ItemCardValue>{activeOrganization.subscription?.plan?.name || 'Starter'}</ItemCardValue>
                       </ItemCardColumn>
-                      <ItemCardColumn>
-                        <ItemCardLabel>Price</ItemCardLabel>
-                        <ItemCardValue>{activeOrganization.subscription?.price || 'Free'}</ItemCardValue>
-                      </ItemCardColumn>
-                      <ItemCardColumn>
-                        <ItemCardLabel>Billing date</ItemCardLabel>
-                        <ItemCardValue>{activeOrganization.subscription?.billingDate || 'Endless'}</ItemCardValue>
-                      </ItemCardColumn>
                     </FlexGrid>
                     <Button variant="secondary" onClick={handleManagePlan}>Manage Plan</Button>
                   </ItemCard>
