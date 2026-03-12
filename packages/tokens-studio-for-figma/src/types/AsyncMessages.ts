@@ -17,13 +17,23 @@ import type { ThemeObject } from './ThemeObject';
 import { DeleteTokenPayload } from './payloads';
 import { TokensToRenamePayload } from '@/app/store/useTokens';
 import { AuthData } from './Auth';
-import { LocalVariableInfo } from '@/plugin/createLocalVariablesInPlugin';
-import { ResolvedVariableInfo } from '@/plugin/asyncMessageHandlers';
 import { RenameVariableToken } from '@/app/store/models/reducers/tokenState';
 import { UpdateTokenVariablePayload } from './payloads/UpdateTokenVariablePayload';
 import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 import { ExportTokenSet } from './ExportTokenSet';
 import type { VariableCollectionInfo } from './VariableCollectionSelection';
+import { OAuthTokens } from './oauth';
+
+export type LocalVariableInfo = {
+  collectionId: string;
+  modeId: string;
+  variableIds: Record<string, string>
+};
+
+export type ResolvedVariableInfo = {
+  name: string;
+  key: string
+};
 
 export enum AsyncMessageTypes {
   // the below messages are going from UI to plugin
@@ -64,6 +74,8 @@ export enum AsyncMessageTypes {
   SET_VARIABLE_EXPORT_SETTINGS = 'async/set-variable-export-settings',
   SET_SELECTED_EXPORT_THEMES = 'async/set-selected-export-themes',
   CREATE_LIVING_DOCUMENTATION = 'async/create-living-documentation',
+  SET_OAUTH_TOKENS = 'async/set-oauth-tokens',
+  SET_ACTIVE_ORGANIZATION_ID = 'async/set-active-organization-id',
   // the below messages are going from plugin to UI
   STARTUP = 'async/startup',
   GET_THEME_INFO = 'async/get-theme-info',
@@ -286,7 +298,10 @@ export type GetThemeInfoMessageResult = AsyncMessage<AsyncMessageTypes.GET_THEME
 
 export type StartupMessage = AsyncMessage<AsyncMessageTypes.STARTUP, (
   ReturnType<typeof startup> extends Promise<infer V> ? V : unknown
-)>;
+) & {
+  oauthTokens?: OAuthTokens | null;
+  activeOrganizationId?: string | null;
+}>;
 export type StartupMessageResult = AsyncMessage<AsyncMessageTypes.STARTUP>;
 
 export type GetFigmaFontsMessage = AsyncMessage<AsyncMessageTypes.GET_FIGMA_FONTS>;
@@ -309,6 +324,16 @@ export type SetAuthDataMessage = AsyncMessage<AsyncMessageTypes.SET_AUTH_DATA, {
   auth: AuthData | null
 }>;
 export type SetAuthDataMessageResult = AsyncMessage<AsyncMessageTypes.SET_AUTH_DATA>;
+
+export type SetOAuthTokensMessage = AsyncMessage<AsyncMessageTypes.SET_OAUTH_TOKENS, {
+  oauthTokens: OAuthTokens | null;
+}>;
+export type SetOAuthTokensMessageResult = AsyncMessage<AsyncMessageTypes.SET_OAUTH_TOKENS>;
+
+export type SetActiveOrganizationIdMessage = AsyncMessage<AsyncMessageTypes.SET_ACTIVE_ORGANIZATION_ID, {
+  activeOrganizationId: string | null;
+}>;
+export type SetActiveOrganizationIdMessageResult = AsyncMessage<AsyncMessageTypes.SET_ACTIVE_ORGANIZATION_ID>;
 
 export type SetUsedEmailMessage = AsyncMessage<AsyncMessageTypes.SET_USED_EMAIL, {
   email: string | undefined
@@ -437,7 +462,9 @@ export type AsyncMessages =
   | RemoveRelaunchDataMessage
   | RemoveStylesWithoutConnectionMessage
   | SetVariableExportSettingsMessage
-  | SetSelectedExportThemesMessage;
+  | SetSelectedExportThemesMessage
+  | SetOAuthTokensMessage
+  | SetActiveOrganizationIdMessage;
 
 export type AsyncMessageResults =
   CreateStylesAsyncMessageResult
@@ -489,7 +516,9 @@ export type AsyncMessageResults =
   | RemoveRelaunchDataMessageResult
   | RemoveStylesWithoutConnectionResult
   | SetVariableExportSettingsMessageResult
-  | SetSelectedExportThemesMessageResult;
+  | SetSelectedExportThemesMessageResult
+  | SetOAuthTokensMessageResult
+  | SetActiveOrganizationIdMessageResult;
 
 export type AsyncMessagesMap = {
   [K in AsyncMessageTypes]: Extract<AsyncMessages, { type: K }>

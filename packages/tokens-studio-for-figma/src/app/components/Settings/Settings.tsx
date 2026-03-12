@@ -10,13 +10,13 @@ import { Dispatch } from '../../store';
 import {
   uiStateSelector,
 } from '@/selectors';
-import AddLicenseKey from '../AddLicenseKey/AddLicenseKey';
 import { Divider } from '../Divider';
 import OnboardingExplainer from '../OnboardingExplainer';
 import RemConfiguration from '../RemConfiguration';
 import { replay } from '@/app/sentry';
 import { sessionRecordingSelector } from '@/selectors/sessionRecordingSelector';
 import { ExplainerModal } from '../ExplainerModal';
+import { Tabs } from '@/constants/Tabs';
 
 // TODO: expose types from @tokens-studio/ui/checkbox
 type CheckedState = boolean | 'indeterminate';
@@ -88,10 +88,34 @@ function Settings() {
     dispatch.uiState.setLastOpened(0);
   }, [dispatch]);
 
+  const handleGoToSubscription = React.useCallback(() => {
+    dispatch.uiState.setActiveTab(Tabs.SUBSCRIPTION);
+  }, [dispatch]);
+
   return (
     <Box className="content scroll-container">
       <Stack direction="column" gap={4} css={{ padding: '$3 0' }}>
-        <AddLicenseKey />
+        <Stack direction="column" gap={2} css={{ padding: '$3 $4' }}>
+          <Text size="xsmall" css={{ color: '$fgMuted', lineHeight: 1.5 }}>
+            Looking for your license key? It has been moved to the
+            {' '}
+            <button
+              type="button"
+              onClick={handleGoToSubscription}
+              style={{
+                all: 'unset',
+                cursor: 'pointer',
+                color: 'var(--colors-accentDefault)',
+                fontWeight: 'var(--fontWeights-sansBold)',
+                textDecoration: 'underline',
+              }}
+            >
+              Subscription
+            </button>
+            {' '}
+            tab.
+          </Text>
+        </Stack>
         <Divider />
         {uiState.onboardingExplainerSyncProviders && (
           <Stack direction="column" gap={2} css={{ padding: '$4' }}>
@@ -172,11 +196,11 @@ function Settings() {
                 }}
               >
                 {debugSession && (
-                <Text>
-                  {t('yourCurrentSessionIdIs')}
-                  {' '}
-                  <b>{debugSession}</b>
-                </Text>
+                  <Text>
+                    {t('yourCurrentSessionIdIs')}
+                    {' '}
+                    <b>{debugSession}</b>
+                  </Text>
                 )}
               </Box>
             </Stack>

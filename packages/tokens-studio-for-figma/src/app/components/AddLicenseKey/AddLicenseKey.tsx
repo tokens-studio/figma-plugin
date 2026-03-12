@@ -19,14 +19,38 @@ import { userIdSelector } from '@/selectors/userIdSelector';
 import { ErrorMessage } from '../ErrorMessage';
 import { addLicenseKey } from '@/utils/addLicenseKey';
 
-export default function AddLicenseKey() {
+const SectionTitle = styled('div', {
+  fontSize: '12px',
+  fontWeight: 600,
+  color: '$fgDefault',
+  marginBottom: '$3',
+});
+
+const SectionCaption = styled('p', {
+  fontSize: '$xsmall',
+  color: '$fgMuted',
+  lineHeight: 1.5,
+  margin: 0,
+});
+
+const InlineLink = styled('a', {
+  color: '#5ba4f5',
+  textDecoration: 'none',
+  '&:hover': { textDecoration: 'underline' },
+});
+
+interface Props {
+  isCompact?: boolean;
+}
+
+export default function AddLicenseKey({ isCompact }: Props) {
   const dispatch = useDispatch<Dispatch>();
   const existingKey = useSelector(licenseKeySelector);
   const licenseKeyError = useSelector(licenseKeyErrorSelector);
   const [newKey, setLicenseKey] = useState(existingKey);
   const { confirm } = useConfirm();
   const userId = useSelector(userIdSelector);
-  const { t } = useTranslation(['licence']);
+  const { t } = useTranslation(['licence', 'subscription']);
   const [isMasked, setIsMasked] = useState(true);
 
   const toggleMask = useCallback(() => {
@@ -74,26 +98,43 @@ export default function AddLicenseKey() {
   }, []);
 
   const addLicenseKeyButton = !existingKey && (
-    <Button onClick={addKey} disabled={existingKey === newKey}>
+    <Button variant="secondary" onClick={addKey} disabled={existingKey === newKey}>
       {t('addLicenseKey')}
     </Button>
   );
 
-  const removeLicenseKeyButton = existingKey && <Button onClick={removeKey}>{t('removeLicenseKey')}</Button>;
+  const removeLicenseKeyButton = existingKey && <Button variant="secondary" onClick={removeKey}>{t('removeLicenseKey')}</Button>;
 
   return (
-    <Stack direction="column" gap={3} css={{ padding: '0 $4' }}>
-      <Stack direction="row" gap={2} align="center" justify="between">
-        <Heading size="medium">{t('licenseKey')}</Heading>
-        <Stack direction="row" gap={2} align="center">
-          <ProBadge campaign="add-license-key" />
-          {existingKey && !licenseKeyError && (
-            <ManageSubscriptionLink href="https://account.tokens.studio" target="_blank">
-              {t('manageSubscription')}
-            </ManageSubscriptionLink>
-          )}
+    <Stack direction="column" gap={3} css={{ padding: isCompact ? 0 : '0 $4' }}>
+      {!isCompact ? (
+        <Stack direction="row" gap={2} align="center" justify="between">
+          <Heading size="medium">{t('licenseKey')}</Heading>
+          <Stack direction="row" gap={2} align="center">
+            <ProBadge campaign="add-license-key" />
+            {existingKey && !licenseKeyError && (
+              <ManageSubscriptionLink href="https://account.tokens.studio" target="_blank">
+                {t('manageSubscription')}
+              </ManageSubscriptionLink>
+            )}
+          </Stack>
         </Stack>
-      </Stack>
+      ) : (
+        <>
+          <div style={{ marginBottom: '8px' }}>
+            <SectionTitle style={{ marginBottom: 0 }}>{t('licence:licenseKey')}</SectionTitle>
+          </div>
+          <SectionCaption style={{ marginBottom: '12px' }}>
+            {t('subscription:activatePlanDescriptionPrefix')}
+            {' '}
+            <InlineLink href="https://account.tokens.studio/email-login" target="_blank" rel="noreferrer">
+              https://account.tokens.studio/email-login
+            </InlineLink>
+            {' '}
+            {t('subscription:activatePlanDescriptionSuffix')}
+          </SectionCaption>
+        </>
+      )}
       <Stack
         direction="row"
         gap={2}
