@@ -50,7 +50,7 @@ export default function AddLicenseKey({ isCompact }: Props) {
   const [newKey, setLicenseKey] = useState(existingKey);
   const { confirm } = useConfirm();
   const userId = useSelector(userIdSelector);
-  const { t } = useTranslation(['licence']);
+  const { t } = useTranslation(['licence', 'subscription']);
   const [isMasked, setIsMasked] = useState(true);
 
   const toggleMask = useCallback(() => {
@@ -122,16 +122,16 @@ export default function AddLicenseKey({ isCompact }: Props) {
       ) : (
         <>
           <div style={{ marginBottom: '8px' }}>
-            <SectionTitle style={{ marginBottom: 0 }}>License key</SectionTitle>
+            <SectionTitle style={{ marginBottom: 0 }}>{t('licence:licenseKey')}</SectionTitle>
           </div>
           <SectionCaption style={{ marginBottom: '12px' }}>
-            To activate plan go through registration process and then check your email or this link
+            {t('subscription:activatePlanDescriptionPrefix')}
             {' '}
             <InlineLink href="https://account.tokens.studio/email-login" target="_blank" rel="noreferrer">
               https://account.tokens.studio/email-login
             </InlineLink>
             {' '}
-            to grab license key
+            {t('subscription:activatePlanDescriptionSuffix')}
           </SectionCaption>
         </>
       )}

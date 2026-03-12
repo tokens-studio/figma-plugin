@@ -1,4 +1,5 @@
 import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   DropdownMenu,
@@ -160,6 +161,7 @@ export default function SubscriptionAccount() {
     setActiveOrganization,
     logout,
   } = useAuthStore();
+  const { t } = useTranslation(['subscription', 'licence']);
 
   const handleManageOrg = useCallback(() => {
     if (activeOrganization) {
@@ -195,7 +197,7 @@ export default function SubscriptionAccount() {
                     lineHeight: 1.2,
                   }}
                   >
-                    {user.fullName || 'Studio User'}
+                    {user.fullName || t('studioUser')}
                   </span>
                   <span style={{
                     fontSize: '12px',
@@ -208,7 +210,7 @@ export default function SubscriptionAccount() {
                 </UserDataStack>
               </div>
               <Button variant="secondary" onClick={logout}>
-                Log out
+                {t('logout')}
               </Button>
             </SectionRow>
 
@@ -222,7 +224,7 @@ export default function SubscriptionAccount() {
               }}
               >
                 <div>
-                  <SectionTitle>Organisation</SectionTitle>
+                  <SectionTitle>{t('organisation')}</SectionTitle>
                   <ItemCard>
                     <DropdownMenu>
                       <DropdownMenu.Trigger asChild>
@@ -259,20 +261,20 @@ export default function SubscriptionAccount() {
                         ))}
                       </StyledDropdownContent>
                     </DropdownMenu>
-                    <Button variant="secondary" onClick={handleManageOrg}>Manage Org</Button>
+                    <Button variant="secondary" onClick={handleManageOrg}>{t('manageOrg')}</Button>
                   </ItemCard>
                 </div>
 
                 <div>
-                  <SectionTitle>Current plan</SectionTitle>
+                  <SectionTitle>{t('currentPlan')}</SectionTitle>
                   <ItemCard>
                     <FlexGrid>
                       <ItemCardColumn>
-                        <ItemCardLabel>Plan</ItemCardLabel>
+                        <ItemCardLabel>{t('plan')}</ItemCardLabel>
                         <ItemCardValue>{activeOrganization.subscription?.plan?.name || 'Starter'}</ItemCardValue>
                       </ItemCardColumn>
                     </FlexGrid>
-                    <Button variant="secondary" onClick={handleManagePlan}>Manage Plan</Button>
+                    <Button variant="secondary" onClick={handleManagePlan}>{t('managePlan')}</Button>
                   </ItemCard>
                 </div>
               </div>

@@ -13,6 +13,7 @@ import general from './general.json';
 import branch from './branch.json';
 import manageStylesAndVariables from './manageStylesAndVariables.json';
 import secondScreen from './secondScreen.json';
+import subscription from './subscription.json';
 
 export default {
   general,
@@ -30,4 +31,5 @@ export default {
   settings,
   manageStylesAndVariables,
   secondScreen,
+  subscription,
 };

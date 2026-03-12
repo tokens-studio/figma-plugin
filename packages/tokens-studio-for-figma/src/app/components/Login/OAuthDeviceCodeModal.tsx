@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Button, Text, Stack, Box,
 } from '@tokens-studio/ui';
@@ -22,6 +23,7 @@ export const OAuthDeviceCodeModal = () => {
     setError,
   } = useAuthStore();
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
+  const { t } = useTranslation(['subscription']);
 
   // Update countdown timer for device code expiration
   useEffect(() => {
@@ -71,13 +73,13 @@ export const OAuthDeviceCodeModal = () => {
     <Modal
       isOpen={!!deviceCode}
       close={handleCancel}
-      title="Authorization Required"
+      title={t('authorizationRequired')}
       size="large"
       showClose
     >
       <Stack direction="column" gap={4} css={{ padding: '$4', alignItems: 'center' }}>
         <Text size="small" muted css={{ textAlign: 'center' }}>
-          A new browser tab should have opened. If not, visit the link below and enter this code:
+          {t('browserTabOpened')}
         </Text>
 
         <UserCodeDisplay>
@@ -98,12 +100,12 @@ export const OAuthDeviceCodeModal = () => {
           onClick={handleOpenVerificationUrl}
           css={{ width: '100%', justifyContent: 'center' }}
         >
-          Open Authorization Page
+          {t('openAuthorizationPage')}
         </Button>
 
         <Box css={{ textAlign: 'center' }}>
           <Text size="xsmall" muted>
-            Verification Link:
+            {t('verificationLink')}
           </Text>
           <Box css={{ marginTop: '$1' }}>
             <a
@@ -125,7 +127,7 @@ export const OAuthDeviceCodeModal = () => {
             color: timeRemaining < 60 ? '$dangerFg' : '$fgMuted',
           }}
         >
-          Code expires in:
+          {t('codeExpiresIn')}
           {' '}
           {formatTime(timeRemaining)}
         </Text>
@@ -137,7 +139,7 @@ export const OAuthDeviceCodeModal = () => {
           }}
           />
           <Text size="small" muted>
-            Waiting for authorization...
+            {t('waitingForAuthorization')}
           </Text>
         </Stack>
       </Stack>

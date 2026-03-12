@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button, Text } from '@tokens-studio/ui';
 import { useAuthStore } from '@/app/store/useAuthStore';
 import { styled } from '@/stitches.config';
@@ -38,6 +39,7 @@ export const OAuthLogin = ({ onSuccess }: OAuthLoginProps) => {
     setError,
     isAuthenticated,
   } = useAuthStore();
+  const { t } = useTranslation(['subscription']);
 
   useEffect(() => {
     if (isAuthenticated && onSuccess) {
@@ -75,17 +77,17 @@ export const OAuthLogin = ({ onSuccess }: OAuthLoginProps) => {
   return (
     <div style={{ width: '100%' }}>
       <LoginRow>
-        <LoginLabel>Already have a Studio Platform account?</LoginLabel>
+        <LoginLabel>{t('alreadyHaveAccount')}</LoginLabel>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           {isLoading && !deviceCode && (
-            <Text muted css={{ fontSize: '$small' }}>Loading...</Text>
+            <Text muted css={{ fontSize: '$small' }}>{t('loading')}</Text>
           )}
           <Button
             variant="secondary"
             onClick={handleOAuthLogin}
             disabled={isLoading}
           >
-            Log In
+            {t('login')}
           </Button>
         </div>
       </LoginRow>
@@ -94,7 +96,7 @@ export const OAuthLogin = ({ onSuccess }: OAuthLoginProps) => {
         <ErrorContainer>
           <Text size="small">{getErrorMessage()}</Text>
           <Button variant="secondary" onClick={handleRestartLogin} css={{ marginTop: '$3', width: '100%' }}>
-            Try Again
+            {t('tryAgain')}
           </Button>
         </ErrorContainer>
       )}
