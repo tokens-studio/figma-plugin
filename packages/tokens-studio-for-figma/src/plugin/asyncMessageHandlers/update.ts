@@ -50,6 +50,7 @@ export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = asy
 
     allWithData = await defaultNodeManager.findBaseNodesWithData({
       updateMode: msg.settings.updateMode,
+      nodesWithoutPluginData: true,
     });
 
     await updateNodes(allWithData, String(msg.settings.baseFontSize || 16));

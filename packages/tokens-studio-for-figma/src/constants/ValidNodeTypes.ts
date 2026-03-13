@@ -12,4 +12,5 @@ export const ValidNodeTypes: NodeType[] = [
   'TEXT',
   'VECTOR',
   'STAR',
+  'SECTION',
 ];
