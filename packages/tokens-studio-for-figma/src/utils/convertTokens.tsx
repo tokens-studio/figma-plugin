@@ -173,11 +173,16 @@ export default function convertToTokenArray({ tokens }: { tokens: Tokens }) {
     token: tokens,
   });
 
-  // Internally we dont care about $value or value, we always use value, so remove it
-  return Object.values(result).map((token) => {
+  // Optimize: Use Object.keys() instead of Object.values().map() to avoid creating intermediate array
+  const keys = Object.keys(result);
+  const output: SingleToken[] = [];
+  for (let i = 0; i < keys.length; i += 1) {
+    const token = result[keys[i]];
+    // Internally we dont care about $value or value, we always use value, so remove it
     if ('$value' in token) delete token.$value;
     if ('$description' in token) delete token.$description;
     if ('$type' in token) delete token.$type;
-    return token;
-  });
+    output.push(token);
+  }
+  return output;
 }
