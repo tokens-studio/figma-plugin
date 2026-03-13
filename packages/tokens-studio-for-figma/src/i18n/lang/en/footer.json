@@ -4,5 +4,6 @@
   "feedback": "Feedback",
   "pullFrom": "Pull from {{provider}}",
   "pushTo": "Push to {{provider}}",
-  "goTo": "Go to {{provider}}"
+  "goTo": "Go to {{provider}}",
+  "readOnly": "Read only"
 }

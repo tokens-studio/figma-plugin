@@ -4,5 +4,6 @@
   "feedback": "retour",
   "pullFrom": "Tirer de {{provider}}",
   "pushTo": "Appuyez sur {{provider}}",
-  "goTo": "Aller à {{provider}}"
+  "goTo": "Aller à {{provider}}",
+  "readOnly": "Lecture seule"
 }
