@@ -14,6 +14,14 @@ jest.mock('../../../hooks/useConfirm', () => ({
   }),
 }));
 
+jest.mock('@/AsyncMessageChannel', () => ({
+  AsyncMessageChannel: {
+    ReactInstance: {
+      message: jest.fn(),
+    },
+  },
+}));
+
 describe('ManageThemesModal', () => {
   it('should render', () => {
     const mockStore = createMockStore({
@@ -88,5 +96,47 @@ describe('ManageThemesModal', () => {
       result.getByText('delete').click();
       expect(result.getByText('delete')).toBeInTheDocument();
     });
+  });
+
+  it('should render attach all variables button', () => {
+    const mockStore = createMockStore({
+      tokenState: {
+        themes: [
+          {
+            id: 'light',
+            name: 'Light',
+            selectedTokenSets: {},
+            $figmaStyleReferences: {},
+          },
+          {
+            id: 'dark',
+            name: 'Dark',
+            selectedTokenSets: {},
+            $figmaStyleReferences: {},
+          },
+        ],
+      },
+    });
+
+    const result = render(
+      <Provider store={mockStore}>
+        <ManageThemesModal />
+      </Provider>,
+    );
+
+    expect(result.getByTestId('button-manage-themes-modal-attach-all-variables')).toBeInTheDocument();
+  });
+
+  it('should disable attach all variables button when no themes', () => {
+    const mockStore = createMockStore({});
+
+    const result = render(
+      <Provider store={mockStore}>
+        <ManageThemesModal />
+      </Provider>,
+    );
+
+    const button = result.getByTestId('button-manage-themes-modal-attach-all-variables');
+    expect(button).toBeDisabled();
   });
 });
