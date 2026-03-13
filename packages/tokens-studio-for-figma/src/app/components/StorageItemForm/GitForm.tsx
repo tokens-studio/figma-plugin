@@ -23,10 +23,11 @@ type Props = {
   onCancel: () => void;
   hasErrored?: boolean;
   errorMessage?: string;
+  isLoading?: boolean;
 };
 
 export default function GitForm({
-  onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
+  onChange, onSubmit, onCancel, values, hasErrored, errorMessage, isLoading = false,
 }: Props) {
   const [isMasked, setIsMasked] = React.useState(true);
 
@@ -151,7 +152,7 @@ export default function GitForm({
             {t('cancel')}
           </Button>
 
-          <Button variant="primary" type="submit" disabled={!values.secret && !values.name}>
+          <Button variant="primary" type="submit" disabled={!values.secret && !values.name} loading={isLoading}>
             {t('save')}
           </Button>
         </Stack>
