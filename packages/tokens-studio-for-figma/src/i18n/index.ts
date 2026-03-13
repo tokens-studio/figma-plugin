@@ -7,6 +7,7 @@ import esTranslations from './lang/es';
 import hiTranslations from './lang/hi';
 import nlTranslations from './lang/nl';
 import zhTranslations from './lang/zh';
+import jaTranslations from './lang/ja';
 
 const isSBX = process.env.NODE_ENV === 'sbx';
 
@@ -19,6 +20,7 @@ export const resources = {
   hi: hiTranslations,
   nl: nlTranslations,
   zh: zhTranslations,
+  ja: jaTranslations,
 };
 
 /**
@@ -47,6 +49,10 @@ export const languages = [{
 {
   title: 'Spanish',
   code: 'es',
+},
+{
+  title: 'Japanese',
+  code: 'ja',
 }];
 
 export const i18nInstance = i18n
