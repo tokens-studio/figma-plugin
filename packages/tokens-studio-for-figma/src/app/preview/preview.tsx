@@ -87,6 +87,7 @@ const mockStartupParams: Omit<StartupMessage, 'licenseKey'> = {
   },
   selectedExportThemes: [],
   oauthTokens: null,
+  activeOrganizationId: null,
 };
 
 const mockActions = {

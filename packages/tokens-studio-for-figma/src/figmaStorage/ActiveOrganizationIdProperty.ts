@@ -1,10 +1,9 @@
-import { OAuthTokens } from '@/types/oauth';
 import { tryParseJson } from '@/utils/tryParseJson';
 import { FigmaStorageProperty, FigmaStorageType } from './FigmaStorageProperty';
 
-export const OAuthTokensProperty = new FigmaStorageProperty<OAuthTokens | null>(
+export const ActiveOrganizationIdProperty = new FigmaStorageProperty<string | null>(
   FigmaStorageType.CLIENT_STORAGE,
-  'oauthTokens',
+  'activeOrganizationId',
   (incoming) => JSON.stringify(incoming),
-  (outgoing) => tryParseJson<OAuthTokens>(outgoing),
+  (outgoing) => tryParseJson<string>(outgoing),
 );

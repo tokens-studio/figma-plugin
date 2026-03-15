@@ -1,5 +1,5 @@
 import {
-  ApiProvidersProperty, AuthDataProperty, LicenseKeyProperty, InitialLoadProperty, OAuthTokensProperty,
+  ApiProvidersProperty, AuthDataProperty, LicenseKeyProperty, InitialLoadProperty, OAuthTokensProperty, ActiveOrganizationIdProperty,
 } from '@/figmaStorage';
 import { getActiveTheme } from '@/utils/getActiveTheme';
 import { getSelectedExportThemes } from '@/utils/getSelectedExportThemes';
@@ -31,6 +31,7 @@ export async function startup() {
     usedEmail,
     variableExportSettings,
     selectedExportThemes,
+    activeOrganizationId,
   ] = await Promise.all([
     getUISettings(false),
     getUsedTokenSet(),
@@ -48,6 +49,7 @@ export async function startup() {
     UsedEmailProperty.read(),
     getVariableExportSettings(),
     getSelectedExportThemes(),
+    ActiveOrganizationIdProperty.read(),
   ]);
 
   // If we have saved variable export settings, apply them to the settings
@@ -81,5 +83,6 @@ export async function startup() {
     oauthTokens,
     usedEmail,
     selectedExportThemes,
+    activeOrganizationId,
   };
 }
