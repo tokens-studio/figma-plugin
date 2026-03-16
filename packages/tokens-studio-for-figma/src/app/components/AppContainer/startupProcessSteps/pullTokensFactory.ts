@@ -72,6 +72,8 @@ export function pullTokensFactory(
             || matchingSet.provider === StorageProviderType.GITLAB
             || matchingSet.provider === StorageProviderType.ADO
             || matchingSet.provider === StorageProviderType.BITBUCKET
+            || matchingSet.provider === StorageProviderType.TOKENS_STUDIO_OAUTH
+            || (matchingSet.provider === StorageProviderType.TOKENS_STUDIO && (matchingSet as any).internalId?.startsWith('tokens-studio-'))
           ) {
             const branches = await useRemoteTokensResult.fetchBranches(matchingSet);
             if (branches) dispatch.branchState.setBranches(branches);

@@ -8,6 +8,7 @@ import { storageTypeSelector } from '@/selectors';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { TokensStudioStorageType } from '@/types/StorageType';
 import useStorage from '@/app/store/useStorage';
+import useRemoteTokens from '@/app/store/remoteTokens';
 import { Dispatch } from '@/app/store';
 
 const Avatar = styled('img', {
@@ -81,6 +82,7 @@ export const StudioProjectSelector = () => {
     const storageType = useSelector(storageTypeSelector);
     const dispatch = useDispatch<Dispatch>();
     const { setStorageType } = useStorage();
+    const { fetchBranches } = useRemoteTokens();
 
     if (!activeOrganization) return null;
 
@@ -118,6 +120,11 @@ export const StudioProjectSelector = () => {
                                         };
                                         dispatch.uiState.setLocalApiState(newProviderData as any);
                                         setStorageType({ provider: newProviderData as any, shouldSetInDocument: true });
+
+                                        const branches = await fetchBranches(newProviderData as any);
+                                        if (branches) {
+                                            dispatch.branchState.setBranches(branches);
+                                        }
                                     } catch (e) {
                                         console.error('Failed to load project tokens for active provider', e);
                                     }

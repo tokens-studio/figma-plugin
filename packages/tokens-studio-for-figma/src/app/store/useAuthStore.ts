@@ -37,7 +37,7 @@ interface AuthState {
   setOAuthTokens: (tokens: OAuthTokens | null) => Promise<void>;
   fetchUserData: (tokens: OAuthTokens) => Promise<void>;
   fetchProjects: (orgId: string) => Promise<void>;
-  loadProjectTokens: (projectId: string) => Promise<void>;
+  loadProjectTokens: (projectId: string, branch?: string) => Promise<void>;
   refreshTokens: () => Promise<void>;
 }
 
@@ -368,7 +368,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
-  loadProjectTokens: async (projectId: string) => {
+  loadProjectTokens: async (projectId: string, branch?: string) => {
     const { oauthTokens, activeOrganization } = get();
     if (!oauthTokens || !activeOrganization) return;
 
@@ -381,7 +381,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const projectData = await fetchProjectDataRest(
         oauthTokens.accessToken,
         apiBaseUrl,
-        projectId
+        projectId,
+        branch || 'main'
       );
 
       if (projectData && projectData.tokens) {

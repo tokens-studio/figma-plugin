@@ -90,6 +90,7 @@ export type TokensStudioOAuthStorageType = GenericStorageType<
     name: string; // this is only for reference
     orgId: string; // this is the organization id
     id: string; // this is the project id
+    branch?: string; // this is the base branch
     baseUrl?: string; // this is the base URL for the Studio instance
   }
 >;

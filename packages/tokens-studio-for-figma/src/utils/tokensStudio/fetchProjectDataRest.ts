@@ -1,13 +1,8 @@
 import { AnyTokenSet } from '@/types/tokens';
 import { ThemeObjectsList } from '@/types';
+import { RestBranch } from './fetchBranchesListRest';
 
 // Types derived from REST endpoints
-interface RestBranch {
-    id: string;
-    name: string;
-    is_default: boolean;
-    change_set_id: string;
-}
 
 interface RestTokenSet {
     id: string;
@@ -65,6 +60,7 @@ export async function fetchProjectDataRest(
         const branchesRes = await fetch(`${apiBaseUrl}/api/v1/projects/${projectId}/branches`, { headers });
         if (!branchesRes.ok) throw new Error(`Failed to fetch branches: ${branchesRes.statusText}`);
         const branchesData = await branchesRes.json();
+        console.log('Fetched Branches for Project Data:', branchesData);
 
         let branches: RestBranch[] = [];
         if (branchesData.data && Array.isArray(branchesData.data)) {
@@ -86,6 +82,9 @@ export async function fetchProjectDataRest(
         const branch = branches.find((b) => b.name === branchName) || branches.find((b) => b.is_default) || branches[0];
         if (!branch) throw new Error(`Branch ${branchName} not found`);
         const changeSetId = branch.change_set_id;
+        
+        console.log(`Pulling tokens from Project: ${projectId}, Branch: ${branch.name}, Change Set ID: ${changeSetId}`);
+
         const branchQuery = `change_set_id=${encodeURIComponent(changeSetId)}`;
 
         // 2. Fetch all required data concurrently

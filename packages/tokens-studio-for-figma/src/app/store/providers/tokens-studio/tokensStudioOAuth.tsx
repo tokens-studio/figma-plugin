@@ -22,8 +22,9 @@ import usePushDialog from '../../../hooks/usePushDialog';
 import { RemoteResponseData } from '../../../../types/RemoteResponseData';
 import { ErrorMessages } from '../../../../constants/ErrorMessages';
 import { PushOverrides } from '../../remoteTokens';
-import { useAuthStore } from '../../useAuthStore';
 import { fetchProjectDataRest } from '../../../../utils/tokensStudio/fetchProjectDataRest';
+import { fetchBranchesListRest } from '../../../../utils/tokensStudio/fetchBranchesListRest';
+import { useAuthStore } from '../../useAuthStore';
 import { OAuthService } from '../../../services/OAuthService';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
@@ -48,7 +49,7 @@ export function useTokensStudioOAuth() {
             if (oauthTokens?.accessToken) {
                 const studioUrl = 'production.tokens.studio';
                 const apiBaseUrl = OAuthService.getApiBaseUrl(studioUrl);
-                const projectData = await fetchProjectDataRest(oauthTokens.accessToken, apiBaseUrl, context.id);
+                const projectData = await fetchProjectDataRest(oauthTokens.accessToken, apiBaseUrl, context.id, context.branch || 'main');
                 if (projectData) {
                     const sortedTokens = applyTokenSetOrder(
                         projectData.tokens as any,
@@ -73,6 +74,21 @@ export function useTokensStudioOAuth() {
                 status: 'failure',
                 errorMessage: 'OAuth token missing',
             };
+        },
+        [],
+    );
+
+    const fetchBranchesForTokensStudio = useCallback(
+        async (context: TokensStudioOAuthCredentials): Promise<string[] | null> => {
+            const { oauthTokens } = useAuthStore.getState();
+
+            if (oauthTokens?.accessToken) {
+                const studioUrl = 'production.tokens.studio';
+                const apiBaseUrl = OAuthService.getApiBaseUrl(studioUrl);
+                const branches = await fetchBranchesListRest(oauthTokens.accessToken, apiBaseUrl, context.id);
+                return branches;
+            }
+            return null;
         },
         [],
     );
@@ -141,7 +157,8 @@ export function useTokensStudioOAuth() {
         () => ({
             syncTokensWithTokensStudioOAuth,
             pullTokensFromTokensStudioOAuth,
+            fetchBranchesForTokensStudio,
         }),
-        [syncTokensWithTokensStudioOAuth, pullTokensFromTokensStudioOAuth],
+        [syncTokensWithTokensStudioOAuth, pullTokensFromTokensStudioOAuth, fetchBranchesForTokensStudio],
     );
 }

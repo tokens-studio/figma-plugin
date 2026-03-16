@@ -182,12 +182,14 @@ export class ADOTokenStorage extends GitTokenStorage {
 
   public async fetchBranches() {
     const { value } = await this.getRefs();
+    console.log('Fetched ADO refs:', value);
     const branches:string[] = [];
     for (const val of value) {
       if (val.name) {
         branches.push(val.name.replace(/^refs\/heads\//, ''));
       }
     }
+    console.log('Fetched ADO branches:', branches);
     return branches;
   }
 

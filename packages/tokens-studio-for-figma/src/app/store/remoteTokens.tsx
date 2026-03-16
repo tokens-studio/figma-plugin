@@ -96,6 +96,7 @@ export default function useRemoteTokens() {
   const {
     syncTokensWithTokensStudioOAuth,
     pullTokensFromTokensStudioOAuth,
+    fetchBranchesForTokensStudio,
   } = useTokensStudioOAuth();
   const {
     addNewADOCredentials,
@@ -629,6 +630,8 @@ export default function useRemoteTokens() {
           return fetchBitbucketBranches(context);
         case StorageProviderType.ADO:
           return fetchADOBranches(context);
+        case StorageProviderType.TOKENS_STUDIO_OAUTH:
+          return fetchBranchesForTokensStudio(context as any);
         default:
           return null;
       }

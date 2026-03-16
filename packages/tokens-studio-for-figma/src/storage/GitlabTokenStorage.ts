@@ -83,6 +83,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
     const branches = await retryWithBackoff(
       () => this.gitlabClient.Branches.all(this.projectId!),
     );
+    console.log('Fetched GitLab branches:', branches);
     return branches.map((branch) => branch.name);
   }
 
