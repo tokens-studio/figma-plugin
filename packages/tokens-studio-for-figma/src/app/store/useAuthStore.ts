@@ -35,7 +35,7 @@ interface AuthState {
   setActiveOrganization: (orgId: string) => void;
   setActiveProject: (projectId: string) => void;
   setOAuthTokens: (tokens: OAuthTokens | null) => Promise<void>;
-  fetchUserData: (tokens: OAuthTokens) => Promise<void>;
+  fetchUserData: (tokens: OAuthTokens, activeProjectId?: string) => Promise<void>;
   fetchProjects: (orgId: string) => Promise<void>;
   loadProjectTokens: (projectId: string, branch?: string) => Promise<void>;
   refreshTokens: () => Promise<void>;
@@ -198,7 +198,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     });
   },
 
-  fetchUserData: async (tokens: OAuthTokens) => {
+  fetchUserData: async (tokens: OAuthTokens, activeProjectId?: string) => {
     let currentTokens = tokens;
     if (OAuthService.needsRefresh(currentTokens)) {
       try {
@@ -300,9 +300,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       }
 
       let initialProject = activeOrganization?.projects?.data?.[0] || null;
-      if (activeOrganization && localApiState?.provider === 'tokensstudio-oauth' && localApiState.id) {
-        initialProject = activeOrganization.projects?.data?.find(p => p.id === localApiState.id) || initialProject;
+      let targetProjectId = activeProjectId || (localApiState?.provider === 'tokensstudio-oauth' ? localApiState?.id : null);
+      if (activeOrganization && targetProjectId) {
+        initialProject = activeOrganization.projects?.data?.find(p => p.id === targetProjectId) || initialProject;
       }
+      console.log('[fetchUserData] Initializing activeProject to:', initialProject, 'based on activeProjectId:', activeProjectId, 'localApiState:', localApiState);
 
       set({
         user,

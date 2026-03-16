@@ -47,7 +47,8 @@ export function savePluginDataFactory(dispatch: Dispatch, params: StartupMessage
           useAuthStore.setState({ activeOrganizationId: params.activeOrganizationId });
         }
         useAuthStore.getState().setOAuthTokens(params.oauthTokens);
-        useAuthStore.getState().fetchUserData(params.oauthTokens);
+        const activeProjectId = params.storageType?.provider === 'tokensstudio-oauth' ? (params.storageType as any).id : undefined;
+        useAuthStore.getState().fetchUserData(params.oauthTokens, activeProjectId);
       }
     } else {
       throw new Error('User not found');

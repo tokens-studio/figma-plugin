@@ -13,6 +13,9 @@ import { hasTokenValues } from '@/utils/hasTokenValues';
 import { notifyToUI } from '@/plugin/notifiers';
 import type useRemoteTokens from '@/app/store/remoteTokens';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
+import { useAuthStore } from '../../../store/useAuthStore';
+
+// @TODO - this file should be removed and useRemoteTokens should be used instead!';
 import { isGitProvider } from '@/utils/is';
 import { categorizeError } from '@/utils/error/categorizeError';
 
@@ -42,6 +45,14 @@ export function pullTokensFactory(
         isSameCredentials(provider, storageType)
       ));
 
+      if (matchingSet) {
+        matchingSet = {
+          ...matchingSet,
+          ...storageType,
+          secret: matchingSet.secret,
+        } as StorageTypeCredentials;
+      }
+
       // If no matching set found but we are authenticated via Tokens Studio OAuth, create a synthetic matching set
       if (
         !matchingSet
@@ -57,6 +68,8 @@ export function pullTokensFactory(
           secret: params.oauthTokens.accessToken,
         } as StorageTypeCredentials;
       }
+
+      console.log('[pullTokensFactory] initialized matchingSet from storageType:', matchingSet?.id, 'storageType payload:', storageType);
 
       if (matchingSet) {
         // found API credentials
@@ -86,6 +99,7 @@ export function pullTokensFactory(
           dispatch.tokenState.setActiveTheme({ newActiveTheme: activeTheme || null, shouldUpdateNodes: false });
           dispatch.tokenState.setCollapsedTokenSets(params.localTokenData?.collapsedTokenSets || []);
 
+          console.log('[pullTokensFactory] About to pull tokens using matchingSet:', matchingSet.id, 'branch:', (matchingSet as any).branch, 'Is activeProject id different?', useAuthStore.getState().activeProject?.id);
           const remoteData = await useRemoteTokensResult.pullTokens({
             context: matchingSet,
             activeTheme,
