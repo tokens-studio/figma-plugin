@@ -43,8 +43,11 @@ const StorageItem = ({ item, onEdit, onMigrate, isOAuthApp }: Props) => {
   const isAccessDisabled = (item as any).__isAccessDisabled;
   const planName = (item as any).__planName;
   const subscriptionStatus = (item as any).__subscriptionStatus;
-  
-  const [selectedProjectId, setSelectedProjectId] = React.useState<string | undefined>(undefined);
+  const isActive = React.useCallback(() => isSameCredentials(item, storageType), [item, storageType]);
+
+  const [selectedProjectId, setSelectedProjectId] = React.useState<string | undefined>(
+    isActive() ? (item as any).id : undefined
+  );
 
   // Check if this is a Bitbucket item using app password
   const isBitbucketWithAppPassword = React.useMemo(() => (
@@ -57,9 +60,6 @@ const StorageItem = ({ item, onEdit, onMigrate, isOAuthApp }: Props) => {
     });
     return shouldDelete;
   }, [confirm, t]);
-
-  const isActive = React.useCallback(() => isSameCredentials(item, storageType), [item, storageType]);
-
   const handleDelete = React.useCallback(async () => {
     if (await askUserIfDelete()) {
       deleteProvider(item);
@@ -74,7 +74,13 @@ const StorageItem = ({ item, onEdit, onMigrate, isOAuthApp }: Props) => {
 
   const handleRestore = React.useCallback(async () => {
     if (isOAuth) {
-      const idToLoad = selectedProjectId || item.id || activeProject?.id;
+      let fallbackId = item.id;
+      const isCurrentlyActiveOrg = !(item as any).orgId || (item as any).orgId === useAuthStore.getState().activeOrganizationId;
+      if (isCurrentlyActiveOrg && activeProject) {
+          fallbackId = activeProject.id;
+      }
+
+      const idToLoad = selectedProjectId || fallbackId;
       if (idToLoad) {
         try {
           if ((item as any).orgId) {

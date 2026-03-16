@@ -77,25 +77,62 @@ const StyledDropdownItem = styled(DropdownMenu.Item, {
     },
 });
 
-export const StudioProjectSelector = () => {
-    const { activeOrganization, activeProject, setActiveProject, loadProjectTokens } = useAuthStore();
+export interface StudioProjectSelectorProps {
+    orgId?: string;
+    value?: string;
+    onChange?: (projectId: string) => void;
+}
+
+export const StudioProjectSelector = ({ orgId, value, onChange }: StudioProjectSelectorProps) => {
+    const { organizations, activeProject, setActiveProject, loadProjectTokens } = useAuthStore();
     const storageType = useSelector(storageTypeSelector);
     const dispatch = useDispatch<Dispatch>();
     const { setStorageType } = useStorage();
     const { fetchBranches } = useRemoteTokens();
 
+    const activeOrganization = React.useMemo(() => {
+        if (orgId) {
+            return organizations.find(o => o.id === orgId) || null;
+        }
+        return useAuthStore.getState().activeOrganization;
+    }, [orgId, organizations]);
+
     if (!activeOrganization) return null;
 
     const hasProjects = activeOrganization.projects?.data?.length > 0;
+
+    const activeProjectToUse = React.useMemo(() => {
+        // 1. If explicitly controlled by parent (e.g. inactive state setting override)
+        if (value && activeOrganization?.projects?.data) {
+            return activeOrganization.projects.data.find(p => p.id === value) || null;
+        }
+        
+        // 2. If this organization is the globally ACTIVE storage type, its project comes directly from storageType state
+        const isOrgActiveInStorage = storageType.provider === StorageProviderType.TOKENS_STUDIO_OAUTH && (storageType as any).internalId === `tokens-studio-${orgId || useAuthStore.getState().activeOrganizationId}`;
+        
+        if (isOrgActiveInStorage && activeOrganization?.projects?.data) {
+            const storedProject = activeOrganization.projects.data.find(p => p.id === (storageType as any).id);
+            if (storedProject) return storedProject;
+        }
+
+        // 3. Fallback to the purely local activeProject in useAuthStore if it aligns
+        const isCurrentlyActiveOrg = !orgId || orgId === useAuthStore.getState().activeOrganizationId;
+        if (isCurrentlyActiveOrg && activeProject) {
+            return activeProject;
+        }
+        
+        // 4. Fallback to the first project in the organization
+        return activeOrganization?.projects?.data?.[0] || null;
+    }, [value, activeOrganization, orgId, activeProject, storageType]);
 
     return (
         <DropdownMenu>
             <DropdownMenu.Trigger asChild disabled={!hasProjects}>
                 <OrgDropdownTriggerBtn disabled={!hasProjects}>
                     <AvatarFallback>
-                        {activeProject?.name[0] || 'P'}
+                        {activeProjectToUse?.name[0] || 'P'}
                     </AvatarFallback>
-                    {activeProject?.name || (!hasProjects ? 'No projects' : 'Select Project')}
+                    {activeProjectToUse?.name || (!hasProjects ? 'No projects' : 'Select Project')}
                     <CaretDownIcon style={{ marginLeft: '4px', color: 'var(--colors-fgMuted)' }} />
                 </OrgDropdownTriggerBtn>
             </DropdownMenu.Trigger>
@@ -105,10 +142,19 @@ export const StudioProjectSelector = () => {
                         <StyledDropdownItem
                             key={project.id}
                             onClick={async () => {
-                                setActiveProject(project.id);
+                                if (onChange) {
+                                    onChange(project.id);
+                                }
+                                
+                                const isCurrentlyActiveOrg = !orgId || orgId === useAuthStore.getState().activeOrganizationId;
 
-                                // Auto-load tokens if Provider is currently active
+                                if (isCurrentlyActiveOrg && !onChange) {
+                                    setActiveProject(project.id);
+                                }
+
+                                // Auto-load tokens if Provider is currently active AND this is the active org
                                 if (
+                                    isCurrentlyActiveOrg &&
                                     storageType.provider === StorageProviderType.TOKENS_STUDIO_OAUTH &&
                                     (storageType as any).internalId?.startsWith('tokens-studio-')
                                 ) {

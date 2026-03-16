@@ -284,7 +284,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         console.warn('Could not fetch organizations via new backend, fallback missing depending on API.', err);
       }
 
-      const storedOrgId = get().activeOrganizationId;
+      const storedState = store.getState();
+      const localApiState = storedState.uiState?.localApiState;
+      
+      const storedOrgId = get().activeOrganizationId || (localApiState?.provider === 'tokensstudio-oauth' ? localApiState.internalId?.replace('tokens-studio-', '') : null);
+      
       const activeOrganization = storedOrgId
         ? organizations.find((o) => o.id === storedOrgId) || (organizations.length > 0 ? organizations[0] : null)
         : (organizations.length > 0 ? organizations[0] : null);
@@ -295,11 +299,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         isPro = accessArr.includes('figma_plugin');
       }
 
+      let initialProject = activeOrganization?.projects?.data?.[0] || null;
+      if (activeOrganization && localApiState?.provider === 'tokensstudio-oauth' && localApiState.id) {
+        initialProject = activeOrganization.projects?.data?.find(p => p.id === localApiState.id) || initialProject;
+      }
+
       set({
         user,
         organizations,
         activeOrganization,
-        activeProject: activeOrganization?.projects?.data?.[0] || null,
+        activeProject: initialProject,
         isPro,
         isLoading: false,
         isAuthenticated: true,
@@ -360,10 +369,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             ? { ...state.activeOrganization, projects: { data: projects } }
             : state.activeOrganization;
 
+          const nextActiveProject = state.activeOrganization?.id === orgId
+            ? (projects.find(p => p.id === state.activeProject?.id) || projects[0] || null)
+            : state.activeProject;
+
           return {
             organizations: updatedOrganizations,
             activeOrganization: updatedActiveOrg,
-            activeProject: (state.activeOrganization?.id === orgId) ? (projects[0] || null) : state.activeProject,
+            activeProject: nextActiveProject,
           };
         });
       }
