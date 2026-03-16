@@ -165,10 +165,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   setActiveOrganization: (orgId: string) => {
     set((state) => {
       const org = state.organizations.find(o => o.id === orgId) || null;
+      const access = org?.subscription?.access || [];
+      const isPro = access.includes('figma_plugin');
+
       return {
         activeOrganizationId: org?.id || null,
         activeOrganization: org,
         activeProject: org?.projects?.data?.[0] || null,
+        isPro,
       };
     });
     AsyncMessageChannel.ReactInstance.message({
@@ -285,11 +289,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         ? organizations.find((o) => o.id === storedOrgId) || (organizations.length > 0 ? organizations[0] : null)
         : (organizations.length > 0 ? organizations[0] : null);
 
-      const isPro = organizations.some(org => {
-        const status = org.subscription?.subscription_status;
-        return status === 'active' || status === 'trialing' || status === 'past_due';
-      });
-      console.log('useAuthStore: isPro calculation', { isPro, subscriptionStatuses: organizations.map(o => o.subscription?.subscription_status) });
+      let isPro = false;
+      if (activeOrganization) {
+        const accessArr = activeOrganization.subscription?.access || [];
+        isPro = accessArr.includes('figma_plugin');
+      }
 
       set({
         user,
