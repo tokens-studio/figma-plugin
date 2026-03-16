@@ -129,8 +129,12 @@ export function useTokensStudioOAuth() {
                             const stringifiedRemoteTokens = JSON.stringify(compact([data.tokens, data.themes, TokenFormat.format]), null, 2);
                             dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
                             dispatch.tokenState.setCollapsedTokenSets([]);
+                            dispatch.tokenState.setEditProhibited(true);
                             notifyToUI('Pulled tokens from Tokens Studio OAuth');
                         }
+                    } else {
+                        // Even if it didn't change, we still want it read only
+                        dispatch.tokenState.setEditProhibited(true);
                     }
                 }
 

@@ -404,6 +404,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
         const stringifiedRemoteTokens = JSON.stringify(compact([tokens, themes, TokenFormat.format]), null, 2);
         store.dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
+        store.dispatch.tokenState.setEditProhibited(true);
 
         notifyToUI('Successfully loaded project tokens', { error: false });
       } else {

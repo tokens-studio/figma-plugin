@@ -11,6 +11,7 @@ import {
   usedTokenSetSelector,
   localApiStateSelector,
   activeThemeSelector,
+  editProhibitedSelector,
 } from '@/selectors';
 import useRemoteTokens from '../store/remoteTokens';
 import useConfirm from '@/app/hooks/useConfirm';
@@ -44,6 +45,7 @@ export default function BranchSelector() {
   const apiData = useSelector(apiSelector);
   const activeTheme = useSelector(activeThemeSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
+  const editProhibited = useSelector(editProhibitedSelector);
   const { t } = useTranslation(['branch', 'licence']);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [currentBranch, setCurrentBranch] = useState(localApiStateBranch);
@@ -181,6 +183,7 @@ export default function BranchSelector() {
         onCreateBranchFromCurrentChanges={createBranchFromCurrentChanges}
         branches={branchState.branches}
         currentBranch={currentBranch}
+        editProhibited={editProhibited}
       />
       {createBranchModalVisible && startBranch && (
         <CreateBranchModal

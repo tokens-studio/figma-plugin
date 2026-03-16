@@ -27,6 +27,7 @@ interface BranchSelectorPopoverProps {
   onCreateBranchFromSelected: (branch: string) => void;
   onCreateBranchFromCurrentChanges: () => void;
   currentBranch: string;
+  editProhibited?: boolean;
 }
 
 export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
@@ -37,6 +38,7 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
   onCreateBranchFromSelected,
   currentBranch,
   onCreateBranchFromCurrentChanges,
+  editProhibited,
 }) => {
   const seed = useUIDSeed();
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -275,7 +277,7 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
                         <Text size="small" bold css={{ flex: 1 }}>
                           {getTitle()}
                         </Text>
-                        {mode === 'switch' && (
+                        {mode === 'switch' && !editProhibited && (
                         <IconButton
                           type="button"
                           tooltip={t('createNew')}
