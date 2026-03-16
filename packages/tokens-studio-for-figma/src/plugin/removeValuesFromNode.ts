@@ -11,23 +11,57 @@ function removeStrokeIfEmptySides(node) {
   }
 }
 
+function captureAutoLayoutSizingState(node: BaseNode) {
+  return {
+    layoutSizingHorizontal: 'layoutSizingHorizontal' in node ? node.layoutSizingHorizontal : undefined,
+    layoutSizingVertical: 'layoutSizingVertical' in node ? node.layoutSizingVertical : undefined,
+    primaryAxisSizingMode: 'primaryAxisSizingMode' in node ? node.primaryAxisSizingMode : undefined,
+    counterAxisSizingMode: 'counterAxisSizingMode' in node ? node.counterAxisSizingMode : undefined,
+  };
+}
+
+function restoreAutoLayoutSizingState(
+  node: BaseNode,
+  autoLayoutSizingState: ReturnType<typeof captureAutoLayoutSizingState>,
+) {
+  if ('layoutSizingHorizontal' in node && typeof autoLayoutSizingState.layoutSizingHorizontal !== 'undefined') {
+    (node as BaseNode & { layoutSizingHorizontal: unknown }).layoutSizingHorizontal = autoLayoutSizingState.layoutSizingHorizontal;
+  }
+
+  if ('layoutSizingVertical' in node && typeof autoLayoutSizingState.layoutSizingVertical !== 'undefined') {
+    (node as BaseNode & { layoutSizingVertical: unknown }).layoutSizingVertical = autoLayoutSizingState.layoutSizingVertical;
+  }
+
+  if ('primaryAxisSizingMode' in node && typeof autoLayoutSizingState.primaryAxisSizingMode !== 'undefined') {
+    (node as BaseNode & { primaryAxisSizingMode: unknown }).primaryAxisSizingMode = autoLayoutSizingState.primaryAxisSizingMode;
+  }
+
+  if ('counterAxisSizingMode' in node && typeof autoLayoutSizingState.counterAxisSizingMode !== 'undefined') {
+    (node as BaseNode & { counterAxisSizingMode: unknown }).counterAxisSizingMode = autoLayoutSizingState.counterAxisSizingMode;
+  }
+}
+
 export default function removeValuesFromNode(node: BaseNode, prop: Properties) {
   // BORDER RADIUS
   switch (prop) {
     case 'width':
       if ('resize' in node) {
+        const autoLayoutSizingState = captureAutoLayoutSizingState(node);
         const oldWidth = node.width;
         const oldHeight = node.height;
         node.resize(0.1, oldHeight);
         node.resize(oldWidth, oldHeight);
+        restoreAutoLayoutSizingState(node, autoLayoutSizingState);
       }
       break;
     case 'height':
       if ('resize' in node) {
+        const autoLayoutSizingState = captureAutoLayoutSizingState(node);
         const oldWidth = node.width;
         const oldHeight = node.height;
         node.resize(oldWidth, 0.1);
         node.resize(oldWidth, oldHeight);
+        restoreAutoLayoutSizingState(node, autoLayoutSizingState);
       }
       break;
     case 'borderRadius':
@@ -234,12 +268,12 @@ export default function removeValuesFromNode(node: BaseNode, prop: Properties) {
         node.itemSpacing = 0;
       }
       if ('resize' in node) {
-        if ('resize' in node) {
-          const oldWidth = node.width;
-          const oldHeight = node.height;
-          node.resize(0.1, 0.1);
-          node.resize(oldWidth, oldHeight);
-        }
+        const autoLayoutSizingState = captureAutoLayoutSizingState(node);
+        const oldWidth = node.width;
+        const oldHeight = node.height;
+        node.resize(0.1, 0.1);
+        node.resize(oldWidth, oldHeight);
+        restoreAutoLayoutSizingState(node, autoLayoutSizingState);
       }
       break;
     default:
