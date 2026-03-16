@@ -110,7 +110,7 @@ const StorageItem = ({ item, onEdit, onMigrate, isOAuthApp }: Props) => {
       setHasErrored(true);
       setErrorMessage(response?.errorMessage);
     }
-  }, [item, restoreStoredProvider, isOAuthApp, activeProject, loadProjectTokens, dispatch.uiState, setStorageType]);
+  }, [item, restoreStoredProvider, isOAuthApp, activeProject, loadProjectTokens, dispatch.uiState, setStorageType, selectedProjectId, isOAuth, setActiveOrganization, setActiveProject]);
 
   return (
     <StyledStorageItem data-testid={`storageitem-${provider}-${id}`} key={`${provider}-${item.internalId || id}`} active={isActive()} hasError={isBitbucketWithAppPassword} css={isAccessDisabled ? { opacity: 0.6, pointerEvents: 'none' } : {}}>

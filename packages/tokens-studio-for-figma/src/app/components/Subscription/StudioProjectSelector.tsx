@@ -104,7 +104,10 @@ export const StudioProjectSelector = ({ orgId, value, onChange }: StudioProjectS
     const activeProjectToUse = React.useMemo(() => {
         // 1. If explicitly controlled by parent (e.g. inactive state setting override)
         if (value && activeOrganization?.projects?.data) {
-            return activeOrganization.projects.data.find(p => p.id === value) || null;
+            const found = activeOrganization.projects.data.find(p => p.id === value) || null;
+            if (found) {
+                return found;
+            }
         }
         
         // 2. If this organization is the globally ACTIVE storage type, its project comes directly from storageType state
@@ -112,7 +115,9 @@ export const StudioProjectSelector = ({ orgId, value, onChange }: StudioProjectS
         
         if (isOrgActiveInStorage && activeOrganization?.projects?.data) {
             const storedProject = activeOrganization.projects.data.find(p => p.id === (storageType as any).id);
-            if (storedProject) return storedProject;
+            if (storedProject) {
+                return storedProject;
+            }
         }
 
         // 3. Fallback to the purely local activeProject in useAuthStore if it aligns
