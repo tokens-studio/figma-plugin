@@ -148,7 +148,7 @@ export default function BranchSelector() {
   const onBranchSelected = React.useCallback(
     async (branch: string) => {
       track('Branch changed');
-      if (hasChanges) {
+      if (hasChanges && !editProhibited) {
         if (await askUserIfPushChanges()) {
           await changeAndPull(branch);
         }
@@ -156,7 +156,7 @@ export default function BranchSelector() {
         await changeAndPull(branch);
       }
     },
-    [askUserIfPushChanges, changeAndPull, hasChanges],
+    [askUserIfPushChanges, changeAndPull, hasChanges, editProhibited],
   );
 
   const onCreateBranchModalSuccess = React.useCallback(
