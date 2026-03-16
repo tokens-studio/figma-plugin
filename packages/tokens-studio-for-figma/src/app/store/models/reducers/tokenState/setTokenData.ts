@@ -24,7 +24,10 @@ export function setTokenData(state: TokenState, payload: SetTokenDataPayload): T
 
   const allAvailableTokenSets = Object.keys(values);
   const usedTokenSets = Object.fromEntries(
-    allAvailableTokenSets.map((tokenSet) => [tokenSet, payload.usedTokenSet?.[tokenSet] ?? TokenSetStatus.DISABLED]),
+    allAvailableTokenSets.map((tokenSet) => [
+      tokenSet,
+      payload.usedTokenSet?.[tokenSet] ?? state.usedTokenSet?.[tokenSet] ?? TokenSetStatus.DISABLED,
+    ]),
   );
   const newActiveTheme = payload.activeTheme;
   Object.entries(newActiveTheme ?? {}).forEach(([group, activeTheme]) => {
