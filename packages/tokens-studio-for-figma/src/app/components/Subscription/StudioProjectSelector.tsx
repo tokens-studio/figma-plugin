@@ -170,6 +170,7 @@ export const StudioProjectSelector = ({ orgId, value, onChange }: StudioProjectS
                                             id: project.id,
                                         };
                                         dispatch.uiState.setLocalApiState(newProviderData as any);
+                                        dispatch.uiState.setApiData(newProviderData as any);
                                         setStorageType({ provider: newProviderData as any, shouldSetInDocument: true });
 
                                         const branches = await fetchBranches(newProviderData as any);

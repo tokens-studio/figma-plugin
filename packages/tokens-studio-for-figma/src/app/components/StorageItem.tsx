@@ -32,7 +32,7 @@ const StorageItem = ({ item, onEdit, onMigrate, isOAuthApp }: Props) => {
   const storageType = useSelector(storageTypeSelector);
   const { provider, id, name } = item;
   const branch = isGitProvider(item) ? item.branch : null;
-  const { restoreStoredProvider, deleteProvider } = useRemoteTokens();
+  const { restoreStoredProvider, deleteProvider, fetchBranches } = useRemoteTokens();
   const { confirm } = useConfirm();
   const { setStorageType } = useStorage();
   const dispatch = useDispatch<Dispatch>();
@@ -90,11 +90,22 @@ const StorageItem = ({ item, onEdit, onMigrate, isOAuthApp }: Props) => {
           await loadProjectTokens(idToLoad);
           const newItem = { ...item, id: idToLoad };
           dispatch.uiState.setLocalApiState(newItem);
+          dispatch.uiState.setApiData(newItem);
           setStorageType({
             provider: newItem,
             shouldSetInDocument: true,
           });
           setHasErrored(false);
+
+          try {
+            const branches = await fetchBranches(newItem as any);
+            if (branches) {
+              dispatch.branchState.setBranches(branches);
+            }
+          } catch (e: any) {
+             console.error('Failed to fetch branches', e);
+          }
+
         } catch (e: any) {
           setHasErrored(true);
           setErrorMessage(e.message || 'Failed to load project tokens');
@@ -110,7 +121,7 @@ const StorageItem = ({ item, onEdit, onMigrate, isOAuthApp }: Props) => {
       setHasErrored(true);
       setErrorMessage(response?.errorMessage);
     }
-  }, [item, restoreStoredProvider, isOAuthApp, activeProject, loadProjectTokens, dispatch.uiState, setStorageType, selectedProjectId, isOAuth, setActiveOrganization, setActiveProject]);
+  }, [item, restoreStoredProvider, fetchBranches, isOAuthApp, activeProject, loadProjectTokens, dispatch.uiState, dispatch.branchState, setStorageType, selectedProjectId, isOAuth, setActiveOrganization, setActiveProject]);
 
   return (
     <StyledStorageItem data-testid={`storageitem-${provider}-${id}`} key={`${provider}-${item.internalId || id}`} active={isActive()} hasError={isBitbucketWithAppPassword} css={isAccessDisabled ? { opacity: 0.6, pointerEvents: 'none' } : {}}>
