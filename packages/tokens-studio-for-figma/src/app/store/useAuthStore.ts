@@ -305,8 +305,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         isAuthenticated: true,
       });
 
-      if (activeOrganization) {
-        await get().fetchProjects(activeOrganization.id);
+      if (organizations.length > 0) {
+        await Promise.all(organizations.map(org => get().fetchProjects(org.id)));
       }
     } catch (error) {
       console.error('Error fetching user data:', error);

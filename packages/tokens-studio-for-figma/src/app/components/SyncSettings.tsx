@@ -68,24 +68,27 @@ const SyncSettings = () => {
   const apiProviders = useSelector(apiProvidersSelector);
   const dispatch = useDispatch<Dispatch>();
 
-  const { isAuthenticated, activeOrganization, activeProject } = useAuthStore();
+  const { isAuthenticated, organizations } = useAuthStore();
 
-  const renderedProviders = React.useMemo(() => {
-    let list = [...apiProviders];
-    if (isAuthenticated && activeOrganization) {
-      list = [
-        {
+  const studioProviders = React.useMemo(() => {
+    if (isAuthenticated && organizations?.length) {
+      return organizations.map(org => {
+        const hasAccess = org.subscription?.access?.includes('figma_plugin');
+        return {
           provider: StorageProviderType.TOKENS_STUDIO_OAUTH,
-          internalId: `tokens-studio-${activeOrganization.id}`,
-          name: activeOrganization.name,
-          orgId: activeOrganization.id,
-          id: activeProject?.id || '',
-        } as StorageTypeCredentials,
-        ...list,
-      ];
+          internalId: `tokens-studio-${org.id}`,
+          name: org.name,
+          orgId: org.id,
+          id: org.projects?.data?.[0]?.id || '',
+          // Inject custom property so StorageItem can know without cross-referencing
+          __isAccessDisabled: !hasAccess,
+          __planName: org.subscription?.plan?.name || '',
+          __subscriptionStatus: org.subscription?.subscription_status || '',
+        } as StorageTypeCredentials & { __isAccessDisabled: boolean; __planName: string; __subscriptionStatus: string };
+      });
     }
-    return list;
-  }, [apiProviders, isAuthenticated, activeOrganization, activeProject]);
+    return [];
+  }, [isAuthenticated, organizations]);
 
   const [open, setOpen] = React.useState(false);
 
@@ -224,8 +227,19 @@ const SyncSettings = () => {
           </Stack>
 
           <Stack direction="column" gap={2} width="full" align="start">
+            {studioProviders.map((item) => (
+              <StorageItem
+                key={item.internalId}
+                onEdit={handleEditClick(item)}
+                onMigrate={handleEditClick(item, true)}
+                item={item}
+              />
+            ))}
             <LocalStorageItem />
-            {renderedProviders.length > 0 && renderedProviders.map((item) => (
+            {apiProviders.length > 0 && (
+              <Box css={{ width: '100%', height: '1px', backgroundColor: '$borderSubtle', margin: '$2 0' }} />
+            )}
+            {apiProviders.length > 0 && apiProviders.map((item) => (
               <StorageItem
                 key={item?.internalId || `${item.provider}-${item.id}`}
                 onEdit={handleEditClick(item)}

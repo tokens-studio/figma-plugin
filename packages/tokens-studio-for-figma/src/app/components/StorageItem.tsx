@@ -38,8 +38,13 @@ const StorageItem = ({ item, onEdit, onMigrate, isOAuthApp }: Props) => {
   const dispatch = useDispatch<Dispatch>();
 
   const { t } = useTranslation(['storage']);
-  const { loadProjectTokens, activeProject } = useAuthStore();
+  const { loadProjectTokens, activeProject, setActiveOrganization, setActiveProject } = useAuthStore();
   const isOAuth = React.useMemo(() => item.provider === StorageProviderType.TOKENS_STUDIO_OAUTH, [item]);
+  const isAccessDisabled = (item as any).__isAccessDisabled;
+  const planName = (item as any).__planName;
+  const subscriptionStatus = (item as any).__subscriptionStatus;
+  
+  const [selectedProjectId, setSelectedProjectId] = React.useState<string | undefined>(undefined);
 
   // Check if this is a Bitbucket item using app password
   const isBitbucketWithAppPassword = React.useMemo(() => (
@@ -69,12 +74,18 @@ const StorageItem = ({ item, onEdit, onMigrate, isOAuthApp }: Props) => {
 
   const handleRestore = React.useCallback(async () => {
     if (isOAuth) {
-      if (activeProject?.id) {
+      const idToLoad = selectedProjectId || item.id || activeProject?.id;
+      if (idToLoad) {
         try {
-          await loadProjectTokens(activeProject.id);
-          dispatch.uiState.setLocalApiState(item);
+          if ((item as any).orgId) {
+            setActiveOrganization((item as any).orgId as string);
+          }
+          setActiveProject(idToLoad);
+          await loadProjectTokens(idToLoad);
+          const newItem = { ...item, id: idToLoad };
+          dispatch.uiState.setLocalApiState(newItem);
           setStorageType({
-            provider: item,
+            provider: newItem,
             shouldSetInDocument: true,
           });
           setHasErrored(false);
@@ -96,7 +107,7 @@ const StorageItem = ({ item, onEdit, onMigrate, isOAuthApp }: Props) => {
   }, [item, restoreStoredProvider, isOAuthApp, activeProject, loadProjectTokens, dispatch.uiState, setStorageType]);
 
   return (
-    <StyledStorageItem data-testid={`storageitem-${provider}-${id}`} key={`${provider}-${id}`} active={isActive()} hasError={isBitbucketWithAppPassword}>
+    <StyledStorageItem data-testid={`storageitem-${provider}-${id}`} key={`${provider}-${item.internalId || id}`} active={isActive()} hasError={isBitbucketWithAppPassword} css={isAccessDisabled ? { opacity: 0.6, pointerEvents: 'none' } : {}}>
       <div style={{
         display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-between', alignItems: 'center',
       }}
@@ -141,9 +152,15 @@ const StorageItem = ({ item, onEdit, onMigrate, isOAuthApp }: Props) => {
                   maxWidth: '100%',
                 }}
               >
-                {id}
-                {' '}
-                {branch && ` (${branch})`}
+                {isOAuth ? (
+                  subscriptionStatus === 'trial_expired' ? 'Trial expired' : planName || 'Essential'
+                ) : (
+                  <>
+                    {id}
+                    {' '}
+                    {branch && ` (${branch})`}
+                  </>
+                )}
               </Box>
             </Stack>
           </Stack>
@@ -170,14 +187,17 @@ const StorageItem = ({ item, onEdit, onMigrate, isOAuthApp }: Props) => {
                 <TokenFormatBadge extended />
               )}
               {isOAuth ? (
-                <StudioProjectSelector />
+                <>
+                  <StudioProjectSelector orgId={(item as any).orgId} />
+                  <Badge>{t('active')}</Badge>
+                </>
               ) : (
                 <Badge>{t('active')}</Badge>
               )}
             </Stack>
           ) : (
             <Stack gap={2} align="center">
-              {isOAuth && <StudioProjectSelector />}
+              {isOAuth && <StudioProjectSelector orgId={(item as any).orgId} value={selectedProjectId} onChange={setSelectedProjectId} />}
               <Button data-testid="button-storage-item-apply" variant="secondary" size="small" onClick={handleRestore}>
                 {t('apply')}
               </Button>
