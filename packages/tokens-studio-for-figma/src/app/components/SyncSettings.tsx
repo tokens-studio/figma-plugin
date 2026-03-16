@@ -73,7 +73,22 @@ const SyncSettings = () => {
   const studioProviders = React.useMemo(() => {
     if (isAuthenticated && organizations?.length) {
       return organizations.map(org => {
+        console.log('[SyncSettings] Raw organization API object:', org);
+        if (org.subscription) console.log('[SyncSettings] Subscription object:', org.subscription);
+        
         const hasAccess = org.subscription?.access?.includes('figma_plugin');
+        
+        let planName = '';
+        if (org.subscription) {
+          const sub = org.subscription as any;
+          if (typeof sub.plan === 'string') planName = sub.plan;
+          else if (sub.plan?.name) planName = sub.plan.name;
+          else if (sub.plan_name) planName = sub.plan_name;
+          else if (sub.current_plan) planName = sub.current_plan;
+          
+          if (sub.current_plan === null) planName = 'Starter';
+        }
+
         return {
           provider: StorageProviderType.TOKENS_STUDIO_OAUTH,
           internalId: `tokens-studio-${org.id}`,
@@ -82,7 +97,7 @@ const SyncSettings = () => {
           id: org.projects?.data?.[0]?.id || '',
           // Inject custom property so StorageItem can know without cross-referencing
           __isAccessDisabled: !hasAccess,
-          __planName: org.subscription?.plan?.name || '',
+          __planName: planName,
           __subscriptionStatus: org.subscription?.subscription_status || '',
         } as StorageTypeCredentials & { __isAccessDisabled: boolean; __planName: string; __subscriptionStatus: string };
       });

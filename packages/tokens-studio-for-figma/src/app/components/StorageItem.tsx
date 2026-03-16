@@ -170,7 +170,7 @@ const StorageItem = ({ item, onEdit, onMigrate, isOAuthApp }: Props) => {
                 }}
               >
                 {isOAuth ? (
-                  subscriptionStatus === 'trial_expired' ? 'Trial expired' : planName || 'Essential'
+                  subscriptionStatus === 'trial_expired' ? 'Trial expired' : planName
                 ) : (
                   <>
                     {id}
