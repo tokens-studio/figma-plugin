@@ -180,41 +180,42 @@ export default function SubscriptionAccount() {
       <Card>
         {/* Authenticated Dashboard */}
         {isAuthenticated && user ? (
-          <CardSection>
-            {/* User Profile Header */}
-            <SectionRow>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                {user.avatar ? (
-                  <Avatar src={user.avatar} alt="User avatar" />
-                ) : (
-                  <AvatarFallback>{user.fullName?.[0] || 'U'}</AvatarFallback>
-                )}
-                <UserDataStack>
-                  <span style={{
-                    fontSize: '13px',
-                    fontWeight: 600,
-                    color: 'var(--colors-fgDefault)',
-                    lineHeight: 1.2,
-                  }}
-                  >
-                    {user.fullName || t('studioUser')}
-                  </span>
-                  <span style={{
-                    fontSize: '12px',
-                    color: 'var(--colors-fgMuted)',
-                    lineHeight: 1.2,
-                  }}
-                  >
-                    {user.email}
-                  </span>
-                </UserDataStack>
-              </div>
-              <Button variant="secondary" onClick={logout}>
-                {t('logout')}
-              </Button>
-            </SectionRow>
+          <>
+            <CardSection>
+              {/* User Profile Header */}
+              <SectionRow>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  {user.avatar ? (
+                    <Avatar src={user.avatar} alt="User avatar" />
+                  ) : (
+                    <AvatarFallback>{user.fullName?.[0] || 'U'}</AvatarFallback>
+                  )}
+                  <UserDataStack>
+                    <span style={{
+                      fontSize: '13px',
+                      fontWeight: 600,
+                      color: 'var(--colors-fgDefault)',
+                      lineHeight: 1.2,
+                    }}
+                    >
+                      {user.fullName || t('studioUser')}
+                    </span>
+                    <span style={{
+                      fontSize: '12px',
+                      color: 'var(--colors-fgMuted)',
+                      lineHeight: 1.2,
+                    }}
+                    >
+                      {user.email}
+                    </span>
+                  </UserDataStack>
+                </div>
+                <Button variant="secondary" onClick={logout}>
+                  {t('logout')}
+                </Button>
+              </SectionRow>
 
-            {organizations.length > 0 && activeOrganization && (
+              {organizations.length > 0 && activeOrganization && (
               <>
                 <Divider css={{ margin: '0 -$4' }} />
                 <div style={{
@@ -279,8 +280,14 @@ export default function SubscriptionAccount() {
                   </div>
                 </div>
               </>
-            )}
-          </CardSection>
+              )}
+            </CardSection>
+
+            <Divider css={{ margin: '0 -$4' }} />
+            <CardSection>
+              <AddLicenseKey isCompact />
+            </CardSection>
+          </>
         ) : (
           <>
             {/* If Not Authenticated, Show Login Component */}
