@@ -383,10 +383,10 @@ export type UpdateVariablesAsyncMessage = AsyncMessage<AsyncMessageTypes.UPDATE_
 export type UpdateVariablesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.UPDATE_VARIABLES>;
 
 export type RemoveRelaunchDataMessage = AsyncMessage<
-  AsyncMessageTypes.REMOVE_RELAUNCH_DATA,
-  {
-    area: UpdateMode;
-  }
+AsyncMessageTypes.REMOVE_RELAUNCH_DATA,
+{
+  area: UpdateMode;
+}
 >;
 export type RemoveRelaunchDataMessageResult = AsyncMessage<AsyncMessageTypes.REMOVE_RELAUNCH_DATA>;
 

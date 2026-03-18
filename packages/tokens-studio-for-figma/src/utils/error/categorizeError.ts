@@ -14,10 +14,10 @@ export function categorizeError(error: any, context?: {
   operation?: string;
   hasCredentials?: boolean;
 }): {
-  type: ErrorCategory;
-  message: string;
-  header?: string;
-} {
+    type: ErrorCategory;
+    message: string;
+    header?: string;
+  } {
   const errorString = String(error);
   const errorMessage = error?.message || errorString;
 

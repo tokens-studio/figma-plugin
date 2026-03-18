@@ -19,6 +19,7 @@ import { TokenFormatBadge } from './TokenFormatBadge';
 import { isUsingAppPassword } from '@/utils/bitbucketMigration';
 import { StudioProjectSelector } from './Subscription/StudioProjectSelector';
 import { useAuthStore } from '@/app/store/useAuthStore';
+
 type Props = {
   item: StorageTypeCredentials;
   onEdit: () => void;
@@ -26,7 +27,9 @@ type Props = {
   isOAuthApp?: boolean;
 };
 
-const StorageItem = ({ item, onEdit, onMigrate, isOAuthApp }: Props) => {
+const StorageItem = ({
+  item, onEdit, onMigrate, isOAuthApp,
+}: Props) => {
   const [hasErrored, setHasErrored] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState<string>();
   const storageType = useSelector(storageTypeSelector);
@@ -38,7 +41,9 @@ const StorageItem = ({ item, onEdit, onMigrate, isOAuthApp }: Props) => {
   const dispatch = useDispatch<Dispatch>();
 
   const { t } = useTranslation(['storage']);
-  const { loadProjectTokens, activeProject, setActiveOrganization, setActiveProject } = useAuthStore();
+  const {
+    loadProjectTokens, activeProject, setActiveOrganization, setActiveProject,
+  } = useAuthStore();
   const isOAuth = React.useMemo(() => item.provider === StorageProviderType.TOKENS_STUDIO_OAUTH, [item]);
   const isAccessDisabled = (item as any).__isAccessDisabled;
   const planName = (item as any).__planName;
@@ -46,7 +51,7 @@ const StorageItem = ({ item, onEdit, onMigrate, isOAuthApp }: Props) => {
   const isActive = React.useCallback(() => isSameCredentials(item, storageType), [item, storageType]);
 
   const [selectedProjectId, setSelectedProjectId] = React.useState<string | undefined>(
-    isActive() ? (item as any).id : undefined
+    isActive() ? (item as any).id : undefined,
   );
 
   // Check if this is a Bitbucket item using app password
@@ -77,7 +82,7 @@ const StorageItem = ({ item, onEdit, onMigrate, isOAuthApp }: Props) => {
       let fallbackId = item.id;
       const isCurrentlyActiveOrg = !(item as any).orgId || (item as any).orgId === useAuthStore.getState().activeOrganizationId;
       if (isCurrentlyActiveOrg && activeProject) {
-          fallbackId = activeProject.id;
+        fallbackId = activeProject.id;
       }
 
       const idToLoad = selectedProjectId || fallbackId;
@@ -103,9 +108,8 @@ const StorageItem = ({ item, onEdit, onMigrate, isOAuthApp }: Props) => {
               dispatch.branchState.setBranches(branches);
             }
           } catch (e: any) {
-             console.error('Failed to fetch branches', e);
+            console.error('Failed to fetch branches', e);
           }
-
         } catch (e: any) {
           setHasErrored(true);
           setErrorMessage(e.message || 'Failed to load project tokens');

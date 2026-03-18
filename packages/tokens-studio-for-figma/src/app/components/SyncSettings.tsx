@@ -72,12 +72,12 @@ const SyncSettings = () => {
 
   const studioProviders = React.useMemo(() => {
     if (isAuthenticated && organizations?.length) {
-      return organizations.map(org => {
+      return organizations.map((org) => {
         console.log('[SyncSettings] Raw organization API object:', org);
         if (org.subscription) console.log('[SyncSettings] Subscription object:', org.subscription);
-        
+
         const hasAccess = org.subscription?.access?.includes('figma_plugin');
-        
+
         let planName = '';
         if (org.subscription) {
           const sub = org.subscription as any;
@@ -85,7 +85,7 @@ const SyncSettings = () => {
           else if (sub.plan?.name) planName = sub.plan.name;
           else if (sub.plan_name) planName = sub.plan_name;
           else if (sub.current_plan) planName = sub.current_plan;
-          
+
           if (sub.current_plan === null) planName = 'Starter';
         }
 
@@ -252,7 +252,10 @@ const SyncSettings = () => {
             ))}
             <LocalStorageItem />
             {apiProviders.length > 0 && (
-              <Box css={{ width: '100%', height: '1px', backgroundColor: '$borderSubtle', margin: '$2 0' }} />
+              <Box css={{
+                width: '100%', height: '1px', backgroundColor: '$borderSubtle', margin: '$2 0',
+              }}
+              />
             )}
             {apiProviders.length > 0 && apiProviders.map((item) => (
               <StorageItem

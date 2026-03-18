@@ -1,9 +1,9 @@
 import React from 'react';
 import { CaretDownIcon } from '@radix-ui/react-icons';
 import { DropdownMenu } from '@tokens-studio/ui';
+import { useDispatch, useSelector } from 'react-redux';
 import { styled } from '@/stitches.config';
 import { useAuthStore } from '@/app/store/useAuthStore';
-import { useDispatch, useSelector } from 'react-redux';
 import { storageTypeSelector } from '@/selectors';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { TokensStudioStorageType } from '@/types/StorageType';
@@ -12,182 +12,184 @@ import useRemoteTokens from '@/app/store/remoteTokens';
 import { Dispatch } from '@/app/store';
 
 const Avatar = styled('img', {
-    width: 16,
-    height: 16,
-    borderRadius: '2px',
-    objectFit: 'cover',
+  width: 16,
+  height: 16,
+  borderRadius: '2px',
+  objectFit: 'cover',
 });
 
 const AvatarFallback = styled('div', {
-    width: 24,
-    height: 24,
-    borderRadius: '4px',
-    backgroundColor: '$bgSubtle',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    color: '$fgMuted',
-    fontSize: '12px',
+  width: 24,
+  height: 24,
+  borderRadius: '4px',
+  backgroundColor: '$bgSubtle',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  color: '$fgMuted',
+  fontSize: '12px',
 });
 
 const OrgDropdownTriggerBtn = styled('button', {
-    all: 'unset',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    cursor: 'pointer',
-    fontSize: '$small',
-    backgroundColor: '$bgDefault',
-    padding: '4px 12px 4px 4px',
-    borderRadius: '$medium',
-    border: '1px solid $borderSubtle',
-    color: '$fgDefault',
-    '&:hover': {
-        backgroundColor: '$bgSubtle',
-    },
-    '&:disabled': {
-        opacity: 0.5,
-        cursor: 'not-allowed',
-    },
+  all: 'unset',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
+  cursor: 'pointer',
+  fontSize: '$small',
+  backgroundColor: '$bgDefault',
+  padding: '4px 12px 4px 4px',
+  borderRadius: '$medium',
+  border: '1px solid $borderSubtle',
+  color: '$fgDefault',
+  '&:hover': {
+    backgroundColor: '$bgSubtle',
+  },
+  '&:disabled': {
+    opacity: 0.5,
+    cursor: 'not-allowed',
+  },
 });
 
 const StyledDropdownContent = styled(DropdownMenu.Content, {
-    minWidth: 200,
-    backgroundColor: '$bgDefault',
-    borderRadius: '$medium',
-    padding: '$2',
-    boxShadow: '$default',
-    border: '1px solid $borderSubtle',
-    zIndex: 10,
+  minWidth: 200,
+  backgroundColor: '$bgDefault',
+  borderRadius: '$medium',
+  padding: '$2',
+  boxShadow: '$default',
+  border: '1px solid $borderSubtle',
+  zIndex: 10,
 });
 
 const StyledDropdownItem = styled(DropdownMenu.Item, {
-    fontSize: '$small',
-    padding: '$2 $3',
-    borderRadius: '$small',
-    cursor: 'pointer',
-    outline: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '$2',
-    color: '$fgDefault',
-    '&:hover, &:focus': {
-        backgroundColor: '$interaction',
-        color: '$onInteraction',
-    },
+  fontSize: '$small',
+  padding: '$2 $3',
+  borderRadius: '$small',
+  cursor: 'pointer',
+  outline: 'none',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '$2',
+  color: '$fgDefault',
+  '&:hover, &:focus': {
+    backgroundColor: '$interaction',
+    color: '$onInteraction',
+  },
 });
 
 export interface StudioProjectSelectorProps {
-    orgId?: string;
-    value?: string;
-    onChange?: (projectId: string) => void;
+  orgId?: string;
+  value?: string;
+  onChange?: (projectId: string) => void;
 }
 
 export const StudioProjectSelector = ({ orgId, value, onChange }: StudioProjectSelectorProps) => {
-    const { organizations, activeProject, setActiveProject, loadProjectTokens } = useAuthStore();
-    const storageType = useSelector(storageTypeSelector);
-    const dispatch = useDispatch<Dispatch>();
-    const { setStorageType } = useStorage();
-    const { fetchBranches } = useRemoteTokens();
+  const {
+    organizations, activeProject, setActiveProject, loadProjectTokens,
+  } = useAuthStore();
+  const storageType = useSelector(storageTypeSelector);
+  const dispatch = useDispatch<Dispatch>();
+  const { setStorageType } = useStorage();
+  const { fetchBranches } = useRemoteTokens();
 
-    const activeOrganization = React.useMemo(() => {
-        if (orgId) {
-            return organizations.find(o => o.id === orgId) || null;
-        }
-        return useAuthStore.getState().activeOrganization;
-    }, [orgId, organizations]);
+  const activeOrganization = React.useMemo(() => {
+    if (orgId) {
+      return organizations.find((o) => o.id === orgId) || null;
+    }
+    return useAuthStore.getState().activeOrganization;
+  }, [orgId, organizations]);
 
-    if (!activeOrganization) return null;
+  if (!activeOrganization) return null;
 
-    const hasProjects = activeOrganization.projects?.data?.length > 0;
+  const hasProjects = activeOrganization.projects?.data?.length > 0;
 
-    const activeProjectToUse = React.useMemo(() => {
-        // 1. If explicitly controlled by parent (e.g. inactive state setting override)
-        if (value && activeOrganization?.projects?.data) {
-            const found = activeOrganization.projects.data.find(p => p.id === value) || null;
-            if (found) {
-                return found;
-            }
-        }
-        
-        // 2. If this organization is the globally ACTIVE storage type, its project comes directly from storageType state
-        const isOrgActiveInStorage = storageType.provider === StorageProviderType.TOKENS_STUDIO_OAUTH && (storageType as any).internalId === `tokens-studio-${orgId || useAuthStore.getState().activeOrganizationId}`;
-        
-        if (isOrgActiveInStorage && activeOrganization?.projects?.data) {
-            const storedProject = activeOrganization.projects.data.find(p => p.id === (storageType as any).id);
-            if (storedProject) {
-                return storedProject;
-            }
-        }
+  const activeProjectToUse = React.useMemo(() => {
+    // 1. If explicitly controlled by parent (e.g. inactive state setting override)
+    if (value && activeOrganization?.projects?.data) {
+      const found = activeOrganization.projects.data.find((p) => p.id === value) || null;
+      if (found) {
+        return found;
+      }
+    }
 
-        // 3. Fallback to the purely local activeProject in useAuthStore if it aligns
-        const isCurrentlyActiveOrg = !orgId || orgId === useAuthStore.getState().activeOrganizationId;
-        if (isCurrentlyActiveOrg && activeProject) {
-            return activeProject;
-        }
-        
-        // 4. Fallback to the first project in the organization
-        return activeOrganization?.projects?.data?.[0] || null;
-    }, [value, activeOrganization, orgId, activeProject, storageType]);
+    // 2. If this organization is the globally ACTIVE storage type, its project comes directly from storageType state
+    const isOrgActiveInStorage = storageType.provider === StorageProviderType.TOKENS_STUDIO_OAUTH && (storageType as any).internalId === `tokens-studio-${orgId || useAuthStore.getState().activeOrganizationId}`;
 
-    return (
-        <DropdownMenu>
-            <DropdownMenu.Trigger asChild disabled={!hasProjects}>
-                <OrgDropdownTriggerBtn disabled={!hasProjects}>
-                    <AvatarFallback>
-                        {activeProjectToUse?.name[0] || 'P'}
-                    </AvatarFallback>
-                    {activeProjectToUse?.name || (!hasProjects ? 'No projects' : 'Select Project')}
-                    <CaretDownIcon style={{ marginLeft: '4px', color: 'var(--colors-fgMuted)' }} />
-                </OrgDropdownTriggerBtn>
-            </DropdownMenu.Trigger>
-            {hasProjects && (
-                <StyledDropdownContent>
-                    {activeOrganization.projects.data.map((project) => (
-                        <StyledDropdownItem
-                            key={project.id}
-                            onClick={async () => {
-                                if (onChange) {
-                                    onChange(project.id);
-                                }
-                                
-                                const isCurrentlyActiveOrg = !orgId || orgId === useAuthStore.getState().activeOrganizationId;
+    if (isOrgActiveInStorage && activeOrganization?.projects?.data) {
+      const storedProject = activeOrganization.projects.data.find((p) => p.id === (storageType as any).id);
+      if (storedProject) {
+        return storedProject;
+      }
+    }
 
-                                if (isCurrentlyActiveOrg && !onChange) {
-                                    setActiveProject(project.id);
-                                }
+    // 3. Fallback to the purely local activeProject in useAuthStore if it aligns
+    const isCurrentlyActiveOrg = !orgId || orgId === useAuthStore.getState().activeOrganizationId;
+    if (isCurrentlyActiveOrg && activeProject) {
+      return activeProject;
+    }
 
-                                // Auto-load tokens if Provider is currently active AND this is the active org
-                                if (
-                                    isCurrentlyActiveOrg &&
-                                    storageType.provider === StorageProviderType.TOKENS_STUDIO_OAUTH &&
-                                    (storageType as any).internalId?.startsWith('tokens-studio-')
-                                ) {
-                                    try {
-                                        await loadProjectTokens(project.id);
-                                        const newProviderData = {
-                                            ...storageType,
-                                            id: project.id,
-                                        };
-                                        dispatch.uiState.setLocalApiState(newProviderData as any);
-                                        dispatch.uiState.setApiData(newProviderData as any);
-                                        setStorageType({ provider: newProviderData as any, shouldSetInDocument: true });
+    // 4. Fallback to the first project in the organization
+    return activeOrganization?.projects?.data?.[0] || null;
+  }, [value, activeOrganization, orgId, activeProject, storageType]);
 
-                                        const branches = await fetchBranches(newProviderData as any);
-                                        if (branches) {
-                                            dispatch.branchState.setBranches(branches);
-                                        }
-                                    } catch (e) {
-                                        console.error('Failed to load project tokens for active provider', e);
-                                    }
-                                }
-                            }}
-                        >
-                            {project.name}
-                        </StyledDropdownItem>
-                    ))}
-                </StyledDropdownContent>
-            )}
-        </DropdownMenu>
-    );
+  return (
+    <DropdownMenu>
+      <DropdownMenu.Trigger asChild disabled={!hasProjects}>
+        <OrgDropdownTriggerBtn disabled={!hasProjects}>
+          <AvatarFallback>
+            {activeProjectToUse?.name[0] || 'P'}
+          </AvatarFallback>
+          {activeProjectToUse?.name || (!hasProjects ? 'No projects' : 'Select Project')}
+          <CaretDownIcon style={{ marginLeft: '4px', color: 'var(--colors-fgMuted)' }} />
+        </OrgDropdownTriggerBtn>
+      </DropdownMenu.Trigger>
+      {hasProjects && (
+        <StyledDropdownContent>
+          {activeOrganization.projects.data.map((project) => (
+            <StyledDropdownItem
+              key={project.id}
+              onClick={async () => {
+                if (onChange) {
+                  onChange(project.id);
+                }
+
+                const isCurrentlyActiveOrg = !orgId || orgId === useAuthStore.getState().activeOrganizationId;
+
+                if (isCurrentlyActiveOrg && !onChange) {
+                  setActiveProject(project.id);
+                }
+
+                // Auto-load tokens if Provider is currently active AND this is the active org
+                if (
+                  isCurrentlyActiveOrg
+                                    && storageType.provider === StorageProviderType.TOKENS_STUDIO_OAUTH
+                                    && (storageType as any).internalId?.startsWith('tokens-studio-')
+                ) {
+                  try {
+                    await loadProjectTokens(project.id);
+                    const newProviderData = {
+                      ...storageType,
+                      id: project.id,
+                    };
+                    dispatch.uiState.setLocalApiState(newProviderData as any);
+                    dispatch.uiState.setApiData(newProviderData as any);
+                    setStorageType({ provider: newProviderData as any, shouldSetInDocument: true });
+
+                    const branches = await fetchBranches(newProviderData as any);
+                    if (branches) {
+                      dispatch.branchState.setBranches(branches);
+                    }
+                  } catch (e) {
+                    console.error('Failed to load project tokens for active provider', e);
+                  }
+                }
+              }}
+            >
+              {project.name}
+            </StyledDropdownItem>
+          ))}
+        </StyledDropdownContent>
+      )}
+    </DropdownMenu>
+  );
 };

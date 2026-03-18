@@ -1,13 +1,15 @@
 import { create } from 'zustand';
+import compact from 'just-compact';
 import { OAuthService } from '../services/OAuthService';
 import { OAuthError } from '@/types/OAuthError';
-import type { OAuthTokens, UserData, Organization, Project } from '@/types/oauth';
+import type {
+  OAuthTokens, UserData, Organization, Project,
+} from '@/types/oauth';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { fetchProjectDataRest } from '@/utils/tokensStudio/fetchProjectDataRest';
 import { store } from '@/app/store';
 import { notifyToUI } from '@/plugin/notifiers';
-import compact from 'just-compact';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 
 interface DeviceCodeState {
@@ -112,14 +114,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       await get().fetchUserData(tokens);
       await get().setOAuthTokens(tokens);
-
     } catch (error) {
-      const errorMessage =
-        error instanceof OAuthError
-          ? error.getUserMessage()
-          : error instanceof Error
-            ? error.message
-            : 'OAuth login failed';
+      const errorMessage = error instanceof OAuthError
+        ? error.getUserMessage()
+        : error instanceof Error
+          ? error.message
+          : 'OAuth login failed';
 
       set({
         isAuthenticated: false,
@@ -156,7 +156,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       if (controller) {
         controller.abort();
       }
-      set({ error: null, isLoading: false, deviceCode: null, _deviceCodeAbortController: null });
+      set({
+        error: null, isLoading: false, deviceCode: null, _deviceCodeAbortController: null,
+      });
     } else {
       set({ error });
     }
@@ -164,7 +166,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   setActiveOrganization: (orgId: string) => {
     set((state) => {
-      const org = state.organizations.find(o => o.id === orgId) || null;
+      const org = state.organizations.find((o) => o.id === orgId) || null;
       const access = org?.subscription?.access || [];
       const isPro = access.includes('figma_plugin');
 
@@ -185,7 +187,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   setActiveProject: (projectId: string) => {
     set((state) => {
-      const project = state.activeOrganization?.projects?.data?.find(p => p.id === projectId) || null;
+      const project = state.activeOrganization?.projects?.data?.find((p) => p.id === projectId) || null;
       return { activeProject: project };
     });
   },
@@ -231,18 +233,18 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const attrs = userDataRaw.attributes || userDataRaw;
 
       const user: UserData = {
-        id: (userDataRaw.id as string) || (userDataRaw.uuid as string) || "",
-        uuid: (userDataRaw.uuid as string) || (userDataRaw.id as string) || "",
-        firstName: (attrs.first_name as string) || (attrs.firstName as string) || "",
-        lastName: (attrs.last_name as string) || (attrs.lastName as string) || "",
-        email: (attrs.email as string) || "",
-        avatar: (attrs.avatar_url as string) || (attrs.avatar as string) || (attrs.logo_url as string) || "",
+        id: (userDataRaw.id as string) || (userDataRaw.uuid as string) || '',
+        uuid: (userDataRaw.uuid as string) || (userDataRaw.id as string) || '',
+        firstName: (attrs.first_name as string) || (attrs.firstName as string) || '',
+        lastName: (attrs.last_name as string) || (attrs.lastName as string) || '',
+        email: (attrs.email as string) || '',
+        avatar: (attrs.avatar_url as string) || (attrs.avatar as string) || (attrs.logo_url as string) || '',
         fullName:
-          (attrs.full_name as string) ||
-          (attrs.fullName as string) ||
-          `${(attrs.first_name as string) || (attrs.firstName as string) || ""} ${(attrs.last_name as string) || (attrs.lastName as string) || ""}`.trim() ||
-          (attrs.name as string) ||
-          "",
+          (attrs.full_name as string)
+          || (attrs.fullName as string)
+          || `${(attrs.first_name as string) || (attrs.firstName as string) || ''} ${(attrs.last_name as string) || (attrs.lastName as string) || ''}`.trim()
+          || (attrs.name as string)
+          || '',
       };
 
       // 2. Fetch Organizations Data
@@ -286,9 +288,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       const storedState = store.getState();
       const localApiState = storedState.uiState?.localApiState;
-      
+
       const storedOrgId = get().activeOrganizationId || (localApiState?.provider === 'tokensstudio-oauth' ? localApiState.internalId?.replace('tokens-studio-', '') : null);
-      
+
       const activeOrganization = storedOrgId
         ? organizations.find((o) => o.id === storedOrgId) || (organizations.length > 0 ? organizations[0] : null)
         : (organizations.length > 0 ? organizations[0] : null);
@@ -300,9 +302,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       }
 
       let initialProject = activeOrganization?.projects?.data?.[0] || null;
-      let targetProjectId = activeProjectId || (localApiState?.provider === 'tokensstudio-oauth' ? localApiState?.id : null);
+      const targetProjectId = activeProjectId || (localApiState?.provider === 'tokensstudio-oauth' ? localApiState?.id : null);
       if (activeOrganization && targetProjectId) {
-        initialProject = activeOrganization.projects?.data?.find(p => p.id === targetProjectId) || initialProject;
+        initialProject = activeOrganization.projects?.data?.find((p) => p.id === targetProjectId) || initialProject;
       }
       console.log('[fetchUserData] Initializing activeProject to:', initialProject, 'based on activeProjectId:', activeProjectId, 'localApiState:', localApiState);
 
@@ -317,7 +319,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       });
 
       if (organizations.length > 0) {
-        await Promise.all(organizations.map(org => get().fetchProjects(org.id)));
+        await Promise.all(organizations.map((org) => get().fetchProjects(org.id)));
       }
     } catch (error) {
       console.error('Error fetching user data:', error);
@@ -372,7 +374,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             : state.activeOrganization;
 
           const nextActiveProject = state.activeOrganization?.id === orgId
-            ? (projects.find(p => p.id === state.activeProject?.id) || projects[0] || null)
+            ? (projects.find((p) => p.id === state.activeProject?.id) || projects[0] || null)
             : state.activeProject;
 
           return {
@@ -401,7 +403,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         oauthTokens.accessToken,
         apiBaseUrl,
         projectId,
-        branch || 'main'
+        branch || 'main',
       );
 
       if (projectData && projectData.tokens) {
@@ -410,7 +412,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
         store.dispatch.tokenState.setTokenData({
           values: tokens as any,
-          themes: themes,
+          themes,
           activeTheme: {},
           hasChangedRemote: false,
         });
@@ -451,5 +453,5 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       // set({ isAuthenticated: false, oauthTokens: null });
       throw error;
     }
-  }
+  },
 }));
