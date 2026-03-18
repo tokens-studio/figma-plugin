@@ -105,7 +105,7 @@ export default function BranchSelector() {
     async (branch: string) => {
       track('Create new branch from specific branch');
 
-      if (hasChanges && (await askUserIfPushChanges())) {
+      if (hasChanges && apiData?.provider !== StorageProviderType.TOKENS_STUDIO_OAUTH && (await askUserIfPushChanges())) {
         // User chose to discard changes - clear local token state
         dispatch.tokenState.setEmptyTokens();
       }
@@ -113,7 +113,7 @@ export default function BranchSelector() {
       setStartBranch(branch);
       setCreateBranchModalVisible(true);
     },
-    [hasChanges, askUserIfPushChanges, dispatch],
+    [hasChanges, askUserIfPushChanges, dispatch, apiData?.provider],
   );
 
   const changeAndPull = React.useCallback(
@@ -148,7 +148,7 @@ export default function BranchSelector() {
   const onBranchSelected = React.useCallback(
     async (branch: string) => {
       track('Branch changed');
-      if (hasChanges && !editProhibited) {
+      if (hasChanges && !editProhibited && apiData?.provider !== StorageProviderType.TOKENS_STUDIO_OAUTH) {
         if (await askUserIfPushChanges()) {
           await changeAndPull(branch);
         }
@@ -156,7 +156,7 @@ export default function BranchSelector() {
         await changeAndPull(branch);
       }
     },
-    [askUserIfPushChanges, changeAndPull, hasChanges, editProhibited],
+    [askUserIfPushChanges, changeAndPull, hasChanges, editProhibited, apiData?.provider],
   );
 
   const onCreateBranchModalSuccess = React.useCallback(
