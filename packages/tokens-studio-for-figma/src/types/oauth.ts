@@ -79,6 +79,7 @@ export type Organization = {
   avatarUrl?: string;
   id: string;
   slug?: string;
+  current_user_seat_type?: string;
   subscription?: {
     id: string;
     subscription_status?: string;

@@ -168,7 +168,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set((state) => {
       const org = state.organizations.find((o) => o.id === orgId) || null;
       const access = org?.subscription?.access || [];
-      const isPro = access.includes('figma_plugin');
+      const isPro = access.includes('figma_plugin') && org?.current_user_seat_type === 'EDITOR';
 
       return {
         activeOrganizationId: org?.id || null,
@@ -277,6 +277,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             name: org.type && org.attributes ? (org.attributes.name || '') : (org.name || ''),
             slug: org.type && org.attributes ? (org.attributes.slug || '') : (org.slug || ''),
             avatarUrl: org.type && org.attributes ? (org.attributes.logo_url || org.attributes.avatar_url || '') : (org.avatar_url || org.avatar || org.logo_url || ''),
+            current_user_seat_type: org.type && org.attributes ? org.attributes.current_user_seat_type : org.current_user_seat_type,
             subscription: org.type && org.attributes ? org.attributes.subscription : org.subscription,
             projects: (org.type && org.attributes ? org.attributes.projects : org.projects) || { data: [] },
           }));
@@ -298,7 +299,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       let isPro = false;
       if (activeOrganization) {
         const accessArr = activeOrganization.subscription?.access || [];
-        isPro = accessArr.includes('figma_plugin');
+        isPro = accessArr.includes('figma_plugin') && activeOrganization.current_user_seat_type === 'EDITOR';
       }
 
       let initialProject = activeOrganization?.projects?.data?.[0] || null;
