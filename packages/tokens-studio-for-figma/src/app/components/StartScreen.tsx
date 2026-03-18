@@ -87,6 +87,11 @@ function StartScreen() {
     dispatch.uiState.setLocalApiState(credentialsToSet);
   }, [apiProviders, dispatch.tokenState, dispatch.uiState, storageType]);
 
+  const onGoToSubscription = React.useCallback(() => {
+    dispatch.uiState.setLastError(null);
+    dispatch.uiState.setActiveTab(Tabs.SUBSCRIPTION);
+  }, [dispatch.uiState]);
+
   const onProviderSelect = React.useCallback(async (providerId: string) => {
     const selectedProvider = apiProviders.find((provider) => provider.internalId === providerId);
     if (selectedProvider) {
@@ -213,18 +218,28 @@ function StartScreen() {
               id="callout-action-setupsync"
               heading={getCalloutContent.heading}
               description={getCalloutContent.description}
-              action={{
+              action={storageType?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH ? undefined : {
                 onClick: onSetSyncClick,
                 text: t('enterCredentials'),
               }}
-              secondaryAction={matchingProvider ? {
+              secondaryAction={storageType?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH ? undefined : (matchingProvider ? {
                 onClick: () => {
                   dispatch.uiState.setLastError(null);
                   restoreStoredProvider(matchingProvider);
                 },
                 text: t('retry'),
-              } : undefined}
-            />
+              } : undefined)}
+            >
+              {storageType?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH && (
+                <Button
+                  size="small"
+                  variant="primary"
+                  onClick={onGoToSubscription}
+                >
+                  {t('goToSubscription', { defaultValue: 'Go to Subscription' })}
+                </Button>
+              )}
+            </Callout>
           )}
           {!isLoadingProvider && storageType?.provider === StorageProviderType.LOCAL && (
             <Stack direction="column" gap={4}>
