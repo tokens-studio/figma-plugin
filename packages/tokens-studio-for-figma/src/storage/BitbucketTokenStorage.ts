@@ -72,13 +72,11 @@ export class BitbucketTokenStorage extends GitTokenStorage {
           throw new Error(`Failed to fetch branches: ${response.status} ${response.statusText}`);
         }
         const data = await response.json();
-        console.log('Fetched Bitbucket branches page:', data);
         if (data.values && Array.isArray(data.values)) {
           branches.push(...data.values.map((branch: any) => branch.name));
         }
         url = data.next || null;
       }
-      console.log('Fetched Bitbucket branches:', branches);
       return branches;
     } catch (error) {
       if (error instanceof Error && error.message === 'BITBUCKET_UNAUTHORIZED') {

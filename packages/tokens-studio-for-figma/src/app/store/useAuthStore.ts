@@ -281,7 +281,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             subscription: org.type && org.attributes ? org.attributes.subscription : org.subscription,
             projects: (org.type && org.attributes ? org.attributes.projects : org.projects) || { data: [] },
           }));
-          console.log('useAuthStore: fetched organizations', organizations);
         }
       } catch (err) {
         console.warn('Could not fetch organizations via new backend, fallback missing depending on API.', err);
@@ -307,7 +306,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       if (activeOrganization && targetProjectId) {
         initialProject = activeOrganization.projects?.data?.find((p) => p.id === targetProjectId) || initialProject;
       }
-      console.log('[fetchUserData] Initializing activeProject to:', initialProject, 'based on activeProjectId:', activeProjectId, 'localApiState:', localApiState);
 
       set({
         user,
@@ -358,8 +356,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           name: p.name || (p.attributes?.name) || '',
           slug: p.slug || (p.attributes?.slug) || '',
         }));
-
-        console.log('Fetched projects:', projects); // Add debug log
 
         set((state) => {
           // Update the organization in the list and active organization if it matches

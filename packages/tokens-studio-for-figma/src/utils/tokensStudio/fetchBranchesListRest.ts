@@ -19,7 +19,6 @@ export async function fetchBranchesListRest(
     const branchesRes = await fetch(`${apiBaseUrl}/api/v1/projects/${projectId}/branches`, { headers });
     if (!branchesRes.ok) throw new Error(`Failed to fetch branches: ${branchesRes.statusText}`);
     const branchesData = await branchesRes.json();
-    console.log('Fetched branches data:', branchesData);
 
     let branches: RestBranch[] = [];
     if (branchesData.data && Array.isArray(branchesData.data)) {
@@ -37,8 +36,6 @@ export async function fetchBranchesListRest(
         change_set_id: item.id,
       }));
     }
-
-    console.log('Processed branches:', branches);
 
     return branches.map((b) => b.name);
   } catch (error) {

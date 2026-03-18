@@ -73,9 +73,6 @@ const SyncSettings = () => {
   const studioProviders = React.useMemo(() => {
     if (isAuthenticated && organizations?.length) {
       return organizations.map((org) => {
-        console.log('[SyncSettings] Raw organization API object:', org);
-        if (org.subscription) console.log('[SyncSettings] Subscription object:', org.subscription);
-
         const hasAccess = org.subscription?.access?.includes('figma_plugin');
 
         let planName = '';

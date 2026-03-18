@@ -69,8 +69,6 @@ export function pullTokensFactory(
         } as StorageTypeCredentials;
       }
 
-      console.log('[pullTokensFactory] initialized matchingSet from storageType:', matchingSet?.id, 'storageType payload:', storageType);
-
       if (matchingSet) {
         // found API credentials
         try {
@@ -99,7 +97,6 @@ export function pullTokensFactory(
           dispatch.tokenState.setActiveTheme({ newActiveTheme: activeTheme || null, shouldUpdateNodes: false });
           dispatch.tokenState.setCollapsedTokenSets(params.localTokenData?.collapsedTokenSets || []);
 
-          console.log('[pullTokensFactory] About to pull tokens using matchingSet:', matchingSet.id, 'branch:', (matchingSet as any).branch, 'Is activeProject id different?', useAuthStore.getState().activeProject?.id);
           const remoteData = await useRemoteTokensResult.pullTokens({
             context: matchingSet,
             activeTheme,
