@@ -161,6 +161,7 @@ function StartScreen() {
 
   // Determine if we should show the provider selector
   const shouldShowProviderSelector = apiProviders.length > 0 && storageType?.provider === StorageProviderType.LOCAL;
+  const isTokensStudioOAuth = storageType?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH;
 
   return (
     <Box
@@ -218,19 +219,19 @@ function StartScreen() {
               id="callout-action-setupsync"
               heading={getCalloutContent.heading}
               description={getCalloutContent.description}
-              action={storageType?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH ? undefined : {
+              action={isTokensStudioOAuth ? undefined : {
                 onClick: onSetSyncClick,
                 text: t('enterCredentials'),
               }}
-              secondaryAction={storageType?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH ? undefined : (matchingProvider ? {
+              secondaryAction={(!isTokensStudioOAuth && matchingProvider) ? {
                 onClick: () => {
                   dispatch.uiState.setLastError(null);
                   restoreStoredProvider(matchingProvider);
                 },
                 text: t('retry'),
-              } : undefined)}
+              } : undefined}
             >
-              {storageType?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH && (
+              {isTokensStudioOAuth && (
                 <Button
                   size="small"
                   variant="primary"
