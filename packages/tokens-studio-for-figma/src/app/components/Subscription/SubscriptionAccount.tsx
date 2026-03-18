@@ -151,6 +151,17 @@ const StyledDropdownItem = styled(DropdownMenu.Item, {
 
 // ─── Component ───────────────────────────────────────────────────────
 
+const getPlanName = (sub: any) => {
+  if (!sub) return 'Starter';
+  const name = (typeof sub.plan === 'string' ? sub.plan : undefined)
+    || sub.plan?.name
+    || sub.plan_name
+    || sub.current_plan;
+
+  if (!name) return 'Starter';
+  return name;
+};
+
 export default function SubscriptionAccount() {
   // OAuth Auth store
   const {
@@ -272,7 +283,7 @@ export default function SubscriptionAccount() {
                       <FlexGrid>
                         <ItemCardColumn>
                           <ItemCardLabel>{t('plan')}</ItemCardLabel>
-                          <ItemCardValue>{activeOrganization.subscription?.plan?.name || 'Starter'}</ItemCardValue>
+                          <ItemCardValue style={{ textTransform: 'capitalize' }}>{getPlanName(activeOrganization.subscription)}</ItemCardValue>
                         </ItemCardColumn>
                       </FlexGrid>
                       <Button variant="secondary" onClick={handleManagePlan}>{t('managePlan')}</Button>
