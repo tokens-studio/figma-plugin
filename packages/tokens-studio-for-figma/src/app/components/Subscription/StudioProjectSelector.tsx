@@ -120,10 +120,11 @@ export const StudioProjectSelector = ({ orgId, value, onChange }: StudioProjectS
       && (storageType as any).internalId?.startsWith('tokens-studio-')
     ) {
       try {
-        await loadProjectTokens(projectId);
+        await loadProjectTokens(projectId, 'main');
         const newProviderData = {
           ...storageType,
           id: projectId,
+          branch: 'main',
         };
         dispatch.uiState.setLocalApiState(newProviderData as any);
         dispatch.uiState.setApiData(newProviderData as any);
