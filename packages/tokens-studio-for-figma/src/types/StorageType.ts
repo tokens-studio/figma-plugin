@@ -92,6 +92,9 @@ StorageProviderType.TOKENS_STUDIO_OAUTH,
   id: string; // this is the project id
   branch?: string; // this is the base branch
   baseUrl?: string; // this is the base URL for the Studio instance
+  isAccessDisabled?: boolean; // system payload
+  planName?: string; // system payload
+  subscriptionStatus?: string; // system payload
 }
 >;
 

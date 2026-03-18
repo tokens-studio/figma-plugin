@@ -13,12 +13,6 @@ interface RestTokenSet {
   order_index?: number;
 }
 
-interface RestThemeGroup {
-  id: string;
-  name: string;
-  options: any[];
-}
-
 interface RestThemeOption {
   id: string;
   name: string;

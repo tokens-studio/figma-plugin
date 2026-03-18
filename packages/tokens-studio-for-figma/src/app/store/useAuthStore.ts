@@ -30,7 +30,7 @@ interface AuthState {
   isLoading: boolean;
   isPro: boolean;
   deviceCode: DeviceCodeState | null; // Device code info for UI display
-  _deviceCodeAbortController: AbortController | null;
+  deviceCodeAbortController: AbortController | null;
   loginWithOAuth: () => Promise<void>;
   logout: () => Promise<void>;
   setError: (error: string | null) => void;
@@ -55,7 +55,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   isLoading: false,
   isPro: false,
   deviceCode: null,
-  _deviceCodeAbortController: null,
+  deviceCodeAbortController: null,
 
   loginWithOAuth: async () => {
     set({ isLoading: true, error: null, deviceCode: null });
@@ -90,7 +90,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
         // Create abort controller for cancellation
         const abortController = new AbortController();
-        set({ _deviceCodeAbortController: abortController });
+        set({ deviceCodeAbortController: abortController });
 
         // Poll for token (this will wait until user authorizes)
         tokens = await OAuthService.completeDeviceCodeFlow(
@@ -103,7 +103,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         );
 
         // Clear device code state and abort controller
-        set({ deviceCode: null, _deviceCodeAbortController: null });
+        set({ deviceCode: null, deviceCodeAbortController: null });
       } else {
         // Fallback or old PKCE Flow
         const result = await OAuthService.performPKCEFlow(studioUrl);
@@ -115,17 +115,18 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       await get().fetchUserData(tokens);
       await get().setOAuthTokens(tokens);
     } catch (error) {
-      const errorMessage = error instanceof OAuthError
-        ? error.getUserMessage()
-        : error instanceof Error
-          ? error.message
-          : 'OAuth login failed';
+      let errorMessage = 'OAuth login failed';
+      if (error instanceof OAuthError) {
+        errorMessage = error.getUserMessage();
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
 
       set({
         isAuthenticated: false,
         oauthTokens: null,
         deviceCode: null,
-        _deviceCodeAbortController: null,
+        deviceCodeAbortController: null,
         error: errorMessage,
         isLoading: false,
       });
@@ -152,12 +153,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   setError: (error: string | null) => {
     if (error === null) {
       // If clearing error, also cancel any in-progress device code flow
-      const controller = get()._deviceCodeAbortController;
+      const controller = get().deviceCodeAbortController;
       if (controller) {
         controller.abort();
       }
       set({
-        error: null, isLoading: false, deviceCode: null, _deviceCodeAbortController: null,
+        error: null, isLoading: false, deviceCode: null, deviceCodeAbortController: null,
       });
     } else {
       set({ error });
@@ -291,9 +292,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       const storedOrgId = get().activeOrganizationId || (localApiState?.provider === 'tokensstudio-oauth' ? localApiState.internalId?.replace('tokens-studio-', '') : null);
 
+      const fallbackOrg = organizations.length > 0 ? organizations[0] : null;
       const activeOrganization = storedOrgId
-        ? organizations.find((o) => o.id === storedOrgId) || (organizations.length > 0 ? organizations[0] : null)
-        : (organizations.length > 0 ? organizations[0] : null);
+        ? organizations.find((o) => o.id === storedOrgId) || fallbackOrg
+        : fallbackOrg;
 
       let isPro = false;
       if (activeOrganization) {

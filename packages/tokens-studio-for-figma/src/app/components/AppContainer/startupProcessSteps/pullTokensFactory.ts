@@ -13,9 +13,6 @@ import { hasTokenValues } from '@/utils/hasTokenValues';
 import { notifyToUI } from '@/plugin/notifiers';
 import type useRemoteTokens from '@/app/store/remoteTokens';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
-import { useAuthStore } from '../../../store/useAuthStore';
-
-// @TODO - this file should be removed and useRemoteTokens should be used instead!';
 import { isGitProvider } from '@/utils/is';
 import { categorizeError } from '@/utils/error/categorizeError';
 

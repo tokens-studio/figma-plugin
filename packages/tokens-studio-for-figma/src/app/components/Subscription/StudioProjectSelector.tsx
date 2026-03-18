@@ -6,17 +6,9 @@ import { styled } from '@/stitches.config';
 import { useAuthStore } from '@/app/store/useAuthStore';
 import { storageTypeSelector } from '@/selectors';
 import { StorageProviderType } from '@/constants/StorageProviderType';
-import { TokensStudioStorageType } from '@/types/StorageType';
 import useStorage from '@/app/store/useStorage';
 import useRemoteTokens from '@/app/store/remoteTokens';
 import { Dispatch } from '@/app/store';
-
-const Avatar = styled('img', {
-  width: 16,
-  height: 16,
-  borderRadius: '2px',
-  objectFit: 'cover',
-});
 
 const AvatarFallback = styled('div', {
   width: 24,
@@ -77,6 +69,24 @@ const StyledDropdownItem = styled(DropdownMenu.Item, {
   },
 });
 
+const ProjectDropdownItem = React.memo(({
+  project,
+  onSelect,
+}: {
+  project: { id: string; name: string };
+  onSelect: (id: string) => void;
+}) => {
+  const handleClick = React.useCallback(() => {
+    onSelect(project.id);
+  }, [onSelect, project.id]);
+
+  return (
+    <StyledDropdownItem onClick={handleClick}>
+      {project.name}
+    </StyledDropdownItem>
+  );
+});
+
 export interface StudioProjectSelectorProps {
   orgId?: string;
   value?: string;
@@ -92,6 +102,43 @@ export const StudioProjectSelector = ({ orgId, value, onChange }: StudioProjectS
   const { setStorageType } = useStorage();
   const { fetchBranches } = useRemoteTokens();
 
+  const handleProjectSelect = React.useCallback(async (projectId: string) => {
+    if (onChange) {
+      onChange(projectId);
+    }
+
+    const isCurrentlyActiveOrg = !orgId || orgId === useAuthStore.getState().activeOrganizationId;
+
+    if (isCurrentlyActiveOrg && !onChange) {
+      setActiveProject(projectId);
+    }
+
+    // Auto-load tokens if Provider is currently active AND this is the active org
+    if (
+      isCurrentlyActiveOrg
+      && storageType.provider === StorageProviderType.TOKENS_STUDIO_OAUTH
+      && (storageType as any).internalId?.startsWith('tokens-studio-')
+    ) {
+      try {
+        await loadProjectTokens(projectId);
+        const newProviderData = {
+          ...storageType,
+          id: projectId,
+        };
+        dispatch.uiState.setLocalApiState(newProviderData as any);
+        dispatch.uiState.setApiData(newProviderData as any);
+        setStorageType({ provider: newProviderData as any, shouldSetInDocument: true });
+
+        const branches = await fetchBranches(newProviderData as any);
+        if (branches) {
+          dispatch.branchState.setBranches(branches);
+        }
+      } catch (e) {
+        console.error('Failed to load project tokens for active provider', e);
+      }
+    }
+  }, [onChange, orgId, setActiveProject, storageType, loadProjectTokens, dispatch, setStorageType, fetchBranches]);
+
   const activeOrganization = React.useMemo(() => {
     if (orgId) {
       return organizations.find((o) => o.id === orgId) || null;
@@ -99,14 +146,17 @@ export const StudioProjectSelector = ({ orgId, value, onChange }: StudioProjectS
     return useAuthStore.getState().activeOrganization;
   }, [orgId, organizations]);
 
-  if (!activeOrganization) return null;
+  const projectsData = React.useMemo(
+    () => activeOrganization?.projects?.data ?? [],
+    [activeOrganization],
+  );
 
-  const hasProjects = activeOrganization.projects?.data?.length > 0;
+  const hasProjects = projectsData.length > 0;
 
   const activeProjectToUse = React.useMemo(() => {
     // 1. If explicitly controlled by parent (e.g. inactive state setting override)
-    if (value && activeOrganization?.projects?.data) {
-      const found = activeOrganization.projects.data.find((p) => p.id === value) || null;
+    if (value && projectsData.length > 0) {
+      const found = projectsData.find((p) => p.id === value) || null;
       if (found) {
         return found;
       }
@@ -115,8 +165,8 @@ export const StudioProjectSelector = ({ orgId, value, onChange }: StudioProjectS
     // 2. If this organization is the globally ACTIVE storage type, its project comes directly from storageType state
     const isOrgActiveInStorage = storageType.provider === StorageProviderType.TOKENS_STUDIO_OAUTH && (storageType as any).internalId === `tokens-studio-${orgId || useAuthStore.getState().activeOrganizationId}`;
 
-    if (isOrgActiveInStorage && activeOrganization?.projects?.data) {
-      const storedProject = activeOrganization.projects.data.find((p) => p.id === (storageType as any).id);
+    if (isOrgActiveInStorage && projectsData.length > 0) {
+      const storedProject = projectsData.find((p) => p.id === (storageType as any).id);
       if (storedProject) {
         return storedProject;
       }
@@ -129,8 +179,10 @@ export const StudioProjectSelector = ({ orgId, value, onChange }: StudioProjectS
     }
 
     // 4. Fallback to the first project in the organization
-    return activeOrganization?.projects?.data?.[0] || null;
-  }, [value, activeOrganization, orgId, activeProject, storageType]);
+    return projectsData[0] || null;
+  }, [value, projectsData, orgId, activeProject, storageType]);
+
+  if (!activeOrganization) return null;
 
   return (
     <DropdownMenu>
@@ -145,48 +197,12 @@ export const StudioProjectSelector = ({ orgId, value, onChange }: StudioProjectS
       </DropdownMenu.Trigger>
       {hasProjects && (
         <StyledDropdownContent>
-          {activeOrganization.projects.data.map((project) => (
-            <StyledDropdownItem
+          {projectsData.map((project) => (
+            <ProjectDropdownItem
               key={project.id}
-              onClick={async () => {
-                if (onChange) {
-                  onChange(project.id);
-                }
-
-                const isCurrentlyActiveOrg = !orgId || orgId === useAuthStore.getState().activeOrganizationId;
-
-                if (isCurrentlyActiveOrg && !onChange) {
-                  setActiveProject(project.id);
-                }
-
-                // Auto-load tokens if Provider is currently active AND this is the active org
-                if (
-                  isCurrentlyActiveOrg
-                                    && storageType.provider === StorageProviderType.TOKENS_STUDIO_OAUTH
-                                    && (storageType as any).internalId?.startsWith('tokens-studio-')
-                ) {
-                  try {
-                    await loadProjectTokens(project.id);
-                    const newProviderData = {
-                      ...storageType,
-                      id: project.id,
-                    };
-                    dispatch.uiState.setLocalApiState(newProviderData as any);
-                    dispatch.uiState.setApiData(newProviderData as any);
-                    setStorageType({ provider: newProviderData as any, shouldSetInDocument: true });
-
-                    const branches = await fetchBranches(newProviderData as any);
-                    if (branches) {
-                      dispatch.branchState.setBranches(branches);
-                    }
-                  } catch (e) {
-                    console.error('Failed to load project tokens for active provider', e);
-                  }
-                }
-              }}
-            >
-              {project.name}
-            </StyledDropdownItem>
+              project={project}
+              onSelect={handleProjectSelect}
+            />
           ))}
         </StyledDropdownContent>
       )}

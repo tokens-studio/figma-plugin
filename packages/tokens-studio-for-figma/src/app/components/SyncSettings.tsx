@@ -93,10 +93,10 @@ const SyncSettings = () => {
           orgId: org.id,
           id: org.projects?.data?.[0]?.id || '',
           // Inject custom property so StorageItem can know without cross-referencing
-          __isAccessDisabled: !hasAccess,
-          __planName: planName,
-          __subscriptionStatus: org.subscription?.subscription_status || '',
-        } as StorageTypeCredentials & { __isAccessDisabled: boolean; __planName: string; __subscriptionStatus: string };
+          isAccessDisabled: !hasAccess,
+          planName,
+          subscriptionStatus: org.subscription?.subscription_status || '',
+        } as StorageTypeCredentials;
       });
     }
     return [];

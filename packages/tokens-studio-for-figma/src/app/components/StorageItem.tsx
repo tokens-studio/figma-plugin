@@ -45,9 +45,11 @@ const StorageItem = ({
     loadProjectTokens, activeProject, setActiveOrganization, setActiveProject,
   } = useAuthStore();
   const isOAuth = React.useMemo(() => item.provider === StorageProviderType.TOKENS_STUDIO_OAUTH, [item]);
-  const isAccessDisabled = (item as any).__isAccessDisabled;
-  const planName = (item as any).__planName;
-  const subscriptionStatus = (item as any).__subscriptionStatus;
+
+  const oauthItem = item as Extract<StorageTypeCredentials, { provider: StorageProviderType.TOKENS_STUDIO_OAUTH }>;
+  const { isAccessDisabled } = oauthItem;
+  const { planName } = oauthItem;
+  const { subscriptionStatus } = oauthItem;
   const isActive = React.useCallback(() => isSameCredentials(item, storageType), [item, storageType]);
 
   const [selectedProjectId, setSelectedProjectId] = React.useState<string | undefined>(
@@ -173,15 +175,18 @@ const StorageItem = ({
                   maxWidth: '100%',
                 }}
               >
-                {isOAuth ? (
-                  subscriptionStatus === 'trial_expired' ? 'Trial expired' : planName
-                ) : (
-                  <>
-                    {id}
-                    {' '}
-                    {branch && ` (${branch})`}
-                  </>
-                )}
+                {(() => {
+                  if (isOAuth) {
+                    return subscriptionStatus === 'trial_expired' ? 'Trial expired' : planName;
+                  }
+                  return (
+                    <>
+                      {id}
+                      {' '}
+                      {branch && ` (${branch})`}
+                    </>
+                  );
+                })()}
               </Box>
             </Stack>
           </Stack>
