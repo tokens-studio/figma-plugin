@@ -10,7 +10,9 @@ import {
   themesListSelector,
   tokensSelector,
   usedTokenSetSelector,
+  editProhibitedSelector,
 } from '@/selectors';
+import { useChangedState } from '@/hooks/useChangedState';
 import { isEqual } from '@/utils/isEqual';
 import { StorageTypeCredentials } from '@/types/StorageType';
 import { StorageProviderType } from '@/constants/StorageProviderType';
@@ -32,7 +34,9 @@ export function useTokensStudioOAuth() {
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
-  const { t } = useTranslation(['sync']);
+  const { t } = useTranslation(['sync', 'branch', 'general']);
+  const { hasChanges } = useChangedState();
+  const editProhibited = useSelector(editProhibitedSelector);
 
   const pullTokensFromTokensStudioOAuth = useCallback(
     async (context: TokensStudioOAuthCredentials): Promise<RemoteResponseData | null> => {
@@ -156,6 +160,18 @@ export function useTokensStudioOAuth() {
     async (projectId: string, branch?: string) => {
       const { oauthTokens, activeOrganization } = useAuthStore.getState();
       if (!oauthTokens || !activeOrganization) return;
+
+      if (hasChanges && !editProhibited) {
+        const confirmResult = await confirm({
+          text: t('unSavedChanges', { ns: 'branch' }) as string,
+          description: t('ifYouCreate', { ns: 'branch' }) as string,
+          confirmAction: t('discardChanges', { ns: 'branch' }) as string,
+          cancelAction: t('cancel', { ns: 'general' }) as string,
+        });
+        if (confirmResult === false) {
+          throw new Error('User cancelled pull');
+        }
+      }
 
       useAuthStore.setState({ isLoading: true });
 
