@@ -10,14 +10,13 @@ import useRemoteTokens from '../store/remoteTokens';
 import { storageTypeSelector } from '@/selectors';
 import { StyledStorageItem } from './StyledStorageItem';
 import { StorageProviderType, type StorageTypeCredentials } from '@/types/StorageType';
-import { isGitProvider } from '@/utils/is';
+import { isGitProvider, isTokensStudioOAuthType } from '@/utils/is';
 import useConfirm from '../hooks/useConfirm';
 import { getProviderIcon } from '@/utils/getProviderIcon';
 import useStorage from '../store/useStorage';
 import { Dispatch } from '../store';
 import { TokenFormatBadge } from './TokenFormatBadge';
 import { isUsingAppPassword } from '@/utils/bitbucketMigration';
-import { isTokensStudioOAuthType } from '@/utils/is';
 import { StudioProjectSelector } from './Subscription/StudioProjectSelector';
 import { useAuthStore } from '@/app/store/useAuthStore';
 import { useTokensStudioOAuth } from '../store/providers/tokens-studio/tokensStudioOAuth';
@@ -50,16 +49,14 @@ const StorageItem = ({
   const isOAuth = React.useMemo(() => isTokensStudioOAuthType(item), [item]);
 
   const oauthItem = isTokensStudioOAuthType(item) ? item : null;
-  
-  const org = React.useMemo(() => {
-    return oauthItem && oauthItem.orgId 
-      ? organizations.find((o) => o.id === oauthItem.orgId) 
-      : null;
-  }, [oauthItem, organizations]);
+
+  const org = React.useMemo(() => (oauthItem && oauthItem.orgId
+    ? organizations.find((o) => o.id === oauthItem.orgId)
+    : null), [oauthItem, organizations]);
 
   const hasAccess = org?.subscription?.access?.includes('figma_plugin') ?? true;
   const isAccessDisabled = oauthItem ? !hasAccess : false;
-  
+
   const planName = React.useMemo(() => {
     if (!org?.subscription) return '';
     const sub = org.subscription as any;
@@ -70,7 +67,7 @@ const StorageItem = ({
     if (sub.current_plan === null) return 'Starter';
     return '';
   }, [org]);
-  
+
   const subscriptionStatus = org?.subscription?.subscription_status || '';
   const isActive = React.useCallback(() => isSameCredentials(item, storageType), [item, storageType]);
 

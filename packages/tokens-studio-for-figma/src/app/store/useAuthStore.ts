@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import compact from 'just-compact';
 import { OAuthService } from '../services/OAuthService';
 import { OAuthError } from '@/types/OAuthError';
 import type {
@@ -7,11 +6,8 @@ import type {
 } from '@/types/oauth';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
-import { fetchProjectDataRest } from '@/utils/tokensStudio/fetchProjectDataRest';
 import { store } from '@/app/store';
-import { notifyToUI } from '@/plugin/notifiers';
 import { TOKENS_STUDIO_APP_URL } from '@/constants/TokensStudio';
-import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 
 interface DeviceCodeState {
   userCode: string;

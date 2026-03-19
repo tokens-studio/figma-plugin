@@ -72,15 +72,13 @@ const SyncSettings = () => {
 
   const studioProviders = React.useMemo(() => {
     if (isAuthenticated && organizations?.length) {
-      return organizations.map((org) => {
-        return {
-          provider: StorageProviderType.TOKENS_STUDIO_OAUTH,
-          internalId: `tokens-studio-${org.id}`,
-          name: org.name,
-          orgId: org.id,
-          id: org.projects?.data?.[0]?.id || '',
-        } as StorageTypeCredentials;
-      });
+      return organizations.map((org) => ({
+        provider: StorageProviderType.TOKENS_STUDIO_OAUTH,
+        internalId: `tokens-studio-${org.id}`,
+        name: org.name,
+        orgId: org.id,
+        id: org.projects?.data?.[0]?.id || '',
+      } as StorageTypeCredentials));
     }
     return [];
   }, [isAuthenticated, organizations]);

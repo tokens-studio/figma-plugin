@@ -1,6 +1,6 @@
 import { AnyTokenSet } from '@/types/tokens';
 import { ThemeObjectsList } from '@/types';
-import { RestBranch, parseBranchesFromResponse } from './fetchBranchesListRest';
+import { parseBranchesFromResponse } from './fetchBranchesListRest';
 
 // Types derived from REST endpoints
 
@@ -85,7 +85,7 @@ export async function fetchProjectDataRest(
       themeOptionsRes.json(),
     ]);
 
-    const hasExceededPaginationLimit = tokensData?.meta?.pagination?.total_items > 10000 
+    const hasExceededPaginationLimit = tokensData?.meta?.pagination?.total_items > 10000
       || (tokensData?.data && tokensData.data.length >= 10000);
 
     // Parse token sets
