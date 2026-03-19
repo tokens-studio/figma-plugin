@@ -68,9 +68,13 @@ export default function BranchSelector() {
       if (apiData && localApiState) {
         const isTokensStudioProvider = apiData?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH && localApiState?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH;
         if ((isGitProvider(apiData) && isGitProvider(localApiState)) || isTokensStudioProvider) {
-          const fetchedBranches = await fetchBranches(apiData);
-          if (fetchedBranches) {
-            dispatch.branchState.setBranches(fetchedBranches);
+          try {
+            const fetchedBranches = await fetchBranches(apiData);
+            if (fetchedBranches) {
+              dispatch.branchState.setBranches(fetchedBranches);
+            }
+          } catch (error) {
+            console.error('Failed to fetch branches upon opening popover:', error);
           }
         }
       }
@@ -166,8 +170,8 @@ export default function BranchSelector() {
       const isTokensStudioProvider = apiData?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH && localApiState?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH;
       if ((isGitProvider(apiData) && isGitProvider(localApiState)) || isTokensStudioProvider) {
         dispatch.branchState.setBranches(branches.includes(branch) ? branches : [...branches, branch]);
-        dispatch.uiState.setApiData({ ...apiData, branch } as any);
-        dispatch.uiState.setLocalApiState({ ...localApiState, branch } as any);
+        dispatch.uiState.setApiData({ ...apiData, branch } as StorageTypeCredentials);
+        dispatch.uiState.setLocalApiState({ ...localApiState, branch } as StorageTypeCredentials);
       }
     },
     [dispatch, apiData, localApiState],

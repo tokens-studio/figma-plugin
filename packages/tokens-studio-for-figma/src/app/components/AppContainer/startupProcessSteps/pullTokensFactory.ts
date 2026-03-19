@@ -13,7 +13,7 @@ import { hasTokenValues } from '@/utils/hasTokenValues';
 import { notifyToUI } from '@/plugin/notifiers';
 import type useRemoteTokens from '@/app/store/remoteTokens';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
-import { isGitProvider } from '@/utils/is';
+import { isGitProvider, isTokensStudioOAuthType } from '@/utils/is';
 import { categorizeError } from '@/utils/error/categorizeError';
 
 export function pullTokensFactory(
@@ -54,8 +54,8 @@ export function pullTokensFactory(
       if (
         !matchingSet
         && (
-          storageType.provider === StorageProviderType.TOKENS_STUDIO_OAUTH
-          || (storageType.provider === StorageProviderType.TOKENS_STUDIO && (storageType as any).internalId?.startsWith('tokens-studio-'))
+          isTokensStudioOAuthType(storageType)
+          || (storageType.provider === StorageProviderType.TOKENS_STUDIO && typeof (storageType as { internalId?: string }).internalId === 'string' && (storageType as { internalId?: string }).internalId!.startsWith('tokens-studio-'))
         )
         && params.oauthTokens
       ) {
@@ -80,8 +80,8 @@ export function pullTokensFactory(
             || matchingSet.provider === StorageProviderType.GITLAB
             || matchingSet.provider === StorageProviderType.ADO
             || matchingSet.provider === StorageProviderType.BITBUCKET
-            || matchingSet.provider === StorageProviderType.TOKENS_STUDIO_OAUTH
-            || (matchingSet.provider === StorageProviderType.TOKENS_STUDIO && (matchingSet as any).internalId?.startsWith('tokens-studio-'))
+            || isTokensStudioOAuthType(matchingSet)
+            || (matchingSet.provider === StorageProviderType.TOKENS_STUDIO && typeof (matchingSet as { internalId?: string }).internalId === 'string' && (matchingSet as { internalId?: string }).internalId!.startsWith('tokens-studio-'))
           ) {
             const branches = await useRemoteTokensResult.fetchBranches(matchingSet);
             if (branches) dispatch.branchState.setBranches(branches);

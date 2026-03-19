@@ -6,6 +6,7 @@ import { styled } from '@/stitches.config';
 import { useAuthStore } from '@/app/store/useAuthStore';
 import { storageTypeSelector } from '@/selectors';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import { useTokensStudioOAuth } from '@/app/store/providers/tokens-studio/tokensStudioOAuth';
 import useStorage from '@/app/store/useStorage';
 import useRemoteTokens from '@/app/store/remoteTokens';
 import { Dispatch } from '@/app/store';
@@ -95,8 +96,9 @@ export interface StudioProjectSelectorProps {
 
 export const StudioProjectSelector = ({ orgId, value, onChange }: StudioProjectSelectorProps) => {
   const {
-    organizations, activeProject, setActiveProject, loadProjectTokens,
+    organizations, activeProject, setActiveProject, activeOrganizationId, activeOrganization: storeActiveOrganization,
   } = useAuthStore();
+  const { loadProjectTokens } = useTokensStudioOAuth();
   const storageType = useSelector(storageTypeSelector);
   const dispatch = useDispatch<Dispatch>();
   const { setStorageType } = useStorage();
@@ -107,7 +109,7 @@ export const StudioProjectSelector = ({ orgId, value, onChange }: StudioProjectS
       onChange(projectId);
     }
 
-    const isCurrentlyActiveOrg = !orgId || orgId === useAuthStore.getState().activeOrganizationId;
+    const isCurrentlyActiveOrg = !orgId || orgId === activeOrganizationId;
 
     if (isCurrentlyActiveOrg && !onChange) {
       setActiveProject(projectId);
@@ -144,8 +146,8 @@ export const StudioProjectSelector = ({ orgId, value, onChange }: StudioProjectS
     if (orgId) {
       return organizations.find((o) => o.id === orgId) || null;
     }
-    return useAuthStore.getState().activeOrganization;
-  }, [orgId, organizations]);
+    return storeActiveOrganization;
+  }, [orgId, organizations, storeActiveOrganization]);
 
   const projectsData = React.useMemo(
     () => activeOrganization?.projects?.data ?? [],
@@ -164,7 +166,7 @@ export const StudioProjectSelector = ({ orgId, value, onChange }: StudioProjectS
     }
 
     // 2. If this organization is the globally ACTIVE storage type, its project comes directly from storageType state
-    const isOrgActiveInStorage = storageType.provider === StorageProviderType.TOKENS_STUDIO_OAUTH && (storageType as any).internalId === `tokens-studio-${orgId || useAuthStore.getState().activeOrganizationId}`;
+    const isOrgActiveInStorage = storageType.provider === StorageProviderType.TOKENS_STUDIO_OAUTH && (storageType as any).internalId === `tokens-studio-${orgId || activeOrganizationId}`;
 
     if (isOrgActiveInStorage && projectsData.length > 0) {
       const storedProject = projectsData.find((p) => p.id === (storageType as any).id);
@@ -174,7 +176,7 @@ export const StudioProjectSelector = ({ orgId, value, onChange }: StudioProjectS
     }
 
     // 3. Fallback to the purely local activeProject in useAuthStore if it aligns
-    const isCurrentlyActiveOrg = !orgId || orgId === useAuthStore.getState().activeOrganizationId;
+    const isCurrentlyActiveOrg = !orgId || orgId === activeOrganizationId;
     if (isCurrentlyActiveOrg && activeProject) {
       return activeProject;
     }

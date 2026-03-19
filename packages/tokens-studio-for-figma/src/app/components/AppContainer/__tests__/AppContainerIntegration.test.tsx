@@ -42,8 +42,7 @@ const mockUser = {
   name: 'Jan Six',
 };
 
-// @ts-ignore
-const mockSettings: SavedSettings = {
+const mockSettings = {
   language: 'en',
   width: 800,
   height: 500,
@@ -55,7 +54,7 @@ const mockSettings: SavedSettings = {
   updateOnChange: false,
   updateRemote: true,
   shouldUpdateStyles: true,
-};
+} as SavedSettings;
 
 const mockValues: Record<string, AnyTokenList> = {
   global: [

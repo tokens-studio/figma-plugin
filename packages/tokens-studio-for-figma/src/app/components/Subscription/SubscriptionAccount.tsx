@@ -7,6 +7,7 @@ import {
 import { CaretDownIcon } from '@radix-ui/react-icons';
 import { styled } from '@/stitches.config';
 import { AddLicenseKey } from '../AddLicenseKey';
+import { TOKENS_STUDIO_APP_URL } from '@/constants/TokensStudio';
 import { OAuthLogin } from '../Login/OAuthLogin';
 import { useAuthStore } from '@/app/store/useAuthStore';
 import { Divider } from '../Divider';
@@ -176,13 +177,13 @@ export default function SubscriptionAccount() {
 
   const handleManageOrg = useCallback(() => {
     if (activeOrganization) {
-      window.open(`https://production.tokens.studio/organizations/${activeOrganization.id}`, '_blank');
+      window.open(`https://${TOKENS_STUDIO_APP_URL}/organizations/${activeOrganization.id}`, '_blank');
     }
   }, [activeOrganization]);
 
   const handleManagePlan = useCallback(() => {
     if (activeOrganization) {
-      window.open(`https://production.tokens.studio/organizations/${activeOrganization.id}/subscription`, '_blank');
+      window.open(`https://${TOKENS_STUDIO_APP_URL}/organizations/${activeOrganization.id}/subscription`, '_blank');
     }
   }, [activeOrganization]);
 

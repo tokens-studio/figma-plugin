@@ -17,8 +17,10 @@ import useStorage from '../store/useStorage';
 import { Dispatch } from '../store';
 import { TokenFormatBadge } from './TokenFormatBadge';
 import { isUsingAppPassword } from '@/utils/bitbucketMigration';
+import { isTokensStudioOAuthType } from '@/utils/is';
 import { StudioProjectSelector } from './Subscription/StudioProjectSelector';
 import { useAuthStore } from '@/app/store/useAuthStore';
+import { useTokensStudioOAuth } from '../store/providers/tokens-studio/tokensStudioOAuth';
 
 type Props = {
   item: StorageTypeCredentials;
@@ -42,23 +44,43 @@ const StorageItem = ({
 
   const { t } = useTranslation(['storage']);
   const {
-    loadProjectTokens, activeProject, setActiveOrganization, setActiveProject,
+    activeProject, setActiveOrganization, setActiveProject, organizations,
   } = useAuthStore();
-  const isOAuth = React.useMemo(() => item.provider === StorageProviderType.TOKENS_STUDIO_OAUTH, [item]);
+  const { loadProjectTokens } = useTokensStudioOAuth();
+  const isOAuth = React.useMemo(() => isTokensStudioOAuthType(item), [item]);
 
-  const oauthItem = item as Extract<StorageTypeCredentials, { provider: StorageProviderType.TOKENS_STUDIO_OAUTH }>;
-  const { isAccessDisabled } = oauthItem;
-  const { planName } = oauthItem;
-  const { subscriptionStatus } = oauthItem;
+  const oauthItem = isTokensStudioOAuthType(item) ? item : null;
+  
+  const org = React.useMemo(() => {
+    return oauthItem && oauthItem.orgId 
+      ? organizations.find((o) => o.id === oauthItem.orgId) 
+      : null;
+  }, [oauthItem, organizations]);
+
+  const hasAccess = org?.subscription?.access?.includes('figma_plugin') ?? true;
+  const isAccessDisabled = oauthItem ? !hasAccess : false;
+  
+  const planName = React.useMemo(() => {
+    if (!org?.subscription) return '';
+    const sub = org.subscription as any;
+    if (typeof sub.plan === 'string') return sub.plan;
+    if (sub.plan?.name) return sub.plan.name;
+    if (sub.plan_name) return sub.plan_name;
+    if (sub.current_plan) return sub.current_plan;
+    if (sub.current_plan === null) return 'Starter';
+    return '';
+  }, [org]);
+  
+  const subscriptionStatus = org?.subscription?.subscription_status || '';
   const isActive = React.useCallback(() => isSameCredentials(item, storageType), [item, storageType]);
 
   const [selectedProjectId, setSelectedProjectId] = React.useState<string | undefined>(
-    isActive() ? (item as any).id : undefined,
+    isActive() && oauthItem ? oauthItem.id : undefined,
   );
 
   // Check if this is a Bitbucket item using app password
   const isBitbucketWithAppPassword = React.useMemo(() => (
-    item.provider === StorageProviderType.BITBUCKET && isUsingAppPassword(item as any)
+    item.provider === StorageProviderType.BITBUCKET && isUsingAppPassword(item as Extract<StorageTypeCredentials, { provider: StorageProviderType.BITBUCKET }>)
   ), [item]);
 
   const askUserIfDelete = React.useCallback(async () => {
@@ -80,9 +102,9 @@ const StorageItem = ({
   }, [deleteProvider, item, askUserIfDelete, setStorageType, dispatch.uiState, dispatch.tokenState]);
 
   const handleRestore = React.useCallback(async () => {
-    if (isOAuth) {
-      let fallbackId = item.id;
-      const isCurrentlyActiveOrg = !(item as any).orgId || (item as any).orgId === useAuthStore.getState().activeOrganizationId;
+    if (oauthItem) {
+      let fallbackId = oauthItem.id;
+      const isCurrentlyActiveOrg = !oauthItem.orgId || oauthItem.orgId === useAuthStore.getState().activeOrganizationId;
       if (isCurrentlyActiveOrg && activeProject) {
         fallbackId = activeProject.id;
       }
@@ -90,22 +112,18 @@ const StorageItem = ({
       const idToLoad = selectedProjectId || fallbackId;
       if (idToLoad) {
         try {
-          if ((item as any).orgId) {
-            setActiveOrganization((item as any).orgId as string);
+          if (oauthItem.orgId) {
+            setActiveOrganization(oauthItem.orgId);
           }
           setActiveProject(idToLoad);
           await loadProjectTokens(idToLoad);
-          const newItem = { ...item, id: idToLoad };
+          const newItem = { ...oauthItem, id: idToLoad };
           dispatch.uiState.setLocalApiState(newItem);
           dispatch.uiState.setApiData(newItem);
-          setStorageType({
-            provider: newItem,
-            shouldSetInDocument: true,
-          });
-          setHasErrored(false);
+          setStorageType({ provider: newItem, shouldSetInDocument: true });
 
           try {
-            const branches = await fetchBranches(newItem as any);
+            const branches = await fetchBranches(newItem);
             if (branches) {
               dispatch.branchState.setBranches(branches);
             }
@@ -214,7 +232,7 @@ const StorageItem = ({
               )}
               {isOAuth ? (
                 <>
-                  <StudioProjectSelector orgId={(item as any).orgId} />
+                  <StudioProjectSelector orgId={oauthItem?.orgId} />
                   <Badge>{t('active')}</Badge>
                 </>
               ) : (
@@ -223,7 +241,7 @@ const StorageItem = ({
             </Stack>
           ) : (
             <Stack gap={2} align="center">
-              {isOAuth && <StudioProjectSelector orgId={(item as any).orgId} value={selectedProjectId} onChange={setSelectedProjectId} />}
+              {isOAuth && <StudioProjectSelector orgId={oauthItem?.orgId} value={selectedProjectId} onChange={setSelectedProjectId} />}
               <Button data-testid="button-storage-item-apply" variant="secondary" size="small" onClick={handleRestore}>
                 {t('apply')}
               </Button>

@@ -20,6 +20,7 @@ import { fetchBranchesListRest } from '../../../../utils/tokensStudio/fetchBranc
 import { useAuthStore } from '../../useAuthStore';
 import { OAuthService } from '../../../services/OAuthService';
 import { applyTokenSetOrder } from '@/utils/tokenset';
+import { TOKENS_STUDIO_APP_URL } from '@/constants/TokensStudio';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 
 type TokensStudioOAuthCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.TOKENS_STUDIO_OAUTH }>;
@@ -38,10 +39,13 @@ export function useTokensStudioOAuth() {
             const { oauthTokens } = useAuthStore.getState();
 
             if (oauthTokens?.accessToken) {
-                const studioUrl = 'production.tokens.studio';
+                const studioUrl = TOKENS_STUDIO_APP_URL;
                 const apiBaseUrl = OAuthService.getApiBaseUrl(studioUrl);
                 const projectData = await fetchProjectDataRest(oauthTokens.accessToken, apiBaseUrl, context.id, context.branch || 'main');
                 if (projectData) {
+                    if (projectData.hasExceededPaginationLimit) {
+                        notifyToUI('Maximum limit of 10,000 tokens reached. Some tokens may be missing.', { error: true });
+                    }
                     const sortedTokens = applyTokenSetOrder(
                         projectData.tokens as any,
                         projectData.tokenSetOrder,
@@ -74,7 +78,7 @@ export function useTokensStudioOAuth() {
             const { oauthTokens } = useAuthStore.getState();
 
             if (oauthTokens?.accessToken) {
-                const studioUrl = 'production.tokens.studio';
+                const studioUrl = TOKENS_STUDIO_APP_URL;
                 const apiBaseUrl = OAuthService.getApiBaseUrl(studioUrl);
                 const branches = await fetchBranchesListRest(oauthTokens.accessToken, apiBaseUrl, context.id);
                 return branches;
@@ -148,12 +152,69 @@ export function useTokensStudioOAuth() {
         [confirm, dispatch, activeTheme, tokens, themes, usedTokenSet, pullTokensFromTokensStudioOAuth, t],
     );
 
+    const loadProjectTokens = useCallback(
+        async (projectId: string, branch?: string) => {
+            const { oauthTokens, activeOrganization } = useAuthStore.getState();
+            if (!oauthTokens || !activeOrganization) return;
+
+            useAuthStore.setState({ isLoading: true });
+
+            const studioUrl = TOKENS_STUDIO_APP_URL;
+            const apiBaseUrl = OAuthService.getApiBaseUrl(studioUrl);
+
+            try {
+                const projectData = await fetchProjectDataRest(
+                    oauthTokens.accessToken,
+                    apiBaseUrl,
+                    projectId,
+                    branch || 'main',
+                );
+
+                if (projectData && projectData.tokens) {
+                    if (projectData.hasExceededPaginationLimit) {
+                        notifyToUI('Maximum limit of 10,000 tokens reached. Some tokens may be missing.', { error: true });
+                    }
+                    const { tokens: newTokens, themes: newThemes, tokenSetOrder } = projectData;
+
+                    dispatch.tokenState.setTokenData({
+                        values: newTokens as any,
+                        themes: newThemes,
+                        activeTheme: {},
+                        hasChangedRemote: false,
+                    });
+
+                    dispatch.tokenState.setRemoteData({
+                        tokens: newTokens as any,
+                        themes: newThemes,
+                        metadata: { tokenSetOrder },
+                    });
+
+                    const stringifiedRemoteTokens = JSON.stringify(compact([newTokens, newThemes, TokenFormat.format]), null, 2);
+                    dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
+                    dispatch.tokenState.setEditProhibited(true);
+
+                    notifyToUI('Successfully loaded project tokens', { error: false });
+                } else {
+                    notifyToUI('Project has no tokens or could not load tokens.', { error: true });
+                    throw new Error('Project has no tokens or could not load tokens.');
+                }
+            } catch (error) {
+                console.error('Failed to load project tokens:', error);
+                throw error; // Rethrow so caller can catch it and avoid silent failures
+            } finally {
+                useAuthStore.setState({ isLoading: false });
+            }
+        },
+        [dispatch]
+    );
+
     return useMemo(
         () => ({
             syncTokensWithTokensStudioOAuth,
             pullTokensFromTokensStudioOAuth,
             fetchBranchesForTokensStudio,
+            loadProjectTokens,
         }),
-        [syncTokensWithTokensStudioOAuth, pullTokensFromTokensStudioOAuth, fetchBranchesForTokensStudio],
+        [syncTokensWithTokensStudioOAuth, pullTokensFromTokensStudioOAuth, fetchBranchesForTokensStudio, loadProjectTokens],
     );
 }
