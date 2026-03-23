@@ -57,6 +57,7 @@ function Settings() {
     } else {
       try {
         replay.stop();
+        setDebugSession('');
       } catch (err) {
         console.warn('Replay is likely stopped already', err);
       }
@@ -67,14 +68,14 @@ function Settings() {
   useEffect(() => {
     async function getSessionId() {
       try {
-        const id = replay.getReplayId();
+        const id = await replay.getReplayId();
         setDebugSession(id || '');
       } catch (err) {
         // Silently fail
       }
     }
     getSessionId();
-  });
+  }, []);
 
   const closeOnboarding = React.useCallback(() => {
     dispatch.uiState.setOnboardingExplainerSyncProviders(false);
