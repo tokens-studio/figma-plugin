@@ -62,6 +62,8 @@ export async function applySiblingStyleId(node: BaseNode, styleIds: StyleIdMap, 
       case 'INSTANCE':
       case 'COMPONENT_SET':
       case 'FRAME':
+      // @ts-expect-error SlotNode not yet in @figma/plugin-typings
+      case 'SLOT':
       case 'SECTION':
       case 'BOOLEAN_OPERATION':
         {
@@ -77,7 +79,7 @@ export async function applySiblingStyleId(node: BaseNode, styleIds: StyleIdMap, 
           if (newEffectStyleId) {
             node.effectStyleId = newEffectStyleId;
           }
-          if (['COMPONENT', 'COMPONENT_SET', 'SECTION', 'INSTANCE', 'FRAME', 'BOOLEAN_OPERATION'].includes(node.type) && 'children' in node) {
+          if (['COMPONENT', 'COMPONENT_SET', 'SECTION', 'INSTANCE', 'FRAME', 'SLOT', 'BOOLEAN_OPERATION'].includes(node.type) && 'children' in node) {
             await Promise.all(node.children.map((child) => applySiblingStyleId(child, styleIds, styleMap, activeThemes)));
           }
         }
