@@ -1,26 +1,16 @@
 /**
  * Temporary type declarations for Figma's SlotNode.
- * Figma released Slots but has not yet updated @figma/plugin-typings.
+ * Figma released Slots but has not yet updated @figma/plugin-typings on npm.
+ * Source: https://github.com/figma/plugin-typings/tree/owong/slots-plugin-typings
  * Remove this file once official typings land.
  */
 declare global {
-  // SlotNode behaves like a FrameNode — it supports children, layout, fills,
-  // strokes, corner radius, effects, variables, and all frame-equivalent properties.
-  interface SlotNode
-    extends BaseNodeMixin,
-      ChildrenMixin,
-      CornerMixin,
-      RectangleCornerMixin,
-      BlendMixin,
-      ConstraintMixin,
-      LayoutMixin,
-      ExplicitVariableModesMixin,
-      MinimalBlendMixin,
-      FramePrototypingMixin,
-      ReactionMixin,
-      VariableConsumptionMixin {
+  // SlotNode extends DefaultFrameMixin — same capability surface as FrameNode.
+  interface SlotNode extends DefaultFrameMixin {
     readonly type: 'SLOT';
-    clone(): SlotNode;
+    /** Resets a given slot node to the original component slot content. */
+    resetSlot(): void;
+    readonly isAssignedSlot: boolean;
   }
 }
 
