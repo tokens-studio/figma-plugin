@@ -47,6 +47,7 @@ export function useTokensStudioOAuth() {
         const apiBaseUrl = OAuthService.getApiBaseUrl(studioUrl);
         const projectData = await fetchProjectDataRest(oauthTokens.accessToken, apiBaseUrl, context.id, context.branch || 'main');
         if (projectData) {
+          dispatch.tokenState.setEditProhibited(true);
           if (projectData.hasExceededPaginationLimit) {
             notifyToUI('Maximum limit of 10,000 tokens reached. Some tokens may be missing.', { error: true });
           }
