@@ -22,8 +22,7 @@ export const setupReplay = () => {
 
       if (client) {
         if (!client?.getIntegration(Sentry.Replay)) {
-          // @ts-ignore This should never be undefined after the check above
-          client.addIntegration(new Replay());
+          client.addIntegration(replay);
         }
       }
     } catch (error) {
