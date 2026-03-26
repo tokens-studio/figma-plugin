@@ -49,7 +49,10 @@
     "renameExisting": "मौजूदा शैली और वेरिएबल नाम अपडेट करें",
     "renameExistingExplanation": "टोकन नाम से मेल खाने के लिए मौजूदा शैलियों और वेरिएबल्स का नाम बदल दिया जाएगा",
     "removeWithoutConnection": "किसी टोकन से जुड़े बिना शैलियाँ और वेरिएबल हटाएँ",
-    "removeWithoutConnectionExplanation": "वे शैलियाँ और वेरिएबल जो किसी टोकन से जुड़े नहीं हैं, हटा दिए जाएंगे"
+    "removeWithoutConnectionExplanation": "वे शैलियाँ और वेरिएबल जो किसी टोकन से जुड़े नहीं हैं, हटा दिए जाएंगे",
+    "deprecatedTokens": "अप्रचलित टोकन",
+    "skipDeprecatedTokens": "वेरिएबल सिंक करते समय अप्रचलित टोकन छोड़ें",
+    "skipDeprecatedTokensExplanation": "अप्रचलित के रूप में चिह्नित टोकन Figma वेरिएबल के रूप में नहीं बनाए या अपडेट किए जाएंगे"
   },
   "variables": {
     "color": "रंग",

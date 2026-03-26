@@ -25,6 +25,7 @@ import {
   stylesEffectSelector,
   stylesTypographySelector,
   stylesGradientSelector,
+  skipDeprecatedTokensInVariableSyncSelector,
 } from '@/selectors';
 import ignoreFirstPartImage from '@/app/assets/hints/ignoreFirstPartForStyles.png';
 import prefixStylesImage from '@/app/assets/hints/prefixStyles.png';
@@ -49,6 +50,7 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
   const variablesNumber = useSelector(variablesNumberSelector);
   const variablesBoolean = useSelector(variablesBooleanSelector);
   const variablesString = useSelector(variablesStringSelector);
+  const skipDeprecatedTokensInVariableSync = useSelector(skipDeprecatedTokensInVariableSyncSelector);
   const stylesColor = useSelector(stylesColorSelector);
   const stylesTypography = useSelector(stylesTypographySelector);
   const stylesEffect = useSelector(stylesEffectSelector);
@@ -141,6 +143,13 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
   const handleExportStylesGradient = React.useCallback(
     (state: CheckedState) => {
       dispatch.settings.setStylesGradient(!!state);
+    },
+    [dispatch.settings],
+  );
+
+  const handleSkipDeprecatedChange = React.useCallback(
+    (checked: boolean) => {
+      dispatch.settings.setSkipDeprecatedTokensInVariableSync(checked);
     },
     [dispatch.settings],
   );
@@ -268,6 +277,21 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
               <Label css={{ fontWeight: '$sansRegular', fontSize: '$xsmall' }} htmlFor="removeWithoutConnection">{t('options.removeWithoutConnection')}</Label>
               <ExplainerModal title={t('options.removeWithoutConnection')}>
                 <Box>{t('options.removeWithoutConnectionExplanation')}</Box>
+              </ExplainerModal>
+            </StyledCheckboxGrid>
+          </Stack>
+          <Stack direction="column" gap={3}>
+            <Text bold css={{ fontSize: '$medium' }}>{t('options.deprecatedTokens')}</Text>
+            <StyledCheckboxGrid>
+              <Switch
+                data-testid="skipDeprecatedTokens"
+                id="skipDeprecatedTokens"
+                checked={!!skipDeprecatedTokensInVariableSync}
+                onCheckedChange={handleSkipDeprecatedChange}
+              />
+              <Label css={{ fontWeight: '$sansRegular', fontSize: '$xsmall' }} htmlFor="skipDeprecatedTokens">{t('options.skipDeprecatedTokens')}</Label>
+              <ExplainerModal title={t('options.skipDeprecatedTokens')}>
+                <Box>{t('options.skipDeprecatedTokensExplanation')}</Box>
               </ExplainerModal>
             </StyledCheckboxGrid>
           </Stack>

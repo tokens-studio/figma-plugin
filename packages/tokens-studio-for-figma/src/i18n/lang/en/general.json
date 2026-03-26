@@ -10,6 +10,7 @@
   "unsavedChanges": "Unsaved changes",
   "value": "Value",
   "description": "Description",
+  "deprecated": "Deprecated",
   "removed": "Removed",
   "changelog": "Changelog",
   "next": "Next",

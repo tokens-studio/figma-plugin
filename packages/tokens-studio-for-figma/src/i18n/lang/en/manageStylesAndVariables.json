@@ -50,7 +50,10 @@
   "createStylesWithVariableReferences": "Create styles with variable references",
   "createStylesWithVariableReferencesExplanation": "Styles will be created containing references to variables",
   "removeWithoutConnection": "Remove styles and variables without connection to a token",
-  "removeWithoutConnectionExplanation": "Styles and variables that are not connected to a token will be removed"
+  "removeWithoutConnectionExplanation": "Styles and variables that are not connected to a token will be removed",
+  "deprecatedTokens": "Deprecated tokens",
+  "skipDeprecatedTokens": "Skip deprecated tokens when syncing variables",
+  "skipDeprecatedTokensExplanation": "Tokens marked as deprecated will not be created or updated as Figma variables"
 },
 "variables": {
   "color": "Color",

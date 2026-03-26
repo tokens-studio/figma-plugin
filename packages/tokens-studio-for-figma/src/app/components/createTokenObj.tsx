@@ -61,9 +61,10 @@ export function appendTypeToToken(token: Omit<SingleToken, 'type'> & { type?: To
 }
 
 // Creates a tokens object so that tokens are displayed in groups in the UI.
-export function createTokensObject(tokens: (Omit<SingleToken, 'type'> & { type?: TokenTypes; })[], tokenFilter = '') {
+export function createTokensObject(tokens: (Omit<SingleToken, 'type'> & { type?: TokenTypes; })[], tokenFilter = '', hideDeprecated = false) {
   if (tokens.length > 0) {
     const obj = tokens.reduce<CreateTokensObjectResult>((acc, cur) => {
+      if (hideDeprecated && (cur as SingleToken).$deprecated) return acc;
       let hasSubstring:boolean = false;
       try {
         hasSubstring = cur.name?.toLowerCase().search(tokenFilter?.toLowerCase()) >= 0;
@@ -90,12 +91,12 @@ export function createTokensObject(tokens: (Omit<SingleToken, 'type'> & { type?:
 
 // Takes an array of tokens, transforms them into
 // an object and merges that with values we require for the UI
-export function mappedTokens(tokens: SingleToken[], tokenFilter: string) {
+export function mappedTokens(tokens: SingleToken[], tokenFilter: string, hideDeprecated = false) {
   const tokenObj = extend(true, {}, tokenTypes) as Record<
   TokenTypes,
   TokenTypeSchema & { values: DeepKeyTokenMap }
   >;
-  const tokenObjects = createTokensObject(tokens, tokenFilter);
+  const tokenObjects = createTokensObject(tokens, tokenFilter, hideDeprecated);
 
   Object.entries(tokenObjects).forEach(([key, group]) => {
     tokenObj[key as TokenTypes] = {

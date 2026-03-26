@@ -1,4 +1,5 @@
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
+import { applyDeprecatedToFormat } from './applyDeprecatedToFormat';
 
 export function convertTokenToFormat(token, isExpanded = false) {
   if (token.inheritTypeLevel) delete token.type;
@@ -21,5 +22,6 @@ export function convertTokenToFormat(token, isExpanded = false) {
     ...(description ? { [TokenFormat.tokenDescriptionKey]: description } : {}),
   };
   delete returnValue.inheritTypeLevel;
+  applyDeprecatedToFormat(returnValue);
   return returnValue;
 }

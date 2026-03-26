@@ -44,6 +44,32 @@ describe('generateTokensToCreate', () => {
     ]);
   });
 
+  it('excludes deprecated tokens when skipDeprecated is true', () => {
+    const tokensWithDeprecated: Record<string, AnyTokenList> = {
+      core: [
+        { name: 'primary.red', value: '#ff0000', type: TokenTypes.COLOR },
+        { name: 'primary.blue', value: '#0000ff', type: TokenTypes.COLOR, $deprecated: true },
+      ],
+    };
+
+    const { tokensToCreate } = generateTokensToCreate({ theme, tokens: tokensWithDeprecated, skipDeprecated: true });
+
+    expect(tokensToCreate.map((t) => t.name)).toEqual(['primary.red']);
+  });
+
+  it('includes deprecated tokens when skipDeprecated is false (default)', () => {
+    const tokensWithDeprecated: Record<string, AnyTokenList> = {
+      core: [
+        { name: 'primary.red', value: '#ff0000', type: TokenTypes.COLOR },
+        { name: 'primary.blue', value: '#0000ff', type: TokenTypes.COLOR, $deprecated: true },
+      ],
+    };
+
+    const { tokensToCreate } = generateTokensToCreate({ theme, tokens: tokensWithDeprecated });
+
+    expect(tokensToCreate.map((t) => t.name)).toEqual(['primary.red', 'primary.blue']);
+  });
+
   it('does not create tokens if their type is not in tokenTypesToCreateVariable', () => {
     const tokensWithInvalidType: Record<string, AnyTokenList> = {
       core: [
