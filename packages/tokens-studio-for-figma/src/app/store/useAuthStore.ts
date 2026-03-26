@@ -166,7 +166,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set((state) => {
       const org = state.organizations.find((o) => o.id === orgId) || null;
       const access = org?.subscription?.access || [];
-      const isPro = access.includes('figma_plugin') && org?.current_user_seat_type === 'EDITOR';
+      const subStatus = org?.subscription?.subscription_status || '';
+      const isExpired = subStatus === 'trial_expired' || subStatus === 'canceled' || subStatus === 'expired';
+      const isPro = access.includes('figma_plugin') && org?.current_user_seat_type === 'EDITOR' && !isExpired;
 
       return {
         activeOrganizationId: org?.id || null,
@@ -297,7 +299,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       let isPro = false;
       if (activeOrganization) {
         const accessArr = activeOrganization.subscription?.access || [];
-        isPro = accessArr.includes('figma_plugin') && activeOrganization.current_user_seat_type === 'EDITOR';
+        const subStatus = activeOrganization.subscription?.subscription_status || '';
+        const isExpired = subStatus === 'trial_expired' || subStatus === 'canceled' || subStatus === 'expired';
+        isPro = accessArr.includes('figma_plugin') && activeOrganization.current_user_seat_type === 'EDITOR' && !isExpired;
       }
 
       let initialProject = activeOrganization?.projects?.data?.[0] || null;

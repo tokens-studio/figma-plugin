@@ -284,7 +284,13 @@ export default function SubscriptionAccount() {
                       <FlexGrid>
                         <ItemCardColumn>
                           <ItemCardLabel>{t('plan')}</ItemCardLabel>
-                          <ItemCardValue style={{ textTransform: 'capitalize' }}>{getPlanName(activeOrganization.subscription)}</ItemCardValue>
+                          <ItemCardValue style={{ textTransform: 'capitalize' }}>
+                            {activeOrganization.subscription?.subscription_status === 'trial_expired' 
+                              ? 'Trial expired' 
+                              : (activeOrganization.subscription?.subscription_status === 'expired' || activeOrganization.subscription?.subscription_status === 'canceled') 
+                                ? 'Expired' 
+                                : getPlanName(activeOrganization.subscription)}
+                          </ItemCardValue>
                         </ItemCardColumn>
                       </FlexGrid>
                       <Button variant="secondary" onClick={handleManagePlan}>{t('managePlan')}</Button>
