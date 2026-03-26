@@ -63,7 +63,7 @@ export async function applySiblingStyleId(node: BaseNode, styleIds: StyleIdMap, 
       case 'COMPONENT_SET':
       case 'FRAME':
       // @ts-expect-error SlotNode not yet in @figma/plugin-typings
-      case 'SLOT':
+      case 'SLOT': // eslint-disable-line no-fallthrough
       case 'SECTION':
       case 'BOOLEAN_OPERATION':
         {
