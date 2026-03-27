@@ -2,4 +2,4 @@
 "@tokens-studio/figma-plugin": patch
 ---
 
-Enchance Pro access obtained from Studio Sync
+Fixed a bug with Studio sync's access rights
