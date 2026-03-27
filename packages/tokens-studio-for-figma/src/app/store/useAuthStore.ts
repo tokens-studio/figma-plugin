@@ -158,7 +158,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   setActiveOrganization: (orgId: string) => {
     set((state) => {
       const org = state.organizations.find((o) => o.id === orgId) || null;
-      const isPro = org?.subscription?.access?.includes('figma_plugin') || false;
+      const accessArr = org?.subscription?.access || [];
+      const isTrialExpired = org?.subscription?.plan_status === 'trial_expired' || org?.subscription?.plan_status === 'expired';
+      const isPro = accessArr.includes('figma_plugin') && org?.current_user_seat_type === 'EDITOR' && !isTrialExpired;
 
       if (org) {
         AsyncMessageChannel.ReactInstance.message({
@@ -253,7 +255,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             const rawPlanName = sub.current_plan || sub.plan?.name || 'Starter';
             // Capitalize first letter
             let planName = rawPlanName.charAt(0).toUpperCase() + rawPlanName.slice(1);
-            if (sub.plan_status === 'trialing' || sub.subscription_status === 'trialing') {
+            if (sub.plan_status === 'trial_expired' || sub.plan_status === 'expired') {
+              planName = `${planName} Trial Expired`;
+            } else if (sub.plan_status === 'trialing') {
               planName = `${planName} Trial`;
             }
 
@@ -290,6 +294,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
               uuid: org.type && org.attributes ? (org.id || '') : (org.uuid || org.id || ''),
               name: org.type && org.attributes ? (org.attributes.name || '') : (org.name || ''),
               slug: org.type && org.attributes ? (org.attributes.slug || '') : (org.slug || ''),
+              current_user_seat_type: org.type && org.attributes ? (org.attributes.current_user_seat_type || '') : (org.current_user_seat_type || ''),
               avatarUrl: org.type && org.attributes ? (org.attributes.logo_url || org.attributes.avatar_url || '') : (org.avatar_url || org.avatar || org.logo_url || ''),
               subscription: {
                 ...sub,
@@ -315,7 +320,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const storedId = get().activeOrganizationId;
       const activeOrganization = organizations.find((o) => o.id === storedId) || (organizations.length > 0 ? organizations[0] : null);
 
-      const isPro = activeOrganization?.subscription?.access?.includes('figma_plugin') || false;
+      let isPro = false;
+      if (activeOrganization) {
+        const accessArr = activeOrganization.subscription?.access || [];
+        const isTrialExpired = activeOrganization.subscription?.plan_status === 'trial_expired' || activeOrganization.subscription?.plan_status === 'expired';
+        isPro = accessArr.includes('figma_plugin') && activeOrganization.current_user_seat_type === 'EDITOR' && !isTrialExpired;
+      }
 
       set({
         user,
