@@ -21,6 +21,7 @@ interface AuthState {
   oauthTokens: OAuthTokens | null;
   user: UserData | null;
   organizations: Organization[];
+  activeOrganizationId: string | null;
   activeOrganization: Organization | null;
   activeProject: Project | null;
   error: string | null;
@@ -34,8 +35,8 @@ interface AuthState {
   setActiveOrganization: (orgId: string) => void;
   setActiveProject: (projectId: string) => void;
   setOAuthTokens: (tokens: OAuthTokens | null) => Promise<void>;
-  fetchUserData: (tokens: OAuthTokens) => Promise<void>;
-  fetchProjects: (orgId: string) => Promise<void>;
+  fetchUserData: (tokens: OAuthTokens, persistedProjectId?: string) => Promise<void>;
+  fetchProjects: (orgId: string, persistedProjectId?: string) => Promise<void>;
   loadProjectTokens: (projectId: string) => Promise<void>;
   refreshTokens: () => Promise<void>;
 }
@@ -45,6 +46,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   oauthTokens: null,
   user: null,
   organizations: [],
+  activeOrganizationId: null,
   activeOrganization: null,
   activeProject: null,
   error: null,
@@ -138,6 +140,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       oauthTokens: null,
       user: null,
       organizations: [],
+      activeOrganizationId: null,
       activeOrganization: null,
       activeProject: null,
       isPro: false,
@@ -164,6 +167,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set((state) => {
       const org = state.organizations.find(o => o.id === orgId) || null;
       return {
+        activeOrganizationId: orgId,
         activeOrganization: org,
         activeProject: org?.projects?.data?.[0] || null,
       };
@@ -187,7 +191,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     });
   },
 
-  fetchUserData: async (tokens: OAuthTokens) => {
+  fetchUserData: async (tokens: OAuthTokens, persistedProjectId?: string) => {
     let currentTokens = tokens;
     if (OAuthService.needsRefresh(currentTokens)) {
       try {
@@ -281,18 +285,20 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       });
       console.log('useAuthStore: isPro calculation', { isPro, subscriptionStatuses: organizations.map(o => o.subscription?.subscription_status) });
 
+      const defaultProject = activeOrganization?.projects?.data?.find(p => p.id === persistedProjectId) || activeOrganization?.projects?.data?.[0] || null;
       set({
         user,
         organizations,
+        activeOrganizationId: activeOrganization?.id || null,
         activeOrganization,
-        activeProject: activeOrganization?.projects?.data?.[0] || null,
+        activeProject: defaultProject,
         isPro,
         isLoading: false,
         isAuthenticated: true,
       });
 
       if (activeOrganization) {
-        await get().fetchProjects(activeOrganization.id);
+        await get().fetchProjects(activeOrganization.id, persistedProjectId);
       }
     } catch (error) {
       console.error('Error fetching user data:', error);
@@ -300,7 +306,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
-  fetchProjects: async (orgId: string) => {
+  fetchProjects: async (orgId: string, persistedProjectId?: string) => {
     const { oauthTokens } = get();
     if (!oauthTokens) return;
 
@@ -349,7 +355,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           return {
             organizations: updatedOrganizations,
             activeOrganization: updatedActiveOrg,
-            activeProject: (state.activeOrganization?.id === orgId) ? (projects[0] || null) : state.activeProject,
+            activeProject: (state.activeOrganization?.id === orgId) ? (projects.find(p => p.id === persistedProjectId) || projects[0] || null) : state.activeProject,
           };
         });
       }
