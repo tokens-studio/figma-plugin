@@ -32,7 +32,7 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
 
   const handleSelectTheme = useCallback((themeId: string) => {
     const groupOfTheme = availableThemes.find((theme) => theme.value === themeId)?.group ?? INTERNAL_THEMES_NO_GROUP;
-    const nextTheme = activeTheme;
+    const nextTheme = { ...activeTheme };
     if (typeof nextTheme[groupOfTheme] !== 'undefined' && nextTheme[groupOfTheme] === themeId) {
       delete nextTheme[groupOfTheme];
     } else {
@@ -139,9 +139,9 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
           </DropdownMenu.Item>
           <DropdownMenu.Separator />
           {availableThemes.length === 0 && (
-          <DropdownMenu.RadioItem css={{ paddingLeft: '$6' }} value="" disabled={!activeTheme} onSelect={handleClearTheme}>
-            <Text css={{ color: '$fgDisabled', fontSize: '$xsmall' }}>{t('noThemes')}</Text>
-          </DropdownMenu.RadioItem>
+            <DropdownMenu.RadioItem css={{ paddingLeft: '$6' }} value="" disabled={!activeTheme} onSelect={handleClearTheme}>
+              <Text css={{ color: '$fgDisabled', fontSize: '$xsmall' }}>{t('noThemes')}</Text>
+            </DropdownMenu.RadioItem>
           )}
           {availableThemeOptions}
 

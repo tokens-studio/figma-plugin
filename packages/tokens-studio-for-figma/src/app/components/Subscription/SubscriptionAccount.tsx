@@ -7,6 +7,7 @@ import {
 import { CaretDownIcon } from '@radix-ui/react-icons';
 import { styled } from '@/stitches.config';
 import { AddLicenseKey } from '../AddLicenseKey';
+import { TOKENS_STUDIO_APP_URL } from '@/constants/TokensStudio';
 import { OAuthLogin } from '../Login/OAuthLogin';
 import { useAuthStore } from '@/app/store/useAuthStore';
 import { Divider } from '../Divider';
@@ -151,6 +152,17 @@ const StyledDropdownItem = styled(DropdownMenu.Item, {
 
 // ─── Component ───────────────────────────────────────────────────────
 
+const getPlanName = (sub: any) => {
+  if (!sub) return 'Starter';
+  const name = (typeof sub.plan === 'string' ? sub.plan : undefined)
+    || sub.plan?.name
+    || sub.plan_name
+    || sub.current_plan;
+
+  if (!name) return 'Starter';
+  return name;
+};
+
 export default function SubscriptionAccount() {
   // OAuth Auth store
   const {
@@ -165,13 +177,13 @@ export default function SubscriptionAccount() {
 
   const handleManageOrg = useCallback(() => {
     if (activeOrganization) {
-      window.open(`https://production.tokens.studio/organizations/${activeOrganization.id}`, '_blank');
+      window.open(`https://${TOKENS_STUDIO_APP_URL}/organizations/${activeOrganization.id}`, '_blank');
     }
   }, [activeOrganization]);
 
   const handleManagePlan = useCallback(() => {
     if (activeOrganization) {
-      window.open(`https://production.tokens.studio/organizations/${activeOrganization.id}/subscription`, '_blank');
+      window.open(`https://${TOKENS_STUDIO_APP_URL}/organizations/${activeOrganization.id}/subscription`, '_blank');
     }
   }, [activeOrganization]);
 
@@ -180,107 +192,120 @@ export default function SubscriptionAccount() {
       <Card>
         {/* Authenticated Dashboard */}
         {isAuthenticated && user ? (
-          <CardSection>
-            {/* User Profile Header */}
-            <SectionRow>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                {user.avatar ? (
-                  <Avatar src={user.avatar} alt="User avatar" />
-                ) : (
-                  <AvatarFallback>{user.fullName?.[0] || 'U'}</AvatarFallback>
-                )}
-                <UserDataStack>
-                  <span style={{
-                    fontSize: '13px',
-                    fontWeight: 600,
-                    color: 'var(--colors-fgDefault)',
-                    lineHeight: 1.2,
-                  }}
-                  >
-                    {user.fullName || t('studioUser')}
-                  </span>
-                  <span style={{
-                    fontSize: '12px',
-                    color: 'var(--colors-fgMuted)',
-                    lineHeight: 1.2,
-                  }}
-                  >
-                    {user.email}
-                  </span>
-                </UserDataStack>
-              </div>
-              <Button variant="secondary" onClick={logout}>
-                {t('logout')}
-              </Button>
-            </SectionRow>
+          <>
+            <CardSection>
+              {/* User Profile Header */}
+              <SectionRow>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  {user.avatar ? (
+                    <Avatar src={user.avatar} alt="User avatar" />
+                  ) : (
+                    <AvatarFallback>{user.fullName?.[0] || 'U'}</AvatarFallback>
+                  )}
+                  <UserDataStack>
+                    <span style={{
+                      fontSize: '13px',
+                      fontWeight: 600,
+                      color: 'var(--colors-fgDefault)',
+                      lineHeight: 1.2,
+                    }}
+                    >
+                      {user.fullName || t('studioUser')}
+                    </span>
+                    <span style={{
+                      fontSize: '12px',
+                      color: 'var(--colors-fgMuted)',
+                      lineHeight: 1.2,
+                    }}
+                    >
+                      {user.email}
+                    </span>
+                  </UserDataStack>
+                </div>
+                <Button variant="secondary" onClick={logout}>
+                  {t('logout')}
+                </Button>
+              </SectionRow>
 
-            {organizations.length > 0 && activeOrganization && (
-            <>
-              <Divider css={{ margin: '0 -$4' }} />
-              <div style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '24px',
-              }}
-              >
-                <div>
-                  <SectionTitle>{t('organisation')}</SectionTitle>
-                  <ItemCard>
-                    <DropdownMenu>
-                      <DropdownMenu.Trigger asChild>
-                        <OrgDropdownTriggerBtn>
-                          {activeOrganization.avatarUrl ? (
-                            <Avatar src={activeOrganization.avatarUrl} style={{ width: 24, height: 24, borderRadius: '4px' }} alt="" />
-                          ) : (
-                            <AvatarFallback style={{
-                              width: 24,
-                              height: 24,
-                              fontSize: '12px',
-                              borderRadius: '4px',
-                            }}
-                            >
-                              {activeOrganization.name[0]}
-                            </AvatarFallback>
-                          )}
-                          {activeOrganization.name}
-                          <CaretDownIcon style={{ marginLeft: '4px', color: 'var(--colors-fgMuted)' }} />
-                        </OrgDropdownTriggerBtn>
-                      </DropdownMenu.Trigger>
-                      <StyledDropdownContent>
-                        {organizations.map((org) => (
-                          <StyledDropdownItem
-                            key={org.id}
-                                                            // eslint-disable-next-line react/jsx-no-bind
-                            onClick={() => setActiveOrganization(org.id)}
-                          >
-                            {org.avatarUrl && (
-                            <Avatar src={org.avatarUrl} alt="" css={{ width: 16, height: 16, borderRadius: '2px' }} />
+              {organizations.length > 0 && activeOrganization && (
+              <>
+                <Divider css={{ margin: '0 -$4' }} />
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '24px',
+                }}
+                >
+                  <div>
+                    <SectionTitle>{t('organisation')}</SectionTitle>
+                    <ItemCard>
+                      <DropdownMenu>
+                        <DropdownMenu.Trigger asChild>
+                          <OrgDropdownTriggerBtn>
+                            {activeOrganization.avatarUrl ? (
+                              <Avatar src={activeOrganization.avatarUrl} style={{ width: 24, height: 24, borderRadius: '4px' }} alt="" />
+                            ) : (
+                              <AvatarFallback style={{
+                                width: 24,
+                                height: 24,
+                                fontSize: '12px',
+                                borderRadius: '4px',
+                              }}
+                              >
+                                {activeOrganization.name[0]}
+                              </AvatarFallback>
                             )}
-                            {org.name}
-                          </StyledDropdownItem>
-                        ))}
-                      </StyledDropdownContent>
-                    </DropdownMenu>
-                    <Button variant="secondary" onClick={handleManageOrg}>{t('manageOrg')}</Button>
-                  </ItemCard>
-                </div>
+                            {activeOrganization.name}
+                            <CaretDownIcon style={{ marginLeft: '4px', color: 'var(--colors-fgMuted)' }} />
+                          </OrgDropdownTriggerBtn>
+                        </DropdownMenu.Trigger>
+                        <StyledDropdownContent>
+                          {organizations.map((org) => (
+                            <StyledDropdownItem
+                              key={org.id}
+                              // eslint-disable-next-line react/jsx-no-bind
+                              onClick={() => setActiveOrganization(org.id)}
+                            >
+                              {org.avatarUrl && (
+                                <Avatar src={org.avatarUrl} alt="" css={{ width: 16, height: 16, borderRadius: '2px' }} />
+                              )}
+                              {org.name}
+                            </StyledDropdownItem>
+                          ))}
+                        </StyledDropdownContent>
+                      </DropdownMenu>
+                      <Button variant="secondary" onClick={handleManageOrg}>{t('manageOrg')}</Button>
+                    </ItemCard>
+                  </div>
 
-                <div>
-                  <SectionTitle>{t('currentPlan')}</SectionTitle>
-                  <ItemCard>
-                    <FlexGrid>
-                      <ItemCardColumn>
-                        <ItemCardLabel>{t('plan')}</ItemCardLabel>
-                        <ItemCardValue>{activeOrganization.subscription?.plan?.name || 'Starter'}</ItemCardValue>
-                      </ItemCardColumn>
-                    </FlexGrid>
-                    <Button variant="secondary" onClick={handleManagePlan}>{t('managePlan')}</Button>
-                  </ItemCard>
+                  <div>
+                    <SectionTitle>{t('currentPlan')}</SectionTitle>
+                    <ItemCard>
+                      <FlexGrid>
+                        <ItemCardColumn>
+                          <ItemCardLabel>{t('plan')}</ItemCardLabel>
+                          <ItemCardValue style={{ textTransform: 'capitalize' }}>
+                            {activeOrganization.subscription?.subscription_status === 'trial_expired' 
+                              ? 'Trial expired' 
+                              : (activeOrganization.subscription?.subscription_status === 'expired' || activeOrganization.subscription?.subscription_status === 'canceled') 
+                                ? 'Expired' 
+                                : getPlanName(activeOrganization.subscription)}
+                          </ItemCardValue>
+                        </ItemCardColumn>
+                      </FlexGrid>
+                      <Button variant="secondary" onClick={handleManagePlan}>{t('managePlan')}</Button>
+                    </ItemCard>
+                  </div>
                 </div>
-              </div>
-            </>
-            )}
-          </CardSection>
+              </>
+              )}
+            </CardSection>
+
+            <Divider css={{ margin: '0 -$4' }} />
+            <CardSection>
+              <AddLicenseKey isCompact />
+            </CardSection>
+          </>
         ) : (
           <>
             {/* If Not Authenticated, Show Login Component */}

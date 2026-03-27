@@ -5,6 +5,7 @@ export * from './isSingleToken';
 export * from './isPropertyType';
 export * from './isSingleBoxShadowToken';
 export * from './isTokenType';
+export * from './isTokensStudioOAuthType';
 export * from './isGitProvider';
 export * from './isPrimitiveValue';
 export * from './isSingleBoxShadowValue';

@@ -2,7 +2,7 @@ import React from 'react';
 import { styled } from '@/stitches.config';
 import SubscriptionAccount from './SubscriptionAccount';
 
-// ─── Styled ──────────────────────────────────────────────────────────
+// ─── Sub-tab row: "Plans" and "Account" as pill buttons ─────────────
 
 const Wrapper = styled('div', {
   display: 'flex',
@@ -13,6 +13,7 @@ const Wrapper = styled('div', {
 });
 
 export default function Subscription() {
+  // Hidden "Plans" tab to match main branch behavior
   return (
     <Wrapper className="content">
       <SubscriptionAccount />

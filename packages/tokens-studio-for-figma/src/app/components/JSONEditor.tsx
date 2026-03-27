@@ -20,7 +20,7 @@ function JSONEditor({
   const editProhibited = useSelector(editProhibitedSelector);
   const activeTokenSetReadOnly = useSelector(activeTokenSetReadOnlySelector);
   const activeApiProvider = useSelector(activeApiProviderSelector);
-  const isTokensStudioProvider = activeApiProvider === StorageProviderType.TOKENS_STUDIO;
+  const isTokensStudioProvider = activeApiProvider === StorageProviderType.TOKENS_STUDIO || activeApiProvider === StorageProviderType.TOKENS_STUDIO_OAUTH;
 
   const { handleJSONUpdate } = useTokens();
   const { isDarkTheme } = useFigmaTheme();

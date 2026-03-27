@@ -152,6 +152,9 @@ export default function Footer() {
                 size="small"
                 icon={<RefreshIcon />}
               />
+              {storageType.provider === StorageProviderType.TOKENS_STUDIO_OAUTH && (
+                <BranchSelector />
+              )}
             </Stack>
           ) : null}
       </Stack>

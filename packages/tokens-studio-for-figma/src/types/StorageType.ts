@@ -84,6 +84,17 @@ StorageProviderType.TOKENS_STUDIO,
 }
 >;
 
+export type TokensStudioOAuthStorageType = GenericStorageType<
+StorageProviderType.TOKENS_STUDIO_OAUTH,
+{
+  name: string; // this is only for reference
+  orgId: string; // this is the organization id
+  id: string; // this is the project id
+  branch?: string; // this is the base branch
+  baseUrl?: string; // this is the base URL for the Studio instance
+}
+>;
+
 export type ADOStorageType = GenericStorageType<
 StorageProviderType.ADO,
 {
@@ -112,7 +123,7 @@ export type GenericVersionedStorageType = GenericStorageType<StorageProviderType
   name?: string; // this is only for refrence
   id: string // this would be the URL
   flow: GenericVersionedStorageFlow,
-  additionalHeaders: GenericVersionedAdditionalHeaders ;
+  additionalHeaders: GenericVersionedAdditionalHeaders;
 }>;
 
 export type StorageType =
@@ -125,7 +136,8 @@ export type StorageType =
   | ADOStorageType
   | BitbucketStorageType
   | SupernovaStorageType
-  | TokensStudioStorageType;
+  | TokensStudioStorageType
+  | TokensStudioOAuthStorageType;
 
 export type StorageTypeCredentials =
   | StorageTypeCredential<URLStorageType>
@@ -136,7 +148,8 @@ export type StorageTypeCredentials =
   | StorageTypeCredential<BitbucketStorageType>
   | StorageTypeCredential<ADOStorageType>
   | StorageTypeCredential<SupernovaStorageType>
-  | StorageTypeCredential<TokensStudioStorageType>;
+  | StorageTypeCredential<TokensStudioStorageType>
+  | StorageTypeCredential<TokensStudioOAuthStorageType, false>;
 
 export type StorageTypeFormValues<Incomplete extends boolean = false> =
   | ({ new?: boolean; provider: StorageProviderType.URL } & OptionalPartial<
@@ -174,6 +187,10 @@ export type StorageTypeFormValues<Incomplete extends boolean = false> =
   | ({ new?: boolean; provider: StorageProviderType.TOKENS_STUDIO } & OptionalPartial<
   Incomplete,
   Omit<StorageTypeCredential<TokensStudioStorageType>, 'provider'>
+  >)
+  | ({ new?: boolean; provider: StorageProviderType.TOKENS_STUDIO_OAUTH } & OptionalPartial<
+  Incomplete,
+  Omit<StorageTypeCredential<TokensStudioOAuthStorageType, false>, 'provider'>
   >)
   | { new?: boolean; provider: StorageProviderType.LOCAL };
 export { StorageProviderType };

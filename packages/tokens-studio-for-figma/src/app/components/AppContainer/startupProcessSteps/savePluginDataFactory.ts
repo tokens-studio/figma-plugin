@@ -1,4 +1,5 @@
 import type { Dispatch } from '@/app/store';
+import { isTokensStudioOAuthType } from '@/utils/is';
 import type { StartupMessage } from '@/types/AsyncMessages';
 import { identify, track } from '@/utils/analytics';
 import { useAuthStore } from '@/app/store/useAuthStore';
@@ -47,7 +48,8 @@ export function savePluginDataFactory(dispatch: Dispatch, params: StartupMessage
           useAuthStore.setState({ activeOrganizationId: params.activeOrganizationId });
         }
         useAuthStore.getState().setOAuthTokens(params.oauthTokens);
-        useAuthStore.getState().fetchUserData(params.oauthTokens);
+        const activeProjectId = params.storageType && isTokensStudioOAuthType(params.storageType) ? params.storageType.id : undefined;
+        useAuthStore.getState().fetchUserData(params.oauthTokens, activeProjectId);
       }
     } else {
       throw new Error('User not found');

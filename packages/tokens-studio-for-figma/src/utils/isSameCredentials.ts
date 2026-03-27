@@ -35,6 +35,7 @@ function isSameCredentials(
         && JSON.stringify(credential.mapping) === JSON.stringify(stored.mapping)
       );
     case StorageProviderType.TOKENS_STUDIO:
+    case StorageProviderType.TOKENS_STUDIO_OAUTH:
       return (
         credential.id === stored.id
         && credential.provider === stored.provider
