@@ -1,5 +1,12 @@
 # @tokens-studio/figma-plugin
 
+## 2.11.3
+
+### Patch Changes
+
+- aa7554eed: Fixed a bug with Studio sync's access rights
+- 8a546f260: Add SlotNode support so theme propagation and token persistence work correctly on Figma Slots
+
 ## 2.11.2
 
 ### Patch Changes
