@@ -12,7 +12,8 @@ import {
 import Box from '../Box';
 
 interface NodeIconProps {
-  type: NodeType;
+  // Allow 'SLOT' in addition to standard NodeType (not yet in @figma/plugin-typings)
+  type: NodeType | 'SLOT';
   width?: number;
   height?: number;
 }
@@ -24,6 +25,7 @@ export default function NodeIcon({ type, width = 12, height = 12 }: NodeIconProp
       icon = <TextIcon width={width} height={height} />;
       break;
     case 'FRAME':
+    case 'SLOT':
       icon = <FrameIcon width={width} height={height} />;
       break;
     case 'INSTANCE':
