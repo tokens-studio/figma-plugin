@@ -251,6 +251,96 @@ describe('removeTokensByValue', () => {
     expect(mockNode.itemSpacing).toBe(0);
   });
 
+  it('should preserve auto-layout hug mode when removing width', () => {
+    const autoLayoutNode = ({
+      width: 120,
+      height: 80,
+      layoutSizingHorizontal: 'HUG',
+      layoutSizingVertical: 'HUG',
+      resize(width: number, height: number) {
+        this.width = width;
+        this.height = height;
+        // Simulate Figma converting hug to fixed during resize().
+        this.layoutSizingHorizontal = 'FIXED';
+        this.layoutSizingVertical = 'FIXED';
+      },
+    } as unknown) as BaseNode & {
+      width: number;
+      height: number;
+      layoutSizingHorizontal: 'HUG' | 'FIXED';
+      layoutSizingVertical: 'HUG' | 'FIXED';
+      resize: (width: number, height: number) => void;
+    };
+
+    removeValuesFromNode(autoLayoutNode, Properties.width);
+
+    expect(autoLayoutNode.width).toBe(120);
+    expect(autoLayoutNode.height).toBe(80);
+    expect(autoLayoutNode.layoutSizingHorizontal).toBe('HUG');
+    expect(autoLayoutNode.layoutSizingVertical).toBe('HUG');
+  });
+
+  it('should preserve auto-layout hug mode when removing height', () => {
+    const autoLayoutNode = ({
+      width: 120,
+      height: 80,
+      layoutSizingHorizontal: 'HUG',
+      layoutSizingVertical: 'HUG',
+      resize(width: number, height: number) {
+        this.width = width;
+        this.height = height;
+        // Simulate Figma converting hug to fixed during resize().
+        this.layoutSizingHorizontal = 'FIXED';
+        this.layoutSizingVertical = 'FIXED';
+      },
+    } as unknown) as BaseNode & {
+      width: number;
+      height: number;
+      layoutSizingHorizontal: 'HUG' | 'FIXED';
+      layoutSizingVertical: 'HUG' | 'FIXED';
+      resize: (width: number, height: number) => void;
+    };
+
+    removeValuesFromNode(autoLayoutNode, Properties.height);
+
+    expect(autoLayoutNode.width).toBe(120);
+    expect(autoLayoutNode.height).toBe(80);
+    expect(autoLayoutNode.layoutSizingHorizontal).toBe('HUG');
+    expect(autoLayoutNode.layoutSizingVertical).toBe('HUG');
+  });
+
+  it('should preserve auto-layout primary/counter sizing mode when removing dimension', () => {
+    const autoLayoutNode = ({
+      width: 100,
+      height: 60,
+      itemSpacing: 8,
+      primaryAxisSizingMode: 'AUTO',
+      counterAxisSizingMode: 'AUTO',
+      resize(width: number, height: number) {
+        this.width = width;
+        this.height = height;
+        // Simulate Figma converting auto sizing to fixed during resize().
+        this.primaryAxisSizingMode = 'FIXED';
+        this.counterAxisSizingMode = 'FIXED';
+      },
+    } as unknown) as BaseNode & {
+      width: number;
+      height: number;
+      itemSpacing: number;
+      primaryAxisSizingMode: 'AUTO' | 'FIXED';
+      counterAxisSizingMode: 'AUTO' | 'FIXED';
+      resize: (width: number, height: number) => void;
+    };
+
+    removeValuesFromNode(autoLayoutNode, Properties.dimension);
+
+    expect(autoLayoutNode.width).toBe(100);
+    expect(autoLayoutNode.height).toBe(60);
+    expect(autoLayoutNode.itemSpacing).toBe(0);
+    expect(autoLayoutNode.primaryAxisSizingMode).toBe('AUTO');
+    expect(autoLayoutNode.counterAxisSizingMode).toBe('AUTO');
+  });
+
   it('should set fills as an empty array', () => {
     removeValuesFromNode(mockNode, Properties.asset);
     expect(mockNode.fills).toEqual([]);
