@@ -165,11 +165,25 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   setActiveOrganization: (orgId: string) => {
     set((state) => {
-      const org = state.organizations.find(o => o.id === orgId) || null;
+      const org = state.organizations.find((o) => o.id === orgId) || null;
+      const accessArr = org?.subscription?.access || [];
+      const planName = org?.subscription?.plan?.name || '';
+      const isPartner = planName.toLowerCase().includes('partner');
+      const isTrialExpired = !isPartner && (org?.subscription?.plan_status === 'trial_expired' || org?.subscription?.plan_status === 'expired');
+      const isPro = accessArr.includes('figma_plugin') && org?.current_user_seat_type === 'EDITOR' && !isTrialExpired;
+
+      if (org) {
+        AsyncMessageChannel.ReactInstance.message({
+          type: AsyncMessageTypes.SET_ACTIVE_ORGANIZATION_ID,
+          activeOrganizationId: org.id,
+        });
+      }
+
       return {
-        activeOrganizationId: orgId,
         activeOrganization: org,
+        activeOrganizationId: org?.id || null,
         activeProject: org?.projects?.data?.[0] || null,
+        isPro,
       };
     });
     // Fetch projects if needed
@@ -262,35 +276,98 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             orgsArray = Array.isArray(orgsDataRaw.data) ? orgsDataRaw.data : [];
           }
 
-          organizations = orgsArray.map((org: any) => ({
-            id: org.type && org.attributes ? (org.id || '') : (org.uuid || org.id || ''),
-            uuid: org.type && org.attributes ? (org.id || '') : (org.uuid || org.id || ''),
-            name: org.type && org.attributes ? (org.attributes.name || '') : (org.name || ''),
-            slug: org.type && org.attributes ? (org.attributes.slug || '') : (org.slug || ''),
-            avatarUrl: org.type && org.attributes ? (org.attributes.logo_url || org.attributes.avatar_url || '') : (org.avatar_url || org.avatar || org.logo_url || ''),
-            subscription: org.type && org.attributes ? org.attributes.subscription : org.subscription,
-            projects: (org.type && org.attributes ? org.attributes.projects : org.projects) || { data: [] },
-          }));
-          console.log('useAuthStore: fetched organizations', organizations);
+          organizations = orgsArray.map((org: any) => {
+            const sub = (org.type && org.attributes ? org.attributes.subscription : org.subscription) || {};
+
+            // Plan name mapping
+            const rawPlanName = sub.current_plan || sub.plan?.name || 'Starter';
+            // Capitalize first letter
+            let planName = rawPlanName.charAt(0).toUpperCase() + rawPlanName.slice(1);
+            const isPartner = rawPlanName.toLowerCase().includes('partner');
+
+            if (!isPartner) {
+              if (sub.plan_status === 'trial_expired' || sub.plan_status === 'expired') {
+                planName = `${planName} Trial Expired`;
+              } else if (sub.plan_status === 'trialing') {
+                planName = `${planName} Trial`;
+              }
+            }
+
+            // Billing date mapping
+            let billingDate = sub.trial_ends_at || sub.billing_date || sub.billingDate || 'Endless';
+            if (billingDate && billingDate !== 'Endless') {
+              try {
+                billingDate = new Date(billingDate).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                });
+              } catch (e) {
+                // Keep original if parsing fails
+              }
+            }
+
+            // Price mapping
+            let price = sub.price || sub.amount || sub.billing_amount;
+            if (!price && rawPlanName.toLowerCase() === 'organisation') {
+              price = '€599.00'; // Fallback observed in dashboard
+            } else if (!price) {
+              price = 'Free';
+            }
+
+            // Seats mapping
+            const editorTotal = sub.editor_seats_total || sub.editorSeatsTotal || sub.seats_total || sub.seats || 0;
+            const editorUsed = sub.editor_seats_used || sub.editorSeatsUsed || sub.seats_used || 0;
+            const viewerTotal = sub.viewer_seats_total || sub.viewerSeatsTotal || 0;
+            const viewerUsed = sub.viewer_seats_used || sub.viewerSeatsUsed || 0;
+
+            return {
+              id: org.type && org.attributes ? (org.id || '') : (org.uuid || org.id || ''),
+              uuid: org.type && org.attributes ? (org.id || '') : (org.uuid || org.id || ''),
+              name: org.type && org.attributes ? (org.attributes.name || '') : (org.name || ''),
+              slug: org.type && org.attributes ? (org.attributes.slug || '') : (org.slug || ''),
+              current_user_seat_type: org.type && org.attributes ? (org.attributes.current_user_seat_type || '') : (org.current_user_seat_type || ''),
+              avatarUrl: org.type && org.attributes ? (org.attributes.logo_url || org.attributes.avatar_url || '') : (org.avatar_url || org.avatar || org.logo_url || ''),
+              subscription: {
+                ...sub,
+                plan: {
+                  id: sub.plan?.id || '',
+                  name: planName,
+                },
+                price,
+                billingDate,
+                editor_seats_total: editorTotal,
+                editor_seats_used: editorUsed,
+                viewer_seats_total: viewerTotal,
+                viewer_seats_used: viewerUsed,
+              },
+              projects: (org.type && org.attributes ? org.attributes.projects : org.projects) || { data: [] },
+            };
+          });
         }
       } catch (err) {
         console.warn('Could not fetch organizations via new backend, fallback missing depending on API.', err);
       }
 
-      const activeOrganization = organizations.length > 0 ? organizations[0] : null;
+      const storedId = get().activeOrganizationId;
+      const activeOrganization = organizations.find((o) => o.id === storedId) || (organizations.length > 0 ? organizations[0] : null);
 
-      const isPro = organizations.some(org => {
-        const status = org.subscription?.subscription_status;
-        return status === 'active' || status === 'trialing' || status === 'past_due';
-      });
-      console.log('useAuthStore: isPro calculation', { isPro, subscriptionStatuses: organizations.map(o => o.subscription?.subscription_status) });
+      let isPro = false;
+      if (activeOrganization) {
+        const accessArr = activeOrganization.subscription?.access || [];
+        const planName = activeOrganization.subscription?.plan?.name || '';
+        const isPartner = planName.toLowerCase().includes('partner');
+        const isTrialExpired = !isPartner && (activeOrganization.subscription?.plan_status === 'trial_expired' || activeOrganization.subscription?.plan_status === 'expired');
+        isPro = accessArr.includes('figma_plugin') && activeOrganization.current_user_seat_type === 'EDITOR' && !isTrialExpired;
+      }
 
       const defaultProject = activeOrganization?.projects?.data?.find(p => p.id === persistedProjectId) || activeOrganization?.projects?.data?.[0] || null;
+
       set({
         user,
         organizations,
-        activeOrganizationId: activeOrganization?.id || null,
         activeOrganization,
+        activeOrganizationId: activeOrganization?.id || null,
         activeProject: defaultProject,
         isPro,
         isLoading: false,
@@ -299,6 +376,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       if (activeOrganization) {
         await get().fetchProjects(activeOrganization.id, persistedProjectId);
+
+        if (activeOrganization.id !== storedId) {
+          AsyncMessageChannel.ReactInstance.message({
+            type: AsyncMessageTypes.SET_ACTIVE_ORGANIZATION_ID,
+            activeOrganizationId: activeOrganization.id,
+          });
+        }
       }
     } catch (error) {
       console.error('Error fetching user data:', error);

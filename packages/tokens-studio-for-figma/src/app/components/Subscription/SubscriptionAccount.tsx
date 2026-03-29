@@ -285,11 +285,13 @@ export default function SubscriptionAccount() {
                         <ItemCardColumn>
                           <ItemCardLabel>{t('plan')}</ItemCardLabel>
                           <ItemCardValue style={{ textTransform: 'capitalize' }}>
-                            {activeOrganization.subscription?.subscription_status === 'trial_expired' 
-                              ? 'Trial expired' 
-                              : (activeOrganization.subscription?.subscription_status === 'expired' || activeOrganization.subscription?.subscription_status === 'canceled') 
-                                ? 'Expired' 
-                                : getPlanName(activeOrganization.subscription)}
+                            {getPlanName(activeOrganization.subscription).toLowerCase().includes('partner')
+                              ? getPlanName(activeOrganization.subscription)
+                              : activeOrganization.subscription?.subscription_status === 'trial_expired' 
+                                ? 'Trial expired' 
+                                : (activeOrganization.subscription?.subscription_status === 'expired' || activeOrganization.subscription?.subscription_status === 'canceled') 
+                                  ? 'Expired' 
+                                  : getPlanName(activeOrganization.subscription)}
                           </ItemCardValue>
                         </ItemCardColumn>
                       </FlexGrid>
