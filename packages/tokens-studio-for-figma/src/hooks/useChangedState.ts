@@ -7,6 +7,7 @@ import {
   themesListSelector,
   tokensSelector,
 } from '@/selectors';
+import { tokenSetMetadataSelector } from '@/selectors/tokenSetMetadataSelector';
 import { findDifferentState } from '@/utils/findDifferentState';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { compareLastSyncedState } from '@/utils/compareLastSyncedState';
@@ -19,6 +20,7 @@ export function useChangedState() {
   const storageType = useSelector(storageTypeSelector);
   const lastSyncedState = useSelector(lastSyncedStateSelector);
   const tokenFormat = useSelector(tokenFormatSelector);
+  const tokenSetMetadata = useSelector(tokenSetMetadataSelector);
   const dispatch = useDispatch();
 
   const changedPushState = useMemo(() => {
@@ -26,9 +28,9 @@ export function useChangedState() {
     return findDifferentState(remoteData, {
       tokens,
       themes,
-      metadata: storageType.provider !== StorageProviderType.LOCAL ? { tokenSetOrder } : {},
+      metadata: storageType.provider !== StorageProviderType.LOCAL ? { tokenSetOrder, tokenSetsData: tokenSetMetadata } : {},
     });
-  }, [remoteData, tokens, themes, storageType]);
+  }, [remoteData, tokens, themes, storageType, tokenSetMetadata]);
 
   const changedPullState = useMemo(() => {
     const tokenSetOrder = Object.keys(tokens);
@@ -36,11 +38,11 @@ export function useChangedState() {
       {
         tokens,
         themes,
-        metadata: storageType.provider !== StorageProviderType.LOCAL ? { tokenSetOrder } : {},
+        metadata: storageType.provider !== StorageProviderType.LOCAL ? { tokenSetOrder, tokenSetsData: tokenSetMetadata } : {},
       },
       remoteData,
     );
-  }, [remoteData, tokens, themes, storageType]);
+  }, [remoteData, tokens, themes, storageType, tokenSetMetadata]);
 
   const hasChanges = useMemo(() => {
     const hasChanged = !compareLastSyncedState(tokens, themes, lastSyncedState, tokenFormat);

@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import compact from 'just-compact';
-import { Dispatch } from '@/app/store';
+import { Dispatch, store } from '@/app/store';
 import useConfirm from '@/app/hooks/useConfirm';
 import { notifyToUI } from '@/plugin/notifiers';
 import {
@@ -57,10 +57,16 @@ export function useTokensStudioOAuth() {
             projectData.tokens as any,
             projectData.tokenSetOrder,
           );
+          const { themes } = store.getState().tokenState;
+          const alignedThemes = projectData.themes.map((remoteTheme) => {
+            const localTheme = themes.find((t) => t.id === remoteTheme.id);
+            return localTheme ? alignObjectKeys(remoteTheme, localTheme) : remoteTheme;
+          });
+
           return {
             status: 'success',
             tokens: sortedTokens,
-            themes: projectData.themes,
+            themes: alignedThemes,
             metadata: {
               tokenSetOrder: projectData.tokenSetOrder,
               tokenSetsData: projectData.tokenSets as any,
@@ -195,20 +201,26 @@ export function useTokensStudioOAuth() {
           }
           const { tokens: newTokens, themes: newThemes, tokenSetOrder } = projectData;
 
+          const { themes } = store.getState().tokenState;
+          const alignedNewThemes = newThemes.map((remoteTheme) => {
+            const localTheme = themes.find((t) => t.id === remoteTheme.id);
+            return localTheme ? alignObjectKeys(remoteTheme, localTheme) : remoteTheme;
+          });
+
           dispatch.tokenState.setTokenData({
             values: newTokens as any,
-            themes: newThemes,
+            themes: alignedNewThemes,
             activeTheme: {},
             hasChangedRemote: false,
           });
 
           dispatch.tokenState.setRemoteData({
             tokens: newTokens as any,
-            themes: newThemes,
+            themes: alignedNewThemes,
             metadata: { tokenSetOrder },
           });
 
-          const stringifiedRemoteTokens = JSON.stringify(compact([newTokens, newThemes, TokenFormat.format]), null, 2);
+          const stringifiedRemoteTokens = JSON.stringify(compact([newTokens, alignedNewThemes, TokenFormat.format]), null, 2);
           dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
           dispatch.tokenState.setEditProhibited(true);
 
@@ -236,4 +248,40 @@ export function useTokensStudioOAuth() {
     }),
     [syncTokensWithTokensStudioOAuth, pullTokensFromTokensStudioOAuth, fetchBranchesForTokensStudio, loadProjectTokens],
   );
+}
+
+export function alignObjectKeys<T extends Record<string, any>>(obj: T, template: T, isSelectedTokenSets: boolean = false): T {
+  if (!obj || !template || typeof obj !== 'object' || typeof template !== 'object') return obj;
+
+  const aligned: any = Array.isArray(obj) ? [] : {};
+
+  // Copy keys that exist in template exactly in template's order
+  Object.keys(template).forEach((key) => {
+    if (key in obj) {
+      if (
+        typeof obj[key] === 'object'
+        && obj[key] !== null
+        && typeof template[key] === 'object'
+        && template[key] !== null
+      ) {
+        aligned[key] = alignObjectKeys(obj[key], template[key], key === 'selectedTokenSets');
+      } else {
+        aligned[key] = obj[key];
+      }
+    } else if (isSelectedTokenSets && template[key] === 'disabled') {
+      aligned[key] = 'disabled';
+    }
+  });
+
+  // Append any extra keys from obj at the end
+  Object.keys(obj).forEach((key) => {
+    if (!(key in aligned)) {
+      if (isSelectedTokenSets && obj[key] === 'disabled') {
+         return;
+      }
+      aligned[key] = obj[key];
+    }
+  });
+
+  return aligned;
 }

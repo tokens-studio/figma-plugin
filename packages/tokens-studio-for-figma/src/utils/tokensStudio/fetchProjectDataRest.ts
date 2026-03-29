@@ -1,5 +1,5 @@
 import { AnyTokenSet } from '@/types/tokens';
-import { ThemeObjectsList } from '@/types';
+import { ThemeObjectsList, ThemeObject } from '@/types';
 import { parseBranchesFromResponse } from './fetchBranchesListRest';
 
 // Types derived from REST endpoints
@@ -177,8 +177,8 @@ export async function fetchProjectDataRest(
         const options = optionsByGroupId[id] || [];
 
         options.forEach((opt) => {
-          // Map token sets ID -> name mapping
           const selectedTokenSetsByName: Record<string, string> = {};
+
           Object.entries(opt.selected_token_sets || {}).forEach(([setId, status]) => {
             const setName = tokenSetIdToName[setId];
             if (setName) {
@@ -186,16 +186,19 @@ export async function fetchProjectDataRest(
             }
           });
 
-          themes.push({
+          const themeObj: ThemeObject = {
             id: opt.id,
             name: opt.name,
             group: name,
             selectedTokenSets: selectedTokenSetsByName as any,
-            $figmaStyleReferences: opt.figmaStyleReferences,
-            $figmaVariableReferences: opt.figmaVariableReferences,
-            $figmaCollectionId: opt.figmaCollectionId,
-            $figmaModeId: opt.figmaModeId,
-          });
+          };
+
+          if (opt.figmaStyleReferences !== undefined) themeObj.$figmaStyleReferences = opt.figmaStyleReferences;
+          if (opt.figmaVariableReferences !== undefined) themeObj.$figmaVariableReferences = opt.figmaVariableReferences;
+          if (opt.figmaCollectionId !== undefined) themeObj.$figmaCollectionId = opt.figmaCollectionId;
+          if (opt.figmaModeId !== undefined) themeObj.$figmaModeId = opt.figmaModeId;
+
+          themes.push(themeObj);
         });
       });
     }
