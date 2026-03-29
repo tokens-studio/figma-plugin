@@ -11,6 +11,7 @@ import {
   tokensSelector,
   usedTokenSetSelector,
   editProhibitedSelector,
+  localApiStateSelector,
 } from '@/selectors';
 import { useChangedState } from '@/hooks/useChangedState';
 import { isEqual } from '@/utils/isEqual';
@@ -37,6 +38,7 @@ export function useTokensStudioOAuth() {
   const { t } = useTranslation(['sync', 'branch', 'general']);
   const { hasChanges } = useChangedState();
   const editProhibited = useSelector(editProhibitedSelector);
+  const localApiState = useSelector(localApiStateSelector);
 
   const pullTokensFromTokensStudioOAuth = useCallback(
     async (context: TokensStudioOAuthCredentials): Promise<RemoteResponseData | null> => {
@@ -162,7 +164,7 @@ export function useTokensStudioOAuth() {
       const { oauthTokens, activeOrganization } = useAuthStore.getState();
       if (!oauthTokens || !activeOrganization) return;
 
-      if (hasChanges && !editProhibited) {
+      if (hasChanges && !editProhibited && localApiState?.provider !== StorageProviderType.LOCAL) {
         const confirmResult = await confirm({
           text: t('unSavedChanges', { ns: 'branch' }) as string,
           description: t('ifYouCreate', { ns: 'branch' }) as string,
