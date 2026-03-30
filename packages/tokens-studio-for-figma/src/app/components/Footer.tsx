@@ -50,6 +50,7 @@ export default function Footer() {
   const activeTheme = useSelector(activeThemeSelector);
   const { hasChanges: hasLocalChange } = useChangedState();
   const { hasRemoteChange } = uiState;
+  const canPush = !editProhibited && hasLocalChange;
 
   React.useEffect(() => {
     const interval = setInterval(() => {
@@ -109,7 +110,7 @@ export default function Footer() {
                 }
               />
             </DirtyStateBadgeWrapper>
-            <DirtyStateBadgeWrapper badge={hasLocalChange}>
+            <DirtyStateBadgeWrapper badge={canPush} badgeTestId="footer-push-dirty-badge">
               <IconButton
                 data-testid="footer-push-button"
                 icon={<UploadIcon />}
@@ -117,7 +118,7 @@ export default function Footer() {
                 variant="invisible"
                 size="small"
                 tooltipSide="top"
-                disabled={editProhibited || !hasLocalChange}
+                disabled={!canPush}
                 tooltip={
                   t('pushTo', {
                     provider: transformProviderName(storageType.provider),
