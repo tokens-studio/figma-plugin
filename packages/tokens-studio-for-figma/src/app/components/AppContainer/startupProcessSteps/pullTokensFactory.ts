@@ -50,7 +50,10 @@ export function pullTokensFactory(
         } as StorageTypeCredentials;
       }
 
-      // If no matching set found but we are authenticated via Tokens Studio OAuth, create a synthetic matching set
+      // Tokens Studio OAuth uses live session tokens instead of static saved credentials like GitHub.
+      //  Since we don't have a saved API config for it in local storage,
+      // this block dynamically constructs a mock provider object using the active OAuth token.
+      // This lets us cleanly reuse the existing sync architecture without writing separate OAuth-specific code paths.
       if (
         !matchingSet
         && (
