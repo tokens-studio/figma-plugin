@@ -53,8 +53,9 @@ export default async function updateVariables({
   let themeBaseFontSize = settings.baseFontSize;
   if (settings.aliasBaseFontSize) {
     const resolvedBaseFontSize = getAliasValue(settings.aliasBaseFontSize, resolvedTokens);
-    if (resolvedBaseFontSize && typeof resolvedBaseFontSize === 'string') {
-      themeBaseFontSize = resolvedBaseFontSize;
+    if (resolvedBaseFontSize !== null && resolvedBaseFontSize !== undefined
+      && (typeof resolvedBaseFontSize === 'string' || typeof resolvedBaseFontSize === 'number')) {
+      themeBaseFontSize = String(resolvedBaseFontSize);
     }
   }
 
