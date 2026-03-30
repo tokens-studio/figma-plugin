@@ -28,6 +28,42 @@ import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 
 type TokensStudioOAuthCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.TOKENS_STUDIO_OAUTH }>;
 
+export function alignObjectKeys<T extends Record<string, any>>(obj: T, template: T, isSelectedTokenSets: boolean = false): T {
+  if (!obj || !template || typeof obj !== 'object' || typeof template !== 'object') return obj;
+
+  const aligned: any = Array.isArray(obj) ? [] : {};
+
+  // Copy keys that exist in template exactly in template's order
+  Object.keys(template).forEach((key) => {
+    if (key in obj) {
+      if (
+        typeof obj[key] === 'object'
+        && obj[key] !== null
+        && typeof template[key] === 'object'
+        && template[key] !== null
+      ) {
+        aligned[key] = alignObjectKeys(obj[key], template[key], key === 'selectedTokenSets');
+      } else {
+        aligned[key] = obj[key];
+      }
+    } else if (isSelectedTokenSets && template[key] === 'disabled') {
+      aligned[key] = 'disabled';
+    }
+  });
+
+  // Append any extra keys from obj at the end
+  Object.keys(obj).forEach((key) => {
+    if (!(key in aligned)) {
+      if (isSelectedTokenSets && obj[key] === 'disabled') {
+         return;
+      }
+      aligned[key] = obj[key];
+    }
+  });
+
+  return aligned;
+}
+
 export function useTokensStudioOAuth() {
   const tokens = useSelector(tokensSelector);
   const activeTheme = useSelector(activeThemeSelector);
@@ -248,40 +284,4 @@ export function useTokensStudioOAuth() {
     }),
     [syncTokensWithTokensStudioOAuth, pullTokensFromTokensStudioOAuth, fetchBranchesForTokensStudio, loadProjectTokens],
   );
-}
-
-export function alignObjectKeys<T extends Record<string, any>>(obj: T, template: T, isSelectedTokenSets: boolean = false): T {
-  if (!obj || !template || typeof obj !== 'object' || typeof template !== 'object') return obj;
-
-  const aligned: any = Array.isArray(obj) ? [] : {};
-
-  // Copy keys that exist in template exactly in template's order
-  Object.keys(template).forEach((key) => {
-    if (key in obj) {
-      if (
-        typeof obj[key] === 'object'
-        && obj[key] !== null
-        && typeof template[key] === 'object'
-        && template[key] !== null
-      ) {
-        aligned[key] = alignObjectKeys(obj[key], template[key], key === 'selectedTokenSets');
-      } else {
-        aligned[key] = obj[key];
-      }
-    } else if (isSelectedTokenSets && template[key] === 'disabled') {
-      aligned[key] = 'disabled';
-    }
-  });
-
-  // Append any extra keys from obj at the end
-  Object.keys(obj).forEach((key) => {
-    if (!(key in aligned)) {
-      if (isSelectedTokenSets && obj[key] === 'disabled') {
-         return;
-      }
-      aligned[key] = obj[key];
-    }
-  });
-
-  return aligned;
 }

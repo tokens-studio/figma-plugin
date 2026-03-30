@@ -163,6 +163,15 @@ const getPlanName = (sub: any) => {
   return name;
 };
 
+const getPlanDisplayName = (sub: any) => {
+  const planName = getPlanName(sub);
+  if (planName.toLowerCase().includes('partner')) return planName;
+  const status = sub?.subscription_status;
+  if (status === 'trial_expired') return 'Trial expired';
+  if (status === 'expired' || status === 'canceled') return 'Expired';
+  return planName;
+};
+
 export default function SubscriptionAccount() {
   // OAuth Auth store
   const {
@@ -285,13 +294,7 @@ export default function SubscriptionAccount() {
                         <ItemCardColumn>
                           <ItemCardLabel>{t('plan')}</ItemCardLabel>
                           <ItemCardValue style={{ textTransform: 'capitalize' }}>
-                            {getPlanName(activeOrganization.subscription).toLowerCase().includes('partner')
-                              ? getPlanName(activeOrganization.subscription)
-                              : activeOrganization.subscription?.subscription_status === 'trial_expired' 
-                                ? 'Trial expired' 
-                                : (activeOrganization.subscription?.subscription_status === 'expired' || activeOrganization.subscription?.subscription_status === 'canceled') 
-                                  ? 'Expired' 
-                                  : getPlanName(activeOrganization.subscription)}
+                            {getPlanDisplayName(activeOrganization.subscription)}
                           </ItemCardValue>
                         </ItemCardColumn>
                       </FlexGrid>
