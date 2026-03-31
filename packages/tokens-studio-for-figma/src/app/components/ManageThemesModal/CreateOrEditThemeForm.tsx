@@ -193,6 +193,12 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
     }
   }, [isSearchActive]);
 
+  const handleResetFilters = useCallback(() => {
+    setStatusFilter('all');
+    setSearchTerm('');
+    setIsSearchActive(false);
+  }, []);
+
   const renderFilterDropdown = () => (
     <DropdownMenu>
       <DropdownMenu.Trigger asChild>
@@ -382,10 +388,18 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
                 />
               );
             }
-            if (isSearchActive && searchTerm) {
+            if ((isSearchActive && searchTerm) || statusFilter !== 'all') {
               return (
-                <Box css={{ padding: '$4', textAlign: 'center', color: '$fgMuted' }}>
-                  No sets found
+                <Box css={{
+                  padding: '$8', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '$3',
+                }}
+                >
+                  <Box css={{ color: '$fgMuted', fontSize: '$small' }}>
+                    {t('noItemsMatch')}
+                  </Box>
+                  <Button variant="secondary" size="small" onClick={handleResetFilters}>
+                    {t('reset')}
+                  </Button>
                 </Box>
               );
             }
