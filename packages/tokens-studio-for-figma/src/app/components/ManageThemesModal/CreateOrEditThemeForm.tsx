@@ -200,14 +200,16 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
           icon={<FilterList />}
           size="small"
           variant="invisible"
+          tooltip={t('filterSets')}
+          css={statusFilter !== 'all' ? { color: '$interactionPrimary' } : undefined}
         />
       </DropdownMenu.Trigger>
       <DropdownMenu.Portal>
-        <DropdownMenu.Content side="bottom">
+        <DropdownMenu.Content side="bottom" css={{ maxWidth: '200px' }}>
           <DropdownMenu.RadioGroup value={statusFilter} onValueChange={setStatusFilter}>
             <DropdownMenu.RadioItem value="all">
               <DropdownMenu.ItemIndicator><Check /></DropdownMenu.ItemIndicator>
-              <Box>All</Box>
+              <Box>{t('all')}</Box>
             </DropdownMenu.RadioItem>
             <DropdownMenu.RadioItem value={TokenSetStatus.ENABLED}>
               <DropdownMenu.ItemIndicator><Check /></DropdownMenu.ItemIndicator>
