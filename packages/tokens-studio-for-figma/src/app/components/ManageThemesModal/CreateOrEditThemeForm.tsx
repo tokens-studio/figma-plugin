@@ -93,7 +93,8 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
             let currentParentPath = item.parent;
             while (currentParentPath && currentParentPath !== '') {
               keptItemPaths.add(currentParentPath);
-              const parentItem = treeOrListItems.find((i) => i.path === currentParentPath);
+              const pathToFind = currentParentPath;
+              const parentItem = treeOrListItems.find((i) => i.path === pathToFind);
               currentParentPath = parentItem?.parent || null;
             }
           }
