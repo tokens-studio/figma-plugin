@@ -114,6 +114,7 @@ const StorageItem = ({
           }
           setActiveProject(idToLoad);
           await loadProjectTokens(idToLoad);
+          setHasErrored(false);
           const newItem = { ...oauthItem, id: idToLoad };
           dispatch.uiState.setLocalApiState(newItem);
           dispatch.uiState.setApiData(newItem);

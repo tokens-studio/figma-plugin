@@ -231,7 +231,7 @@ export function useTokensStudioOAuth() {
           branch || 'main',
         );
 
-        if (projectData && projectData.tokens) {
+        if (projectData) {
           if (projectData.hasExceededPaginationLimit) {
             notifyToUI('Maximum limit of 10,000 tokens reached. Some tokens may be missing.', { error: true });
           }
@@ -244,14 +244,14 @@ export function useTokensStudioOAuth() {
           });
 
           dispatch.tokenState.setTokenData({
-            values: newTokens as any,
+            values: (newTokens || {}) as any,
             themes: alignedNewThemes,
             activeTheme: {},
             hasChangedRemote: false,
           });
 
           dispatch.tokenState.setRemoteData({
-            tokens: newTokens as any,
+            tokens: (newTokens || {}) as any,
             themes: alignedNewThemes,
             metadata: { tokenSetOrder },
           });
@@ -260,13 +260,27 @@ export function useTokensStudioOAuth() {
           dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
           dispatch.tokenState.setEditProhibited(true);
 
-          notifyToUI('Successfully loaded project tokens', { error: false });
+          dispatch.uiState.setLastError(null);
+
+          const hasTokens = newTokens && Object.keys(newTokens).length > 0;
+          const message = hasTokens ? 'Successfully loaded project tokens' : 'Successfully loaded tokens, but there are no tokens in the selected project';
+          notifyToUI(message, { error: false });
         } else {
-          notifyToUI('Project has no tokens or could not load tokens.', { error: true });
-          throw new Error('Project has no tokens or could not load tokens.');
+          dispatch.uiState.setLastError({ type: 'other', message: 'Could not load project data.' });
+          notifyToUI('Could not load project data.', { error: true });
+          throw new Error('Could not load project data.');
         }
       } catch (error) {
         console.error('Failed to load project tokens:', error);
+        if ((error as any).code === 'variables_source_of_truth') {
+          const message = 'This feature is not available for projects using variables as source of truth';
+          dispatch.uiState.setLastError({ type: 'other', message });
+          notifyToUI(message, { error: true });
+        } else {
+          const message = error instanceof Error ? error.message : 'Could not load project data.';
+          dispatch.uiState.setLastError({ type: 'other', message });
+          notifyToUI(message, { error: true });
+        }
         throw error; // Rethrow so caller can catch it and avoid silent failures
       } finally {
         useAuthStore.setState({ isLoading: false });

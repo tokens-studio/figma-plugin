@@ -73,16 +73,26 @@ export async function fetchProjectDataRest(
       fetch(`${apiBaseUrl}/api/v1/projects/${projectId}/theme_options?${branchQuery}&per_page=1000`, { headers }),
     ]);
 
-    if (!tokensRes.ok) throw new Error(`Failed to fetch tokens: ${tokensRes.statusText}`);
-    if (!tokenSetsRes.ok) throw new Error(`Failed to fetch token sets: ${tokenSetsRes.statusText}`);
-    if (!themeGroupsRes.ok) throw new Error(`Failed to fetch theme groups: ${themeGroupsRes.statusText}`);
-    if (!themeOptionsRes.ok) throw new Error(`Failed to fetch theme options: ${themeOptionsRes.statusText}`);
+    const handleFetchResponse = async (res: Response, resourceName: string) => {
+      if (!res.ok) {
+        let errorData: { code?: string; error?: string } = {};
+        try {
+          errorData = await res.json();
+        } catch (e) {
+          // ignore parsing error
+        }
+        const error = new Error(errorData.error || `Failed to fetch ${resourceName}: ${res.statusText}`);
+        if (errorData.code) (error as any).code = errorData.code;
+        throw error;
+      }
+      return res.json();
+    };
 
     const [tokensData, tokenSetsData, themeGroupsData, themeOptionsData] = await Promise.all([
-      tokensRes.json(),
-      tokenSetsRes.json(),
-      themeGroupsRes.json(),
-      themeOptionsRes.json(),
+      handleFetchResponse(tokensRes, 'tokens'),
+      handleFetchResponse(tokenSetsRes, 'token sets'),
+      handleFetchResponse(themeGroupsRes, 'theme groups'),
+      handleFetchResponse(themeOptionsRes, 'theme options'),
     ]);
 
     const hasExceededPaginationLimit = tokensData?.meta?.pagination?.total_items > 10000
@@ -204,7 +214,7 @@ export async function fetchProjectDataRest(
     }
 
     return {
-      tokens: Object.keys(tokens).length > 0 ? tokens : undefined as any,
+      tokens,
       themes,
       tokenSets: tokenSetsMap,
       tokenSetOrder,
