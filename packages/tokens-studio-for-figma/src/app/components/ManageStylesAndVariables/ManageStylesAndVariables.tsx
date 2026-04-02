@@ -82,7 +82,8 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
       await createStylesFromSelectedThemes(selectedThemes);
     }
   }, [setShowModal, activeTab, selectedThemes, selectedSets, createVariablesFromSets, createStylesFromSelectedTokenSets, createVariablesFromThemes, createStylesFromSelectedThemes]);
-  const canExportToFigma = activeTab === 'useSets' ? selectedSets.length > 0 : selectedThemes.length > 0;
+
+  const canExportToFigma = activeTab === 'useSets' ? selectedSets.length > 0 : isProUser && selectedThemes.length > 0;
 
   const handleTabChange = React.useCallback((tab: 'useThemes' | 'useSets') => {
     setActiveTab(tab);
@@ -123,7 +124,7 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
               </Button>
             </Stack>
           </Stack>
-  )}
+        )}
         stickyFooter
       >
         <Tabs defaultValue={activeTab}>
