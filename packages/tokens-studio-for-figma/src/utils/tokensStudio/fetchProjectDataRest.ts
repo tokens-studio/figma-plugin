@@ -39,6 +39,46 @@ function transformTokenValue(token: any): unknown {
   return value;
 }
 
+async function fetchAllPages(url: string, headers: HeadersInit, resourceName: string) {
+  let allData: any[] = [];
+  let currentPage = 1;
+  let totalPages = 1;
+  let meta: any = {};
+
+  do {
+    const separator = url.includes('?') ? '&' : '?';
+    const pageUrl = `${url}${separator}page=${currentPage}`;
+    const res = await fetch(pageUrl, { headers });
+
+    if (!res.ok) {
+      let errorData: { code?: string; error?: string } = {};
+      try {
+        errorData = await res.json();
+      } catch (e) {
+        // ignore parsing error
+      }
+      const error = new Error(errorData.error || `Failed to fetch ${resourceName}: ${res.statusText}`);
+      if (errorData.code) (error as any).code = errorData.code;
+      throw error;
+    }
+
+    const json = await res.json();
+    if (json.data && Array.isArray(json.data)) {
+      allData = [...allData, ...json.data];
+    }
+    meta = json.meta || meta;
+
+    if (json.meta?.pagination) {
+      totalPages = json.meta.pagination.total_pages || 1;
+      currentPage++;
+    } else {
+      break;
+    }
+  } while (currentPage <= totalPages);
+
+  return { data: allData, meta };
+}
+
 export async function fetchProjectDataRest(
   authToken: string,
   apiBaseUrl: string,
@@ -65,12 +105,11 @@ export async function fetchProjectDataRest(
     const branchQuery = `change_set_id=${encodeURIComponent(changeSetId)}`;
 
     // 2. Fetch all required data concurrently
-    const [tokensRes, tokenSetsRes, themeGroupsRes, themeOptionsRes] = await Promise.all([
+    const [tokensRes, tokenSetsData, themeGroupsData, themeOptionsData] = await Promise.all([
       fetch(`${apiBaseUrl}/api/v1/projects/${projectId}/tokens?${branchQuery}&per_page=10000`, { headers }),
-      // Note: fetching multiple pages is left out for simplicity unless there's many sets. We just fetch page 1.
-      fetch(`${apiBaseUrl}/api/v1/projects/${projectId}/token_sets?${branchQuery}&per_page=100`, { headers }),
-      fetch(`${apiBaseUrl}/api/v1/projects/${projectId}/theme_groups?${branchQuery}&per_page=100`, { headers }),
-      fetch(`${apiBaseUrl}/api/v1/projects/${projectId}/theme_options?${branchQuery}&per_page=1000`, { headers }),
+      fetchAllPages(`${apiBaseUrl}/api/v1/projects/${projectId}/token_sets?${branchQuery}&per_page=100`, headers, 'token sets'),
+      fetchAllPages(`${apiBaseUrl}/api/v1/projects/${projectId}/theme_groups?${branchQuery}&per_page=100`, headers, 'theme groups'),
+      fetchAllPages(`${apiBaseUrl}/api/v1/projects/${projectId}/theme_options?${branchQuery}&per_page=1000`, headers, 'theme options'),
     ]);
 
     const handleFetchResponse = async (res: Response, resourceName: string) => {
@@ -88,12 +127,7 @@ export async function fetchProjectDataRest(
       return res.json();
     };
 
-    const [tokensData, tokenSetsData, themeGroupsData, themeOptionsData] = await Promise.all([
-      handleFetchResponse(tokensRes, 'tokens'),
-      handleFetchResponse(tokenSetsRes, 'token sets'),
-      handleFetchResponse(themeGroupsRes, 'theme groups'),
-      handleFetchResponse(themeOptionsRes, 'theme options'),
-    ]);
+    const tokensData = await handleFetchResponse(tokensRes, 'tokens');
 
     const hasExceededPaginationLimit = tokensData?.meta?.pagination?.total_items > 10000
       || (tokensData?.data && tokensData.data.length >= 10000);
