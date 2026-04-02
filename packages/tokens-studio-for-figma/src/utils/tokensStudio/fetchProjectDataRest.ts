@@ -70,7 +70,7 @@ async function fetchAllPages(url: string, headers: HeadersInit, resourceName: st
 
     if (json.meta?.pagination) {
       totalPages = json.meta.pagination.total_pages || 1;
-      currentPage++;
+      currentPage += 1;
     } else {
       break;
     }
