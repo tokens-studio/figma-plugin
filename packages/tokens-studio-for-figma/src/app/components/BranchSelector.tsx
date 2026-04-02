@@ -11,6 +11,7 @@ import {
   usedTokenSetSelector,
   localApiStateSelector,
   activeThemeSelector,
+  editProhibitedSelector,
 } from '@/selectors';
 import useRemoteTokens from '../store/remoteTokens';
 import useConfirm from '@/app/hooks/useConfirm';
@@ -20,6 +21,7 @@ import { isGitProvider } from '@/utils/is';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { StorageTypeCredentials } from '@/types/StorageType';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 import { track } from '@/utils/analytics';
 import CreateBranchModal from './modals/CreateBranchModal';
 import Modal from './Modal';
@@ -31,6 +33,7 @@ export default function BranchSelector() {
   const { confirm } = useConfirm();
   const {
     pullTokens,
+    fetchBranches,
   } = useRemoteTokens();
   const dispatch = useDispatch<Dispatch>();
   const { setStorageType } = useStorage();
@@ -42,6 +45,7 @@ export default function BranchSelector() {
   const apiData = useSelector(apiSelector);
   const activeTheme = useSelector(activeThemeSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
+  const editProhibited = useSelector(editProhibitedSelector);
   const { t } = useTranslation(['branch', 'licence']);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [currentBranch, setCurrentBranch] = useState(localApiStateBranch);
@@ -58,9 +62,24 @@ export default function BranchSelector() {
     // Do nothing - prevent closing the modal during branch switch
   }, []);
 
-  const handleOpenChangePopover = React.useCallback((open: boolean) => {
+  const handleOpenChangePopover = React.useCallback(async (open: boolean) => {
     setIsPopoverOpen(open);
-  }, []);
+    if (open) {
+      if (apiData && localApiState) {
+        const isTokensStudioProvider = apiData?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH && localApiState?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH;
+        if ((isGitProvider(apiData) && isGitProvider(localApiState)) || isTokensStudioProvider) {
+          try {
+            const fetchedBranches = await fetchBranches(apiData);
+            if (fetchedBranches) {
+              dispatch.branchState.setBranches(fetchedBranches);
+            }
+          } catch (error) {
+            console.error('Failed to fetch branches upon opening popover:', error);
+          }
+        }
+      }
+    }
+  }, [apiData, localApiState, dispatch, fetchBranches]);
 
   useEffect(() => {
     setCurrentBranch(localApiStateBranch);
@@ -90,7 +109,7 @@ export default function BranchSelector() {
     async (branch: string) => {
       track('Create new branch from specific branch');
 
-      if (hasChanges && (await askUserIfPushChanges())) {
+      if (hasChanges && apiData?.provider !== StorageProviderType.TOKENS_STUDIO_OAUTH && (await askUserIfPushChanges())) {
         // User chose to discard changes - clear local token state
         dispatch.tokenState.setEmptyTokens();
       }
@@ -98,12 +117,13 @@ export default function BranchSelector() {
       setStartBranch(branch);
       setCreateBranchModalVisible(true);
     },
-    [hasChanges, askUserIfPushChanges, dispatch],
+    [hasChanges, askUserIfPushChanges, dispatch, apiData?.provider],
   );
 
   const changeAndPull = React.useCallback(
     async (branch: string) => {
-      if (isGitProvider(apiData) && isGitProvider(localApiState)) {
+      const isTokensStudioProvider = apiData?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH && localApiState?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH;
+      if ((isGitProvider(apiData) && isGitProvider(localApiState)) || isTokensStudioProvider) {
         setIsSwitchingBranch(true);
         try {
           // Clear local token state BEFORE pulling to prevent bleed
@@ -132,7 +152,7 @@ export default function BranchSelector() {
   const onBranchSelected = React.useCallback(
     async (branch: string) => {
       track('Branch changed');
-      if (hasChanges) {
+      if (hasChanges && !editProhibited && apiData?.provider !== StorageProviderType.TOKENS_STUDIO_OAUTH) {
         if (await askUserIfPushChanges()) {
           await changeAndPull(branch);
         }
@@ -140,17 +160,18 @@ export default function BranchSelector() {
         await changeAndPull(branch);
       }
     },
-    [askUserIfPushChanges, changeAndPull, hasChanges],
+    [askUserIfPushChanges, changeAndPull, hasChanges, editProhibited, apiData?.provider],
   );
 
   const onCreateBranchModalSuccess = React.useCallback(
     (branch: string, branches: string[]) => {
       setCreateBranchModalVisible(false);
       setCurrentBranch(branch);
-      if (isGitProvider(apiData) && isGitProvider(localApiState)) {
+      const isTokensStudioProvider = apiData?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH && localApiState?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH;
+      if ((isGitProvider(apiData) && isGitProvider(localApiState)) || isTokensStudioProvider) {
         dispatch.branchState.setBranches(branches.includes(branch) ? branches : [...branches, branch]);
-        dispatch.uiState.setApiData({ ...apiData, branch });
-        dispatch.uiState.setLocalApiState({ ...localApiState, branch });
+        dispatch.uiState.setApiData({ ...apiData, branch } as StorageTypeCredentials);
+        dispatch.uiState.setLocalApiState({ ...localApiState, branch } as StorageTypeCredentials);
       }
     },
     [dispatch, apiData, localApiState],
@@ -166,6 +187,7 @@ export default function BranchSelector() {
         onCreateBranchFromCurrentChanges={createBranchFromCurrentChanges}
         branches={branchState.branches}
         currentBranch={currentBranch}
+        editProhibited={editProhibited}
       />
       {createBranchModalVisible && startBranch && (
         <CreateBranchModal

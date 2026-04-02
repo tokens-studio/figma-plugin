@@ -47,7 +47,7 @@ export class OAuthError extends Error {
         return 'Your session has expired. Please log in again.';
       case OAuthErrorType.NETWORK_ERROR:
         return 'Network error occurred. Please check your connection and try again.';
-        // Device Code Flow errors
+      // Device Code Flow errors
       case OAuthErrorType.DEVICE_CODE_REQUEST_FAILED:
         return 'Failed to request authorization code. Please try again.';
       case OAuthErrorType.DEVICE_CODE_EXPIRED:

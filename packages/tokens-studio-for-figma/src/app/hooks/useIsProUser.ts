@@ -14,7 +14,9 @@ export function useIsProUser() {
   const storageType = useSelector(storageTypeSelector);
   const { isPro } = useAuthStore();
 
-  return useMemo(() => (
-    Boolean(existingKey && !licenseKeyError) || Boolean(validPAT && storageType?.provider === StorageProviderType.TOKENS_STUDIO) || isPro
-  ), [existingKey, licenseKeyError, validPAT, storageType, isPro]);
+  return useMemo(() => {
+    const hasLicenseKey = Boolean(existingKey && !licenseKeyError);
+    const hasTokensStudioPAT = Boolean(validPAT && (storageType?.provider === StorageProviderType.TOKENS_STUDIO));
+    return hasLicenseKey || hasTokensStudioPAT || isPro;
+  }, [existingKey, licenseKeyError, validPAT, storageType, isPro]);
 }

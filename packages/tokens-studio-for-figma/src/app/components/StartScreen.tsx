@@ -87,6 +87,11 @@ function StartScreen() {
     dispatch.uiState.setLocalApiState(credentialsToSet);
   }, [apiProviders, dispatch.tokenState, dispatch.uiState, storageType]);
 
+  const onGoToSubscription = React.useCallback(() => {
+    dispatch.uiState.setLastError(null);
+    dispatch.uiState.setActiveTab(Tabs.SUBSCRIPTION);
+  }, [dispatch.uiState]);
+
   const onProviderSelect = React.useCallback(async (providerId: string) => {
     const selectedProvider = apiProviders.find((provider) => provider.internalId === providerId);
     if (selectedProvider) {
@@ -156,6 +161,7 @@ function StartScreen() {
 
   // Determine if we should show the provider selector
   const shouldShowProviderSelector = apiProviders.length > 0 && storageType?.provider === StorageProviderType.LOCAL;
+  const isTokensStudioOAuth = storageType?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH;
 
   return (
     <Box
@@ -213,18 +219,28 @@ function StartScreen() {
               id="callout-action-setupsync"
               heading={getCalloutContent.heading}
               description={getCalloutContent.description}
-              action={{
+              action={isTokensStudioOAuth ? undefined : {
                 onClick: onSetSyncClick,
                 text: t('enterCredentials'),
               }}
-              secondaryAction={matchingProvider ? {
+              secondaryAction={(!isTokensStudioOAuth && matchingProvider) ? {
                 onClick: () => {
                   dispatch.uiState.setLastError(null);
                   restoreStoredProvider(matchingProvider);
                 },
                 text: t('retry'),
               } : undefined}
-            />
+            >
+              {isTokensStudioOAuth && (
+                <Button
+                  size="small"
+                  variant="primary"
+                  onClick={onGoToSubscription}
+                >
+                  {t('goToSubscription', { defaultValue: 'Go to Subscription' })}
+                </Button>
+              )}
+            </Callout>
           )}
           {!isLoadingProvider && storageType?.provider === StorageProviderType.LOCAL && (
             <Stack direction="column" gap={4}>
