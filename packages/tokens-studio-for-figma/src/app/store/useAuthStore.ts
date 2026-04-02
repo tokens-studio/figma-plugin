@@ -9,6 +9,7 @@ import { store } from '@/app/store';
 import { notifyToUI } from '@/plugin/notifiers';
 import compact from 'just-compact';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
+import { TOKENS_STUDIO_APP_URL } from '@/constants/TokensStudio';
 
 interface DeviceCodeState {
   userCode: string;
@@ -58,7 +59,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ isLoading: true, error: null, deviceCode: null });
 
     try {
-      const studioUrl = 'production.tokens.studio';
+      const studioUrl = TOKENS_STUDIO_APP_URL;
       let tokens: OAuthTokens;
 
       if (OAuthService.usesDeviceCodeFlow(studioUrl)) {
@@ -215,7 +216,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         // Continue with old tokens, might fail but we already have an error handler
       }
     }
-    const studioUrl = 'production.tokens.studio';
+    const studioUrl = TOKENS_STUDIO_APP_URL;
     const apiBaseUrl = OAuthService.getApiBaseUrl(studioUrl);
 
     try {
@@ -393,7 +394,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     const { oauthTokens } = get();
     if (!oauthTokens) return;
 
-    const studioUrl = 'production.tokens.studio';
+    const studioUrl = TOKENS_STUDIO_APP_URL;
     const apiBaseUrl = OAuthService.getApiBaseUrl(studioUrl);
 
     try {
@@ -451,7 +452,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
     set({ isLoading: true });
 
-    const studioUrl = 'production.tokens.studio';
+    const studioUrl = TOKENS_STUDIO_APP_URL;
     const apiBaseUrl = OAuthService.getApiBaseUrl(studioUrl);
 
     try {
@@ -498,7 +499,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     if (!oauthTokens || !oauthTokens.refreshToken) return;
 
     try {
-      const studioUrl = 'production.tokens.studio';
+      const studioUrl = TOKENS_STUDIO_APP_URL;
       const newTokens = await OAuthService.refreshTokens(null, oauthTokens.refreshToken, studioUrl);
       await get().setOAuthTokens(newTokens);
     } catch (error) {
