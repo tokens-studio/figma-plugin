@@ -1,5 +1,12 @@
 # @tokens-studio/figma-plugin
 
+## 2.11.4
+
+### Patch Changes
+
+- 897f1dc37: Add ability to filter token sets(enabled/disabled/reference) when editing a theme
+- 2a9d75970: Add ability to fetch tokens, sets and themes from the new Tokens Studio platform.
+
 ## 2.11.3
 
 ### Patch Changes
