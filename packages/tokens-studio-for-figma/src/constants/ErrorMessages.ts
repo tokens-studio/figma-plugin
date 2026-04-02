@@ -26,7 +26,7 @@ export enum ErrorMessages {
   BITBUCKET_CONNECTIVITY_ERROR = 'Unable to connect to Bitbucket. Please check your internet connection or try again later.',
   ADO_CONNECTIVITY_ERROR = 'Unable to connect to Azure DevOps. Please check your internet connection or try again later.',
   TOKENSSTUDIO_CONNECTIVITY_ERROR = 'Unable to connect to Tokens Studio. Please check your internet connection or try again later.',
-  TOKENSSTUDIO_OAUTH_CREDENTIAL_ERROR = 'Error syncing with Tokens Studio OAuth, check credentials',
+  TOKENSSTUDIO_OAUTH_CREDENTIAL_ERROR = 'Error syncing with Tokens Studio. Please login again.',
   TOKENSSTUDIO_OAUTH_CONNECTIVITY_ERROR = 'Unable to connect to Tokens Studio OAuth. Please check your internet connection or try again later.',
   JSONBIN_CONNECTIVITY_ERROR = 'Unable to connect to JSONbin. Please check your internet connection or try again later.',
 }
