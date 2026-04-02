@@ -237,18 +237,18 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const attrs = userDataRaw.attributes || userDataRaw;
 
       const user: UserData = {
-        id: (userDataRaw.id as string) || (userDataRaw.uuid as string) || "",
-        uuid: (userDataRaw.uuid as string) || (userDataRaw.id as string) || "",
-        firstName: (attrs.first_name as string) || (attrs.firstName as string) || "",
-        lastName: (attrs.last_name as string) || (attrs.lastName as string) || "",
-        email: (attrs.email as string) || "",
-        avatar: (attrs.avatar_url as string) || (attrs.avatar as string) || (attrs.logo_url as string) || "",
+        id: (userDataRaw.id as string) || (userDataRaw.uuid as string) || '',
+        uuid: (userDataRaw.uuid as string) || (userDataRaw.id as string) || '',
+        firstName: (attrs.first_name as string) || (attrs.firstName as string) || '',
+        lastName: (attrs.last_name as string) || (attrs.lastName as string) || '',
+        email: (attrs.email as string) || '',
+        avatar: (attrs.avatar_url as string) || (attrs.avatar as string) || (attrs.logo_url as string) || '',
         fullName:
           (attrs.full_name as string) ||
           (attrs.fullName as string) ||
-          `${(attrs.first_name as string) || (attrs.firstName as string) || ""} ${(attrs.last_name as string) || (attrs.lastName as string) || ""}`.trim() ||
+          `${(attrs.first_name as string) || (attrs.firstName as string) || ''} ${(attrs.last_name as string) || (attrs.lastName as string) || ''}`.trim() ||
           (attrs.name as string) ||
-          "",
+          '',
       };
 
       // 2. Fetch Organizations Data
