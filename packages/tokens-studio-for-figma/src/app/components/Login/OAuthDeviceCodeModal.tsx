@@ -120,17 +120,17 @@ export const OAuthDeviceCodeModal = () => {
         </Box>
 
         {timeRemaining !== null && (
-        <Text
-          size="small"
-          css={{
-            textAlign: 'center',
-            color: timeRemaining < 60 ? '$dangerFg' : '$fgMuted',
-          }}
-        >
-          {t('codeExpiresIn')}
-          {' '}
-          {formatTime(timeRemaining)}
-        </Text>
+          <Text
+            size="small"
+            css={{
+              textAlign: 'center',
+              color: timeRemaining < 60 ? '$dangerFg' : '$fgMuted',
+            }}
+          >
+            {t('codeExpiresIn')}
+            {' '}
+            {formatTime(timeRemaining)}
+          </Text>
         )}
 
         <Stack direction="row" justify="center" align="center" gap={2} css={{ marginTop: '$2' }}>

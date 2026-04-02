@@ -17,6 +17,7 @@ import { StorageTypeCredentials } from '@/types/StorageType';
 import LocalStorageItem from './LocalStorageItem';
 import { getProviderIcon } from '@/utils/getProviderIcon';
 import { StyledBetaBadge } from './StyledBetaBadge';
+import { useAuthStore } from '@/app/store/useAuthStore';
 
 const SyncSettings = () => {
   const localApiState = useSelector(localApiStateSelector);
@@ -66,6 +67,21 @@ const SyncSettings = () => {
 
   const apiProviders = useSelector(apiProvidersSelector);
   const dispatch = useDispatch<Dispatch>();
+
+  const { isAuthenticated, organizations } = useAuthStore();
+
+  const studioProviders = React.useMemo(() => {
+    if (isAuthenticated && organizations?.length) {
+      return organizations.map((org) => ({
+        provider: StorageProviderType.TOKENS_STUDIO_OAUTH,
+        internalId: `tokens-studio-${org.id}`,
+        name: org.name,
+        orgId: org.id,
+        id: org.projects?.data?.[0]?.id || '',
+      } as StorageTypeCredentials));
+    }
+    return [];
+  }, [isAuthenticated, organizations]);
 
   const [open, setOpen] = React.useState(false);
 
@@ -173,30 +189,30 @@ const SyncSettings = () => {
 
                   <Stack direction="column" gap={4}>
                     {
-                    providers.map((provider) => (
-                      <Stack direction="row" justify="between" align="center" key={provider.text}>
-                        <Stack direction="column">
-                          <Box css={{
-                            color: '$fgDefault', display: 'inline-flex', gap: '$2', alignItems: 'center',
-                          }}
+                      providers.map((provider) => (
+                        <Stack direction="row" justify="between" align="center" key={provider.text}>
+                          <Stack direction="column">
+                            <Box css={{
+                              color: '$fgDefault', display: 'inline-flex', gap: '$2', alignItems: 'center',
+                            }}
+                            >
+                              <Box css={{ color: '$fgMuted' }}>{getProviderIcon(provider.type)}</Box>
+                              {provider.text}
+                              {provider.beta && <StyledBetaBadge>BETA</StyledBetaBadge>}
+                            </Box>
+                          </Stack>
+                          <Button
+                            key={provider.type}
+                            onClick={handleProviderClick(provider.type)}
+                            variant="secondary"
+                            size="small"
+                            data-testid={`add-${provider.text}-credential`}
                           >
-                            <Box css={{ color: '$fgMuted' }}>{getProviderIcon(provider.type)}</Box>
-                            {provider.text}
-                            {provider.beta && <StyledBetaBadge>BETA</StyledBetaBadge>}
-                          </Box>
+                            {t('choose')}
+                          </Button>
                         </Stack>
-                        <Button
-                          key={provider.type}
-                          onClick={handleProviderClick(provider.type)}
-                          variant="secondary"
-                          size="small"
-                          data-testid={`add-${provider.text}-credential`}
-                        >
-                          {t('choose')}
-                        </Button>
-                      </Stack>
-                    ))
-                  }
+                      ))
+                    }
                   </Stack>
                 </Dialog.Content>
               </Dialog.Portal>
@@ -204,7 +220,21 @@ const SyncSettings = () => {
           </Stack>
 
           <Stack direction="column" gap={2} width="full" align="start">
+            {studioProviders.map((item) => (
+              <StorageItem
+                key={item.internalId}
+                onEdit={handleEditClick(item)}
+                onMigrate={handleEditClick(item, true)}
+                item={item}
+              />
+            ))}
             <LocalStorageItem />
+            {apiProviders.length > 0 && (
+              <Box css={{
+                width: '100%', height: '1px', backgroundColor: '$borderSubtle', margin: '$2 0',
+              }}
+              />
+            )}
             {apiProviders.length > 0 && apiProviders.map((item) => (
               <StorageItem
                 key={item?.internalId || `${item.provider}-${item.id}`}

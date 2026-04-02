@@ -139,9 +139,9 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
           </DropdownMenu.Item>
           <DropdownMenu.Separator />
           {availableThemes.length === 0 && (
-          <DropdownMenu.RadioItem css={{ paddingLeft: '$6' }} value="" disabled={!activeTheme} onSelect={handleClearTheme}>
-            <Text css={{ color: '$fgDisabled', fontSize: '$xsmall' }}>{t('noThemes')}</Text>
-          </DropdownMenu.RadioItem>
+            <DropdownMenu.RadioItem css={{ paddingLeft: '$6' }} value="" disabled={!activeTheme} onSelect={handleClearTheme}>
+              <Text css={{ color: '$fgDisabled', fontSize: '$xsmall' }}>{t('noThemes')}</Text>
+            </DropdownMenu.RadioItem>
           )}
           {availableThemeOptions}
 

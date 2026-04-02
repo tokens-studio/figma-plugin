@@ -5,7 +5,7 @@ import type { StartupMessage } from '@/types/AsyncMessages';
 import type { Dispatch, RootState } from '@/app/store';
 import { Tabs } from '@/constants/Tabs';
 import { storageTypeSelector } from '@/selectors';
-import { StorageProviderType } from '@/constants/StorageProviderType';
+import { StorageProviderType, StorageTypeCredentials } from '@/types/StorageType';
 import useConfirm from '@/app/hooks/useConfirm';
 import isSameCredentials from '@/utils/isSameCredentials';
 import { track } from '@/utils/analytics';
@@ -13,7 +13,7 @@ import { hasTokenValues } from '@/utils/hasTokenValues';
 import { notifyToUI } from '@/plugin/notifiers';
 import type useRemoteTokens from '@/app/store/remoteTokens';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
-import { isGitProvider } from '@/utils/is';
+import { isGitProvider, isTokensStudioOAuthType } from '@/utils/is';
 import { categorizeError } from '@/utils/error/categorizeError';
 
 export function pullTokensFactory(
@@ -38,9 +38,36 @@ export function pullTokensFactory(
     const storageType = storageTypeSelector(state);
 
     if (isRemoteStorage) {
-      const matchingSet = params.localApiProviders?.find((provider) => (
+      let matchingSet = params.localApiProviders?.find((provider) => (
         isSameCredentials(provider, storageType)
       ));
+
+      if (matchingSet) {
+        matchingSet = {
+          ...matchingSet,
+          ...storageType,
+          secret: matchingSet.secret,
+        } as StorageTypeCredentials;
+      }
+
+      // Tokens Studio OAuth uses live session tokens instead of static saved credentials like GitHub.
+      //  Since we don't have a saved API config for it in local storage,
+      // this block dynamically constructs a mock provider object using the active OAuth token.
+      // This lets us cleanly reuse the existing sync architecture without writing separate OAuth-specific code paths.
+      if (
+        !matchingSet
+        && (
+          isTokensStudioOAuthType(storageType)
+          || (storageType.provider === StorageProviderType.TOKENS_STUDIO && typeof (storageType as { internalId?: string }).internalId === 'string' && (storageType as { internalId?: string }).internalId!.startsWith('tokens-studio-'))
+        )
+        && params.oauthTokens
+      ) {
+        matchingSet = {
+          ...storageType,
+          provider: StorageProviderType.TOKENS_STUDIO_OAUTH,
+          secret: params.oauthTokens.accessToken,
+        } as StorageTypeCredentials;
+      }
 
       if (matchingSet) {
         // found API credentials
@@ -56,6 +83,8 @@ export function pullTokensFactory(
             || matchingSet.provider === StorageProviderType.GITLAB
             || matchingSet.provider === StorageProviderType.ADO
             || matchingSet.provider === StorageProviderType.BITBUCKET
+            || isTokensStudioOAuthType(matchingSet)
+            || (matchingSet.provider === StorageProviderType.TOKENS_STUDIO && typeof (matchingSet as { internalId?: string }).internalId === 'string' && (matchingSet as { internalId?: string }).internalId!.startsWith('tokens-studio-'))
           ) {
             const branches = await useRemoteTokensResult.fetchBranches(matchingSet);
             if (branches) dispatch.branchState.setBranches(branches);
@@ -149,10 +178,11 @@ export function pullTokensFactory(
       StorageProviderType.URL,
       StorageProviderType.SUPERNOVA,
       StorageProviderType.TOKENS_STUDIO,
+      StorageProviderType.TOKENS_STUDIO_OAUTH,
     ].includes(storageType.provider);
 
     const hasLocalData = params.localTokenData
-                         && Object.values(params.localTokenData?.values ?? {}).some((value) => value.length > 0);
+      && Object.values(params.localTokenData?.values ?? {}).some((value) => value.length > 0);
 
     // Check if storage is remote and local data is empty
     if (isRemoteStorage && !hasLocalData) {

@@ -16,10 +16,11 @@ type Props = {
     text: React.ReactNode
     onClick: React.ComponentProps<typeof Button>['onClick']
   }
+  children?: React.ReactNode
 };
 
 export default function Callout({
-  heading, description, action, secondaryAction, id,
+  heading, description, action, secondaryAction, id, children,
 }: Props) {
   return (
     <Box css={{
@@ -35,7 +36,7 @@ export default function Callout({
             <Heading>{heading}</Heading>
             <Text muted size="xsmall">{description}</Text>
           </Stack>
-          {(action || secondaryAction) && (
+          {(action || secondaryAction || children) && (
             <Stack direction="row" gap={2}>
               {action && (
                 <Button data-testid={id} size="small" variant="primary" onClick={action.onClick}>
@@ -52,6 +53,7 @@ export default function Callout({
                   {secondaryAction.text}
                 </Button>
               )}
+              {children}
             </Stack>
           )}
         </Stack>

@@ -189,7 +189,7 @@ const PLANS: PlanConfig[] = [
     name: 'Starter',
     underlineColor: '#7DDE3B',
     description:
-            'Create a free Starter account to unlock exports, import Figma variables, and manage unlimited tokens and sets with ease.',
+      'Create a free Starter account to unlock exports, import Figma variables, and manage unlimited tokens and sets with ease.',
     yearlyPrice: null,
     monthlyPrice: null,
     yearlyNote: 'No billing details required',
@@ -202,7 +202,7 @@ const PLANS: PlanConfig[] = [
     name: 'Starter Plus',
     underlineColor: '#E8409D',
     description:
-            'Designed for advanced users who want full control – unlock all plugin features and build smarter, faster, and at scale.',
+      'Designed for advanced users who want full control – unlock all plugin features and build smarter, faster, and at scale.',
     yearlyPrice: '€39',
     monthlyPrice: '€49',
     yearlyNote: 'per month, billed annually',
@@ -215,7 +215,7 @@ const PLANS: PlanConfig[] = [
     name: 'Essential',
     underlineColor: '#E8632A',
     description:
-            'Get full access to the Studio platform – sync, manage, and deliver tokens at scale. Built for professional solo builders.',
+      'Get full access to the Studio platform – sync, manage, and deliver tokens at scale. Built for professional solo builders.',
     yearlyPrice: '€169',
     monthlyPrice: '€199',
     yearlyNote: 'No billing details required',
@@ -228,7 +228,7 @@ const PLANS: PlanConfig[] = [
     name: 'Organization',
     underlineColor: '#7B5FF5',
     description:
-            'Scale your design system with the full Studio platform – manage teams, projects, and collaboration at any level.',
+      'Scale your design system with the full Studio platform – manage teams, projects, and collaboration at any level.',
     yearlyPrice: '€499',
     monthlyPrice: '€599',
     yearlyNote: 'No billing details required',
@@ -316,7 +316,7 @@ export default function SubscriptionPlans() {
               <CTAButton
                 type="button"
                 variant={plan.ctaVariant}
-                                // eslint-disable-next-line react/jsx-no-bind
+                // eslint-disable-next-line react/jsx-no-bind
                 onClick={() => handleCTAClick(plan.ctaHref)}
               >
                 {plan.ctaLabel}

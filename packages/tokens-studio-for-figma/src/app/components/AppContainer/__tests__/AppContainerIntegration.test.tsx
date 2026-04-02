@@ -42,7 +42,7 @@ const mockUser = {
   name: 'Jan Six',
 };
 
-const mockSettings: SavedSettings = {
+const mockSettings = {
   language: 'en',
   width: 800,
   height: 500,
@@ -54,7 +54,7 @@ const mockSettings: SavedSettings = {
   updateOnChange: false,
   updateRemote: true,
   shouldUpdateStyles: true,
-};
+} as SavedSettings;
 
 const mockValues: Record<string, AnyTokenList> = {
   global: [
@@ -120,6 +120,7 @@ const mockStartupParams: Omit<StartupMessage, 'licenseKey'> = {
   lastOpened: Date.now(),
   onboardingExplainer: {
     sets: true,
+    exportSets: true,
     inspect: true,
     syncProviders: true,
   },
@@ -136,8 +137,15 @@ const mockStartupParams: Omit<StartupMessage, 'licenseKey'> = {
     usedTokenSet: {},
     updatedAt: new Date().toISOString(),
     values: {},
+    collapsedTokenSets: null,
+    tokenFormat: null,
     version: '91',
   },
+  oauthTokens: null,
+  initialLoad: true,
+  usedEmail: null,
+  authData: null,
+  selectedExportThemes: [],
 };
 
 // #region helpers

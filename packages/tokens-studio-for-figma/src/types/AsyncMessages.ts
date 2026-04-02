@@ -17,23 +17,14 @@ import type { ThemeObject } from './ThemeObject';
 import { DeleteTokenPayload } from './payloads';
 import { TokensToRenamePayload } from '@/app/store/useTokens';
 import { AuthData } from './Auth';
+import { LocalVariableInfo } from '@/plugin/createLocalVariablesInPlugin';
+import { ResolvedVariableInfo } from '@/plugin/asyncMessageHandlers';
 import { RenameVariableToken } from '@/app/store/models/reducers/tokenState';
 import { UpdateTokenVariablePayload } from './payloads/UpdateTokenVariablePayload';
 import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 import { ExportTokenSet } from './ExportTokenSet';
 import type { VariableCollectionInfo } from './VariableCollectionSelection';
 import { OAuthTokens } from './oauth';
-
-export type LocalVariableInfo = {
-  collectionId: string;
-  modeId: string;
-  variableIds: Record<string, string>
-};
-
-export type ResolvedVariableInfo = {
-  name: string;
-  key: string
-};
 
 export enum AsyncMessageTypes {
   // the below messages are going from UI to plugin

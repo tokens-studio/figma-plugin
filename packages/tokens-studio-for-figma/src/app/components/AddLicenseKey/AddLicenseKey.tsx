@@ -18,6 +18,7 @@ import ProBadge from '../ProBadge';
 import { userIdSelector } from '@/selectors/userIdSelector';
 import { ErrorMessage } from '../ErrorMessage';
 import { addLicenseKey } from '@/utils/addLicenseKey';
+import { useAuthStore } from '@/app/store/useAuthStore';
 
 const SectionTitle = styled('div', {
   fontSize: '12px',
@@ -45,6 +46,7 @@ interface Props {
 
 export default function AddLicenseKey({ isCompact }: Props) {
   const dispatch = useDispatch<Dispatch>();
+  const { isAuthenticated, user } = useAuthStore();
   const existingKey = useSelector(licenseKeySelector);
   const licenseKeyError = useSelector(licenseKeyErrorSelector);
   const [newKey, setLicenseKey] = useState(existingKey);
@@ -124,52 +126,60 @@ export default function AddLicenseKey({ isCompact }: Props) {
           <div style={{ marginBottom: '8px' }}>
             <SectionTitle style={{ marginBottom: 0 }}>{t('licence:licenseKey')}</SectionTitle>
           </div>
-          <SectionCaption style={{ marginBottom: '12px' }}>
-            {t('subscription:activatePlanDescriptionPrefix')}
-            {' '}
-            <InlineLink href="https://account.tokens.studio/email-login" target="_blank" rel="noreferrer">
-              https://account.tokens.studio/email-login
-            </InlineLink>
-            {' '}
-            {t('subscription:activatePlanDescriptionSuffix')}
-          </SectionCaption>
+          {isAuthenticated && user ? (
+            <SectionCaption style={{ marginBottom: '12px' }}>
+              {t('subscription:signOutToEnterLicense', 'Please sign out of your Tokens Studio account to enter or manage a legacy license key.')}
+            </SectionCaption>
+          ) : (
+            <SectionCaption style={{ marginBottom: '12px' }}>
+              {t('subscription:activatePlanDescriptionPrefix')}
+              {' '}
+              <InlineLink href="https://account.tokens.studio/email-login" target="_blank" rel="noreferrer">
+                https://account.tokens.studio/email-login
+              </InlineLink>
+              {' '}
+              {t('subscription:activatePlanDescriptionSuffix')}
+            </SectionCaption>
+          )}
         </>
       )}
-      <Stack
-        direction="row"
-        gap={2}
-        css={{
-          display: 'flex',
-          alignItems: 'flex-end',
-          width: '100%',
-        }}
-      >
-        <Box css={{ flexGrow: 1 }}>
-          <TextInput
-            type={isMasked ? 'password' : 'text'}
-            trailingAction={(
-              <IconButton
-                variant="invisible"
-                size="small"
-                onClick={toggleMask}
-                icon={isMasked ? <EyeClosedIcon /> : <EyeOpenIcon />}
-              />
+      {!(isAuthenticated && user) && (
+        <Stack
+          direction="row"
+          gap={2}
+          css={{
+            display: 'flex',
+            alignItems: 'flex-end',
+            width: '100%',
+          }}
+        >
+          <Box css={{ flexGrow: 1 }}>
+            <TextInput
+              type={isMasked ? 'password' : 'text'}
+              trailingAction={(
+                <IconButton
+                  variant="invisible"
+                  size="small"
+                  onClick={toggleMask}
+                  icon={isMasked ? <EyeClosedIcon /> : <EyeOpenIcon />}
+                />
+              )}
+              name="license-key"
+              data-testid="settings-license-key-input"
+              value={newKey || ''}
+              onChange={onLicenseKeyChange}
+              validationStatus={licenseKeyError ? 'error' : undefined}
+            />
+            {licenseKeyError && (
+              <Box css={{ paddingTop: '$2' }}>
+                <ErrorMessage>{licenseKeyError}</ErrorMessage>
+              </Box>
             )}
-            name="license-key"
-            data-testid="settings-license-key-input"
-            value={newKey || ''}
-            onChange={onLicenseKeyChange}
-            validationStatus={licenseKeyError ? 'error' : undefined}
-          />
-          {licenseKeyError && (
-            <Box css={{ paddingTop: '$2' }}>
-              <ErrorMessage>{licenseKeyError}</ErrorMessage>
-            </Box>
-          )}
-        </Box>
-        {addLicenseKeyButton}
-        {removeLicenseKeyButton}
-      </Stack>
+          </Box>
+          {addLicenseKeyButton}
+          {removeLicenseKeyButton}
+        </Stack>
+      )}
     </Stack>
   );
 }

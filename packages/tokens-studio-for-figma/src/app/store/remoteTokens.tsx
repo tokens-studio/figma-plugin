@@ -30,7 +30,7 @@ import { isEqual } from '@/utils/isEqual';
 import { categorizeError } from '@/utils/error/categorizeError';
 import usePullDialog from '../hooks/usePullDialog';
 import { Tabs } from '@/constants/Tabs';
-import { useTokensStudio } from './providers/tokens-studio';
+import { useTokensStudio, useTokensStudioOAuth } from './providers/tokens-studio';
 import { notifyToUI } from '@/plugin/notifiers';
 
 export type PushOverrides = { branch: string; commitMessage: string };
@@ -93,6 +93,11 @@ export default function useRemoteTokens() {
     pullTokensFromTokensStudio,
   } = useTokensStudio();
   const {
+    syncTokensWithTokensStudioOAuth,
+    pullTokensFromTokensStudioOAuth,
+    fetchBranchesForTokensStudio,
+  } = useTokensStudioOAuth();
+  const {
     addNewADOCredentials,
     syncTokensWithADO,
     pullTokensFromADO,
@@ -150,6 +155,11 @@ export default function useRemoteTokens() {
           }
           case StorageProviderType.TOKENS_STUDIO: {
             remoteData = await pullTokensFromTokensStudio(context);
+            dispatch.tokenState.setTokenFormat(TokenFormatOptions.DTCG);
+            break;
+          }
+          case StorageProviderType.TOKENS_STUDIO_OAUTH: {
+            remoteData = await pullTokensFromTokensStudioOAuth(context as any);
             dispatch.tokenState.setTokenFormat(TokenFormatOptions.DTCG);
             break;
           }
@@ -249,6 +259,10 @@ export default function useRemoteTokens() {
                 dispatch.tokenState.setTokenSetMetadata(remoteData.metadata?.tokenSetsData ?? {});
                 break;
               }
+              case StorageProviderType.TOKENS_STUDIO_OAUTH: {
+                dispatch.tokenState.setTokenSetMetadata(remoteData.metadata?.tokenSetsData ?? {});
+                break;
+              }
               default:
                 break;
             }
@@ -323,6 +337,7 @@ export default function useRemoteTokens() {
       closePullDialog,
       pullTokensFromSupernova,
       pullTokensFromTokensStudio,
+      pullTokensFromTokensStudioOAuth,
     ],
   );
 
@@ -360,6 +375,11 @@ export default function useRemoteTokens() {
           dispatch.tokenState.setTokenFormat(TokenFormatOptions.DTCG);
           break;
         }
+        case StorageProviderType.TOKENS_STUDIO_OAUTH: {
+          content = await syncTokensWithTokensStudioOAuth(context as any);
+          dispatch.tokenState.setTokenFormat(TokenFormatOptions.DTCG);
+          break;
+        }
         default:
           content = await pullTokens({ context });
       }
@@ -389,6 +409,7 @@ export default function useRemoteTokens() {
       syncTokensWithADO,
       syncTokensWithSupernova,
       syncTokensWithTokensStudio,
+      syncTokensWithTokensStudioOAuth,
     ],
   );
 
@@ -525,6 +546,10 @@ export default function useRemoteTokens() {
           content = await addNewTokensStudioCredentials(credentials);
           break;
         }
+        case StorageProviderType.TOKENS_STUDIO_OAUTH: {
+          content = await syncTokensWithTokensStudioOAuth(credentials as any);
+          break;
+        }
         default:
           throw new Error('Not implemented');
       }
@@ -557,6 +582,7 @@ export default function useRemoteTokens() {
       addNewADOCredentials,
       addNewSupernovaCredentials,
       addNewTokensStudioCredentials,
+      syncTokensWithTokensStudioOAuth,
       createNewJSONBin,
       createNewGenericVersionedStorage,
       pullTokensFromURL,
@@ -603,6 +629,8 @@ export default function useRemoteTokens() {
           return fetchBitbucketBranches(context);
         case StorageProviderType.ADO:
           return fetchADOBranches(context);
+        case StorageProviderType.TOKENS_STUDIO_OAUTH:
+          return fetchBranchesForTokensStudio(context as any);
         default:
           return null;
       }

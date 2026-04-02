@@ -1,11 +1,15 @@
 import { create } from 'zustand';
 import { OAuthService } from '../services/OAuthService';
 import { OAuthError } from '@/types/OAuthError';
-import type {
-  OAuthTokens, UserData, Organization, Project,
-} from '@/types/oauth';
+import type { OAuthTokens, UserData, Organization, Project } from '@/types/oauth';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
+import { fetchProjectDataRest } from '@/utils/tokensStudio/fetchProjectDataRest';
+import { store } from '@/app/store';
+import { notifyToUI } from '@/plugin/notifiers';
+import compact from 'just-compact';
+import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
+import { TOKENS_STUDIO_APP_URL } from '@/constants/TokensStudio';
 
 interface DeviceCodeState {
   userCode: string;
@@ -18,20 +22,24 @@ interface AuthState {
   oauthTokens: OAuthTokens | null;
   user: UserData | null;
   organizations: Organization[];
+  activeOrganizationId: string | null;
   activeOrganization: Organization | null;
+  activeProject: Project | null;
   error: string | null;
   isLoading: boolean;
   isPro: boolean;
-  activeOrganizationId: string | null;
   deviceCode: DeviceCodeState | null; // Device code info for UI display
   deviceCodeAbortController: AbortController | null;
   loginWithOAuth: () => Promise<void>;
   logout: () => Promise<void>;
   setError: (error: string | null) => void;
   setActiveOrganization: (orgId: string) => void;
+  setActiveProject: (projectId: string) => void;
   setOAuthTokens: (tokens: OAuthTokens | null) => Promise<void>;
-  fetchUserData: (tokens: OAuthTokens) => Promise<void>;
-  fetchProjects: (orgId: string) => Promise<void>;
+  fetchUserData: (tokens: OAuthTokens, persistedProjectId?: string) => Promise<void>;
+  fetchProjects: (orgId: string, persistedProjectId?: string) => Promise<void>;
+  loadProjectTokens: (projectId: string) => Promise<void>;
+  refreshTokens: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -39,19 +47,19 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   oauthTokens: null,
   user: null,
   organizations: [],
+  activeOrganizationId: null,
   activeOrganization: null,
+  activeProject: null,
   error: null,
   isLoading: false,
   isPro: false,
-  activeOrganizationId: null,
   deviceCode: null,
   deviceCodeAbortController: null,
-
   loginWithOAuth: async () => {
     set({ isLoading: true, error: null, deviceCode: null });
 
     try {
-      const studioUrl = 'production.tokens.studio';
+      const studioUrl = TOKENS_STUDIO_APP_URL;
       let tokens: OAuthTokens;
 
       if (OAuthService.usesDeviceCodeFlow(studioUrl)) {
@@ -104,6 +112,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       await get().fetchUserData(tokens);
       await get().setOAuthTokens(tokens);
+
     } catch (error) {
       let errorMessage = 'OAuth login failed';
       if (error instanceof OAuthError) {
@@ -131,8 +140,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       oauthTokens: null,
       user: null,
       organizations: [],
-      activeOrganization: null,
       activeOrganizationId: null,
+      activeOrganization: null,
+      activeProject: null,
       isPro: false,
       deviceCode: null,
       error: null,
@@ -147,9 +157,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       if (controller) {
         controller.abort();
       }
-      set({
-        error: null, isLoading: false, deviceCode: null, deviceCodeAbortController: null,
-      });
+      set({ error: null, isLoading: false, deviceCode: null, deviceCodeAbortController: null });
     } else {
       set({ error });
     }
@@ -159,7 +167,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set((state) => {
       const org = state.organizations.find((o) => o.id === orgId) || null;
       const accessArr = org?.subscription?.access || [];
-      const isTrialExpired = org?.subscription?.plan_status === 'trial_expired' || org?.subscription?.plan_status === 'expired';
+      const planName = org?.subscription?.plan?.name || '';
+      const isPartner = planName.toLowerCase().includes('partner');
+      const isTrialExpired = !isPartner && (org?.subscription?.plan_status === 'trial_expired' || org?.subscription?.plan_status === 'expired');
       const isPro = accessArr.includes('figma_plugin') && org?.current_user_seat_type === 'EDITOR' && !isTrialExpired;
 
       if (org) {
@@ -172,11 +182,19 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       return {
         activeOrganization: org,
         activeOrganizationId: org?.id || null,
+        activeProject: org?.projects?.data?.[0] || null,
         isPro,
       };
     });
     // Fetch projects if needed
     get().fetchProjects(orgId);
+  },
+
+  setActiveProject: (projectId: string) => {
+    set((state) => {
+      const project = state.activeOrganization?.projects?.data?.find(p => p.id === projectId) || null;
+      return { activeProject: project };
+    });
   },
 
   setOAuthTokens: async (tokens: OAuthTokens | null) => {
@@ -187,8 +205,18 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     });
   },
 
-  fetchUserData: async (tokens: OAuthTokens) => {
-    const studioUrl = 'production.tokens.studio';
+  fetchUserData: async (tokens: OAuthTokens, persistedProjectId?: string) => {
+    let currentTokens = tokens;
+    if (OAuthService.needsRefresh(currentTokens)) {
+      try {
+        await get().refreshTokens();
+        currentTokens = get().oauthTokens!;
+      } catch (err) {
+        console.error('Failed to refresh tokens during fetchUserData', err);
+        // Continue with old tokens, might fail but we already have an error handler
+      }
+    }
+    const studioUrl = TOKENS_STUDIO_APP_URL;
     const apiBaseUrl = OAuthService.getApiBaseUrl(studioUrl);
 
     try {
@@ -217,11 +245,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         email: (attrs.email as string) || '',
         avatar: (attrs.avatar_url as string) || (attrs.avatar as string) || (attrs.logo_url as string) || '',
         fullName:
-                    (attrs.full_name as string)
-                    || (attrs.fullName as string)
-                    || `${(attrs.first_name as string) || (attrs.firstName as string) || ''} ${(attrs.last_name as string) || (attrs.lastName as string) || ''}`.trim()
-                    || (attrs.name as string)
-                    || '',
+          (attrs.full_name as string) ||
+          (attrs.fullName as string) ||
+          `${(attrs.first_name as string) || (attrs.firstName as string) || ''} ${(attrs.last_name as string) || (attrs.lastName as string) || ''}`.trim() ||
+          (attrs.name as string) ||
+          '',
       };
 
       // 2. Fetch Organizations Data
@@ -255,10 +283,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             const rawPlanName = sub.current_plan || sub.plan?.name || 'Starter';
             // Capitalize first letter
             let planName = rawPlanName.charAt(0).toUpperCase() + rawPlanName.slice(1);
-            if (sub.plan_status === 'trial_expired' || sub.plan_status === 'expired') {
-              planName = `${planName} Trial Expired`;
-            } else if (sub.plan_status === 'trialing') {
-              planName = `${planName} Trial`;
+            const isPartner = rawPlanName.toLowerCase().includes('partner');
+
+            if (!isPartner) {
+              if (sub.plan_status === 'trial_expired' || sub.plan_status === 'expired') {
+                planName = `${planName} Trial Expired`;
+              } else if (sub.plan_status === 'trialing') {
+                planName = `${planName} Trial`;
+              }
             }
 
             // Billing date mapping
@@ -323,22 +355,27 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       let isPro = false;
       if (activeOrganization) {
         const accessArr = activeOrganization.subscription?.access || [];
-        const isTrialExpired = activeOrganization.subscription?.plan_status === 'trial_expired' || activeOrganization.subscription?.plan_status === 'expired';
+        const planName = activeOrganization.subscription?.plan?.name || '';
+        const isPartner = planName.toLowerCase().includes('partner');
+        const isTrialExpired = !isPartner && (activeOrganization.subscription?.plan_status === 'trial_expired' || activeOrganization.subscription?.plan_status === 'expired');
         isPro = accessArr.includes('figma_plugin') && activeOrganization.current_user_seat_type === 'EDITOR' && !isTrialExpired;
       }
+
+      const defaultProject = activeOrganization?.projects?.data?.find(p => p.id === persistedProjectId) || activeOrganization?.projects?.data?.[0] || null;
 
       set({
         user,
         organizations,
         activeOrganization,
         activeOrganizationId: activeOrganization?.id || null,
+        activeProject: defaultProject,
         isPro,
         isLoading: false,
         isAuthenticated: true,
       });
 
       if (activeOrganization) {
-        await get().fetchProjects(activeOrganization.id);
+        await get().fetchProjects(activeOrganization.id, persistedProjectId);
 
         if (activeOrganization.id !== storedId) {
           AsyncMessageChannel.ReactInstance.message({
@@ -353,11 +390,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
-  fetchProjects: async (orgId: string) => {
+  fetchProjects: async (orgId: string, persistedProjectId?: string) => {
     const { oauthTokens } = get();
     if (!oauthTokens) return;
 
-    const studioUrl = 'production.tokens.studio';
+    const studioUrl = TOKENS_STUDIO_APP_URL;
     const apiBaseUrl = OAuthService.getApiBaseUrl(studioUrl);
 
     try {
@@ -400,6 +437,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           return {
             organizations: updatedOrganizations,
             activeOrganization: updatedActiveOrg,
+            activeProject: (state.activeOrganization?.id === orgId) ? (projects.find(p => p.id === persistedProjectId) || projects[0] || null) : state.activeProject,
           };
         });
       }
@@ -408,4 +446,67 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
+  loadProjectTokens: async (projectId: string) => {
+    const { oauthTokens, activeOrganization } = get();
+    if (!oauthTokens || !activeOrganization) return;
+
+    set({ isLoading: true });
+
+    const studioUrl = TOKENS_STUDIO_APP_URL;
+    const apiBaseUrl = OAuthService.getApiBaseUrl(studioUrl);
+
+    try {
+      const projectData = await fetchProjectDataRest(
+        oauthTokens.accessToken,
+        apiBaseUrl,
+        projectId
+      );
+
+      if (projectData && projectData.tokens) {
+        // Apply token set order and dispatch to Redux store
+        const { tokens, themes, tokenSetOrder } = projectData;
+
+        store.dispatch.tokenState.setTokenData({
+          values: tokens as any,
+          themes: themes,
+          activeTheme: {},
+          hasChangedRemote: false,
+        });
+
+        store.dispatch.tokenState.setRemoteData({
+          tokens: tokens as any,
+          themes,
+          metadata: { tokenSetOrder },
+        });
+
+        const stringifiedRemoteTokens = JSON.stringify(compact([tokens, themes, TokenFormat.format]), null, 2);
+        store.dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
+
+        notifyToUI('Successfully loaded project tokens', { error: false });
+      } else {
+        notifyToUI('Project has no tokens or could not load tokens.', { error: true });
+      }
+    } catch (error) {
+      console.error('Failed to load project tokens:', error);
+      notifyToUI('Failed to load project tokens', { error: true });
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  refreshTokens: async () => {
+    const { oauthTokens } = get();
+    if (!oauthTokens || !oauthTokens.refreshToken) return;
+
+    try {
+      const studioUrl = TOKENS_STUDIO_APP_URL;
+      const newTokens = await OAuthService.refreshTokens(null, oauthTokens.refreshToken, studioUrl);
+      await get().setOAuthTokens(newTokens);
+    } catch (error) {
+      console.error('Failed to refresh tokens:', error);
+      // If refresh fails, we might want to logout or show error
+      // set({ isAuthenticated: false, oauthTokens: null });
+      throw error;
+    }
+  }
 }));
