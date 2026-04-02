@@ -420,8 +420,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           slug: p.slug || (p.attributes?.slug) || '',
         }));
 
-        console.log('Fetched projects:', projects); // Add debug log
-
         set((state) => {
           // Update the organization in the list and active organization if it matches
           const updatedOrganizations = state.organizations.map((org) => {
