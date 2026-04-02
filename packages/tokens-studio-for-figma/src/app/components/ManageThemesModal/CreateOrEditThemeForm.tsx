@@ -1,10 +1,10 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, useWatch } from 'react-hook-form';
 import { useSelector, useStore } from 'react-redux';
 import {
-  Box, Button, IconButton, Stack,
+  Box, Button, IconButton, Stack, DropdownMenu,
 } from '@tokens-studio/ui';
-import { NavArrowLeft } from 'iconoir-react';
+import { NavArrowLeft, FilterList, Check } from 'iconoir-react';
 import { useTranslation } from 'react-i18next';
 import { useDebouncedCallback } from 'use-debounce';
 import { allTokenSetsSelector, themesListSelector, usedTokenSetSelector } from '@/selectors';
@@ -52,6 +52,7 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
   const [showGroupInput, setShowGroupInput] = useState(false);
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
   const githubMfsEnabled = useIsGitMultiFileEnabled();
   const selectedTokenSets = useMemo(() => (
     usedTokenSetSelector(store.getState())
@@ -67,44 +68,6 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
       : tokenSetListToList(availableTokenSets)
   ), [githubMfsEnabled, availableTokenSets]);
 
-  const filteredTreeOrListItems = useMemo(() => {
-    if (!searchTerm || !isSearchActive) {
-      return treeOrListItems;
-    }
-
-    const lowerSearchTerm = searchTerm.toLowerCase();
-    const matchingItems = new Set<string>();
-
-    // First pass: find all items that match the search term
-    treeOrListItems.forEach((item) => {
-      if (item.label.toLowerCase().includes(lowerSearchTerm)) {
-        matchingItems.add(item.path);
-
-        // Add all parent paths
-        let currentParentPath = item.parent;
-        while (currentParentPath && currentParentPath !== '') {
-          matchingItems.add(currentParentPath);
-          const pathToFind = currentParentPath;
-          const parentItem = treeOrListItems.find((i) => i.path === pathToFind);
-          currentParentPath = parentItem?.parent || null;
-        }
-      }
-    });
-
-    // Second pass: include children of matching folders
-    treeOrListItems.forEach((item) => {
-      if (!item.isLeaf && matchingItems.has(item.path)) {
-        treeOrListItems.forEach((child) => {
-          if (child.path.startsWith(`${item.path}/`)) {
-            matchingItems.add(child.path);
-          }
-        });
-      }
-    });
-
-    return treeOrListItems.filter((item) => matchingItems.has(item.path));
-  }, [treeOrListItems, searchTerm, isSearchActive]);
-
   const {
     register, handleSubmit, control, resetField,
   } = useForm<FormValues>({
@@ -113,6 +76,70 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
       ...defaultValues,
     },
   });
+
+  const tokenSetsState = useWatch({ control, name: 'tokenSets' });
+
+  const filteredTreeOrListItems = useMemo(() => {
+    let baseItems = treeOrListItems;
+    if (statusFilter !== 'all') {
+      const keptItemPaths = new Set<string>();
+
+      treeOrListItems.forEach((item) => {
+        if (item.isLeaf) {
+          const status = tokenSetsState?.[item.path] ?? TokenSetStatus.DISABLED;
+          if (status === statusFilter) {
+            keptItemPaths.add(item.path);
+
+            let currentParentPath = item.parent;
+            while (currentParentPath && currentParentPath !== '') {
+              keptItemPaths.add(currentParentPath);
+              const pathToFind = currentParentPath;
+              const parentItem = treeOrListItems.find((i) => i.path === pathToFind);
+              currentParentPath = parentItem?.parent || null;
+            }
+          }
+        }
+      });
+
+      baseItems = treeOrListItems.filter((item) => keptItemPaths.has(item.path));
+    }
+
+    if (!searchTerm || !isSearchActive) {
+      return baseItems;
+    }
+
+    const lowerSearchTerm = searchTerm.toLowerCase();
+    const matchingItems = new Set<string>();
+
+    // First pass: find all items that match the search term
+    baseItems.forEach((item) => {
+      if (item.label.toLowerCase().includes(lowerSearchTerm)) {
+        matchingItems.add(item.path);
+
+        // Add all parent paths
+        let currentParentPath = item.parent;
+        while (currentParentPath && currentParentPath !== '') {
+          matchingItems.add(currentParentPath);
+          const pathToFind = currentParentPath;
+          const parentItem = baseItems.find((i) => i.path === pathToFind);
+          currentParentPath = parentItem?.parent || null;
+        }
+      }
+    });
+
+    // Second pass: include children of matching folders
+    baseItems.forEach((item) => {
+      if (!item.isLeaf && matchingItems.has(item.path)) {
+        baseItems.forEach((child) => {
+          if (child.path.startsWith(`${item.path}/`)) {
+            matchingItems.add(child.path);
+          }
+        });
+      }
+    });
+
+    return baseItems.filter((item) => matchingItems.has(item.path));
+  }, [treeOrListItems, searchTerm, isSearchActive, statusFilter, tokenSetsState]);
 
   const handleGroupKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Escape') {
@@ -165,6 +192,49 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
       setSearchTerm('');
     }
   }, [isSearchActive]);
+
+  const handleResetFilters = useCallback(() => {
+    setStatusFilter('all');
+    setSearchTerm('');
+    setIsSearchActive(false);
+  }, []);
+
+  const renderFilterDropdown = () => (
+    <DropdownMenu>
+      <DropdownMenu.Trigger asChild>
+        <IconButton
+          data-testid="button-filter-token-sets"
+          icon={<FilterList />}
+          size="small"
+          variant="invisible"
+          tooltip={t('filterSets')}
+          css={statusFilter !== 'all' ? { color: '$interactionPrimary' } : undefined}
+        />
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Portal>
+        <DropdownMenu.Content side="bottom" css={{ maxWidth: '200px' }}>
+          <DropdownMenu.RadioGroup value={statusFilter} onValueChange={setStatusFilter}>
+            <DropdownMenu.RadioItem value="all">
+              <DropdownMenu.ItemIndicator><Check /></DropdownMenu.ItemIndicator>
+              <Box>{t('all')}</Box>
+            </DropdownMenu.RadioItem>
+            <DropdownMenu.RadioItem value={TokenSetStatus.ENABLED}>
+              <DropdownMenu.ItemIndicator><Check /></DropdownMenu.ItemIndicator>
+              <Box>{t('enabled')}</Box>
+            </DropdownMenu.RadioItem>
+            <DropdownMenu.RadioItem value={TokenSetStatus.DISABLED}>
+              <DropdownMenu.ItemIndicator><Check /></DropdownMenu.ItemIndicator>
+              <Box>{t('disabled')}</Box>
+            </DropdownMenu.RadioItem>
+            <DropdownMenu.RadioItem value={TokenSetStatus.SOURCE}>
+              <DropdownMenu.ItemIndicator><Check /></DropdownMenu.ItemIndicator>
+              <Box>{t('referenceOnly')}</Box>
+            </DropdownMenu.RadioItem>
+          </DropdownMenu.RadioGroup>
+        </DropdownMenu.Content>
+      </DropdownMenu.Portal>
+    </DropdownMenu>
+  );
 
   return (
     <StyledForm id="form-create-or-edit-theme" onSubmit={handleSubmit(onSubmit)}>
@@ -267,15 +337,18 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
                 >
                   {t('nSets')}
                 </Box>
-                <SearchInputWithToggle
-                  isSearchActive={isSearchActive}
-                  searchTerm={searchTerm}
-                  onToggleSearch={handleToggleSearch}
-                  onSearchTermChange={handleSearchTermChangeWithTracking}
-                  placeholder={t('searchTokenSets')}
-                  tooltip={t('searchSets')}
-                  autofocus
-                />
+                <Stack direction="row" gap={2} align="center">
+                  {renderFilterDropdown()}
+                  <SearchInputWithToggle
+                    isSearchActive={isSearchActive}
+                    searchTerm={searchTerm}
+                    onToggleSearch={handleToggleSearch}
+                    onSearchTermChange={handleSearchTermChangeWithTracking}
+                    placeholder={t('searchTokenSets')}
+                    tooltip={t('searchSets')}
+                    autofocus
+                  />
+                </Stack>
               </Stack>
             </Box>
           )}
@@ -287,15 +360,18 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
             <Box css={{ fontSize: '$small', fontWeight: '$sansMedium', color: '$fgDefault' }}>
               {t('sets.title')}
             </Box>
-            <SearchInputWithToggle
-              isSearchActive={isSearchActive}
-              searchTerm={searchTerm}
-              onToggleSearch={handleToggleSearch}
-              onSearchTermChange={handleSearchTermChangeWithTracking}
-              placeholder={t('searchTokenSets')}
-              tooltip={t('searchSets')}
-              autofocus
-            />
+            <Stack direction="row" gap={2} align="center">
+              {renderFilterDropdown()}
+              <SearchInputWithToggle
+                isSearchActive={isSearchActive}
+                searchTerm={searchTerm}
+                onToggleSearch={handleToggleSearch}
+                onSearchTermChange={handleSearchTermChangeWithTracking}
+                placeholder={t('searchTokenSets')}
+                tooltip={t('searchSets')}
+                autofocus
+              />
+            </Stack>
           </Stack>
         </Box>
       )}
@@ -312,10 +388,18 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
                 />
               );
             }
-            if (isSearchActive && searchTerm) {
+            if ((isSearchActive && searchTerm) || statusFilter !== 'all') {
               return (
-                <Box css={{ padding: '$4', textAlign: 'center', color: '$fgMuted' }}>
-                  No sets found
+                <Box css={{
+                  padding: '$8', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '$3',
+                }}
+                >
+                  <Box css={{ color: '$fgMuted', fontSize: '$small' }}>
+                    {t('noItemsMatch')}
+                  </Box>
+                  <Button variant="secondary" size="small" onClick={handleResetFilters}>
+                    {t('reset')}
+                  </Button>
                 </Box>
               );
             }
