@@ -1,7 +1,6 @@
 import { createSelector } from 'reselect';
 import { localApiStateSelector } from './localApiStateSelector';
-import { isGitProvider } from '@/utils/is';
-import { StorageProviderType } from '@/constants/StorageProviderType';
+import { isGitProvider, isTokensStudioOAuthType } from '@/utils/is';
 
 export const localApiStateBranchSelector = createSelector(
   localApiStateSelector,
@@ -9,8 +8,8 @@ export const localApiStateBranchSelector = createSelector(
     if (isGitProvider(api)) {
       return api.branch;
     }
-    if (api && api.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
-      return (api as any).branch || 'main';
+    if (isTokensStudioOAuthType(api)) {
+      return api.branch || 'main';
     }
     return null;
   },
