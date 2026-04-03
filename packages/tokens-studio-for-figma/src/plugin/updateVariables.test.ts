@@ -297,4 +297,123 @@ describe('updateVariables', () => {
     // Verify that 2rem was converted to 30px (2 * 15)
     expect(mockSetValueForMode).toHaveBeenCalledWith('1:1', 30);
   });
+
+  it('should resolve aliasBaseFontSize per theme when baseline token value is a plain number (not a string with px)', async () => {
+    // This test covers the case where the baseFontSize token resolves to a plain
+    // number (e.g., 16) rather than a string like '16px'. getAliasValue returns
+    // a number in this case, which previously caused the per-theme baseFontSize
+    // to be silently ignored.
+    mockSetValueForMode.mockClear();
+
+    // Create variable mocks with valuesByMode initialized so setNumberValuesOnVariable doesn't bail early
+    const numericFontSizeMdVariable: Variable = {
+      name: 'font-size/md',
+      variableCollectionId: 'VariableCollectionId:1:0',
+      resolvedType: 'FLOAT',
+      setValueForMode: mockSetValueForMode,
+      id: 'VariableID:numeric:1',
+      key: 'VariableID:numeric:1',
+      description: '',
+      valuesByMode: { '1:0': 0, '1:1': 0 },
+      remote: false,
+      remove: jest.fn(),
+    };
+
+    const numericBaselineVariable: Variable = {
+      name: 'typography/baseline',
+      variableCollectionId: 'VariableCollectionId:1:0',
+      resolvedType: 'FLOAT',
+      setValueForMode: mockSetValueForMode,
+      id: 'VariableID:numeric:2',
+      key: 'VariableID:numeric:2',
+      description: '',
+      valuesByMode: { '1:0': 0, '1:1': 0 },
+      remote: false,
+      remove: jest.fn(),
+    };
+
+    figma.variables.createVariable = jest.fn().mockImplementation((name) => {
+      if (name === 'font-size/md') return numericFontSizeMdVariable;
+      return numericBaselineVariable;
+    });
+    figma.variables.getLocalVariables = jest.fn().mockReturnValue([]);
+
+    // Mobile theme: baseline token has a plain numeric value (no 'px')
+    const mobileThemeNumeric: ThemeObject = {
+      id: 'ThemeId:mobile-numeric',
+      name: 'Mobile',
+      group: 'Device',
+      selectedTokenSets: { mobileNumeric: TokenSetStatus.ENABLED },
+    };
+
+    const mobileNumericTokens = {
+      mobileNumeric: [
+        {
+          name: 'typography.baseline',
+          value: 16, // plain number, not '16px'
+          type: TokenTypes.FONT_SIZES,
+        },
+        {
+          name: 'font-size.md',
+          value: '1rem',
+          type: TokenTypes.FONT_SIZES,
+        },
+      ],
+    };
+
+    const settingsWithNumericAlias = {
+      ...settings,
+      baseFontSize: '10', // fallback value — should NOT be used
+      aliasBaseFontSize: '{typography.baseline}',
+    };
+
+    await updateVariables({
+      collection,
+      mode: '1:0',
+      theme: mobileThemeNumeric,
+      tokens: mobileNumericTokens,
+      settings: settingsWithNumericAlias,
+      overallConfig: { mobileNumeric: TokenSetStatus.ENABLED },
+    });
+
+    // 1rem should be resolved using the per-theme baseline of 16 (not fallback of 10)
+    expect(mockSetValueForMode).toHaveBeenCalledWith('1:0', 16);
+
+    mockSetValueForMode.mockClear();
+
+    // Desktop theme: baseline is 18 (plain number)
+    const desktopThemeNumeric: ThemeObject = {
+      id: 'ThemeId:desktop-numeric',
+      name: 'Desktop',
+      group: 'Device',
+      selectedTokenSets: { desktopNumeric: TokenSetStatus.ENABLED },
+    };
+
+    const desktopNumericTokens = {
+      desktopNumeric: [
+        {
+          name: 'typography.baseline',
+          value: 18, // plain number, not '18px'
+          type: TokenTypes.FONT_SIZES,
+        },
+        {
+          name: 'font-size.md',
+          value: '1rem',
+          type: TokenTypes.FONT_SIZES,
+        },
+      ],
+    };
+
+    await updateVariables({
+      collection,
+      mode: '1:1',
+      theme: desktopThemeNumeric,
+      tokens: desktopNumericTokens,
+      settings: settingsWithNumericAlias,
+      overallConfig: { desktopNumeric: TokenSetStatus.ENABLED },
+    });
+
+    // 1rem should be resolved using the per-theme baseline of 18 (not fallback of 10)
+    expect(mockSetValueForMode).toHaveBeenCalledWith('1:1', 18);
+  });
 });
