@@ -290,11 +290,14 @@ export default async function setValuesOnVariable(
                       const hasKeyUppercase = Object.prototype.hasOwnProperty.call(newCodeSyntax, key.toUpperCase());
                       const keyExists = hasKey || hasKeyLowercase || hasKeyUppercase;
 
-                      const syntaxValue = hasKey
-                        ? (newCodeSyntax as CodeSyntax)[key]
-                        : hasKeyLowercase
-                          ? (newCodeSyntax as CodeSyntax)[key.toLowerCase()]
-                          : (newCodeSyntax as CodeSyntax)[key.toUpperCase()];
+                      let syntaxValue;
+                      if (hasKey) {
+                        syntaxValue = (newCodeSyntax as CodeSyntax)[key];
+                      } else if (hasKeyLowercase) {
+                        syntaxValue = (newCodeSyntax as CodeSyntax)[key.toLowerCase()];
+                      } else {
+                        syntaxValue = (newCodeSyntax as CodeSyntax)[key.toUpperCase()];
+                      }
 
                       const currentSyntaxValue = currentVar.codeSyntax?.[figmaPlatform] || '';
                       const valueToSet = (typeof syntaxValue === 'string') ? syntaxValue.trim() : '';
