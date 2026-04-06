@@ -364,6 +364,46 @@ describe('SetValuesOnVariable', () => {
       });
     });
 
+    it('should update codeSyntax with uppercase keys', async () => {
+      const colorVariable = {
+        ...testVariable,
+        resolvedType: 'COLOR',
+        valuesByMode: {
+          309: {
+            r: 0, g: 0, b: 0, a: 1,
+          },
+        },
+      } as unknown as Variable;
+
+      const tokens = [{
+        name: 'test.variable',
+        path: 'test/variable',
+        rawValue: '#ff0000',
+        value: '#ff0000',
+        type: TokenTypes.COLOR,
+        variableId: 'test-key-1',
+        $extensions: {
+          'com.figma.codeSyntax': {
+            WEB: 'web-syntax-upper',
+            ANDROID: 'android-syntax-upper',
+            IOS: 'ios-syntax-upper',
+          },
+        },
+      }] as SingleToken<true, { path: string; variableId: string }>[];
+
+      await setValuesOnVariable([colorVariable], tokens, collection, mode, baseFontSize);
+
+      // Verify codeSyntax was set
+      expect(mockSetVariableCodeSyntax).toHaveBeenCalledWith('WEB', 'web-syntax-upper');
+      expect(mockSetVariableCodeSyntax).toHaveBeenCalledWith('ANDROID', 'android-syntax-upper');
+      expect(mockSetVariableCodeSyntax).toHaveBeenCalledWith('iOS', 'ios-syntax-upper');
+      
+      // Verify value was updated to new color
+      expect(mockSetValueForMode).toHaveBeenCalledWith(mode, {
+        r: 1, g: 0, b: 0, a: 1,
+      });
+    });
+
     it('should update hiddenFromPublishing with value change', async () => {
       const tokens = [{
         name: 'test.variable',
