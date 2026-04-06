@@ -179,13 +179,13 @@ export async function fetchProjectDataRest(
           const rawExtensions = token.attributes?.$extensions || token.attributes?.extensions || {};
           const $extensions = { ...rawExtensions };
 
-          // Flatten nested 'com.figma' from REST API to flat keys expected by the plugin
+          // Flatten nested 'com.figma' from REST API to flat keys expected by the plugin,
+          // but preserve the nested object for consumers that still read $extensions['com.figma'].
           if ($extensions['com.figma'] && typeof $extensions['com.figma'] === 'object') {
             const figmaExt = $extensions['com.figma'];
             if (figmaExt.scopes !== undefined) $extensions['com.figma.scopes'] = figmaExt.scopes;
             if (figmaExt.codeSyntax !== undefined) $extensions['com.figma.codeSyntax'] = figmaExt.codeSyntax;
             if (figmaExt.hiddenFromPublishing !== undefined) $extensions['com.figma.hiddenFromPublishing'] = figmaExt.hiddenFromPublishing;
-            delete $extensions['com.figma'];
           }
 
           if (token.attributes?.scopes || token.attributes?.scope) {
