@@ -20,6 +20,7 @@ export function categorizeError(error: any, context?: {
   } {
   const errorString = String(error);
   const errorMessage = error?.message || errorString;
+  const normalizedErrorMessage = errorMessage.toLowerCase();
 
   // Helper function to get provider-specific messages using ErrorMessages constants
   const getProviderSpecificMessage = (baseMessage: string, type: 'credential' | 'connectivity') => {
@@ -140,15 +141,18 @@ export function categorizeError(error: any, context?: {
   const credentialKeywords = [
     '401',
     '403',
-    'Unauthorized',
-    'Forbidden',
+    'unauthorized',
+    'forbidden',
     'credential',
     'authentication',
-    'Authentication',
-    'permission',
+    'permission denied',
+    'insufficient permission',
+    'insufficient permissions',
+    'access denied',
+    'not authorized',
   ];
 
-  const hasCredentialError = credentialKeywords.some((keyword) => errorMessage.includes(keyword));
+  const hasCredentialError = credentialKeywords.some((keyword) => normalizedErrorMessage.includes(keyword));
 
   if (hasCredentialError) {
     const message = getProviderSpecificMessage(errorMessage, 'credential');

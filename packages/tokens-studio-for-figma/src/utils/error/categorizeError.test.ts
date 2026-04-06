@@ -54,6 +54,14 @@ describe('categorizeError', () => {
       expect(result.type).toBe('credential');
       expect(result.message).toBe('Authentication failed');
     });
+
+    it('should categorize permission denied errors', () => {
+      const error = new Error('Permission denied while accessing repository');
+      const result = categorizeError(error);
+
+      expect(result.type).toBe('credential');
+      expect(result.message).toBe('Permission denied while accessing repository');
+    });
   });
 
   describe('connectivity errors', () => {
@@ -113,6 +121,14 @@ describe('categorizeError', () => {
 
       expect(result.type).toBe('other');
       expect(result.message).toBe('Custom error');
+    });
+
+    it('should not classify schema validation property names as credential errors', () => {
+      const error = new Error('must NOT have additional properties: permission');
+      const result = categorizeError(error);
+
+      expect(result.type).toBe('other');
+      expect(result.message).toBe('must NOT have additional properties: permission');
     });
   });
 });
