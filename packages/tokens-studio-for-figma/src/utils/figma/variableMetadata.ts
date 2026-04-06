@@ -36,7 +36,8 @@ export function normalizeVariableScopes(scopes: TokenVariableScope[]): VariableS
  * Extracts code syntax for a given platform key, checking both PascalCase and lowercase variations.
  */
 export function getCodeSyntaxValue(codeSyntax: CodeSyntax, key: string): string | undefined {
-  return codeSyntax[key] !== undefined
-    ? codeSyntax[key]
-    : codeSyntax[key.toLowerCase()];
+  if (codeSyntax[key] !== undefined) return codeSyntax[key];
+  if (codeSyntax[key.toLowerCase()] !== undefined) return codeSyntax[key.toLowerCase()];
+  if (codeSyntax[key.toUpperCase()] !== undefined) return codeSyntax[key.toUpperCase()];
+  return undefined;
 }

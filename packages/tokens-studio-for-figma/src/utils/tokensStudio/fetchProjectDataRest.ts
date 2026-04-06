@@ -176,11 +176,32 @@ export async function fetchProjectDataRest(
       setTokens.forEach((token: any) => {
         const tokenName = token.attributes?.name;
         if (tokenName) {
+          const rawExtensions = token.attributes?.$extensions || token.attributes?.extensions || {};
+          const $extensions = { ...rawExtensions };
+
+          // Flatten nested 'com.figma' from REST API to flat keys expected by the plugin
+          if ($extensions['com.figma'] && typeof $extensions['com.figma'] === 'object') {
+            const figmaExt = $extensions['com.figma'];
+            if (figmaExt.scopes !== undefined) $extensions['com.figma.scopes'] = figmaExt.scopes;
+            if (figmaExt.codeSyntax !== undefined) $extensions['com.figma.codeSyntax'] = figmaExt.codeSyntax;
+            if (figmaExt.hiddenFromPublishing !== undefined) $extensions['com.figma.hiddenFromPublishing'] = figmaExt.hiddenFromPublishing;
+            delete $extensions['com.figma'];
+          }
+
+          if (token.attributes?.scopes || token.attributes?.scope) {
+            $extensions['com.figma.scopes'] = token.attributes.scopes || token.attributes.scope;
+          }
+
+          if (token.attributes?.syntaxes) {
+            $extensions['com.figma.codeSyntax'] = token.attributes.syntaxes;
+          }
+
           transformedTokens.push({
             name: tokenName,
             value: transformTokenValue(token),
             type: token.attributes?.type,
             ...(token.attributes?.description && { description: token.attributes.description }),
+            ...(Object.keys($extensions).length > 0 && { $extensions }),
           });
         }
       });
