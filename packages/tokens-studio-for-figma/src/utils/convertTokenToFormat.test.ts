@@ -50,11 +50,34 @@ describe('convertTokenToFormat', () => {
       $type: 'string',
     });
   });
+
+  it('DTCG: includes $deprecated: true in output', () => {
+    const token = { type: 'color', value: '#ff0000', $deprecated: true };
+    const result = convertTokenToFormat(token);
+    expect(result.$deprecated).toBe(true);
+  });
+
+  it('DTCG: omits $deprecated when false or absent', () => {
+    expect(convertTokenToFormat({ type: 'color', value: '#ff0000', $deprecated: false }).$deprecated).toBeUndefined();
+    expect(convertTokenToFormat({ type: 'color', value: '#ff0000' }).$deprecated).toBeUndefined();
+  });
 });
 
 describe('convertTokenToFormat', () => {
   beforeEach(() => {
     setFormat(TokenFormatOptions.Legacy);
+  });
+
+  it('Legacy: moves $deprecated into $extensions[studio.tokens].deprecated', () => {
+    const token = { type: 'color', value: '#ff0000', $deprecated: true };
+    const result = convertTokenToFormat(token);
+    expect(result.$deprecated).toBeUndefined();
+    expect(result.$extensions?.['studio.tokens']?.deprecated).toBe(true);
+  });
+
+  it('Legacy: omits deprecated from $extensions when false or absent', () => {
+    expect(convertTokenToFormat({ type: 'color', value: '#ff0000', $deprecated: false }).$extensions?.['studio.tokens']?.deprecated).toBeUndefined();
+    expect(convertTokenToFormat({ type: 'color', value: '#ff0000' }).$extensions?.['studio.tokens']?.deprecated).toBeUndefined();
   });
 
   it('converts to chosen format', async () => {

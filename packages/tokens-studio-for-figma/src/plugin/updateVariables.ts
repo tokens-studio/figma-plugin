@@ -47,6 +47,7 @@ export default async function updateVariables({
     filterByTokenSet,
     overallConfig,
     themeTokenResolver,
+    skipDeprecated: !!settings.skipDeprecatedTokensInVariableSync,
   });
 
   // Resolve the base font size for this specific theme using the same resolved tokens

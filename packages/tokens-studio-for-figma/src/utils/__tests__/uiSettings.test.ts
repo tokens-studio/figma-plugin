@@ -103,6 +103,7 @@ describe('uiSettings', () => {
       aliasBaseFontSize: '16',
       baseFontSize: '16',
       autoApplyThemeOnDrop: false,
+      skipDeprecatedTokensInVariableSync: false,
       seenGenericVersionedHeaderMigrationDialog: false,
       seenTermsUpdate2026: false,
     });
@@ -169,6 +170,7 @@ describe('uiSettings', () => {
       aliasBaseFontSize: '16',
       baseFontSize: '16',
       autoApplyThemeOnDrop: false,
+      skipDeprecatedTokensInVariableSync: false,
       seenGenericVersionedHeaderMigrationDialog: false,
       seenTermsUpdate2026: false,
     });

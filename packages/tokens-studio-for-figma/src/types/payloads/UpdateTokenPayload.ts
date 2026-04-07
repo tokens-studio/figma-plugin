@@ -33,6 +33,7 @@ type GenericTokenInput<T extends TokenTypes, V = string> = {
   type: T;
   value: V;
   description?: string;
+  $deprecated?: boolean;
   oldName?: string; // only passed when editing token
   shouldUpdate?: boolean
   shouldUpdateDocument?: boolean;

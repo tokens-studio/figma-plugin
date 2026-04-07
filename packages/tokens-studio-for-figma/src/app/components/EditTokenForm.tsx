@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import {
-  Button, Heading, Textarea, Label, Stack,
+  Button, Heading, Textarea, Label, Stack, Switch,
 } from '@tokens-studio/ui';
 import { track } from '@/utils/analytics';
 import { Dispatch } from '../store';
@@ -24,7 +24,7 @@ import { checkIfAlias, checkIfContainsAlias, getAliasValue } from '@/utils/alias
 import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
 import {
   activeTokenSetSelector, editTokenSelector, themesListSelector, tokensSelector,
-  showEditFormSelector,
+  showEditFormSelector, hideDeprecatedTokensSelector,
 } from '@/selectors';
 import { TokenTypes } from '@/constants/TokenTypes';
 import TypographyInput from './TypographyInput';
@@ -56,10 +56,11 @@ type Choice = { key: string; label: string; enabled?: boolean; unique?: boolean 
 
 // @TODO this needs to be reviewed from a typings perspective + performance
 function EditTokenForm({ resolvedTokens }: Props) {
-  const { t } = useTranslation(['tokens', 'errors']);
+  const { t } = useTranslation(['tokens', 'errors', 'general']);
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const tokens = useSelector(tokensSelector);
   const editToken = useSelector(editTokenSelector);
+  const hideDeprecatedTokens = useSelector(hideDeprecatedTokensSelector);
   const themes = useSelector(themesListSelector);
   const [selectedTokenSets, setSelectedTokenSets] = React.useState<string[]>([activeTokenSet]);
   const {
@@ -414,6 +415,16 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken],
   );
 
+  const handleDeprecatedChange = React.useCallback(
+    (checked: boolean) => {
+      setInternalEditToken({
+        ...internalEditToken,
+        $deprecated: checked ? true : undefined,
+      });
+    },
+    [internalEditToken],
+  );
+
   const resolvedValue = React.useMemo(() => {
     if (internalEditToken) {
       return typeof internalEditToken?.value === 'string'
@@ -425,7 +436,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
 
   // @TODO update to useCallback
   const submitTokenValue = async ({
-    type, value, name, $extensions,
+    type, value, name, $extensions, $deprecated,
   }: EditTokenObject) => {
     if (internalEditToken && value && name) {
       let oldName: string | undefined;
@@ -441,6 +452,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
         track('Create token', { type: internalEditToken.type, isModifier: !!$extensions?.['studio.tokens']?.modify });
         createSingleToken({
           description: internalEditToken.description ?? internalEditToken.oldDescription,
+          $deprecated: $deprecated ?? undefined,
           parent: activeTokenSet,
           name: newName,
           type,
@@ -450,6 +462,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
       } else if (internalEditToken.status === EditTokenFormStatus.EDIT) {
         editSingleToken({
           description: internalEditToken.description ?? internalEditToken.oldDescription,
+          $deprecated: $deprecated ?? undefined,
           parent: activeTokenSet,
           name: newName,
           oldName,
@@ -747,6 +760,21 @@ function EditTokenForm({ resolvedTokens }: Props) {
             rows={3}
             css={{ fontSize: '$xsmall', padding: '$3' }}
           />
+        </Box>
+        <Box css={{ display: 'flex', flexDirection: 'column', gap: '$2' }}>
+          <Box css={{ display: 'flex', alignItems: 'center', gap: '$3' }}>
+            <Switch
+              id="deprecated"
+              checked={!!internalEditToken?.$deprecated}
+              onCheckedChange={handleDeprecatedChange}
+            />
+            <Label css={{ fontWeight: '$sansRegular', fontSize: '$xsmall' }} htmlFor="deprecated">{t('deprecated', { ns: 'general' })}</Label>
+          </Box>
+          {internalEditToken?.$deprecated && hideDeprecatedTokens && (
+            <Text size="xsmall" muted css={{ color: '$dangerFg' }}>
+              {t('deprecatedHiddenWarning')}
+            </Text>
+          )}
         </Box>
         <FigmaVariableForm
           internalEditToken={internalEditToken}

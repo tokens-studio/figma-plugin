@@ -49,7 +49,10 @@
     "renameExisting": "Actualizar estilos existentes y nombres de variables",
     "renameExistingExplanation": "Se cambiará el nombre de los estilos y variables existentes para que coincidan con el nombre del token.",
     "removeWithoutConnection": "Eliminar estilos y variables sin conexión a un token",
-    "removeWithoutConnectionExplanation": "Se eliminarán los estilos y variables que no estén conectados a un token."
+    "removeWithoutConnectionExplanation": "Se eliminarán los estilos y variables que no estén conectados a un token.",
+    "deprecatedTokens": "Tokens obsoletos",
+    "skipDeprecatedTokens": "Omitir tokens obsoletos al sincronizar variables",
+    "skipDeprecatedTokensExplanation": "Los tokens marcados como obsoletos no se crearán ni actualizarán como variables de Figma"
   },
   "variables": {
     "color": "Color",

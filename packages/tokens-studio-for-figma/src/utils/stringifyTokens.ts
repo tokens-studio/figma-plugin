@@ -6,6 +6,7 @@ import { TokenFormat, TokenFormatOptions } from '@/plugin/TokenFormatStoreClass'
 import { TokenInJSON } from './convertTokens';
 import { processNumberValue } from './processNumberValue';
 import { TokenTypes } from '@/constants/TokenTypes';
+import { applyDeprecatedToFormat } from './applyDeprecatedToFormat';
 
 export function getGroupTypeName(tokenName: string, groupLevel: number): string {
   if (tokenName.includes('.')) {
@@ -43,6 +44,7 @@ export default function stringifyTokens(
         delete tokenInJSON.value;
         delete tokenInJSON.description;
       }
+      applyDeprecatedToFormat(tokenInJSON);
       delete tokenInJSON.type;
       set(tokenObj, token.name, tokenInJSON, { merge: true });
     } else {
@@ -55,6 +57,7 @@ export default function stringifyTokens(
         delete tokenInJSON.value;
         delete tokenInJSON.description;
       }
+      applyDeprecatedToFormat(tokenInJSON);
       set(tokenObj, token.name, tokenInJSON, { merge: true });
     }
   });

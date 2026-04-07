@@ -19,9 +19,11 @@ export type TokenInJSON<T extends TokenTypes = any, V = any> = {
       [key: string]: any;
       id?: string;
       modify?: any;
+      deprecated?: boolean;
     };
     id?: string;
   };
+  $deprecated?: boolean;
 } & (
   | {
     type: T;
@@ -87,6 +89,13 @@ function checkForTokens({
     if (token[TokenFormat.tokenDescriptionKey] && typeof token[TokenFormat.tokenDescriptionKey] === 'string') {
       returnValue.description = token[TokenFormat.tokenDescriptionKey] as string;
     }
+    const incomingToken = token as TokenInJSON;
+    const legacyDeprecated = incomingToken.$extensions?.['studio.tokens']?.deprecated;
+    const dtcgDeprecated = incomingToken.$deprecated;
+    const deprecatedValue = dtcgDeprecated ?? legacyDeprecated;
+    if (typeof deprecatedValue === 'boolean') {
+      (returnValue as SingleToken<false>).$deprecated = deprecatedValue;
+    }
     if (!token[TokenFormat.tokenTypeKey] && inheritType) {
       returnValue.type = inheritType as TokenTypes;
       returnValue.inheritTypeLevel = currentTypeLevel as number;
@@ -109,6 +118,13 @@ function checkForTokens({
     }, {});
     if (token[TokenFormat.tokenDescriptionKey] && typeof token[TokenFormat.tokenDescriptionKey] === 'string') {
       returnValue.description = token[TokenFormat.tokenDescriptionKey] as string;
+    }
+    const incomingToken = token as TokenInJSON;
+    const legacyDeprecated = incomingToken.$extensions?.['studio.tokens']?.deprecated;
+    const dtcgDeprecated = incomingToken.$deprecated;
+    const deprecatedValue = dtcgDeprecated ?? legacyDeprecated;
+    if (typeof deprecatedValue === 'boolean') {
+      (returnValue as SingleToken<false>).$deprecated = deprecatedValue;
     }
     if (!token[TokenFormat.tokenTypeKey] && inheritType) {
       returnValue.type = inheritType as TokenTypes;
