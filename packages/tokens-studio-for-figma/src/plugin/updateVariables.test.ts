@@ -4,7 +4,7 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { ThemeObject } from '@/types';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 
-const newVariable: Variable = {
+const newVariable = {
   name: 'primary/500',
   variableCollectionId: 'VariableCollectionId:1:0',
   resolvedType: 'COLOR',
@@ -64,7 +64,7 @@ describe('updateVariables', () => {
   figma.variables.createVariable = jest.fn().mockReturnValue(newVariable);
 
   const collection = { id: 'VariableCollectionId:1:0' };
-  const theme: ThemeObject = {
+  const theme = {
     id: 'ThemeId:1:2',
     name: 'Light',
     group: 'Modes',
@@ -155,7 +155,7 @@ describe('updateVariables', () => {
     mockSetValueForMode.mockClear();
 
     // Mock variables for font size tokens
-    const fontSizeVariable1rem: Variable = {
+    const fontSizeVariable1rem = {
       name: 'font-size/1rem',
       variableCollectionId: 'VariableCollectionId:1:0',
       resolvedType: 'FLOAT',
@@ -168,7 +168,7 @@ describe('updateVariables', () => {
       remove: jest.fn(),
     };
 
-    const fontSizeVariable2rem: Variable = {
+    const fontSizeVariable2rem = {
       name: 'font-size/2rem',
       variableCollectionId: 'VariableCollectionId:1:0',
       resolvedType: 'FLOAT',
@@ -181,7 +181,7 @@ describe('updateVariables', () => {
       remove: jest.fn(),
     };
 
-    const baselineVariable: Variable = {
+    const baselineVariable = {
       name: 'typography/baseline',
       variableCollectionId: 'VariableCollectionId:1:0',
       resolvedType: 'FLOAT',
@@ -206,7 +206,7 @@ describe('updateVariables', () => {
     figma.variables.getLocalVariables = jest.fn().mockReturnValue([]);
 
     // Mobile theme with 16px baseline
-    const mobileTheme: ThemeObject = {
+    const mobileTheme = {
       id: 'ThemeId:mobile',
       name: 'Mobile',
       group: 'Responsive',
@@ -254,7 +254,7 @@ describe('updateVariables', () => {
     expect(mockSetValueForMode).toHaveBeenCalledWith('1:0', 32);
 
     // Tablet theme with 15px baseline
-    const tabletTheme: ThemeObject = {
+    const tabletTheme = {
       id: 'ThemeId:tablet',
       name: 'Tablet',
       group: 'Responsive',
@@ -296,5 +296,172 @@ describe('updateVariables', () => {
     expect(mockSetValueForMode).toHaveBeenCalledWith('1:1', 15);
     // Verify that 2rem was converted to 30px (2 * 15)
     expect(mockSetValueForMode).toHaveBeenCalledWith('1:1', 30);
+  });
+
+  it('should handle numeric baseFontSize results from getAliasValue (math evaluated)', async () => {
+    mockSetValueForMode.mockClear();
+
+    const baselineVariable = {
+      name: 'typography/baseline',
+      variableCollectionId: 'VariableCollectionId:1:0',
+      resolvedType: 'FLOAT',
+      setValueForMode: mockSetValueForMode,
+      id: 'VariableID:1:3',
+      key: 'VariableID:1:3',
+      description: '',
+      valuesByMode: { '1:0': 16 },
+      remote: false,
+      remove: jest.fn(),
+    };
+
+    const newVarForTest = {
+      name: 'sizing/test',
+      variableCollectionId: 'VariableCollectionId:1:0',
+      resolvedType: 'FLOAT',
+      setValueForMode: mockSetValueForMode,
+      id: 'VariableID:1:new',
+      key: 'VariableID:1:new',
+      description: '',
+      valuesByMode: { '1:0': 0 },
+      remote: false,
+      remove: jest.fn(),
+    };
+
+    figma.variables.createVariable = jest.fn().mockImplementation((name) => {
+      if (name === 'typography/baseline') return baselineVariable;
+      if (name === 'sizing/test') return newVarForTest;
+      return newVariable;
+    });
+
+    figma.variables.getLocalVariables = jest.fn().mockReturnValue([]);
+
+    const theme = {
+      id: 'ThemeId:test',
+      name: 'Test',
+      group: 'Test group',
+      selectedTokenSets: { core: TokenSetStatus.ENABLED },
+    };
+
+    const tokens = {
+      core: [
+        {
+          name: 'typography.baseline',
+          value: '16', 
+          type: TokenTypes.FONT_SIZES,
+        },
+        {
+          name: 'sizing.test',
+          value: '1.5rem',
+          type: TokenTypes.SIZING,
+        },
+      ],
+    };
+
+    const settingsWithAlias = {
+      ...settings,
+      aliasBaseFontSize: '{typography.baseline}',
+    };
+
+    await updateVariables({
+      collection: { id: 'VariableCollectionId:1:0' } as any,
+      mode: '1:0',
+      theme,
+      tokens,
+      settings: settingsWithAlias,
+      overallConfig: { core: TokenSetStatus.ENABLED },
+    });
+
+    // 1.5rem * 16 = 24
+    expect(mockSetValueForMode).toHaveBeenCalledWith('1:0', 24);
+  });
+
+  it('should apply different baseFontSize for different modes in the same collection', async () => {
+    mockSetValueForMode.mockClear();
+
+    const collection: any = {
+      id: 'collection1',
+      modes: [
+        { modeId: 'mode-a', name: 'Mode A' },
+        { modeId: 'mode-b', name: 'Mode B' },
+      ],
+    };
+
+    const tokens: any = {
+      core: [
+        { name: 'base.font-size', value: '16', type: TokenTypes.NUMBER },
+        { name: 'spacing.small', value: '1rem', type: TokenTypes.SPACING },
+      ],
+      dark: [
+        { name: 'base.font-size', value: '20', type: TokenTypes.NUMBER },
+      ],
+    };
+
+    const settings: any = {
+      aliasBaseFontSize: '{base.font-size}',
+      variablesNumber: true,
+      variablesColor: false,
+      variablesString: false,
+      variablesBoolean: false,
+      renameExistingStylesAndVariables: false,
+      removeStylesAndVariablesWithoutConnection: false,
+    };
+
+    const themeA: any = {
+      id: 'theme-a',
+      name: 'Theme A',
+      selectedTokenSets: { core: TokenSetStatus.ENABLED },
+      $figmaModeId: 'mode-a',
+    };
+
+    const themeB: any = {
+      id: 'theme-b',
+      name: 'Theme B',
+      selectedTokenSets: {
+        core: TokenSetStatus.ENABLED,
+        dark: TokenSetStatus.ENABLED,
+      },
+      $figmaModeId: 'mode-b',
+    };
+
+    const mockVariable: any = {
+      id: 'var1',
+      key: 'var1-key',
+      name: 'spacing/small',
+      resolvedType: 'FLOAT',
+      variableCollectionId: 'collection1',
+      valuesByMode: { 'mode-a': 16, 'mode-b': 16 }, // Initial values
+      setValueForMode: mockSetValueForMode,
+    };
+
+    (figma.variables.getLocalVariables as jest.Mock).mockReturnValue([mockVariable]);
+    (figma.variables.getVariableByIdAsync as jest.Mock).mockResolvedValue(mockVariable);
+
+    // Call updateVariables for Theme A (Mode A)
+    await updateVariables({
+      collection,
+      mode: 'mode-a',
+      theme: themeA,
+      tokens,
+      settings,
+      overallConfig: { core: TokenSetStatus.ENABLED },
+    });
+
+    // Call updateVariables for Theme B (Mode B)
+    await updateVariables({
+      collection,
+      mode: 'mode-b',
+      theme: themeB,
+      tokens,
+      settings,
+      overallConfig: {
+        core: TokenSetStatus.ENABLED,
+        dark: TokenSetStatus.ENABLED,
+      },
+    });
+
+    // Verify Mode A got 16px (1rem * 16)
+    expect(mockSetValueForMode).toHaveBeenCalledWith('mode-a', 16);
+    // Verify Mode B got 20px (1rem * 20)
+    expect(mockSetValueForMode).toHaveBeenCalledWith('mode-b', 20);
   });
 });
