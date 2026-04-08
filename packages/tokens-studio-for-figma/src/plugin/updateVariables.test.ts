@@ -4,7 +4,7 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { ThemeObject } from '@/types';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 
-const newVariable = {
+const newVariable: Variable = {
   name: 'primary/500',
   variableCollectionId: 'VariableCollectionId:1:0',
   resolvedType: 'COLOR',
@@ -64,7 +64,7 @@ describe('updateVariables', () => {
   figma.variables.createVariable = jest.fn().mockReturnValue(newVariable);
 
   const collection = { id: 'VariableCollectionId:1:0' };
-  const theme = {
+  const theme: ThemeObject = {
     id: 'ThemeId:1:2',
     name: 'Light',
     group: 'Modes',
@@ -155,7 +155,7 @@ describe('updateVariables', () => {
     mockSetValueForMode.mockClear();
 
     // Mock variables for font size tokens
-    const fontSizeVariable1rem = {
+    const fontSizeVariable1rem: Variable = {
       name: 'font-size/1rem',
       variableCollectionId: 'VariableCollectionId:1:0',
       resolvedType: 'FLOAT',
@@ -168,7 +168,7 @@ describe('updateVariables', () => {
       remove: jest.fn(),
     };
 
-    const fontSizeVariable2rem = {
+    const fontSizeVariable2rem: Variable = {
       name: 'font-size/2rem',
       variableCollectionId: 'VariableCollectionId:1:0',
       resolvedType: 'FLOAT',
@@ -181,7 +181,7 @@ describe('updateVariables', () => {
       remove: jest.fn(),
     };
 
-    const baselineVariable = {
+    const baselineVariable: Variable = {
       name: 'typography/baseline',
       variableCollectionId: 'VariableCollectionId:1:0',
       resolvedType: 'FLOAT',
@@ -206,7 +206,7 @@ describe('updateVariables', () => {
     figma.variables.getLocalVariables = jest.fn().mockReturnValue([]);
 
     // Mobile theme with 16px baseline
-    const mobileTheme = {
+    const mobileTheme: ThemeObject = {
       id: 'ThemeId:mobile',
       name: 'Mobile',
       group: 'Responsive',
@@ -254,7 +254,7 @@ describe('updateVariables', () => {
     expect(mockSetValueForMode).toHaveBeenCalledWith('1:0', 32);
 
     // Tablet theme with 15px baseline
-    const tabletTheme = {
+    const tabletTheme: ThemeObject = {
       id: 'ThemeId:tablet',
       name: 'Tablet',
       group: 'Responsive',
