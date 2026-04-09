@@ -213,28 +213,96 @@ function convertRadialGradient(parts: string[]): {
   type: 'GRADIENT_RADIAL';
 } {
   // Parse radial gradient syntax: radial-gradient([shape size] [at position], color-stops)
-  // For Figma, we'll use a basic radial transform centered at 0.5, 0.5
-  // More complex positioning and sizing could be added later
-
-  // Skip shape/size/position parameters for now and focus on color stops
+  let centerX = 0.5;
+  let centerY = 0.5;
   let colorStopsStart = 0;
+
   if (parts.length > 0 && !parts[0].includes('#') && !parts[0].includes('rgb') && !parts[0].includes('hsl')) {
-    // First part might be shape/size/position, skip it
+    const positionPart = parts[0];
     colorStopsStart = 1;
+
+    const parseCoord = (coord: string) => {
+      switch (coord) {
+        case 'left': return 0;
+        case 'right': return 1;
+        case 'top': return 0;
+        case 'bottom': return 1;
+        case 'center': return 0.5;
+        default:
+          if (coord.endsWith('%')) return parseFloat(coord) / 100;
+          return 0.5;
+      }
+    };
+
+      const lowerPositionPart = positionPart.toLowerCase();
+      let positionString = '';
+      if (lowerPositionPart.includes(' at ')) {
+        [, positionString] = lowerPositionPart.split(' at ');
+      } else if (lowerPositionPart.startsWith('at ')) {
+        positionString = lowerPositionPart.substring(3);
+      }
+
+      if (positionString) {
+        const posParts = positionString.trim().split(/\s+/);
+        if (posParts.length === 1) {
+          const p = posParts[0];
+          if (['left', 'right'].includes(p)) {
+            centerX = parseCoord(p);
+            centerY = 0.5;
+          } else if (['top', 'bottom'].includes(p)) {
+            centerX = 0.5;
+            centerY = parseCoord(p);
+          } else {
+            centerX = parseCoord(p);
+            centerY = 0.5;
+          }
+        } else if (posParts.length >= 2) {
+          const first = posParts[0];
+          const second = posParts[1];
+          const firstIsY = ['top', 'bottom'].includes(first);
+          const secondIsX = ['left', 'right'].includes(second);
+
+          if (firstIsY || secondIsX) {
+            centerY = parseCoord(first);
+            centerX = parseCoord(second);
+          } else {
+            centerX = parseCoord(first);
+            centerY = parseCoord(second);
+          }
+        }
+      }
   }
 
   const colorStopParts = parts.slice(colorStopsStart);
-  const gradientStops = parseColorStops(colorStopParts);
 
-  // Create identity transform for basic radial gradient centered at 0.5, 0.5
-  const gradientTransform: Transform = [
-    [1, 0, 0],
-    [0, 1, 0],
+  // a, e are the scale factors. 
+  // For the most common CSS keywords, we use verified matrices to match Figma's behavior.
+  let matrix: Transform | null = null;
+  const posString = parts[0]?.toLowerCase() || '';
+
+  if (posString.includes('at top') && !posString.includes('left') && !posString.includes('right')) {
+    matrix = [[1.0, 0, 0], [0, 1.0, 0.5]]; // Top Eye center at 1.0
+  } else if (posString.includes('at bottom') && !posString.includes('left') && !posString.includes('right')) {
+    matrix = [[1.0, 0, 0], [0, 1.0, -0.5]]; // Bottom Edge center at 0.0
+  } else if (posString.includes('at left') && !posString.includes('top') && !posString.includes('bottom')) {
+    matrix = [[1.0, 0, -0.5], [0, 1.0, 0]]; // Left Edge center at 0.0
+  } else if (posString.includes('at right') && !posString.includes('top') && !posString.includes('bottom')) {
+    matrix = [[1.0, 0, 0.5], [0, 1.0, 0]]; // Right Edge center at 1.0
+  }
+
+  const figmaCenterY = 1 - centerY;
+  const figmaScaleY = 2 * Math.max(figmaCenterY, 1 - figmaCenterY);
+  const correctedTy = figmaCenterY - 0.5 * figmaScaleY;
+  const correctedTx = centerX - 0.5 * (2 * Math.max(centerX, 1 - centerX));
+
+  const gradientTransform: Transform = matrix || [
+    [roundToPrecision(2 * Math.max(centerX, 1 - centerX)), 0, roundToPrecision(correctedTx)],
+    [0, roundToPrecision(figmaScaleY), roundToPrecision(correctedTy)],
   ];
 
   return {
-    type: 'GRADIENT_RADIAL' as const,
-    gradientStops,
+    type: 'GRADIENT_RADIAL',
+    gradientStops: parseColorStops(colorStopParts),
     gradientTransform,
   };
 }
@@ -283,22 +351,25 @@ function convertConicGradient(parts: string[]): {
 }
 
 // if node type check is needed due to bugs caused by obscure node types, use (value: string/*, node?: BaseNode | PaintStyle) and convertStringToFigmaGradient(value, target)
-export function convertStringToFigmaGradient(value: string): {
+export function convertStringToFigmaGradient(gradientString: string): {
   gradientStops: ColorStop[];
   gradientTransform: Transform;
-  type?: 'GRADIENT_LINEAR' | 'GRADIENT_RADIAL' | 'GRADIENT_ANGULAR';
+  type: 'GRADIENT_LINEAR' | 'GRADIENT_RADIAL' | 'GRADIENT_ANGULAR' | 'GRADIENT_DIAMOND';
 } {
   // Detect gradient type from the CSS function name
-  const gradientType = value.substring(0, value.indexOf('('));
-  const innerContent = value.substring(value.indexOf('(') + 1, value.lastIndexOf(')'));
+  const gradientType = gradientString.substring(0, gradientString.indexOf('(')).trim().toLowerCase();
+  const innerContent = gradientString.substring(gradientString.indexOf('(') + 1, gradientString.lastIndexOf(')'));
   const parts = parseGradientParts(innerContent);
 
   switch (gradientType) {
     case 'linear-gradient':
+    case 'repeating-linear-gradient':
       return convertLinearGradient(parts);
     case 'radial-gradient':
+    case 'repeating-radial-gradient':
       return convertRadialGradient(parts);
     case 'conic-gradient':
+    case 'repeating-conic-gradient':
       return convertConicGradient(parts);
     default:
       // Fallback to linear gradient for backward compatibility

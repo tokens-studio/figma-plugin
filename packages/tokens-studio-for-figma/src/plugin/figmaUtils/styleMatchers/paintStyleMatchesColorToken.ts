@@ -18,5 +18,14 @@ export function paintStyleMatchesColorToken(paintStyle: PaintStyle | undefined, 
     };
     return isPaintEqual(stylePaint, tokenPaint);
   }
+  if (stylePaint?.type === 'GRADIENT_RADIAL') {
+    const { gradientStops, gradientTransform } = convertStringToFigmaGradient(colorToken);
+    const tokenPaint: GradientPaint = {
+      type: 'GRADIENT_RADIAL',
+      gradientTransform,
+      gradientStops,
+    };
+    return isPaintEqual(stylePaint, tokenPaint);
+  }
   return false;
 }
