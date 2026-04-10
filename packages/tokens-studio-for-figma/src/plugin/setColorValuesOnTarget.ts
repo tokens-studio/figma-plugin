@@ -57,8 +57,8 @@ const getGradientPaint = async (fallbackValue, token) => {
     }
   }
   const newPaint: GradientPaint = {
-    type: type || 'GRADIENT_LINEAR',
-    gradientTransform: gradientTransform!,
+    type,
+    gradientTransform,
     gradientStops: gradientStopsWithReferences,
   };
   return newPaint;

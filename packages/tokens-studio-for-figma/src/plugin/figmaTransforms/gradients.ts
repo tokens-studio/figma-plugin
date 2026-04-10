@@ -217,7 +217,18 @@ function convertRadialGradient(parts: string[]): {
   let centerY = 0.5;
   let colorStopsStart = 0;
 
-  if (parts.length > 0 && !parts[0].includes('#') && !parts[0].includes('rgb') && !parts[0].includes('hsl')) {
+  const isPositionPart = (part: string) => {
+    const lowerPart = part.toLowerCase();
+    return (
+      lowerPart.includes('at ')
+      || lowerPart.includes('circle')
+      || lowerPart.includes('ellipse')
+      || lowerPart.includes('closest-')
+      || lowerPart.includes('farthest-')
+    );
+  };
+
+  if (parts.length > 0 && isPositionPart(parts[0])) {
     const positionPart = parts[0];
     colorStopsStart = 1;
 
@@ -281,7 +292,7 @@ function convertRadialGradient(parts: string[]): {
   const posString = parts[0]?.toLowerCase() || '';
 
   if (posString.includes('at top') && !posString.includes('left') && !posString.includes('right')) {
-    matrix = [[1.0, 0, 0], [0, 1.0, 0.5]]; // Top Eye center at 1.0
+    matrix = [[1.0, 0, 0], [0, 1.0, 0.5]]; // Top Edge center at 1.0
   } else if (posString.includes('at bottom') && !posString.includes('left') && !posString.includes('right')) {
     matrix = [[1.0, 0, 0], [0, 1.0, -0.5]]; // Bottom Edge center at 0.0
   } else if (posString.includes('at left') && !posString.includes('top') && !posString.includes('bottom')) {
