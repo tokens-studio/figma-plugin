@@ -377,6 +377,8 @@ describe('updateVariables', () => {
 
   it('should apply different baseFontSize for different modes in the same collection', async () => {
     mockSetValueForMode.mockClear();
+    const mockSpacingSetValueForMode = jest.fn();
+    const mockBaseFontSizeSetValueForMode = jest.fn();
 
     const collection: any = {
       id: 'collection1',
@@ -423,18 +425,35 @@ describe('updateVariables', () => {
       $figmaModeId: 'mode-b',
     };
 
-    const mockVariable: any = {
+    const mockSpacingVariable: any = {
       id: 'var1',
       key: 'var1-key',
       name: 'spacing/small',
       resolvedType: 'FLOAT',
       variableCollectionId: 'collection1',
-      valuesByMode: { 'mode-a': 16, 'mode-b': 16 }, // Initial values
-      setValueForMode: mockSetValueForMode,
+      valuesByMode: { 'mode-a': 0, 'mode-b': 0 }, // Initial values changed to 0
+      setValueForMode: mockSpacingSetValueForMode,
     };
 
-    (figma.variables.getLocalVariables as jest.Mock).mockReturnValue([mockVariable]);
-    (figma.variables.getVariableByIdAsync as jest.Mock).mockResolvedValue(mockVariable);
+    const mockBaseFontSizeVariable: any = {
+      id: 'var2',
+      key: 'var2-key',
+      name: 'base/font-size',
+      resolvedType: 'FLOAT',
+      variableCollectionId: 'collection1',
+      valuesByMode: { 'mode-a': 0, 'mode-b': 0 }, // Initial values changed to 0
+      setValueForMode: mockBaseFontSizeSetValueForMode,
+    };
+
+    (figma.variables.getLocalVariables as jest.Mock).mockReturnValue([
+      mockSpacingVariable,
+      mockBaseFontSizeVariable,
+    ]);
+    (figma.variables.getVariableByIdAsync as jest.Mock).mockImplementation(async (id: string) => {
+      if (id === mockSpacingVariable.id) return mockSpacingVariable;
+      if (id === mockBaseFontSizeVariable.id) return mockBaseFontSizeVariable;
+      return null;
+    });
 
     // Call updateVariables for Theme A (Mode A)
     await updateVariables({
@@ -459,9 +478,14 @@ describe('updateVariables', () => {
       },
     });
 
-    // Verify Mode A got 16px (1rem * 16)
-    expect(mockSetValueForMode).toHaveBeenCalledWith('mode-a', 16);
-    // Verify Mode B got 20px (1rem * 20)
-    expect(mockSetValueForMode).toHaveBeenCalledWith('mode-b', 20);
+    // Verify spacing/small got 16px for Mode A (1rem * 16)
+    // Note: It might not be called if value is already 16, but we check consistency
+    expect(mockSpacingSetValueForMode).toHaveBeenCalledWith('mode-a', 16);
+    // Verify spacing/small got 20px for Mode B (1rem * 20)
+    expect(mockSpacingSetValueForMode).toHaveBeenCalledWith('mode-b', 20);
+
+    // Verify base/font-size updates
+    expect(mockBaseFontSizeSetValueForMode).toHaveBeenCalledWith('mode-a', 16);
+    expect(mockBaseFontSizeSetValueForMode).toHaveBeenCalledWith('mode-b', 20);
   });
 });
