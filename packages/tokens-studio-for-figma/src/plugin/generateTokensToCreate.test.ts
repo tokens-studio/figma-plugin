@@ -60,4 +60,36 @@ describe('generateTokensToCreate', () => {
 
     expect(tokensToCreate).toEqual([]);
   });
+
+  it('normalizes token set names when matching enabled sets', () => {
+    const nestedTheme: ThemeObject = {
+      id: 'ThemeId:1:3',
+      name: 'Dark',
+      selectedTokenSets: {
+        'core / colors': TokenSetStatus.ENABLED,
+      },
+    };
+
+    const nestedTokens: Record<string, AnyTokenList> = {
+      'core/colors': [
+        {
+          name: 'primary.dark',
+          value: '#101010',
+          type: TokenTypes.COLOR,
+        },
+      ],
+    };
+
+    const { tokensToCreate } = generateTokensToCreate({ theme: nestedTheme, tokens: nestedTokens });
+
+    expect(tokensToCreate).toEqual([
+      {
+        name: 'primary.dark',
+        value: '#101010',
+        rawValue: '#101010',
+        internal__Parent: 'core/colors',
+        type: TokenTypes.COLOR,
+      },
+    ]);
+  });
 });

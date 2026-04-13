@@ -124,4 +124,32 @@ describe('getTokenSetsOrder', () => {
       overallSets: [],
     });
   });
+
+  it('normalizes token set names when matching used and active sets', () => {
+    const tokens: Record<string, SingleToken[]> = {
+      'brand/core': [],
+      'brand/semantic': [],
+      global: [],
+    };
+
+    const usedSets: UsedTokenSetsMap = {
+      'brand / core': TokenSetStatus.ENABLED,
+      'brand / semantic': TokenSetStatus.SOURCE,
+      global: TokenSetStatus.DISABLED,
+    };
+
+    const overallConfig: UsedTokenSetsMap = {
+      'brand / core': TokenSetStatus.ENABLED,
+      'brand / semantic': TokenSetStatus.SOURCE,
+      global: TokenSetStatus.DISABLED,
+    };
+
+    const result = getTokenSetsOrder(tokens, usedSets, overallConfig, 'brand / semantic');
+
+    expect(result).toEqual({
+      tokenSetsOrder: ['global', 'brand/core', 'brand/semantic'],
+      usedSetsList: ['brand/core', 'brand/semantic'],
+      overallSets: ['global'],
+    });
+  });
 });
