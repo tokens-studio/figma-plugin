@@ -3,6 +3,7 @@ import { SingleToken } from '@/types/tokens';
 import { ThemeObject, UsedTokenSetsMap } from '@/types';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { getTokenSetsOrder } from './getTokenSetsOrder';
+import { normalizeTokenSetName } from './normalizeTokenSetName';
 
 export type ResolveTokenValuesResult = SingleToken<
 true,
@@ -17,12 +18,13 @@ export function getOverallConfig(themes: ThemeObject[], selectedThemes: string[]
     if (!currentTheme) return acc;
 
     Object.entries(currentTheme.selectedTokenSets).forEach(([tokenSet, status]) => {
+      const normalizedTokenSet = normalizeTokenSetName(tokenSet);
       // If the set is enabled, set it. Meaning, it should always win.
       if (status === TokenSetStatus.ENABLED) {
-        acc[tokenSet] = status;
+        acc[normalizedTokenSet] = status;
         // If the set is source, only set it to source if it wasnt set to enabled.
-      } else if (status === TokenSetStatus.SOURCE && acc[tokenSet] !== TokenSetStatus.ENABLED) {
-        acc[tokenSet] = status;
+      } else if (status === TokenSetStatus.SOURCE && acc[normalizedTokenSet] !== TokenSetStatus.ENABLED) {
+        acc[normalizedTokenSet] = status;
       }
     });
     return acc;
@@ -30,9 +32,13 @@ export function getOverallConfig(themes: ThemeObject[], selectedThemes: string[]
 }
 
 export function getEnabledTokenSets(usedSets: UsedTokenSetsMap = {}) {
-  return Object.keys(usedSets)
-    .filter((key) => usedSets[key] === TokenSetStatus.ENABLED)
-    .map((tokenSet) => tokenSet);
+  return Array.from(
+    new Set(
+      Object.entries(usedSets)
+        .filter(([, status]) => status === TokenSetStatus.ENABLED)
+        .map(([tokenSet]) => normalizeTokenSetName(tokenSet)),
+    ),
+  );
 }
 
 export function mergeTokenGroups(
