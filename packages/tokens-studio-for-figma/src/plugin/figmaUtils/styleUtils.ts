@@ -59,7 +59,7 @@ export function getLocalStyle<T extends StyleTypeName>(
   key: T,
 ): StyleType<T> | undefined {
   const styleId = getStyleId(node, key) || getStyleIdFromBackup(node, backupKey);
-  return figma.getStyleById(styleId) as StyleType<T>;
+  return (styleId ? figma.getStyleById(styleId) : undefined) as StyleType<T>;
 }
 
 export function setStyleIdBackup(node: BaseNode, backupKey: string, styleId: string) {
