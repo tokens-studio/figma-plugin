@@ -53,6 +53,31 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
   const treeItems = themeListToTree(themes);
   const { t } = useTranslation(['tokens']);
 
+  const themesById = useMemo(() => new Map(themes.map((t) => [t.id, t])), [themes]);
+
+  const getThemeDepth = useCallback((themeId: string) => {
+    let depth = 0;
+    let currentId = themeId;
+    while (true) {
+      const theme = themesById.get(currentId);
+      if (theme?.$figmaParentThemeId && themesById.has(theme.$figmaParentThemeId)) {
+        depth += 1;
+        currentId = theme.$figmaParentThemeId;
+      } else {
+        break;
+      }
+    }
+    return depth;
+  }, [themesById]);
+
+  const getGroupDepth = useCallback((groupName: string) => {
+    const firstThemeInGroup = themes.find((t) => t.group === groupName);
+    if (firstThemeInGroup) {
+      return getThemeDepth(firstThemeInGroup.id);
+    }
+    return 0;
+  }, [themes, getThemeDepth]);
+
   // Available parent theme GROUPS (not individual themes)
   const availableParentGroups = useMemo(() => {
     // Get all unique theme groups, excluding extended ones
@@ -447,14 +472,14 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
                           isActive={activeTheme?.[item.parent as string] === item.value.id}
                           onOpen={handleToggleThemeEditor}
                           groupName={item.parent as string}
-                          indentationDepth={typeof item.parent === 'string' ? (item.parent.match(/\//g) || []).length : 0}
+                          indentationDepth={getThemeDepth((item.value as ThemeObject).id)}
                           isUnderExtendedGroup={!!parentIsExtended}
                         />
                       ) : (
                         <ThemeListGroupHeader
                           label={item.value === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : item.value as string}
                           groupName={item.value as string}
-                          indentationDepth={typeof item.value === 'string' ? (item.value.match(/\//g) || []).length : 0}
+                          indentationDepth={getGroupDepth(item.value as string)}
                           isExtendedGroup={isExtended}
                           onExtendThemeGroup={(groupName) => {
                             setSelectedParentGroup(groupName);

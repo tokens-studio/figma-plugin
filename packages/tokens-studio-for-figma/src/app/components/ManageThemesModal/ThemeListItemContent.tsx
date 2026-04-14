@@ -52,14 +52,16 @@ export function ThemeListItemContent({
         display: 'inherit',
         cursor: 'inherit',
         position: 'relative',
-        // Progressive indentation based on depth level (each level adds $6 padding)
-        ...(indentationDepth > 0 ? { paddingLeft: `calc($6 * ${indentationDepth})` } : {}),
+        '&:not(:first-of-type)': { marginTop: '$4' },
+        // Progressive indentation based on depth level:
+        // Base indentation of 1 for all themes, plus additional indentation for extended themes
+        paddingLeft: `calc($6 * ${indentationDepth + 1})`,
         // Visual hierarchy line for extended groups
         ...(isUnderExtendedGroup ? {
           '&::before': {
             content: '',
             position: 'absolute',
-            left: '12px',
+            left: `calc($6 * ${indentationDepth} + 12px)`,
             top: 0,
             bottom: 0,
             width: '1px',
@@ -71,6 +73,7 @@ export function ThemeListItemContent({
             borderBottom: '1px solid $borderMuted',
             borderLeft: '1px solid $borderMuted',
             width: '4px',
+            left: `calc($6 * ${indentationDepth} + 12px)`,
             backgroundColor: 'transparent',
           },
         } : {}),
