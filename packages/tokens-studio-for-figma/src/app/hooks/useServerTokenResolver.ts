@@ -83,19 +83,15 @@ export function useServerTokenResolver() {
         themeSelections,
       });
 
-      const resolved = await fetchServerResolvedTokens(
-        {
-          apiBaseUrl: serverResolverContext.apiBaseUrl,
-          projectId: serverResolverContext.projectId,
-          changeSetId: serverResolverContext.changeSetId,
-          authToken: oauthTokens.accessToken,
-          themeSelections,
-        },
-        tokens,
-      );
+      const resolved = await fetchServerResolvedTokens({
+        apiBaseUrl: serverResolverContext.apiBaseUrl,
+        projectId: serverResolverContext.projectId,
+        changeSetId: serverResolverContext.changeSetId,
+        authToken: oauthTokens.accessToken,
+        themeSelections,
+      });
 
-      // Only update state if we got a valid response — errors leave the previous
-      // serverResolvedTokens intact (which may be null, causing local fallback)
+      // Dispatch the flat map directly — updateSources merges it on top of local resolution
       if (resolved !== null) {
         dispatch.tokenState.setServerResolvedTokens(resolved);
       }

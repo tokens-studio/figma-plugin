@@ -100,8 +100,13 @@ export interface TokenState {
   renamedCollections: [string, string][] | null;
   /** Set when connected via Tokens Studio OAuth — used to call the gRPC resolver */
   serverResolverContext: ServerResolverContext | null;
-  /** Last resolved token list fetched from the Studio server. null = use local resolver */
-  serverResolvedTokens: ResolveTokenValuesResult[] | null;
+  /**
+   * Flat map of tokenName → resolved value string, as returned by the Studio gRPC server.
+   * Only contains theme-affected tokens (delta), not the full token set.
+   * These values are merged on top of local resolution in updateSources.
+   * null = server hasn't responded yet or is unavailable → use local resolver only.
+   */
+  serverResolvedTokens: Record<string, string> | null;
 }
 
 export const tokenState = createModel<RootModel>()({
@@ -741,7 +746,7 @@ export const tokenState = createModel<RootModel>()({
       // Clear cached server results whenever the context changes (e.g. branch switch)
       serverResolvedTokens: null,
     }),
-    setServerResolvedTokens: (state, payload: ResolveTokenValuesResult[] | null): TokenState => ({
+    setServerResolvedTokens: (state, payload: Record<string, string> | null): TokenState => ({
       ...state,
       serverResolvedTokens: payload,
     }),

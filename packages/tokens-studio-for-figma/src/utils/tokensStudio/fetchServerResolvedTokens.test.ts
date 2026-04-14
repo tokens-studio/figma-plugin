@@ -1,5 +1,3 @@
-import { TokenTypes } from '@/constants/TokenTypes';
-import { AnyTokenList } from '@/types/tokens';
 import { fetchServerResolvedTokens } from './fetchServerResolvedTokens';
 
 // Mock global fetch
@@ -14,18 +12,6 @@ const BASE_OPTIONS = {
   themeSelections: { Mode: 'Dark' },
 };
 
-// Typed fixture matching AnyTokenList element requirements
-const RAW_TOKENS: Record<string, AnyTokenList> = {
-  'core/colors': [
-    {
-      name: 'color.primary', value: '{core.red.500}', type: TokenTypes.COLOR,
-    },
-    {
-      name: 'core.red.500', value: '#FF0000', type: TokenTypes.COLOR,
-    },
-  ] as AnyTokenList,
-};
-
 describe('fetchServerResolvedTokens', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -36,104 +22,98 @@ describe('fetchServerResolvedTokens', () => {
   it('returns null on a 4xx response', async () => {
     mockFetch.mockResolvedValueOnce({ ok: false, status: 404, statusText: 'Not Found' });
 
-    const result = await fetchServerResolvedTokens(BASE_OPTIONS, RAW_TOKENS);
+    const result = await fetchServerResolvedTokens(BASE_OPTIONS);
     expect(result).toBeNull();
   });
 
   it('returns null on a 5xx response', async () => {
     mockFetch.mockResolvedValueOnce({ ok: false, status: 500, statusText: 'Internal Server Error' });
 
-    const result = await fetchServerResolvedTokens(BASE_OPTIONS, RAW_TOKENS);
+    const result = await fetchServerResolvedTokens(BASE_OPTIONS);
     expect(result).toBeNull();
   });
 
   it('returns null on a network error', async () => {
     mockFetch.mockRejectedValueOnce(new Error('Network failure'));
 
-    const result = await fetchServerResolvedTokens(BASE_OPTIONS, RAW_TOKENS);
+    const result = await fetchServerResolvedTokens(BASE_OPTIONS);
     expect(result).toBeNull();
   });
 
-  it('returns null when server response is not an object', async () => {
+  it('returns null when response data is not a plain object', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: async () => null,
+      json: async () => ({ data: null }),
     });
 
-    const result = await fetchServerResolvedTokens(BASE_OPTIONS, RAW_TOKENS);
+    const result = await fetchServerResolvedTokens(BASE_OPTIONS);
     expect(result).toBeNull();
   });
 
-  it('maps flat server response { tokenName: resolvedValue } to ResolveTokenValuesResult[]', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
-        'color.primary': '#FF0000',
-        'color.secondary': '#0000FF',
-      }),
-    });
-
-    const result = await fetchServerResolvedTokens(BASE_OPTIONS, RAW_TOKENS);
-    expect(result).not.toBeNull();
-    expect(result).toHaveLength(2);
-
-    const primary = result!.find((t) => t.name === 'color.primary');
-    expect(primary).toBeDefined();
-    expect(primary!.value).toBe('#FF0000');
-    expect(primary!.failedToResolve).toBe(false);
-    expect(primary!.type).toBe(TokenTypes.COLOR);
-  });
-
-  it('maps nested { data: { tokens: {...} } } server response shape', async () => {
+  it('extracts flat map from { data: { tokenName: value } } response shape', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({
         data: {
-          tokens: {
-            'color.primary': '#FF0000',
-          },
+          'color.primary': '#FF0000',
+          'color.secondary': '#0000FF',
         },
+        meta: { resolved: ['color.primary', 'color.secondary'], unresolved: [], errors: {} },
       }),
     });
 
-    const result = await fetchServerResolvedTokens(BASE_OPTIONS, RAW_TOKENS);
-    expect(result).toHaveLength(1);
-    expect(result![0].name).toBe('color.primary');
-    expect(result![0].value).toBe('#FF0000');
+    const result = await fetchServerResolvedTokens(BASE_OPTIONS);
+    expect(result).not.toBeNull();
+    expect(result!['color.primary']).toBe('#FF0000');
+    expect(result!['color.secondary']).toBe('#0000FF');
+    expect(Object.keys(result!)).toHaveLength(2);
   });
 
-  it('sets rawValue to the original alias reference', async () => {
+  it('returns null when data is missing', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: async () => ({ 'color.primary': '#FF0000' }),
+      json: async () => ({ meta: { resolved: [] } }),
     });
 
-    const result = await fetchServerResolvedTokens(BASE_OPTIONS, RAW_TOKENS);
-    const primary = result!.find((t) => t.name === 'color.primary');
-    expect(primary!.rawValue).toBe('{core.red.500}');
+    const result = await fetchServerResolvedTokens(BASE_OPTIONS);
+    expect(result).toBeNull();
   });
 
-  it('sends POST request with correct URL, auth header, and body', async () => {
+  it('sends GET request with correct URL, auth header, and query params', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: async () => ({}),
+      json: async () => ({ data: {} }),
     });
 
-    await fetchServerResolvedTokens(BASE_OPTIONS, RAW_TOKENS);
+    await fetchServerResolvedTokens(BASE_OPTIONS);
 
+    const expectedParams = new URLSearchParams({ change_set_id: 'cs-456', Mode: 'Dark' });
     expect(mockFetch).toHaveBeenCalledWith(
-      'https://api.tokens.studio/api/v1/projects/proj-123/resolved_tokens',
+      `https://api.tokens.studio/api/v1/projects/proj-123/resolved_tokens?${expectedParams.toString()}`,
       expect.objectContaining({
-        method: 'POST',
+        method: 'GET',
         headers: expect.objectContaining({
           Authorization: 'Bearer test-token',
-          'Content-Type': 'application/json',
-        }),
-        body: JSON.stringify({
-          change_set_id: 'cs-456',
-          theme_selections: { Mode: 'Dark' },
         }),
       }),
     );
+  });
+
+  it('encodes multiple theme selections as separate query params', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ data: {} }),
+    });
+
+    await fetchServerResolvedTokens({
+      ...BASE_OPTIONS,
+      themeSelections: { foundation: 'base', 'color-scheme': 'blue' },
+    });
+
+    const [calledUrl] = mockFetch.mock.calls[0];
+    const url = new URL(calledUrl);
+    expect(url.searchParams.get('foundation')).toBe('base');
+    expect(url.searchParams.get('color-scheme')).toBe('blue');
+    expect(url.searchParams.get('change_set_id')).toBe('cs-456');
   });
 });
