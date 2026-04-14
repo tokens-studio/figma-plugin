@@ -15,6 +15,7 @@ export type ReferenceVariableType = {
   variable: Variable;
   modeId: string;
   referenceVariable: string;
+  collection?: VariableCollection;
 };
 
 export default async function setValuesOnVariable(
@@ -170,29 +171,29 @@ export default async function setValuesOnVariable(
             switch (variableType) {
               case 'BOOLEAN':
                 if (typeof token.value === 'string' && !token.value.includes('{')) {
-                  setBooleanValuesOnVariable(variable, mode, token.value);
+                  setBooleanValuesOnVariable(variable, mode, token.value, collection);
                 }
                 break;
               case 'COLOR':
                 if (typeof token.value === 'string' && !token.value.includes('{')) {
-                  setColorValuesOnVariable(variable, mode, token.value);
+                  setColorValuesOnVariable(variable, mode, token.value, collection);
                 }
                 break;
               case 'FLOAT': {
                 const value = String(token.value);
                 if (typeof value === 'string' && !value.includes('{')) {
                   const transformedValue = transformValue(value, token.type, baseFontSize, true);
-                  setNumberValuesOnVariable(variable, mode, Number(transformedValue));
+                  setNumberValuesOnVariable(variable, mode, Number(transformedValue), collection);
                 }
                 break;
               }
               case 'STRING':
                 if (typeof token.value === 'string' && !token.value.includes('{')) {
-                  setStringValuesOnVariable(variable, mode, token.value);
+                  setStringValuesOnVariable(variable, mode, token.value, collection);
                   // Given we cannot determine the combined family of a variable, we cannot use fallback weights from our estimates.
                   // This is not an issue because users can set numerical font weights with variables, so we opt-out of the guesswork and just apply the numerical weight.
                 } else if (token.type === TokenTypes.FONT_WEIGHTS && Array.isArray(token.value)) {
-                  setStringValuesOnVariable(variable, mode, token.value[0]);
+                  setStringValuesOnVariable(variable, mode, token.value[0], collection);
                 }
                 break;
               default:
@@ -209,6 +210,7 @@ export default async function setValuesOnVariable(
                 variable,
                 modeId: mode,
                 referenceVariable: referenceTokenName,
+                collection,
               });
             }
           }

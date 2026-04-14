@@ -76,10 +76,39 @@ export default async function updateVariablesToReference(figmaVariables: Map<str
       if (!variable) return;
 
       try {
-        await aliasVariable.variable.setValueForMode(aliasVariable.modeId, {
+        const newValue: any = {
           type: 'VARIABLE_ALIAS',
           id: variable.id,
-        });
+        };
+
+        // Handle extended collections: if alias matches parent mode, clear override
+        const modeObj = aliasVariable.collection?.modes.find((m) => m.modeId === aliasVariable.modeId);
+        const parentModeId = (modeObj as any)?.parentModeId;
+
+        if (parentModeId) {
+          const parentValue = aliasVariable.variable.valuesByMode[parentModeId];
+          if (
+            typeof parentValue === 'object'
+            && parentValue !== null
+            && (parentValue as any).type === 'VARIABLE_ALIAS'
+            && (parentValue as any).id === variable.id
+          ) {
+            (aliasVariable.variable as any).clearValueForMode(aliasVariable.modeId);
+            return;
+          }
+        }
+
+        const existingValue = aliasVariable.variable.valuesByMode[aliasVariable.modeId];
+        if (
+          typeof existingValue === 'object'
+          && existingValue !== null
+          && (existingValue as any).type === 'VARIABLE_ALIAS'
+          && (existingValue as any).id === variable.id
+        ) {
+          return;
+        }
+
+        await aliasVariable.variable.setValueForMode(aliasVariable.modeId, newValue);
         updatedVariables.push(aliasVariable.variable);
       } catch (e) {
         console.log('error setting value for mode', e, aliasVariable, variable);
