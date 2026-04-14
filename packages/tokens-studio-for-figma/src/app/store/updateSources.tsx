@@ -1,5 +1,6 @@
 import { startTransaction } from '@sentry/react';
 import { mergeTokenGroups } from '@/utils/tokenHelpers';
+import type { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
 import { Dispatch } from '@/app/store';
 import { notifyToUI } from '../../plugin/notifiers';
 import { updateJSONBinTokens } from './providers/jsonbin';
@@ -50,6 +51,8 @@ type UpdateTokensOnSourcesPayload = {
   tokenFormat: TokenFormatOptions
   tokensSize: number
   themesSize: number
+  /** Pre-resolved tokens from the Studio server (gRPC resolver). When present, skip local resolution. */
+  serverResolvedTokens?: ResolveTokenValuesResult[] | null;
 };
 
 async function updateRemoteTokens({
@@ -148,6 +151,7 @@ export default async function updateTokensOnSources({
   tokenFormat,
   compressedTokens,
   compressedThemes,
+  serverResolvedTokens,
 }: UpdateTokensOnSourcesPayload) {
   if (tokenValues && !isLocal && shouldUpdateRemote && !editProhibited) {
     updateRemoteTokens({
@@ -162,9 +166,10 @@ export default async function updateTokensOnSources({
     });
   }
 
-  const mergedTokens = tokens
-    ? defaultTokenResolver.setTokens(mergeTokenGroups(tokens, usedTokenSet))
-    : null;
+  // When server-resolved tokens are available (OAuth + gRPC resolver responded),
+  // use them directly. Otherwise fall back to the local TypeScript resolver.
+  const mergedTokens = serverResolvedTokens
+    ?? (tokens ? defaultTokenResolver.setTokens(mergeTokenGroups(tokens, usedTokenSet)) : null);
 
   const tokensSize = (compressedTokens.length / 1024) * 2; // UTF-16 uses 2 bytes per character
   const themesSize = (compressedThemes.length / 1024) * 2;

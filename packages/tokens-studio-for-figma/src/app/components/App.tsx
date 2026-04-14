@@ -16,9 +16,13 @@ import LoadingBar from './LoadingBar';
 import { ConvertToDTCGModal } from './ConvertToDTCGModal';
 import Subscription from './Subscription';
 import { OAuthDeviceCodeModal } from './Login/OAuthDeviceCodeModal';
+import { useServerTokenResolver } from '@/app/hooks/useServerTokenResolver';
 
 function App() {
   const activeTab = useSelector(activeTabSelector);
+  // Watches activeTheme + token changes for OAuth projects and fires server-side
+  // resolution via the Studio gRPC-backed endpoint, storing results in Redux.
+  useServerTokenResolver();
 
   return (
     <Box css={{ isolation: 'isolate' }}>

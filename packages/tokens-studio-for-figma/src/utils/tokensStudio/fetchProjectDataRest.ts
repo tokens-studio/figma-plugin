@@ -30,6 +30,8 @@ export type ProjectData = {
   tokenSets: Record<string, { isDynamic: boolean }>;
   tokenSetOrder: string[];
   hasExceededPaginationLimit?: boolean;
+  /** The change_set_id for the resolved branch — used for server-side token resolution */
+  changeSetId: string;
 };
 
 function transformTokenValue(token: any): unknown {
@@ -274,6 +276,7 @@ export async function fetchProjectDataRest(
       tokenSets: tokenSetsMap,
       tokenSetOrder,
       hasExceededPaginationLimit,
+      changeSetId,
     };
   } catch (error) {
     console.error('Error fetching project data from REST API:', error);
