@@ -5,7 +5,7 @@ import { Box, DropdownMenu, IconButton } from '@tokens-studio/ui';
 import { Check, Settings } from 'iconoir-react';
 import { Dispatch } from '../store';
 import {
-  settingsStateSelector, localApiStateSelector, autoApplyThemeOnDropSelector, shouldSwapFigmaModesSelector,
+  settingsStateSelector, localApiStateSelector, autoApplyThemeOnDropSelector, shouldSwapFigmaModesSelector, hideDeprecatedTokensSelector,
 } from '@/selectors';
 import { isEqual } from '@/utils/isEqual';
 import { track } from '@/utils/analytics';
@@ -21,6 +21,7 @@ export default function SettingsDropdown() {
   } = useSelector(settingsStateSelector, isEqual);
   const autoApplyThemeOnDrop = useSelector(autoApplyThemeOnDropSelector);
   const shouldSwapFigmaModes = useSelector(shouldSwapFigmaModesSelector);
+  const hideDeprecatedTokens = useSelector(hideDeprecatedTokensSelector);
 
   const {
     setUpdateOnChange, setUpdateRemote, setShouldSwapStyles, setShouldSwapFigmaModes, setShouldUpdateStyles, setAutoApplyThemeOnDrop,
@@ -61,6 +62,12 @@ export default function SettingsDropdown() {
     track('shouldSwapFigmaModes', { value: newValue });
     setShouldSwapFigmaModes(newValue);
   }, [shouldSwapFigmaModes, setShouldSwapFigmaModes]);
+
+  const { toggleHideDeprecatedTokens } = useDispatch<Dispatch>().uiState;
+
+  const handleToggleHideDeprecated = React.useCallback(() => {
+    toggleHideDeprecatedTokens();
+  }, [toggleHideDeprecatedTokens]);
 
   return (
     <DropdownMenu>
@@ -148,6 +155,20 @@ export default function SettingsDropdown() {
             {t('update.shouldSwapFigmaModes.title')}
             <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>
               {t('update.shouldSwapFigmaModes.description')}
+            </Box>
+          </DropdownMenu.CheckboxItem>
+          <DropdownMenu.Separator />
+          <DropdownMenu.CheckboxItem
+            data-testid="hide-deprecated-toggle"
+            checked={hideDeprecatedTokens}
+            onCheckedChange={handleToggleHideDeprecated}
+          >
+            <DropdownMenu.ItemIndicator>
+              <Check />
+            </DropdownMenu.ItemIndicator>
+            {t('update.hideDeprecated.title')}
+            <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>
+              {t('update.hideDeprecated.description')}
             </Box>
           </DropdownMenu.CheckboxItem>
         </DropdownMenu.Content>

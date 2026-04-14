@@ -41,6 +41,7 @@ export async function updateUISettings(uiSettings: Partial<SavedSettings>) {
       storeTokenIdInJsonEditor: uiSettings.storeTokenIdInJsonEditor ?? data?.storeTokenIdInJsonEditor,
       tokenFormat: uiSettings.tokenFormat ?? data?.tokenFormat,
       autoApplyThemeOnDrop: uiSettings.autoApplyThemeOnDrop ?? data?.autoApplyThemeOnDrop,
+      skipDeprecatedTokensInVariableSync: uiSettings.skipDeprecatedTokensInVariableSync ?? data?.skipDeprecatedTokensInVariableSync,
       seenGenericVersionedHeaderMigrationDialog: uiSettings.seenGenericVersionedHeaderMigrationDialog ?? data?.seenGenericVersionedHeaderMigrationDialog,
       seenTermsUpdate2026: uiSettings.seenTermsUpdate2026 ?? data?.seenTermsUpdate2026,
     });
@@ -85,6 +86,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
     let storeTokenIdInJsonEditor: boolean;
     let tokenFormat: TokenFormatOptions;
     let autoApplyThemeOnDrop: boolean;
+    let skipDeprecatedTokensInVariableSync: boolean;
     let seenGenericVersionedHeaderMigrationDialog: boolean;
     let seenTermsUpdate2026: boolean;
 
@@ -120,6 +122,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
       storeTokenIdInJsonEditor = typeof data.storeTokenIdInJsonEditor === 'undefined' ? false : data.storeTokenIdInJsonEditor;
       tokenFormat = data.tokenFormat || TokenFormatOptions.DTCG;
       autoApplyThemeOnDrop = typeof data.autoApplyThemeOnDrop === 'undefined' ? false : data.autoApplyThemeOnDrop;
+      skipDeprecatedTokensInVariableSync = typeof data.skipDeprecatedTokensInVariableSync === 'undefined' ? false : data.skipDeprecatedTokensInVariableSync;
       seenGenericVersionedHeaderMigrationDialog = typeof data.seenGenericVersionedHeaderMigrationDialog === 'undefined' ? false : data.seenGenericVersionedHeaderMigrationDialog;
       seenTermsUpdate2026 = typeof data.seenTermsUpdate2026 === 'undefined' ? false : data.seenTermsUpdate2026;
       settings = {
@@ -154,6 +157,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
         storeTokenIdInJsonEditor,
         tokenFormat,
         autoApplyThemeOnDrop,
+        skipDeprecatedTokensInVariableSync,
         seenGenericVersionedHeaderMigrationDialog,
         seenTermsUpdate2026,
       };

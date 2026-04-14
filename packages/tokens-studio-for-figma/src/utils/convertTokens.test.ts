@@ -142,3 +142,46 @@ describe('convertToTokenArray', () => {
     ]);
   });
 });
+
+describe('convertToTokenArray — $deprecated', () => {
+  it('DTCG: parses top-level $deprecated: true', () => {
+    setFormat(TokenFormatOptions.DTCG);
+    const tokens = { 'color.red': { $type: 'color', $value: '#ff0000', $deprecated: true } };
+    const result = convertToTokenArray({ tokens });
+    expect(result[0].$deprecated).toBe(true);
+  });
+
+  it('DTCG: does not set $deprecated when absent', () => {
+    setFormat(TokenFormatOptions.DTCG);
+    const tokens = { 'color.red': { $type: 'color', $value: '#ff0000' } };
+    const result = convertToTokenArray({ tokens });
+    expect(result[0].$deprecated).toBeUndefined();
+  });
+
+  it('Legacy: parses $deprecated from $extensions[studio.tokens].deprecated', () => {
+    setFormat(TokenFormatOptions.Legacy);
+    const tokens = {
+      'color.red': {
+        type: 'color',
+        value: '#ff0000',
+        $extensions: { 'studio.tokens': { deprecated: true } },
+      },
+    };
+    const result = convertToTokenArray({ tokens });
+    expect(result[0].$deprecated).toBe(true);
+  });
+
+  it('Legacy: DTCG $deprecated takes precedence over extensions', () => {
+    setFormat(TokenFormatOptions.Legacy);
+    const tokens = {
+      'color.red': {
+        type: 'color',
+        value: '#ff0000',
+        $deprecated: true,
+        $extensions: { 'studio.tokens': { deprecated: false } },
+      },
+    };
+    const result = convertToTokenArray({ tokens });
+    expect(result[0].$deprecated).toBe(true);
+  });
+});

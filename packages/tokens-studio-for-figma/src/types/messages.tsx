@@ -64,6 +64,7 @@ export type UiSettingsFromPluginMessage = {
     prefixStylesWithThemeName: boolean;
     renameExistingStylesAndVariables: boolean;
     removeStylesAndVariablesWithoutConnection: boolean;
+    skipDeprecatedTokensInVariableSync: boolean;
     inspectDeep: boolean;
     shouldSwapStyles: boolean;
     shouldSwapFigmaModes: boolean;

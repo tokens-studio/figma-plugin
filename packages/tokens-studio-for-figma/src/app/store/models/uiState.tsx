@@ -75,6 +75,7 @@ export interface UIState {
   editToken: EditTokenObject;
   showEditForm: boolean;
   tokenFilter: string;
+  hideDeprecatedTokens: boolean;
   confirmState: ConfirmProps;
   showPushDialog: { state: string | false, overrides?: PushOverrides };
   showPullDialog: string | false;
@@ -142,6 +143,7 @@ export const uiState = createModel<RootModel>()({
     showEditForm: false,
     tokenFilter: '',
     tokenFilterVisible: false,
+    hideDeprecatedTokens: false,
     confirmState: defaultConfirmState,
     showPushDialog: { state: false },
     showPullDialog: false,
@@ -343,6 +345,12 @@ export const uiState = createModel<RootModel>()({
       return {
         ...state,
         tokenFilter: payload,
+      };
+    },
+    toggleHideDeprecatedTokens(state) {
+      return {
+        ...state,
+        hideDeprecatedTokens: !state.hideDeprecatedTokens,
       };
     },
     toggleShowEmptyGroups(state, payload: boolean | null) {

@@ -22,5 +22,8 @@ export function updateTokenPayloadToSingleToken(
     ...(payload.description ? {
       description: payload.description,
     } : {}),
+    ...(payload.$deprecated === true ? {
+      $deprecated: true,
+    } : {}),
   } as SingleToken;
 }

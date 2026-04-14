@@ -49,7 +49,10 @@
     "renameExisting": "Mettre à jour les styles et les noms de variables existants",
     "renameExistingExplanation": "Les styles et variables existants seront renommés pour correspondre au nom du jeton",
     "removeWithoutConnection": "Supprimer les styles et les variables sans connexion à un jeton",
-    "removeWithoutConnectionExplanation": "Les styles et variables qui ne sont pas connectés à un jeton seront supprimés"
+    "removeWithoutConnectionExplanation": "Les styles et variables qui ne sont pas connectés à un jeton seront supprimés",
+    "deprecatedTokens": "Jetons obsolètes",
+    "skipDeprecatedTokens": "Ignorer les jetons obsolètes lors de la synchronisation des variables",
+    "skipDeprecatedTokensExplanation": "Les jetons marqués comme obsolètes ne seront pas créés ou mis à jour en tant que variables Figma"
   },
   "variables": {
     "color": "Couleur",
