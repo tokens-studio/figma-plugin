@@ -23,16 +23,11 @@ type Payload = Omit<ThemeObject, 'id' | '$figmaStyleReferences'> & {
  */
 function findExtendedChildGroups(parentGroup: string, allThemes: ThemeObject[]): string[] {
   const childGroups = new Set<string>();
+  const parentThemeIds = new Set(allThemes.filter((t) => t.group === parentGroup).map((t) => t.id));
 
   allThemes.forEach((theme) => {
-    if (theme.group && theme.group.startsWith(`${parentGroup}/`)) {
-      // Extract the immediate child group (not grandchildren)
-      const parts = theme.group.split('/');
-      const parentParts = parentGroup.split('/');
-      // Only include direct children (one level deeper)
-      if (parts.length === parentParts.length + 1) {
-        childGroups.add(theme.group);
-      }
+    if (theme.group && theme.$figmaParentThemeId && parentThemeIds.has(theme.$figmaParentThemeId)) {
+      childGroups.add(theme.group);
     }
   });
 

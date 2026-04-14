@@ -18,17 +18,17 @@ export async function createNecessaryVariableCollections(themes: ThemeObjectsLis
 
   for (const currentTheme of collectionsToCreateOrUpdate) {
     //  Handle extended collections - only if the setting is enabled
-    if (settings.exportExtendedCollections && currentTheme.$figmaIsExtension && currentTheme.$figmaParentCollectionId) {
-      // Extract parent group name from hierarchical format "ParentGroup/ExtendedGroup"
-      const parentGroupName = currentTheme.group?.split('/')[0];
+    if (settings.exportExtendedCollections && currentTheme.$figmaIsExtension && currentTheme.$figmaParentThemeId) {
+      // Find parent theme to get its collection name
+      const parentTheme = themes.find((t) => t.id === currentTheme.$figmaParentThemeId);
+      const parentGroupName = parentTheme ? (parentTheme.group ?? parentTheme.name) : undefined;
 
       // Find parent collection by NAME (not by ID, since IDs change between exports)
-      const parentCollection = acc.find((c) => c.name === parentGroupName);
+      const parentCollection = parentGroupName ? acc.find((c) => c.name === truncateCollectionName(parentGroupName)) : undefined;
 
       if (parentCollection) {
-        // Extract child collection name from hierarchical group
-        // group format: "ParentCollection/ChildCollection"
-        const childCollectionName = currentTheme.group?.split('/').pop() || currentTheme.name;
+        // Use theme's own group/name as child collection name, allowing arbitrary names
+        const childCollectionName = currentTheme.group ?? currentTheme.name;
         const truncatedChildName = truncateCollectionName(childCollectionName);
 
         // Check if extended collection already exists
