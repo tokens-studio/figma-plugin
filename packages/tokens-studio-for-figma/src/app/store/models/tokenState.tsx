@@ -43,8 +43,8 @@ import { RenameTokensAcrossSetsPayload } from '@/types/payloads/RenameTokensAcro
 import { wrapTransaction } from '@/profiling/transaction';
 import addIdPropertyToTokens from '@/utils/addIdPropertyToTokens';
 import { TokenFormat, TokenFormatOptions, setFormat } from '@/plugin/TokenFormatStoreClass';
-import { pushToTokensStudio } from '../providers/tokens-studio';
-import { StorageTypeCredential, TokensStudioStorageType } from '@/types/StorageType';
+import { pushToTokensStudio, pushToTokensStudioOAuth } from '../providers/tokens-studio';
+import { StorageTypeCredential, TokensStudioStorageType, TokensStudioOAuthStorageType } from '@/types/StorageType';
 import {
   createTokenInTokensStudio,
   duplicateTokenInTokensStudio,
@@ -79,7 +79,7 @@ export interface TokenState {
   changedState: CompareStateType;
   remoteData: CompareStateType;
   tokenFormat: TokenFormatOptions;
-  tokenSetMetadata: Record<string, { isDynamic?: boolean }>;
+  tokenSetMetadata: Record<string, { isDynamic?: boolean; id?: string }>;
   importedThemes: {
     newThemes: ThemeObjectsList;
     updatedThemes: ThemeObjectsList;
@@ -760,6 +760,25 @@ export const tokenState = createModel<RootModel>()({
           });
         }
       }
+
+      if (payload.shouldUpdate && rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
+        const tokenSet = rootState.tokenState.tokens[payload.parent];
+        const token = tokenSet?.find((t) => t.name === payload.name);
+        if (token) {
+          pushToTokensStudioOAuth({
+            context: rootState.uiState.api as StorageTypeCredential<TokensStudioOAuthStorageType, false>,
+            action: (payload.oldName || token.$extensions?.id) ? 'EDIT_TOKEN' : 'CREATE_TOKEN',
+            data: {
+              id: token.$extensions?.id,
+              name: token.name,
+              value: token.value,
+              type: token.type,
+              description: token.description,
+              token_set_id: (rootState.tokenState.tokenSetMetadata[payload.parent] as any)?.id,
+            },
+          });
+        }
+      }
     },
     deleteToken(payload: DeleteTokenPayload, rootState) {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
@@ -776,6 +795,20 @@ export const tokenState = createModel<RootModel>()({
             data: {
               raw: rawSet,
               name: payload.parent,
+            },
+          });
+        }
+      }
+
+      if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
+        const tokenSet = rootState.tokenState.tokens[payload.parent];
+        const token = tokenSet?.find((t) => t.name === payload.path);
+        if (token) {
+          pushToTokensStudioOAuth({
+            context: rootState.uiState.api as StorageTypeCredential<TokensStudioOAuthStorageType, false>,
+            action: 'DELETE_TOKEN',
+            data: {
+              id: token.$extensions?.id,
             },
           });
         }
@@ -797,6 +830,27 @@ export const tokenState = createModel<RootModel>()({
           onTokenSetCreated: dispatch.tokenState.setTokenSetMetadata,
         });
       }
+
+      if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
+        pushToTokensStudioOAuth({
+          context: rootState.uiState.api as StorageTypeCredential<TokensStudioOAuthStorageType, false>,
+          action: 'CREATE_TOKEN_SET',
+          data: {
+            name,
+          },
+          successCallback: (result) => {
+            if (result?.data?.id) {
+              dispatch.tokenState.setTokenSetMetadata({
+                ...rootState.tokenState.tokenSetMetadata,
+                [name]: {
+                  id: result.data.id,
+                  isDynamic: false,
+                },
+              });
+            }
+          },
+        });
+      }
     },
     duplicateTokenSet() {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
@@ -814,6 +868,20 @@ export const tokenState = createModel<RootModel>()({
           onTokenSetUpdated: dispatch.tokenState.setTokenSetMetadata,
         });
       }
+
+      if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
+        const tokenSetId = (rootState.tokenState.tokenSetMetadata[data.oldName] as any)?.id;
+        if (tokenSetId) {
+          pushToTokensStudioOAuth({
+            context: rootState.uiState.api as StorageTypeCredential<TokensStudioOAuthStorageType, false>,
+            action: 'UPDATE_TOKEN_SET',
+            data: {
+              id: tokenSetId,
+              name: data.newName,
+            },
+          });
+        }
+      }
     },
     deleteTokenSet(name: string, rootState) {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
@@ -825,18 +893,36 @@ export const tokenState = createModel<RootModel>()({
           onTokenSetDeleted: dispatch.tokenState.setTokenSetMetadata,
         });
       }
+
+      if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
+        const tokenSetId = (rootState.tokenState.tokenSetMetadata[name] as any)?.id;
+        if (tokenSetId) {
+          pushToTokensStudioOAuth({
+            context: rootState.uiState.api as StorageTypeCredential<TokensStudioOAuthStorageType, false>,
+            action: 'DELETE_TOKEN_SET',
+            data: {
+              id: tokenSetId,
+            },
+          });
+        }
+      }
     },
     setTokenSetOrder(data: string[], rootState) {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
 
-      if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO) {
-        pushToTokensStudio({
-          context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
-          action: 'UPDATE_TOKEN_SET_ORDER',
-          data: data.map((name, index) => ({
-            orderIndex: index,
-            path: name,
-          })),
+      if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
+        data.forEach((name, index) => {
+          const tokenSetId = (rootState.tokenState.tokenSetMetadata[name] as any)?.id;
+          if (tokenSetId) {
+            pushToTokensStudioOAuth({
+              context: rootState.uiState.api as StorageTypeCredential<TokensStudioOAuthStorageType, false>,
+              action: 'UPDATE_TOKEN_SET',
+              data: {
+                id: tokenSetId,
+                order_index: index,
+              },
+            });
+          }
         });
       }
     },
@@ -866,6 +952,24 @@ export const tokenState = createModel<RootModel>()({
           payload,
         });
       }
+
+      if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
+        const tokenSet = rootState.tokenState.tokens[payload.parent];
+        const token = tokenSet?.find((t) => t.name === payload.newName);
+        if (token) {
+          pushToTokensStudioOAuth({
+            context: rootState.uiState.api as StorageTypeCredential<TokensStudioOAuthStorageType, false>,
+            action: 'CREATE_TOKEN',
+            data: {
+              name: token.name,
+              value: token.value,
+              type: token.type,
+              description: token.description,
+              token_set_id: (rootState.tokenState.tokenSetMetadata[payload.parent] as any)?.id,
+            },
+          });
+        }
+      }
     },
     createToken(payload: UpdateTokenPayload, rootState) {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
@@ -875,6 +979,24 @@ export const tokenState = createModel<RootModel>()({
           rootState,
           payload,
         });
+      }
+
+      if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
+        const tokenSet = rootState.tokenState.tokens[payload.parent];
+        const token = tokenSet?.find((t) => t.name === payload.name);
+        if (token) {
+          pushToTokensStudioOAuth({
+            context: rootState.uiState.api as StorageTypeCredential<TokensStudioOAuthStorageType, false>,
+            action: 'CREATE_TOKEN',
+            data: {
+              name: token.name,
+              value: token.value,
+              type: token.type,
+              description: token.description,
+              token_set_id: (rootState.tokenState.tokenSetMetadata[payload.parent] as any)?.id,
+            },
+          });
+        }
       }
     },
     setTokenFormat(payload: TokenFormatOptions) {
@@ -1004,16 +1126,22 @@ export const tokenState = createModel<RootModel>()({
 
       dispatch.tokenState.setUpdatedAliases(updatedTokens);
 
-      if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO) {
+      if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
         for (const set of updatedSets) {
           const content = updatedTokens[set];
-          const rawSet = singleTokensToRawTokenSet(content, true);
-
-          pushToTokensStudio({
-            context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
-            action: 'UPDATE_TOKEN_SET',
-            data: { raw: rawSet, name: set },
-          });
+          for (const token of content) {
+            // Only update if it's one of the tokens that actually changed (has an update)
+            // This is a bit inefficient, but ensures sync.
+            // Ideally we'd have a list of changed tokens.
+            pushToTokensStudioOAuth({
+              context: rootState.uiState.api as StorageTypeCredential<TokensStudioOAuthStorageType, false>,
+              action: 'EDIT_TOKEN',
+              data: {
+                id: token.$extensions?.id,
+                value: token.value,
+              },
+            });
+          }
         }
       }
     },

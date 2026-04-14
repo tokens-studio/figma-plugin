@@ -13,7 +13,13 @@ const newVariable: Variable = {
   key: 'VariableID:1:0',
   description: '',
   valuesByMode: {},
-};
+  remote: false,
+  scopes: [],
+  hiddenFromPublishing: false,
+  getPublishStatusAsync: jest.fn(),
+  resolveForConsumer: jest.fn(),
+  remove: jest.fn(),
+} as any;
 
 describe('updateVariables', () => {
   figma.variables.getLocalVariablesAsync = jest.fn().mockResolvedValue([{
@@ -165,8 +171,12 @@ describe('updateVariables', () => {
       description: '',
       valuesByMode: { '1:0': 0, '1:1': 0 }, // Initialize with 0 for both modes
       remote: false,
+      scopes: [],
+      hiddenFromPublishing: false,
+      getPublishStatusAsync: jest.fn(),
+      resolveForConsumer: jest.fn(),
       remove: jest.fn(),
-    };
+    } as any;
 
     const fontSizeVariable2rem: Variable = {
       name: 'font-size/2rem',
@@ -178,8 +188,12 @@ describe('updateVariables', () => {
       description: '',
       valuesByMode: { '1:0': 0, '1:1': 0 }, // Initialize with 0 for both modes
       remote: false,
+      scopes: [],
+      hiddenFromPublishing: false,
+      getPublishStatusAsync: jest.fn(),
+      resolveForConsumer: jest.fn(),
       remove: jest.fn(),
-    };
+    } as any;
 
     const baselineVariable: Variable = {
       name: 'typography/baseline',
@@ -191,8 +205,12 @@ describe('updateVariables', () => {
       description: '',
       valuesByMode: { '1:0': 0, '1:1': 0 }, // Initialize with 0 for both modes
       remote: false,
+      scopes: [],
+      hiddenFromPublishing: false,
+      getPublishStatusAsync: jest.fn(),
+      resolveForConsumer: jest.fn(),
       remove: jest.fn(),
-    };
+    } as any;
 
     // Mock createVariable to return different variables based on name
     figma.variables.createVariable = jest.fn().mockImplementation((name) => {

@@ -91,6 +91,7 @@ StorageProviderType.TOKENS_STUDIO_OAUTH,
   orgId: string; // this is the organization id
   id: string; // this is the project id
   branch?: string; // this is the base branch
+  changeSetId?: string; // this is the UUID of the branch (required for REST)
   baseUrl?: string; // this is the base URL for the Studio instance
 }
 >;

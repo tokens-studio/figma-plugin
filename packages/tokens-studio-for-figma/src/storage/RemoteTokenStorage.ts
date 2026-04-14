@@ -10,6 +10,7 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 export type RemoteTokenStorageMetadata = {
   tokenSetOrder?: string[];
   tokenSetsData?: Record<string, { isDynamic?: boolean }>;
+  changeSetId?: string;
 };
 
 export type RemoteTokenStorageData<Metadata> = {

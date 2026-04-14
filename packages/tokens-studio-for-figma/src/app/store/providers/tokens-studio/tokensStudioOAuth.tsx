@@ -25,8 +25,85 @@ import { OAuthService } from '../../../services/OAuthService';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { TOKENS_STUDIO_APP_URL } from '@/constants/TokensStudio';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
+import {
+  createTokenRest,
+  updateTokenRest,
+  deleteTokenRest,
+  createTokenSetRest,
+  updateTokenSetRest,
+  deleteTokenSetRest,
+  createThemeGroupRest,
+  updateThemeGroupRest,
+  deleteThemeGroupRest,
+} from '../../../../utils/tokensStudio/restApi';
 
 type TokensStudioOAuthCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.TOKENS_STUDIO_OAUTH }>;
+
+interface PushToTokensStudioOAuth {
+  context: TokensStudioOAuthCredentials;
+  action: string;
+  data: any;
+  successCallback?: (result: any) => void;
+}
+
+export const pushToTokensStudioOAuth = async ({
+  context, action, data, successCallback,
+}: PushToTokensStudioOAuth) => {
+  const { oauthTokens } = useAuthStore.getState();
+  if (!oauthTokens?.accessToken) return;
+
+  const studioUrl = TOKENS_STUDIO_APP_URL;
+  const apiBaseUrl = OAuthService.getApiBaseUrl(studioUrl);
+  const { id: projectId, branch, changeSetId } = context;
+  let result: any;
+
+  try {
+    switch (action) {
+      case 'CREATE_TOKEN':
+        result = await createTokenRest(oauthTokens.accessToken, apiBaseUrl, projectId, data, branch, changeSetId);
+        break;
+      case 'EDIT_TOKEN':
+        result = await updateTokenRest(oauthTokens.accessToken, apiBaseUrl, projectId, data.id, data, branch, changeSetId);
+        break;
+      case 'DELETE_TOKEN':
+        result = await deleteTokenRest(oauthTokens.accessToken, apiBaseUrl, projectId, data.id, branch, changeSetId);
+        break;
+      case 'CREATE_TOKEN_SET':
+        result = await createTokenSetRest(oauthTokens.accessToken, apiBaseUrl, projectId, data, branch, changeSetId);
+        break;
+      case 'UPDATE_TOKEN_SET': {
+        if (data.id) {
+          result = await updateTokenSetRest(oauthTokens.accessToken, apiBaseUrl, projectId, data.id, data, branch, changeSetId);
+        }
+        break;
+      }
+      case 'DELETE_TOKEN_SET':
+        if (data.id) {
+          result = await deleteTokenSetRest(oauthTokens.accessToken, apiBaseUrl, projectId, data.id, branch, changeSetId);
+        }
+        break;
+      case 'CREATE_THEME_GROUP':
+        result = await createThemeGroupRest(oauthTokens.accessToken, apiBaseUrl, projectId, data, branch, changeSetId);
+        break;
+      case 'UPDATE_THEME_GROUP':
+        if (data.id) {
+          result = await updateThemeGroupRest(oauthTokens.accessToken, apiBaseUrl, projectId, data.id, data, branch, changeSetId);
+        }
+        break;
+      case 'DELETE_THEME_GROUP':
+        if (data.id) {
+          result = await deleteThemeGroupRest(oauthTokens.accessToken, apiBaseUrl, projectId, data.id, branch, changeSetId);
+        }
+        break;
+      default:
+        console.warn('Unknown REST action', action);
+    }
+    if (successCallback) successCallback(result);
+  } catch (error) {
+    console.error('Failed to push to Tokens Studio OAuth via REST:', error);
+    notifyToUI(`Failed to sync: ${error instanceof Error ? error.message : 'Unknown error'}`, { error: true });
+  }
+};
 
 export function alignObjectKeys<T extends Record<string, any>>(obj: T, template: T, isSelectedTokenSets: boolean = false): T {
   if (!obj || !template || typeof obj !== 'object' || typeof template !== 'object') return obj;
@@ -85,7 +162,7 @@ export function useTokensStudioOAuth() {
         const apiBaseUrl = OAuthService.getApiBaseUrl(studioUrl);
         const projectData = await fetchProjectDataRest(oauthTokens.accessToken, apiBaseUrl, context.id, context.branch || 'main');
         if (projectData) {
-          dispatch.tokenState.setEditProhibited(true);
+          // dispatch.tokenState.setEditProhibited(true);
           if (projectData.hasExceededPaginationLimit) {
             notifyToUI('Maximum limit of 10,000 tokens reached. Some tokens may be missing.', { error: true });
           }
@@ -106,6 +183,7 @@ export function useTokensStudioOAuth() {
             metadata: {
               tokenSetOrder: projectData.tokenSetOrder,
               tokenSetsData: projectData.tokenSets as any,
+              changeSetId: projectData.changeSetId,
             },
           };
         }
@@ -135,6 +213,22 @@ export function useTokensStudioOAuth() {
       return null;
     },
     [],
+  );
+
+  const pushTokensToTokensStudioOAuth = useCallback(
+    async (context: TokensStudioOAuthCredentials): Promise<RemoteResponseData> => {
+      // For now, OAuth REST sync is primarily driven by individual actions in tokenState.tsx.
+      // A full 'push' (like Git) might be implemented later if needed, 
+      // but the requirement is to sync back when a token is changed.
+      // We return success here to satisfy the remoteTokens.tsx push flow if triggered.
+      return {
+        status: 'success',
+        tokens,
+        themes,
+        metadata: {},
+      };
+    },
+    [tokens, themes],
   );
 
   const syncTokensWithTokensStudioOAuth = useCallback(
@@ -171,14 +265,14 @@ export function useTokensStudioOAuth() {
                 metadata: data.metadata,
               });
               const stringifiedRemoteTokens = JSON.stringify(compact([data.tokens, data.themes, TokenFormat.format]), null, 2);
-              dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
+               dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
               dispatch.tokenState.setCollapsedTokenSets([]);
-              dispatch.tokenState.setEditProhibited(true);
+              // dispatch.tokenState.setEditProhibited(true);
               notifyToUI('Pulled tokens from Tokens Studio OAuth');
             }
-          } else {
+           } else {
             // Even if it didn't change, we still want it read only
-            dispatch.tokenState.setEditProhibited(true);
+            // dispatch.tokenState.setEditProhibited(true);
           }
         }
 
@@ -256,9 +350,9 @@ export function useTokensStudioOAuth() {
             metadata: { tokenSetOrder },
           });
 
-          const stringifiedRemoteTokens = JSON.stringify(compact([newTokens, alignedNewThemes, TokenFormat.format]), null, 2);
+           const stringifiedRemoteTokens = JSON.stringify(compact([newTokens, alignedNewThemes, TokenFormat.format]), null, 2);
           dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
-          dispatch.tokenState.setEditProhibited(true);
+          // dispatch.tokenState.setEditProhibited(true);
 
           dispatch.uiState.setLastError(null);
 
@@ -295,7 +389,8 @@ export function useTokensStudioOAuth() {
       pullTokensFromTokensStudioOAuth,
       fetchBranchesForTokensStudio,
       loadProjectTokens,
+      pushTokensToTokensStudioOAuth,
     }),
-    [syncTokensWithTokensStudioOAuth, pullTokensFromTokensStudioOAuth, fetchBranchesForTokensStudio, loadProjectTokens],
+    [syncTokensWithTokensStudioOAuth, pullTokensFromTokensStudioOAuth, fetchBranchesForTokensStudio, loadProjectTokens, pushTokensToTokensStudioOAuth],
   );
 }

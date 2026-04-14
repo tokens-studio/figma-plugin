@@ -27,8 +27,9 @@ interface RestThemeOption {
 export type ProjectData = {
   tokens: AnyTokenSet | null;
   themes: ThemeObjectsList;
-  tokenSets: Record<string, { isDynamic: boolean }>;
+  tokenSets: Record<string, { id: string; isDynamic: boolean }>;
   tokenSetOrder: string[];
+  changeSetId: string;
   hasExceededPaginationLimit?: boolean;
 };
 
@@ -163,7 +164,7 @@ export async function fetchProjectDataRest(
     }
 
     const tokens: AnyTokenSet = {};
-    const tokenSetsMap: Record<string, { isDynamic: boolean }> = {};
+    const tokenSetsMap: Record<string, { id: string; isDynamic: boolean }> = {};
     const tokenSetIdToName: Record<string, string> = {};
 
     // Sort by order_index and transform
@@ -181,11 +182,15 @@ export async function fetchProjectDataRest(
             value: transformTokenValue(token),
             type: token.attributes?.type,
             ...(token.attributes?.description && { description: token.attributes.description }),
+            $extensions: {
+              ...(token.attributes?.$extensions || {}),
+              id: token.id,
+            },
           });
         }
       });
       tokens[set.name] = transformedTokens as any;
-      tokenSetsMap[set.name] = { isDynamic: set.is_dynamic };
+      tokenSetsMap[set.name] = { id: set.id, isDynamic: set.is_dynamic };
       tokenSetIdToName[set.id] = set.name;
     });
 
@@ -252,6 +257,7 @@ export async function fetchProjectDataRest(
       themes,
       tokenSets: tokenSetsMap,
       tokenSetOrder,
+      changeSetId,
       hasExceededPaginationLimit,
     };
   } catch (error) {
