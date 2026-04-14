@@ -13,6 +13,35 @@ import { ThemeObject } from '@/types';
 import { LabelledCheckbox } from './LabelledCheckbox';
 import { SearchInputWithToggle } from '../SearchInputWithToggle';
 
+function getHierarchicalThemes(themes: ThemeObject[]): ThemeObject[] {
+  const themesById = new Map(themes.map((t) => [t.id, t]));
+  const childrenByParent = new Map<string, string[]>();
+  const roots: string[] = [];
+
+  themes.forEach((t) => {
+    if (t.$figmaParentThemeId && themesById.has(t.$figmaParentThemeId)) {
+      const children = childrenByParent.get(t.$figmaParentThemeId) || [];
+      children.push(t.id);
+      childrenByParent.set(t.$figmaParentThemeId, children);
+    } else {
+      roots.push(t.id);
+    }
+  });
+
+  const result: ThemeObject[] = [];
+  function pushWithChildren(id: string) {
+    const theme = themesById.get(id);
+    if (theme) {
+      result.push(theme);
+      const children = childrenByParent.get(id) || [];
+      children.forEach(pushWithChildren);
+    }
+  }
+
+  roots.forEach(pushWithChildren);
+  return result;
+}
+
 export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: { selectedThemes: string[], setSelectedThemes: (themes: string[]) => void }) {
   const { t } = useTranslation(['manageStylesAndVariables']);
   const themes = useSelector(themesListSelector);
@@ -88,11 +117,28 @@ export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: {
     }
   }, [filteredThemes, selectedThemes, setSelectedThemes]);
 
+  const themesById = useMemo(() => new Map(themes.map((t) => [t.id, t])), [themes]);
+
   function createThemeRow(theme: ThemeObject) {
+    let depth = 0;
+    let currentId = theme.id;
+    while (true) {
+      const t = themesById.get(currentId);
+      if (t?.$figmaParentThemeId && themesById.has(t.$figmaParentThemeId)) {
+        depth += 1;
+        currentId = t.$figmaParentThemeId;
+      } else {
+        break;
+      }
+    }
+
     return (
       <Stack
         gap={3}
         key={theme.id}
+        direction="row"
+        align="center"
+        css={{ paddingLeft: depth ? `$${depth * 4}` : undefined }}
       >
         {/* eslint-disable-next-line react/jsx-no-bind */}
         <LabelledCheckbox id={theme.id} checked={selectedThemes.includes(theme.id)} onChange={() => handleSelectTheme(theme.id)} label={theme.name} />
@@ -137,7 +183,7 @@ export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: {
               </>
             )}
           </Stack>
-
+ 
         </StyledCard>
       ) : (
         <StyledCard>
@@ -171,13 +217,13 @@ export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: {
                   {ThemeGroups.map((group) => (
                     <Stack direction="column" gap={2} key={group}>
                       <Heading size="small">{group}</Heading>
-                      {filteredThemes.filter((theme) => theme.group === group).map((theme) => createThemeRow(theme))}
+                      {getHierarchicalThemes(filteredThemes.filter((theme) => theme.group === group)).map((theme) => createThemeRow(theme))}
                     </Stack>
                   ))}
                   {ungroupedThemes.length ? (
                     <Stack direction="column" gap={2}>
                       <Heading size="small">{t('generic.noGroup')}</Heading>
-                      {ungroupedThemes.map((theme) => createThemeRow(theme))}
+                      {getHierarchicalThemes(ungroupedThemes).map((theme) => createThemeRow(theme))}
                     </Stack>
                   ) : null}
                 </>
