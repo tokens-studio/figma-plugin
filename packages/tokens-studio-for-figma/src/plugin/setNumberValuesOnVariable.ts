@@ -16,8 +16,8 @@ export default function setNumberValuesOnVariable(variable: Variable, mode: stri
     }
     const existingVariableValue = variable.valuesByMode[mode];
     if (
-      existingVariableValue === undefined
-      || !(typeof existingVariableValue === 'number' || isVariableWithAliasReference(existingVariableValue))
+      existingVariableValue !== undefined
+      && !(typeof existingVariableValue === 'number' || isVariableWithAliasReference(existingVariableValue))
     ) return;
 
     // For direct number values, compare using threshold
