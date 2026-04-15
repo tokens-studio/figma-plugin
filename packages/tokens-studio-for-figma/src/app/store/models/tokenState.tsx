@@ -57,7 +57,7 @@ import { CreateSingleTokenData, EditSingleTokenData } from '../useManageTokens';
 import { singleTokensToRawTokenSet } from '@/utils/convert';
 import { checkStorageSize } from '@/utils/checkStorageSize';
 import { compareLastSyncedState } from '@/utils/compareLastSyncedState';
-import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
+
 
 
 /** Context required to call the Studio gRPC-backed resolver endpoint */

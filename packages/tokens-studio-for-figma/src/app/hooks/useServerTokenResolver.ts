@@ -63,7 +63,7 @@ export function useServerTokenResolver() {
       storageProvider !== StorageProviderType.TOKENS_STUDIO_OAUTH
       || !serverResolverContext
     ) {
-      return;
+      return undefined;
     }
 
     // Clear any pending debounce
