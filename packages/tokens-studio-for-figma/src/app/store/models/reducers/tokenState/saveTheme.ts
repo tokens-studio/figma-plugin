@@ -54,7 +54,9 @@ export function saveTheme(state: TokenState, data: Payload): TokenState {
     selectedTokenSets,
     ...(data?.group ? { group: data.group } : {}),
     // Preserve extended collection metadata
-    ...(data.$figmaIsExtension !== undefined ? { $figmaIsExtension: data.$figmaIsExtension } : {}),
+    // $figmaIsExtension is derived from $figmaParentThemeId — a theme with a parent ID is always an extension,
+    // even if the flag was absent (e.g. themes created before the flag was introduced)
+    ...(data.$figmaParentThemeId ? { $figmaIsExtension: true } : data.$figmaIsExtension !== undefined ? { $figmaIsExtension: data.$figmaIsExtension } : {}),
     ...(data.$figmaParentCollectionId ? { $figmaParentCollectionId: data.$figmaParentCollectionId } : {}),
     ...(data.$figmaParentThemeId ? { $figmaParentThemeId: data.$figmaParentThemeId } : {}),
     ...(data.$figmaMirrorParentSets !== undefined ? { $figmaMirrorParentSets: data.$figmaMirrorParentSets } : {}),

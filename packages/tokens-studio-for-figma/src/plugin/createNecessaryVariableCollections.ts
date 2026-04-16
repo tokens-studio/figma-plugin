@@ -12,20 +12,41 @@ import {
 export async function createNecessaryVariableCollections(themes: ThemeObjectsList, selectedThemes: string[], settings: SettingsState): Promise<VariableCollection[]> {
   const allCollections = await figma.variables.getLocalVariableCollectionsAsync();
   const collectionsToCreateOrUpdate = themes.filter((theme) => selectedThemes.includes(theme.id));
+  console.log('[createNecessaryVariableCollections] Starting. Total themes:', themes.length, '| Selected:', selectedThemes.length, '| collectionsToCreateOrUpdate:', collectionsToCreateOrUpdate.length);
+  console.log('[createNecessaryVariableCollections] Settings:', { exportExtendedCollections: settings.exportExtendedCollections });
+  console.log('[createNecessaryVariableCollections] All theme ids/names:', themes.map((t) => ({ id: t.id, name: t.name, group: t.group, isExtension: t.$figmaIsExtension, parentThemeId: t.$figmaParentThemeId })));
 
 
   const acc: VariableCollection[] = [];
 
   for (const currentTheme of collectionsToCreateOrUpdate) {
+    console.log(`\n[createNecessaryVariableCollections] Processing theme: "${currentTheme.name}" (id: ${currentTheme.id})`, {
+      isExtension: currentTheme.$figmaIsExtension,
+      parentThemeId: currentTheme.$figmaParentThemeId,
+      collectionId: currentTheme.$figmaCollectionId,
+    });
     //  Handle extended collections - only if the setting is enabled
-    if (settings.exportExtendedCollections && currentTheme.$figmaIsExtension && currentTheme.$figmaParentThemeId) {
+    // A theme is an extension if it has a $figmaParentThemeId — $figmaIsExtension is derived/optional and may be absent on older themes
+    if (settings.exportExtendedCollections && currentTheme.$figmaParentThemeId) {
+      console.log(`[createNecessaryVariableCollections] ✅ Theme "${currentTheme.name}" qualifies as extended. Entering extended collection path.`);
       // Find parent theme to get its collection name
       const parentTheme = themes.find((t) => t.id === currentTheme.$figmaParentThemeId);
+      console.log(`[createNecessaryVariableCollections] Parent theme lookup for id "${currentTheme.$figmaParentThemeId}":`, parentTheme ? { id: parentTheme.id, name: parentTheme.name, group: parentTheme.group } : '⚠️ NOT FOUND in themes list');
       const parentGroupName = parentTheme ? (parentTheme.group ?? parentTheme.name) : undefined;
+      console.log(`[createNecessaryVariableCollections] Parent group name resolved to:`, parentGroupName ?? '⚠️ undefined (parentTheme missing or has no group/name)');
 
       // Find parent collection by NAME (not by ID, since IDs change between exports)
+      const truncatedParentName = parentGroupName ? truncateCollectionName(parentGroupName) : undefined;
+      console.log(`[createNecessaryVariableCollections] Looking for parent collection with truncated name: "${truncatedParentName}" in acc (${acc.length} collections):`, acc.map((c) => ({ id: c.id, name: c.name })));
       const parentCollection = parentGroupName ? acc.find((c) => c.name === truncateCollectionName(parentGroupName)) : undefined;
 
+      if (parentCollection) {
+        console.log(`[createNecessaryVariableCollections] ✅ Parent collection found: "${parentCollection.name}" (id: ${parentCollection.id})`);
+      } else {
+        console.warn(`[createNecessaryVariableCollections] ❌ Parent collection NOT found in acc. This is why the extended collection won't be created.`);
+        console.warn(`[createNecessaryVariableCollections] Is the parent theme also selected? selectedThemes:`, selectedThemes);
+        console.warn(`[createNecessaryVariableCollections] Parent theme id: "${currentTheme.$figmaParentThemeId}". Parent theme in selected list?`, selectedThemes.includes(currentTheme.$figmaParentThemeId ?? ''));
+      }
       if (parentCollection) {
         // Use theme's own group/name as child collection name, allowing arbitrary names
         const childCollectionName = currentTheme.group ?? currentTheme.name;
@@ -34,9 +55,11 @@ export async function createNecessaryVariableCollections(themes: ThemeObjectsLis
         // Check if extended collection already exists
         // IMPORTANT: Check acc first by NAME (for collections created in this run)
         // Then check by ID (for existing collections in Figma)
+        console.log(`[createNecessaryVariableCollections] Child collection name: "${childCollectionName}" → truncated: "${truncatedChildName}"`);
         const existingExtendedCollection = acc.find((c) => c.name === truncatedChildName)
           || acc.find((c) => c.id === currentTheme.$figmaCollectionId)
           || allCollections.find((c) => c.id === currentTheme.$figmaCollectionId);
+        console.log(`[createNecessaryVariableCollections] Existing extended collection check:`, existingExtendedCollection ? `Found: "${existingExtendedCollection.name}" (id: ${existingExtendedCollection.id})` : 'None found → will create new');
 
         if (existingExtendedCollection) {
           // Update existing extended collection
@@ -99,6 +122,12 @@ export async function createNecessaryVariableCollections(themes: ThemeObjectsLis
           // Don't fall through - skip this theme entirely to avoid duplicate regular collections
           continue;
         }
+      }
+    } else {
+      if (!settings.exportExtendedCollections) {
+        console.log(`[createNecessaryVariableCollections] ℹ️ Theme "${currentTheme.name}" skipped extended path: exportExtendedCollections setting is OFF`);
+      } else {
+        console.log(`[createNecessaryVariableCollections] ℹ️ Theme "${currentTheme.name}" has no $figmaParentThemeId. Treating as regular collection.`);
       }
     }
 
