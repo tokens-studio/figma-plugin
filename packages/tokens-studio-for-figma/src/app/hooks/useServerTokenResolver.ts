@@ -4,6 +4,7 @@ import {
   activeThemeSelector,
   themesListSelector,
   tokensSelector,
+  usedTokenSetSelector,
 } from '@/selectors';
 import { Dispatch, RootState } from '@/app/store';
 import { useAuthStore } from '@/app/store/useAuthStore';
@@ -33,6 +34,7 @@ export function useServerTokenResolver() {
   const storageProvider = useSelector(
     (state: RootState) => state.uiState.storageType?.provider,
   );
+  const usedTokenSet = useSelector(usedTokenSetSelector);
 
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -76,11 +78,15 @@ export function useServerTokenResolver() {
       if (!oauthTokens?.accessToken) return;
 
       const themeSelections = buildThemeSelections();
+      const activeSets = Object.entries(usedTokenSet)
+        .filter(([, status]) => status === 'enabled')
+        .map(([name]) => name);
 
       console.log('[ServerResolver] Fetching resolved tokens from server…', {
         projectId: serverResolverContext.projectId,
         changeSetId: serverResolverContext.changeSetId,
         themeSelections,
+        activeSets,
       });
 
       const resolved = await fetchServerResolvedTokens({
@@ -89,6 +95,7 @@ export function useServerTokenResolver() {
         changeSetId: serverResolverContext.changeSetId,
         authToken: oauthTokens.accessToken,
         themeSelections,
+        activeSets,
       });
 
       // Dispatch the flat map directly — updateSources merges it on top of local resolution
@@ -104,5 +111,5 @@ export function useServerTokenResolver() {
     };
     // Deliberately omit buildThemeSelections from deps — theme/activeTheme already cover it
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTheme, tokens, serverResolverContext, storageProvider, dispatch]);
+  }, [activeTheme, tokens, usedTokenSet, serverResolverContext, storageProvider, dispatch]);
 }

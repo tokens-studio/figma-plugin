@@ -1,5 +1,5 @@
 import { startTransaction } from '@sentry/react';
-import { mergeTokenGroups } from '@/utils/tokenHelpers';
+import { mergeTokenGroups, mergeServerResolvedTokens } from '@/utils/tokenHelpers';
 
 import { Dispatch } from '@/app/store';
 import { notifyToUI } from '../../plugin/notifiers';
@@ -174,14 +174,13 @@ export default async function updateTokensOnSources({
   // If the server returned theme-specific overrides, merge them on top.
   // The server delta takes precedence for the tokens it resolved; all other
   // tokens retain their locally-resolved values.
-  let mergedTokens = locallyResolved;
+  const mergedTokens = locallyResolved
+    ? mergeServerResolvedTokens(locallyResolved, serverResolvedTokens)
+    : null;
+
   if (locallyResolved && serverResolvedTokens && Object.keys(serverResolvedTokens).length > 0) {
-    mergedTokens = locallyResolved.map((token) => {
-      const serverValue = serverResolvedTokens[token.name];
-      return serverValue !== undefined ? { ...token, value: serverValue } : token;
-    }) as typeof locallyResolved;
     console.log(`[gRPC Resolver] Merged ${Object.keys(serverResolvedTokens).length} server-resolved values into ${locallyResolved.length} local tokens ✓`);
-  } else {
+  } else if (locallyResolved) {
     console.log('[gRPC Resolver] Using local TokenResolver only (no server delta available)');
   }
 

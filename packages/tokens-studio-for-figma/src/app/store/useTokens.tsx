@@ -3,7 +3,9 @@ import { useCallback, useMemo, useContext } from 'react';
 import { AnyTokenList, SingleToken, TokenToRename } from '@/types/tokens';
 import stringifyTokens from '@/utils/stringifyTokens';
 import formatTokens from '@/utils/formatTokens';
-import { getEnabledTokenSets, getOverallConfig, mergeTokenGroups } from '@/utils/tokenHelpers';
+import {
+  getEnabledTokenSets, getOverallConfig, mergeTokenGroups, mergeServerResolvedTokens,
+} from '@/utils/tokenHelpers';
 import useConfirm from '../hooks/useConfirm';
 import { Properties } from '@/constants/Properties';
 import { track } from '@/utils/analytics';
@@ -350,6 +352,8 @@ export default function useTokens() {
     [activeTokenSet, tokens, confirm, handleBulkRemap, dispatch.tokenState, settings],
   );
 
+  const serverResolvedTokens = useSelector((state: RootState) => state.tokenState.serverResolvedTokens);
+
   // Asks user which styles to create, then calls Figma with all tokens to create styles
   const createStylesFromSelectedTokenSets = useCallback(
     async (selectedSets: ExportTokenSet[]) => {
@@ -377,7 +381,10 @@ export default function useTokens() {
 
       const tokensToResolve = mergeTokenGroups(tokens, selectedSetsMap);
 
-      const resolved = defaultTokenResolver.setTokens(tokensToResolve);
+      const resolved = mergeServerResolvedTokens(
+        defaultTokenResolver.setTokens(tokensToResolve),
+        serverResolvedTokens,
+      );
       const withoutSourceTokens = resolved.filter(
         (token) => !token.internal__Parent || enabledTokenSets.includes(token.internal__Parent), // filter out SOURCE tokens
       );
@@ -420,7 +427,7 @@ export default function useTokens() {
 
       dispatch.uiState.completeJob(BackgroundJobs.UI_CREATE_STYLES);
     },
-    [tokens, settings, dispatch.uiState],
+    [tokens, settings, dispatch.uiState, serverResolvedTokens],
   );
 
   const createStylesFromSelectedThemes = useCallback(
@@ -459,7 +466,10 @@ export default function useTokens() {
 
           if (enabledTokenSets.length > 0) {
             const tokensToResolve = mergeTokenGroups(tokens, selectedSets, overallConfig);
-            const allTokens = defaultTokenResolver.setTokens(tokensToResolve);
+            const allTokens = mergeServerResolvedTokens(
+              defaultTokenResolver.setTokens(tokensToResolve),
+              serverResolvedTokens,
+            );
 
             const tokensFromEnabledSets = allTokens.filter(
               (token) => !token.internal__Parent || enabledTokenSets.includes(token.internal__Parent), // only use enabled sets
@@ -530,7 +540,7 @@ export default function useTokens() {
 
       dispatch.uiState.completeJob(BackgroundJobs.UI_CREATE_STYLES);
     },
-    [dispatch.tokenState, tokens, settings, themes, dispatch.uiState],
+    [dispatch.tokenState, tokens, settings, themes, dispatch.uiState, serverResolvedTokens],
   );
 
   const renameStylesFromTokens = useCallback(

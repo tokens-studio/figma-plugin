@@ -10,9 +10,9 @@ import InspectorDebugView from './InspectorDebugView';
 import InspectorMultiView from './InspectorMultiView';
 import IconDebug from '@/icons/debug.svg';
 import IconInspect from '@/icons/multiinspect.svg';
-import { Dispatch } from '../store';
+import { Dispatch, RootState } from '../store';
 import Label from './Label';
-import { mergeTokenGroups } from '@/utils/tokenHelpers';
+import { mergeTokenGroups, mergeServerResolvedTokens } from '@/utils/tokenHelpers';
 import { track } from '@/utils/analytics';
 import {
   inspectDeepSelector,
@@ -31,10 +31,14 @@ function Inspector() {
   const tokens = useSelector(tokensSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const inspectDeep = useSelector(inspectDeepSelector);
+  const serverResolvedTokens = useSelector((state: RootState) => state.tokenState.serverResolvedTokens);
   // TODO: Put this into state in a performant way
   const resolvedTokens = React.useMemo(() => (
-    defaultTokenResolver.setTokens(mergeTokenGroups(tokens, usedTokenSet))
-  ), [tokens, usedTokenSet]);
+    mergeServerResolvedTokens(
+      defaultTokenResolver.setTokens(mergeTokenGroups(tokens, usedTokenSet)),
+      serverResolvedTokens,
+    )
+  ), [tokens, usedTokenSet, serverResolvedTokens]);
 
   const handleSetInspectView = React.useCallback((view: 'multi' | 'debug') => {
     if (view) {

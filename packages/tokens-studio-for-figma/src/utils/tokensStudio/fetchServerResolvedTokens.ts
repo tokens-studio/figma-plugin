@@ -7,6 +7,8 @@ export interface ServerResolveOptions {
   authToken: string;
   /** { [themeGroupName]: themeOptionName } — maps active theme selections to server format */
   themeSelections: Record<string, string>;
+  /** Array of active token set names */
+  activeSets?: string[];
 }
 
 /**
@@ -29,7 +31,7 @@ export async function fetchServerResolvedTokens(
   _rawTokens?: Record<string, AnyTokenList>,
 ): Promise<Record<string, string> | null> {
   const {
-    apiBaseUrl, projectId, changeSetId, authToken, themeSelections,
+    apiBaseUrl, projectId, changeSetId, authToken, themeSelections, activeSets,
   } = options;
 
   try {
@@ -38,6 +40,9 @@ export async function fetchServerResolvedTokens(
     const params = new URLSearchParams({ change_set_id: changeSetId });
     Object.entries(themeSelections).forEach(([group, option]) => {
       params.set(group, option);
+    });
+    activeSets?.forEach((set) => {
+      params.append('set', set);
     });
 
     const response = await fetch(
