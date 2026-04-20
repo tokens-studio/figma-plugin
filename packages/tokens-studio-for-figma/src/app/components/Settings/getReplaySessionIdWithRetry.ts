@@ -13,7 +13,9 @@ const DEFAULT_ATTEMPTS = 6;
 const DEFAULT_RETRY_DELAY_MS = 300;
 
 function wait(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  return new Promise<void>((resolve) => {
+    setTimeout(resolve, ms);
+  });
 }
 
 async function getReplayId(replayController: ReplayController) {
