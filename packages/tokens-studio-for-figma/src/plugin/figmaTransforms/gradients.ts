@@ -374,13 +374,10 @@ export function convertStringToFigmaGradient(gradientString: string): {
 
   switch (gradientType) {
     case 'linear-gradient':
-    case 'repeating-linear-gradient':
       return convertLinearGradient(parts);
     case 'radial-gradient':
-    case 'repeating-radial-gradient':
       return convertRadialGradient(parts);
     case 'conic-gradient':
-    case 'repeating-conic-gradient':
       return convertConicGradient(parts);
     default:
       // Fallback to linear gradient for backward compatibility
