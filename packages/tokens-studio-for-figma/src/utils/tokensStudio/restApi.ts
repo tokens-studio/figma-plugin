@@ -35,8 +35,8 @@ async function restRequest(
       method,
       headers: {
         Authorization: `Bearer ${authToken}`,
-        'Content-Type': 'application/vnd.api+json',
-        Accept: 'application/vnd.api+json',
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
       },
       body: body ? JSON.stringify(body) : undefined,
     });
@@ -68,10 +68,7 @@ export async function createTokenSetRest(
   return restRequest(authToken, apiBaseUrl, `/api/v1/projects/${projectId}/token_sets`, {
     method: 'POST',
     body: {
-      data: {
-        type: 'token_sets',
-        attributes: data,
-      },
+      token_set: data,
     },
     query: (changeSetId || branch) ? { change_set_id: changeSetId || branch || '' } : undefined,
   });
@@ -89,14 +86,10 @@ export async function updateTokenSetRest(
   return restRequest(authToken, apiBaseUrl, `/api/v1/projects/${projectId}/token_sets/${tokenSetId}`, {
     method: 'PATCH',
     body: {
-      data: {
-        id: tokenSetId,
-        type: 'token_sets',
-        attributes: {
-          name: data.name,
-          type: data.type,
-          order_index: data.order_index,
-        },
+      token_set: {
+        name: data.name,
+        type: data.type,
+        order_index: data.order_index,
       },
     },
     query: (changeSetId || branch) ? { change_set_id: changeSetId || branch || '' } : undefined,
@@ -135,15 +128,12 @@ export async function createTokenRest(
   return restRequest(authToken, apiBaseUrl, `/api/v1/projects/${projectId}/tokens`, {
     method: 'POST',
     body: {
-      data: {
-        type: 'tokens',
-        attributes: {
-          name: data.name,
-          value: data.value,
-          type: data.type,
-          token_set_id: data.token_set_id,
-          description: data.description,
-        },
+      token: {
+        name: data.name,
+        value: data.value,
+        type: data.type,
+        token_set_id: data.token_set_id,
+        description: data.description,
       },
     },
     query: (changeSetId || branch) ? { change_set_id: changeSetId || branch || '' } : undefined,
@@ -168,16 +158,12 @@ export async function updateTokenRest(
   return restRequest(authToken, apiBaseUrl, `/api/v1/projects/${projectId}/tokens/${tokenId}`, {
     method: 'PATCH',
     body: {
-      data: {
-        id: tokenId,
-        type: 'tokens',
-        attributes: {
-          name: data.name,
-          value: data.value,
-          type: data.type,
-          description: data.description,
-          token_set_id: data.token_set_id,
-        },
+      token: {
+        name: data.name,
+        value: data.value,
+        type: data.type,
+        description: data.description,
+        token_set_id: data.token_set_id,
       },
     },
     query: (changeSetId || branch) ? { change_set_id: changeSetId || branch || '' } : undefined,
@@ -213,10 +199,7 @@ export async function createThemeGroupRest(
   return restRequest(authToken, apiBaseUrl, `/api/v1/projects/${projectId}/theme_groups`, {
     method: 'POST',
     body: {
-      data: {
-        type: 'theme_groups',
-        attributes: data,
-      },
+      theme_group: data,
     },
     query: (changeSetId || branch) ? { change_set_id: changeSetId || branch || '' } : undefined,
   });
@@ -237,13 +220,9 @@ export async function updateThemeGroupRest(
   return restRequest(authToken, apiBaseUrl, `/api/v1/projects/${projectId}/theme_groups/${themeGroupId}`, {
     method: 'PATCH',
     body: {
-      data: {
-        id: themeGroupId,
-        type: 'theme_groups',
-        attributes: {
-          name: data.name,
-          options: data.options,
-        },
+      theme_group: {
+        name: data.name,
+        options: data.options,
       },
     },
     query: (changeSetId || branch) ? { change_set_id: changeSetId || branch || '' } : undefined,
