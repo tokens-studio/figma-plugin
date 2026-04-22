@@ -801,14 +801,12 @@ export const tokenState = createModel<RootModel>()({
       }
 
       if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
-        const tokenSet = rootState.tokenState.tokens[payload.parent];
-        const token = tokenSet?.find((t) => t.name === payload.path);
-        if (token) {
+        if (payload.id) {
           pushToTokensStudioOAuth({
             context: rootState.uiState.api as StorageTypeCredential<TokensStudioOAuthStorageType, false>,
             action: 'DELETE_TOKEN',
             data: {
-              id: token.$extensions?.id,
+              id: payload.id,
             },
           });
         }

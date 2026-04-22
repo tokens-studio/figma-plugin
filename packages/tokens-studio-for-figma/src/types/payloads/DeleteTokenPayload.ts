@@ -5,5 +5,6 @@ export type DeleteTokenPayload = {
   path: string;
   type?: TokenTypes;
   sourceId?: string;
+  id?: string;
   index?: number;
 };

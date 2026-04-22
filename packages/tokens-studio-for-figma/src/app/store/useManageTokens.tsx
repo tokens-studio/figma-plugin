@@ -150,7 +150,15 @@ export default function useManageTokens() {
         name: BackgroundJobs.UI_DELETETOKEN,
         isInfinite: true,
       });
-      deleteToken(data); // This triggers an updateDocument call as expected
+
+      const tokenSet = store.getState().tokenState.tokens[data.parent];
+      const tokenToFix = tokenSet?.find((t) => t.name === data.path);
+      const deletePayload = {
+        ...data,
+        id: tokenToFix?.$extensions?.id,
+      };
+
+      deleteToken(deletePayload); // This triggers an updateDocument call as expected
       if (Array.isArray(userConfirmation.data) && userConfirmation.data.includes(StyleOptions.REMOVE)) {
         removeStylesFromTokens(data);
       }
