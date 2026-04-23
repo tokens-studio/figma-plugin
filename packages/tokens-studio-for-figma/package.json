@@ -32,6 +32,7 @@
     "serve:preview": "serve preview -p 58630",
     "changeset": "changeset",
     "translate": "node  ./scripts/translate.mjs",
+    "test:api": "TOKENS_STUDIO_AUTH_TOKEN=$(node scripts/token-manager.mjs) jest src/utils/tokensStudio/__tests__/restApi.int.test.ts",
     "lint": "eslint . --quiet --fix",
     "lint:nofix": "eslint .",
     "storybook": "start-storybook -p 6006",
