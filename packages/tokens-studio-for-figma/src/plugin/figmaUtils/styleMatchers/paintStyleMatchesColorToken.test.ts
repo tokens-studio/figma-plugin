@@ -21,6 +21,9 @@ describe('paintStyleMatchesColorToken', () => {
     getSharedPluginData: () => dummyFunc<string>(),
     setSharedPluginData: noop,
     getSharedPluginDataKeys: () => dummyFunc<string[]>(),
+    getStyleConsumersAsync: () => dummyFunc<Promise<any>>(),
+    consumers: [],
+    descriptionMarkdown: '',
   };
 
   describe('when Figma paints is missing', () => {
@@ -281,6 +284,63 @@ describe('paintStyleMatchesColorToken', () => {
           paints: [{ gradientTransform, gradientStops, type: 'GRADIENT_LINEAR' }],
         };
 
+        expect(paintStyleMatchesColorToken(figmaPaintStyle, colorToken)).toBe(false);
+      });
+    });
+
+    describe('radial gradients', () => {
+      it('should match radial gradient color token against same radial paint style', () => {
+        const gradientColor: RGB = { r: 1, g: 0, b: 0 };
+        const gradientStops: ReadonlyArray<ColorStop> = [
+          { position: 0, color: { ...gradientColor, a: 1 } },
+          { position: 1, color: { ...gradientColor, a: 0 } },
+        ];
+        const colorToken = 'radial-gradient(#ff0000 0%, #ff000000 100%)';
+        const gradientTransform: Transform = [
+          [1, 0, 0],
+          [0, 1, 0],
+        ];
+        const figmaPaintStyle: PaintStyle = {
+          ...dummyFigmaPaintStyle,
+          paints: [{ gradientTransform, gradientStops, type: 'GRADIENT_RADIAL' }],
+        };
+        expect(paintStyleMatchesColorToken(figmaPaintStyle, colorToken)).toBe(true);
+      });
+
+      it('should match radial gradient with center/transform', () => {
+        const gradientColor: RGB = { r: 1, g: 1, b: 1 };
+        const gradientStops: ReadonlyArray<ColorStop> = [
+          { position: 0, color: { ...gradientColor, a: 1 } },
+          { position: 1, color: { ...gradientColor, a: 1 } },
+        ];
+        // radial-gradient(at top, ...) result in [[1, 0, 0], [0, 1, 0.5]]
+        const colorToken = 'radial-gradient(at top, #ffffff 0%, #ffffff 100%)';
+        const gradientTransform: Transform = [
+          [1, 0, 0],
+          [0, 1, 0.5],
+        ];
+        const figmaPaintStyle: PaintStyle = {
+          ...dummyFigmaPaintStyle,
+          paints: [{ gradientTransform, gradientStops, type: 'GRADIENT_RADIAL' }],
+        };
+        expect(paintStyleMatchesColorToken(figmaPaintStyle, colorToken)).toBe(true);
+      });
+
+      it('should NOT match radial gradient with different transform', () => {
+        const gradientColor: RGB = { r: 1, g: 1, b: 1 };
+        const gradientStops: ReadonlyArray<ColorStop> = [
+          { position: 0, color: { ...gradientColor, a: 1 } },
+          { position: 1, color: { ...gradientColor, a: 1 } },
+        ];
+        const colorToken = 'radial-gradient(at top, #ffffff 0%, #ffffff 100%)';
+        const gradientTransform: Transform = [
+          [1, 0, 0],
+          [0, 1, 0],
+        ];
+        const figmaPaintStyle: PaintStyle = {
+          ...dummyFigmaPaintStyle,
+          paints: [{ gradientTransform, gradientStops, type: 'GRADIENT_RADIAL' }],
+        };
         expect(paintStyleMatchesColorToken(figmaPaintStyle, colorToken)).toBe(false);
       });
     });

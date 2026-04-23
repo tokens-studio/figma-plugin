@@ -23,8 +23,8 @@ export default function setColorValuesOnVariable(variable: Variable, mode: strin
     const { color, opacity } = convertToFigmaColor(value);
     const existingVariableValue = variable.valuesByMode[mode];
     if (
-      !existingVariableValue
-      || !(isFigmaColorObject(existingVariableValue) || isVariableWithAliasReference(existingVariableValue))
+      existingVariableValue
+      && !(isFigmaColorObject(existingVariableValue) || isVariableWithAliasReference(existingVariableValue))
     ) return;
 
     const newValue = { ...color, a: opacity };
