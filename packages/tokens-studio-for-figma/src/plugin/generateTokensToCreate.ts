@@ -4,6 +4,7 @@ import { ThemeObject, UsedTokenSetsMap } from '@/types';
 import { AnyTokenList } from '@/types/tokens';
 import { TokenResolver } from '@/utils/TokenResolver';
 import { mergeTokenGroups, ResolveTokenValuesResult } from '@/utils/tokenHelpers';
+import { normalizeTokenSetName } from '@/utils/normalizeTokenSetName';
 
 export function generateTokensToCreate({
   theme,
@@ -19,9 +20,10 @@ export function generateTokensToCreate({
   themeTokenResolver?: TokenResolver;
 }): { tokensToCreate: ResolveTokenValuesResult[]; resolvedTokens: ResolveTokenValuesResult[] } {
   // Big O(resolveTokenValues * mergeTokenGroups)
+  const normalizedFilterByTokenSet = filterByTokenSet ? normalizeTokenSetName(filterByTokenSet) : undefined;
   const enabledTokenSets = Object.entries(theme.selectedTokenSets)
-    .filter(([name, status]) => status === TokenSetStatus.ENABLED && (!filterByTokenSet || name === filterByTokenSet))
-    .map(([tokenSet]) => tokenSet);
+    .filter(([name, status]) => status === TokenSetStatus.ENABLED && (!normalizedFilterByTokenSet || normalizeTokenSetName(name) === normalizedFilterByTokenSet))
+    .map(([tokenSet]) => normalizeTokenSetName(tokenSet));
   // Create a separate TokenResolver instance for this theme to avoid interference
   // when multiple themes are processed concurrently (if not provided)
   const resolver = themeTokenResolver || new TokenResolver([]);

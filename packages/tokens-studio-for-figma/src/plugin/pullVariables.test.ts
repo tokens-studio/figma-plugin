@@ -868,6 +868,28 @@ describe('pullStyles', () => {
     expect(notifyStyleValuesSpy).toHaveBeenCalledWith({}, []);
   });
 
+  it('does not treat spacing around "/" in token set names as a rename', async () => {
+    (AsyncMessageChannel.PluginInstance.message as jest.Mock).mockResolvedValueOnce({
+      themes: [
+        {
+          id: 'collection-1-default',
+          name: 'Default',
+          group: 'Collection 1',
+          selectedTokenSets: {
+            'Collection 1 / Default': 'enabled',
+          },
+          $figmaStyleReferences: {},
+          $figmaModeId: '1:0',
+          $figmaCollectionId: 'VariableID:1:0',
+        },
+      ],
+    });
+
+    await pullVariables({ useDimensions: false, useRem: false }, [], true);
+
+    expect(notifyRenamedCollectionsSpy).not.toHaveBeenCalled();
+  });
+
   it('updates existing themes when collection names change', async () => {
     // Mock AsyncMessageChannel to return existing themes with old collection name
     (AsyncMessageChannel.PluginInstance.message as jest.Mock).mockResolvedValueOnce({

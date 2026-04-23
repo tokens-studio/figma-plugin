@@ -8,6 +8,7 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { getVariablesWithoutZombies } from './getVariablesWithoutZombies';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { normalizeVariableName } from '@/utils/normalizeVariableName';
+import { normalizeTokenSetName } from '@/utils/normalizeTokenSetName';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 
@@ -324,6 +325,7 @@ export default async function pullVariables(options: PullVariablesOptions, theme
         }), {});
 
         const tokenSetName = `${collection.name}/${mode.name}`;
+        const normalizedCurrentTokenSetName = normalizeTokenSetName(tokenSetName);
         const themeId = `${collection.name.toLowerCase()}-${mode.name.toLowerCase()}`;
 
         processedThemes.add(`${collection.id}:${mode.modeId}`);
@@ -335,10 +337,10 @@ export default async function pullVariables(options: PullVariablesOptions, theme
         if (matchingTheme) {
           // Find token sets in this theme that are different from the current token set name
           Object.keys(matchingTheme.selectedTokenSets || {}).forEach((existingTokenSet) => {
-            if (existingTokenSet !== tokenSetName
+            if (normalizeTokenSetName(existingTokenSet) !== normalizedCurrentTokenSetName
               && existingTokenSet.includes('/')
               && !renamedCollections.has(existingTokenSet)
-              && !Array.from(renamedCollections.values()).includes(tokenSetName)) {
+              && !Array.from(renamedCollections.values()).some((newTokenSet) => normalizeTokenSetName(newTokenSet) === normalizedCurrentTokenSetName)) {
               renamedCollections.set(existingTokenSet, tokenSetName);
             }
           });
@@ -360,13 +362,13 @@ export default async function pullVariables(options: PullVariablesOptions, theme
       }));
     }));
 
-    const currentTokenSets = new Set(themesToCreate.map((theme) => `${theme.group}/${theme.name}`));
+    const currentTokenSets = new Set(themesToCreate.map((theme) => normalizeTokenSetName(`${theme.group}/${theme.name}`)));
     for (const existingSet of existingTokenSets) {
       if (renamedCollections.has(existingSet)) {
         continue;
       }
 
-      if (existingSet.includes('/') && !currentTokenSets.has(existingSet)) {
+      if (existingSet.includes('/') && !currentTokenSets.has(normalizeTokenSetName(existingSet))) {
         // Find matching theme by collection ID and mode ID only
         const matchingTheme = themeInfo.themes?.find((t) => {
           if (!t.$figmaCollectionId || !t.$figmaModeId) {
@@ -385,7 +387,7 @@ export default async function pullVariables(options: PullVariablesOptions, theme
 
           if (currentTheme) {
             const newSet = `${currentTheme.group}/${currentTheme.name}`;
-            if (currentTokenSets.has(newSet)) {
+            if (currentTokenSets.has(normalizeTokenSetName(newSet))) {
               renamedCollections.set(existingSet, newSet);
               continue;
             }
