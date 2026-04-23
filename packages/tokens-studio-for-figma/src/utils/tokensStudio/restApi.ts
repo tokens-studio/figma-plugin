@@ -68,7 +68,10 @@ export async function createTokenSetRest(
   return restRequest(authToken, apiBaseUrl, `/api/v1/projects/${projectId}/token_sets`, {
     method: 'POST',
     body: {
-      token_set: data,
+      data: {
+        type: 'token_sets',
+        attributes: data,
+      },
     },
     query: (changeSetId || branch) ? { change_set_id: changeSetId || branch || '' } : undefined,
   });
@@ -86,10 +89,13 @@ export async function updateTokenSetRest(
   return restRequest(authToken, apiBaseUrl, `/api/v1/projects/${projectId}/token_sets/${tokenSetId}`, {
     method: 'PATCH',
     body: {
-      token_set: {
-        name: data.name,
-        type: data.type,
-        order_index: data.order_index,
+      data: {
+        type: 'token_sets',
+        attributes: {
+          name: data.name,
+          type: data.type,
+          order_index: data.order_index,
+        },
       },
     },
     query: (changeSetId || branch) ? { change_set_id: changeSetId || branch || '' } : undefined,
