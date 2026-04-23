@@ -89,6 +89,24 @@ async function runCypressAuth() {
   }
 }
 
+async function updateEnv(token) {
+  const envPath = path.join(__dirname, '..', '.env');
+  if (!fs.existsSync(envPath)) return;
+
+  const content = fs.readFileSync(envPath, 'utf8');
+  const lines = content.split('\n');
+  const tokenLineIndex = lines.findIndex(l => l.startsWith('TOKENS_STUDIO_AUTH_TOKEN='));
+
+  if (tokenLineIndex !== -1) {
+    lines[tokenLineIndex] = `TOKENS_STUDIO_AUTH_TOKEN=${token}`;
+  } else {
+    lines.push(`TOKENS_STUDIO_AUTH_TOKEN=${token}`);
+  }
+
+  fs.writeFileSync(envPath, lines.join('\n'));
+  process.stderr.write("Updated .env with new token.\n");
+}
+
 async function main() {
   let cache = {};
   if (fs.existsSync(TOKEN_FILE)) {
@@ -96,6 +114,7 @@ async function main() {
   }
 
   if (cache.access_token && await validateToken(cache.access_token)) {
+    await updateEnv(cache.access_token);
     console.log(cache.access_token);
     return;
   }
@@ -104,6 +123,7 @@ async function main() {
   try {
     const newData = await runCypressAuth();
     process.stderr.write("\n✅ Automated Auth successful.\n");
+    await updateEnv(newData.access_token);
     console.log(newData.access_token);
   } catch (err) {
     process.stderr.write(`\n❌ Error: ${err.message}\n`);
