@@ -9,15 +9,25 @@ class SharedDataHandler {
   }
 
   keys(node: BaseNode) {
-    return node.getSharedPluginDataKeys(this.namespace);
+    try {
+      return node.getSharedPluginDataKeys(this.namespace);
+    } catch (e) {
+      console.error('Error getting shared plugin data keys', e);
+      return [];
+    }
   }
 
   get<Result = string>(node: BaseNode, key: string, transformer?: (value: string) => Result) {
-    const value = node.getSharedPluginData(this.namespace, key);
-    if (value) {
-      return (transformer ? transformer(value) : value) as Result;
+    try {
+      const value = node.getSharedPluginData(this.namespace, key);
+      if (value) {
+        return (transformer ? transformer(value) : value) as Result;
+      }
+      return value;
+    } catch (e) {
+      console.error('Error getting shared plugin data', e);
+      return null;
     }
-    return value;
   }
 
   getAll<Result = string>(node: BaseNode) {
@@ -43,7 +53,12 @@ class SharedDataHandler {
   }
 
   set(node: BaseNode, key: string, value: string) {
-    return node.setSharedPluginData(this.namespace, key, value);
+    try {
+      return node.setSharedPluginData(this.namespace, key, value);
+    } catch (e) {
+      console.error('Error setting shared plugin data', e);
+      return null;
+    }
   }
 }
 
