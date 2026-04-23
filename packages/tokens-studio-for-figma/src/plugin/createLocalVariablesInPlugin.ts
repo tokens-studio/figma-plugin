@@ -62,7 +62,7 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
 
     // Calculate total number of variables for progress tracking
     const totalVariableTokens = selectedThemeObjects.reduce((total, theme) => {
-      const { tokensToCreate } = generateTokensToCreate({ theme, tokens, overallConfig });
+      const { tokensToCreate } = generateTokensToCreate({ theme, tokens, overallConfig, skipDeprecated: !!settings.skipDeprecatedTokensInVariableSync });
       const variableTokenCount = tokensToCreate.filter((token) => checkIfTokenCanCreateVariable(token, settings)).length;
       return total + variableTokenCount;
     }, 0);
@@ -109,7 +109,7 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
      * 2. If a platform is missing in the current mode AND doesn't exist anywhere, we safely remove it from Figma (Orphan Purging).
      */
     selectedThemeObjects.forEach((theme) => {
-      const { tokensToCreate } = generateTokensToCreate({ theme, tokens, overallConfig });
+      const { tokensToCreate } = generateTokensToCreate({ theme, tokens, overallConfig, skipDeprecated: !!settings.skipDeprecatedTokensInVariableSync });
       tokensToCreate.forEach((token) => {
         const figmaExtensions = token.$extensions?.['com.figma'] as FigmaExtensions;
         if (figmaExtensions?.codeSyntax) {

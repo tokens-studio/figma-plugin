@@ -56,6 +56,7 @@ export interface SettingsState {
   renameExistingStylesAndVariables?: boolean;
   removeStylesAndVariablesWithoutConnection?: boolean;
   autoApplyThemeOnDrop?: boolean;
+  skipDeprecatedTokensInVariableSync?: boolean;
   seenGenericVersionedHeaderMigrationDialog?: boolean;
   seenTermsUpdate2026?: boolean;
 }
@@ -100,6 +101,7 @@ export const settings = createModel<RootModel>()({
     variablesString: true,
     variablesNumber: true,
     variablesBoolean: true,
+    skipDeprecatedTokensInVariableSync: false,
     stylesColor: true,
     stylesTypography: true,
     stylesEffect: true,

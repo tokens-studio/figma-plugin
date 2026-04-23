@@ -22,6 +22,7 @@ export type EditSingleTokenData = {
   name: string;
   value: SingleToken['value'];
   description?: string;
+  $deprecated?: boolean;
   oldName?: string;
   shouldUpdateDocument?: boolean;
   $extensions?: {
@@ -40,6 +41,7 @@ export type CreateSingleTokenData = {
   name: string;
   value: SingleToken['value'];
   description?: string;
+  $deprecated?: boolean;
   shouldUpdateDocument?: boolean;
   $extensions?: {
     [key: string]: any;
@@ -63,7 +65,7 @@ export default function useManageTokens() {
 
   const editSingleToken = useCallback(async (data: EditSingleTokenData) => {
     const {
-      parent, type, name, value, description, oldName, shouldUpdateDocument = true, $extensions,
+      parent, type, name, value, description, $deprecated, oldName, shouldUpdateDocument = true, $extensions,
     } = data;
     dispatch.uiState.startJob({
       name: BackgroundJobs.UI_EDITSINGLETOKEN,
@@ -79,6 +81,7 @@ export default function useManageTokens() {
         type,
         value,
         description,
+        $deprecated,
         oldName,
         shouldUpdate: shouldUpdateDocument,
         $extensions,
@@ -93,7 +96,7 @@ export default function useManageTokens() {
 
   const createSingleToken = useCallback(async (data: CreateSingleTokenData) => {
     const {
-      parent, type, name, value, description, shouldUpdateDocument = true, $extensions,
+      parent, type, name, value, description, $deprecated, shouldUpdateDocument = true, $extensions,
     } = data;
     dispatch.uiState.startJob({
       name: BackgroundJobs.UI_CREATESINGLETOKEN,
@@ -114,6 +117,7 @@ export default function useManageTokens() {
         type,
         value,
         description,
+        $deprecated,
         shouldUpdate: shouldUpdateDocument,
         $extensions,
       } as UpdateTokenPayload);

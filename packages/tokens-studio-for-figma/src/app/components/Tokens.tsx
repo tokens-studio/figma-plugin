@@ -19,7 +19,7 @@ import useTokens from '../store/useTokens';
 import AttentionIcon from '@/icons/attention.svg';
 import { TokensContext } from '@/context';
 import {
-  activeTokenSetSelector, aliasBaseFontSizeSelector, manageThemesModalOpenSelector, scrollPositionSetSelector, showEditFormSelector, tokenFilterSelector, tokensSelector, tokenTypeSelector, usedTokenSetSelector,
+  activeTokenSetSelector, aliasBaseFontSizeSelector, manageThemesModalOpenSelector, scrollPositionSetSelector, showEditFormSelector, tokenFilterSelector, tokensSelector, tokenTypeSelector, usedTokenSetSelector, hideDeprecatedTokensSelector,
 } from '@/selectors';
 import { ThemeSelector } from './ThemeSelector';
 import { ManageThemesModal } from './ManageThemesModal';
@@ -92,6 +92,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
   const manageThemesModalOpen = useSelector(manageThemesModalOpenSelector);
   const scrollPositionSet = useSelector(scrollPositionSetSelector);
   const tokenFilter = useSelector(tokenFilterSelector);
+  const hideDeprecatedTokens = useSelector(hideDeprecatedTokensSelector);
   const aliasBaseFontSize = useSelector(aliasBaseFontSizeSelector);
   const dispatch = useDispatch<Dispatch>();
   const [tokenSetsVisible, setTokenSetsVisible] = React.useState(true);
@@ -126,7 +127,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
 
   const memoizedTokens = React.useMemo(() => {
     if (tokens[activeTokenSet]) {
-      const mapped = mappedTokens(tokens[activeTokenSet], tokenFilter).sort((a, b) => {
+      const mapped = mappedTokens(tokens[activeTokenSet], tokenFilter, hideDeprecatedTokens).sort((a, b) => {
         if (b[1].values) {
           return 1;
         }
@@ -143,7 +144,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
       }));
     }
     return [];
-  }, [tokens, activeTokenSet, tokenFilter]);
+  }, [tokens, activeTokenSet, tokenFilter, hideDeprecatedTokens]);
 
   const handleToggleTokenSetsVisibility = React.useCallback(() => {
     setTokenSetsVisible(!tokenSetsVisible);

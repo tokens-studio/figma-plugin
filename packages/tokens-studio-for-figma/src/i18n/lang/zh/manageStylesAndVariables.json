@@ -49,7 +49,10 @@
     "renameExisting": "更新现有样式和变量名称",
     "renameExistingExplanation": "现有样式和变量将被重命名以匹配令牌名称",
     "removeWithoutConnection": "删除样式和变量而不连接到令牌",
-    "removeWithoutConnectionExplanation": "未连接到令牌的样式和变量将被删除"
+    "removeWithoutConnectionExplanation": "未连接到令牌的样式和变量将被删除",
+    "deprecatedTokens": "已弃用的令牌",
+    "skipDeprecatedTokens": "同步变量时跳过已弃用的令牌",
+    "skipDeprecatedTokensExplanation": "标记为已弃用的令牌将不会作为 Figma 变量创建或更新"
   },
   "variables": {
     "color": "颜色",

@@ -48,6 +48,21 @@ export default function ChangedTokenItem({
           </Stack>
         </Stack>
         )}
+        {((token.importType === 'UPDATE' && typeof token.oldDeprecated === 'boolean') || (token.importType === 'NEW' && token.$deprecated)) && (
+        <Stack direction="row" align="center" justify="between" gap={1}>
+          <Text size="small">{t('deprecated')}</Text>
+          <Stack direction="row" align="center" gap={1}>
+            {typeof token.oldDeprecated === 'boolean' ? (
+              <StyledDiff type="danger">
+                {String(token.oldDeprecated)}
+              </StyledDiff>
+            ) : null}
+            <StyledDiff type="success">
+              {String(!!token.$deprecated)}
+            </StyledDiff>
+          </Stack>
+        </Stack>
+        )}
         {
           token.importType === 'REMOVE' && (
             <StyledDiff type="danger">

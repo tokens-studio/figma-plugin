@@ -23,18 +23,15 @@ export function findDifferentState(baseState: CompareStateType, compareState: Co
     values.forEach((token) => {
       const oldValue = baseState.tokens[tokenSet]?.find((t) => t.name === token.name);
       if (oldValue) {
-        if (!isEqual(oldValue.value, token.value)) {
-          const updatedToken: ImportToken = { ...token };
-          updatedToken.oldValue = oldValue.value;
-          updatedToken.importType = 'UPDATE';
+        const valueChanged = !isEqual(oldValue.value, token.value);
+        const descriptionChanged = !isEqual(oldValue.description, token.description);
+        const deprecatedChanged = !isEqual(oldValue.$deprecated, token.$deprecated);
+        if (valueChanged || descriptionChanged || deprecatedChanged) {
+          const updatedToken: ImportToken = { ...token, importType: 'UPDATE' };
+          if (valueChanged) updatedToken.oldValue = oldValue.value;
+          if (descriptionChanged) updatedToken.oldDescription = oldValue.description;
+          if (deprecatedChanged) updatedToken.oldDeprecated = oldValue.$deprecated ?? false;
           updatedTokens.push(updatedToken);
-        }
-        if (!isEqual(oldValue.description, token.description)) {
-          updatedTokens.push({
-            ...token,
-            oldDescription: oldValue.description,
-            importType: 'UPDATE',
-          });
         }
       } else {
         newTokens.push({ ...token, importType: 'NEW' });

@@ -92,6 +92,7 @@ export type SavedSettings = {
   storeTokenIdInJsonEditor: boolean;
   tokenFormat: TokenFormatOptions;
   autoApplyThemeOnDrop: boolean;
+  skipDeprecatedTokensInVariableSync: boolean;
   seenGenericVersionedHeaderMigrationDialog?: boolean;
   seenTermsUpdate2026?: boolean;
 };
@@ -128,6 +129,7 @@ export function notifyUISettings(
     tokenFormat,
     renameExistingStylesAndVariables,
     removeStylesAndVariablesWithoutConnection,
+    skipDeprecatedTokensInVariableSync,
     seenGenericVersionedHeaderMigrationDialog,
     seenTermsUpdate2026,
   }: SavedSettings,
@@ -167,6 +169,7 @@ export function notifyUISettings(
       tokenFormat,
       renameExistingStylesAndVariables,
       removeStylesAndVariablesWithoutConnection,
+      skipDeprecatedTokensInVariableSync,
       seenGenericVersionedHeaderMigrationDialog,
       seenTermsUpdate2026,
     },

@@ -11,12 +11,14 @@ export function generateTokensToCreate({
   filterByTokenSet,
   overallConfig = {},
   themeTokenResolver,
+  skipDeprecated = false,
 }: {
   theme: ThemeObject;
   tokens: Record<string, AnyTokenList>;
   filterByTokenSet?: string;
   overallConfig?: UsedTokenSetsMap;
   themeTokenResolver?: TokenResolver;
+  skipDeprecated?: boolean;
 }): { tokensToCreate: ResolveTokenValuesResult[]; resolvedTokens: ResolveTokenValuesResult[] } {
   // Big O(resolveTokenValues * mergeTokenGroups)
   const enabledTokenSets = Object.entries(theme.selectedTokenSets)
@@ -27,7 +29,8 @@ export function generateTokensToCreate({
   const resolver = themeTokenResolver || new TokenResolver([]);
   const resolved = resolver.setTokens(mergeTokenGroups(tokens, theme.selectedTokenSets, overallConfig));
   const tokensToCreate = resolved.filter(
-    (token) => ((!token.internal__Parent || enabledTokenSets.includes(token.internal__Parent)) && tokenTypesToCreateVariable.includes(token.type)), // filter out SOURCE tokens
+    (token) => ((!token.internal__Parent || enabledTokenSets.includes(token.internal__Parent)) && tokenTypesToCreateVariable.includes(token.type)) // filter out SOURCE tokens
+      && !(skipDeprecated && token.$deprecated), // filter out deprecated tokens when requested
   );
   return { tokensToCreate, resolvedTokens: resolved };
 }

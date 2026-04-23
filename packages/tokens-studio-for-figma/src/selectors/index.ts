@@ -81,3 +81,5 @@ export * from './tokensSizeSelector';
 export * from './themesSizeSelector';
 export * from './showBitbucketMigrationDialogSelector';
 export * from './triggerMigrationEditSelector';
+export * from './hideDeprecatedTokensSelector';
+export * from './skipDeprecatedTokensInVariableSyncSelector';

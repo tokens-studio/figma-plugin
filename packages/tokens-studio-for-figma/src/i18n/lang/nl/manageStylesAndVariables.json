@@ -49,7 +49,10 @@
     "renameExisting": "Update bestaande stijl- en variabelenamen",
     "renameExistingExplanation": "Bestaande stijlen en variabelen worden hernoemd zodat ze overeenkomen met de tokennaam",
     "removeWithoutConnection": "Verwijder stijlen en variabelen zonder verbinding met een token",
-    "removeWithoutConnectionExplanation": "Stijlen en variabelen die niet aan een token zijn gekoppeld, worden verwijderd"
+    "removeWithoutConnectionExplanation": "Stijlen en variabelen die niet aan een token zijn gekoppeld, worden verwijderd",
+    "deprecatedTokens": "Verouderde tokens",
+    "skipDeprecatedTokens": "Verouderde tokens overslaan bij het synchroniseren van variabelen",
+    "skipDeprecatedTokensExplanation": "Tokens die als verouderd zijn gemarkeerd, worden niet aangemaakt of bijgewerkt als Figma-variabelen"
   },
   "variables": {
     "color": "Kleur",

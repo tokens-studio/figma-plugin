@@ -256,3 +256,22 @@ describe('createTokenObj', () => {
     expect(result).toEqual(RESULT_TOKENS);
   });
 });
+
+describe('createTokensObject — hideDeprecated', () => {
+  const tokens = [
+    { id: '1', type: TokenTypes.COLOR, name: 'color.active', value: '#ff0000' },
+    { id: '2', type: TokenTypes.COLOR, name: 'color.deprecated', value: '#0000ff', $deprecated: true },
+  ];
+
+  it('includes deprecated tokens when hideDeprecated is false (default)', () => {
+    const result = createTokensObject(tokens);
+    expect((result[TokenTypes.COLOR]?.values as any)?.color?.active).toBeDefined();
+    expect((result[TokenTypes.COLOR]?.values as any)?.color?.deprecated).toBeDefined();
+  });
+
+  it('excludes deprecated tokens when hideDeprecated is true', () => {
+    const result = createTokensObject(tokens, '', true);
+    expect((result[TokenTypes.COLOR]?.values as any)?.color?.active).toBeDefined();
+    expect((result[TokenTypes.COLOR]?.values as any)?.color?.deprecated).toBeUndefined();
+  });
+});

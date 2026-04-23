@@ -135,6 +135,52 @@ describe('stringfyTokens', () => {
     expect(stringifyTokens(emptyTokens, activeTokenSet)).toEqual('{}');
   });
 
+  it('DTCG: serializes $deprecated at top level when true', () => {
+    setFormat(TokenFormatOptions.DTCG);
+    const input = {
+      global: [{ name: 'color.red', type: 'color', value: '#ff0000', $deprecated: true }],
+    };
+    const result = JSON.parse(stringifyTokens(input, 'global'));
+    expect(result.color.red.$deprecated).toBe(true);
+    expect(result.color.red.$extensions).toBeUndefined();
+  });
+
+  it('DTCG: omits $deprecated when false or absent', () => {
+    setFormat(TokenFormatOptions.DTCG);
+    const input = {
+      global: [
+        { name: 'color.red', type: 'color', value: '#ff0000', $deprecated: false },
+        { name: 'color.blue', type: 'color', value: '#0000ff' },
+      ],
+    };
+    const result = JSON.parse(stringifyTokens(input, 'global'));
+    expect(result.color.red.$deprecated).toBeUndefined();
+    expect(result.color.blue.$deprecated).toBeUndefined();
+  });
+
+  it('Legacy: moves $deprecated into $extensions[studio.tokens].deprecated', () => {
+    setFormat(TokenFormatOptions.Legacy);
+    const input = {
+      global: [{ name: 'color.red', type: 'color', value: '#ff0000', $deprecated: true }],
+    };
+    const result = JSON.parse(stringifyTokens(input, 'global'));
+    expect(result.color.red.$deprecated).toBeUndefined();
+    expect(result.color.red.$extensions?.['studio.tokens']?.deprecated).toBe(true);
+  });
+
+  it('Legacy: omits deprecated from $extensions when false or absent', () => {
+    setFormat(TokenFormatOptions.Legacy);
+    const input = {
+      global: [
+        { name: 'color.red', type: 'color', value: '#ff0000', $deprecated: false },
+        { name: 'color.blue', type: 'color', value: '#0000ff' },
+      ],
+    };
+    const result = JSON.parse(stringifyTokens(input, 'global'));
+    expect(result.color.red.$extensions?.['studio.tokens']?.deprecated).toBeUndefined();
+    expect(result.color.blue.$extensions?.['studio.tokens']?.deprecated).toBeUndefined();
+  });
+
   it('convert legacy token list to the JSON string with nested structure', () => {
     const input = {
       global: [
