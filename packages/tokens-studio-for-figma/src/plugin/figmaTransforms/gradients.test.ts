@@ -387,6 +387,16 @@ describe('radial and conic gradients', () => {
     expect(result.gradientTransform).toEqual([[1, 0, 0], [0, 1, 0]]);
   });
 
+  it('should handle radial-gradient(ellipse at top, ...)', () => {
+    const input = 'radial-gradient(ellipse at top, #ffffff 0, #666666 100%)';
+    const result = convertStringToFigmaGradient(input);
+    expect(result.type).toEqual('GRADIENT_RADIAL');
+    expect(result.gradientTransform).toEqual([
+      [1, 0, 0],
+      [0, 1, 0.5],
+    ]);
+  });
+
   it('should convert conic gradient', () => {
     const result = convertStringToFigmaGradient('conic-gradient(#ff0000, #0000ff)');
     expect(result.type).toEqual('GRADIENT_ANGULAR');
@@ -423,6 +433,26 @@ describe('radial and conic gradients', () => {
     const result = convertStringToFigmaGradient('radial-gradient(circle at center, #ff0000, #0000ff)');
     expect(result.type).toEqual('GRADIENT_RADIAL');
     expect(result.gradientStops).toHaveLength(2);
+  });
+
+
+  it('should handle radial-gradient(at bottom right, ...)', () => {
+    const input = 'radial-gradient(at bottom right, #ffffff, #000000)';
+    const result = convertStringToFigmaGradient(input);
+    expect(result.gradientTransform).toEqual([
+      [2, 0, 0],
+      [0, 2, -1],
+    ]);
+  });
+
+  it('should handle radial-gradient with case-insensitivity and extra spaces', () => {
+    const input = 'RADIAL-GRADIENT(Ellipse  at  TOP left, #ffffff, #000000)';
+    const result = convertStringToFigmaGradient(input);
+    expect(result.type).toEqual('GRADIENT_RADIAL');
+    expect(result.gradientTransform).toEqual([
+      [2, 0, -1],
+      [0, 2, 0],
+    ]);
   });
 
   it('should handle conic gradient with at position', () => {
