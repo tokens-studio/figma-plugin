@@ -908,6 +908,14 @@ export const tokenState = createModel<RootModel>()({
     setTokenSetOrder(data: string[], rootState) {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
 
+      if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO) {
+        pushToTokensStudio({
+          context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
+          action: 'UPDATE_TOKEN_SET_ORDER',
+          data: data.map((name, index) => ({ path: name, orderIndex: index })),
+        });
+      }
+
       if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
         data.forEach((name, index) => {
           const tokenSetId = (rootState.tokenState.tokenSetMetadata[name] as any)?.id;
