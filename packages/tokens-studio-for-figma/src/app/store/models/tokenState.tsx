@@ -746,10 +746,15 @@ export const tokenState = createModel<RootModel>()({
       // Clear cached server results whenever the context changes (e.g. branch switch)
       serverResolvedTokens: null,
     }),
-    setServerResolvedTokens: (state, payload: Record<string, string> | null): TokenState => ({
-      ...state,
-      serverResolvedTokens: payload,
-    }),
+    setServerResolvedTokens: (state, payload: Record<string, string> | null): TokenState => {
+      if (isEqual(state.serverResolvedTokens, payload)) {
+        return state;
+      }
+      return {
+        ...state,
+        serverResolvedTokens: payload,
+      };
+    },
     ...tokenStateReducers,
   },
   effects: (dispatch) => ({
@@ -877,6 +882,10 @@ export const tokenState = createModel<RootModel>()({
       if (payload.shouldUpdate) {
         dispatch.tokenState.updateDocument();
       }
+    },
+    setServerResolvedTokens() {
+      // Trigger document update whenever server-resolved tokens change
+      dispatch.tokenState.updateDocument({ shouldUpdateNodes: true });
     },
     toggleUsedTokenSet() {
       dispatch.tokenState.updateDocument({ updateRemote: false });

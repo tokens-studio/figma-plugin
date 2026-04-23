@@ -5,6 +5,7 @@ import {
   themesListSelector,
   tokensSelector,
   usedTokenSetSelector,
+  lastSyncedStateSelector,
 } from '@/selectors';
 import { Dispatch, RootState } from '@/app/store';
 import { useAuthStore } from '@/app/store/useAuthStore';
@@ -35,6 +36,7 @@ export function useServerTokenResolver() {
     (state: RootState) => state.uiState.storageType?.provider,
   );
   const usedTokenSet = useSelector(usedTokenSetSelector);
+  const lastSyncedState = useSelector(lastSyncedStateSelector);
 
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -111,5 +113,5 @@ export function useServerTokenResolver() {
     };
     // Deliberately omit buildThemeSelections from deps — theme/activeTheme already cover it
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTheme, tokens, usedTokenSet, serverResolverContext, storageProvider, dispatch]);
+  }, [activeTheme, tokens, usedTokenSet, serverResolverContext, storageProvider, dispatch, lastSyncedState]);
 }

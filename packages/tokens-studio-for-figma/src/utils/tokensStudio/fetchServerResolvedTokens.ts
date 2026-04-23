@@ -37,7 +37,10 @@ export async function fetchServerResolvedTokens(
   try {
     // Build query string: change_set_id + each theme selection as a flat param
     // e.g. ?change_set_id=abc&color-scheme=blue&foundation=base
-    const params = new URLSearchParams({ change_set_id: changeSetId });
+    const params = new URLSearchParams({ 
+      change_set_id: changeSetId,
+      t: Date.now().toString(), // Cache buster
+    });
     Object.entries(themeSelections).forEach(([group, option]) => {
       params.set(group, option);
     });
