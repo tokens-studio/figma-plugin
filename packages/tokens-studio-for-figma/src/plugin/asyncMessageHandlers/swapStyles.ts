@@ -24,6 +24,11 @@ function getRootNode(updateMode: UpdateMode) {
 
 // Go through layers to swap styles
 export async function swapStyles(activeTheme: Record<string, string>, themes: ThemeObjectsList, updateMode: UpdateMode) {
+  // Commit undo point before swapping styles
+  if (typeof figma !== 'undefined' && figma.commitUndo) {
+    figma.commitUndo();
+  }
+  
   const activeThemes = themes.filter((theme) => Object.values(activeTheme).some((v) => v === theme.id)).map((t) => t.name);
   // Creates an object that groups sibling styles by token name and theme name, e.g. { 'color.background': { 'dark': 'S:1234,4:16', 'light': 'S:1235,4:16' } }
   const mappedStyleReferences = themes.reduce((acc, theme) => {
