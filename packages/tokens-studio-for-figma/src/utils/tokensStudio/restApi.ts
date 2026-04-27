@@ -1,5 +1,3 @@
-import { notifyToUI } from '@/plugin/notifiers';
-
 interface RestOptions {
   method?: 'GET' | 'POST' | 'PATCH' | 'DELETE';
   body?: any;
@@ -14,17 +12,12 @@ async function restRequest(
 ) {
   const { method = 'GET', body, query } = options;
   const url = new URL(`${apiBaseUrl}${endpoint}`);
-  
+
   if (query) {
     Object.entries(query).forEach(([key, value]) => {
       url.searchParams.append(key, value);
     });
   }
-
-  const headers: HeadersInit = {
-    Authorization: `Bearer ${authToken}`,
-    'Content-Type': 'application/json',
-  };
 
   try {
     if (body) {

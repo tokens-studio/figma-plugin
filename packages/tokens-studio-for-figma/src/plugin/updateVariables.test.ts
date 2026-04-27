@@ -364,7 +364,7 @@ describe('updateVariables', () => {
       core: [
         {
           name: 'typography.baseline',
-          value: '16', 
+          value: '16',
           type: TokenTypes.FONT_SIZES,
         },
         {

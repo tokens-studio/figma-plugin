@@ -132,7 +132,7 @@ export function alignObjectKeys<T extends Record<string, any>>(obj: T, template:
   Object.keys(obj).forEach((key) => {
     if (!(key in aligned)) {
       if (isSelectedTokenSets && obj[key] === 'disabled') {
-         return;
+        return;
       }
       aligned[key] = obj[key];
     }
@@ -216,17 +216,18 @@ export function useTokensStudioOAuth() {
   );
 
   const pushTokensToTokensStudioOAuth = useCallback(
-    async (context: TokensStudioOAuthCredentials): Promise<RemoteResponseData> => {
+    async (_context: TokensStudioOAuthCredentials): Promise<RemoteResponseData> => {
       // For now, OAuth REST sync is primarily driven by individual actions in tokenState.tsx.
-      // A full 'push' (like Git) might be implemented later if needed, 
+      // A full 'push' (like Git) might be implemented later if needed,
       // but the requirement is to sync back when a token is changed.
       // We return success here to satisfy the remoteTokens.tsx push flow if triggered.
-      return {
+      const result: RemoteResponseData = {
         status: 'success',
         tokens,
         themes,
         metadata: {},
       };
+      return result;
     },
     [tokens, themes],
   );
@@ -265,12 +266,12 @@ export function useTokensStudioOAuth() {
                 metadata: data.metadata,
               });
               const stringifiedRemoteTokens = JSON.stringify(compact([data.tokens, data.themes, TokenFormat.format]), null, 2);
-               dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
+              dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
               dispatch.tokenState.setCollapsedTokenSets([]);
               // dispatch.tokenState.setEditProhibited(true);
               notifyToUI('Pulled tokens from Tokens Studio OAuth');
             }
-           } else {
+          } else {
             // Even if it didn't change, we still want it read only
             // dispatch.tokenState.setEditProhibited(true);
           }
@@ -350,7 +351,7 @@ export function useTokensStudioOAuth() {
             metadata: { tokenSetOrder },
           });
 
-           const stringifiedRemoteTokens = JSON.stringify(compact([newTokens, alignedNewThemes, TokenFormat.format]), null, 2);
+          const stringifiedRemoteTokens = JSON.stringify(compact([newTokens, alignedNewThemes, TokenFormat.format]), null, 2);
           dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
           // dispatch.tokenState.setEditProhibited(true);
 
