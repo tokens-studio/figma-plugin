@@ -9,11 +9,23 @@ class SharedDataHandler {
   }
 
   keys(node: BaseNode) {
-    return node.getSharedPluginDataKeys(this.namespace);
+    try {
+      return node.getSharedPluginDataKeys(this.namespace);
+    } catch (err) {
+      console.warn('Unable to read shared plugin data keys from node', node.id, err);
+      return [];
+    }
   }
 
   get<Result = string>(node: BaseNode, key: string, transformer?: (value: string) => Result) {
-    const value = node.getSharedPluginData(this.namespace, key);
+    let value = '';
+    try {
+      value = node.getSharedPluginData(this.namespace, key);
+    } catch (err) {
+      console.warn('Unable to read shared plugin data from node', node.id, err);
+      return value;
+    }
+
     if (value) {
       return (transformer ? transformer(value) : value) as Result;
     }
