@@ -28,6 +28,7 @@ export type ProjectData = {
   tokens: AnyTokenSet | null;
   themes: ThemeObjectsList;
   tokenSets: Record<string, { id: string; isDynamic: boolean }>;
+  themeGroups: Record<string, { id: string }>;
   tokenSetOrder: string[];
   changeSetId: string;
   hasExceededPaginationLimit?: boolean;
@@ -138,11 +139,6 @@ export async function fetchProjectDataRest(
     if (tokenSetsData.data && Array.isArray(tokenSetsData.data)) {
       tokenSetsData.data.forEach((item: any) => {
         let setName = item.attributes?.name || item.id;
-        // Strip the root directory prefix if it exists (e.g. "florian-tokens/component/btn" -> "component/btn")
-        const slashIndex = setName.indexOf('/');
-        if (slashIndex > 0) {
-          setName = setName.substring(slashIndex + 1);
-        }
 
         tokenSets.push({
           id: item.id,
@@ -165,6 +161,7 @@ export async function fetchProjectDataRest(
 
     const tokens: AnyTokenSet = {};
     const tokenSetsMap: Record<string, { id: string; isDynamic: boolean }> = {};
+    const themeGroupsMap: Record<string, { id: string }> = {};
     const tokenSetIdToName: Record<string, string> = {};
 
     // Sort by order_index and transform
@@ -243,6 +240,7 @@ export async function fetchProjectDataRest(
       themeGroupsData.data.forEach((group: any) => {
         const { id } = group;
         const name = group.attributes?.name || id;
+        themeGroupsMap[name] = { id };
         const options = optionsByGroupId[id] || [];
 
         options.forEach((opt) => {
@@ -276,6 +274,7 @@ export async function fetchProjectDataRest(
       tokens,
       themes,
       tokenSets: tokenSetsMap,
+      themeGroups: themeGroupsMap,
       tokenSetOrder,
       changeSetId,
       hasExceededPaginationLimit,

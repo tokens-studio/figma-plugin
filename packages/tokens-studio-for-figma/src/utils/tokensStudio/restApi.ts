@@ -219,10 +219,7 @@ export async function updateThemeGroupRest(
   return restRequest(authToken, apiBaseUrl, `/api/v1/projects/${projectId}/theme_groups/${themeGroupId}`, {
     method: 'PATCH',
     body: {
-      theme_group: {
-        name: data.name,
-        options: data.options,
-      },
+      theme_group: data,
     },
     query: (changeSetId || branch) ? { change_set_id: changeSetId || branch || '' } : undefined,
   });
@@ -237,6 +234,72 @@ export async function deleteThemeGroupRest(
   changeSetId?: string,
 ) {
   return restRequest(authToken, apiBaseUrl, `/api/v1/projects/${projectId}/theme_groups/${themeGroupId}`, {
+    method: 'DELETE',
+    query: (changeSetId || branch) ? { change_set_id: changeSetId || branch || '' } : undefined,
+  });
+}
+
+// Theme Option Operations
+export async function createThemeOptionRest(
+  authToken: string,
+  apiBaseUrl: string,
+  projectId: string,
+  data: {
+    name: string;
+    theme_group_id: string;
+    selected_token_sets: Record<string, string>;
+    figma_style_references?: Record<string, string>;
+    figma_variable_references?: Record<string, string>;
+    figma_collection_id?: string;
+    figma_mode_id?: string;
+  },
+  branch?: string,
+  changeSetId?: string,
+) {
+  return restRequest(authToken, apiBaseUrl, `/api/v1/projects/${projectId}/theme_options`, {
+    method: 'POST',
+    body: {
+      theme_option: data,
+    },
+    query: (changeSetId || branch) ? { change_set_id: changeSetId || branch || '' } : undefined,
+  });
+}
+
+export async function updateThemeOptionRest(
+  authToken: string,
+  apiBaseUrl: string,
+  projectId: string,
+  themeOptionId: string,
+  data: {
+    name?: string;
+    theme_group_id?: string;
+    selected_token_sets?: Record<string, string>;
+    figma_style_references?: Record<string, string>;
+    figma_variable_references?: Record<string, string>;
+    figma_collection_id?: string;
+    figma_mode_id?: string;
+  },
+  branch?: string,
+  changeSetId?: string,
+) {
+  return restRequest(authToken, apiBaseUrl, `/api/v1/projects/${projectId}/theme_options/${themeOptionId}`, {
+    method: 'PATCH',
+    body: {
+      theme_option: data,
+    },
+    query: (changeSetId || branch) ? { change_set_id: changeSetId || branch || '' } : undefined,
+  });
+}
+
+export async function deleteThemeOptionRest(
+  authToken: string,
+  apiBaseUrl: string,
+  projectId: string,
+  themeOptionId: string,
+  branch?: string,
+  changeSetId?: string,
+) {
+  return restRequest(authToken, apiBaseUrl, `/api/v1/projects/${projectId}/theme_options/${themeOptionId}`, {
     method: 'DELETE',
     query: (changeSetId || branch) ? { change_set_id: changeSetId || branch || '' } : undefined,
   });

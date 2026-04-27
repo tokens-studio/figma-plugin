@@ -35,6 +35,9 @@ import {
   createThemeGroupRest,
   updateThemeGroupRest,
   deleteThemeGroupRest,
+  createThemeOptionRest,
+  updateThemeOptionRest,
+  deleteThemeOptionRest,
 } from '../../../../utils/tokensStudio/restApi';
 
 type TokensStudioOAuthCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.TOKENS_STUDIO_OAUTH }>;
@@ -85,23 +88,42 @@ export const pushToTokensStudioOAuth = async ({
       case 'CREATE_THEME_GROUP':
         result = await createThemeGroupRest(oauthTokens.accessToken, apiBaseUrl, projectId, data, branch, changeSetId);
         break;
-      case 'UPDATE_THEME_GROUP':
-        if (data.id) {
-          result = await updateThemeGroupRest(oauthTokens.accessToken, apiBaseUrl, projectId, data.id, data, branch, changeSetId);
+      case 'UPDATE_THEME_GROUP': {
+        const { id, ...themeGroupData } = data;
+        if (id) {
+          result = await updateThemeGroupRest(oauthTokens.accessToken, apiBaseUrl, projectId, id, themeGroupData, branch, changeSetId);
         }
         break;
+      }
       case 'DELETE_THEME_GROUP':
         if (data.id) {
           result = await deleteThemeGroupRest(oauthTokens.accessToken, apiBaseUrl, projectId, data.id, branch, changeSetId);
+        }
+        break;
+      case 'CREATE_THEME':
+        result = await createThemeOptionRest(oauthTokens.accessToken, apiBaseUrl, projectId, data, branch, changeSetId);
+        break;
+      case 'UPDATE_THEME': {
+        const { id, ...themeOptionData } = data;
+        if (id) {
+          result = await updateThemeOptionRest(oauthTokens.accessToken, apiBaseUrl, projectId, id, themeOptionData, branch, changeSetId);
+        }
+        break;
+      }
+      case 'DELETE_THEME':
+        if (data.id) {
+          result = await deleteThemeOptionRest(oauthTokens.accessToken, apiBaseUrl, projectId, data.id, branch, changeSetId);
         }
         break;
       default:
         console.warn('Unknown REST action', action);
     }
     if (successCallback) successCallback(result);
+    return result;
   } catch (error) {
     console.error('Failed to push to Tokens Studio OAuth via REST:', error);
     notifyToUI(`Failed to sync: ${error instanceof Error ? error.message : 'Unknown error'}`, { error: true });
+    return null;
   }
 };
 
@@ -183,6 +205,7 @@ export function useTokensStudioOAuth() {
             metadata: {
               tokenSetOrder: projectData.tokenSetOrder,
               tokenSetsData: projectData.tokenSets as any,
+              themeGroupsData: projectData.themeGroups as any,
               changeSetId: projectData.changeSetId,
             },
           };

@@ -31,7 +31,7 @@ import {
 } from '@/types/payloads';
 import { updateTokenPayloadToSingleToken } from '@/utils/updateTokenPayloadToSingleToken';
 import { RootModel } from '@/types/RootModel';
-import { ThemeObjectsList, UsedTokenSetsMap } from '@/types';
+import { ThemeObject, ThemeObjectsList, UsedTokenSetsMap } from '@/types';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { isEqual } from '@/utils/isEqual';
 import { StorageProviderType } from '@/constants/StorageProviderType';
@@ -57,6 +57,7 @@ import { CreateSingleTokenData, EditSingleTokenData } from '../useManageTokens';
 import { singleTokensToRawTokenSet } from '@/utils/convert';
 import { checkStorageSize } from '@/utils/checkStorageSize';
 import { compareLastSyncedState } from '@/utils/compareLastSyncedState';
+import { RemoteTokenStorageMetadata } from '@/storage/RemoteTokenStorage';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
@@ -644,6 +645,21 @@ export const tokenState = createModel<RootModel>()({
     setRemoteData: (state, data: CompareStateType): TokenState => ({
       ...state,
       remoteData: data,
+    }),
+    setRemoteMetadata: (state, data: RemoteTokenStorageMetadata): TokenState => ({
+      ...state,
+      remoteData: {
+        ...state.remoteData,
+        metadata: data,
+      },
+    }),
+    updateTheme: (state, { oldId, theme }: { oldId: string; theme: ThemeObject }): TokenState => ({
+      ...state,
+      themes: state.themes.map((t) => (t.id === oldId ? theme : t)),
+    }),
+    removeTheme: (state, id: string): TokenState => ({
+      ...state,
+      themes: state.themes.filter((t) => t.id !== id),
     }),
     setTokenFormat: (state, data: TokenFormatOptions): TokenState => ({
       ...state,
