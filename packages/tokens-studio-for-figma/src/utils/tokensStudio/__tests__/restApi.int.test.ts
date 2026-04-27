@@ -11,20 +11,35 @@ const API_BASE_URL = 'https://api-staging.tokens.studio';
 const EMAIL = 'akshay@tokens.studio';
 const PASSWORD = 'Test@123';
 
-const authToken = process.env.TOKENS_STUDIO_AUTH_TOKEN || '';
+let authToken = '';
 let projectId = process.env.TOKENS_STUDIO_PROJECT_ID || '';
 
-const describeIntegration = authToken ? describe : describe.skip;
-
-describeIntegration('Tokens Studio REST API Integration', () => {
+describe('Tokens Studio REST API Integration', () => {
   // Use a longer timeout for integration testing
   jest.setTimeout(60000);
 
   beforeAll(async () => {
-    // Obtain a projectId to run tests against if not provided
+    // 1. Obtain authToken via login
+    const authRes = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user: { email: EMAIL, password: PASSWORD } })
+    });
+    
+    if (!authRes.ok) {
+      throw new Error(`Auth failed: ${authRes.statusText} ${await authRes.text()}`);
+    }
+    
+    const authData = await authRes.json();
+    authToken = authData.meta.token;
+
+    // 2. Obtain a projectId to run tests against if not provided
     if (authToken && !projectId) {
       const projRes = await fetch(`${API_BASE_URL}/api/v1/projects`, {
-        headers: { Authorization: `Bearer ${authToken}` }
+        headers: { 
+          Authorization: `Bearer ${authToken}`,
+          Accept: 'application/json'
+        }
       });
       
       if (!projRes.ok) {
@@ -32,16 +47,18 @@ describeIntegration('Tokens Studio REST API Integration', () => {
       }
       
       const projData = await projRes.json();
-      if (!projData.data || projData.data.length === 0) {
+      const projects = projData.data || [];
+      if (projects.length === 0) {
         throw new Error('No projects found to run tests. Please create at least one project manually.');
       }
       
-      const targetProject = projData.data.find((p: any) => p.attributes?.name === 'Project1' || p.name === 'Project1');
+      const targetProject = projects.find((p) => p.attributes?.name === 'Project1' || p.name === 'Project1');
       
       if (targetProject) {
         projectId = targetProject.id;
       } else {
-        throw new Error("Could not find a project named 'Project1' to run the tests.");
+        // Fallback to the first project if Project1 is not found
+        projectId = projects[0].id;
       }
     }
   });

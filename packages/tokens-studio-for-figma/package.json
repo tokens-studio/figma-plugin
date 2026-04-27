@@ -26,7 +26,7 @@
     "test:quiet": "npm run test -- --reporters=jest-silent-reporter --coverage=false",
     "test:coverage": "npm run test -- --collectCoverageFrom='[\"src/**/*.{js,jsx,ts,tsx}\"]' --coverage --collectCoverage=true --coverageDirectory='./' --forceExit --detectOpenHandles",
     "test:coverage:ci": "npm run test:coverage -- --reporters=jest-silent-reporter --coverageReporters='json-summary'",
-    "test:api": "TOKENS_STUDIO_AUTH_TOKEN=$(node scripts/token-manager.mjs) jest src/utils/tokensStudio/__tests__/restApi.int.test.ts",
+    "test:api": "jest src/utils/tokensStudio/__tests__/restApi.int.test.ts",
     "test:e2e": "cypress run --browser chrome",
     "cy:open": "cypress open",
     "cy:run": "cypress run --headless",
