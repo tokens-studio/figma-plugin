@@ -10,6 +10,7 @@ import {
 import { Dispatch, RootState } from '@/app/store';
 import { useAuthStore } from '@/app/store/useAuthStore';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { fetchServerResolvedTokens } from '@/utils/tokensStudio/fetchServerResolvedTokens';
 
 const SERVER_RESOLVE_DEBOUNCE_MS = 150;
@@ -81,7 +82,7 @@ export function useServerTokenResolver() {
 
       const themeSelections = buildThemeSelections();
       const activeSets = Object.entries(usedTokenSet)
-        .filter(([, status]) => status === 'enabled')
+        .filter(([, status]) => status === TokenSetStatus.ENABLED)
         .map(([name]) => name);
 
 
