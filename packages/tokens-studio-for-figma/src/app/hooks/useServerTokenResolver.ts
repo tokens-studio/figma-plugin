@@ -86,6 +86,9 @@ export function useServerTokenResolver() {
 
 
 
+      // Clear any stale server-resolved tokens before starting a new fetch cycle
+      dispatch.tokenState.setServerResolvedTokens(null);
+
       const resolved = await fetchServerResolvedTokens({
         apiBaseUrl: serverResolverContext.apiBaseUrl,
         projectId: serverResolverContext.projectId,
@@ -95,10 +98,9 @@ export function useServerTokenResolver() {
         activeSets,
       });
 
-      // Dispatch the flat map directly — updateSources merges it on top of local resolution
-      if (resolved !== null) {
-        dispatch.tokenState.setServerResolvedTokens(resolved);
-      }
+      // Always dispatch — if the server returned null (error/no delta),
+      // we must ensure any previous delta is cleared so the UI falls back to local resolution.
+      dispatch.tokenState.setServerResolvedTokens(resolved);
     }, SERVER_RESOLVE_DEBOUNCE_MS);
 
     return () => {
