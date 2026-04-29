@@ -178,11 +178,7 @@ export default async function updateTokensOnSources({
     ? mergeServerResolvedTokens(locallyResolved, serverResolvedTokens)
     : null;
 
-  if (locallyResolved && serverResolvedTokens && Object.keys(serverResolvedTokens).length > 0) {
-    console.log(`[gRPC Resolver] Merged ${Object.keys(serverResolvedTokens).length} server-resolved values into ${locallyResolved.length} local tokens ✓`);
-  } else if (locallyResolved) {
-    console.log('[gRPC Resolver] Using local TokenResolver only (no server delta available)');
-  }
+
 
   const tokensSize = (compressedTokens.length / 1024) * 2; // UTF-16 uses 2 bytes per character
   const themesSize = (compressedThemes.length / 1024) * 2;

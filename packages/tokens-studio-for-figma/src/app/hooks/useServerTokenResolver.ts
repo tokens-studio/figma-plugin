@@ -84,12 +84,7 @@ export function useServerTokenResolver() {
         .filter(([, status]) => status === 'enabled')
         .map(([name]) => name);
 
-      console.log('[ServerResolver] Fetching resolved tokens from server…', {
-        projectId: serverResolverContext.projectId,
-        changeSetId: serverResolverContext.changeSetId,
-        themeSelections,
-        activeSets,
-      });
+
 
       const resolved = await fetchServerResolvedTokens({
         apiBaseUrl: serverResolverContext.apiBaseUrl,

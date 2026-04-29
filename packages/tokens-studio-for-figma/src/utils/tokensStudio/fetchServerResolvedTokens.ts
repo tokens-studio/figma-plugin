@@ -60,9 +60,7 @@ export async function fetchServerResolvedTokens(
     );
 
     if (!response.ok) {
-      console.warn(
-        `[ServerResolver] Server returned ${response.status} ${response.statusText} — falling back to local resolver`,
-      );
+
       return null;
     }
 
@@ -76,14 +74,14 @@ export async function fetchServerResolvedTokens(
     );
 
     if (!flatMap) {
-      console.warn('[ServerResolver] Unexpected response shape — falling back to local resolver');
+
       return null;
     }
 
-    console.log(`[ServerResolver] Received ${Object.keys(flatMap).length} theme-resolved tokens from server`);
+
     return flatMap;
   } catch (error) {
-    console.warn('[ServerResolver] Network error — falling back to local resolver:', error);
+
     return null;
   }
 }
