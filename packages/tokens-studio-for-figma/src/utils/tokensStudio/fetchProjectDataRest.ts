@@ -1,3 +1,5 @@
+import { normalizeTokenType } from './normalizeTokenType';
+import { TokenTypes } from '@/constants/TokenTypes';
 import { AnyTokenSet } from '@/types/tokens';
 import { ThemeObjectsList, ThemeObject } from '@/types';
 import { parseBranchesFromResponse } from './fetchBranchesListRest';
@@ -31,6 +33,7 @@ export type ProjectData = {
   tokenSetOrder: string[];
   hasExceededPaginationLimit?: boolean;
 };
+
 
 function transformTokenValue(token: any): unknown {
   const value = token.attributes?.value;
@@ -199,7 +202,7 @@ export async function fetchProjectDataRest(
           transformedTokens.push({
             name: tokenName,
             value: transformTokenValue(token),
-            type: token.attributes?.type,
+            type: normalizeTokenType(token.attributes?.type),
             ...(token.attributes?.description && { description: token.attributes.description }),
             ...(Object.keys($extensions).length > 0 && { $extensions }),
           });

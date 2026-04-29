@@ -3,6 +3,8 @@ import {
 } from '@tokens-studio/sdk';
 import * as Sentry from '@sentry/react';
 import { AnyTokenSet } from '@/types/tokens';
+import { normalizeTokenType } from '@/utils/tokensStudio/normalizeTokenType';
+import { TokenTypes } from '@/constants/TokenTypes';
 import { notifyToUI } from '@/plugin/notifiers';
 import {
   RemoteTokenStorage,
@@ -66,6 +68,16 @@ type ProjectData = {
   tokenSetOrder: string[];
 };
 
+function normalizeTokens(tokens: any) {
+  if (Array.isArray(tokens)) {
+    return tokens.map((token: any) => ({
+      ...token,
+      type: normalizeTokenType(token.type),
+    }));
+  }
+  return tokens;
+}
+
 async function getProjectData(id: string, orgId: string, client: any): Promise<ProjectData | null> {
   try {
     const data = await client.query({
@@ -93,7 +105,7 @@ async function getProjectData(id: string, orgId: string, client: any): Promise<P
     const returnData = tokenSets.reduce(
       (acc, tokenSet) => {
         if (!tokenSet.name) return acc;
-        acc.tokens[tokenSet.name] = JSON.parse(JSON.stringify(tokenSet.raw));
+        acc.tokens[tokenSet.name] = normalizeTokens(tokenSet.raw);
         acc.tokenSets[tokenSet.name] = { isDynamic: tokenSet.type === TokenSetType.Dynamic };
         return acc;
       },
