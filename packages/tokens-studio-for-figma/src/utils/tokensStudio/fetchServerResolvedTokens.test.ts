@@ -17,6 +17,7 @@ describe('fetchServerResolvedTokens', () => {
     jest.clearAllMocks();
     jest.spyOn(console, 'log').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
+    jest.spyOn(Date, 'now').mockReturnValue(1777406477644);
   });
 
   it('returns null on a 4xx response', async () => {
@@ -87,13 +88,18 @@ describe('fetchServerResolvedTokens', () => {
 
     await fetchServerResolvedTokens(BASE_OPTIONS);
 
-    const expectedParams = new URLSearchParams({ change_set_id: 'cs-456', Mode: 'Dark' });
+    const expectedParams = new URLSearchParams({ 
+      change_set_id: 'cs-456', 
+      t: '1777406477644',
+      Mode: 'Dark',
+    });
     expect(mockFetch).toHaveBeenCalledWith(
       `https://api.tokens.studio/api/v1/projects/proj-123/resolved_tokens?${expectedParams.toString()}`,
       expect.objectContaining({
         method: 'GET',
         headers: expect.objectContaining({
           Authorization: 'Bearer test-token',
+          'Content-Type': 'application/json',
         }),
       }),
     );
