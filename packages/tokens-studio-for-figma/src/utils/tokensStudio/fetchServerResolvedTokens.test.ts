@@ -1,6 +1,7 @@
 import { fetchServerResolvedTokens } from './fetchServerResolvedTokens';
 
 // Mock global fetch
+const originalFetch = global.fetch;
 const mockFetch = jest.fn();
 global.fetch = mockFetch;
 
@@ -18,6 +19,14 @@ describe('fetchServerResolvedTokens', () => {
     jest.spyOn(console, 'log').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
     jest.spyOn(Date, 'now').mockReturnValue(1777406477644);
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  afterAll(() => {
+    global.fetch = originalFetch;
   });
 
   it('returns null on a 4xx response', async () => {
