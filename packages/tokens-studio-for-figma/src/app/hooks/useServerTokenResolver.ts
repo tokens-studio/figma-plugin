@@ -108,7 +108,5 @@ export function useServerTokenResolver() {
         clearTimeout(debounceTimer.current);
       }
     };
-    // Deliberately omit buildThemeSelections from deps — theme/activeTheme already cover it
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTheme, tokens, usedTokenSet, serverResolverContext, storageProvider, dispatch, lastSyncedState]);
+  }, [activeTheme, buildThemeSelections, tokens, usedTokenSet, serverResolverContext, storageProvider, dispatch, lastSyncedState]);
 }
