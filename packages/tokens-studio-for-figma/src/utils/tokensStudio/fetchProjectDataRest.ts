@@ -1,5 +1,4 @@
 import { normalizeTokenType } from './normalizeTokenType';
-import { TokenTypes } from '@/constants/TokenTypes';
 import { AnyTokenSet } from '@/types/tokens';
 import { ThemeObjectsList, ThemeObject } from '@/types';
 import { parseBranchesFromResponse } from './fetchBranchesListRest';

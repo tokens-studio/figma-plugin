@@ -4,7 +4,6 @@ import {
 import * as Sentry from '@sentry/react';
 import { AnyTokenSet } from '@/types/tokens';
 import { normalizeTokenType } from '@/utils/tokensStudio/normalizeTokenType';
-import { TokenTypes } from '@/constants/TokenTypes';
 import { notifyToUI } from '@/plugin/notifiers';
 import {
   RemoteTokenStorage,
