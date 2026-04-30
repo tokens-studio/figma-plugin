@@ -7,6 +7,7 @@ import {
   isSingleTokenValueObject,
   isSingleTypographyToken,
 } from './is';
+import { normalizeTokenType } from './tokensStudio/normalizeTokenType';
 import { TokenGroupInJSON, isTokenGroupWithType } from './is/isTokenGroupWithType';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 import { isSingleTokenInJSON } from './is/isSingleTokenInJson';
@@ -91,7 +92,7 @@ function checkForTokens({
       returnValue.type = inheritType as TokenTypes;
       returnValue.inheritTypeLevel = currentTypeLevel as number;
     } else {
-      returnValue.type = token[TokenFormat.tokenTypeKey];
+      returnValue.type = normalizeTokenType(token[TokenFormat.tokenTypeKey]) as TokenTypes;
       if (inheritType === token[TokenFormat.tokenTypeKey] && currentTypeLevel > 0) {
         returnValue.inheritTypeLevel = currentTypeLevel as number;
       }
@@ -114,7 +115,7 @@ function checkForTokens({
       returnValue.type = inheritType as TokenTypes;
       returnValue.inheritTypeLevel = currentTypeLevel as number;
     } else {
-      returnValue.type = token[TokenFormat.tokenTypeKey] as TokenTypes;
+      returnValue.type = normalizeTokenType(token[TokenFormat.tokenTypeKey] as string) as TokenTypes;
     }
   } else if (typeof token === 'object') {
     // We dont have a single token value key yet, so it's likely a group which we need to iterate over
@@ -124,7 +125,7 @@ function checkForTokens({
     // When token groups are typed, we need to inherit the type to their children
     if (isTokenGroupWithType(token)) {
       const { [TokenFormat.tokenTypeKey]: groupType, ...tokenValues } = token;
-      inheritType = groupType as unknown as TokenTypes;
+      inheritType = normalizeTokenType(groupType as string);
       currentTypeLevel = groupLevel;
       tokenToCheck = tokenValues as Tokens;
     }
