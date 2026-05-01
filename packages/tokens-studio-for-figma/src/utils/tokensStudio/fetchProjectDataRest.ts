@@ -139,11 +139,6 @@ export async function fetchProjectDataRest(
     if (tokenSetsData.data && Array.isArray(tokenSetsData.data)) {
       tokenSetsData.data.forEach((item: any) => {
         let setName = item.attributes?.name || item.id;
-        // Strip the root directory prefix if it exists (e.g. "florian-tokens/component/btn" -> "component/btn")
-        const slashIndex = setName.indexOf('/');
-        if (slashIndex > 0) {
-          setName = setName.substring(slashIndex + 1);
-        }
 
         tokenSets.push({
           id: item.id,
