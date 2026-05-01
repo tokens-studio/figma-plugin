@@ -92,11 +92,15 @@ function checkForTokens({
     }
     if (!token[TokenFormat.tokenTypeKey] && inheritType) {
       returnValue.type = inheritType as TokenTypes;
+      returnValue.inheritTypeLevel = currentTypeLevel as number;
     } else {
       returnValue.type = shouldNormalize
         ? normalizeTokenType(token[TokenFormat.tokenTypeKey]) as TokenTypes
         : token[TokenFormat.tokenTypeKey];
-      if (inheritType === token[TokenFormat.tokenTypeKey] && currentTypeLevel > 0) {
+      const typeToCompare = shouldNormalize
+        ? normalizeTokenType(token[TokenFormat.tokenTypeKey])
+        : token[TokenFormat.tokenTypeKey];
+      if (inheritType === typeToCompare && currentTypeLevel > 0) {
         returnValue.inheritTypeLevel = currentTypeLevel as number;
       }
     }
