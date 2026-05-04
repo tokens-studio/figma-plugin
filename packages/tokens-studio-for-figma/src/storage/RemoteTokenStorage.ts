@@ -135,7 +135,7 @@ export abstract class RemoteTokenStorage<
         } else if (file.type === 'tokenSet') {
           data.tokens = {
             ...data.tokens,
-            ...parseTokenValues({ [file.name]: file.data }),
+            ...parseTokenValues({ [file.name]: file.data }, true),
           };
         } else if (file.type === 'metadata') {
           data.metadata = {
