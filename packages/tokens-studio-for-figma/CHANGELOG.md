@@ -1,5 +1,12 @@
 # @tokens-studio/figma-plugin
 
+## 2.11.6
+
+### Patch Changes
+
+- 87ff6386c: Fixed an issue where tokens imported from Tokens Studio were incorrectly recognized as custom tokens due to type name mismatches (e.g., 'space' vs 'spacing', 'size' vs 'sizing').
+- 38e5b4e4a: Fixed an issue where token set folder structure was lost when pulling tokens from new Studio OAuth.
+
 ## 2.11.5
 
 ### Patch Changes
