@@ -49,6 +49,22 @@ describe('isSingleToken', () => {
 
     expect(isSingleToken(wrongToken)).toBe(false);
   });
+  it('rejects token groups with name and value child tokens', () => {
+    const tokenGroup = {
+      name: {
+        type: 'typography',
+        name: 'included-link.contract.chip.text.label.name',
+        value: { fontFamily: 'Inter' },
+      },
+      value: {
+        type: 'typography',
+        name: 'included-link.contract.chip.text.label.value',
+        value: { fontFamily: 'Inter' },
+      },
+    };
+
+    expect(isSingleToken(tokenGroup)).toBe(false);
+  });
 });
 
 describe('isSingleTypographyToken', () => {

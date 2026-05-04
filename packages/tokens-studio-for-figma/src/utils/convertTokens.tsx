@@ -45,6 +45,17 @@ export type Tokens =
     $description?: string;
   };
 
+function normalizeTokenType(type: unknown): TokenTypes | undefined {
+  switch (type) {
+    case 'space':
+      return TokenTypes.SPACING;
+    case 'size':
+      return TokenTypes.SIZING;
+    default:
+      return typeof type === 'string' ? type as TokenTypes : undefined;
+  }
+}
+
 // @TODO fix typings
 function checkForTokens({
   obj,
@@ -83,16 +94,17 @@ function checkForTokens({
   if (isSingleTokenInJSON(token)) {
     returnValue = token as SingleToken<false>;
     returnValue.value = token[TokenFormat.tokenValueKey];
+    const tokenType = normalizeTokenType(token[TokenFormat.tokenTypeKey]);
 
     if (token[TokenFormat.tokenDescriptionKey] && typeof token[TokenFormat.tokenDescriptionKey] === 'string') {
       returnValue.description = token[TokenFormat.tokenDescriptionKey] as string;
     }
-    if (!token[TokenFormat.tokenTypeKey] && inheritType) {
+    if (!tokenType && inheritType) {
       returnValue.type = inheritType as TokenTypes;
       returnValue.inheritTypeLevel = currentTypeLevel as number;
     } else {
-      returnValue.type = token[TokenFormat.tokenTypeKey];
-      if (inheritType === token[TokenFormat.tokenTypeKey] && currentTypeLevel > 0) {
+      returnValue.type = tokenType as TokenTypes;
+      if (inheritType === tokenType && currentTypeLevel > 0) {
         returnValue.inheritTypeLevel = currentTypeLevel as number;
       }
     }
@@ -107,14 +119,15 @@ function checkForTokens({
       acc[key] = isSingleTokenValueObject(val) && returnValuesOnly ? val[TokenFormat.tokenValueKey] : val;
       return acc;
     }, {});
+    const tokenType = normalizeTokenType(token[TokenFormat.tokenTypeKey]);
     if (token[TokenFormat.tokenDescriptionKey] && typeof token[TokenFormat.tokenDescriptionKey] === 'string') {
       returnValue.description = token[TokenFormat.tokenDescriptionKey] as string;
     }
-    if (!token[TokenFormat.tokenTypeKey] && inheritType) {
+    if (!tokenType && inheritType) {
       returnValue.type = inheritType as TokenTypes;
       returnValue.inheritTypeLevel = currentTypeLevel as number;
     } else {
-      returnValue.type = token[TokenFormat.tokenTypeKey] as TokenTypes;
+      returnValue.type = tokenType as TokenTypes;
     }
   } else if (typeof token === 'object') {
     // We dont have a single token value key yet, so it's likely a group which we need to iterate over
@@ -124,7 +137,7 @@ function checkForTokens({
     // When token groups are typed, we need to inherit the type to their children
     if (isTokenGroupWithType(token)) {
       const { [TokenFormat.tokenTypeKey]: groupType, ...tokenValues } = token;
-      inheritType = groupType as unknown as TokenTypes;
+      inheritType = normalizeTokenType(groupType);
       currentTypeLevel = groupLevel;
       tokenToCheck = tokenValues as Tokens;
     }
@@ -159,7 +172,7 @@ function checkForTokens({
     };
   }
 
-  if (typeof returnValue === 'object' && 'name' in returnValue && returnValue?.name) {
+  if (typeof returnValue === 'object' && 'name' in returnValue && typeof returnValue?.name === 'string') {
     returnValue.name = returnValue.name.split('/').join('.');
   }
 
