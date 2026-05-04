@@ -2,13 +2,19 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { SetTokenDataPayload } from '@/types/payloads';
 import { AnyTokenList, SingleToken, TokenStore } from '@/types/tokens';
 import convertToTokenArray from './convertTokens';
+import { normalizeTokenType } from './tokensStudio/normalizeTokenType';
 import { detectFormat } from './detectFormat';
 
-export default function parseTokenValues(tokens: SetTokenDataPayload['values']): TokenStore['values'] {
+export default function parseTokenValues(tokens: SetTokenDataPayload['values'], shouldNormalize = false): TokenStore['values'] {
   // If we receive an array of tokens, move them all to the global set
   if (Array.isArray(tokens)) {
     return {
-      global: tokens,
+      global: shouldNormalize
+        ? tokens.map((token) => ({
+          ...token,
+          type: normalizeTokenType(token.type) as TokenTypes,
+        } as SingleToken))
+        : tokens,
     };
   }
 
@@ -19,14 +25,22 @@ export default function parseTokenValues(tokens: SetTokenDataPayload['values']):
     const parsedGroup = group[1];
 
     if (Array.isArray(parsedGroup)) {
-      prev.push([group[0], parsedGroup]);
+      prev.push([
+        group[0],
+        shouldNormalize
+          ? parsedGroup.map((token) => ({
+            ...token,
+            type: normalizeTokenType(token.type) as TokenTypes,
+          } as SingleToken))
+          : parsedGroup,
+      ]);
       return prev;
     }
 
     if (typeof parsedGroup === 'object') {
       detectFormat(parsedGroup, true);
 
-      const convertedToArray = convertToTokenArray({ tokens: parsedGroup });
+      const convertedToArray = convertToTokenArray({ tokens: parsedGroup, shouldNormalize });
       prev.push([group[0], convertedToArray]);
       return prev;
     }

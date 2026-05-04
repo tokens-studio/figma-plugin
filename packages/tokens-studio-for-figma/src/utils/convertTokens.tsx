@@ -7,6 +7,7 @@ import {
   isSingleTokenValueObject,
   isSingleTypographyToken,
 } from './is';
+import { normalizeTokenType } from './tokensStudio/normalizeTokenType';
 import { TokenGroupInJSON, isTokenGroupWithType } from './is/isTokenGroupWithType';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 import { isSingleTokenInJSON } from './is/isSingleTokenInJson';
@@ -58,6 +59,7 @@ function checkForTokens({
   inheritType,
   groupLevel = 0,
   currentTypeLevel = 0,
+  shouldNormalize = false,
 }: {
   obj: SingleToken<true>[];
   token: Tokens | TokenGroupInJSON;
@@ -70,6 +72,7 @@ function checkForTokens({
   inheritType?: string;
   groupLevel?: number;
   currentTypeLevel?: number;
+  shouldNormalize?: boolean;
 }): [(SingleToken & SingleToken & OptionalDTCGKeys)[], SingleToken & OptionalDTCGKeys | undefined] {
   let returnValue:
   | Pick<SingleToken<false>, 'name' | 'value' | 'type' | 'description' | 'inheritTypeLevel'>
@@ -91,8 +94,13 @@ function checkForTokens({
       returnValue.type = inheritType as TokenTypes;
       returnValue.inheritTypeLevel = currentTypeLevel as number;
     } else {
-      returnValue.type = token[TokenFormat.tokenTypeKey];
-      if (inheritType === token[TokenFormat.tokenTypeKey] && currentTypeLevel > 0) {
+      returnValue.type = shouldNormalize
+        ? normalizeTokenType(token[TokenFormat.tokenTypeKey]) as TokenTypes
+        : token[TokenFormat.tokenTypeKey];
+      const typeToCompare = shouldNormalize
+        ? normalizeTokenType(token[TokenFormat.tokenTypeKey])
+        : token[TokenFormat.tokenTypeKey];
+      if (inheritType === typeToCompare && currentTypeLevel > 0) {
         returnValue.inheritTypeLevel = currentTypeLevel as number;
       }
     }
@@ -114,7 +122,9 @@ function checkForTokens({
       returnValue.type = inheritType as TokenTypes;
       returnValue.inheritTypeLevel = currentTypeLevel as number;
     } else {
-      returnValue.type = token[TokenFormat.tokenTypeKey] as TokenTypes;
+      returnValue.type = shouldNormalize
+        ? normalizeTokenType(token[TokenFormat.tokenTypeKey] as string) as TokenTypes
+        : token[TokenFormat.tokenTypeKey] as TokenTypes;
     }
   } else if (typeof token === 'object') {
     // We dont have a single token value key yet, so it's likely a group which we need to iterate over
@@ -124,7 +134,9 @@ function checkForTokens({
     // When token groups are typed, we need to inherit the type to their children
     if (isTokenGroupWithType(token)) {
       const { [TokenFormat.tokenTypeKey]: groupType, ...tokenValues } = token;
-      inheritType = groupType as unknown as TokenTypes;
+      inheritType = shouldNormalize
+        ? normalizeTokenType(groupType as string)
+        : groupType as unknown as TokenTypes;
       currentTypeLevel = groupLevel;
       tokenToCheck = tokenValues as Tokens;
     }
@@ -143,6 +155,7 @@ function checkForTokens({
           inheritType,
           groupLevel,
           currentTypeLevel,
+          shouldNormalize,
         });
         if (root && result) {
           obj.push({ ...result, name: [root, key].join('.') });
@@ -166,11 +179,12 @@ function checkForTokens({
   return [obj, returnValue as SingleToken | undefined];
 }
 
-export default function convertToTokenArray({ tokens }: { tokens: Tokens }) {
+export default function convertToTokenArray({ tokens, shouldNormalize = false }: { tokens: Tokens, shouldNormalize?: boolean }) {
   const [result] = checkForTokens({
     obj: [],
     root: null,
     token: tokens,
+    shouldNormalize,
   });
 
   // Internally we dont care about $value or value, we always use value, so remove it
