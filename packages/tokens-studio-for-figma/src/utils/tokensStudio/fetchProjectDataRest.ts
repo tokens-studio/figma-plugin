@@ -1,3 +1,4 @@
+import { normalizeTokenType } from './normalizeTokenType';
 import { AnyTokenSet } from '@/types/tokens';
 import { ThemeObjectsList, ThemeObject } from '@/types';
 import { parseBranchesFromResponse } from './fetchBranchesListRest';
@@ -33,6 +34,7 @@ export type ProjectData = {
   /** The change_set_id for the resolved branch — used for server-side token resolution */
   changeSetId: string;
 };
+
 
 function transformTokenValue(token: any): unknown {
   const value = token.attributes?.value;
@@ -139,11 +141,6 @@ export async function fetchProjectDataRest(
     if (tokenSetsData.data && Array.isArray(tokenSetsData.data)) {
       tokenSetsData.data.forEach((item: any) => {
         let setName = item.attributes?.name || item.id;
-        // Strip the root directory prefix if it exists (e.g. "florian-tokens/component/btn" -> "component/btn")
-        const slashIndex = setName.indexOf('/');
-        if (slashIndex > 0) {
-          setName = setName.substring(slashIndex + 1);
-        }
 
         tokenSets.push({
           id: item.id,
@@ -201,7 +198,7 @@ export async function fetchProjectDataRest(
           transformedTokens.push({
             name: tokenName,
             value: transformTokenValue(token),
-            type: token.attributes?.type,
+            type: normalizeTokenType(token.attributes?.type),
             ...(token.attributes?.description && { description: token.attributes.description }),
             ...(Object.keys($extensions).length > 0 && { $extensions }),
           });
