@@ -141,4 +141,54 @@ describe('convertToTokenArray', () => {
       { name: 'global.nestGroupWithType.font.big', value: '24px', type: 'dimension' },
     ]);
   });
+
+  it('ignores non-string name properties in token JSON', () => {
+    expect(convertToTokenArray({
+      tokens: {
+        global: {
+          color: {
+            primary: {
+              $value: '#ff0000',
+              $type: 'color',
+              name: 123,
+            },
+          },
+        },
+      },
+    })).toEqual([
+      {
+        name: 'global.color.primary',
+        value: '#ff0000',
+        type: 'color',
+      },
+    ]);
+  });
+
+  it('normalizes new Studio type aliases to plugin token types', () => {
+    expect(convertToTokenArray({
+      tokens: {
+        global: {
+          gap: {
+            $value: '8px',
+            $type: 'space',
+          },
+          width: {
+            $value: '16px',
+            $type: 'size',
+          },
+        },
+      },
+    })).toEqual([
+      {
+        name: 'global.gap',
+        value: '8px',
+        type: 'spacing',
+      },
+      {
+        name: 'global.width',
+        value: '16px',
+        type: 'sizing',
+      },
+    ]);
+  });
 });

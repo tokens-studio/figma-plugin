@@ -6,5 +6,6 @@ export function isSingleToken(token: SingleToken | any): token is SingleToken {
     && typeof token === 'object'
     && 'value' in token
     && 'name' in token
+    && typeof token.name === 'string'
   );
 }
