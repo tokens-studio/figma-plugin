@@ -40,6 +40,7 @@ export function useServerTokenResolver() {
   const lastSyncedState = useSelector(lastSyncedStateSelector);
 
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const requestId = useRef(0);
 
   /**
    * Build theme_selections in the format the server expects:
@@ -85,7 +86,8 @@ export function useServerTokenResolver() {
         .filter(([, status]) => status === TokenSetStatus.ENABLED)
         .map(([name]) => name);
 
-
+      requestId.current += 1;
+      const thisRequest = requestId.current;
 
       // Clear any stale server-resolved tokens before starting a new fetch cycle
       dispatch.tokenState.setServerResolvedTokens(null);
@@ -98,6 +100,8 @@ export function useServerTokenResolver() {
         themeSelections,
         activeSets,
       });
+
+      if (thisRequest !== requestId.current) return;
 
       // Always dispatch — if the server returned null (error/no delta),
       // we must ensure any previous delta is cleared so the UI falls back to local resolution.
