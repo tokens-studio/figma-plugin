@@ -1,5 +1,3 @@
-import { AnyTokenList } from '@/types/tokens';
-
 export interface ServerResolveOptions {
   apiBaseUrl: string;
   projectId: string;
@@ -24,11 +22,9 @@ export interface ServerResolveOptions {
  * Returns null on any error so callers fall back to local resolution silently.
  *
  * @param options  - Connection context and theme selections
- * @param _rawTokens - Unused; kept for API compatibility during transition
  */
 export async function fetchServerResolvedTokens(
   options: ServerResolveOptions,
-  _rawTokens?: Record<string, AnyTokenList>,
 ): Promise<Record<string, string> | null> {
   const {
     apiBaseUrl, projectId, changeSetId, authToken, themeSelections, activeSets,
