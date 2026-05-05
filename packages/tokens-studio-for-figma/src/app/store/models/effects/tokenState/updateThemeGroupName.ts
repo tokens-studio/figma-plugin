@@ -11,7 +11,7 @@ export function updateThemeGroupName(dispatch: RematchDispatch<RootModel>) {
       shouldUpdateNodes: false,
     });
 
-    if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
+    if (rootState?.uiState?.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
       const { metadata } = rootState.tokenState.remoteData;
       const { themeGroupsData } = metadata || {};
       const groupId = themeGroupsData?.[oldGroupName]?.id;

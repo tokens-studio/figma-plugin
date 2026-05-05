@@ -10,8 +10,8 @@ export function renameVariableNamesToThemes(dispatch: RematchDispatch<RootModel>
       shouldUpdateNodes: false,
     });
 
-    if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
-      rootState.tokenState.themes.forEach((theme: any) => {
+    if (rootState?.uiState?.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
+      rootState.tokenState?.themes?.forEach((theme: any) => {
         pushThemeToTokensStudioOAuth(theme, rootState, dispatch);
       });
     }

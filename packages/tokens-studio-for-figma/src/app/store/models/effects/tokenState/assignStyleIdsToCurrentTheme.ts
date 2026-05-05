@@ -10,9 +10,9 @@ export function assignStyleIdsToCurrentTheme(dispatch: RematchDispatch<RootModel
       shouldUpdateNodes: false,
     });
 
-    if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
-      payload.selectedThemes.forEach((themeId) => {
-        const theme = rootState.tokenState.themes.find((t: any) => t.id === themeId);
+    if (rootState?.uiState?.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
+      payload?.selectedThemes?.forEach((themeId) => {
+        const theme = rootState.tokenState?.themes?.find((t: any) => t.id === themeId);
         if (theme) {
           pushThemeToTokensStudioOAuth(theme, rootState, dispatch);
         }
