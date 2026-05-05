@@ -53,8 +53,7 @@ export const pushToTokensStudioOAuth = async ({
   context, action, data, successCallback,
 }: PushToTokensStudioOAuth) => {
   const { oauthTokens } = useAuthStore.getState();
-  if (!oauthTokens?.accessToken) return;
-
+  if (!oauthTokens?.accessToken) return null;
   const studioUrl = TOKENS_STUDIO_APP_URL;
   const apiBaseUrl = OAuthService.getApiBaseUrl(studioUrl);
   const { id: projectId, branch, changeSetId } = context;
