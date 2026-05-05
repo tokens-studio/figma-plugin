@@ -131,4 +131,21 @@ describe('fetchServerResolvedTokens', () => {
     expect(url.searchParams.get('color-scheme')).toBe('blue');
     expect(url.searchParams.get('change_set_id')).toBe('cs-456');
   });
+
+  it('encodes activeSets as repeated query params', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ data: {} }),
+    });
+
+    await fetchServerResolvedTokens({
+      ...BASE_OPTIONS,
+      activeSets: ['global', 'theme', 'core'],
+    });
+
+    const [calledUrl] = mockFetch.mock.calls[0];
+    const url = new URL(calledUrl);
+    const sets = url.searchParams.getAll('set');
+    expect(sets).toEqual(['global', 'theme', 'core']);
+  });
 });
