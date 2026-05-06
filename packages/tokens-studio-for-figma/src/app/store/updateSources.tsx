@@ -1,5 +1,6 @@
 import { startTransaction } from '@sentry/react';
-import { mergeTokenGroups } from '@/utils/tokenHelpers';
+import { mergeTokenGroups, mergeServerResolvedTokens } from '@/utils/tokenHelpers';
+
 import { Dispatch } from '@/app/store';
 import { notifyToUI } from '../../plugin/notifiers';
 import { updateJSONBinTokens } from './providers/jsonbin';
@@ -50,6 +51,8 @@ type UpdateTokensOnSourcesPayload = {
   tokenFormat: TokenFormatOptions
   tokensSize: number
   themesSize: number
+  /** Flat map of tokenName → resolved value from the Studio gRPC server (theme delta only). */
+  serverResolvedTokens?: Record<string, string> | null;
 };
 
 async function updateRemoteTokens({
@@ -148,6 +151,7 @@ export default async function updateTokensOnSources({
   tokenFormat,
   compressedTokens,
   compressedThemes,
+  serverResolvedTokens,
 }: UpdateTokensOnSourcesPayload) {
   if (tokenValues && !isLocal && shouldUpdateRemote && !editProhibited) {
     updateRemoteTokens({
@@ -162,9 +166,19 @@ export default async function updateTokensOnSources({
     });
   }
 
-  const mergedTokens = tokens
+  // Always run local resolution to get the complete token list.
+  const locallyResolved = tokens
     ? defaultTokenResolver.setTokens(mergeTokenGroups(tokens, usedTokenSet))
     : null;
+
+  // If the server returned theme-specific overrides, merge them on top.
+  // The server delta takes precedence for the tokens it resolved; all other
+  // tokens retain their locally-resolved values.
+  const mergedTokens = locallyResolved
+    ? mergeServerResolvedTokens(locallyResolved, serverResolvedTokens)
+    : null;
+
+
 
   const tokensSize = (compressedTokens.length / 1024) * 2; // UTF-16 uses 2 bytes per character
   const themesSize = (compressedThemes.length / 1024) * 2;

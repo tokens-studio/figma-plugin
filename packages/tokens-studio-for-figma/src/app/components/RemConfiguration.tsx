@@ -8,8 +8,8 @@ import {
 import remConfigurationImage from '@/app/assets/hints/remConfiguration.png';
 import IconBrokenLink from '@/icons/brokenlink.svg';
 import { TokenTypes } from '@/constants/TokenTypes';
-import { mergeTokenGroups } from '@/utils/tokenHelpers';
-import { Dispatch } from '../store';
+import { mergeTokenGroups, mergeServerResolvedTokens } from '@/utils/tokenHelpers';
+import { Dispatch, RootState } from '../store';
 import {
   tokensSelector, usedTokenSetSelector, activeTokenSetSelector, aliasBaseFontSizeSelector,
 } from '@/selectors';
@@ -31,11 +31,15 @@ const RemConfiguration = () => {
 
   const toggleModalVisible = React.useCallback(() => setModalVisible((prev) => !prev), []);
 
+  const serverResolvedTokens = useSelector((state: RootState) => state.tokenState.serverResolvedTokens);
   const resolvedTokens = React.useMemo(
-    () => defaultTokenResolver.setTokens(
-      mergeTokenGroups(tokens, usedTokenSet, {}, activeTokenSet),
+    () => mergeServerResolvedTokens(
+      defaultTokenResolver.setTokens(
+        mergeTokenGroups(tokens, usedTokenSet, {}, activeTokenSet),
+      ),
+      serverResolvedTokens,
     ),
-    [tokens, usedTokenSet, activeTokenSet],
+    [tokens, usedTokenSet, activeTokenSet, serverResolvedTokens],
   );
 
   const displayBaseFontValue = React.useMemo(() => {

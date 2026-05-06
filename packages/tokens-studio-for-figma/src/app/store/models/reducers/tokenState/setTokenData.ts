@@ -61,5 +61,6 @@ export function setTokenData(state: TokenState, payload: SetTokenDataPayload): T
     usedTokenSet: Array.isArray(payload.values) ? { global: TokenSetStatus.ENABLED } : usedTokenSets,
     tokensSize,
     themesSize,
+    serverResolvedTokens: null,
   };
 }

@@ -3,12 +3,12 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ToggleGroup, IconButton } from '@tokens-studio/ui';
-import { mergeTokenGroups } from '@/utils/tokenHelpers';
+import { mergeTokenGroups, mergeServerResolvedTokens } from '@/utils/tokenHelpers';
 import TokenListing from './TokenListing';
 import TokensBottomBar from './TokensBottomBar';
 import ToggleEmptyButton from './ToggleEmptyButton';
 import { mappedTokens } from './createTokenObj';
-import { Dispatch } from '../store';
+import { Dispatch, RootState } from '../store';
 import TokenSetSelector from './TokenSetSelector';
 import TokenFilter from './TokenFilter';
 import EditTokenFormModal from './EditTokenFormModal';
@@ -93,6 +93,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
   const scrollPositionSet = useSelector(scrollPositionSetSelector);
   const tokenFilter = useSelector(tokenFilterSelector);
   const aliasBaseFontSize = useSelector(aliasBaseFontSizeSelector);
+  const serverResolvedTokens = useSelector((state: RootState) => state.tokenState.serverResolvedTokens);
   const dispatch = useDispatch<Dispatch>();
   const [tokenSetsVisible, setTokenSetsVisible] = React.useState(true);
   const { getStringTokens } = useTokens();
@@ -111,8 +112,11 @@ function Tokens({ isActive }: { isActive: boolean }) {
   }, [activeTokenSet]);
 
   const resolvedTokens = React.useMemo(
-    () => defaultTokenResolver.setTokens(mergeTokenGroups(tokens, usedTokenSet, {}, activeTokenSet)),
-    [tokens, usedTokenSet, activeTokenSet],
+    () => mergeServerResolvedTokens(
+      defaultTokenResolver.setTokens(mergeTokenGroups(tokens, usedTokenSet, {}, activeTokenSet)),
+      serverResolvedTokens,
+    ),
+    [tokens, usedTokenSet, activeTokenSet, serverResolvedTokens],
   );
 
   const tokenType = useSelector(tokenTypeSelector);

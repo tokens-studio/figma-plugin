@@ -11,21 +11,33 @@ export function generateTokensToCreate({
   filterByTokenSet,
   overallConfig = {},
   themeTokenResolver,
+  preResolvedTokens,
 }: {
   theme: ThemeObject;
   tokens: Record<string, AnyTokenList>;
   filterByTokenSet?: string;
   overallConfig?: UsedTokenSetsMap;
   themeTokenResolver?: TokenResolver;
+  /**
+   * Optional pre-resolved tokens from the Studio server (gRPC resolver).
+   * When provided, skips local mergeTokenGroups + TokenResolver entirely
+   * so resolved values match exactly what the Studio web app shows.
+   */
+  preResolvedTokens?: ResolveTokenValuesResult[];
 }): { tokensToCreate: ResolveTokenValuesResult[]; resolvedTokens: ResolveTokenValuesResult[] } {
-  // Big O(resolveTokenValues * mergeTokenGroups)
   const enabledTokenSets = Object.entries(theme.selectedTokenSets)
     .filter(([name, status]) => status === TokenSetStatus.ENABLED && (!filterByTokenSet || name === filterByTokenSet))
     .map(([tokenSet]) => tokenSet);
-  // Create a separate TokenResolver instance for this theme to avoid interference
-  // when multiple themes are processed concurrently (if not provided)
-  const resolver = themeTokenResolver || new TokenResolver([]);
-  const resolved = resolver.setTokens(mergeTokenGroups(tokens, theme.selectedTokenSets, overallConfig));
+
+  // Use server-resolved tokens when available to guarantee consistency with the Studio app.
+  // Otherwise fall back to local resolution.
+  const resolved: ResolveTokenValuesResult[] = preResolvedTokens
+    ?? (() => {
+      const resolver = themeTokenResolver || new TokenResolver([]);
+      return resolver.setTokens(mergeTokenGroups(tokens, theme.selectedTokenSets, overallConfig));
+    })();
+
+  // Big O(resolveTokenValues * mergeTokenGroups) — only applies for local resolution path
   const tokensToCreate = resolved.filter(
     (token) => ((!token.internal__Parent || enabledTokenSets.includes(token.internal__Parent)) && tokenTypesToCreateVariable.includes(token.type)), // filter out SOURCE tokens
   );
