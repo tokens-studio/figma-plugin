@@ -1,5 +1,11 @@
 # @tokens-studio/figma-plugin
 
+## 2.11.7
+
+### Patch Changes
+
+- 6b939f9c4: Introduced server-side token resolution for Tokens Studio OAuth projects, leveraging our gRPC-backed engine to provide more accurate, theme-aware token values directly within the plugin.
+
 ## 2.11.6
 
 ### Patch Changes
