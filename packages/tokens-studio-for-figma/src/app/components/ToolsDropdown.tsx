@@ -57,7 +57,7 @@ export default function ToolsDropdown() {
             <DropdownMenu.Item disabled={editProhibited} onSelect={handleShowPresetLoadModal}>
               {t('loadFromPreset')}
             </DropdownMenu.Item>
-            <DropdownMenu.Item disabled={editProhibited} onSelect={handleShowExportModal}>
+            <DropdownMenu.Item onSelect={handleShowExportModal}>
               {t('exportToFile')}
             </DropdownMenu.Item>
           </DropdownMenu.Content>
