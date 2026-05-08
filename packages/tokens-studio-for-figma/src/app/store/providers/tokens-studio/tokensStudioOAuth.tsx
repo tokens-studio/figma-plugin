@@ -184,6 +184,11 @@ export function useTokensStudioOAuth() {
         const projectData = await fetchProjectDataRest(oauthTokens.accessToken, apiBaseUrl, context.id, context.branch || 'main');
         if (projectData) {
           // dispatch.tokenState.setEditProhibited(true);
+          dispatch.tokenState.setServerResolverContext({
+            projectId: context.id,
+            changeSetId: projectData.changeSetId,
+            apiBaseUrl,
+          });
           if (projectData.hasExceededPaginationLimit) {
             notifyToUI('Maximum limit of 10,000 tokens reached. Some tokens may be missing.', { error: true });
           }
@@ -266,8 +271,8 @@ export function useTokensStudioOAuth() {
         if (data) {
           if (
             !isEqual(data.tokens, tokens)
-                        || !isEqual(data.themes, themes)
-                        || !isEqual(data.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
+            || !isEqual(data.themes, themes)
+            || !isEqual(data.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
           ) {
             const confirmResult = await confirm({
               text: t('pullFrom', { provider: 'Tokens Studio OAuth' }),
@@ -376,6 +381,11 @@ export function useTokensStudioOAuth() {
           const stringifiedRemoteTokens = JSON.stringify(compact([newTokens, alignedNewThemes, TokenFormat.format]), null, 2);
           dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
           // dispatch.tokenState.setEditProhibited(true);
+          dispatch.tokenState.setServerResolverContext({
+            projectId,
+            changeSetId: projectData.changeSetId,
+            apiBaseUrl,
+          });
 
           dispatch.uiState.setLastError(null);
 

@@ -31,8 +31,9 @@ export type ProjectData = {
   tokenSets: Record<string, { id: string; isDynamic: boolean }>;
   themeGroups: Record<string, { id: string }>;
   tokenSetOrder: string[];
-  changeSetId: string;
   hasExceededPaginationLimit?: boolean;
+  /** The change_set_id for the resolved branch — used for server-side token resolution */
+  changeSetId: string;
 };
 
 

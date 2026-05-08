@@ -59,6 +59,15 @@ import { checkStorageSize } from '@/utils/checkStorageSize';
 import { compareLastSyncedState } from '@/utils/compareLastSyncedState';
 import { RemoteTokenStorageMetadata } from '@/storage/RemoteTokenStorage';
 
+
+
+/** Context required to call the Studio gRPC-backed resolver endpoint */
+export interface ServerResolverContext {
+  projectId: string;
+  changeSetId: string;
+  apiBaseUrl: string;
+}
+
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
   stringTokens: string;
@@ -90,6 +99,15 @@ export interface TokenState {
   tokensSize: number;
   themesSize: number;
   renamedCollections: [string, string][] | null;
+  /** Set when connected via Tokens Studio OAuth — used to call the gRPC resolver */
+  serverResolverContext: ServerResolverContext | null;
+  /**
+   * Flat map of tokenName → resolved value string, as returned by the Studio gRPC server.
+   * Only contains theme-affected tokens (delta), not the full token set.
+   * These values are merged on top of local resolution in updateSources.
+   * null = server hasn't responded yet or is unavailable → use local resolver only.
+   */
+  serverResolvedTokens: Record<string, string> | null;
 }
 
 export const tokenState = createModel<RootModel>()({
@@ -135,6 +153,8 @@ export const tokenState = createModel<RootModel>()({
     tokensSize: 0,
     themesSize: 0,
     renamedCollections: null,
+    serverResolverContext: null,
+    serverResolvedTokens: null,
   } as unknown as TokenState,
   reducers: {
     setTokensSize: (state, size: number) => ({
@@ -736,6 +756,21 @@ export const tokenState = createModel<RootModel>()({
       compressedTokens: payload.compressedTokens,
       compressedThemes: payload.compressedThemes,
     }),
+    setServerResolverContext: (state, payload: ServerResolverContext | null): TokenState => ({
+      ...state,
+      serverResolverContext: payload,
+      // Clear cached server results whenever the context changes (e.g. branch switch)
+      serverResolvedTokens: null,
+    }),
+    setServerResolvedTokens: (state, payload: Record<string, string> | null): TokenState => {
+      if (isEqual(state.serverResolvedTokens, payload)) {
+        return state;
+      }
+      return {
+        ...state,
+        serverResolvedTokens: payload,
+      };
+    },
     ...tokenStateReducers,
   },
   effects: (dispatch) => ({
@@ -956,6 +991,10 @@ export const tokenState = createModel<RootModel>()({
         dispatch.tokenState.updateDocument();
       }
     },
+    setServerResolvedTokens() {
+      // Trigger document update whenever server-resolved tokens change
+      dispatch.tokenState.updateDocument({ shouldUpdateNodes: true, updateRemote: false });
+    },
     toggleUsedTokenSet() {
       dispatch.tokenState.updateDocument({ updateRemote: false });
     },
@@ -1136,6 +1175,7 @@ export const tokenState = createModel<RootModel>()({
               tokenFormat: rootState.tokenState.tokenFormat,
               tokensSize: rootState.tokenState.tokensSize,
               themesSize: rootState.tokenState.themesSize,
+              serverResolvedTokens: rootState.tokenState.serverResolvedTokens,
             });
           },
         );

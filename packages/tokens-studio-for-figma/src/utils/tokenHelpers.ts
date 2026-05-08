@@ -90,3 +90,31 @@ export function mergeTokenGroups(
     return mergedTokens;
   }, [] as SingleToken[]);
 }
+/**
+ * Merges server-side resolved tokens (gRPC delta) on top of locally-resolved tokens.
+ * Only tokens present in the server delta are updated; others retain their local values.
+ *
+ * @param locallyResolved - List of tokens resolved by the local TokenResolver
+ * @param serverResolvedTokens - Flat map of { tokenName: "resolvedValue" } from the Studio server
+ */
+export function mergeServerResolvedTokens(
+  locallyResolved: ResolveTokenValuesResult[],
+  serverResolvedTokens?: Record<string, string> | null,
+): ResolveTokenValuesResult[] {
+  if (!locallyResolved || !serverResolvedTokens || Object.keys(serverResolvedTokens).length === 0) {
+    return locallyResolved;
+  }
+
+  return locallyResolved.map((token) => {
+    const serverValue = serverResolvedTokens[token.name];
+    if (serverValue !== undefined) {
+      return {
+        ...token,
+        value: serverValue,
+        // Since we got a value from the server, it's considered successfully resolved
+        failedToResolve: false,
+      } as ResolveTokenValuesResult;
+    }
+    return token;
+  });
+}

@@ -14,7 +14,7 @@ import { useADO } from './providers/ado';
 import useFile from '@/app/store/providers/file';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import {
-  activeTabSelector, apiSelector, themesListSelector, tokensSelector,
+  activeTabSelector, apiSelector, themesListSelector, tokensSelector, activeThemeSelector, usedTokenSetSelector,
 } from '@/selectors';
 import { ThemeObject, UsedTokenSetsMap } from '@/types';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
@@ -52,6 +52,8 @@ export default function useRemoteTokens() {
   const tokens = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
   const activeTab = useSelector(activeTabSelector);
+  const currentActiveTheme = useSelector(activeThemeSelector);
+  const currentUsedTokenSet = useSelector(usedTokenSetSelector);
   const { showPullDialog, closePullDialog, showPullDialogError } = usePullDialog();
 
   const { setStorageType } = useStorage();
@@ -112,8 +114,8 @@ export default function useRemoteTokens() {
   const pullTokens = useCallback(
     async ({
       context = api,
-      usedTokenSet,
-      activeTheme,
+      usedTokenSet = currentUsedTokenSet,
+      activeTheme = currentActiveTheme,
       collapsedTokenSets,
       updateLocalTokens = false,
       skipConfirmation = false,
@@ -330,6 +332,8 @@ export default function useRemoteTokens() {
       tokens,
       themes,
       activeTab,
+      currentActiveTheme,
+      currentUsedTokenSet,
       dispatch,
       api,
       pullTokensFromGenericVersionedStorage,

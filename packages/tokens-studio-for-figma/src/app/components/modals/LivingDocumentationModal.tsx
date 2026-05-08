@@ -17,8 +17,9 @@ import {
   activeThemeSelector,
   themesListSelector,
 } from '@/selectors';
-import { mergeTokenGroups, getOverallConfig } from '@/utils/tokenHelpers';
+import { mergeTokenGroups, getOverallConfig, mergeServerResolvedTokens } from '@/utils/tokenHelpers';
 import { defaultTokenResolver } from '@/utils/TokenResolver';
+import { RootState } from '../../store';
 import { track } from '@/utils/analytics';
 
 const StyledCode = styled('code', {
@@ -60,6 +61,7 @@ export default function LivingDocumentationModal({
     }
   }, [isOpen, initialTokenSet, initialStartsWith]);
 
+  const serverResolvedTokens = useSelector((state: RootState) => state.tokenState.serverResolvedTokens);
   // Get resolved tokens using the same pattern as other components, including proper theme configuration
   const resolvedTokens = React.useMemo(() => {
     // Get the active theme IDs (activeTheme is Record<string, string>)
@@ -71,8 +73,11 @@ export default function LivingDocumentationModal({
     // Merge tokens with proper theme configuration
     const mergedTokens = mergeTokenGroups(tokens, usedTokenSet, overallConfig, activeTokenSet);
 
-    return defaultTokenResolver.setTokens(mergedTokens);
-  }, [tokens, usedTokenSet, activeTokenSet, activeTheme, themes]);
+    return mergeServerResolvedTokens(
+      defaultTokenResolver.setTokens(mergedTokens),
+      serverResolvedTokens,
+    );
+  }, [tokens, usedTokenSet, activeTokenSet, activeTheme, themes, serverResolvedTokens]);
 
   const handleTokenSetChange = React.useCallback((value: string) => {
     setTokenSet(value);
