@@ -49,6 +49,21 @@ interface PushToTokensStudioOAuth {
   successCallback?: (result: any) => void;
 }
 
+const ACTION_LABELS: Record<string, string> = {
+  CREATE_TOKEN: 'Created token',
+  EDIT_TOKEN: 'Updated token',
+  DELETE_TOKEN: 'Deleted token',
+  CREATE_TOKEN_SET: 'Created token set',
+  UPDATE_TOKEN_SET: 'Updated token set',
+  DELETE_TOKEN_SET: 'Deleted token set',
+  CREATE_THEME_GROUP: 'Created theme group',
+  UPDATE_THEME_GROUP: 'Updated theme group',
+  DELETE_THEME_GROUP: 'Deleted theme group',
+  CREATE_THEME: 'Created theme',
+  UPDATE_THEME: 'Updated theme',
+  DELETE_THEME: 'Deleted theme',
+};
+
 export const pushToTokensStudioOAuth = async ({
   context, action, data, successCallback,
 }: PushToTokensStudioOAuth) => {
@@ -116,6 +131,10 @@ export const pushToTokensStudioOAuth = async ({
         break;
       default:
         console.warn('Unknown REST action', action);
+    }
+    if (result) {
+      const actionLabel = ACTION_LABELS[action] || 'Synced change';
+      notifyToUI(`${actionLabel} to Tokens Studio`);
     }
     if (successCallback) successCallback(result);
     return result;
