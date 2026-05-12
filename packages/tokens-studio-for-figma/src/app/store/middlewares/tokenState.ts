@@ -22,6 +22,13 @@ const refOnlyActions = [
   'tokenState/assignStyleIdsToTheme',
   'tokenState/disconnectVariableFromTheme',
   'tokenState/disconnectStyleFromTheme',
+  'tokenState/renameVariableIdsToTheme',
+  'tokenState/renameStyleIdsToCurrentTheme',
+  'tokenState/renameVariableNamesToThemes',
+  'tokenState/renameStyleNamesToCurrentTheme',
+  'tokenState/removeVariableNamesFromThemes',
+  'tokenState/removeStyleNamesFromThemes',
+  'tokenState/removeStyleIdsFromThemes',
 ];
 
 export const tokenStateMiddleware = (store) => (next) => (action) => {
@@ -48,6 +55,6 @@ export const tokenStateMiddleware = (store) => (next) => (action) => {
     updateThemeRefsViaRestApi({
       prevState,
       rootState: nextState,
-    });
+    }).catch((err) => console.error('[tokenStateMiddleware] REST ref sync failed:', err));
   }
 };

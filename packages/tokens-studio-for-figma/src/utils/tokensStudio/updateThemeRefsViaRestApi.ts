@@ -1,6 +1,7 @@
 import { RematchRootState } from '@rematch/core';
 import { RootModel } from '@/types/RootModel';
 import { ThemeObjectsList } from '@/types';
+import { TokensStudioOAuthStorageType } from '@/types/StorageType';
 import { useAuthStore } from '@/app/store/useAuthStore';
 import { OAuthService } from '@/app/services/OAuthService';
 import { TOKENS_STUDIO_APP_URL } from '@/constants/TokensStudio';
@@ -13,8 +14,8 @@ interface UpdateThemeRefsPayload {
 }
 
 function shallowEqual(
-  a: Record<string, string> | undefined,
-  b: Record<string, string> | undefined,
+  a: Record<string, string> | null | undefined,
+  b: Record<string, string> | null | undefined,
 ): boolean {
   if (a === b) return true;
   if (!a || !b) return false;
@@ -38,8 +39,9 @@ export async function updateThemeRefsViaRestApi({
   const context = rootState.uiState.api;
   if (!context || !('id' in context)) return;
 
-  const projectId = (context as any).id;
-  const branchName = (context as any).branch || 'main';
+  const oauthContext = context as TokensStudioOAuthStorageType;
+  const projectId = oauthContext.id;
+  const branchName = oauthContext.branch || 'main';
 
   const apiBaseUrl = OAuthService.getApiBaseUrl(TOKENS_STUDIO_APP_URL);
 

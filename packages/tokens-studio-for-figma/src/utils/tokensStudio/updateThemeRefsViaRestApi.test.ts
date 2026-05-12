@@ -162,6 +162,7 @@ describe('updateThemeRefsViaRestApi', () => {
   });
 
   it('should abort if changeSetId cannot be resolved', async () => {
+    const spy = jest.spyOn(console, 'error').mockImplementation();
     mockResolveChangeSetId.mockResolvedValue(null);
 
     const themes = [{
@@ -176,5 +177,6 @@ describe('updateThemeRefsViaRestApi', () => {
 
     expect(mockPatchGroup).not.toHaveBeenCalled();
     expect(mockPatchOption).not.toHaveBeenCalled();
+    spy.mockRestore();
   });
 });
