@@ -12,6 +12,18 @@ interface UpdateThemeRefsPayload {
   rootState: RematchRootState<RootModel, Record<string, never>>;
 }
 
+function shallowEqual(
+  a: Record<string, string> | undefined,
+  b: Record<string, string> | undefined,
+): boolean {
+  if (a === b) return true;
+  if (!a || !b) return false;
+  const keysA = Object.keys(a);
+  const keysB = Object.keys(b);
+  if (keysA.length !== keysB.length) return false;
+  return keysA.every((k) => a[k] === b[k]);
+}
+
 /**
  * Diffs prev vs next themes and PATCHes changed refs to Studio-on-Rails.
  * Only called for ref-mutation actions on the OAuth provider path.
@@ -50,64 +62,52 @@ export async function updateThemeRefsViaRestApi({
 
   for (const nextTheme of nextThemes) {
     const prevTheme = prevThemes.find((t) => t.id === nextTheme.id);
-    if (!prevTheme) continue;
+    if (prevTheme) {
+      const themeGroupId = nextTheme.$themeGroupId;
+      const themeOptionId = nextTheme.$themeOptionId;
 
-    const themeGroupId = nextTheme.$themeGroupId;
-    const themeOptionId = nextTheme.$themeOptionId;
+      // Variable refs — group-level, only PATCH once per group
+      if (themeGroupId && !patchedGroups.has(themeGroupId)) {
+        const prevVarRefs = prevTheme.$figmaVariableReferences;
+        const nextVarRefs = nextTheme.$figmaVariableReferences;
 
-    // Variable refs — group-level, only PATCH once per group
-    if (themeGroupId && !patchedGroups.has(themeGroupId)) {
-      const prevVarRefs = prevTheme.$figmaVariableReferences;
-      const nextVarRefs = nextTheme.$figmaVariableReferences;
-
-      if (!shallowEqual(prevVarRefs, nextVarRefs)) {
-        patchedGroups.add(themeGroupId);
-        try {
-          await patchThemeGroupVariableRefs(
-            oauthTokens.accessToken,
-            apiBaseUrl,
-            projectId,
-            changeSetId,
-            themeGroupId,
-            nextVarRefs ?? {},
-          );
-        } catch (err) {
-          console.error('[updateThemeRefsViaRestApi] Failed to patch variable refs:', err);
+        if (!shallowEqual(prevVarRefs, nextVarRefs)) {
+          patchedGroups.add(themeGroupId);
+          try {
+            await patchThemeGroupVariableRefs(
+              oauthTokens.accessToken,
+              apiBaseUrl,
+              projectId,
+              changeSetId,
+              themeGroupId,
+              nextVarRefs ?? {},
+            );
+          } catch (err) {
+            console.error('[updateThemeRefsViaRestApi] Failed to patch variable refs:', err);
+          }
         }
       }
-    }
 
-    // Style refs — option-level
-    if (themeOptionId) {
-      const prevStyleRefs = prevTheme.$figmaStyleReferences;
-      const nextStyleRefs = nextTheme.$figmaStyleReferences;
+      // Style refs — option-level
+      if (themeOptionId) {
+        const prevStyleRefs = prevTheme.$figmaStyleReferences;
+        const nextStyleRefs = nextTheme.$figmaStyleReferences;
 
-      if (!shallowEqual(prevStyleRefs, nextStyleRefs)) {
-        try {
-          await patchThemeOptionStyleRefs(
-            oauthTokens.accessToken,
-            apiBaseUrl,
-            projectId,
-            changeSetId,
-            themeOptionId,
-            nextStyleRefs ?? {},
-          );
-        } catch (err) {
-          console.error('[updateThemeRefsViaRestApi] Failed to patch style refs:', err);
+        if (!shallowEqual(prevStyleRefs, nextStyleRefs)) {
+          try {
+            await patchThemeOptionStyleRefs(
+              oauthTokens.accessToken,
+              apiBaseUrl,
+              projectId,
+              changeSetId,
+              themeOptionId,
+              nextStyleRefs ?? {},
+            );
+          } catch (err) {
+            console.error('[updateThemeRefsViaRestApi] Failed to patch style refs:', err);
+          }
         }
       }
     }
   }
-}
-
-function shallowEqual(
-  a: Record<string, string> | undefined,
-  b: Record<string, string> | undefined,
-): boolean {
-  if (a === b) return true;
-  if (!a || !b) return false;
-  const keysA = Object.keys(a);
-  const keysB = Object.keys(b);
-  if (keysA.length !== keysB.length) return false;
-  return keysA.every((k) => a[k] === b[k]);
 }
