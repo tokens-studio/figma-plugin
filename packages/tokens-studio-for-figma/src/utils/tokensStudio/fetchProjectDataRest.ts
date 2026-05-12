@@ -259,7 +259,7 @@ export async function fetchProjectDataRest(
           };
 
           if (opt.figmaStyleReferences !== undefined) themeObj.$figmaStyleReferences = opt.figmaStyleReferences;
-          if (groupVariableRefs !== undefined) themeObj.$figmaVariableReferences = groupVariableRefs;
+          if (groupVariableRefs !== undefined) themeObj.$figmaVariableReferences = { ...groupVariableRefs };
           if (opt.figmaCollectionId !== undefined) themeObj.$figmaCollectionId = opt.figmaCollectionId;
           if (opt.figmaModeId !== undefined) themeObj.$figmaModeId = opt.figmaModeId;
 
