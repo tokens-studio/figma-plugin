@@ -4,10 +4,12 @@ import { useTranslation } from 'react-i18next';
 import { DropdownMenu, IconButton } from '@tokens-studio/ui';
 
 import { FileZipIcon } from '@primer/octicons-react';
-import { editProhibitedSelector } from '@/selectors';
+import { apiSelector, editProhibitedSelector } from '@/selectors';
 import FileLoadModal from './modals/FileLoadModal';
 import PresetLoadModal from './modals/PresetLoadModal';
 import ExportModal from './modals/ExportModal';
+import { StorageProviderType } from '@/constants/StorageProviderType';
+import { TOKENS_STUDIO_APP_URL } from '@/constants/TokensStudio';
 
 export default function ToolsDropdown() {
   const editProhibited = useSelector(editProhibitedSelector);
@@ -30,9 +32,16 @@ export default function ToolsDropdown() {
     showPresetLoadModal(false);
   }, []);
 
+  const api = useSelector(apiSelector);
+  const isTokensStudioOAuth = api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH;
+
   const handleShowFileLoadModal = useCallback(() => {
-    showFileLoadModal(true);
-  }, []);
+    if (isTokensStudioOAuth && api?.id) {
+      window.open(`https://${TOKENS_STUDIO_APP_URL}/projects/${api.id}/tokens/import`, '_blank');
+    } else {
+      showFileLoadModal(true);
+    }
+  }, [isTokensStudioOAuth, api?.id]);
 
   const handleShowPresetLoadModal = useCallback(() => {
     showPresetLoadModal(true);
@@ -51,7 +60,7 @@ export default function ToolsDropdown() {
 
         <DropdownMenu.Portal>
           <DropdownMenu.Content side="top">
-            <DropdownMenu.Item disabled={editProhibited} onSelect={handleShowFileLoadModal}>
+            <DropdownMenu.Item disabled={!isTokensStudioOAuth && editProhibited} onSelect={handleShowFileLoadModal}>
               {t('loadFromFile')}
             </DropdownMenu.Item>
             <DropdownMenu.Item disabled={editProhibited} onSelect={handleShowPresetLoadModal}>
