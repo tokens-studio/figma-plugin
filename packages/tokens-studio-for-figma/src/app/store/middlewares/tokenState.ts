@@ -1,6 +1,6 @@
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { updateThemeGroupsInTokensStudio } from '@/storage/tokensStudio/updateThemeGroupsInTokensStudio';
-import { updateThemeRefsViaRestApi } from '@/utils/tokensStudio/updateThemeRefsViaRestApi';
+import { updateThemeRefsViaRestApi, snapshotThemeRefs } from '@/utils/tokensStudio/updateThemeRefsViaRestApi';
 
 const actionsToTriggerUpdateInTokensStudio = [
   'tokenState/assignVariableIdsToCurrentTheme',
@@ -33,6 +33,14 @@ const refOnlyActions = [
 
 export const tokenStateMiddleware = (store) => (next) => (action) => {
   const prevState = store.getState();
+
+  // Capture refs snapshot BEFORE the action runs
+  const isOAuthRefAction = prevState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH
+    && refOnlyActions.includes(action.type);
+  const prevThemeRefs = isOAuthRefAction
+    ? snapshotThemeRefs(prevState.tokenState.themes)
+    : undefined;
+
   next(action);
   const nextState = store.getState();
 
@@ -48,12 +56,9 @@ export const tokenStateMiddleware = (store) => (next) => (action) => {
     });
   }
 
-  if (
-    nextState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH
-      && refOnlyActions.includes(action.type)
-  ) {
+  if (prevThemeRefs) {
     updateThemeRefsViaRestApi({
-      prevState,
+      prevThemeRefs,
       rootState: nextState,
     }).catch((err) => console.error('[tokenStateMiddleware] REST ref sync failed:', err));
   }

@@ -8,9 +8,31 @@ import { TOKENS_STUDIO_APP_URL } from '@/constants/TokensStudio';
 import { resolveChangeSetId } from './fetchBranchesListRest';
 import { patchThemeGroupVariableRefs, patchThemeOptionStyleRefs } from './pushThemeRefsRest';
 
+/** Pre-action snapshot of each theme's refs, keyed by theme id. */
+export type ThemeRefsSnapshot = Map<string, {
+  varRefs?: Record<string, string>;
+  styleRefs?: Record<string, string>;
+}>;
+
 interface UpdateThemeRefsPayload {
-  prevState: RematchRootState<RootModel, Record<string, never>>;
+  /** Cloned refs captured *before* the reducer ran (immune to in-place mutation). */
+  prevThemeRefs: ThemeRefsSnapshot;
   rootState: RematchRootState<RootModel, Record<string, never>>;
+}
+
+/**
+ * Shallow-clone every theme's ref maps to create a snapshot that is immune
+ * to in-place mutations performed by some reducers.
+ */
+export function snapshotThemeRefs(themes: ThemeObjectsList): ThemeRefsSnapshot {
+  const snapshot: ThemeRefsSnapshot = new Map();
+  themes.forEach((theme) => {
+    snapshot.set(theme.id, {
+      varRefs: theme.$figmaVariableReferences ? { ...theme.$figmaVariableReferences } : undefined,
+      styleRefs: theme.$figmaStyleReferences ? { ...theme.$figmaStyleReferences } : undefined,
+    });
+  });
+  return snapshot;
 }
 
 function shallowEqual(
@@ -30,7 +52,7 @@ function shallowEqual(
  * Only called for ref-mutation actions on the OAuth provider path.
  */
 export async function updateThemeRefsViaRestApi({
-  prevState,
+  prevThemeRefs,
   rootState,
 }: UpdateThemeRefsPayload): Promise<void> {
   const { oauthTokens } = useAuthStore.getState();
@@ -56,21 +78,20 @@ export async function updateThemeRefsViaRestApi({
     return;
   }
 
-  const prevThemes: ThemeObjectsList = prevState.tokenState.themes;
   const nextThemes: ThemeObjectsList = rootState.tokenState.themes;
 
   // Track which groups have already been patched (variable refs are group-level)
   const patchedGroups = new Set<string>();
 
   for (const nextTheme of nextThemes) {
-    const prevTheme = prevThemes.find((t) => t.id === nextTheme.id);
-    if (prevTheme) {
+    const prev = prevThemeRefs.get(nextTheme.id);
+    if (prev) {
       const themeGroupId = nextTheme.$themeGroupId;
       const themeOptionId = nextTheme.$themeOptionId;
 
       // Variable refs — group-level, only PATCH once per group
       if (themeGroupId && !patchedGroups.has(themeGroupId)) {
-        const prevVarRefs = prevTheme.$figmaVariableReferences;
+        const prevVarRefs = prev.varRefs;
         const nextVarRefs = nextTheme.$figmaVariableReferences;
 
         if (!shallowEqual(prevVarRefs, nextVarRefs)) {
@@ -92,7 +113,7 @@ export async function updateThemeRefsViaRestApi({
 
       // Style refs — option-level
       if (themeOptionId) {
-        const prevStyleRefs = prevTheme.$figmaStyleReferences;
+        const prevStyleRefs = prev.styleRefs;
         const nextStyleRefs = nextTheme.$figmaStyleReferences;
 
         if (!shallowEqual(prevStyleRefs, nextStyleRefs)) {
