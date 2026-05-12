@@ -20,7 +20,6 @@ interface RestThemeOption {
   theme_group_id: string;
   selected_token_sets: Record<string, string>;
   figmaStyleReferences?: Record<string, string>;
-  figmaVariableReferences?: Record<string, string>;
   figmaCollectionId?: string;
   figmaModeId?: string;
 }
@@ -219,7 +218,6 @@ export async function fetchProjectDataRest(
           theme_group_id: item.relationships?.theme_group?.data?.id || '',
           selected_token_sets: item.attributes?.selected_token_sets || {},
           figmaStyleReferences: item.attributes?.figma_style_references,
-          figmaVariableReferences: item.attributes?.figma_variable_references,
           figmaCollectionId: item.attributes?.figma_collection_id,
           figmaModeId: item.attributes?.figma_mode_id,
         });
@@ -232,12 +230,13 @@ export async function fetchProjectDataRest(
       optionsByGroupId[opt.theme_group_id].push(opt);
     });
 
-    // Parse theme groups
+    // Parse theme groups — variable refs live at the group level
     const themes: ThemeObjectsList = [];
     if (themeGroupsData.data && Array.isArray(themeGroupsData.data)) {
       themeGroupsData.data.forEach((group: any) => {
         const { id } = group;
         const name = group.attributes?.name || id;
+        const groupVariableRefs: Record<string, string> | undefined = group.attributes?.figma_variable_references;
         const options = optionsByGroupId[id] || [];
 
         options.forEach((opt) => {
@@ -255,10 +254,12 @@ export async function fetchProjectDataRest(
             name: opt.name,
             group: name,
             selectedTokenSets: selectedTokenSetsByName as any,
+            $themeGroupId: id,
+            $themeOptionId: opt.id,
           };
 
           if (opt.figmaStyleReferences !== undefined) themeObj.$figmaStyleReferences = opt.figmaStyleReferences;
-          if (opt.figmaVariableReferences !== undefined) themeObj.$figmaVariableReferences = opt.figmaVariableReferences;
+          if (groupVariableRefs !== undefined) themeObj.$figmaVariableReferences = groupVariableRefs;
           if (opt.figmaCollectionId !== undefined) themeObj.$figmaCollectionId = opt.figmaCollectionId;
           if (opt.figmaModeId !== undefined) themeObj.$figmaModeId = opt.figmaModeId;
 
