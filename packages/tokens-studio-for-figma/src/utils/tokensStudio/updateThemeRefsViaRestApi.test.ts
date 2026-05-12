@@ -1,4 +1,4 @@
-import { updateThemeRefsViaRestApi } from './updateThemeRefsViaRestApi';
+import { updateThemeRefsViaRestApi, snapshotThemeRefs } from './updateThemeRefsViaRestApi';
 
 // Mock dependencies
 jest.mock('@/app/store/useAuthStore', () => ({
@@ -46,7 +46,7 @@ describe('updateThemeRefsViaRestApi', () => {
     mockPatchOption.mockResolvedValue(undefined);
   });
 
-  const makeState = (themes: any[], api?: any) => ({
+  const makeRootState = (themes: any[], api?: any) => ({
     tokenState: { themes },
     uiState: { api: api || { provider: 'tokensstudio-oauth', id: 'proj-1', branch: 'main' } },
   });
@@ -62,8 +62,8 @@ describe('updateThemeRefsViaRestApi', () => {
     }];
 
     await updateThemeRefsViaRestApi({
-      prevState: makeState(themes) as any,
-      rootState: makeState(themes) as any,
+      prevThemeRefs: snapshotThemeRefs(themes as any),
+      rootState: makeRootState(themes) as any,
     });
 
     expect(mockPatchGroup).not.toHaveBeenCalled();
@@ -87,8 +87,8 @@ describe('updateThemeRefsViaRestApi', () => {
     }];
 
     await updateThemeRefsViaRestApi({
-      prevState: makeState(prevThemes) as any,
-      rootState: makeState(nextThemes) as any,
+      prevThemeRefs: snapshotThemeRefs(prevThemes as any),
+      rootState: makeRootState(nextThemes) as any,
     });
 
     expect(mockPatchGroup).toHaveBeenCalledWith(
@@ -118,8 +118,8 @@ describe('updateThemeRefsViaRestApi', () => {
     }];
 
     await updateThemeRefsViaRestApi({
-      prevState: makeState(prevThemes) as any,
-      rootState: makeState(nextThemes) as any,
+      prevThemeRefs: snapshotThemeRefs(prevThemes as any),
+      rootState: makeRootState(nextThemes) as any,
     });
 
     expect(mockPatchOption).toHaveBeenCalledWith(
@@ -143,8 +143,8 @@ describe('updateThemeRefsViaRestApi', () => {
     ];
 
     await updateThemeRefsViaRestApi({
-      prevState: makeState(prevThemes) as any,
-      rootState: makeState(nextThemes) as any,
+      prevThemeRefs: snapshotThemeRefs(prevThemes as any),
+      rootState: makeRootState(nextThemes) as any,
     });
 
     expect(mockPatchGroup).toHaveBeenCalledTimes(1);
@@ -154,8 +154,8 @@ describe('updateThemeRefsViaRestApi', () => {
     mockGetState.mockReturnValue({ oauthTokens: null });
 
     await updateThemeRefsViaRestApi({
-      prevState: makeState([]) as any,
-      rootState: makeState([]) as any,
+      prevThemeRefs: new Map(),
+      rootState: makeRootState([]) as any,
     });
 
     expect(mockResolveChangeSetId).not.toHaveBeenCalled();
@@ -171,12 +171,54 @@ describe('updateThemeRefsViaRestApi', () => {
     }];
 
     await updateThemeRefsViaRestApi({
-      prevState: makeState([{ id: 'opt-1', $themeGroupId: 'grp-1', $themeOptionId: 'opt-1' }]) as any,
-      rootState: makeState(themes) as any,
+      prevThemeRefs: snapshotThemeRefs([{ id: 'opt-1', $themeGroupId: 'grp-1', $themeOptionId: 'opt-1' }] as any),
+      rootState: makeRootState(themes) as any,
     });
 
     expect(mockPatchGroup).not.toHaveBeenCalled();
     expect(mockPatchOption).not.toHaveBeenCalled();
     spy.mockRestore();
+  });
+
+  it('should correctly detect changes even when refs are mutated in-place by utilizing snapshots', async () => {
+    // Simulate what the current reducers do: mutate refs in-place
+    const sharedVarRefs = { 'color.old': 'VarID:1' };
+    
+    const themesBeforeMutation = [{
+      id: 'light',
+      $themeGroupId: 'grp-1',
+      $themeOptionId: 'opt-1',
+      $figmaVariableReferences: sharedVarRefs,
+    }];
+
+    // Capture snapshot BEFORE the mutation
+    const prevThemeRefs = snapshotThemeRefs(themesBeforeMutation as any);
+
+    // Now mutate in-place (simulating the reducer)
+    sharedVarRefs['color.new'] = 'VarID:1';
+    delete sharedVarRefs['color.old'];
+
+    // nextState themes point to the mutated sharedVarRefs object
+    const nextThemes = [{
+      id: 'light',
+      $themeGroupId: 'grp-1',
+      $themeOptionId: 'opt-1',
+      $figmaVariableReferences: sharedVarRefs,
+    }];
+
+    await updateThemeRefsViaRestApi({
+      prevThemeRefs,
+      rootState: makeRootState(nextThemes) as any,
+    });
+
+    // The diff should succeed because it compares against the snapshot
+    expect(mockPatchGroup).toHaveBeenCalledWith(
+      'test-token',
+      'https://api.studio.example.com',
+      'proj-1',
+      'cs-789',
+      'grp-1',
+      { 'color.new': 'VarID:1' },
+    );
   });
 });
