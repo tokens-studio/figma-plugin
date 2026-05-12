@@ -63,7 +63,7 @@ export default function ToolsDropdown() {
             <DropdownMenu.Item disabled={!isTokensStudioOAuth && editProhibited} onSelect={handleShowFileLoadModal}>
               {t('loadFromFile')}
             </DropdownMenu.Item>
-            <DropdownMenu.Item disabled={editProhibited} onSelect={handleShowPresetLoadModal}>
+            <DropdownMenu.Item disabled={editProhibited || isTokensStudioOAuth} onSelect={handleShowPresetLoadModal}>
               {t('loadFromPreset')}
             </DropdownMenu.Item>
             <DropdownMenu.Item onSelect={handleShowExportModal}>
