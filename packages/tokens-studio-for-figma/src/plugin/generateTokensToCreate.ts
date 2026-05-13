@@ -3,7 +3,17 @@ import { tokenTypesToCreateVariable } from '@/constants/VariableTypes';
 import { ThemeObject, UsedTokenSetsMap } from '@/types';
 import { AnyTokenList } from '@/types/tokens';
 import { TokenResolver } from '@/utils/TokenResolver';
-import { mergeTokenGroups, ResolveTokenValuesResult } from '@/utils/tokenHelpers';
+import { mergeTokenGroups, ResolveTokenValuesResult, mergeServerResolvedTokens } from '@/utils/tokenHelpers';
+
+export type GenerateTokensToCreatePayload = {
+  theme: ThemeObject;
+  tokens: Record<string, AnyTokenList>;
+  filterByTokenSet?: string;
+  overallConfig?: UsedTokenSetsMap;
+  themeTokenResolver?: TokenResolver;
+  preResolvedTokens?: ResolveTokenValuesResult[];
+  serverResolvedTokens?: Record<string, string> | null;
+};
 
 export function generateTokensToCreate({
   theme,
@@ -12,19 +22,8 @@ export function generateTokensToCreate({
   overallConfig = {},
   themeTokenResolver,
   preResolvedTokens,
-}: {
-  theme: ThemeObject;
-  tokens: Record<string, AnyTokenList>;
-  filterByTokenSet?: string;
-  overallConfig?: UsedTokenSetsMap;
-  themeTokenResolver?: TokenResolver;
-  /**
-   * Optional pre-resolved tokens from the Studio server (gRPC resolver).
-   * When provided, skips local mergeTokenGroups + TokenResolver entirely
-   * so resolved values match exactly what the Studio web app shows.
-   */
-  preResolvedTokens?: ResolveTokenValuesResult[];
-}): { tokensToCreate: ResolveTokenValuesResult[]; resolvedTokens: ResolveTokenValuesResult[] } {
+  serverResolvedTokens,
+}: GenerateTokensToCreatePayload): { tokensToCreate: ResolveTokenValuesResult[]; resolvedTokens: ResolveTokenValuesResult[] } {
   const enabledTokenSets = Object.entries(theme.selectedTokenSets)
     .filter(([name, status]) => status === TokenSetStatus.ENABLED && (!filterByTokenSet || name === filterByTokenSet))
     .map(([tokenSet]) => tokenSet);
@@ -34,7 +33,8 @@ export function generateTokensToCreate({
   const resolved: ResolveTokenValuesResult[] = preResolvedTokens
     ?? (() => {
       const resolver = themeTokenResolver || new TokenResolver([]);
-      return resolver.setTokens(mergeTokenGroups(tokens, theme.selectedTokenSets, overallConfig));
+      const locallyResolved = resolver.setTokens(mergeTokenGroups(tokens, theme.selectedTokenSets, overallConfig));
+      return mergeServerResolvedTokens(locallyResolved, serverResolvedTokens);
     })();
 
   // Big O(resolveTokenValues * mergeTokenGroups) — only applies for local resolution path

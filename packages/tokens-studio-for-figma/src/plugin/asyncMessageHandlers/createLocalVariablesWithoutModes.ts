@@ -4,7 +4,7 @@ import createLocalVariablesWithoutModesInPlugin from '../createLocalVariablesWit
 
 // This function is used to create variables based on token sets, without the use of themes
 export const createLocalVariablesWithoutModes: AsyncMessageChannelHandlers[AsyncMessageTypes.CREATE_LOCAL_VARIABLES_WITHOUT_MODES] = async (msg) => {
-  const result = await createLocalVariablesWithoutModesInPlugin(msg.tokens, msg.settings, msg.selectedSets);
+  const result = await createLocalVariablesWithoutModesInPlugin(msg.tokens, msg.settings, msg.selectedSets, msg.serverResolvedTokens);
   return {
     variableIds: result.allVariableCollectionIds,
     totalVariables: result.totalVariables,
