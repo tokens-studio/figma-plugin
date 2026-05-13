@@ -677,8 +677,12 @@ export class OAuthService {
   }
 
   /**
+  /**
      * Refresh tokens via the JWT refresh endpoint (POST /api/v1/auth/refresh).
      * Uses token rotation: the old refresh token is revoked and a new pair is issued.
+     *
+     * @deprecated Kept for potential web-app login flow. Not used by the Device Code
+     * path — the Figma plugin refreshes via POST /oauth/token (see TokenRefreshManager).
      */
   static async refreshJwtTokens(
     refreshToken: string,

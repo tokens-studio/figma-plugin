@@ -19,7 +19,7 @@ export class RefreshError extends Error {
 }
 
 /** Error codes that indicate the refresh token itself is permanently invalid. */
-const FATAL_ERROR_CODES = ['invalid_grant', 'invalid_token', 'invalid_client'];
+const FATAL_ERROR_CODES = ['invalid_grant', 'invalid_token', 'invalid_client', 'unauthorized_client'];
 
 function classifyError(error: unknown): RefreshErrorKind {
   if (error instanceof Error) {
