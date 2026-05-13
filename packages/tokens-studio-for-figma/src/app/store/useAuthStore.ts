@@ -508,6 +508,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       await get().setOAuthTokens(newTokens);
     } catch (error) {
       console.error('Failed to refresh tokens:', error);
+      // Only logout on fatal errors (invalid_grant, invalid_token, etc.)
+      // Transient errors (network, 5xx) should keep the session alive
+      const { RefreshError } = await import('@/app/services/TokenRefreshManager');
+      if (error instanceof RefreshError && error.kind === 'fatal') {
+        await get().logout();
+      }
       throw error;
     }
   },
