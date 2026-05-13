@@ -1,13 +1,16 @@
 import { create } from 'zustand';
+import compact from 'just-compact';
 import { OAuthService } from '../services/OAuthService';
+import { TokenRefreshManager } from '../services/TokenRefreshManager';
 import { OAuthError } from '@/types/OAuthError';
-import type { OAuthTokens, UserData, Organization, Project } from '@/types/oauth';
+import type {
+  OAuthTokens, UserData, Organization, Project,
+} from '@/types/oauth';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { fetchProjectDataRest } from '@/utils/tokensStudio/fetchProjectDataRest';
 import { store } from '@/app/store';
 import { notifyToUI } from '@/plugin/notifiers';
-import compact from 'just-compact';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 import { TOKENS_STUDIO_APP_URL } from '@/constants/TokensStudio';
 
@@ -112,7 +115,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       await get().fetchUserData(tokens);
       await get().setOAuthTokens(tokens);
-
     } catch (error) {
       let errorMessage = 'OAuth login failed';
       if (error instanceof OAuthError) {
@@ -157,7 +159,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       if (controller) {
         controller.abort();
       }
-      set({ error: null, isLoading: false, deviceCode: null, deviceCodeAbortController: null });
+      set({
+        error: null, isLoading: false, deviceCode: null, deviceCodeAbortController: null,
+      });
     } else {
       set({ error });
     }
@@ -192,7 +196,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   setActiveProject: (projectId: string) => {
     set((state) => {
-      const project = state.activeOrganization?.projects?.data?.find(p => p.id === projectId) || null;
+      const project = state.activeOrganization?.projects?.data?.find((p) => p.id === projectId) || null;
       return { activeProject: project };
     });
   },
@@ -224,7 +228,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const userResponse = await fetch(`${apiBaseUrl}/api/v1/auth/me`, {
         method: 'GET',
         headers: {
-          Authorization: `Bearer ${tokens.accessToken}`,
+          Authorization: `Bearer ${currentTokens.accessToken}`,
           'Content-Type': 'application/json',
         },
       });
@@ -245,11 +249,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         email: (attrs.email as string) || '',
         avatar: (attrs.avatar_url as string) || (attrs.avatar as string) || (attrs.logo_url as string) || '',
         fullName:
-          (attrs.full_name as string) ||
-          (attrs.fullName as string) ||
-          `${(attrs.first_name as string) || (attrs.firstName as string) || ''} ${(attrs.last_name as string) || (attrs.lastName as string) || ''}`.trim() ||
-          (attrs.name as string) ||
-          '',
+          (attrs.full_name as string)
+          || (attrs.fullName as string)
+          || `${(attrs.first_name as string) || (attrs.firstName as string) || ''} ${(attrs.last_name as string) || (attrs.lastName as string) || ''}`.trim()
+          || (attrs.name as string)
+          || '',
       };
 
       // 2. Fetch Organizations Data
@@ -259,7 +263,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         const orgsResponse = await fetch(`${apiBaseUrl}/api/v1/organizations`, {
           method: 'GET',
           headers: {
-            Authorization: `Bearer ${tokens.accessToken}`,
+            Authorization: `Bearer ${currentTokens.accessToken}`,
             'Content-Type': 'application/json',
           },
         });
@@ -361,7 +365,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         isPro = accessArr.includes('figma_plugin') && activeOrganization.current_user_seat_type === 'EDITOR' && !isTrialExpired;
       }
 
-      const defaultProject = activeOrganization?.projects?.data?.find(p => p.id === persistedProjectId) || activeOrganization?.projects?.data?.[0] || null;
+      const defaultProject = activeOrganization?.projects?.data?.find((p) => p.id === persistedProjectId) || activeOrganization?.projects?.data?.[0] || null;
 
       set({
         user,
@@ -437,7 +441,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           return {
             organizations: updatedOrganizations,
             activeOrganization: updatedActiveOrg,
-            activeProject: (state.activeOrganization?.id === orgId) ? (projects.find(p => p.id === persistedProjectId) || projects[0] || null) : state.activeProject,
+            activeProject: (state.activeOrganization?.id === orgId) ? (projects.find((p) => p.id === persistedProjectId) || projects[0] || null) : state.activeProject,
           };
         });
       }
@@ -459,7 +463,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const projectData = await fetchProjectDataRest(
         oauthTokens.accessToken,
         apiBaseUrl,
-        projectId
+        projectId,
       );
 
       if (projectData && projectData.tokens) {
@@ -468,7 +472,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
         store.dispatch.tokenState.setTokenData({
           values: tokens as any,
-          themes: themes,
+          themes,
           activeTheme: {},
           hasChangedRemote: false,
         });
@@ -500,13 +504,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
     try {
       const studioUrl = TOKENS_STUDIO_APP_URL;
-      const newTokens = await OAuthService.refreshTokens(null, oauthTokens.refreshToken, studioUrl);
+      const newTokens = await TokenRefreshManager.refreshTokens(oauthTokens, studioUrl);
       await get().setOAuthTokens(newTokens);
     } catch (error) {
       console.error('Failed to refresh tokens:', error);
-      // If refresh fails, we might want to logout or show error
-      // set({ isAuthenticated: false, oauthTokens: null });
       throw error;
     }
-  }
+  },
 }));
