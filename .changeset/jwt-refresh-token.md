@@ -2,4 +2,4 @@
 "@tokens-studio/figma-plugin": patch
 ---
 
-Add JWT refresh token support with single-flight concurrency protection and fix token usage bug in fetchUserData
+Improved token refresh behavior that caused users to be logged out after certain days of inactivity
