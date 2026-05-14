@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import compact from 'just-compact';
 import { OAuthService } from '../services/OAuthService';
-import { TokenRefreshManager } from '../services/TokenRefreshManager';
+import { TokenRefreshManager, RefreshError } from '../services/TokenRefreshManager';
 import { OAuthError } from '@/types/OAuthError';
 import type {
   OAuthTokens, UserData, Organization, Project,
@@ -510,7 +510,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       console.error('Failed to refresh tokens:', error);
       // Only logout on fatal errors (invalid_grant, invalid_token, etc.)
       // Transient errors (network, 5xx) should keep the session alive
-      const { RefreshError } = await import('@/app/services/TokenRefreshManager');
       if (error instanceof RefreshError && error.kind === 'fatal') {
         await get().logout();
       }
