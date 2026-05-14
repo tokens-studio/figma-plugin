@@ -619,9 +619,9 @@ export class OAuthService {
   }
 
   /**
-     * Refresh OAuth tokens
+     * Refresh OAuth tokens via standard OAuth endpoint
      */
-  static async refreshTokens(
+  static async refreshOAuthTokens(
     config: OAuthConfig | null,
     refreshToken: string,
     studioUrl?: string,
@@ -660,9 +660,91 @@ export class OAuthService {
         expiresAt: Date.now() + tokenData.expires_in * 1000,
       };
     } catch (error) {
-      console.error('Error refreshing tokens:', error);
+      console.error('Error refreshing OAuth tokens:', error);
       throw new Error('Failed to refresh access tokens');
     }
+  }
+
+  /**
+     * Refresh tokens via the JWT refresh endpoint (POST /api/v1/auth/refresh).
+     * Uses token rotation: the old refresh token is revoked and a new pair is issued.
+     *
+     * @deprecated Kept for potential web-app login flow. Not used by the Device Code
+     * path — the Figma plugin refreshes via POST /oauth/token (see TokenRefreshManager).
+     */
+  static async refreshJwtTokens(
+    refreshToken: string,
+    studioUrl?: string,
+  ): Promise<OAuthTokens> {
+    const apiBaseUrl = studioUrl
+      ? this.getApiBaseUrl(studioUrl)
+      : 'https://api.tokens.studio';
+    const refreshUrl = `${apiBaseUrl}/api/v1/auth/refresh`;
+
+    const response = await fetch(refreshUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ refresh_token: refreshToken }),
+    });
+
+    if (!response.ok) {
+      let errorDetail = `JWT token refresh failed: ${response.status}`;
+      try {
+        const errorData = await response.json();
+        const firstError = errorData?.errors?.[0];
+        if (firstError) {
+          errorDetail = `${firstError.code}: ${firstError.detail}`;
+        }
+      } catch {
+        // ignore parse error
+      }
+      throw new OAuthError(
+        OAuthErrorType.TOKEN_REFRESH_FAILED,
+        errorDetail,
+        'Your session has expired. Please log in again.',
+      );
+    }
+
+    const data = await response.json();
+    const newAccessToken = data?.meta?.token;
+    const newRefreshToken = data?.meta?.refresh_token;
+
+    if (!newAccessToken || !newRefreshToken) {
+      throw new OAuthError(
+        OAuthErrorType.TOKEN_REFRESH_FAILED,
+        'JWT refresh response missing token or refresh_token in meta',
+        'Your session has expired. Please log in again.',
+      );
+    }
+
+    return {
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken,
+      tokenType: 'Bearer',
+      expiresAt: this.getExpiresAtFromJwt(newAccessToken),
+    };
+  }
+
+  /**
+     * Extract the expiration timestamp from a JWT's payload.
+     * Falls back to 24 hours from now if the token cannot be decoded.
+     */
+  static getExpiresAtFromJwt(token: string): number {
+    const DEFAULT_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 hours
+    try {
+      const parts = token.split('.');
+      if (parts.length !== 3) return Date.now() + DEFAULT_EXPIRY_MS;
+
+      const payload = JSON.parse(atob(parts[1]));
+      if (typeof payload.exp === 'number') {
+        return payload.exp * 1000; // Convert seconds to milliseconds
+      }
+    } catch {
+      // Token isn't a valid JWT — use default
+    }
+    return Date.now() + DEFAULT_EXPIRY_MS;
   }
 
   /**
