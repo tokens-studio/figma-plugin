@@ -666,18 +666,6 @@ export class OAuthService {
   }
 
   /**
-     * Kept for backward compatibility — delegates to refreshOAuthTokens
-     */
-  static async refreshTokens(
-    config: OAuthConfig | null,
-    refreshToken: string,
-    studioUrl?: string,
-  ): Promise<OAuthTokens> {
-    return this.refreshOAuthTokens(config, refreshToken, studioUrl);
-  }
-
-  /**
-  /**
      * Refresh tokens via the JWT refresh endpoint (POST /api/v1/auth/refresh).
      * Uses token rotation: the old refresh token is revoked and a new pair is issued.
      *
