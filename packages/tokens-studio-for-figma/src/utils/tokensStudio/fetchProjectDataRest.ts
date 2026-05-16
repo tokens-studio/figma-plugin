@@ -28,7 +28,8 @@ interface RestThemeOption {
 export type ProjectData = {
   tokens: AnyTokenSet | null;
   themes: ThemeObjectsList;
-  tokenSets: Record<string, { isDynamic: boolean }>;
+  tokenSets: Record<string, { id: string; isDynamic: boolean }>;
+  themeGroups: Record<string, { id: string }>;
   tokenSetOrder: string[];
   hasExceededPaginationLimit?: boolean;
   /** The change_set_id for the resolved branch — used for server-side token resolution */
@@ -162,7 +163,8 @@ export async function fetchProjectDataRest(
     }
 
     const tokens: AnyTokenSet = {};
-    const tokenSetsMap: Record<string, { isDynamic: boolean }> = {};
+    const tokenSetsMap: Record<string, { id: string; isDynamic: boolean }> = {};
+    const themeGroupsMap: Record<string, { id: string }> = {};
     const tokenSetIdToName: Record<string, string> = {};
 
     // Sort by order_index and transform
@@ -200,12 +202,15 @@ export async function fetchProjectDataRest(
             value: transformTokenValue(token),
             type: normalizeTokenType(token.attributes?.type),
             ...(token.attributes?.description && { description: token.attributes.description }),
-            ...(Object.keys($extensions).length > 0 && { $extensions }),
+            $extensions: {
+              ...(token.attributes?.$extensions || {}),
+              id: token.id,
+            },
           });
         }
       });
       tokens[set.name] = transformedTokens as any;
-      tokenSetsMap[set.name] = { isDynamic: set.is_dynamic };
+      tokenSetsMap[set.name] = { id: set.id, isDynamic: set.is_dynamic };
       tokenSetIdToName[set.id] = set.name;
     });
 
@@ -238,6 +243,7 @@ export async function fetchProjectDataRest(
       themeGroupsData.data.forEach((group: any) => {
         const { id } = group;
         const name = group.attributes?.name || id;
+        themeGroupsMap[name] = { id };
         const options = optionsByGroupId[id] || [];
 
         options.forEach((opt) => {
@@ -271,9 +277,10 @@ export async function fetchProjectDataRest(
       tokens,
       themes,
       tokenSets: tokenSetsMap,
+      themeGroups: themeGroupsMap,
       tokenSetOrder,
-      hasExceededPaginationLimit,
       changeSetId,
+      hasExceededPaginationLimit,
     };
   } catch (error) {
     console.error('Error fetching project data from REST API:', error);

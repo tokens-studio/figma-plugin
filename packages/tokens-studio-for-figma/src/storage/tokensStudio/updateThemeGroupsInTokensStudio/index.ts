@@ -1,7 +1,8 @@
 import { RematchDispatch, RematchRootState } from '@rematch/core';
-import { pushToTokensStudio } from '@/app/store/providers/tokens-studio';
-import { StorageTypeCredential, TokensStudioStorageType } from '@/types/StorageType';
+import { pushToTokensStudio, pushToTokensStudioOAuth } from '@/app/store/providers/tokens-studio';
+import { StorageTypeCredential, TokensStudioStorageType, TokensStudioOAuthStorageType } from '@/types/StorageType';
 import { RootModel } from '@/types/RootModel';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 import { ThemeObject, ThemeObjectsList } from '@/types';
 import { getThemeGroupsToUpdate } from './getThemeGroupsToUpdate';
 import { updateThemeGroupName } from './updateThemeGroupName';
@@ -86,40 +87,80 @@ export async function updateThemeGroupsInTokensStudio({
       data.newName = themesToUpdate[0].group;
     }
 
-    pushToTokensStudio({
-      context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
-      action: 'UPDATE_THEME_GROUP',
-      data,
-    });
+    if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO) {
+      pushToTokensStudio({
+        context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
+        action: 'UPDATE_THEME_GROUP',
+        data,
+      });
+    }
+
+    if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
+      pushToTokensStudioOAuth({
+        context: rootState.uiState.api as StorageTypeCredential<TokensStudioOAuthStorageType, false>,
+        action: 'UPDATE_THEME_GROUP',
+        data: {
+          ...data,
+          id: themesToUpdate[0].id,
+        },
+      });
+    }
   }
 
   if (themeToCreate) {
-    pushToTokensStudio({
-      context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
-      action: 'CREATE_THEME_GROUP',
-      data: {
-        name: themeToCreate.group,
-        options: [{
-          name: themeToCreate.name,
-          selectedTokenSets: themeToCreate.selectedTokenSets,
-          figmaStyleReferences: themeToCreate.$figmaStyleReferences,
-          figmaVariableReferences: themeToCreate.$figmaVariableReferences,
-          figmaCollectionId: themeToCreate.$figmaCollectionId,
-          figmaModeId: themeToCreate.$figmaModeId,
-        }],
-      },
-    });
+    const data = {
+      name: themeToCreate.group,
+      options: [{
+        name: themeToCreate.name,
+        selectedTokenSets: themeToCreate.selectedTokenSets,
+        figmaStyleReferences: themeToCreate.$figmaStyleReferences,
+        figmaVariableReferences: themeToCreate.$figmaVariableReferences,
+        figmaCollectionId: themeToCreate.$figmaCollectionId,
+        figmaModeId: themeToCreate.$figmaModeId,
+      }],
+    };
+
+    if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO) {
+      pushToTokensStudio({
+        context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
+        action: 'CREATE_THEME_GROUP',
+        data,
+      });
+    }
+
+    if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
+      pushToTokensStudioOAuth({
+        context: rootState.uiState.api as StorageTypeCredential<TokensStudioOAuthStorageType, false>,
+        action: 'CREATE_THEME_GROUP',
+        data,
+      });
+    }
   }
 
   if (themeGroupsToDelete.length) {
     for (const groupName of themeGroupsToDelete) {
-      pushToTokensStudio({
-        context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
-        action: 'DELETE_THEME_GROUP',
-        data: {
-          name: groupName,
-        },
-      });
+      if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO) {
+        pushToTokensStudio({
+          context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
+          action: 'DELETE_THEME_GROUP',
+          data: {
+            name: groupName,
+          },
+        });
+      }
+
+      if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
+        const themeToDelete = prevThemes.find((theme) => theme.group === groupName || theme.name === groupName);
+        if (themeToDelete) {
+          pushToTokensStudioOAuth({
+            context: rootState.uiState.api as StorageTypeCredential<TokensStudioOAuthStorageType, false>,
+            action: 'DELETE_THEME_GROUP',
+            data: {
+              id: themeToDelete.id,
+            },
+          });
+        }
+      }
     }
   }
 }
