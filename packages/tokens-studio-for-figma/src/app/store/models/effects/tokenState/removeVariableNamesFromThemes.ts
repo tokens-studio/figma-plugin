@@ -2,6 +2,7 @@ import type { RematchDispatch } from '@rematch/core';
 import type { RootModel } from '@/types/RootModel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { pushThemeToTokensStudioOAuth } from './utils/pushThemeToTokensStudioOAuth';
+import { store } from '@/app/store';
 
 export function removeVariableNamesFromThemes(dispatch: RematchDispatch<RootModel>) {
   return (payload: any, rootState: any): void => {
@@ -11,8 +12,9 @@ export function removeVariableNamesFromThemes(dispatch: RematchDispatch<RootMode
     });
 
     if (rootState?.uiState?.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
-      rootState.tokenState?.themes?.forEach((theme: any) => {
-        pushThemeToTokensStudioOAuth(theme, rootState, dispatch);
+      const currentState = store.getState();
+      currentState.tokenState?.themes?.forEach((theme: any) => {
+        pushThemeToTokensStudioOAuth(theme, currentState, dispatch);
       });
     }
   };

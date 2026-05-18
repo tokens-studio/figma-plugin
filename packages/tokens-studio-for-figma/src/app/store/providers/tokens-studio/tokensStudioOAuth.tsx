@@ -221,6 +221,8 @@ export function useTokensStudioOAuth() {
             return localTheme ? alignObjectKeys(remoteTheme, localTheme) : remoteTheme;
           });
 
+          console.log('--- pullTokensFromTokensStudioOAuth alignedThemes ---', JSON.stringify(alignedThemes, null, 2));
+
           return {
             status: 'success',
             tokens: sortedTokens,
@@ -383,6 +385,8 @@ export function useTokensStudioOAuth() {
             const localTheme = themes.find((t) => t.id === remoteTheme.id);
             return localTheme ? alignObjectKeys(remoteTheme, localTheme) : remoteTheme;
           });
+
+          console.log('--- loadProjectTokens alignedNewThemes ---', JSON.stringify(alignedNewThemes, null, 2));
 
           dispatch.tokenState.setTokenData({
             values: (newTokens || {}) as any,

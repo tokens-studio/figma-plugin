@@ -217,17 +217,59 @@ export async function fetchProjectDataRest(
     // Parse theme options
     const themeOptions: RestThemeOption[] = [];
     if (themeOptionsData.data && Array.isArray(themeOptionsData.data)) {
+      console.log('--- RAW THEME OPTIONS FROM REST API ---', JSON.stringify(themeOptionsData.data, null, 2));
       themeOptionsData.data.forEach((item: any) => {
-        themeOptions.push({
+        const rawStyleRefs = item.attributes?.figma_style_references || [];
+        const figmaStyleReferences: Record<string, string> = {};
+        if (Array.isArray(rawStyleRefs)) {
+          rawStyleRefs.forEach((ref: any) => {
+            if (ref && ref.name && ref.figma_key) {
+              let key = ref.figma_key;
+              if (key.startsWith('S:')) key = key.substring(2);
+              if (key.endsWith(',')) key = key.slice(0, -1);
+              figmaStyleReferences[ref.name] = `S:${key},`;
+            }
+          });
+        } else if (rawStyleRefs && typeof rawStyleRefs === 'object') {
+          Object.entries(rawStyleRefs).forEach(([name, key]) => {
+            let k = String(key);
+            if (k.startsWith('S:')) k = k.substring(2);
+            if (k.endsWith(',')) k = k.slice(0, -1);
+            figmaStyleReferences[name] = `S:${k},`;
+          });
+        }
+
+        const rawVarRefs = item.attributes?.figma_variable_references || [];
+        const figmaVariableReferences: Record<string, string> = {};
+        if (Array.isArray(rawVarRefs)) {
+          rawVarRefs.forEach((ref: any) => {
+            if (ref && ref.name && ref.figma_key) {
+              figmaVariableReferences[ref.name] = ref.figma_key;
+            }
+          });
+        } else if (rawVarRefs && typeof rawVarRefs === 'object') {
+          Object.entries(rawVarRefs).forEach(([name, key]) => {
+            figmaVariableReferences[name] = String(key);
+          });
+        }
+
+        const option = {
           id: item.id,
           name: item.attributes?.name || item.id,
           theme_group_id: item.relationships?.theme_group?.data?.id || '',
           selected_token_sets: item.attributes?.selected_token_sets || {},
-          figmaStyleReferences: item.attributes?.figma_style_references,
-          figmaVariableReferences: item.attributes?.figma_variable_references,
-          figmaCollectionId: item.attributes?.figma_collection_id,
-          figmaModeId: item.attributes?.figma_mode_id,
+          figmaStyleReferences,
+          figmaVariableReferences,
+          figmaCollectionId: item.attributes?.figma_collection_id || undefined,
+          figmaModeId: item.attributes?.figma_mode_id || undefined,
+        };
+        console.log(`Parsed RestThemeOption [${option.name}]:`, {
+          figmaStyleReferences: option.figmaStyleReferences,
+          figmaVariableReferences: option.figmaVariableReferences,
+          figmaCollectionId: option.figmaCollectionId,
+          figmaModeId: option.figmaModeId,
         });
+        themeOptions.push(option);
       });
     }
 
@@ -244,6 +286,22 @@ export async function fetchProjectDataRest(
         const { id } = group;
         const name = group.attributes?.name || id;
         themeGroupsMap[name] = { id };
+
+        // Parse theme group variable references
+        const rawVarRefs = group.attributes?.figma_variable_references || [];
+        const groupVarReferences: Record<string, string> = {};
+        if (Array.isArray(rawVarRefs)) {
+          rawVarRefs.forEach((ref: any) => {
+            if (ref && ref.name && ref.figma_key) {
+              groupVarReferences[ref.name] = ref.figma_key;
+            }
+          });
+        } else if (rawVarRefs && typeof rawVarRefs === 'object') {
+          Object.entries(rawVarRefs).forEach(([k, v]) => {
+            groupVarReferences[k] = String(v);
+          });
+        }
+
         const options = optionsByGroupId[id] || [];
 
         options.forEach((opt) => {
@@ -264,9 +322,22 @@ export async function fetchProjectDataRest(
           };
 
           if (opt.figmaStyleReferences !== undefined) themeObj.$figmaStyleReferences = opt.figmaStyleReferences;
-          if (opt.figmaVariableReferences !== undefined) themeObj.$figmaVariableReferences = opt.figmaVariableReferences;
+
+          // Inherit figma variable references from group + combine with any on option
+          themeObj.$figmaVariableReferences = {
+            ...groupVarReferences,
+            ...(opt.figmaVariableReferences || {}),
+          };
+
           if (opt.figmaCollectionId !== undefined) themeObj.$figmaCollectionId = opt.figmaCollectionId;
           if (opt.figmaModeId !== undefined) themeObj.$figmaModeId = opt.figmaModeId;
+
+          console.log(`Parsed Final ThemeObject [${themeObj.name}]:`, {
+            $figmaStyleReferences: themeObj.$figmaStyleReferences,
+            $figmaVariableReferences: themeObj.$figmaVariableReferences,
+            $figmaCollectionId: themeObj.$figmaCollectionId,
+            $figmaModeId: themeObj.$figmaModeId,
+          });
 
           themes.push(themeObj);
         });

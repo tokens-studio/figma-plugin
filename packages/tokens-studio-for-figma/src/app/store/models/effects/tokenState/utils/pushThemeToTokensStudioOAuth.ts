@@ -40,11 +40,20 @@ export async function pushThemeToTokensStudioOAuth(payload: any, rootState: any,
       name: payload?.name,
       theme_group_id: themeGroupId,
       selected_token_sets: selectedTokenSets,
-      figma_style_references: payload?.$figmaStyleReferences,
-      figma_variable_references: payload?.$figmaVariableReferences,
-      figma_collection_id: payload?.$figmaCollectionId,
-      figma_mode_id: payload?.$figmaModeId,
+      figma_style_references: payload?.$figmaStyleReferences && !Array.isArray(payload.$figmaStyleReferences)
+        ? payload.$figmaStyleReferences
+        : {},
+      figma_variable_references: payload?.$figmaVariableReferences && !Array.isArray(payload.$figmaVariableReferences)
+        ? payload.$figmaVariableReferences
+        : {},
+      figma_collection_id: payload?.$figmaCollectionId || null,
+      figma_mode_id: payload?.$figmaModeId || null,
     };
+
+    console.log('--- PUSHING THEME DATA TO TOKENS STUDIO OAUTH ---', {
+      payload,
+      themeData,
+    });
 
     const result = await pushToTokensStudioOAuth({
       context: rootState.uiState.api,
