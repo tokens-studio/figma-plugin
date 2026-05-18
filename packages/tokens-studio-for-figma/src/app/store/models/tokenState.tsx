@@ -59,8 +59,6 @@ import { checkStorageSize } from '@/utils/checkStorageSize';
 import { compareLastSyncedState } from '@/utils/compareLastSyncedState';
 import { RemoteTokenStorageMetadata } from '@/storage/RemoteTokenStorage';
 
-
-
 /** Context required to call the Studio gRPC-backed resolver endpoint */
 export interface ServerResolverContext {
   projectId: string;
@@ -199,7 +197,12 @@ export const tokenState = createModel<RootModel>()({
         themes: [
           ...(newThemes.length === 0 && updatedThemes.length === 0 ? data : []),
           ...state.themes.map((existingTheme) => {
-            const updateTheme = updatedThemes.find((importedTheme) => importedTheme.$figmaCollectionId === existingTheme.$figmaCollectionId && importedTheme.$figmaModeId === existingTheme.$figmaModeId);
+            const updateTheme = updatedThemes.find((importedTheme) => {
+              if (importedTheme.$figmaCollectionId && existingTheme.$figmaCollectionId) {
+                return importedTheme.$figmaCollectionId === existingTheme.$figmaCollectionId && importedTheme.$figmaModeId === existingTheme.$figmaModeId;
+              }
+              return importedTheme.id === existingTheme.id || (importedTheme.name === existingTheme.name && importedTheme.group === existingTheme.group);
+            });
             return updateTheme ? { ...existingTheme, ...updateTheme } : existingTheme;
           }),
           ...newThemes,
@@ -717,9 +720,12 @@ export const tokenState = createModel<RootModel>()({
       const updatedThemes: ThemeObjectsList = [];
 
       themes.forEach((theme) => {
-        // Use figmaCollectionId and figmaModeId to identify themes, not just figmaCollectionId
-        const existingTheme = state.themes.find((t) => t.$figmaCollectionId === theme.$figmaCollectionId
-          && t.$figmaModeId === theme.$figmaModeId);
+        const existingTheme = state.themes.find((t) => {
+          if (t.$figmaCollectionId && theme.$figmaCollectionId) {
+            return t.$figmaCollectionId === theme.$figmaCollectionId && t.$figmaModeId === theme.$figmaModeId;
+          }
+          return t.id === theme.id || (t.name === theme.name && t.group === theme.group);
+        });
 
         if (existingTheme) {
           // Check if anything has changed that requires an update
