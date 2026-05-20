@@ -908,6 +908,45 @@ describe('editToken', () => {
     ]);
   });
 
+  it('should preserve ordering of numeric keys when saving JSON data', () => {
+    store.dispatch.tokenState.setJSONData(`{
+      "color": {
+        "base_palette": {
+          "0950": {
+            "value": "#095000",
+            "type": "color"
+          },
+          "1000": {
+            "value": "#100000",
+            "type": "color"
+          }
+        }
+      }
+    }`);
+    const { tokens } = store.getState().tokenState;
+    expect(tokens.global[0].name).toEqual('color.base_palette.0950');
+    expect(tokens.global[1].name).toEqual('color.base_palette.1000');
+
+    // Now reverse the order in the JSON string
+    store.dispatch.tokenState.setJSONData(`{
+      "color": {
+        "base_palette": {
+          "1000": {
+            "value": "#100000",
+            "type": "color"
+          },
+          "0950": {
+            "value": "#095000",
+            "type": "color"
+          }
+        }
+      }
+    }`);
+    const { tokens: updatedTokens } = store.getState().tokenState;
+    expect(updatedTokens.global[0].name).toEqual('color.base_palette.1000');
+    expect(updatedTokens.global[1].name).toEqual('color.base_palette.0950');
+  });
+
   it('can duplicate token', () => {
     store.dispatch.tokenState.duplicateToken({
       newName: 'primary-copy',
