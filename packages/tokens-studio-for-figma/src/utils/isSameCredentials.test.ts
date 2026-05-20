@@ -1,7 +1,7 @@
 // write a test for isSameCredentials function
 
 import { StorageProviderType } from '@/constants/StorageProviderType';
-import isSameCredentials from './isSameCredentials';
+import isSameCredentials, { areProvidersDuplicate } from './isSameCredentials';
 
 describe('isSameCredentials', () => {
   it('should return true if the credentials are the same', () => {
@@ -121,5 +121,62 @@ describe('isSameCredentials', () => {
     };
 
     expect(isSameCredentials(credential, unsupportedProvider)).toBe(false);
+  });
+});
+
+describe('areProvidersDuplicate', () => {
+  it('should return true if providers are structurally identical regardless of internalId or secret', () => {
+    const provider1 = {
+      id: 'six7/figma-tokens',
+      provider: StorageProviderType.GITHUB,
+      filePath: 'tokens.json',
+      branch: 'main',
+      internalId: 'id-1',
+      secret: 'secret-1',
+    };
+    const provider2 = {
+      id: 'six7/figma-tokens',
+      provider: StorageProviderType.GITHUB,
+      filePath: 'tokens.json',
+      branch: 'main',
+      internalId: 'id-2',
+      secret: 'secret-2',
+    };
+
+    expect(areProvidersDuplicate(provider1, provider2)).toBe(true);
+  });
+
+  it('should return false if providers are structurally different', () => {
+    const provider1 = {
+      id: 'six7/figma-tokens',
+      provider: StorageProviderType.GITHUB,
+      filePath: 'tokens.json',
+      branch: 'main',
+      internalId: 'id-1',
+    };
+    const provider2 = {
+      id: 'six7/figma-tokens',
+      provider: StorageProviderType.GITHUB,
+      filePath: 'tokens.json',
+      branch: 'develop',
+      internalId: 'id-2',
+    };
+
+    expect(areProvidersDuplicate(provider1, provider2)).toBe(false);
+  });
+
+  it('should return false if one is LOCAL', () => {
+    const provider1 = {
+      provider: StorageProviderType.LOCAL,
+    };
+    const provider2 = {
+      id: 'six7/figma-tokens',
+      provider: StorageProviderType.GITHUB,
+      filePath: 'tokens.json',
+      branch: 'main',
+      internalId: 'id-2',
+    };
+
+    expect(areProvidersDuplicate(provider1 as any, provider2)).toBe(false);
   });
 });

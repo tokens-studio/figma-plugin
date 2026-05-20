@@ -245,48 +245,48 @@ function convertRadialGradient(parts: string[]): {
       }
     };
 
-      const lowerPositionPart = positionPart.toLowerCase();
-      let positionString = '';
-      if (lowerPositionPart.includes(' at ')) {
-        [, positionString] = lowerPositionPart.split(' at ');
-      } else if (lowerPositionPart.startsWith('at ')) {
-        positionString = lowerPositionPart.substring(3);
-      }
+    const lowerPositionPart = positionPart.toLowerCase();
+    let positionString = '';
+    if (lowerPositionPart.includes(' at ')) {
+      [, positionString] = lowerPositionPart.split(' at ');
+    } else if (lowerPositionPart.startsWith('at ')) {
+      positionString = lowerPositionPart.substring(3);
+    }
 
-      if (positionString) {
-        const posParts = positionString.trim().split(/\s+/);
-        if (posParts.length === 1) {
-          const p = posParts[0];
-          if (['left', 'right'].includes(p)) {
-            centerX = parseCoord(p);
-            centerY = 0.5;
-          } else if (['top', 'bottom'].includes(p)) {
-            centerX = 0.5;
-            centerY = parseCoord(p);
-          } else {
-            centerX = parseCoord(p);
-            centerY = 0.5;
-          }
-        } else if (posParts.length >= 2) {
-          const first = posParts[0];
-          const second = posParts[1];
-          const firstIsY = ['top', 'bottom'].includes(first);
-          const secondIsX = ['left', 'right'].includes(second);
+    if (positionString) {
+      const posParts = positionString.trim().split(/\s+/);
+      if (posParts.length === 1) {
+        const p = posParts[0];
+        if (['left', 'right'].includes(p)) {
+          centerX = parseCoord(p);
+          centerY = 0.5;
+        } else if (['top', 'bottom'].includes(p)) {
+          centerX = 0.5;
+          centerY = parseCoord(p);
+        } else {
+          centerX = parseCoord(p);
+          centerY = 0.5;
+        }
+      } else if (posParts.length >= 2) {
+        const first = posParts[0];
+        const second = posParts[1];
+        const firstIsY = ['top', 'bottom'].includes(first);
+        const secondIsX = ['left', 'right'].includes(second);
 
-          if (firstIsY || secondIsX) {
-            centerY = parseCoord(first);
-            centerX = parseCoord(second);
-          } else {
-            centerX = parseCoord(first);
-            centerY = parseCoord(second);
-          }
+        if (firstIsY || secondIsX) {
+          centerY = parseCoord(first);
+          centerX = parseCoord(second);
+        } else {
+          centerX = parseCoord(first);
+          centerY = parseCoord(second);
         }
       }
+    }
   }
 
   const colorStopParts = parts.slice(colorStopsStart);
 
-  // a, e are the scale factors. 
+  // a, e are the scale factors.
   // For the most common CSS keywords, we use verified matrices to match Figma's behavior.
   let matrix: Transform | null = null;
   const posString = parts[0]?.toLowerCase() || '';

@@ -397,7 +397,7 @@ describe('SetValuesOnVariable', () => {
       expect(mockSetVariableCodeSyntax).toHaveBeenCalledWith('WEB', 'web-syntax-upper');
       expect(mockSetVariableCodeSyntax).toHaveBeenCalledWith('ANDROID', 'android-syntax-upper');
       expect(mockSetVariableCodeSyntax).toHaveBeenCalledWith('iOS', 'ios-syntax-upper');
-      
+
       // Verify value was updated to new color
       expect(mockSetValueForMode).toHaveBeenCalledWith(mode, {
         r: 1, g: 0, b: 0, a: 1,

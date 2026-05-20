@@ -55,7 +55,7 @@ export function alignObjectKeys<T extends Record<string, any>>(obj: T, template:
   Object.keys(obj).forEach((key) => {
     if (!(key in aligned)) {
       if (isSelectedTokenSets && obj[key] === 'disabled') {
-         return;
+        return;
       }
       aligned[key] = obj[key];
     }

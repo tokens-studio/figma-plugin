@@ -11,6 +11,8 @@ import { getUISettings } from '@/utils/uiSettings';
 import { getUserId } from '../../plugin/helpers';
 import { getSavedStorageType, getTokenData } from '../../plugin/node';
 import { UsedEmailProperty } from '@/figmaStorage/UsedEmailProperty';
+import { StorageProviderType } from '@/constants/StorageProviderType';
+import { areProvidersDuplicate } from '@/utils/isSameCredentials';
 
 export async function startup() {
   // on startup we need to fetch all the locally available data so we can bootstrap our UI
@@ -52,6 +54,33 @@ export async function startup() {
     ActiveOrganizationIdProperty.read(),
   ]);
 
+  // Check for duplicate sync providers in localApiProviders, then delete one of them
+  let cleanedApiProviders = localApiProviders;
+  if (localApiProviders && localApiProviders.length > 1) {
+    const keep: typeof localApiProviders = [];
+    let didRemove = false;
+    for (const provider of localApiProviders) {
+      // Find if there is an existing provider in 'keep' that is a duplicate of 'provider'
+      const duplicateIndex = keep.findIndex((k) => areProvidersDuplicate(k, provider));
+      if (duplicateIndex === -1) {
+        keep.push(provider);
+      } else {
+        // We found a duplicate! We need to decide which one to keep.
+        // If the current one ('provider') has the same internalId as the active storageType,
+        // we should keep it instead of the existing one.
+        const isActiveCurrent = storageType && storageType.provider !== StorageProviderType.LOCAL && 'internalId' in storageType && storageType.internalId && provider.internalId === storageType.internalId;
+        if (isActiveCurrent) {
+          keep[duplicateIndex] = provider;
+        }
+        didRemove = true;
+      }
+    }
+    if (didRemove) {
+      cleanedApiProviders = keep;
+      await ApiProvidersProperty.write(cleanedApiProviders);
+    }
+  }
+
   // If we have saved variable export settings, apply them to the settings
   let finalSettings = settings;
   if (variableExportSettings && Object.keys(variableExportSettings).length > 0) {
@@ -67,7 +96,7 @@ export async function startup() {
     lastOpened,
     onboardingExplainer,
     storageType,
-    localApiProviders,
+    localApiProviders: cleanedApiProviders,
     licenseKey,
     initialLoad: initialLoad ?? false,
     localTokenData: localTokenData ? {

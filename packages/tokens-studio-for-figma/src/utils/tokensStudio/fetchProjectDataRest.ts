@@ -35,7 +35,6 @@ export type ProjectData = {
   changeSetId: string;
 };
 
-
 function transformTokenValue(token: any): unknown {
   const value = token.attributes?.value;
   if (typeof value === 'string') return value;
@@ -140,7 +139,7 @@ export async function fetchProjectDataRest(
     const tokenSets: RestTokenSet[] = [];
     if (tokenSetsData.data && Array.isArray(tokenSetsData.data)) {
       tokenSetsData.data.forEach((item: any) => {
-        let setName = item.attributes?.name || item.id;
+        const setName = item.attributes?.name || item.id;
 
         tokenSets.push({
           id: item.id,

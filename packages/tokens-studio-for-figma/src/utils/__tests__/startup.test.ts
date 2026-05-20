@@ -1,8 +1,13 @@
-import { mockRootGetSharedPluginData } from '../../../tests/__mocks__/figmaMock';
+import { mockRootGetSharedPluginData, mockGetAsync, mockSetAsync } from '../../../tests/__mocks__/figmaMock';
 import { startup } from '../plugin';
 import { TokenTypes } from '@/constants/TokenTypes';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 
 describe('startup', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('should work for an empty document', async () => {
     const result = await startup();
     expect(result).toEqual({
@@ -87,5 +92,41 @@ describe('startup', () => {
       selectedExportThemes: [],
       activeOrganizationId: null,
     });
+  });
+
+  it('should check for and delete duplicate sync providers on startup', async () => {
+    const duplicateProviders = [
+      {
+        id: 'six7/figma-tokens',
+        provider: StorageProviderType.GITHUB,
+        filePath: 'tokens.json',
+        branch: 'main',
+        internalId: 'id-1',
+        secret: 'secret-1',
+      },
+      {
+        id: 'six7/figma-tokens',
+        provider: StorageProviderType.GITHUB,
+        filePath: 'tokens.json',
+        branch: 'main',
+        internalId: 'id-2',
+        secret: 'secret-2',
+      },
+    ];
+
+    mockGetAsync.mockImplementation((key: string) => {
+      if (key === 'apiProviders') {
+        return JSON.stringify(duplicateProviders);
+      }
+      return Promise.resolve(null);
+    });
+
+    const result = await startup();
+
+    // Verify only the first duplicate was kept
+    expect(result.localApiProviders).toEqual([duplicateProviders[0]]);
+
+    // Verify that clientStorage was updated to delete the duplicate
+    expect(mockSetAsync).toHaveBeenCalledWith('apiProviders', JSON.stringify([duplicateProviders[0]]));
   });
 });

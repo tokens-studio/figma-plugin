@@ -47,4 +47,56 @@ function isSameCredentials(
   }
 }
 
+export function areProvidersDuplicate(
+  p1: StorageTypeCredentials,
+  p2: StorageTypeCredentials,
+): boolean {
+  if (p1.provider !== p2.provider) {
+    return false;
+  }
+
+  switch (p1.provider) {
+    case StorageProviderType.GITHUB:
+    case StorageProviderType.GITLAB:
+    case StorageProviderType.ADO:
+    case StorageProviderType.BITBUCKET: {
+      const g1 = p1 as any;
+      const g2 = p2 as any;
+      return (
+        g1.id === g2.id
+        && g1.filePath === g2.filePath
+        && g1.branch === g2.branch
+      );
+    }
+    case StorageProviderType.GENERIC_VERSIONED_STORAGE:
+    case StorageProviderType.JSONBIN:
+    case StorageProviderType.URL: {
+      const g1 = p1 as any;
+      const g2 = p2 as any;
+      return g1.id === g2.id;
+    }
+    case StorageProviderType.SUPERNOVA: {
+      const g1 = p1 as any;
+      const g2 = p2 as any;
+      return (
+        g1.id === g2.id
+        && g1.designSystemUrl === g2.designSystemUrl
+        && JSON.stringify(g1.mapping) === JSON.stringify(g2.mapping)
+      );
+    }
+    case StorageProviderType.TOKENS_STUDIO:
+    case StorageProviderType.TOKENS_STUDIO_OAUTH: {
+      const g1 = p1 as any;
+      const g2 = p2 as any;
+      return (
+        g1.id === g2.id
+        && g1.orgId === g2.orgId
+        && g1.baseUrl === g2.baseUrl
+      );
+    }
+    default:
+      return false;
+  }
+}
+
 export default isSameCredentials;

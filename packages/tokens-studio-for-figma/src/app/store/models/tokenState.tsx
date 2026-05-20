@@ -58,8 +58,6 @@ import { singleTokensToRawTokenSet } from '@/utils/convert';
 import { checkStorageSize } from '@/utils/checkStorageSize';
 import { compareLastSyncedState } from '@/utils/compareLastSyncedState';
 
-
-
 /** Context required to call the Studio gRPC-backed resolver endpoint */
 export interface ServerResolverContext {
   projectId: string;
