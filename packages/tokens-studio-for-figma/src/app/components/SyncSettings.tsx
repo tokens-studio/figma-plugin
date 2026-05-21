@@ -83,6 +83,19 @@ const SyncSettings = () => {
     return [];
   }, [isAuthenticated, organizations]);
 
+  // Defensive: never render an apiProvider that is a Tokens Studio OAuth entry
+  // (those are live-derived above and should not be persisted) or one whose
+  // internalId already matches a live studioProvider — both would create
+  // duplicate rows in Sync Settings.
+  const visibleApiProviders = React.useMemo(() => {
+    const studioInternalIds = new Set(studioProviders.map((p) => p.internalId).filter(Boolean));
+    return apiProviders.filter((item) => {
+      if (item?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) return false;
+      if (item?.internalId && studioInternalIds.has(item.internalId)) return false;
+      return true;
+    });
+  }, [apiProviders, studioProviders]);
+
   const [open, setOpen] = React.useState(false);
 
   // Track when user opens the create new sync provider dialog
@@ -229,13 +242,13 @@ const SyncSettings = () => {
               />
             ))}
             <LocalStorageItem />
-            {apiProviders.length > 0 && (
+            {visibleApiProviders.length > 0 && (
               <Box css={{
                 width: '100%', height: '1px', backgroundColor: '$borderSubtle', margin: '$2 0',
               }}
               />
             )}
-            {apiProviders.length > 0 && apiProviders.map((item) => (
+            {visibleApiProviders.length > 0 && visibleApiProviders.map((item) => (
               <StorageItem
                 key={item?.internalId || `${item.provider}-${item.id}`}
                 onEdit={handleEditClick(item)}

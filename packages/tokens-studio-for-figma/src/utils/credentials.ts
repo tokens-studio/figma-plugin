@@ -3,9 +3,17 @@ import { notifyAPIProviders, notifyUI } from '@/plugin/notifiers';
 import isSameCredentials from './isSameCredentials';
 import { ApiProvidersProperty } from '@/figmaStorage';
 import { StorageTypeCredentials } from '@/types/StorageType';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 import { generateId } from './generateId';
 
 export async function updateCredentials(context: StorageTypeCredentials) {
+  // Tokens Studio OAuth providers are derived live from the user's organizations
+  // on every load and must never be persisted to clientStorage. Persisting them
+  // creates duplicate rows in Sync Settings (a live OAuth-derived row + a stale
+  // persisted row) and can pin sync to a stale token/branch context.
+  if (context.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
+    return;
+  }
   try {
     const data = await ApiProvidersProperty.read();
     let existingProviders: NonNullable<typeof data> = [];
