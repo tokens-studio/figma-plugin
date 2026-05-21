@@ -19,6 +19,15 @@ jest.mock('../hooks/useConfirm', () => ({
   }),
 }));
 
+const mockAuthStoreState = {
+  isAuthenticated: false,
+  organizations: [] as any[],
+};
+
+jest.mock('@/app/store/useAuthStore', () => ({
+  useAuthStore: () => mockAuthStoreState,
+}));
+
 describe('ConfirmDialog', () => {
   const defaultStore = {
     uiState: {
@@ -175,5 +184,57 @@ describe('ConfirmDialog', () => {
 
     // The test is that the total number of BETA badges should be exactly 1 (BitBucket only)
     expect(betaBadges.length).toBe(1);
+  });
+
+  it('should filter out duplicate apiProviders when matching studioProviders exist', async () => {
+    // Populate mock Auth state with an active project in organization
+    mockAuthStoreState.isAuthenticated = true;
+    const mockOrg = {
+      id: 'd360dc7e-d730-42f6-8959-28f8e3d46d33',
+      name: "Akshay's workspace",
+      projects: {
+        data: [{ id: 'proj3', name: 'Project 3' }],
+      },
+    };
+    mockAuthStoreState.organizations = [mockOrg];
+    (mockAuthStoreState as any).activeOrganization = mockOrg;
+    (mockAuthStoreState as any).activeProject = { id: 'proj3', name: 'Project 3' };
+
+    // Build default store with duplicate legacy/oauth credential in apiProviders list
+    const storeWithDuplicate = {
+      uiState: {
+        localApiState: {
+          provider: 'local',
+        },
+        storageType: {
+          provider: 'local',
+        },
+        apiProviders: [
+          {
+            id: 'd360dc7e-d730-42f6-8959-28f8e3d46d33',
+            provider: StorageProviderType.TOKENS_STUDIO,
+            internalId: 'd360dc7e-d730-42f6-8959-28f8e3d46d33',
+          },
+        ],
+      },
+    };
+
+    const mockStore = createMockStore(storeWithDuplicate);
+    const result = render(
+      <Provider store={mockStore}>
+        <SyncSettings />
+      </Provider>,
+    );
+
+    // It should render the dynamic studioProvider 'Akshay's workspace'
+    // But since it detected the duplicate, it should NOT render 'd360dc7e-d730-42f6-8959-28f8e3d46d33' from apiProviders!
+    expect(result.queryByText("Akshay's workspace")).toBeInTheDocument();
+    expect(result.queryByText("d360dc7e-d730-42f6-8959-28f8e3d46d33")).not.toBeInTheDocument();
+
+    // Reset mock auth store state
+    mockAuthStoreState.isAuthenticated = false;
+    mockAuthStoreState.organizations = [];
+    delete (mockAuthStoreState as any).activeOrganization;
+    delete (mockAuthStoreState as any).activeProject;
   });
 });

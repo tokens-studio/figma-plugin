@@ -18,6 +18,7 @@ import LocalStorageItem from './LocalStorageItem';
 import { getProviderIcon } from '@/utils/getProviderIcon';
 import { StyledBetaBadge } from './StyledBetaBadge';
 import { useAuthStore } from '@/app/store/useAuthStore';
+import { isTokensStudioDuplicate } from '@/utils/isSameCredentials';
 
 const SyncSettings = () => {
   const localApiState = useSelector(localApiStateSelector);
@@ -82,6 +83,15 @@ const SyncSettings = () => {
     }
     return [];
   }, [isAuthenticated, organizations]);
+
+  const filteredApiProviders = React.useMemo(() => {
+    return apiProviders.filter((item) => {
+      const isDuplicate = studioProviders.some((studioItem) => 
+        isTokensStudioDuplicate(studioItem, item)
+      );
+      return !isDuplicate;
+    });
+  }, [apiProviders, studioProviders]);
 
   const [open, setOpen] = React.useState(false);
 
@@ -229,13 +239,13 @@ const SyncSettings = () => {
               />
             ))}
             <LocalStorageItem />
-            {apiProviders.length > 0 && (
+            {filteredApiProviders.length > 0 && (
               <Box css={{
                 width: '100%', height: '1px', backgroundColor: '$borderSubtle', margin: '$2 0',
               }}
               />
             )}
-            {apiProviders.length > 0 && apiProviders.map((item) => (
+            {filteredApiProviders.length > 0 && filteredApiProviders.map((item) => (
               <StorageItem
                 key={item?.internalId || `${item.provider}-${item.id}`}
                 onEdit={handleEditClick(item)}

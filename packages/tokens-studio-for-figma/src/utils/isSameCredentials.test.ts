@@ -1,7 +1,8 @@
 // write a test for isSameCredentials function
 
 import { StorageProviderType } from '@/constants/StorageProviderType';
-import isSameCredentials from './isSameCredentials';
+import isSameCredentials, { isTokensStudioDuplicate } from './isSameCredentials';
+import { StorageTypeCredentials } from '@/types/StorageType';
 
 describe('isSameCredentials', () => {
   it('should return true if the credentials are the same', () => {
@@ -123,3 +124,70 @@ describe('isSameCredentials', () => {
     expect(isSameCredentials(credential, unsupportedProvider)).toBe(false);
   });
 });
+
+describe('isTokensStudioDuplicate', () => {
+  it('should return true if they are both studio providers and share the same ID', () => {
+    const p1 = {
+      id: 'proj-123',
+      provider: StorageProviderType.TOKENS_STUDIO,
+      orgId: 'org-abc',
+      baseUrl: 'https://api.tokens.studio',
+    } as StorageTypeCredentials;
+
+    const p2 = {
+      id: 'proj-123',
+      provider: StorageProviderType.TOKENS_STUDIO_OAUTH,
+      orgId: 'org-abc',
+    } as StorageTypeCredentials;
+
+    expect(isTokensStudioDuplicate(p1, p2)).toBe(true);
+  });
+
+  it('should return true if they are both studio providers and share the same orgId when id is missing', () => {
+    const p1 = {
+      provider: StorageProviderType.TOKENS_STUDIO,
+      orgId: 'org-abc',
+      baseUrl: 'https://api.tokens.studio',
+    } as StorageTypeCredentials;
+
+    const p2 = {
+      provider: StorageProviderType.TOKENS_STUDIO_OAUTH,
+      orgId: 'org-abc',
+    } as StorageTypeCredentials;
+
+    expect(isTokensStudioDuplicate(p1, p2)).toBe(true);
+  });
+
+  it('should return false if one is not a studio provider', () => {
+    const p1 = {
+      id: 'proj-123',
+      provider: StorageProviderType.GITHUB,
+      branch: 'main',
+    } as StorageTypeCredentials;
+
+    const p2 = {
+      id: 'proj-123',
+      provider: StorageProviderType.TOKENS_STUDIO_OAUTH,
+      orgId: 'org-abc',
+    } as StorageTypeCredentials;
+
+    expect(isTokensStudioDuplicate(p1, p2)).toBe(false);
+  });
+
+  it('should return false if they have different IDs', () => {
+    const p1 = {
+      id: 'proj-123',
+      provider: StorageProviderType.TOKENS_STUDIO,
+      orgId: 'org-abc',
+    } as StorageTypeCredentials;
+
+    const p2 = {
+      id: 'proj-456',
+      provider: StorageProviderType.TOKENS_STUDIO_OAUTH,
+      orgId: 'org-abc',
+    } as StorageTypeCredentials;
+
+    expect(isTokensStudioDuplicate(p1, p2)).toBe(false);
+  });
+});
+
