@@ -29,6 +29,13 @@ jest.mock('@/app/store/useAuthStore', () => ({
 }));
 
 describe('ConfirmDialog', () => {
+  afterEach(() => {
+    mockAuthStoreState.isAuthenticated = false;
+    mockAuthStoreState.organizations = [];
+    delete (mockAuthStoreState as any).activeOrganization;
+    delete (mockAuthStoreState as any).activeProject;
+  });
+
   const defaultStore = {
     uiState: {
       localApiState: {
@@ -230,11 +237,5 @@ describe('ConfirmDialog', () => {
     // But since it detected the duplicate, it should NOT render 'd360dc7e-d730-42f6-8959-28f8e3d46d33' from apiProviders!
     expect(result.queryByText("Akshay's workspace")).toBeInTheDocument();
     expect(result.queryByText("d360dc7e-d730-42f6-8959-28f8e3d46d33")).not.toBeInTheDocument();
-
-    // Reset mock auth store state
-    mockAuthStoreState.isAuthenticated = false;
-    mockAuthStoreState.organizations = [];
-    delete (mockAuthStoreState as any).activeOrganization;
-    delete (mockAuthStoreState as any).activeProject;
   });
 });

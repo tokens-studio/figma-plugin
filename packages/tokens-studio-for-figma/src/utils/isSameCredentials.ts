@@ -72,7 +72,7 @@ export function isTokensStudioDuplicate(
     return true;
   }
 
-  // Prefix-based matches where one of the internalIds starts with 'tokens-studio-' and contains the other's orgId, id, or internalId
+  // Prefix-based matches where one of the internalIds starts with 'tokens-studio-' and matches the other's orgId, id, or internalId
   if (p1.internalId && p1.internalId.startsWith('tokens-studio-')) {
     const extractedOrgId = p1.internalId.replace('tokens-studio-', '');
     if (extractedOrgId === p2.orgId || extractedOrgId === p2.id || extractedOrgId === p2.internalId) {

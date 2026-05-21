@@ -59,26 +59,33 @@ export async function startup() {
   if (localApiProviders && localApiProviders.length > 0) {
     const uniqueProviders: typeof localApiProviders = [];
     for (const provider of localApiProviders) {
-      const isStudio = provider.provider === StorageProviderType.TOKENS_STUDIO || provider.provider === StorageProviderType.TOKENS_STUDIO_OAUTH;
-      if (isStudio) {
+      if (
+        provider.provider === StorageProviderType.TOKENS_STUDIO ||
+        provider.provider === StorageProviderType.TOKENS_STUDIO_OAUTH
+      ) {
         const duplicateIdx = uniqueProviders.findIndex((existing) => 
           isTokensStudioDuplicate(existing, provider)
         );
         if (duplicateIdx > -1) {
           const existing = uniqueProviders[duplicateIdx];
-          let keepCurrent = false;
-          
-          const existingHasBaseUrl = 'baseUrl' in existing && !!(existing as any).baseUrl;
-          const currentHasBaseUrl = 'baseUrl' in provider && !!(provider as any).baseUrl;
-          
-          if (currentHasBaseUrl && !existingHasBaseUrl) {
-            keepCurrent = true;
-          } else if (provider.provider === StorageProviderType.TOKENS_STUDIO_OAUTH && existing.provider !== StorageProviderType.TOKENS_STUDIO_OAUTH) {
-            keepCurrent = true;
-          }
-          
-          if (keepCurrent) {
-            uniqueProviders[duplicateIdx] = provider;
+          if (
+            existing.provider === StorageProviderType.TOKENS_STUDIO ||
+            existing.provider === StorageProviderType.TOKENS_STUDIO_OAUTH
+          ) {
+            let keepCurrent = false;
+            
+            const existingHasBaseUrl = !!existing.baseUrl;
+            const currentHasBaseUrl = !!provider.baseUrl;
+            
+            if (currentHasBaseUrl && !existingHasBaseUrl) {
+              keepCurrent = true;
+            } else if (provider.provider === StorageProviderType.TOKENS_STUDIO_OAUTH && existing.provider !== StorageProviderType.TOKENS_STUDIO_OAUTH) {
+              keepCurrent = true;
+            }
+            
+            if (keepCurrent) {
+              uniqueProviders[duplicateIdx] = provider;
+            }
           }
         } else {
           uniqueProviders.push(provider);
