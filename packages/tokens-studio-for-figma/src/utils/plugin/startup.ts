@@ -77,6 +77,7 @@ export async function startup() {
     }
     if (didRemove) {
       cleanedApiProviders = keep;
+      console.warn('[Deduplication] Removed duplicate sync provider credentials from storage.');
       await ApiProvidersProperty.write(cleanedApiProviders);
     }
   }

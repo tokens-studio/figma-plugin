@@ -1,6 +1,7 @@
 // write a test for isSameCredentials function
 
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import { StorageTypeCredentials } from '@/types/StorageType';
 import isSameCredentials, { areProvidersDuplicate } from './isSameCredentials';
 
 describe('isSameCredentials', () => {
@@ -126,7 +127,8 @@ describe('isSameCredentials', () => {
 
 describe('areProvidersDuplicate', () => {
   it('should return true if providers are structurally identical regardless of internalId or secret', () => {
-    const provider1 = {
+    const provider1: StorageTypeCredentials = {
+      name: 'GitHub',
       id: 'six7/figma-tokens',
       provider: StorageProviderType.GITHUB,
       filePath: 'tokens.json',
@@ -134,7 +136,8 @@ describe('areProvidersDuplicate', () => {
       internalId: 'id-1',
       secret: 'secret-1',
     };
-    const provider2 = {
+    const provider2: StorageTypeCredentials = {
+      name: 'GitHub',
       id: 'six7/figma-tokens',
       provider: StorageProviderType.GITHUB,
       filePath: 'tokens.json',
@@ -147,34 +150,90 @@ describe('areProvidersDuplicate', () => {
   });
 
   it('should return false if providers are structurally different', () => {
-    const provider1 = {
+    const provider1: StorageTypeCredentials = {
+      name: 'GitHub',
       id: 'six7/figma-tokens',
       provider: StorageProviderType.GITHUB,
       filePath: 'tokens.json',
       branch: 'main',
       internalId: 'id-1',
+      secret: 'secret-1',
     };
-    const provider2 = {
+    const provider2: StorageTypeCredentials = {
+      name: 'GitHub',
       id: 'six7/figma-tokens',
       provider: StorageProviderType.GITHUB,
       filePath: 'tokens.json',
       branch: 'develop',
       internalId: 'id-2',
+      secret: 'secret-2',
     };
 
     expect(areProvidersDuplicate(provider1, provider2)).toBe(false);
+  });
+
+  it('should return false if Git providers have different baseUrls', () => {
+    const provider1: StorageTypeCredentials = {
+      name: 'GitHub',
+      id: 'six7/figma-tokens',
+      provider: StorageProviderType.GITHUB,
+      filePath: 'tokens.json',
+      branch: 'main',
+      internalId: 'id-1',
+      baseUrl: 'https://github.enterprise.com',
+      secret: 'secret-1',
+    };
+    const provider2: StorageTypeCredentials = {
+      name: 'GitHub',
+      id: 'six7/figma-tokens',
+      provider: StorageProviderType.GITHUB,
+      filePath: 'tokens.json',
+      branch: 'main',
+      internalId: 'id-2',
+      baseUrl: 'https://github.com',
+      secret: 'secret-2',
+    };
+
+    expect(areProvidersDuplicate(provider1, provider2)).toBe(false);
+  });
+
+  it('should return true if Git providers have the same baseUrl', () => {
+    const provider1: StorageTypeCredentials = {
+      name: 'GitHub',
+      id: 'six7/figma-tokens',
+      provider: StorageProviderType.GITHUB,
+      filePath: 'tokens.json',
+      branch: 'main',
+      internalId: 'id-1',
+      baseUrl: 'https://github.enterprise.com',
+      secret: 'secret-1',
+    };
+    const provider2: StorageTypeCredentials = {
+      name: 'GitHub',
+      id: 'six7/figma-tokens',
+      provider: StorageProviderType.GITHUB,
+      filePath: 'tokens.json',
+      branch: 'main',
+      internalId: 'id-2',
+      baseUrl: 'https://github.enterprise.com',
+      secret: 'secret-2',
+    };
+
+    expect(areProvidersDuplicate(provider1, provider2)).toBe(true);
   });
 
   it('should return false if one is LOCAL', () => {
     const provider1 = {
       provider: StorageProviderType.LOCAL,
     };
-    const provider2 = {
+    const provider2: StorageTypeCredentials = {
+      name: 'GitHub',
       id: 'six7/figma-tokens',
       provider: StorageProviderType.GITHUB,
       filePath: 'tokens.json',
       branch: 'main',
       internalId: 'id-2',
+      secret: 'secret-2',
     };
 
     expect(areProvidersDuplicate(provider1 as any, provider2)).toBe(false);

@@ -56,42 +56,69 @@ export function areProvidersDuplicate(
   }
 
   switch (p1.provider) {
-    case StorageProviderType.GITHUB:
-    case StorageProviderType.GITLAB:
-    case StorageProviderType.ADO:
-    case StorageProviderType.BITBUCKET: {
-      const g1 = p1 as any;
-      const g2 = p2 as any;
+    case StorageProviderType.GITHUB: {
+      const g2 = p2 as typeof p1;
       return (
-        g1.id === g2.id
-        && g1.filePath === g2.filePath
-        && g1.branch === g2.branch
+        p1.id === g2.id
+        && p1.filePath === g2.filePath
+        && p1.branch === g2.branch
+        && p1.baseUrl === g2.baseUrl
       );
     }
-    case StorageProviderType.GENERIC_VERSIONED_STORAGE:
-    case StorageProviderType.JSONBIN:
+    case StorageProviderType.GITLAB: {
+      const g2 = p2 as typeof p1;
+      return (
+        p1.id === g2.id
+        && p1.filePath === g2.filePath
+        && p1.branch === g2.branch
+        && p1.baseUrl === g2.baseUrl
+      );
+    }
+    case StorageProviderType.ADO: {
+      const g2 = p2 as typeof p1;
+      return (
+        p1.id === g2.id
+        && p1.filePath === g2.filePath
+        && p1.branch === g2.branch
+        && p1.baseUrl === g2.baseUrl
+      );
+    }
+    case StorageProviderType.BITBUCKET: {
+      const g2 = p2 as typeof p1;
+      return (
+        p1.id === g2.id
+        && p1.filePath === g2.filePath
+        && p1.branch === g2.branch
+        && p1.baseUrl === g2.baseUrl
+      );
+    }
+    case StorageProviderType.GENERIC_VERSIONED_STORAGE: {
+      const g2 = p2 as typeof p1;
+      return p1.id === g2.id && p1.flow === g2.flow;
+    }
+    case StorageProviderType.JSONBIN: {
+      const g2 = p2 as typeof p1;
+      return p1.id === g2.id;
+    }
     case StorageProviderType.URL: {
-      const g1 = p1 as any;
-      const g2 = p2 as any;
-      return g1.id === g2.id;
+      const g2 = p2 as typeof p1;
+      return p1.id === g2.id;
     }
     case StorageProviderType.SUPERNOVA: {
-      const g1 = p1 as any;
-      const g2 = p2 as any;
+      const g2 = p2 as typeof p1;
       return (
-        g1.id === g2.id
-        && g1.designSystemUrl === g2.designSystemUrl
-        && JSON.stringify(g1.mapping) === JSON.stringify(g2.mapping)
+        p1.id === g2.id
+        && p1.designSystemUrl === g2.designSystemUrl
+        && JSON.stringify(p1.mapping) === JSON.stringify(g2.mapping)
       );
     }
     case StorageProviderType.TOKENS_STUDIO:
     case StorageProviderType.TOKENS_STUDIO_OAUTH: {
-      const g1 = p1 as any;
-      const g2 = p2 as any;
+      const g2 = p2 as typeof p1;
       return (
-        g1.id === g2.id
-        && g1.orgId === g2.orgId
-        && g1.baseUrl === g2.baseUrl
+        p1.id === g2.id
+        && p1.orgId === g2.orgId
+        && p1.baseUrl === g2.baseUrl
       );
     }
     default:

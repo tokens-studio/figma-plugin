@@ -129,4 +129,50 @@ describe('startup', () => {
     // Verify that clientStorage was updated to delete the duplicate
     expect(mockSetAsync).toHaveBeenCalledWith('apiProviders', JSON.stringify([duplicateProviders[0]]));
   });
+
+  it('should prefer keeping the duplicate sync provider whose internalId matches the active storageType.internalId', async () => {
+    const duplicateProviders = [
+      {
+        id: 'six7/figma-tokens',
+        provider: StorageProviderType.GITHUB,
+        filePath: 'tokens.json',
+        branch: 'main',
+        internalId: 'id-1',
+        secret: 'secret-1',
+      },
+      {
+        id: 'six7/figma-tokens',
+        provider: StorageProviderType.GITHUB,
+        filePath: 'tokens.json',
+        branch: 'main',
+        internalId: 'id-2',
+        secret: 'secret-2',
+      },
+    ];
+
+    mockGetAsync.mockImplementation((key: string) => {
+      if (key === 'apiProviders') {
+        return JSON.stringify(duplicateProviders);
+      }
+      return Promise.resolve(null);
+    });
+
+    mockRootGetSharedPluginData.mockImplementation((namespace: string, key: string) => {
+      if (key.endsWith('storageType')) {
+        return JSON.stringify({
+          provider: StorageProviderType.GITHUB,
+          internalId: 'id-2',
+        });
+      }
+      return '';
+    });
+
+    const result = await startup();
+
+    // Verify that the second duplicate was kept because its internalId matched the active storageType
+    expect(result.localApiProviders).toEqual([duplicateProviders[1]]);
+
+    // Verify that clientStorage was updated to delete the first duplicate
+    expect(mockSetAsync).toHaveBeenCalledWith('apiProviders', JSON.stringify([duplicateProviders[1]]));
+  });
 });
