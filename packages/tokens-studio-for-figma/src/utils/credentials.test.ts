@@ -100,6 +100,20 @@ describe('updateCredentials', () => {
     await updateCredentials(newObject);
     expect(figma.clientStorage.setAsync).toHaveBeenCalledWith('apiProviders', JSON.stringify(newArray));
   });
+
+  it('does not persist Tokens Studio OAuth providers', async () => {
+    const oauthCredential = {
+      id: 'project-1',
+      orgId: 'org-1',
+      name: "admin's workspace",
+      provider: StorageProviderType.TOKENS_STUDIO_OAUTH,
+      internalId: 'tokens-studio-org-1',
+    };
+    await updateCredentials(oauthCredential);
+
+    expect(figma.clientStorage.getAsync).not.toHaveBeenCalled();
+    expect(figma.clientStorage.setAsync).not.toHaveBeenCalled();
+  });
 });
 
 describe('removeSingleCredential', () => {
