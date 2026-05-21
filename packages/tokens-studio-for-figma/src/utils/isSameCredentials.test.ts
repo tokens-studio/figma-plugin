@@ -174,7 +174,7 @@ describe('isTokensStudioDuplicate', () => {
     expect(isTokensStudioDuplicate(p1, p2)).toBe(false);
   });
 
-  it('should return false if they have different IDs', () => {
+  it('should return true if they have different IDs but same orgId', () => {
     const p1 = {
       id: 'proj-123',
       provider: StorageProviderType.TOKENS_STUDIO,
@@ -187,7 +187,7 @@ describe('isTokensStudioDuplicate', () => {
       orgId: 'org-abc',
     } as StorageTypeCredentials;
 
-    expect(isTokensStudioDuplicate(p1, p2)).toBe(false);
+    expect(isTokensStudioDuplicate(p1, p2)).toBe(true);
   });
 });
 

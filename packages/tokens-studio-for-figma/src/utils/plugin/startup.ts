@@ -11,6 +11,8 @@ import { getUISettings } from '@/utils/uiSettings';
 import { getUserId } from '../../plugin/helpers';
 import { getSavedStorageType, getTokenData } from '../../plugin/node';
 import { UsedEmailProperty } from '@/figmaStorage/UsedEmailProperty';
+import { StorageProviderType } from '@/constants/StorageProviderType';
+import { isTokensStudioDuplicate } from '@/utils/isSameCredentials';
 
 export async function startup() {
   // on startup we need to fetch all the locally available data so we can bootstrap our UI
@@ -52,6 +54,46 @@ export async function startup() {
     ActiveOrganizationIdProperty.read(),
   ]);
 
+  // Deduplicate Tokens Studio / Tokens Studio OAuth sync providers in localApiProviders
+  let cleanedApiProviders = localApiProviders;
+  if (localApiProviders && localApiProviders.length > 0) {
+    const uniqueProviders: typeof localApiProviders = [];
+    for (const provider of localApiProviders) {
+      const isStudio = provider.provider === StorageProviderType.TOKENS_STUDIO || provider.provider === StorageProviderType.TOKENS_STUDIO_OAUTH;
+      if (isStudio) {
+        const duplicateIdx = uniqueProviders.findIndex((existing) => 
+          isTokensStudioDuplicate(existing, provider)
+        );
+        if (duplicateIdx > -1) {
+          const existing = uniqueProviders[duplicateIdx];
+          let keepCurrent = false;
+          
+          const existingHasBaseUrl = 'baseUrl' in existing && !!(existing as any).baseUrl;
+          const currentHasBaseUrl = 'baseUrl' in provider && !!(provider as any).baseUrl;
+          
+          if (currentHasBaseUrl && !existingHasBaseUrl) {
+            keepCurrent = true;
+          } else if (provider.provider === StorageProviderType.TOKENS_STUDIO_OAUTH && existing.provider !== StorageProviderType.TOKENS_STUDIO_OAUTH) {
+            keepCurrent = true;
+          }
+          
+          if (keepCurrent) {
+            uniqueProviders[duplicateIdx] = provider;
+          }
+        } else {
+          uniqueProviders.push(provider);
+        }
+      } else {
+        uniqueProviders.push(provider);
+      }
+    }
+
+    if (uniqueProviders.length !== localApiProviders.length) {
+      cleanedApiProviders = uniqueProviders;
+      await ApiProvidersProperty.write(cleanedApiProviders);
+    }
+  }
+
   // If we have saved variable export settings, apply them to the settings
   let finalSettings = settings;
   if (variableExportSettings && Object.keys(variableExportSettings).length > 0) {
@@ -67,7 +109,7 @@ export async function startup() {
     lastOpened,
     onboardingExplainer,
     storageType,
-    localApiProviders,
+    localApiProviders: cleanedApiProviders,
     licenseKey,
     initialLoad: initialLoad ?? false,
     localTokenData: localTokenData ? {

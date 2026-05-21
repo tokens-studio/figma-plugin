@@ -56,37 +56,32 @@ export function isTokensStudioDuplicate(
 
   if (!isStudioP1 || !isStudioP2) return false;
 
-  // 1. Direct match on ID
+  // Direct exact matches of ID or OrgId
   if (p1.id && p2.id && p1.id === p2.id) {
     return true;
   }
-
-  // 2. Match on OrgId. If both specify IDs, they must also share the same ID.
   if (p1.orgId && p2.orgId && p1.orgId === p2.orgId) {
-    if (p1.id && p2.id) {
-      return p1.id === p2.id;
-    }
     return true;
   }
 
-  // 3. Cross-version matches where one provider uses the organization ID in legacy 'id' and the other in OAuth 'orgId'
-  if (p1.id && p2.orgId && p1.id === p2.orgId && !p1.orgId) {
+  // Cross-version matches where one provider uses the organization ID in 'id' and the other in 'orgId'
+  if (p1.id && p2.orgId && p1.id === p2.orgId) {
     return true;
   }
-  if (p1.orgId && p2.id && p1.orgId === p2.id && !p2.orgId) {
+  if (p1.orgId && p2.id && p1.orgId === p2.id) {
     return true;
   }
 
-  // 4. Prefix-based matches on internalId
+  // Prefix-based matches where one of the internalIds starts with 'tokens-studio-' and contains the other's orgId, id, or internalId
   if (p1.internalId && p1.internalId.startsWith('tokens-studio-')) {
     const extractedOrgId = p1.internalId.replace('tokens-studio-', '');
-    if (extractedOrgId === p2.orgId || (!p2.orgId && extractedOrgId === p2.id) || extractedOrgId === p2.internalId) {
+    if (extractedOrgId === p2.orgId || extractedOrgId === p2.id || extractedOrgId === p2.internalId) {
       return true;
     }
   }
   if (p2.internalId && p2.internalId.startsWith('tokens-studio-')) {
     const extractedOrgId = p2.internalId.replace('tokens-studio-', '');
-    if (extractedOrgId === p1.orgId || (!p1.orgId && extractedOrgId === p1.id) || extractedOrgId === p1.internalId) {
+    if (extractedOrgId === p1.orgId || extractedOrgId === p1.id || extractedOrgId === p1.internalId) {
       return true;
     }
   }
