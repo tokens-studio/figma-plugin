@@ -3,9 +3,13 @@ import { notifyAPIProviders, notifyUI } from '@/plugin/notifiers';
 import isSameCredentials from './isSameCredentials';
 import { ApiProvidersProperty } from '@/figmaStorage';
 import { StorageTypeCredentials } from '@/types/StorageType';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 import { generateId } from './generateId';
 
 export async function updateCredentials(context: StorageTypeCredentials) {
+  if (context.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
+    return;
+  }
   try {
     const data = await ApiProvidersProperty.read();
     let existingProviders: NonNullable<typeof data> = [];
