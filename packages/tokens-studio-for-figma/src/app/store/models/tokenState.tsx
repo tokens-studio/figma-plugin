@@ -9,6 +9,7 @@ import * as tokenStateEffects from './effects/tokenState';
 import parseTokenValues from '@/utils/parseTokenValues';
 import { notifyToUI } from '@/plugin/notifiers';
 import parseJson from '@/utils/parseJson';
+import { extractJsonKeysOrder } from '@/utils/extractJsonKeysOrder';
 import { TokenData } from '@/types/SecondScreen';
 import updateTokensOnSources from '../updateSources';
 import {
@@ -57,8 +58,6 @@ import { CreateSingleTokenData, EditSingleTokenData } from '../useManageTokens';
 import { singleTokensToRawTokenSet } from '@/utils/convert';
 import { checkStorageSize } from '@/utils/checkStorageSize';
 import { compareLastSyncedState } from '@/utils/compareLastSyncedState';
-
-
 
 /** Context required to call the Studio gRPC-backed resolver endpoint */
 export interface ServerResolverContext {
@@ -270,6 +269,26 @@ export const tokenState = createModel<RootModel>()({
       const parsedTokens = parseJson(payload);
       parseTokenValues(parsedTokens, true);
       const values = parseTokenValues({ [state.activeTokenSet]: parsedTokens }, true);
+      const activeSetTokens = values[state.activeTokenSet];
+      if (activeSetTokens && Array.isArray(activeSetTokens)) {
+        const orderedNames = extractJsonKeysOrder(payload);
+        const nameToIndex = new Map<string, number>();
+        orderedNames.forEach((name, index) => {
+          if (!nameToIndex.has(name)) {
+            nameToIndex.set(name, index);
+          }
+        });
+        activeSetTokens.sort((a, b) => {
+          const indexA = nameToIndex.get(a.name);
+          const indexB = nameToIndex.get(b.name);
+          if (indexA !== undefined && indexB !== undefined) {
+            return indexA - indexB;
+          }
+          if (indexA !== undefined) return -1;
+          if (indexB !== undefined) return 1;
+          return 0;
+        });
+      }
       return {
         ...state,
         tokens: {
