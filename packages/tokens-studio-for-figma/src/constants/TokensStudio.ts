@@ -1,1 +1,1 @@
-export const TOKENS_STUDIO_APP_URL = 'localhost:3001';
+export const TOKENS_STUDIO_APP_URL = 'staging.tokens.studio';

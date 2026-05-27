@@ -30,7 +30,7 @@ export class OAuthService {
   static getApiBaseUrl(studioUrl: string): string {
     // For local dev mapping
     if (studioUrl.includes('localhost') || studioUrl.includes('127.0.0.1')) {
-      if (studioUrl === 'localhost:3001') return 'http://localhost:3000';
+      if (studioUrl === 'localhost:3001') return 'https://api-staging.tokens.studio';
       return `http://${studioUrl}`;
     }
     // Check if it's production.tokens.studio
