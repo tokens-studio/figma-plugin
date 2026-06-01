@@ -54,8 +54,34 @@ export async function swapFigmaModes(activeTheme: Record<string, string>, themes
     const { $figmaCollectionId: collectionId, $figmaModeId: modeId } = themeObject;
 
     // Validate that the collection exists and contains the mode
-    const collection = await figma.variables.getVariableCollectionByIdAsync(collectionId);
-    if (!collection) {
+    let resolvedCollection = await figma.variables.getVariableCollectionByIdAsync(collectionId);
+    let resolvedModeId = modeId;
+
+    if (!resolvedCollection) {
+      // Fallback: the stored ID is from a different file (e.g. a published library used in a consumer file,
+      // or a collection that was deleted and recreated). Try to resolve via a variable key from
+      // $figmaVariableReferences — variable keys are stable across files.
+      const variableKey = Object.values(themeObject.$figmaVariableReferences ?? {})[0];
+      if (variableKey) {
+        try {
+          const importedVariable = await figma.variables.importVariableByKeyAsync(variableKey);
+          if (importedVariable) {
+            const fallbackCollection = await figma.variables.getVariableCollectionByIdAsync(importedVariable.variableCollectionId);
+            if (fallbackCollection) {
+              const matchingMode = fallbackCollection.modes.find((mode) => mode.name === themeObject.name);
+              if (matchingMode) {
+                resolvedCollection = fallbackCollection;
+                resolvedModeId = matchingMode.modeId;
+              }
+            }
+          }
+        } catch (e) {
+          // importVariableByKeyAsync throws if the key cannot be found in any subscribed library
+        }
+      }
+    }
+
+    if (!resolvedCollection) {
       // eslint-disable-next-line no-console
       console.warn(`Variable collection with ID ${collectionId} no longer exists. Skipping this theme dimension.`);
       notifyUI('One of the variable collections linked to this theme no longer exists', { error: true });
@@ -63,16 +89,16 @@ export async function swapFigmaModes(activeTheme: Record<string, string>, themes
       continue;
     }
 
-    const modeExists = collection.modes.some((mode) => mode.modeId === modeId);
+    const modeExists = resolvedCollection.modes.some((mode) => mode.modeId === resolvedModeId);
     if (!modeExists) {
       // eslint-disable-next-line no-console
-      console.warn(`Mode ${modeId} no longer exists in collection ${collection.name}. Skipping this theme dimension.`);
-      notifyUI(`One of the modes linked to this theme no longer exists in collection "${collection.name}"`, { error: true });
+      console.warn(`Mode ${resolvedModeId} no longer exists in collection ${resolvedCollection.name}. Skipping this theme dimension.`);
+      notifyUI(`One of the modes linked to this theme no longer exists in collection "${resolvedCollection.name}"`, { error: true });
       // eslint-disable-next-line no-continue
       continue;
     }
 
-    validCollectionModePairs.push({ collection, modeId });
+    validCollectionModePairs.push({ collection: resolvedCollection, modeId: resolvedModeId });
   }
 
   if (validCollectionModePairs.length === 0) {
