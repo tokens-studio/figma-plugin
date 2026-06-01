@@ -1,5 +1,6 @@
 import { UpdateMode } from '@/constants/UpdateMode';
 import { ThemeObjectsList, ThemeObject } from '@/types';
+import { truncateModeName } from '@/utils/truncateName';
 import { notifyUI, notifyException } from '../notifiers';
 
 // Type predicate to check for Figma theme with collection and mode IDs
@@ -68,9 +69,9 @@ export async function swapFigmaModes(activeTheme: Record<string, string>, themes
           if (importedVariable) {
             const fallbackCollection = await figma.variables.getVariableCollectionByIdAsync(importedVariable.variableCollectionId);
             if (fallbackCollection) {
-              const matchingMode = fallbackCollection.modes.find((mode) => mode.name === themeObject.name);
+              resolvedCollection = fallbackCollection;
+              const matchingMode = fallbackCollection.modes.find((mode) => mode.name === truncateModeName(themeObject.name));
               if (matchingMode) {
-                resolvedCollection = fallbackCollection;
                 resolvedModeId = matchingMode.modeId;
               }
             }
