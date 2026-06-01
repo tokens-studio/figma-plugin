@@ -105,16 +105,52 @@ export function mergeServerResolvedTokens(
     return locallyResolved;
   }
 
-  return locallyResolved.map((token) => {
+  // First pass: update tokens that are directly named in the server delta.
+  const firstPass = locallyResolved.map((token) => {
     const serverValue = serverResolvedTokens[token.name];
     if (serverValue !== undefined) {
       return {
         ...token,
         value: serverValue,
-        // Since we got a value from the server, it's considered successfully resolved
         failedToResolve: false,
       } as ResolveTokenValuesResult;
     }
     return token;
+  });
+
+  // Second pass: re-resolve composite tokens (typography, border, shadow) whose
+  // individual properties reference atomic tokens that were updated in the server delta.
+  // Without this step, e.g. a typography token referencing {fontFamily.brand} keeps its
+  // locally-resolved (possibly stale or unresolved) value even after fontFamily.brand is
+  // updated by the server.
+  return firstPass.map((token) => {
+    const rawValue = token.resolvedValueWithReferences;
+    if (!rawValue || typeof rawValue !== 'object' || Array.isArray(rawValue)) {
+      return token;
+    }
+
+    let needsUpdate = false;
+    const currentValue: Record<string, unknown> = typeof token.value === 'object' && token.value !== null && !Array.isArray(token.value)
+      ? { ...(token.value as Record<string, unknown>) }
+      : {};
+
+    for (const [key, val] of Object.entries(rawValue as Record<string, unknown>)) {
+      // Match simple {tokenName} references (no nesting)
+      if (typeof val === 'string' && val.startsWith('{') && val.endsWith('}') && !val.slice(1, -1).includes('{')) {
+        const refName = val.slice(1, -1);
+        const serverValue = serverResolvedTokens[refName];
+        if (serverValue !== undefined) {
+          currentValue[key] = serverValue;
+          needsUpdate = true;
+        }
+      }
+    }
+
+    if (!needsUpdate) return token;
+    return {
+      ...token,
+      value: currentValue,
+      failedToResolve: false,
+    } as ResolveTokenValuesResult;
   });
 }
