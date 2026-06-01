@@ -109,9 +109,26 @@ export function mergeServerResolvedTokens(
   const firstPass = locallyResolved.map((token) => {
     const serverValue = serverResolvedTokens[token.name];
     if (serverValue !== undefined) {
+      // Composite tokens (typography, border, shadow) come back from the server as a
+      // JSON-stringified object. Their local value is an object, so we must parse the
+      // string back into an object — otherwise downstream code reads properties off a
+      // string (e.g. `value.fontFamily`) and gets `undefined`, silently dropping the apply.
+      let nextValue: SingleToken['value'] = serverValue;
+      if (
+        typeof serverValue === 'string'
+        && typeof token.value === 'object'
+        && token.value !== null
+        && (serverValue.startsWith('{') || serverValue.startsWith('['))
+      ) {
+        try {
+          nextValue = JSON.parse(serverValue);
+        } catch {
+          // Not valid JSON — keep the raw string.
+        }
+      }
       return {
         ...token,
-        value: serverValue,
+        value: nextValue,
         failedToResolve: false,
       } as ResolveTokenValuesResult;
     }

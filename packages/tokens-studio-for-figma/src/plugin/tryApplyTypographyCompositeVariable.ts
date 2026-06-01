@@ -9,6 +9,32 @@ import { ApplyVariablesStylesOrRawValues } from '@/constants/ApplyVariablesStyle
 // Cache to track font loading promises to prevent race conditions in Promise.all
 const fontLoadingPromises = new Map<string, Promise<void>>();
 
+function dtcgUnitToCssUnit(unit: unknown): string {
+  if (unit === 'PIXELS') return 'px';
+  if (unit === 'PERCENT') return '%';
+  return typeof unit === 'string' ? unit : '';
+}
+
+// Resolved typography values can arrive in formats the raw-apply path can't consume:
+//  - DTCG dimension objects like { value: 24, unit: 'px' } (from variable/local resolution)
+//  - JSON-array font families like '["Comic","Sans","MS"]' (from server resolution)
+// transformValue/setFontStyleOnTarget expect plain strings (e.g. '24px', 'Comic, Sans, MS'),
+// so we normalize here. parseFloat on a raw object yields NaN, which throws when assigned.
+function normalizeTypographyPropertyValue(key: string, raw: any): any {
+  if (raw && typeof raw === 'object' && !Array.isArray(raw) && 'value' in raw) {
+    return `${raw.value}${dtcgUnitToCssUnit(raw.unit)}`;
+  }
+  if ((key === 'fontFamily' || key === 'fontFamilies') && typeof raw === 'string' && raw.trim().startsWith('[')) {
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return parsed.map((f) => String(f)).join(', ');
+    } catch {
+      // Not valid JSON — fall through and use the original string.
+    }
+  }
+  return raw;
+}
+
 export async function tryApplyTypographyCompositeVariable({
   target, value, baseFontSize, resolvedValue,
 }: {
@@ -26,9 +52,13 @@ export async function tryApplyTypographyCompositeVariable({
 
   if (typeof value === 'string') return;
 
+  const normalizedValue = Object.fromEntries(
+    Object.entries(value).map(([key, val]) => [key, normalizeTypographyPropertyValue(key, val)]),
+  ) as typeof value;
+
   try {
     // We iterate over all keys of the typography object and apply variables if available, otherwise we apply the value directly
-    for (const [originalKey, val] of Object.entries(value).filter(([_, keyValue]) => typeof keyValue !== 'undefined')) {
+    for (const [originalKey, val] of Object.entries(normalizedValue).filter(([_, keyValue]) => typeof keyValue !== 'undefined')) {
       if (typeof val === 'undefined') return;
       let successfullyAppliedVariable = false;
       if (resolvedValue[originalKey]?.toString().startsWith('{') && resolvedValue[originalKey].toString().endsWith('}') && shouldCreateStylesWithVariables) {
@@ -72,19 +102,24 @@ export async function tryApplyTypographyCompositeVariable({
           }
         }
       }
-      // If there's no variable we apply the value directly
+      // If there's no variable we apply the value directly. Each property is applied
+      // independently so a single malformed value can't abort the whole typography apply.
       if (!successfullyAppliedVariable) {
-        // First we set font family and weight without variables, we do this because to apply those values we need their combination
-        if (originalKey === 'fontFamily' || originalKey === 'fontWeight') {
-          if ('fontName' in target && ('fontWeight' in value || 'fontFamily' in value)) {
-            setFontStyleOnTarget({ target, value: { fontFamily: value.fontFamily, fontWeight: value.fontWeight }, baseFontSize });
+        try {
+          // First we set font family and weight without variables, we do this because to apply those values we need their combination
+          if (originalKey === 'fontFamily' || originalKey === 'fontWeight') {
+            if ('fontName' in target && ('fontWeight' in normalizedValue || 'fontFamily' in normalizedValue)) {
+              await setFontStyleOnTarget({ target, value: { fontFamily: normalizedValue.fontFamily, fontWeight: normalizedValue.fontWeight }, baseFontSize });
+            }
+          } else {
+            if (target.fontName !== figma.mixed) await figma.loadFontAsync(target.fontName);
+            const transformedValue = transformValue(normalizedValue[originalKey], originalKey, baseFontSize);
+            if (transformedValue !== null && !(typeof transformedValue === 'number' && Number.isNaN(transformedValue))) {
+              target[originalKey] = transformedValue;
+            }
           }
-        } else {
-          if (target.fontName !== figma.mixed) await figma.loadFontAsync(target.fontName);
-          const transformedValue = transformValue(value[originalKey], originalKey, baseFontSize);
-          if (transformedValue !== null) {
-            target[originalKey] = transformedValue;
-          }
+        } catch (e) {
+          console.error('unable to apply typography property', originalKey, normalizedValue[originalKey], e);
         }
       }
     }
