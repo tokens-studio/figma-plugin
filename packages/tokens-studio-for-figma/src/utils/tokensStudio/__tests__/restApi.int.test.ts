@@ -4,6 +4,7 @@ import {
   createTokenRest, updateTokenRest, deleteTokenRest,
   createThemeGroupRest, updateThemeGroupRest, deleteThemeGroupRest,
 } from '../restApi';
+import { parseBranchesFromResponse } from '../fetchBranchesListRest';
 
 import 'whatwg-fetch';
 
@@ -13,6 +14,7 @@ const PASSWORD = 'Test@123';
 
 let authToken = '';
 let projectId = process.env.TOKENS_STUDIO_PROJECT_ID || '';
+let changeSetId = '';
 
 describe('Tokens Studio REST API Integration', () => {
   // Use a longer timeout for integration testing
@@ -61,6 +63,19 @@ describe('Tokens Studio REST API Integration', () => {
         projectId = projects[0].id;
       }
     }
+
+    // 3. Resolve changeSetId for the main branch
+    if (authToken && projectId) {
+      const branchesRes = await fetch(`${API_BASE_URL}/api/v1/projects/${projectId}/branches`, {
+        headers: { Authorization: `Bearer ${authToken}`, Accept: 'application/json' },
+      });
+      if (branchesRes.ok) {
+        const branchesData = await branchesRes.json();
+        const branches = parseBranchesFromResponse(branchesData);
+        const mainBranch = branches.find((b) => b.name === 'main' || b.is_default) || branches[0];
+        changeSetId = mainBranch?.change_set_id || '';
+      }
+    }
   });
 
   describe('Token Sets', () => {
@@ -100,13 +115,13 @@ describe('Tokens Studio REST API Integration', () => {
       // Need a token set to wrap tokens into
       const set = await createTokenSetRest(authToken, API_BASE_URL, projectId, {
         name: 'test-tokens-container',
-      });
+      }, undefined, changeSetId);
       tokenSetId = set.data.id;
     });
 
     afterAll(async () => {
       // Clean up the token set container
-      await deleteTokenSetRest(authToken, API_BASE_URL, projectId, tokenSetId);
+      await deleteTokenSetRest(authToken, API_BASE_URL, projectId, tokenSetId, undefined, changeSetId);
     });
 
     it('creates a token', async () => {
@@ -116,7 +131,7 @@ describe('Tokens Studio REST API Integration', () => {
         type: 'color',
         token_set_id: tokenSetId,
         description: 'a test token',
-      }, 'main');
+      }, undefined, changeSetId);
       expect(result.data).toBeDefined();
       expect(result.data.id).toBeDefined();
       expect(result.data.attributes.name).toBe('color.test');
@@ -128,14 +143,14 @@ describe('Tokens Studio REST API Integration', () => {
       const result = await updateTokenRest(authToken, API_BASE_URL, projectId, tokenId, {
         value: '#00ff00',
         description: 'updated description',
-      }, 'main');
+      }, undefined, changeSetId);
       expect(result.data).toBeDefined();
       expect(result.data.attributes.value).toBe('#00ff00');
       expect(result.data.attributes.description).toBe('updated description');
     });
 
     it('deletes a token', async () => {
-      const result = await deleteTokenRest(authToken, API_BASE_URL, projectId, tokenId, 'main');
+      const result = await deleteTokenRest(authToken, API_BASE_URL, projectId, tokenId, undefined, changeSetId);
       expect(result).toBeDefined();
     });
   });
