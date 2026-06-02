@@ -79,12 +79,16 @@ export const pushToTokensStudioOAuth = async ({
       case 'CREATE_TOKEN':
         result = await createTokenRest(oauthTokens.accessToken, apiBaseUrl, projectId, data, branch, changeSetId);
         break;
-      case 'EDIT_TOKEN':
+      case 'EDIT_TOKEN': {
+        if (!data?.id) break;
         result = await updateTokenRest(oauthTokens.accessToken, apiBaseUrl, projectId, data.id, data, branch, changeSetId);
         break;
-      case 'DELETE_TOKEN':
+      }
+      case 'DELETE_TOKEN': {
+        if (!data?.id) break;
         result = await deleteTokenRest(oauthTokens.accessToken, apiBaseUrl, projectId, data.id, branch, changeSetId);
         break;
+      }
       case 'CREATE_TOKEN_SET':
         result = await createTokenSetRest(oauthTokens.accessToken, apiBaseUrl, projectId, data, branch, changeSetId);
         break;
