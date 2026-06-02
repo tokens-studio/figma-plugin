@@ -3,6 +3,7 @@ import { SingleToken } from '@/types/tokens';
 import { ThemeObject, UsedTokenSetsMap } from '@/types';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { getTokenSetsOrder } from './getTokenSetsOrder';
+import { tryParseJson } from './tryParseJson';
 
 export type ResolveTokenValuesResult = SingleToken<
 true,
@@ -120,11 +121,7 @@ export function mergeServerResolvedTokens(
         && token.value !== null
         && (serverValue.startsWith('{') || serverValue.startsWith('['))
       ) {
-        try {
-          nextValue = JSON.parse(serverValue);
-        } catch {
-          // Not valid JSON — keep the raw string.
-        }
+        nextValue = tryParseJson(serverValue) ?? serverValue;
       }
       return {
         ...token,
@@ -135,11 +132,13 @@ export function mergeServerResolvedTokens(
     return token;
   });
 
-  // Second pass: re-resolve composite tokens (typography, border, shadow) whose
-  // individual properties reference atomic tokens that were updated in the server delta.
+  // Second pass: re-resolve composite tokens (typography, border) whose individual
+  // properties reference atomic tokens that were updated in the server delta.
   // Without this step, e.g. a typography token referencing {fontFamily.brand} keeps its
   // locally-resolved (possibly stale or unresolved) value even after fontFamily.brand is
   // updated by the server.
+  // Note: array-valued tokens (e.g. multi-layer shadow) are not re-resolved here because
+  // nested reference matching inside array elements is not yet implemented.
   return firstPass.map((token) => {
     const rawValue = token.resolvedValueWithReferences;
     if (!rawValue || typeof rawValue !== 'object' || Array.isArray(rawValue)) {

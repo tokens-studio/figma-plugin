@@ -5,6 +5,7 @@ import { ResolvedTypographyObject } from './ResolvedTypographyObject';
 import { transformTypographyKeyToFigmaVariable } from './transformTypographyKeyToFigmaVariable';
 import { SingleTypographyToken } from '@/types/tokens';
 import { ApplyVariablesStylesOrRawValues } from '@/constants/ApplyVariablesStyleOrder';
+import { tryParseJson } from '@/utils/tryParseJson';
 
 // Cache to track font loading promises to prevent race conditions in Promise.all
 const fontLoadingPromises = new Map<string, Promise<void>>();
@@ -25,12 +26,8 @@ function normalizeTypographyPropertyValue(key: string, raw: any): any {
     return `${raw.value}${dtcgUnitToCssUnit(raw.unit)}`;
   }
   if ((key === 'fontFamily' || key === 'fontFamilies') && typeof raw === 'string' && raw.trim().startsWith('[')) {
-    try {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) return parsed.map((f) => String(f)).join(', ');
-    } catch {
-      // Not valid JSON — fall through and use the original string.
-    }
+    const parsed = tryParseJson<unknown[]>(raw);
+    if (Array.isArray(parsed)) return parsed.map((f) => String(f)).join(', ');
   }
   return raw;
 }
@@ -58,8 +55,7 @@ export async function tryApplyTypographyCompositeVariable({
 
   try {
     // We iterate over all keys of the typography object and apply variables if available, otherwise we apply the value directly
-    for (const [originalKey, val] of Object.entries(normalizedValue).filter(([_, keyValue]) => typeof keyValue !== 'undefined')) {
-      if (typeof val === 'undefined') return;
+    for (const [originalKey] of Object.entries(normalizedValue).filter(([_, keyValue]) => typeof keyValue !== 'undefined')) {
       let successfullyAppliedVariable = false;
       if (resolvedValue[originalKey]?.toString().startsWith('{') && resolvedValue[originalKey].toString().endsWith('}') && shouldCreateStylesWithVariables) {
         const variableToApply = await defaultTokenValueRetriever.getVariableReference(resolvedValue[originalKey].toString().slice(1, -1));
