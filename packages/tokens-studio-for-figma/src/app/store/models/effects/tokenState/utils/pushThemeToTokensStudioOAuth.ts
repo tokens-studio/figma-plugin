@@ -101,14 +101,21 @@ export async function pushThemeToTokensStudioOAuth(payload: any, rootState: any,
     });
 
     if (!payload?.id && result?.data?.id) {
-      // Update local theme ID if it was a create operation
-      dispatch.tokenState.updateTheme({
-        oldId: payload?.id || result.data.id, // Fallback if no local ID
-        theme: {
-          ...payload,
-          id: result.data.id,
-        },
-      });
+      // The reducer already stored the theme with a local hash id.
+      // Find it by name + group so we can swap it for the server-assigned id.
+      const currentState = store.getState();
+      const localTheme = currentState.tokenState.themes.find(
+        (t: any) => t.name === payload.name && t.group === (payload.group || undefined),
+      );
+      if (localTheme) {
+        dispatch.tokenState.updateTheme({
+          oldId: localTheme.id,
+          theme: {
+            ...localTheme,
+            id: result.data.id,
+          },
+        });
+      }
     }
   }
 }
