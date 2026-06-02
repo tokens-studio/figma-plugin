@@ -61,7 +61,7 @@ export async function createTokenSetRest(
         attributes: data,
       },
     },
-    query: (changeSetId || branch) ? { change_set_id: changeSetId || branch || '' } : undefined,
+    query: changeSetId ? { change_set_id: changeSetId } : undefined,
   });
 }
 
@@ -86,7 +86,7 @@ export async function updateTokenSetRest(
         },
       },
     },
-    query: (changeSetId || branch) ? { change_set_id: changeSetId || branch || '' } : undefined,
+    query: changeSetId ? { change_set_id: changeSetId } : undefined,
   });
 }
 
@@ -100,7 +100,7 @@ export async function deleteTokenSetRest(
 ) {
   return restRequest(authToken, apiBaseUrl, `/api/v1/projects/${projectId}/token_sets/${tokenSetId}`, {
     method: 'DELETE',
-    query: (changeSetId || branch) ? { change_set_id: changeSetId || branch || '' } : undefined,
+    query: changeSetId ? { change_set_id: changeSetId } : undefined,
   });
 }
 
@@ -130,7 +130,7 @@ export async function createTokenRest(
         description: data.description,
       },
     },
-    query: (changeSetId || branch) ? { change_set_id: changeSetId || branch || '' } : undefined,
+    query: changeSetId ? { change_set_id: changeSetId } : undefined,
   });
 }
 
@@ -160,7 +160,7 @@ export async function updateTokenRest(
         token_set_id: data.token_set_id,
       },
     },
-    query: (changeSetId || branch) ? { change_set_id: changeSetId || branch || '' } : undefined,
+    query: changeSetId ? { change_set_id: changeSetId } : undefined,
   });
 }
 
@@ -174,7 +174,7 @@ export async function deleteTokenRest(
 ) {
   return restRequest(authToken, apiBaseUrl, `/api/v1/projects/${projectId}/tokens/${tokenId}`, {
     method: 'DELETE',
-    query: (changeSetId || branch) ? { change_set_id: changeSetId || branch || '' } : undefined,
+    query: changeSetId ? { change_set_id: changeSetId } : undefined,
   });
 }
 
@@ -195,7 +195,7 @@ export async function createThemeGroupRest(
     body: {
       theme_group: data,
     },
-    query: (changeSetId || branch) ? { change_set_id: changeSetId || branch || '' } : undefined,
+    query: changeSetId ? { change_set_id: changeSetId } : undefined,
   });
 }
 
@@ -216,7 +216,7 @@ export async function updateThemeGroupRest(
     body: {
       theme_group: data,
     },
-    query: (changeSetId || branch) ? { change_set_id: changeSetId || branch || '' } : undefined,
+    query: changeSetId ? { change_set_id: changeSetId } : undefined,
   });
 }
 
@@ -230,7 +230,7 @@ export async function deleteThemeGroupRest(
 ) {
   return restRequest(authToken, apiBaseUrl, `/api/v1/projects/${projectId}/theme_groups/${themeGroupId}`, {
     method: 'DELETE',
-    query: (changeSetId || branch) ? { change_set_id: changeSetId || branch || '' } : undefined,
+    query: changeSetId ? { change_set_id: changeSetId } : undefined,
   });
 }
 
@@ -256,7 +256,7 @@ export async function createThemeOptionRest(
     body: {
       theme_option: data,
     },
-    query: (changeSetId || branch) ? { change_set_id: changeSetId || branch || '' } : undefined,
+    query: changeSetId ? { change_set_id: changeSetId } : undefined,
   });
 }
 
@@ -282,7 +282,7 @@ export async function updateThemeOptionRest(
     body: {
       theme_option: data,
     },
-    query: (changeSetId || branch) ? { change_set_id: changeSetId || branch || '' } : undefined,
+    query: changeSetId ? { change_set_id: changeSetId } : undefined,
   });
 }
 
@@ -296,6 +296,6 @@ export async function deleteThemeOptionRest(
 ) {
   return restRequest(authToken, apiBaseUrl, `/api/v1/projects/${projectId}/theme_options/${themeOptionId}`, {
     method: 'DELETE',
-    query: (changeSetId || branch) ? { change_set_id: changeSetId || branch || '' } : undefined,
+    query: changeSetId ? { change_set_id: changeSetId } : undefined,
   });
 }
