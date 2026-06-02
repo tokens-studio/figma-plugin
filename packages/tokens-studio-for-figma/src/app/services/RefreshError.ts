@@ -2,8 +2,9 @@ export type RefreshErrorKind = 'fatal' | 'transient';
 
 /**
  * Typed refresh error. Only "fatal" errors (invalid_grant, invalid_token,
- * invalid_client) should trigger a logout. Transient errors (network, 5xx)
- * should let the session survive so a subsequent attempt can succeed.
+ * invalid_client, unauthorized_client) should trigger a logout. Transient
+ * errors (network, 5xx) should let the session survive so a subsequent
+ * attempt can succeed.
  */
 export class RefreshError extends Error {
   kind: RefreshErrorKind;

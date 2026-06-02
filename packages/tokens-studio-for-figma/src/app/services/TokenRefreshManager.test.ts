@@ -1,4 +1,5 @@
-import { TokenRefreshManager, RefreshError } from './TokenRefreshManager';
+import { TokenRefreshManager } from './TokenRefreshManager';
+import { RefreshError } from './RefreshError';
 import { OAuthService } from './OAuthService';
 import type { OAuthTokens } from '@/types/oauth';
 
@@ -41,23 +42,23 @@ describe('TokenRefreshManager', () => {
 
   it('returns new tokens when OAuth refresh succeeds', async () => {
     const newTokens = makeNewTokens();
-    mockedOAuthService.refreshOAuthTokens.mockResolvedValue(newTokens);
+    mockedOAuthService.refreshTokens.mockResolvedValue(newTokens);
 
     const result = await TokenRefreshManager.refreshTokens(makeTokens(), STUDIO_URL);
 
     expect(result).toBe(newTokens);
-    expect(mockedOAuthService.refreshOAuthTokens).toHaveBeenCalledWith(null, 'test-refresh', STUDIO_URL);
+    expect(mockedOAuthService.refreshTokens).toHaveBeenCalledWith(null, 'test-refresh', STUDIO_URL);
   });
 
   it('throws a fatal RefreshError on invalid_grant', async () => {
-    mockedOAuthService.refreshOAuthTokens.mockRejectedValue(new Error('invalid_grant: token revoked'));
+    mockedOAuthService.refreshTokens.mockRejectedValue(new Error('invalid_grant: token revoked'));
 
     await expect(TokenRefreshManager.refreshTokens(makeTokens(), STUDIO_URL))
       .rejects.toMatchObject({ kind: 'fatal', message: 'invalid_grant: token revoked' });
   });
 
   it('throws a fatal RefreshError on invalid_token', async () => {
-    mockedOAuthService.refreshOAuthTokens.mockRejectedValue(new Error('invalid_token'));
+    mockedOAuthService.refreshTokens.mockRejectedValue(new Error('invalid_token'));
 
     const err = await TokenRefreshManager.refreshTokens(makeTokens(), STUDIO_URL).catch((e) => e);
     expect(err).toBeInstanceOf(RefreshError);
@@ -65,7 +66,7 @@ describe('TokenRefreshManager', () => {
   });
 
   it('throws a transient RefreshError on network errors', async () => {
-    mockedOAuthService.refreshOAuthTokens.mockRejectedValue(new Error('Network request failed'));
+    mockedOAuthService.refreshTokens.mockRejectedValue(new Error('Network request failed'));
 
     const err = await TokenRefreshManager.refreshTokens(makeTokens(), STUDIO_URL).catch((e) => e);
     expect(err).toBeInstanceOf(RefreshError);
@@ -73,7 +74,7 @@ describe('TokenRefreshManager', () => {
   });
 
   it('throws a transient RefreshError on 5xx errors', async () => {
-    mockedOAuthService.refreshOAuthTokens.mockRejectedValue(new Error('HTTP 503 Service Unavailable'));
+    mockedOAuthService.refreshTokens.mockRejectedValue(new Error('HTTP 503 Service Unavailable'));
 
     const err = await TokenRefreshManager.refreshTokens(makeTokens(), STUDIO_URL).catch((e) => e);
     expect(err).toBeInstanceOf(RefreshError);
@@ -84,7 +85,7 @@ describe('TokenRefreshManager', () => {
     let resolveRefresh: (value: OAuthTokens) => void;
     const newTokens = makeNewTokens();
 
-    mockedOAuthService.refreshOAuthTokens.mockReturnValue(
+    mockedOAuthService.refreshTokens.mockReturnValue(
       new Promise((resolve) => {
         resolveRefresh = resolve;
       }),
@@ -96,7 +97,7 @@ describe('TokenRefreshManager', () => {
     const promise3 = TokenRefreshManager.refreshTokens(tokens, STUDIO_URL);
 
     // Only one call should have been made
-    expect(mockedOAuthService.refreshOAuthTokens).toHaveBeenCalledTimes(1);
+    expect(mockedOAuthService.refreshTokens).toHaveBeenCalledTimes(1);
 
     // Resolve the single refresh
     resolveRefresh!(newTokens);
@@ -111,7 +112,7 @@ describe('TokenRefreshManager', () => {
     const newTokens1 = makeNewTokens();
     const newTokens2 = { ...makeNewTokens(), accessToken: 'second-access' };
 
-    mockedOAuthService.refreshOAuthTokens
+    mockedOAuthService.refreshTokens
       .mockResolvedValueOnce(newTokens1)
       .mockResolvedValueOnce(newTokens2);
 
@@ -121,17 +122,17 @@ describe('TokenRefreshManager', () => {
     // Second call should make a new request
     const result2 = await TokenRefreshManager.refreshTokens(makeTokens(), STUDIO_URL);
     expect(result2).toBe(newTokens2);
-    expect(mockedOAuthService.refreshOAuthTokens).toHaveBeenCalledTimes(2);
+    expect(mockedOAuthService.refreshTokens).toHaveBeenCalledTimes(2);
   });
 
   it('clears in-flight promise after failed refresh', async () => {
-    mockedOAuthService.refreshOAuthTokens.mockRejectedValueOnce(new Error('Network error'));
+    mockedOAuthService.refreshTokens.mockRejectedValueOnce(new Error('Network error'));
 
     await expect(TokenRefreshManager.refreshTokens(makeTokens(), STUDIO_URL)).rejects.toThrow();
 
     // Should be able to try again
     const newTokens = makeNewTokens();
-    mockedOAuthService.refreshOAuthTokens.mockResolvedValue(newTokens);
+    mockedOAuthService.refreshTokens.mockResolvedValue(newTokens);
     const result = await TokenRefreshManager.refreshTokens(makeTokens(), STUDIO_URL);
     expect(result).toBe(newTokens);
   });

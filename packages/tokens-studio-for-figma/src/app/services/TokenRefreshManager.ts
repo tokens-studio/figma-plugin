@@ -2,9 +2,6 @@ import { OAuthService } from './OAuthService';
 import { RefreshError, classifyError } from './RefreshError';
 import type { OAuthTokens } from '@/types/oauth';
 
-export { RefreshError } from './RefreshError';
-export type { RefreshErrorKind } from './RefreshError';
-
 /**
  * Single-flight token refresh manager.
  *
@@ -43,7 +40,7 @@ export class TokenRefreshManager {
     studioUrl: string,
   ): Promise<OAuthTokens> {
     try {
-      return await OAuthService.refreshOAuthTokens(null, currentTokens.refreshToken, studioUrl);
+      return await OAuthService.refreshTokens(null, currentTokens.refreshToken, studioUrl);
     } catch (error) {
       const kind = classifyError(error);
       const message = error instanceof Error ? error.message : 'Token refresh failed';
