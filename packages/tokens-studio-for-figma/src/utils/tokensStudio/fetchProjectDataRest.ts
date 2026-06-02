@@ -217,7 +217,6 @@ export async function fetchProjectDataRest(
     // Parse theme options
     const themeOptions: RestThemeOption[] = [];
     if (themeOptionsData.data && Array.isArray(themeOptionsData.data)) {
-      console.log('--- RAW THEME OPTIONS FROM REST API ---', JSON.stringify(themeOptionsData.data, null, 2));
       themeOptionsData.data.forEach((item: any) => {
         const rawStyleRefs = item.attributes?.figma_style_references || [];
         const figmaStyleReferences: Record<string, string> = {};
@@ -263,12 +262,6 @@ export async function fetchProjectDataRest(
           figmaCollectionId: item.attributes?.figma_collection_id || undefined,
           figmaModeId: item.attributes?.figma_mode_id || undefined,
         };
-        console.log(`Parsed RestThemeOption [${option.name}]:`, {
-          figmaStyleReferences: option.figmaStyleReferences,
-          figmaVariableReferences: option.figmaVariableReferences,
-          figmaCollectionId: option.figmaCollectionId,
-          figmaModeId: option.figmaModeId,
-        });
         themeOptions.push(option);
       });
     }
@@ -331,13 +324,6 @@ export async function fetchProjectDataRest(
 
           if (opt.figmaCollectionId !== undefined) themeObj.$figmaCollectionId = opt.figmaCollectionId;
           if (opt.figmaModeId !== undefined) themeObj.$figmaModeId = opt.figmaModeId;
-
-          console.log(`Parsed Final ThemeObject [${themeObj.name}]:`, {
-            $figmaStyleReferences: themeObj.$figmaStyleReferences,
-            $figmaVariableReferences: themeObj.$figmaVariableReferences,
-            $figmaCollectionId: themeObj.$figmaCollectionId,
-            $figmaModeId: themeObj.$figmaModeId,
-          });
 
           themes.push(themeObj);
         });

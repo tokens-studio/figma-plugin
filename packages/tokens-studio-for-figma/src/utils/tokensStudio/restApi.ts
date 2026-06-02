@@ -20,10 +20,6 @@ async function restRequest(
   }
 
   try {
-    if (body) {
-      console.log(`REST API Request Body [${method} ${url.toString()}]:`, body);
-    }
-
     const response = await fetch(url.toString(), {
       method,
       headers: {
@@ -41,7 +37,6 @@ async function restRequest(
     }
 
     const result = await response.json().catch(() => ({}));
-    console.log(`REST API Response [${method} ${url.toString()}]:`, response.status, result);
     return result;
   } catch (error) {
     console.error(`REST API Request failed [${method} ${endpoint}]:`, error);

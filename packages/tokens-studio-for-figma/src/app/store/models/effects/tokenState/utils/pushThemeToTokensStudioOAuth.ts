@@ -94,11 +94,6 @@ export async function pushThemeToTokensStudioOAuth(payload: any, rootState: any,
       figma_mode_id: payload?.$figmaModeId || null,
     };
 
-    console.log('--- PUSHING THEME DATA TO TOKENS STUDIO OAUTH ---', {
-      payload,
-      themeData,
-    });
-
     const result = await pushToTokensStudioOAuth({
       context: rootState.uiState.api,
       action: payload?.id ? 'UPDATE_THEME' : 'CREATE_THEME',
