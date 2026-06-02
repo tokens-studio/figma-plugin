@@ -1,6 +1,6 @@
 {
   "name": "@tokens-studio/figma-plugin",
-  "version": "2.11.7",
+  "version": "2.11.8",
   "description": "Tokens Studio plugin for Figma",
   "license": "MIT",
   "private": true,
@@ -142,7 +142,6 @@
     "reselect": "^4.1.5",
     "rooks": "^6.4.2",
     "set-value": "^3.0.3",
-    "storyblok-js-client": "^3.3.1",
     "stream-browserify": "^3.0.0",
     "use-debounce": "^6.0.1",
     "uuid": "^9.0.0",

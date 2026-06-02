@@ -1,6 +1,7 @@
 import {
   ApiProvidersProperty, AuthDataProperty, LicenseKeyProperty, InitialLoadProperty, OAuthTokensProperty, ActiveOrganizationIdProperty,
 } from '@/figmaStorage';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 import { getActiveTheme } from '@/utils/getActiveTheme';
 import { getSelectedExportThemes } from '@/utils/getSelectedExportThemes';
 import { getVariableExportSettings } from '@/utils/getVariableExportSettings';
@@ -22,7 +23,7 @@ export async function startup() {
     lastOpened,
     onboardingExplainer,
     storageType,
-    localApiProviders,
+    rawApiProviders,
     licenseKey,
     initialLoad,
     localTokenData,
@@ -51,6 +52,12 @@ export async function startup() {
     getSelectedExportThemes(),
     ActiveOrganizationIdProperty.read(),
   ]);
+
+  let localApiProviders = rawApiProviders;
+  if (rawApiProviders && rawApiProviders.some((p) => p?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH || p?.internalId?.startsWith('tokens-studio-'))) {
+    localApiProviders = rawApiProviders.filter((p) => p?.provider !== StorageProviderType.TOKENS_STUDIO_OAUTH && !p?.internalId?.startsWith('tokens-studio-'));
+    await ApiProvidersProperty.write(localApiProviders);
+  }
 
   // If we have saved variable export settings, apply them to the settings
   let finalSettings = settings;
