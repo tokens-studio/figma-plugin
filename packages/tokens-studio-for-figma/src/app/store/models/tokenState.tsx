@@ -1194,22 +1194,34 @@ export const tokenState = createModel<RootModel>()({
 
       dispatch.tokenState.setUpdatedAliases(updatedTokens);
 
+      if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO) {
+        for (const set of updatedSets) {
+          const content = updatedTokens[set];
+          const rawSet = singleTokensToRawTokenSet(content, true);
+
+          pushToTokensStudio({
+            context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
+            action: 'UPDATE_TOKEN_SET',
+            data: { raw: rawSet, name: set },
+          });
+        }
+      }
+
       if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
         for (const set of updatedSets) {
           const content = updatedTokens[set];
-          for (const token of content) {
-            // Only update if it's one of the tokens that actually changed (has an update)
-            // This is a bit inefficient, but ensures sync.
-            // Ideally we'd have a list of changed tokens.
-            pushToTokensStudioOAuth({
-              context: rootState.uiState.api as StorageTypeCredential<TokensStudioOAuthStorageType, false>,
-              action: 'EDIT_TOKEN',
-              data: {
-                id: token.$extensions?.id,
-                value: token.value,
-              },
-            });
-          }
+          content.forEach((token) => {
+            if (token.$extensions?.id) {
+              pushToTokensStudioOAuth({
+                context: rootState.uiState.api as StorageTypeCredential<TokensStudioOAuthStorageType, false>,
+                action: 'EDIT_TOKEN',
+                data: {
+                  id: token.$extensions.id,
+                  value: token.value,
+                },
+              });
+            }
+          });
         }
       }
     },
