@@ -824,7 +824,7 @@ export const tokenState = createModel<RootModel>()({
         if (token) {
           pushToTokensStudioOAuth({
             context: rootState.uiState.api as StorageTypeCredential<TokensStudioOAuthStorageType, false>,
-            action: (payload.oldName || token.$extensions?.id) ? 'EDIT_TOKEN' : 'CREATE_TOKEN',
+            action: token.$extensions?.id ? 'EDIT_TOKEN' : 'CREATE_TOKEN',
             data: {
               id: token.$extensions?.id,
               name: token.name,
