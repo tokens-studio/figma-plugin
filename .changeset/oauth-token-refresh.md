@@ -2,4 +2,4 @@
 "@tokens-studio/figma-plugin": patch
 ---
 
-Improved token refresh behavior that caused users to be logged out after certain days of inactivity
+Improved Studio platform sync token refresh so users are no longer logged out after certain days of inactivity
