@@ -95,16 +95,8 @@ export async function updateThemeGroupsInTokensStudio({
       });
     }
 
-    if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
-      pushToTokensStudioOAuth({
-        context: rootState.uiState.api as StorageTypeCredential<TokensStudioOAuthStorageType, false>,
-        action: 'UPDATE_THEME_GROUP',
-        data: {
-          ...data,
-          id: themesToUpdate[0].id,
-        },
-      });
-    }
+    // Note: TOKENS_STUDIO_OAUTH sync is driven by tokenState effects (REST) rather than this middleware.
+    // tokenStateMiddleware currently triggers this function only for StorageProviderType.TOKENS_STUDIO.
   }
 
   if (themeToCreate) {
