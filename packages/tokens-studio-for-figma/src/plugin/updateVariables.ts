@@ -21,6 +21,7 @@ export type CreateVariableTypes = {
   progressTracker?: ProgressTracker | null;
   metadataUpdateTracker?: Record<string, boolean>;
   providedPlatformsByVariable?: Record<string, Set<string>>;
+  serverResolvedTokens?: Record<string, string> | null;
 };
 
 export type VariableToken = SingleToken<true, { path: string; variableId: string }>;
@@ -36,6 +37,7 @@ export default async function updateVariables({
   progressTracker,
   metadataUpdateTracker,
   providedPlatformsByVariable,
+  serverResolvedTokens,
 }: CreateVariableTypes) {
   // Create a separate TokenResolver instance for this theme to avoid interference
   // when multiple themes are processed concurrently
@@ -47,6 +49,7 @@ export default async function updateVariables({
     filterByTokenSet,
     overallConfig,
     themeTokenResolver,
+    serverResolvedTokens,
   });
 
   // Resolve the base font size for this specific theme using the same resolved tokens

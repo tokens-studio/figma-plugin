@@ -28,7 +28,7 @@ import { ProgressTracker } from './ProgressTracker';
 * - There's another step that we perform where we check if any variables need to be using references to other variables. This is a second step, as we need to have all variables created first before we can reference them.
 * - TODO: Likely a good idea to merge this with createLocalVariablesInPlugin to reduce duplication
 * */
-export default async function createLocalVariablesWithoutModesInPlugin(tokens: Record<string, AnyTokenList>, settings: SettingsState, selectedSets: ExportTokenSet[]) {
+export default async function createLocalVariablesWithoutModesInPlugin(tokens: Record<string, AnyTokenList>, settings: SettingsState, selectedSets: ExportTokenSet[], serverResolvedTokens?: Record<string, string> | null) {
   // Big O (n * m * x): (n: amount of themes, m: amount of variableCollections, x: amount of modes)
   const allVariableCollectionIds: Record<string, LocalVariableInfo> = {};
   let referenceVariableCandidates: ReferenceVariableType[] = [];
@@ -69,7 +69,7 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
       if (set.status === TokenSetStatus.ENABLED) {
         const theme = { id: '123', name: set.set, selectedTokenSets: { [set.set]: set.status } };
         const { tokensToCreate } = generateTokensToCreate({
-          theme, tokens, overallConfig, filterByTokenSet: set.set,
+          theme, tokens, overallConfig, filterByTokenSet: set.set, serverResolvedTokens,
         });
         const variableTokenCount = tokensToCreate.filter((token) => checkIfTokenCanCreateVariable(token, settings)).length;
         return total + variableTokenCount;
@@ -117,6 +117,7 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
             settings,
             filterByTokenSet: set.set,
             progressTracker: globalProgressTracker,
+            serverResolvedTokens,
           });
           figmaVariablesAfterCreate += allVariableObj.removedVariables.length;
           if (Object.keys(allVariableObj.variableIds).length > 0) {

@@ -1,5 +1,12 @@
 # @tokens-studio/figma-plugin
 
+## 2.11.8
+
+### Patch Changes
+
+- 2f90c0b0f: Fixed an issue where duplicate Tokens Studio OAuth providers were created and persisted in the storage when switching branches, causing visual and functional duplication in the Sync Settings.
+- 8d3ea2f82: Fixed an issue where tokens using complex modifiers (such as `set_alpha`) were incorrectly exported as white or caused errors in Figma variables. This update ensures that the accurately resolved values visible in the Studio UI are correctly preserved during the export process for Tokens Studio OAuth users.
+
 ## 2.11.7
 
 ### Patch Changes

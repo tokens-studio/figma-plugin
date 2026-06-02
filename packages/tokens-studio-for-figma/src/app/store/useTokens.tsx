@@ -19,7 +19,9 @@ import {
   uiStateSelector,
   updateModeSelector,
   themesListSelector,
+  storageTypeSelector,
 } from '@/selectors';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { isEqual } from '@/utils/isEqual';
@@ -64,6 +66,7 @@ export default function useTokens() {
   const updateMode = useSelector(updateModeSelector);
   const tokens = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
+  const storageType = useSelector(storageTypeSelector);
   const settings = useSelector(settingsStateSelector, isEqual);
   const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
   const { confirm } = useConfirm<ConfirmResult>();
@@ -640,11 +643,12 @@ export default function useTokens() {
         type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES,
         tokens: multiValueFilteredTokens,
         settings,
+        serverResolvedTokens: storageType.provider === StorageProviderType.TOKENS_STUDIO_OAUTH ? serverResolvedTokens : null,
       }),
     );
     dispatch.tokenState.assignVariableIdsToTheme(createVariableResult.variableIds);
     dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
-  }, [dispatch.tokenState, dispatch.uiState, tokens, settings]);
+  }, [dispatch.tokenState, dispatch.uiState, tokens, settings, serverResolvedTokens, storageType]);
 
   const createVariablesFromSets = useCallback(
     async (selectedSets: ExportTokenSet[]) => {
@@ -685,12 +689,13 @@ export default function useTokens() {
           tokens,
           settings,
           selectedSets,
+          serverResolvedTokens: storageType.provider === StorageProviderType.TOKENS_STUDIO_OAUTH ? serverResolvedTokens : null,
         }),
       );
       dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
       Promise.resolve();
     },
-    [dispatch.uiState, tokens, settings],
+    [dispatch.uiState, tokens, settings, serverResolvedTokens, storageType],
   );
 
   const createVariablesFromThemes = useCallback(
@@ -732,13 +737,14 @@ export default function useTokens() {
           tokens,
           settings,
           selectedThemes,
+          serverResolvedTokens: storageType.provider === StorageProviderType.TOKENS_STUDIO_OAUTH ? serverResolvedTokens : null,
         }),
       );
       dispatch.tokenState.assignVariableIdsToTheme(createVariableResult.variableIds);
       dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
       Promise.resolve();
     },
-    [dispatch.tokenState, dispatch.uiState, tokens, settings],
+    [dispatch.tokenState, dispatch.uiState, tokens, settings, serverResolvedTokens, storageType],
   );
 
   const renameVariablesFromToken = useCallback(

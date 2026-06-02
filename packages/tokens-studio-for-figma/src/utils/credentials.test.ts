@@ -100,6 +100,18 @@ describe('updateCredentials', () => {
     await updateCredentials(newObject);
     expect(figma.clientStorage.setAsync).toHaveBeenCalledWith('apiProviders', JSON.stringify(newArray));
   });
+
+  it('does not save credentials if provider is TOKENS_STUDIO_OAUTH', async () => {
+    const oauthObject = {
+      id: '123',
+      secret: 'token',
+      name: 'oauth provider',
+      provider: StorageProviderType.TOKENS_STUDIO_OAUTH,
+      orgId: 'org123',
+    };
+    await updateCredentials(oauthObject);
+    expect(figma.clientStorage.setAsync).not.toHaveBeenCalled();
+  });
 });
 
 describe('removeSingleCredential', () => {

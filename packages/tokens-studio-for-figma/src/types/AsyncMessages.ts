@@ -336,6 +336,7 @@ export type CreateLocalVariablesAsyncMessage = AsyncMessage<AsyncMessageTypes.CR
   tokens: Record<string, AnyTokenList>;
   settings: SettingsState,
   selectedThemes?: string[]
+  serverResolvedTokens?: Record<string, string> | null;
 }>;
 export type CreateLocalVariablesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_LOCAL_VARIABLES, {
   variableIds: Record<string, LocalVariableInfo>
@@ -346,6 +347,7 @@ export type CreateLocalVariablesWithoutModesAsyncMessage = AsyncMessage<AsyncMes
   tokens: Record<string, AnyTokenList>;
   settings: SettingsState,
   selectedSets: ExportTokenSet[]
+  serverResolvedTokens?: Record<string, string> | null;
 }>;
 export type CreateLocalVariablesWithoutModesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_LOCAL_VARIABLES_WITHOUT_MODES, {
   variableIds: Record<string, LocalVariableInfo>
