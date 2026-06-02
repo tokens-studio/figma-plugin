@@ -676,10 +676,17 @@ export const tokenState = createModel<RootModel>()({
         metadata: data,
       },
     }),
-    updateTheme: (state, { oldId, theme }: { oldId: string; theme: ThemeObject }): TokenState => ({
-      ...state,
-      themes: state.themes.map((t) => (t.id === oldId ? theme : t)),
-    }),
+    updateTheme: (state, { oldId, theme }: { oldId: string; theme: ThemeObject }): TokenState => {
+      const nextActiveTheme = { ...state.activeTheme };
+      Object.keys(nextActiveTheme).forEach((group) => {
+        if (nextActiveTheme[group] === oldId) nextActiveTheme[group] = theme.id;
+      });
+      return {
+        ...state,
+        themes: state.themes.map((t) => (t.id === oldId ? theme : t)),
+        activeTheme: nextActiveTheme,
+      };
+    },
     removeTheme: (state, id: string): TokenState => ({
       ...state,
       themes: state.themes.filter((t) => t.id !== id),
