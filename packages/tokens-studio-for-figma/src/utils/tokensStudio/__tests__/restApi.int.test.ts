@@ -9,18 +9,25 @@ import { parseBranchesFromResponse } from '../fetchBranchesListRest';
 import 'whatwg-fetch';
 
 const API_BASE_URL = 'https://api-staging.tokens.studio';
-const EMAIL = 'akshay@tokens.studio';
-const PASSWORD = 'Test@123';
+const EMAIL = process.env.TOKENS_STUDIO_TEST_EMAIL;
+const PASSWORD = process.env.TOKENS_STUDIO_TEST_PASSWORD;
 
 let authToken = '';
 let projectId = process.env.TOKENS_STUDIO_PROJECT_ID || '';
 let changeSetId = '';
+
+const skipIntegration = !EMAIL || !PASSWORD;
 
 describe('Tokens Studio REST API Integration', () => {
   // Use a longer timeout for integration testing
   jest.setTimeout(60000);
 
   beforeAll(async () => {
+    if (skipIntegration) {
+      console.warn('Skipping integration tests: TOKENS_STUDIO_TEST_EMAIL / TOKENS_STUDIO_TEST_PASSWORD not set');
+      return;
+    }
+
     // 1. Obtain authToken via login
     const authRes = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
       method: 'POST',
@@ -82,6 +89,7 @@ describe('Tokens Studio REST API Integration', () => {
     let tokenSetId = '';
 
     it('creates a token set', async () => {
+      if (skipIntegration) return;
       const result = await createTokenSetRest(authToken, API_BASE_URL, projectId, {
         name: 'test-integration-set',
         type: 'global',
@@ -94,6 +102,7 @@ describe('Tokens Studio REST API Integration', () => {
     });
 
     it('updates a token set', async () => {
+      if (skipIntegration) return;
       const result = await updateTokenSetRest(authToken, API_BASE_URL, projectId, tokenSetId, {
         name: 'test-integration-set-updated',
       });
@@ -102,6 +111,7 @@ describe('Tokens Studio REST API Integration', () => {
     });
 
     it('deletes a token set', async () => {
+      if (skipIntegration) return;
       const result = await deleteTokenSetRest(authToken, API_BASE_URL, projectId, tokenSetId);
       expect(result).toBeDefined();
     });
@@ -112,6 +122,7 @@ describe('Tokens Studio REST API Integration', () => {
     let tokenId = '';
 
     beforeAll(async () => {
+      if (skipIntegration) return;
       // Need a token set to wrap tokens into
       const set = await createTokenSetRest(authToken, API_BASE_URL, projectId, {
         name: 'test-tokens-container',
@@ -120,11 +131,13 @@ describe('Tokens Studio REST API Integration', () => {
     });
 
     afterAll(async () => {
+      if (skipIntegration) return;
       // Clean up the token set container
       await deleteTokenSetRest(authToken, API_BASE_URL, projectId, tokenSetId, undefined, changeSetId);
     });
 
     it('creates a token', async () => {
+      if (skipIntegration) return;
       const result = await createTokenRest(authToken, API_BASE_URL, projectId, {
         name: 'color.test',
         value: '#ff0000',
@@ -140,6 +153,7 @@ describe('Tokens Studio REST API Integration', () => {
     });
 
     it('updates a token', async () => {
+      if (skipIntegration) return;
       const result = await updateTokenRest(authToken, API_BASE_URL, projectId, tokenId, {
         value: '#00ff00',
         description: 'updated description',
@@ -150,6 +164,7 @@ describe('Tokens Studio REST API Integration', () => {
     });
 
     it('deletes a token', async () => {
+      if (skipIntegration) return;
       const result = await deleteTokenRest(authToken, API_BASE_URL, projectId, tokenId, undefined, changeSetId);
       expect(result).toBeDefined();
     });
@@ -159,6 +174,7 @@ describe('Tokens Studio REST API Integration', () => {
     let themeGroupId = '';
 
     it('creates a theme group', async () => {
+      if (skipIntegration) return;
       const result = await createThemeGroupRest(authToken, API_BASE_URL, projectId, {
         name: 'test-integration-theme',
         options: [],
@@ -170,6 +186,7 @@ describe('Tokens Studio REST API Integration', () => {
     });
 
     it('updates a theme group', async () => {
+      if (skipIntegration) return;
       const result = await updateThemeGroupRest(authToken, API_BASE_URL, projectId, themeGroupId, {
         name: 'test-integration-theme-updated',
       });
@@ -178,6 +195,7 @@ describe('Tokens Studio REST API Integration', () => {
     });
 
     it('deletes a theme group', async () => {
+      if (skipIntegration) return;
       const result = await deleteThemeGroupRest(authToken, API_BASE_URL, projectId, themeGroupId);
       expect(result).toBeDefined();
     });
