@@ -206,7 +206,7 @@ export function useTokensStudioOAuth() {
         const apiBaseUrl = OAuthService.getApiBaseUrl(studioUrl);
         const projectData = await fetchProjectDataRest(oauthTokens.accessToken, apiBaseUrl, context.id, context.branch || 'main');
         if (projectData) {
-          // dispatch.tokenState.setEditProhibited(true);
+          // OAuth mode intentionally allows editing — write-back is handled via REST actions.
           dispatch.tokenState.setServerResolverContext({
             projectId: context.id,
             changeSetId: projectData.changeSetId,
@@ -268,10 +268,10 @@ export function useTokensStudioOAuth() {
 
   const pushTokensToTokensStudioOAuth = useCallback(
     async (_context: TokensStudioOAuthCredentials): Promise<RemoteResponseData> => {
-      // For now, OAuth REST sync is primarily driven by individual actions in tokenState.tsx.
-      // A full 'push' (like Git) might be implemented later if needed,
-      // but the requirement is to sync back when a token is changed.
-      // We return success here to satisfy the remoteTokens.tsx push flow if triggered.
+      // OAuth sync is driven by individual REST actions in tokenState.tsx — there is no bulk push.
+      // If this path is reached, it means remoteTokens.tsx triggered a manual push for an OAuth
+      // context, which is not yet implemented. Returning success to avoid breaking the push flow.
+      console.warn('[TokensStudioOAuth] Full push not implemented — changes are synced via individual REST actions.');
       const result: RemoteResponseData = {
         status: 'success',
         tokens,
@@ -319,12 +319,8 @@ export function useTokensStudioOAuth() {
               const stringifiedRemoteTokens = JSON.stringify(compact([data.tokens, data.themes, TokenFormat.format]), null, 2);
               dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
               dispatch.tokenState.setCollapsedTokenSets([]);
-              // dispatch.tokenState.setEditProhibited(true);
               notifyToUI('Pulled tokens from Tokens Studio OAuth');
             }
-          } else {
-            // Even if it didn't change, we still want it read only
-            // dispatch.tokenState.setEditProhibited(true);
           }
         }
 
@@ -405,7 +401,6 @@ export function useTokensStudioOAuth() {
 
           const stringifiedRemoteTokens = JSON.stringify(compact([newTokens, alignedNewThemes, TokenFormat.format]), null, 2);
           dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
-          // dispatch.tokenState.setEditProhibited(true);
           dispatch.tokenState.setServerResolverContext({
             projectId,
             changeSetId: projectData.changeSetId,

@@ -36,9 +36,10 @@ async function fetchThemeGroupId(projectId: string, groupName: string, changeSet
 
 export async function pushThemeToTokensStudioOAuth(payload: any, rootState: any, dispatch: any) {
   if (rootState?.uiState?.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
-    // Always read the freshest metadata from the live store to avoid stale cache
-    const freshState = store.getState();
-    const { metadata } = freshState.tokenState?.remoteData || {};
+    // Read once from the live store — rootState in effects is the pre-dispatch snapshot and
+    // may have stale remote metadata / themes that were just written by the reducer.
+    const liveState = store.getState();
+    const { metadata } = liveState.tokenState?.remoteData || {};
     const { themeGroupsData, tokenSetsData } = metadata || {};
 
     let themeGroupId = payload.group ? themeGroupsData?.[payload.group]?.id : null;
@@ -101,10 +102,9 @@ export async function pushThemeToTokensStudioOAuth(payload: any, rootState: any,
     });
 
     if (!payload?.id && result?.data?.id) {
-      // The reducer already stored the theme with a local hash id.
+      // Re-read after the async create — the reducer has run by now and stored the theme with a local hash id.
       // Find it by name + group so we can swap it for the server-assigned id.
-      const currentState = store.getState();
-      const localTheme = currentState.tokenState.themes.find(
+      const localTheme = store.getState().tokenState.themes.find(
         (t: any) => t.name === payload.name && t.group === (payload.group || undefined),
       );
       if (localTheme) {
