@@ -104,7 +104,15 @@ export const pushToTokensStudioOAuth = async ({
         }
         break;
       case 'CREATE_THEME_GROUP':
-        result = await createThemeGroupRest(oauthTokens.accessToken, apiBaseUrl, projectId, data, branch, changeSetId);
+        try {
+          result = await createThemeGroupRest(oauthTokens.accessToken, apiBaseUrl, projectId, data, branch, changeSetId);
+        } catch (err) {
+          // 422 "already exists" is expected when the group was created in a previous session.
+          // Return null so the caller can fall back to fetching the existing group id.
+          const msg = err instanceof Error ? err.message : String(err);
+          if (msg.includes('422')) return null;
+          throw err;
+        }
         break;
       case 'UPDATE_THEME_GROUP': {
         const { id, ...themeGroupData } = data;
