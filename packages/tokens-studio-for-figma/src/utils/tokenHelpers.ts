@@ -3,6 +3,7 @@ import { SingleToken } from '@/types/tokens';
 import { ThemeObject, UsedTokenSetsMap } from '@/types';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { getTokenSetsOrder } from './getTokenSetsOrder';
+import { tryParseJson } from './tryParseJson';
 
 export type ResolveTokenValuesResult = SingleToken<
 true,
@@ -105,16 +106,67 @@ export function mergeServerResolvedTokens(
     return locallyResolved;
   }
 
-  return locallyResolved.map((token) => {
+  // First pass: update tokens that are directly named in the server delta.
+  const firstPass = locallyResolved.map((token) => {
     const serverValue = serverResolvedTokens[token.name];
     if (serverValue !== undefined) {
+      // Composite tokens (typography, border, shadow) come back from the server as a
+      // JSON-stringified object. Their local value is an object, so we must parse the
+      // string back into an object — otherwise downstream code reads properties off a
+      // string (e.g. `value.fontFamily`) and gets `undefined`, silently dropping the apply.
+      let nextValue: SingleToken['value'] = serverValue;
+      if (
+        typeof serverValue === 'string'
+        && typeof token.value === 'object'
+        && token.value !== null
+        && (serverValue.startsWith('{') || serverValue.startsWith('['))
+      ) {
+        nextValue = tryParseJson(serverValue) ?? serverValue;
+      }
       return {
         ...token,
-        value: serverValue,
-        // Since we got a value from the server, it's considered successfully resolved
+        value: nextValue,
         failedToResolve: false,
       } as ResolveTokenValuesResult;
     }
     return token;
+  });
+
+  // Second pass: re-resolve composite tokens (typography, border) whose individual
+  // properties reference atomic tokens that were updated in the server delta.
+  // Without this step, e.g. a typography token referencing {fontFamily.brand} keeps its
+  // locally-resolved (possibly stale or unresolved) value even after fontFamily.brand is
+  // updated by the server.
+  // Note: array-valued tokens (e.g. multi-layer shadow) are not re-resolved here because
+  // nested reference matching inside array elements is not yet implemented.
+  return firstPass.map((token) => {
+    const rawValue = token.resolvedValueWithReferences;
+    if (!rawValue || typeof rawValue !== 'object' || Array.isArray(rawValue)) {
+      return token;
+    }
+
+    let needsUpdate = false;
+    const currentValue: Record<string, unknown> = typeof token.value === 'object' && token.value !== null && !Array.isArray(token.value)
+      ? { ...(token.value as Record<string, unknown>) }
+      : {};
+
+    for (const [key, val] of Object.entries(rawValue as Record<string, unknown>)) {
+      // Match simple {tokenName} references (no nesting)
+      if (typeof val === 'string' && val.startsWith('{') && val.endsWith('}') && !val.slice(1, -1).includes('{')) {
+        const refName = val.slice(1, -1);
+        const serverValue = serverResolvedTokens[refName];
+        if (serverValue !== undefined) {
+          currentValue[key] = serverValue;
+          needsUpdate = true;
+        }
+      }
+    }
+
+    if (!needsUpdate) return token;
+    return {
+      ...token,
+      value: currentValue,
+      failedToResolve: false,
+    } as ResolveTokenValuesResult;
   });
 }

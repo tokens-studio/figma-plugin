@@ -3,6 +3,7 @@ import { defaultTokenValueRetriever } from './TokenValueRetriever';
 import { setFontStyleOnTarget } from './setFontStyleOnTarget';
 import { ResolvedTypographyObject } from './ResolvedTypographyObject';
 import { transformTypographyKeyToFigmaVariable } from './transformTypographyKeyToFigmaVariable';
+import { normalizeTypographyPropertyValue } from './normalizeTypographyPropertyValue';
 import { SingleTypographyToken } from '@/types/tokens';
 import { ApplyVariablesStylesOrRawValues } from '@/constants/ApplyVariablesStyleOrder';
 
@@ -26,10 +27,13 @@ export async function tryApplyTypographyCompositeVariable({
 
   if (typeof value === 'string') return;
 
+  const normalizedValue = Object.fromEntries(
+    Object.entries(value).map(([key, val]) => [key, normalizeTypographyPropertyValue(key, val)]),
+  ) as typeof value;
+
   try {
     // We iterate over all keys of the typography object and apply variables if available, otherwise we apply the value directly
-    for (const [originalKey, val] of Object.entries(value).filter(([_, keyValue]) => typeof keyValue !== 'undefined')) {
-      if (typeof val === 'undefined') return;
+    for (const [originalKey] of Object.entries(normalizedValue).filter(([_, keyValue]) => typeof keyValue !== 'undefined')) {
       let successfullyAppliedVariable = false;
       if (resolvedValue[originalKey]?.toString().startsWith('{') && resolvedValue[originalKey].toString().endsWith('}') && shouldCreateStylesWithVariables) {
         const variableToApply = await defaultTokenValueRetriever.getVariableReference(resolvedValue[originalKey].toString().slice(1, -1));
@@ -72,19 +76,24 @@ export async function tryApplyTypographyCompositeVariable({
           }
         }
       }
-      // If there's no variable we apply the value directly
+      // If there's no variable we apply the value directly. Each property is applied
+      // independently so a single malformed value can't abort the whole typography apply.
       if (!successfullyAppliedVariable) {
-        // First we set font family and weight without variables, we do this because to apply those values we need their combination
-        if (originalKey === 'fontFamily' || originalKey === 'fontWeight') {
-          if ('fontName' in target && ('fontWeight' in value || 'fontFamily' in value)) {
-            setFontStyleOnTarget({ target, value: { fontFamily: value.fontFamily, fontWeight: value.fontWeight }, baseFontSize });
+        try {
+          // First we set font family and weight without variables, we do this because to apply those values we need their combination
+          if (originalKey === 'fontFamily' || originalKey === 'fontWeight') {
+            if ('fontName' in target && ('fontWeight' in normalizedValue || 'fontFamily' in normalizedValue)) {
+              await setFontStyleOnTarget({ target, value: { fontFamily: normalizedValue.fontFamily, fontWeight: normalizedValue.fontWeight }, baseFontSize });
+            }
+          } else {
+            if (target.fontName !== figma.mixed) await figma.loadFontAsync(target.fontName);
+            const transformedValue = transformValue(normalizedValue[originalKey], originalKey, baseFontSize);
+            if (transformedValue !== null && !(typeof transformedValue === 'number' && Number.isNaN(transformedValue))) {
+              target[originalKey] = transformedValue;
+            }
           }
-        } else {
-          if (target.fontName !== figma.mixed) await figma.loadFontAsync(target.fontName);
-          const transformedValue = transformValue(value[originalKey], originalKey, baseFontSize);
-          if (transformedValue !== null) {
-            target[originalKey] = transformedValue;
-          }
+        } catch (e) {
+          console.error('unable to apply typography property', originalKey, normalizedValue[originalKey], e);
         }
       }
     }
