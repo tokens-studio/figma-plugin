@@ -1,0 +1,136 @@
+import { RematchRootState } from '@rematch/core';
+import { RootModel } from '@/types/RootModel';
+import { ThemeObjectsList } from '@/types';
+import { TokensStudioOAuthStorageType } from '@/types/StorageType';
+import { useAuthStore } from '@/app/store/useAuthStore';
+import { OAuthService } from '@/app/services/OAuthService';
+import { TOKENS_STUDIO_APP_URL } from '@/constants/TokensStudio';
+import { resolveChangeSetId } from './fetchBranchesListRest';
+import { patchThemeGroupVariableRefs, patchThemeOptionStyleRefs } from './pushThemeRefsRest';
+
+/** Pre-action snapshot of each theme's refs, keyed by theme id. */
+export type ThemeRefsSnapshot = Map<string, {
+  varRefs?: Record<string, string>;
+  styleRefs?: Record<string, string>;
+}>;
+
+interface UpdateThemeRefsPayload {
+  /** Cloned refs captured *before* the reducer ran (immune to in-place mutation). */
+  prevThemeRefs: ThemeRefsSnapshot;
+  rootState: RematchRootState<RootModel, Record<string, never>>;
+}
+
+/**
+ * Shallow-clone every theme's ref maps to create a snapshot that is immune
+ * to in-place mutations performed by some reducers.
+ */
+export function snapshotThemeRefs(themes: ThemeObjectsList): ThemeRefsSnapshot {
+  const snapshot: ThemeRefsSnapshot = new Map();
+  themes.forEach((theme) => {
+    snapshot.set(theme.id, {
+      varRefs: theme.$figmaVariableReferences ? { ...theme.$figmaVariableReferences } : undefined,
+      styleRefs: theme.$figmaStyleReferences ? { ...theme.$figmaStyleReferences } : undefined,
+    });
+  });
+  return snapshot;
+}
+
+function shallowEqual(
+  a: Record<string, string> | null | undefined,
+  b: Record<string, string> | null | undefined,
+): boolean {
+  if (a === b) return true;
+  if (!a || !b) return false;
+  const keysA = Object.keys(a);
+  const keysB = Object.keys(b);
+  if (keysA.length !== keysB.length) return false;
+  return keysA.every((k) => a[k] === b[k]);
+}
+
+/**
+ * Diffs prev vs next themes and PATCHes changed refs to Studio-on-Rails.
+ * Only called for ref-mutation actions on the OAuth provider path.
+ */
+export async function updateThemeRefsViaRestApi({
+  prevThemeRefs,
+  rootState,
+}: UpdateThemeRefsPayload): Promise<void> {
+  const { oauthTokens } = useAuthStore.getState();
+  if (!oauthTokens?.accessToken) return;
+
+  const context = rootState.uiState.api;
+  if (!context || !('id' in context)) return;
+
+  const oauthContext = context as TokensStudioOAuthStorageType;
+  const projectId = oauthContext.id;
+  const branchName = oauthContext.branch || 'main';
+
+  const apiBaseUrl = OAuthService.getApiBaseUrl(TOKENS_STUDIO_APP_URL);
+
+  const changeSetId = await resolveChangeSetId(
+    oauthTokens.accessToken,
+    apiBaseUrl,
+    projectId,
+    branchName,
+  );
+  if (!changeSetId) {
+    console.error('[updateThemeRefsViaRestApi] Could not resolve change_set_id, aborting write');
+    return;
+  }
+
+  const nextThemes: ThemeObjectsList = rootState.tokenState.themes;
+
+  // Track which groups have already been patched (variable refs are group-level)
+  const patchedGroups = new Set<string>();
+
+  for (const nextTheme of nextThemes) {
+    const prev = prevThemeRefs.get(nextTheme.id);
+    if (prev) {
+      const themeGroupId = nextTheme.$themeGroupId;
+      const themeOptionId = nextTheme.$themeOptionId;
+
+      // Variable refs — group-level, only PATCH once per group
+      if (themeGroupId && !patchedGroups.has(themeGroupId)) {
+        const prevVarRefs = prev.varRefs;
+        const nextVarRefs = nextTheme.$figmaVariableReferences;
+
+        if (!shallowEqual(prevVarRefs, nextVarRefs)) {
+          patchedGroups.add(themeGroupId);
+          try {
+            await patchThemeGroupVariableRefs(
+              oauthTokens.accessToken,
+              apiBaseUrl,
+              projectId,
+              changeSetId,
+              themeGroupId,
+              nextVarRefs ?? {},
+            );
+          } catch (err) {
+            console.error('[updateThemeRefsViaRestApi] Failed to patch variable refs:', err);
+          }
+        }
+      }
+
+      // Style refs — option-level
+      if (themeOptionId) {
+        const prevStyleRefs = prev.styleRefs;
+        const nextStyleRefs = nextTheme.$figmaStyleReferences;
+
+        if (!shallowEqual(prevStyleRefs, nextStyleRefs)) {
+          try {
+            await patchThemeOptionStyleRefs(
+              oauthTokens.accessToken,
+              apiBaseUrl,
+              projectId,
+              changeSetId,
+              themeOptionId,
+              nextStyleRefs ?? {},
+            );
+          } catch (err) {
+            console.error('[updateThemeRefsViaRestApi] Failed to patch style refs:', err);
+          }
+        }
+      }
+    }
+  }
+}

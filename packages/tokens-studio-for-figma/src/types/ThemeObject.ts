@@ -15,4 +15,7 @@ export type ThemeObject = {
   $figmaCollectionId?: string;
   $figmaModeId?: string;
   $figmaVariableReferences?: Record<string, string>;
+  // Server IDs for REST API round-trip (Studio-on-Rails)
+  $themeGroupId?: string;
+  $themeOptionId?: string;
 };

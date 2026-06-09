@@ -25,6 +25,33 @@ export function parseBranchesFromResponse(branchesData: any): RestBranch[] {
   return branches;
 }
 
+export async function resolveChangeSetId(
+  authToken: string,
+  apiBaseUrl: string,
+  projectId: string,
+  branchName: string,
+): Promise<string | null> {
+  const headers = {
+    Authorization: `Bearer ${authToken}`,
+    'Content-Type': 'application/json',
+  };
+
+  try {
+    const branchesRes = await fetch(`${apiBaseUrl}/api/v1/projects/${projectId}/branches`, { headers });
+    if (!branchesRes.ok) throw new Error(`Failed to fetch branches: ${branchesRes.statusText}`);
+    const branchesData = await branchesRes.json();
+
+    const branches = parseBranchesFromResponse(branchesData);
+    const branch = branches.find((b) => b.name === branchName)
+      || branches.find((b) => b.is_default);
+
+    return branch?.change_set_id || null;
+  } catch (error) {
+    console.error('Error resolving change_set_id:', error);
+    return null;
+  }
+}
+
 export async function fetchBranchesListRest(
   authToken: string,
   apiBaseUrl: string,
