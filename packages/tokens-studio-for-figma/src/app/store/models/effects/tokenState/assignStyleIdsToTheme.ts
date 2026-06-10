@@ -5,14 +5,14 @@ import { pushThemeToTokensStudioOAuth } from './utils/pushThemeToTokensStudioOAu
 import { store } from '@/app/store';
 
 export function assignStyleIdsToTheme(dispatch: RematchDispatch<RootModel>) {
-  return (payload: { id: string; styleIds: Record<string, string> }, rootState: any): void => {
+  return (payload: { id: string; styleIds: Record<string, string> }, _rootState: any): void => {
     dispatch.tokenState.updateDocument({
       updateRemote: true,
       shouldUpdateNodes: false,
     });
 
-    if (rootState?.uiState?.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
-      const currentState = store.getState();
+    const currentState = store.getState();
+    if (currentState?.uiState?.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
       const theme = currentState.tokenState?.themes?.find((t: any) => t.id === payload?.id);
       if (theme) {
         pushThemeToTokensStudioOAuth(theme, currentState, dispatch);

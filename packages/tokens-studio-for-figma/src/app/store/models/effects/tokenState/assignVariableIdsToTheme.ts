@@ -6,14 +6,14 @@ import { pushThemeToTokensStudioOAuth } from './utils/pushThemeToTokensStudioOAu
 import { store } from '@/app/store';
 
 export function assignVariableIdsToTheme(dispatch: RematchDispatch<RootModel>) {
-  return (payload: Record<string, LocalVariableInfo>, rootState: any): void => {
+  return (payload: Record<string, LocalVariableInfo>, _rootState: any): void => {
     dispatch.tokenState.updateDocument({
       updateRemote: true,
       shouldUpdateNodes: false,
     });
 
-    if (rootState?.uiState?.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
-      const currentState = store.getState();
+    const currentState = store.getState();
+    if (currentState?.uiState?.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
       Object.keys(payload || {}).forEach((themeId) => {
         const theme = currentState.tokenState?.themes?.find((t: any) => t.id === themeId);
         if (theme) {
