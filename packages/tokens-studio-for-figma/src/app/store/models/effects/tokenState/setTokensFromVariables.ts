@@ -56,19 +56,22 @@ export function setTokensFromVariables(dispatch: RematchDispatch<RootModel>) {
           }
         }
 
-        // Create each token in this set
-        for (const token of tokens) {
-          await pushToTokensStudioOAuth({
-            context: context as any,
-            action: 'CREATE_TOKEN',
-            data: {
-              name: token.name,
-              value: token.value,
-              type: token.type,
-              description: token.description,
-              token_set_id: tokenSetId,
-            },
-          });
+        // Only create tokens when we have a valid set ID — avoids REST calls with undefined token_set_id.
+        if (tokenSetId) {
+          for (const token of tokens) {
+            // eslint-disable-next-line no-await-in-loop
+            await pushToTokensStudioOAuth({
+              context: context as any,
+              action: 'CREATE_TOKEN',
+              data: {
+                name: token.name,
+                value: token.value,
+                type: token.type,
+                description: token.description,
+                token_set_id: tokenSetId,
+              },
+            });
+          }
         }
       }
     }
@@ -83,7 +86,7 @@ export function setTokensFromVariables(dispatch: RematchDispatch<RootModel>) {
     // sending theme options before token sets exist on the server.
     const stateAfterSets = store.getState();
     const { importedThemes } = stateAfterSets.tokenState;
-    if (importedThemes) {
+    if (hasChangeSetId && importedThemes) {
       const newThemesToPush = (importedThemes.newThemes || []).map((t: any) => ({ ...t, id: undefined }));
       const updatedThemesToPush = importedThemes.updatedThemes || [];
       // Push themes sequentially so that a shared theme group (e.g. "appearances") is only created

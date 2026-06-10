@@ -17,6 +17,9 @@ export function setThemesFromVariables(dispatch: RematchDispatch<RootModel>) {
     // We need to push the updated themes to Studio OAuth.
     const currentState = store.getState();
     if (currentState?.uiState?.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
+      const hasChangeSetId = !!(currentState.uiState.api as any)?.changeSetId;
+      if (!hasChangeSetId) return;
+
       // If new tokens are also being imported at the same time, setTokensFromVariables will push
       // themes after token sets are created (so selected_token_sets can include server IDs).
       // Skip here to avoid pushing themes before token set IDs are available.

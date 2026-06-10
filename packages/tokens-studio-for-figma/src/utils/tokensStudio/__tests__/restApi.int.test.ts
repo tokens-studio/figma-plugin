@@ -180,22 +180,27 @@ describe('Tokens Studio REST API Integration', () => {
     let tokenId = '';
     let themeGroupId = '';
     let themeOptionId = '';
+    let primitiveName = '';
+    let semanticName = '';
 
     it('creates token sets for imported variable collections', async () => {
       if (skipIntegration) return;
 
+      // Use unique names to avoid collisions with pre-existing sets or failed prior runs.
+      primitiveName = `import-primitives-${Date.now()}`;
       const primitiveResult = await createTokenSetRest(authToken, API_BASE_URL, projectId, {
-        name: 'import-primitives',
+        name: primitiveName,
         type: 'global',
         order_index: 0,
       }, undefined, changeSetId);
       expect(primitiveResult.data).toBeDefined();
       expect(primitiveResult.data.id).toBeDefined();
-      expect(primitiveResult.data.attributes.name).toBe('import-primitives');
+      expect(primitiveResult.data.attributes.name).toBe(primitiveName);
       primitiveSetId = primitiveResult.data.id;
 
+      semanticName = `import-semantic-${Date.now()}`;
       const semanticResult = await createTokenSetRest(authToken, API_BASE_URL, projectId, {
-        name: 'import-semantic',
+        name: semanticName,
         type: 'global',
         order_index: 1,
       }, undefined, changeSetId);
@@ -293,20 +298,23 @@ describe('Tokens Studio REST API Integration', () => {
   // No themes are involved — styles have no collection/mode concept.
   describe('Import Styles Flow', () => {
     let styleSetId = '';
+    let styleSetName = '';
     let colorTokenId = '';
     let typographyTokenId = '';
 
     it('creates a token set for the active set (styles have no parent)', async () => {
       if (skipIntegration) return;
 
+      // Use a unique name to avoid collisions with pre-existing sets or failed prior runs.
+      styleSetName = `import-styles-${Date.now()}`;
       const result = await createTokenSetRest(authToken, API_BASE_URL, projectId, {
-        name: 'global',
+        name: styleSetName,
         type: 'global',
         order_index: 0,
       }, undefined, changeSetId);
       expect(result.data).toBeDefined();
       expect(result.data.id).toBeDefined();
-      expect(result.data.attributes.name).toBe('global');
+      expect(result.data.attributes.name).toBe(styleSetName);
       styleSetId = result.data.id;
     });
 
@@ -343,7 +351,7 @@ describe('Tokens Studio REST API Integration', () => {
       typographyTokenId = result.data.id;
     });
 
-    it('creates a second token set when the active set already exists (reuse path)', async () => {
+    it('creates an additional token when the active set already exists (reuse path)', async () => {
       if (skipIntegration) return;
 
       // Simulates createMultipleTokens reusing an existing set ID instead of re-creating it.

@@ -32,10 +32,13 @@ export function createMultipleTokens(dispatch: RematchDispatch<RootModel>) {
     for (const [setName, tokens] of Object.entries(tokensBySet)) {
       const setMeta = store.getState().tokenState.tokenSetMetadata[setName] as any;
 
-      // If the set was written by setTokensFromVariables during this same import session its
-      // tokens are already on Studio — skip to avoid duplicates. Pre-existing sets (from a
-      // pull) do NOT carry fromVariableImport, so we still write their tokens.
-      if (!setMeta?.fromVariableImport) {
+      if (setMeta?.fromVariableImport) {
+        // Clear the ephemeral flag so future imports into this set are not skipped.
+        dispatch.tokenState.setTokenSetMetadata({
+          ...store.getState().tokenState.tokenSetMetadata,
+          [setName]: { id: setMeta.id, isDynamic: setMeta.isDynamic },
+        });
+      } else {
         // Resolve or create the server ID for this token set.
         let tokenSetId: string | undefined = setMeta?.id;
 
