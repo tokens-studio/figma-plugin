@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 import { OAuthService } from '../services/OAuthService';
+import { TokenRefreshManager } from '../services/TokenRefreshManager';
+import { RefreshError } from '../services/RefreshError';
 import { OAuthError } from '@/types/OAuthError';
 import type { OAuthTokens, UserData, Organization, Project } from '@/types/oauth';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
@@ -224,7 +226,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const userResponse = await fetch(`${apiBaseUrl}/api/v1/auth/me`, {
         method: 'GET',
         headers: {
-          Authorization: `Bearer ${tokens.accessToken}`,
+          Authorization: `Bearer ${currentTokens.accessToken}`,
           'Content-Type': 'application/json',
         },
       });
@@ -259,7 +261,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         const orgsResponse = await fetch(`${apiBaseUrl}/api/v1/organizations`, {
           method: 'GET',
           headers: {
-            Authorization: `Bearer ${tokens.accessToken}`,
+            Authorization: `Bearer ${currentTokens.accessToken}`,
             'Content-Type': 'application/json',
           },
         });
@@ -500,13 +502,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
     try {
       const studioUrl = TOKENS_STUDIO_APP_URL;
-      const newTokens = await OAuthService.refreshTokens(null, oauthTokens.refreshToken, studioUrl);
+      const newTokens = await TokenRefreshManager.refreshTokens(oauthTokens, studioUrl);
       await get().setOAuthTokens(newTokens);
     } catch (error) {
       console.error('Failed to refresh tokens:', error);
-      // If refresh fails, we might want to logout or show error
-      // set({ isAuthenticated: false, oauthTokens: null });
+      // Only logout on fatal errors (invalid_grant, invalid_token, etc.).
+      // Transient errors (network, 5xx) keep the session so a later attempt can succeed.
+      if (error instanceof RefreshError && error.kind === 'fatal') {
+        await get().logout();
+      }
       throw error;
     }
-  }
+  },
 }));
