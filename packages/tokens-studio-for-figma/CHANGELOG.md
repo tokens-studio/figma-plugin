@@ -1,5 +1,13 @@
 # @tokens-studio/figma-plugin
 
+## 2.11.9
+
+### Patch Changes
+
+- 6a594cfe8: Fixed two issues affecting typography tokens for Studio platform users: typography tokens referencing server-resolved values were not resolving correctly, and even when resolved they did not visually update text layers on apply (font, size, line height and other properties were silently dropped until a manual pull).
+- 1876bc42c: implement two-way sync between Figma plugin and Studio platform — theme mutations (create, update, delete, style/variable assignments, disconnects, renames) are now automatically pushed to the Studio REST API in real time
+- 8a9c5e0e7: Improved Studio platform sync token refresh so users are no longer logged out after certain days of inactivity
+
 ## 2.11.8
 
 ### Patch Changes
