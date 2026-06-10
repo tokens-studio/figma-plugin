@@ -37,9 +37,6 @@ export function setTokensFromVariables(dispatch: RematchDispatch<RootModel>) {
         let tokenSetId = existingSetId;
 
         if (!tokenSetId) {
-          // Create the token set and capture the server-assigned ID.
-          // We don't update tokenSetMetadata here because pushThemeToTokensStudioOAuth reads from
-          // remoteData.metadata.tokenSetsData (populated on pull), not tokenSetMetadata.
           const setResult = await pushToTokensStudioOAuth({
             context: context as any,
             action: 'CREATE_TOKEN_SET',
@@ -48,6 +45,14 @@ export function setTokensFromVariables(dispatch: RematchDispatch<RootModel>) {
 
           if (setResult?.data?.id) {
             tokenSetId = setResult.data.id;
+            // Track the server ID so createMultipleTokens (fired when user confirms in the
+            // ImportedTokensDialog) knows this set was already written and can skip it.
+            // Mark fromVariableImport so createMultipleTokens (fired when user confirms in the
+            // dialog) knows these tokens were already written and skips them.
+            dispatch.tokenState.setTokenSetMetadata({
+              ...store.getState().tokenState.tokenSetMetadata,
+              [setName]: { id: tokenSetId, isDynamic: false, fromVariableImport: true } as any,
+            });
           }
         }
 
