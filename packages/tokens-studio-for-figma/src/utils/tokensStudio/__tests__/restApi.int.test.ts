@@ -242,8 +242,8 @@ describe('Tokens Studio REST API Integration', () => {
         name: 'Light',
         theme_group_id: themeGroupId,
         selected_token_sets: {
-          [primitiveSetId]: 'enabled',
-          [semanticSetId]: 'enabled',
+          [primitiveName]: 'enabled',
+          [semanticName]: 'enabled',
         },
       }, undefined, changeSetId);
       expect(result.data).toBeDefined();
