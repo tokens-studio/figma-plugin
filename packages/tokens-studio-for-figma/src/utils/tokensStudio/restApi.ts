@@ -105,6 +105,28 @@ export async function deleteTokenSetRest(
 }
 
 // Token Operations
+export async function batchCreateTokensRest(
+  authToken: string,
+  apiBaseUrl: string,
+  projectId: string,
+  tokens: Array<{
+    name: string;
+    value: any;
+    type: string;
+    token_set_id: string;
+    description?: string;
+  }>,
+  changeSetId: string,
+) {
+  return restRequest(authToken, apiBaseUrl, `/api/v1/projects/${projectId}/tokens/batch_create`, {
+    method: 'POST',
+    body: {
+      change_set_id: changeSetId,
+      tokens,
+    },
+  });
+}
+
 export async function createTokenRest(
   authToken: string,
   apiBaseUrl: string,

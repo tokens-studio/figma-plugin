@@ -29,14 +29,15 @@ export function setTokensFromVariables(dispatch: RematchDispatch<RootModel>) {
         tokensBySet[parent].push(token);
       });
 
-      // For each new token set, create it on the server first, then create its tokens.
-      // We process sets sequentially to ensure each set ID is available before creating tokens.
+      // Create token sets sequentially (no batch API), then batch-create all their tokens in one call.
+      const allTokensToCreate: Array<{ name: string; value: any; type: string; description?: string; token_set_id: string }> = [];
+
       for (const [setName, tokens] of Object.entries(tokensBySet)) {
         const existingSetId = (currentState.tokenState.tokenSetMetadata[setName] as any)?.id;
-
         let tokenSetId = existingSetId;
 
         if (!tokenSetId) {
+          // eslint-disable-next-line no-await-in-loop
           const setResult = await pushToTokensStudioOAuth({
             context: context as any,
             action: 'CREATE_TOKEN_SET',
@@ -45,10 +46,8 @@ export function setTokensFromVariables(dispatch: RematchDispatch<RootModel>) {
 
           if (setResult?.data?.id) {
             tokenSetId = setResult.data.id;
-            // Track the server ID so createMultipleTokens (fired when user confirms in the
-            // ImportedTokensDialog) knows this set was already written and can skip it.
-            // Mark fromVariableImport so createMultipleTokens (fired when user confirms in the
-            // dialog) knows these tokens were already written and skips them.
+            // Mark fromVariableImport so createMultipleTokens skips these sets when the user
+            // confirms in the ImportedTokensDialog, avoiding duplicate writes.
             dispatch.tokenState.setTokenSetMetadata({
               ...store.getState().tokenState.tokenSetMetadata,
               [setName]: { id: tokenSetId, isDynamic: false, fromVariableImport: true } as any,
@@ -56,23 +55,26 @@ export function setTokensFromVariables(dispatch: RematchDispatch<RootModel>) {
           }
         }
 
-        // Only create tokens when we have a valid set ID — avoids REST calls with undefined token_set_id.
         if (tokenSetId) {
-          for (const token of tokens) {
-            // eslint-disable-next-line no-await-in-loop
-            await pushToTokensStudioOAuth({
-              context: context as any,
-              action: 'CREATE_TOKEN',
-              data: {
-                name: token.name,
-                value: token.value,
-                type: token.type,
-                description: token.description,
-                token_set_id: tokenSetId,
-              },
+          tokens.forEach((token) => {
+            allTokensToCreate.push({
+              name: token.name,
+              value: token.value,
+              type: token.type,
+              description: token.description,
+              token_set_id: tokenSetId,
             });
-          }
+          });
         }
+      }
+
+      // Batch-create all tokens in a single request.
+      if (allTokensToCreate.length > 0) {
+        await pushToTokensStudioOAuth({
+          context: context as any,
+          action: 'BATCH_CREATE_TOKENS',
+          data: allTokensToCreate,
+        });
       }
     }
 

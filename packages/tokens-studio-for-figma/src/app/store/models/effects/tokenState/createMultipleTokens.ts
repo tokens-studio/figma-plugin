@@ -29,10 +29,13 @@ export function createMultipleTokens(dispatch: RematchDispatch<RootModel>) {
       tokensBySet[token.parent].push(token);
     });
 
+    const allTokensToCreate: Array<{ name: string; value: any; type: string; description?: string; token_set_id: string }> = [];
+
     for (const [setName, tokens] of Object.entries(tokensBySet)) {
       const setMeta = store.getState().tokenState.tokenSetMetadata[setName] as any;
 
       if (setMeta?.fromVariableImport) {
+        // These tokens were already written by setTokensFromVariables — skip to avoid duplicates.
         // Clear the ephemeral flag so future imports into this set are not skipped.
         dispatch.tokenState.setTokenSetMetadata({
           ...store.getState().tokenState.tokenSetMetadata,
@@ -60,22 +63,26 @@ export function createMultipleTokens(dispatch: RematchDispatch<RootModel>) {
         }
 
         if (tokenSetId) {
-          for (const token of tokens) {
-            // eslint-disable-next-line no-await-in-loop
-            await pushToTokensStudioOAuth({
-              context: context as any,
-              action: 'CREATE_TOKEN',
-              data: {
-                name: token.name,
-                value: token.value,
-                type: token.type,
-                description: token.description,
-                token_set_id: tokenSetId,
-              },
+          tokens.forEach((token) => {
+            allTokensToCreate.push({
+              name: token.name,
+              value: token.value,
+              type: token.type,
+              description: token.description,
+              token_set_id: tokenSetId!,
             });
-          }
+          });
         }
       }
+    }
+
+    // Batch-create all tokens in a single request.
+    if (allTokensToCreate.length > 0) {
+      await pushToTokensStudioOAuth({
+        context: context as any,
+        action: 'BATCH_CREATE_TOKENS',
+        data: allTokensToCreate,
+      });
     }
   };
 }
