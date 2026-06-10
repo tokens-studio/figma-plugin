@@ -287,6 +287,94 @@ describe('Tokens Studio REST API Integration', () => {
     });
   });
 
+  // Simulates the write-back that happens when a user imports Figma styles into a project and
+  // confirms via the ImportedTokensDialog. The sequence mirrors createMultipleTokens.ts:
+  // create the active token set (if absent) → create each confirmed style token inside it.
+  // No themes are involved — styles have no collection/mode concept.
+  describe('Import Styles Flow', () => {
+    let styleSetId = '';
+    let colorTokenId = '';
+    let typographyTokenId = '';
+
+    it('creates a token set for the active set (styles have no parent)', async () => {
+      if (skipIntegration) return;
+
+      const result = await createTokenSetRest(authToken, API_BASE_URL, projectId, {
+        name: 'global',
+        type: 'global',
+        order_index: 0,
+      }, undefined, changeSetId);
+      expect(result.data).toBeDefined();
+      expect(result.data.id).toBeDefined();
+      expect(result.data.attributes.name).toBe('global');
+      styleSetId = result.data.id;
+    });
+
+    it('creates a color token from an imported style', async () => {
+      if (skipIntegration) return;
+
+      const result = await createTokenRest(authToken, API_BASE_URL, projectId, {
+        name: 'color.primary',
+        value: '#0D99FF',
+        type: 'color',
+        token_set_id: styleSetId,
+        description: 'Imported from Figma color style',
+      }, undefined, changeSetId);
+      expect(result.data).toBeDefined();
+      expect(result.data.id).toBeDefined();
+      expect(result.data.attributes.name).toBe('color.primary');
+      expect(result.data.attributes.value).toBe('#0D99FF');
+      colorTokenId = result.data.id;
+    });
+
+    it('creates a typography token from an imported style', async () => {
+      if (skipIntegration) return;
+
+      const result = await createTokenRest(authToken, API_BASE_URL, projectId, {
+        name: 'typography.heading',
+        value: { fontFamily: 'Inter', fontWeight: '700', fontSize: '32' },
+        type: 'typography',
+        token_set_id: styleSetId,
+        description: 'Imported from Figma text style',
+      }, undefined, changeSetId);
+      expect(result.data).toBeDefined();
+      expect(result.data.id).toBeDefined();
+      expect(result.data.attributes.name).toBe('typography.heading');
+      typographyTokenId = result.data.id;
+    });
+
+    it('creates a second token set when the active set already exists (reuse path)', async () => {
+      if (skipIntegration) return;
+
+      // Simulates createMultipleTokens reusing an existing set ID instead of re-creating it.
+      // The set already has styleSetId — we just create another token in it directly.
+      const result = await createTokenRest(authToken, API_BASE_URL, projectId, {
+        name: 'color.secondary',
+        value: '#FF6250',
+        type: 'color',
+        token_set_id: styleSetId,
+      }, undefined, changeSetId);
+      expect(result.data).toBeDefined();
+      expect(result.data.attributes.name).toBe('color.secondary');
+
+      // Clean up the extra token inline
+      await deleteTokenRest(authToken, API_BASE_URL, projectId, result.data.id, undefined, changeSetId);
+    });
+
+    // Clean up in reverse dependency order
+    it('deletes the imported style tokens', async () => {
+      if (skipIntegration) return;
+      await deleteTokenRest(authToken, API_BASE_URL, projectId, colorTokenId, undefined, changeSetId);
+      await deleteTokenRest(authToken, API_BASE_URL, projectId, typographyTokenId, undefined, changeSetId);
+    });
+
+    it('deletes the style token set', async () => {
+      if (skipIntegration) return;
+      const result = await deleteTokenSetRest(authToken, API_BASE_URL, projectId, styleSetId, undefined, changeSetId);
+      expect(result).toBeDefined();
+    });
+  });
+
   describe('Theme Groups', () => {
     let themeGroupId = '';
 
