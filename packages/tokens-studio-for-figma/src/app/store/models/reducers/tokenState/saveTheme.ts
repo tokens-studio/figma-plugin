@@ -32,6 +32,9 @@ export function saveTheme(state: TokenState, data: Payload): TokenState {
     id: themeId,
     name: data.name,
     $figmaStyleReferences: state.themes[themeObjectIndex]?.$figmaStyleReferences ?? {},
+    $figmaVariableReferences: state.themes[themeObjectIndex]?.$figmaVariableReferences ?? {},
+    $figmaCollectionId: state.themes[themeObjectIndex]?.$figmaCollectionId,
+    $figmaModeId: state.themes[themeObjectIndex]?.$figmaModeId,
     selectedTokenSets,
     ...(data?.group ? { group: data.group } : {}),
   });

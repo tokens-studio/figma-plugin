@@ -15,3 +15,6 @@ export * from './assignVariableIdsToTheme';
 export * from './renameVariableIdsToTheme';
 export * from './renameVariableNamesToThemes';
 export * from './removeVariableNamesFromThemes';
+export * from './setThemesFromVariables';
+export * from './disconnectVariableFromTheme';
+export * from './disconnectStyleFromTheme';

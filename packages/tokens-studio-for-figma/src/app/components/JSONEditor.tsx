@@ -38,11 +38,13 @@ function JSONEditor({
     handleChange(value ?? '');
   }, [handleChange]);
 
+  const isReadOnly = editProhibited || activeTokenSetReadOnly || isTokensStudioProvider;
+
   const handleSaveShortcut = React.useCallback((event: KeyboardEvent) => {
-    if (event.metaKey || event.ctrlKey) {
+    if (!isReadOnly && (event.metaKey || event.ctrlKey)) {
       handleJSONUpdate(stringTokens);
     }
-  }, [handleJSONUpdate, stringTokens]);
+  }, [handleJSONUpdate, stringTokens, isReadOnly]);
 
   useShortcut(['KeyS'], handleSaveShortcut);
 
@@ -69,7 +71,7 @@ function JSONEditor({
           fontSize: 11,
           wordWrap: 'on',
           contextmenu: false,
-          readOnly: editProhibited || activeTokenSetReadOnly || isTokensStudioProvider,
+          readOnly: isReadOnly,
         }}
       />
     </Box>

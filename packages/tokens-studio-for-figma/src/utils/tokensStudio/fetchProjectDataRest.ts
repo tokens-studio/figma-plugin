@@ -28,13 +28,13 @@ interface RestThemeOption {
 export type ProjectData = {
   tokens: AnyTokenSet | null;
   themes: ThemeObjectsList;
-  tokenSets: Record<string, { isDynamic: boolean }>;
+  tokenSets: Record<string, { id: string; isDynamic: boolean }>;
+  themeGroups: Record<string, { id: string }>;
   tokenSetOrder: string[];
   hasExceededPaginationLimit?: boolean;
   /** The change_set_id for the resolved branch — used for server-side token resolution */
   changeSetId: string;
 };
-
 
 function transformTokenValue(token: any): unknown {
   const value = token.attributes?.value;
@@ -140,7 +140,7 @@ export async function fetchProjectDataRest(
     const tokenSets: RestTokenSet[] = [];
     if (tokenSetsData.data && Array.isArray(tokenSetsData.data)) {
       tokenSetsData.data.forEach((item: any) => {
-        let setName = item.attributes?.name || item.id;
+        const setName = item.attributes?.name || item.id;
 
         tokenSets.push({
           id: item.id,
@@ -162,7 +162,8 @@ export async function fetchProjectDataRest(
     }
 
     const tokens: AnyTokenSet = {};
-    const tokenSetsMap: Record<string, { isDynamic: boolean }> = {};
+    const tokenSetsMap: Record<string, { id: string; isDynamic: boolean }> = {};
+    const themeGroupsMap: Record<string, { id: string }> = {};
     const tokenSetIdToName: Record<string, string> = {};
 
     // Sort by order_index and transform
@@ -200,12 +201,15 @@ export async function fetchProjectDataRest(
             value: transformTokenValue(token),
             type: normalizeTokenType(token.attributes?.type),
             ...(token.attributes?.description && { description: token.attributes.description }),
-            ...(Object.keys($extensions).length > 0 && { $extensions }),
+            $extensions: {
+              ...$extensions,
+              id: token.id,
+            },
           });
         }
       });
       tokens[set.name] = transformedTokens as any;
-      tokenSetsMap[set.name] = { isDynamic: set.is_dynamic };
+      tokenSetsMap[set.name] = { id: set.id, isDynamic: set.is_dynamic };
       tokenSetIdToName[set.id] = set.name;
     });
 
@@ -213,16 +217,51 @@ export async function fetchProjectDataRest(
     const themeOptions: RestThemeOption[] = [];
     if (themeOptionsData.data && Array.isArray(themeOptionsData.data)) {
       themeOptionsData.data.forEach((item: any) => {
-        themeOptions.push({
+        const rawStyleRefs = item.attributes?.figma_style_references || [];
+        const figmaStyleReferences: Record<string, string> = {};
+        if (Array.isArray(rawStyleRefs)) {
+          rawStyleRefs.forEach((ref: any) => {
+            if (ref && ref.name && ref.figma_key) {
+              let key = ref.figma_key;
+              if (key.startsWith('S:')) key = key.substring(2);
+              if (key.endsWith(',')) key = key.slice(0, -1);
+              figmaStyleReferences[ref.name] = `S:${key},`;
+            }
+          });
+        } else if (rawStyleRefs && typeof rawStyleRefs === 'object') {
+          Object.entries(rawStyleRefs).forEach(([name, key]) => {
+            let k = String(key);
+            if (k.startsWith('S:')) k = k.substring(2);
+            if (k.endsWith(',')) k = k.slice(0, -1);
+            figmaStyleReferences[name] = `S:${k},`;
+          });
+        }
+
+        const rawVarRefs = item.attributes?.figma_variable_references || [];
+        const figmaVariableReferences: Record<string, string> = {};
+        if (Array.isArray(rawVarRefs)) {
+          rawVarRefs.forEach((ref: any) => {
+            if (ref && ref.name && ref.figma_key) {
+              figmaVariableReferences[ref.name] = ref.figma_key;
+            }
+          });
+        } else if (rawVarRefs && typeof rawVarRefs === 'object') {
+          Object.entries(rawVarRefs).forEach(([name, key]) => {
+            figmaVariableReferences[name] = String(key);
+          });
+        }
+
+        const option = {
           id: item.id,
           name: item.attributes?.name || item.id,
           theme_group_id: item.relationships?.theme_group?.data?.id || '',
           selected_token_sets: item.attributes?.selected_token_sets || {},
-          figmaStyleReferences: item.attributes?.figma_style_references,
-          figmaVariableReferences: item.attributes?.figma_variable_references,
-          figmaCollectionId: item.attributes?.figma_collection_id,
-          figmaModeId: item.attributes?.figma_mode_id,
-        });
+          figmaStyleReferences,
+          figmaVariableReferences,
+          figmaCollectionId: item.attributes?.figma_collection_id || undefined,
+          figmaModeId: item.attributes?.figma_mode_id || undefined,
+        };
+        themeOptions.push(option);
       });
     }
 
@@ -238,6 +277,23 @@ export async function fetchProjectDataRest(
       themeGroupsData.data.forEach((group: any) => {
         const { id } = group;
         const name = group.attributes?.name || id;
+        themeGroupsMap[name] = { id };
+
+        // Parse theme group variable references
+        const rawVarRefs = group.attributes?.figma_variable_references || [];
+        const groupVarReferences: Record<string, string> = {};
+        if (Array.isArray(rawVarRefs)) {
+          rawVarRefs.forEach((ref: any) => {
+            if (ref && ref.name && ref.figma_key) {
+              groupVarReferences[ref.name] = ref.figma_key;
+            }
+          });
+        } else if (rawVarRefs && typeof rawVarRefs === 'object') {
+          Object.entries(rawVarRefs).forEach(([k, v]) => {
+            groupVarReferences[k] = String(v);
+          });
+        }
+
         const options = optionsByGroupId[id] || [];
 
         options.forEach((opt) => {
@@ -258,7 +314,13 @@ export async function fetchProjectDataRest(
           };
 
           if (opt.figmaStyleReferences !== undefined) themeObj.$figmaStyleReferences = opt.figmaStyleReferences;
-          if (opt.figmaVariableReferences !== undefined) themeObj.$figmaVariableReferences = opt.figmaVariableReferences;
+
+          // Inherit figma variable references from group + combine with any on option
+          themeObj.$figmaVariableReferences = {
+            ...groupVarReferences,
+            ...(opt.figmaVariableReferences || {}),
+          };
+
           if (opt.figmaCollectionId !== undefined) themeObj.$figmaCollectionId = opt.figmaCollectionId;
           if (opt.figmaModeId !== undefined) themeObj.$figmaModeId = opt.figmaModeId;
 
@@ -271,9 +333,10 @@ export async function fetchProjectDataRest(
       tokens,
       themes,
       tokenSets: tokenSetsMap,
+      themeGroups: themeGroupsMap,
       tokenSetOrder,
-      hasExceededPaginationLimit,
       changeSetId,
+      hasExceededPaginationLimit,
     };
   } catch (error) {
     console.error('Error fetching project data from REST API:', error);

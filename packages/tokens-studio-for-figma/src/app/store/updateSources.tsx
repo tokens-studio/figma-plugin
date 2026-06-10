@@ -121,7 +121,8 @@ async function updateRemoteTokens({
     case StorageProviderType.SUPERNOVA: {
       break;
     }
-    case StorageProviderType.TOKENS_STUDIO: {
+    case StorageProviderType.TOKENS_STUDIO:
+    case StorageProviderType.TOKENS_STUDIO_OAUTH: {
       break;
     }
     default:

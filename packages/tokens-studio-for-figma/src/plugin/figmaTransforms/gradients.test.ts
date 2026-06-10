@@ -435,7 +435,6 @@ describe('radial and conic gradients', () => {
     expect(result.gradientStops).toHaveLength(2);
   });
 
-
   it('should handle radial-gradient(at bottom right, ...)', () => {
     const input = 'radial-gradient(at bottom right, #ffffff, #000000)';
     const result = convertStringToFigmaGradient(input);

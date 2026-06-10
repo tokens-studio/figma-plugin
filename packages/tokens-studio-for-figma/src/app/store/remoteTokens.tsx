@@ -98,6 +98,7 @@ export default function useRemoteTokens() {
     syncTokensWithTokensStudioOAuth,
     pullTokensFromTokensStudioOAuth,
     fetchBranchesForTokensStudio,
+    pushTokensToTokensStudioOAuth,
   } = useTokensStudioOAuth();
   const {
     addNewADOCredentials,
@@ -263,6 +264,12 @@ export default function useRemoteTokens() {
               }
               case StorageProviderType.TOKENS_STUDIO_OAUTH: {
                 dispatch.tokenState.setTokenSetMetadata(remoteData.metadata?.tokenSetsData ?? {});
+                if (remoteData.metadata?.changeSetId) {
+                  dispatch.uiState.setApiData({
+                    ...context,
+                    changeSetId: remoteData.metadata.changeSetId,
+                  });
+                }
                 break;
               }
               default:
@@ -446,6 +453,10 @@ export default function useRemoteTokens() {
           pushResult = await pushTokensToTokensStudio(context);
           break;
         }
+        case StorageProviderType.TOKENS_STUDIO_OAUTH: {
+          pushResult = await pushTokensToTokensStudioOAuth(context as any);
+          break;
+        }
         default:
           throw new Error('Not implemented');
       }
@@ -481,6 +492,7 @@ export default function useRemoteTokens() {
       pushTokensToADO,
       pushTokensToSupernova,
       pushTokensToTokensStudio,
+      pushTokensToTokensStudioOAuth,
       tokens,
       themes,
     ],

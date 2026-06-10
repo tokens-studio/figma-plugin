@@ -1,19 +1,24 @@
 import { SingleToken } from '@/types/tokens';
 
 export default function removeTokenId(token: SingleToken, shouldRemove: boolean): SingleToken {
-  if (token.$extensions && shouldRemove && token.$extensions['studio.tokens']) {
-    delete token.$extensions?.['studio.tokens']?.id;
-    if (Object.keys(token.$extensions?.['studio.tokens'] || {}).length === 0) {
-      delete token.$extensions?.['studio.tokens'];
+  if (!shouldRemove || !token.$extensions) return token;
+
+  const newToken = { ...token, $extensions: { ...token.$extensions } };
+
+  if (newToken.$extensions['studio.tokens']) {
+    newToken.$extensions['studio.tokens'] = { ...newToken.$extensions['studio.tokens'] };
+    delete (newToken.$extensions['studio.tokens'] as any).id;
+    if (Object.keys(newToken.$extensions['studio.tokens']).length === 0) {
+      delete newToken.$extensions['studio.tokens'];
     }
   }
 
-  if (token.$extensions && shouldRemove && token.$extensions.id) {
-    delete token.$extensions?.id;
+  if ((newToken.$extensions as any).id) {
+    delete (newToken.$extensions as any).id;
   }
 
-  if (Object.keys(token.$extensions || {}).length === 0) {
-    delete token.$extensions;
+  if (Object.keys(newToken.$extensions).length === 0) {
+    delete (newToken as any).$extensions;
   }
-  return token;
+  return newToken;
 }
