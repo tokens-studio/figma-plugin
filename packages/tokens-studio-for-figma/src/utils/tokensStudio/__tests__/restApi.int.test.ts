@@ -2,6 +2,7 @@
 import {
   createTokenSetRest, updateTokenSetRest, deleteTokenSetRest,
   createTokenRest, updateTokenRest, deleteTokenRest,
+  batchCreateTokensRest,
   createThemeGroupRest, updateThemeGroupRest, deleteThemeGroupRest,
   createThemeOptionRest, updateThemeOptionRest, deleteThemeOptionRest,
 } from '../restApi';
@@ -177,7 +178,6 @@ describe('Tokens Studio REST API Integration', () => {
   describe('Import Variables Flow', () => {
     let primitiveSetId = '';
     let semanticSetId = '';
-    let tokenId = '';
     let themeGroupId = '';
     let themeOptionId = '';
     let primitiveName = '';
@@ -209,21 +209,17 @@ describe('Tokens Studio REST API Integration', () => {
       semanticSetId = semanticResult.data.id;
     });
 
-    it('creates tokens inside the imported token sets', async () => {
+    it('batch-creates tokens across both imported token sets in one request', async () => {
       if (skipIntegration) return;
 
-      const result = await createTokenRest(authToken, API_BASE_URL, projectId, {
-        name: 'color.brand',
-        value: '#7B61FF',
-        type: 'color',
-        token_set_id: primitiveSetId,
-        description: 'Imported from Figma variable',
-      }, undefined, changeSetId);
+      const result = await batchCreateTokensRest(authToken, API_BASE_URL, projectId, [
+        { name: 'color.brand', value: '#7B61FF', type: 'color', token_set_id: primitiveSetId, description: 'Imported from Figma variable' },
+        { name: 'spacing.sm', value: '8', type: 'dimension', token_set_id: primitiveSetId },
+        { name: 'color.bg', value: '{color.brand}', type: 'color', token_set_id: semanticSetId },
+      ], changeSetId);
       expect(result.data).toBeDefined();
-      expect(result.data.id).toBeDefined();
-      expect(result.data.attributes.name).toBe('color.brand');
-      expect(result.data.attributes.value).toBe('#7B61FF');
-      tokenId = result.data.id;
+      expect(result.data.created_count).toBe(3);
+      expect(result.data.requested_count).toBe(3);
     });
 
     it('creates a theme group for an imported variable collection', async () => {
@@ -279,12 +275,6 @@ describe('Tokens Studio REST API Integration', () => {
       expect(result).toBeDefined();
     });
 
-    it('deletes the imported token', async () => {
-      if (skipIntegration) return;
-      const result = await deleteTokenRest(authToken, API_BASE_URL, projectId, tokenId, undefined, changeSetId);
-      expect(result).toBeDefined();
-    });
-
     it('deletes the imported token sets', async () => {
       if (skipIntegration) return;
       await deleteTokenSetRest(authToken, API_BASE_URL, projectId, primitiveSetId, undefined, changeSetId);
@@ -294,13 +284,11 @@ describe('Tokens Studio REST API Integration', () => {
 
   // Simulates the write-back that happens when a user imports Figma styles into a project and
   // confirms via the ImportedTokensDialog. The sequence mirrors createMultipleTokens.ts:
-  // create the active token set (if absent) → create each confirmed style token inside it.
+  // create the active token set (if absent) → batch-create all confirmed style tokens in one call.
   // No themes are involved — styles have no collection/mode concept.
   describe('Import Styles Flow', () => {
     let styleSetId = '';
     let styleSetName = '';
-    let colorTokenId = '';
-    let typographyTokenId = '';
 
     it('creates a token set for the active set (styles have no parent)', async () => {
       if (skipIntegration) return;
@@ -318,62 +306,28 @@ describe('Tokens Studio REST API Integration', () => {
       styleSetId = result.data.id;
     });
 
-    it('creates a color token from an imported style', async () => {
+    it('batch-creates all confirmed style tokens in one request', async () => {
       if (skipIntegration) return;
 
-      const result = await createTokenRest(authToken, API_BASE_URL, projectId, {
-        name: 'color.primary',
-        value: '#0D99FF',
-        type: 'color',
-        token_set_id: styleSetId,
-        description: 'Imported from Figma color style',
-      }, undefined, changeSetId);
+      const result = await batchCreateTokensRest(authToken, API_BASE_URL, projectId, [
+        { name: 'color.primary', value: '#0D99FF', type: 'color', token_set_id: styleSetId, description: 'Imported from Figma color style' },
+        { name: 'typography.heading', value: { fontFamily: 'Inter', fontWeight: '700', fontSize: '32' }, type: 'typography', token_set_id: styleSetId, description: 'Imported from Figma text style' },
+        { name: 'spacing.md', value: '16', type: 'dimension', token_set_id: styleSetId },
+      ], changeSetId);
       expect(result.data).toBeDefined();
-      expect(result.data.id).toBeDefined();
-      expect(result.data.attributes.name).toBe('color.primary');
-      expect(result.data.attributes.value).toBe('#0D99FF');
-      colorTokenId = result.data.id;
+      expect(result.data.created_count).toBe(3);
+      expect(result.data.requested_count).toBe(3);
     });
 
-    it('creates a typography token from an imported style', async () => {
+    it('batch-creates tokens into an existing set (reuse path — set already has a server ID)', async () => {
       if (skipIntegration) return;
 
-      const result = await createTokenRest(authToken, API_BASE_URL, projectId, {
-        name: 'typography.heading',
-        value: { fontFamily: 'Inter', fontWeight: '700', fontSize: '32' },
-        type: 'typography',
-        token_set_id: styleSetId,
-        description: 'Imported from Figma text style',
-      }, undefined, changeSetId);
+      // Simulates createMultipleTokens reusing an existing set ID rather than re-creating it.
+      const result = await batchCreateTokensRest(authToken, API_BASE_URL, projectId, [
+        { name: 'color.secondary', value: '#FF6250', type: 'color', token_set_id: styleSetId },
+      ], changeSetId);
       expect(result.data).toBeDefined();
-      expect(result.data.id).toBeDefined();
-      expect(result.data.attributes.name).toBe('typography.heading');
-      typographyTokenId = result.data.id;
-    });
-
-    it('creates an additional token when the active set already exists (reuse path)', async () => {
-      if (skipIntegration) return;
-
-      // Simulates createMultipleTokens reusing an existing set ID instead of re-creating it.
-      // The set already has styleSetId — we just create another token in it directly.
-      const result = await createTokenRest(authToken, API_BASE_URL, projectId, {
-        name: 'color.secondary',
-        value: '#FF6250',
-        type: 'color',
-        token_set_id: styleSetId,
-      }, undefined, changeSetId);
-      expect(result.data).toBeDefined();
-      expect(result.data.attributes.name).toBe('color.secondary');
-
-      // Clean up the extra token inline
-      await deleteTokenRest(authToken, API_BASE_URL, projectId, result.data.id, undefined, changeSetId);
-    });
-
-    // Clean up in reverse dependency order
-    it('deletes the imported style tokens', async () => {
-      if (skipIntegration) return;
-      await deleteTokenRest(authToken, API_BASE_URL, projectId, colorTokenId, undefined, changeSetId);
-      await deleteTokenRest(authToken, API_BASE_URL, projectId, typographyTokenId, undefined, changeSetId);
+      expect(result.data.created_count).toBe(1);
     });
 
     it('deletes the style token set', async () => {
