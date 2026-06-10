@@ -5,14 +5,14 @@ import { pushThemeToTokensStudioOAuth } from './utils/pushThemeToTokensStudioOAu
 import { store } from '@/app/store';
 
 export function removeStyleIdsFromThemes(dispatch: RematchDispatch<RootModel>) {
-  return (payload: any, rootState: any): void => {
+  return (payload: any, _rootState: any): void => {
     dispatch.tokenState.updateDocument({
       updateRemote: true,
       shouldUpdateNodes: false,
     });
 
-    if (rootState?.uiState?.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
-      const currentState = store.getState();
+    const currentState = store.getState();
+    if (currentState?.uiState?.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
       currentState.tokenState?.themes?.forEach((theme: any) => {
         pushThemeToTokensStudioOAuth(theme, currentState, dispatch);
       });

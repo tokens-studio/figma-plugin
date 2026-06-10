@@ -44,6 +44,7 @@ import { wrapTransaction } from '@/profiling/transaction';
 import addIdPropertyToTokens from '@/utils/addIdPropertyToTokens';
 import { TokenFormat, TokenFormatOptions, setFormat } from '@/plugin/TokenFormatStoreClass';
 import { pushToTokensStudio, pushToTokensStudioOAuth } from '../providers/tokens-studio';
+import { store } from '@/app/store';
 import { StorageTypeCredential, TokensStudioStorageType, TokensStudioOAuthStorageType } from '@/types/StorageType';
 import {
   createTokenInTokensStudio,
@@ -825,12 +826,12 @@ export const tokenState = createModel<RootModel>()({
         }
       }
 
-      if (payload.shouldUpdate && rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
+      if (payload.shouldUpdate && store.getState().uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
         const tokenSet = rootState.tokenState.tokens[payload.parent];
         const token = tokenSet?.find((t) => t.name === payload.name);
         if (token) {
           pushToTokensStudioOAuth({
-            context: rootState.uiState.api as StorageTypeCredential<TokensStudioOAuthStorageType, false>,
+            context: store.getState().uiState.api as StorageTypeCredential<TokensStudioOAuthStorageType, false>,
             action: token.$extensions?.id ? 'EDIT_TOKEN' : 'CREATE_TOKEN',
             data: {
               id: token.$extensions?.id,
@@ -864,10 +865,10 @@ export const tokenState = createModel<RootModel>()({
         }
       }
 
-      if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
+      if (store.getState().uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
         if (payload.id) {
           pushToTokensStudioOAuth({
-            context: rootState.uiState.api as StorageTypeCredential<TokensStudioOAuthStorageType, false>,
+            context: store.getState().uiState.api as StorageTypeCredential<TokensStudioOAuthStorageType, false>,
             action: 'DELETE_TOKEN',
             data: {
               id: payload.id,
@@ -893,9 +894,9 @@ export const tokenState = createModel<RootModel>()({
         });
       }
 
-      if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
+      if (store.getState().uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
         pushToTokensStudioOAuth({
-          context: rootState.uiState.api as StorageTypeCredential<TokensStudioOAuthStorageType, false>,
+          context: store.getState().uiState.api as StorageTypeCredential<TokensStudioOAuthStorageType, false>,
           action: 'CREATE_TOKEN_SET',
           data: {
             name,
@@ -931,11 +932,11 @@ export const tokenState = createModel<RootModel>()({
         });
       }
 
-      if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
+      if (store.getState().uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
         const tokenSetId = (rootState.tokenState.tokenSetMetadata[data.oldName] as any)?.id;
         if (tokenSetId) {
           pushToTokensStudioOAuth({
-            context: rootState.uiState.api as StorageTypeCredential<TokensStudioOAuthStorageType, false>,
+            context: store.getState().uiState.api as StorageTypeCredential<TokensStudioOAuthStorageType, false>,
             action: 'UPDATE_TOKEN_SET',
             data: {
               id: tokenSetId,
@@ -956,11 +957,11 @@ export const tokenState = createModel<RootModel>()({
         });
       }
 
-      if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
+      if (store.getState().uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
         const tokenSetId = (rootState.tokenState.tokenSetMetadata[name] as any)?.id;
         if (tokenSetId) {
           pushToTokensStudioOAuth({
-            context: rootState.uiState.api as StorageTypeCredential<TokensStudioOAuthStorageType, false>,
+            context: store.getState().uiState.api as StorageTypeCredential<TokensStudioOAuthStorageType, false>,
             action: 'DELETE_TOKEN_SET',
             data: {
               id: tokenSetId,
@@ -980,12 +981,12 @@ export const tokenState = createModel<RootModel>()({
         });
       }
 
-      if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
+      if (store.getState().uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
         data.forEach((name, index) => {
           const tokenSetId = (rootState.tokenState.tokenSetMetadata[name] as any)?.id;
           if (tokenSetId) {
             pushToTokensStudioOAuth({
-              context: rootState.uiState.api as StorageTypeCredential<TokensStudioOAuthStorageType, false>,
+              context: store.getState().uiState.api as StorageTypeCredential<TokensStudioOAuthStorageType, false>,
               action: 'UPDATE_TOKEN_SET',
               data: {
                 id: tokenSetId,
@@ -1027,12 +1028,12 @@ export const tokenState = createModel<RootModel>()({
         });
       }
 
-      if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
+      if (store.getState().uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
         const tokenSet = rootState.tokenState.tokens[payload.parent];
         const token = tokenSet?.find((t) => t.name === payload.newName);
         if (token) {
           pushToTokensStudioOAuth({
-            context: rootState.uiState.api as StorageTypeCredential<TokensStudioOAuthStorageType, false>,
+            context: store.getState().uiState.api as StorageTypeCredential<TokensStudioOAuthStorageType, false>,
             action: 'CREATE_TOKEN',
             data: {
               name: token.name,
@@ -1055,12 +1056,12 @@ export const tokenState = createModel<RootModel>()({
         });
       }
 
-      if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
+      if (store.getState().uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
         const tokenSet = rootState.tokenState.tokens[payload.parent];
         const token = tokenSet?.find((t) => t.name === payload.name);
         if (token) {
           pushToTokensStudioOAuth({
-            context: rootState.uiState.api as StorageTypeCredential<TokensStudioOAuthStorageType, false>,
+            context: store.getState().uiState.api as StorageTypeCredential<TokensStudioOAuthStorageType, false>,
             action: 'CREATE_TOKEN',
             data: {
               name: token.name,
@@ -1214,13 +1215,13 @@ export const tokenState = createModel<RootModel>()({
         }
       }
 
-      if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
+      if (store.getState().uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
         for (const set of updatedSets) {
           const content = updatedTokens[set];
           content.forEach((token) => {
             if (token.$extensions?.id) {
               pushToTokensStudioOAuth({
-                context: rootState.uiState.api as StorageTypeCredential<TokensStudioOAuthStorageType, false>,
+                context: store.getState().uiState.api as StorageTypeCredential<TokensStudioOAuthStorageType, false>,
                 action: 'EDIT_TOKEN',
                 data: {
                   id: token.$extensions.id,

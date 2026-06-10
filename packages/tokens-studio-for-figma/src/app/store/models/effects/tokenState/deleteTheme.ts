@@ -2,9 +2,10 @@ import type { RematchDispatch } from '@rematch/core';
 import type { RootModel } from '@/types/RootModel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { pushToTokensStudioOAuth } from '../../../providers/tokens-studio/tokensStudioOAuth';
+import { store } from '@/app/store';
 
 export function deleteTheme(dispatch: RematchDispatch<RootModel>) {
-  return async (themeId: string, rootState: any): Promise<void> => {
+  return async (themeId: string, _rootState: any): Promise<void> => {
     dispatch.tokenState.removeTheme(themeId);
 
     dispatch.tokenState.updateDocument({
@@ -12,9 +13,10 @@ export function deleteTheme(dispatch: RematchDispatch<RootModel>) {
       shouldUpdateNodes: false,
     });
 
-    if (rootState?.uiState?.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
+    const currentState = store.getState();
+    if (currentState?.uiState?.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
       await pushToTokensStudioOAuth({
-        context: rootState.uiState.api,
+        context: currentState.uiState.api,
         action: 'DELETE_THEME',
         data: { id: themeId },
       });

@@ -3,16 +3,18 @@ import omit from 'just-omit';
 import type { RootModel } from '@/types/RootModel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { pushToTokensStudioOAuth } from '../../../providers/tokens-studio/tokensStudioOAuth';
+import { store } from '@/app/store';
 
 export function updateThemeGroupName(dispatch: RematchDispatch<RootModel>) {
-  return async (oldGroupName: string, newGroupName: string, rootState: any): Promise<void> => {
+  return async (oldGroupName: string, newGroupName: string, _rootState: any): Promise<void> => {
     dispatch.tokenState.updateDocument({
       updateRemote: true,
       shouldUpdateNodes: false,
     });
 
-    if (rootState?.uiState?.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
-      const { metadata } = rootState.tokenState.remoteData;
+    const currentState = store.getState();
+    if (currentState?.uiState?.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
+      const { metadata } = currentState.tokenState.remoteData;
       const { themeGroupsData } = metadata || {};
       const groupId = themeGroupsData?.[oldGroupName]?.id;
 
