@@ -38,6 +38,7 @@ import {
   createThemeOptionRest,
   updateThemeOptionRest,
   deleteThemeOptionRest,
+  batchCreateTokensRest,
 } from '../../../../utils/tokensStudio/restApi';
 
 type TokensStudioOAuthCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.TOKENS_STUDIO_OAUTH }>;
@@ -50,6 +51,7 @@ interface PushToTokensStudioOAuth {
 }
 
 const ACTION_LABELS: Record<string, string> = {
+  BATCH_CREATE_TOKENS: 'Created tokens',
   CREATE_TOKEN: 'Created token',
   EDIT_TOKEN: 'Updated token',
   DELETE_TOKEN: 'Deleted token',
@@ -76,6 +78,11 @@ export const pushToTokensStudioOAuth = async ({
 
   try {
     switch (action) {
+      case 'BATCH_CREATE_TOKENS':
+        if (changeSetId) {
+          result = await batchCreateTokensRest(oauthTokens.accessToken, apiBaseUrl, projectId, data, changeSetId);
+        }
+        break;
       case 'CREATE_TOKEN':
         result = await createTokenRest(oauthTokens.accessToken, apiBaseUrl, projectId, data, branch, changeSetId);
         break;

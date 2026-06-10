@@ -2,7 +2,9 @@
 import {
   createTokenSetRest, updateTokenSetRest, deleteTokenSetRest,
   createTokenRest, updateTokenRest, deleteTokenRest,
+  batchCreateTokensRest,
   createThemeGroupRest, updateThemeGroupRest, deleteThemeGroupRest,
+  createThemeOptionRest, updateThemeOptionRest, deleteThemeOptionRest,
 } from '../restApi';
 import { parseBranchesFromResponse } from '../fetchBranchesListRest';
 
@@ -166,6 +168,173 @@ describe('Tokens Studio REST API Integration', () => {
     it('deletes a token', async () => {
       if (skipIntegration) return;
       const result = await deleteTokenRest(authToken, API_BASE_URL, projectId, tokenId, undefined, changeSetId);
+      expect(result).toBeDefined();
+    });
+  });
+
+  // Simulates the write-back that happens when a user imports Figma variables into an empty project.
+  // The sequence mirrors setTokensFromVariables.ts: create token sets → create tokens → create
+  // theme group → create theme options referencing the token sets.
+  describe('Import Variables Flow', () => {
+    let primitiveSetId = '';
+    let semanticSetId = '';
+    let themeGroupId = '';
+    let themeOptionId = '';
+    let primitiveName = '';
+    let semanticName = '';
+    let themeGroupName = '';
+
+    it('creates token sets for imported variable collections', async () => {
+      if (skipIntegration) return;
+
+      // Use unique names to avoid collisions with pre-existing sets or failed prior runs.
+      primitiveName = `import-primitives-${Date.now()}`;
+      const primitiveResult = await createTokenSetRest(authToken, API_BASE_URL, projectId, {
+        name: primitiveName,
+        type: 'global',
+        order_index: 0,
+      }, undefined, changeSetId);
+      expect(primitiveResult.data).toBeDefined();
+      expect(primitiveResult.data.id).toBeDefined();
+      expect(primitiveResult.data.attributes.name).toBe(primitiveName);
+      primitiveSetId = primitiveResult.data.id;
+
+      semanticName = `import-semantic-${Date.now()}`;
+      const semanticResult = await createTokenSetRest(authToken, API_BASE_URL, projectId, {
+        name: semanticName,
+        type: 'global',
+        order_index: 1,
+      }, undefined, changeSetId);
+      expect(semanticResult.data).toBeDefined();
+      expect(semanticResult.data.id).toBeDefined();
+      semanticSetId = semanticResult.data.id;
+    });
+
+    it('batch-creates tokens across both imported token sets in one request', async () => {
+      if (skipIntegration) return;
+
+      const result = await batchCreateTokensRest(authToken, API_BASE_URL, projectId, [
+        { name: 'color.brand', value: '#7B61FF', type: 'color', token_set_id: primitiveSetId, description: 'Imported from Figma variable' },
+        { name: 'spacing.sm', value: '8', type: 'dimension', token_set_id: primitiveSetId },
+        { name: 'color.bg', value: '{color.brand}', type: 'color', token_set_id: semanticSetId },
+      ], changeSetId);
+      expect(result.data).toBeDefined();
+      expect(result.data.created_count).toBe(3);
+      expect(result.data.requested_count).toBe(3);
+    });
+
+    it('creates a theme group for an imported variable collection', async () => {
+      if (skipIntegration) return;
+
+      themeGroupName = `Mode-${Date.now()}`;
+      const result = await createThemeGroupRest(authToken, API_BASE_URL, projectId, {
+        name: themeGroupName,
+        options: [],
+      }, undefined, changeSetId);
+      expect(result.data).toBeDefined();
+      expect(result.data.id).toBeDefined();
+      expect(result.data.attributes.name).toBe(themeGroupName);
+      themeGroupId = result.data.id;
+    });
+
+    it('creates a theme option referencing the imported token sets', async () => {
+      if (skipIntegration) return;
+
+      const result = await createThemeOptionRest(authToken, API_BASE_URL, projectId, {
+        name: 'Light',
+        theme_group_id: themeGroupId,
+        selected_token_sets: {
+          [primitiveName]: 'enabled',
+          [semanticName]: 'enabled',
+        },
+      }, undefined, changeSetId);
+      expect(result.data).toBeDefined();
+      expect(result.data.id).toBeDefined();
+      expect(result.data.attributes.name).toBe('Light');
+      themeOptionId = result.data.id;
+    });
+
+    it('updates a theme option (e.g. adding a second mode)', async () => {
+      if (skipIntegration) return;
+
+      const result = await updateThemeOptionRest(authToken, API_BASE_URL, projectId, themeOptionId, {
+        name: 'Light Mode',
+      }, undefined, changeSetId);
+      expect(result.data).toBeDefined();
+      expect(result.data.attributes.name).toBe('Light Mode');
+    });
+
+    // Clean up in reverse dependency order
+    it('deletes the theme option', async () => {
+      if (skipIntegration) return;
+      const result = await deleteThemeOptionRest(authToken, API_BASE_URL, projectId, themeOptionId, undefined, changeSetId);
+      expect(result).toBeDefined();
+    });
+
+    it('deletes the theme group', async () => {
+      if (skipIntegration) return;
+      const result = await deleteThemeGroupRest(authToken, API_BASE_URL, projectId, themeGroupId, undefined, changeSetId);
+      expect(result).toBeDefined();
+    });
+
+    it('deletes the imported token sets', async () => {
+      if (skipIntegration) return;
+      await deleteTokenSetRest(authToken, API_BASE_URL, projectId, primitiveSetId, undefined, changeSetId);
+      await deleteTokenSetRest(authToken, API_BASE_URL, projectId, semanticSetId, undefined, changeSetId);
+    });
+  });
+
+  // Simulates the write-back that happens when a user imports Figma styles into a project and
+  // confirms via the ImportedTokensDialog. The sequence mirrors createMultipleTokens.ts:
+  // create the active token set (if absent) → batch-create all confirmed style tokens in one call.
+  // No themes are involved — styles have no collection/mode concept.
+  describe('Import Styles Flow', () => {
+    let styleSetId = '';
+    let styleSetName = '';
+
+    it('creates a token set for the active set (styles have no parent)', async () => {
+      if (skipIntegration) return;
+
+      // Use a unique name to avoid collisions with pre-existing sets or failed prior runs.
+      styleSetName = `import-styles-${Date.now()}`;
+      const result = await createTokenSetRest(authToken, API_BASE_URL, projectId, {
+        name: styleSetName,
+        type: 'global',
+        order_index: 0,
+      }, undefined, changeSetId);
+      expect(result.data).toBeDefined();
+      expect(result.data.id).toBeDefined();
+      expect(result.data.attributes.name).toBe(styleSetName);
+      styleSetId = result.data.id;
+    });
+
+    it('batch-creates all confirmed style tokens in one request', async () => {
+      if (skipIntegration) return;
+
+      const result = await batchCreateTokensRest(authToken, API_BASE_URL, projectId, [
+        { name: 'color.primary', value: '#0D99FF', type: 'color', token_set_id: styleSetId, description: 'Imported from Figma color style' },
+        { name: 'typography.heading', value: { fontFamily: 'Inter', fontWeight: '700', fontSize: '32' }, type: 'typography', token_set_id: styleSetId, description: 'Imported from Figma text style' },
+        { name: 'spacing.md', value: '16', type: 'dimension', token_set_id: styleSetId },
+      ], changeSetId);
+      expect(result.data).toBeDefined();
+      expect(result.data.created_count).toBe(3);
+      expect(result.data.requested_count).toBe(3);
+    });
+
+    it('batch-creates tokens into an existing set (reuse path — set already has a server ID)', async () => {
+      if (skipIntegration) return;
+
+      // Simulates createMultipleTokens reusing an existing set ID rather than re-creating it.
+      const result = await batchCreateTokensRest(authToken, API_BASE_URL, projectId, [
+        { name: 'color.secondary', value: '#FF6250', type: 'color', token_set_id: styleSetId },
+      ], changeSetId);
+      expect(result.data).toBeDefined();
+      expect(result.data.created_count).toBe(1);
+    });
+
+    it('deletes the style token set', async () => {
+      if (skipIntegration) return;
+      const result = await deleteTokenSetRest(authToken, API_BASE_URL, projectId, styleSetId, undefined, changeSetId);
       expect(result).toBeDefined();
     });
   });

@@ -263,13 +263,24 @@ export const tokenState = createModel<RootModel>()({
       ...state,
       renamedCollections,
     }),
-    resetImportedTokens: (state) => ({
-      ...state,
-      importedTokens: {
-        newTokens: [],
-        updatedTokens: [],
-      },
-    }),
+    resetImportedTokens: (state) => {
+      // Strip the ephemeral fromVariableImport flag from all sets so a future style import
+      // targeting the same set names is not silently skipped.
+      const cleanedMetadata = Object.fromEntries(
+        Object.entries(state.tokenSetMetadata || {}).map(([key, meta]) => {
+          const { fromVariableImport, ...rest } = meta as any;
+          return [key, rest];
+        }),
+      );
+      return {
+        ...state,
+        importedTokens: {
+          newTokens: [],
+          updatedTokens: [],
+        },
+        tokenSetMetadata: cleanedMetadata,
+      };
+    },
     setJSONData(state, payload) {
       const parsedTokens = parseJson(payload);
       parseTokenValues(parsedTokens, true);
