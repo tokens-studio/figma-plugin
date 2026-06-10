@@ -49,20 +49,16 @@ interface PushToTokensStudioOAuth {
   successCallback?: (result: any) => void;
 }
 
-const ACTION_LABELS: Record<string, string> = {
-  CREATE_TOKEN: 'Created token',
-  EDIT_TOKEN: 'Updated token',
-  DELETE_TOKEN: 'Deleted token',
-  CREATE_TOKEN_SET: 'Created token set',
-  UPDATE_TOKEN_SET: 'Updated token set',
-  DELETE_TOKEN_SET: 'Deleted token set',
-  CREATE_THEME_GROUP: 'Created theme group',
-  UPDATE_THEME_GROUP: 'Updated theme group',
-  DELETE_THEME_GROUP: 'Deleted theme group',
-  CREATE_THEME: 'Created theme',
-  UPDATE_THEME: 'Updated theme',
-  DELETE_THEME: 'Deleted theme',
-};
+// Debounced toast so rapid sequential syncs show a single "Synced to Tokens Studio" notification
+// instead of stacking one per action.
+let syncNotifyTimer: ReturnType<typeof setTimeout> | null = null;
+function notifySyncSuccess() {
+  if (syncNotifyTimer) clearTimeout(syncNotifyTimer);
+  syncNotifyTimer = setTimeout(() => {
+    notifyToUI('Synced to Tokens Studio', { timeout: 2000 });
+    syncNotifyTimer = null;
+  }, 800);
+}
 
 export const pushToTokensStudioOAuth = async ({
   context, action, data, successCallback,
@@ -145,8 +141,7 @@ export const pushToTokensStudioOAuth = async ({
         console.warn('Unknown REST action', action);
     }
     if (result) {
-      const actionLabel = ACTION_LABELS[action] || 'Synced change';
-      notifyToUI(`${actionLabel} to Tokens Studio`);
+      notifySyncSuccess();
     }
     if (successCallback) successCallback(result);
     return result;

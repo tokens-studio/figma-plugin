@@ -164,7 +164,8 @@ export type PullVariablesMessageResult = AsyncMessage<AsyncMessageTypes.PULL_VAR
 export type NotifyAsyncMessage = AsyncMessage<AsyncMessageTypes.NOTIFY, {
   msg: string;
   opts: {
-    error?: boolean
+    error?: boolean;
+    timeout?: number;
   };
 }>;
 export type NotifyAsyncMessageResult = AsyncMessage<AsyncMessageTypes.NOTIFY>;
