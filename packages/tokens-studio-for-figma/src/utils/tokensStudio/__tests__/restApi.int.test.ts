@@ -182,6 +182,7 @@ describe('Tokens Studio REST API Integration', () => {
     let themeOptionId = '';
     let primitiveName = '';
     let semanticName = '';
+    let themeGroupName = '';
 
     it('creates token sets for imported variable collections', async () => {
       if (skipIntegration) return;
@@ -225,13 +226,14 @@ describe('Tokens Studio REST API Integration', () => {
     it('creates a theme group for an imported variable collection', async () => {
       if (skipIntegration) return;
 
+      themeGroupName = `Mode-${Date.now()}`;
       const result = await createThemeGroupRest(authToken, API_BASE_URL, projectId, {
-        name: 'Mode',
+        name: themeGroupName,
         options: [],
       }, undefined, changeSetId);
       expect(result.data).toBeDefined();
       expect(result.data.id).toBeDefined();
-      expect(result.data.attributes.name).toBe('Mode');
+      expect(result.data.attributes.name).toBe(themeGroupName);
       themeGroupId = result.data.id;
     });
 

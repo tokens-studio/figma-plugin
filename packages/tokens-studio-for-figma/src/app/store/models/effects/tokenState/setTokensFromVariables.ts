@@ -33,10 +33,19 @@ export function setTokensFromVariables(dispatch: RematchDispatch<RootModel>) {
       const allTokensToCreate: Array<{ name: string; value: any; type: string; description?: string; token_set_id: string }> = [];
 
       for (const [setName, tokens] of Object.entries(tokensBySet)) {
-        const existingSetId = (currentState.tokenState.tokenSetMetadata[setName] as any)?.id;
-        let tokenSetId = existingSetId;
+        const existingMeta = store.getState().tokenState.tokenSetMetadata[setName] as any;
+        let tokenSetId = existingMeta?.id;
 
-        if (!tokenSetId) {
+        if (tokenSetId) {
+          // Set already exists on the server — mark it so createMultipleTokens skips it when
+          // the user confirms in ImportedTokensDialog, avoiding duplicate token writes.
+          if (!existingMeta?.fromVariableImport) {
+            dispatch.tokenState.setTokenSetMetadata({
+              ...store.getState().tokenState.tokenSetMetadata,
+              [setName]: { ...existingMeta, fromVariableImport: true } as any,
+            });
+          }
+        } else {
           // eslint-disable-next-line no-await-in-loop
           const setResult = await pushToTokensStudioOAuth({
             context: context as any,
