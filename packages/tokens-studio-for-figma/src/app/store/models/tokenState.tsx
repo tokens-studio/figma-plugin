@@ -267,7 +267,7 @@ export const tokenState = createModel<RootModel>()({
       // Strip the ephemeral fromVariableImport flag from all sets so a future style import
       // targeting the same set names is not silently skipped.
       const cleanedMetadata = Object.fromEntries(
-        Object.entries(state.tokenSetMetadata).map(([key, meta]) => {
+        Object.entries(state.tokenSetMetadata || {}).map(([key, meta]) => {
           const { fromVariableImport, ...rest } = meta as any;
           return [key, rest];
         }),
