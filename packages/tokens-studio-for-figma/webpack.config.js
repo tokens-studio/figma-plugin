@@ -212,6 +212,10 @@ module.exports = wrapper((env, argv) => {
       }),
       new webpack.DefinePlugin({
         'process.env.PREVIEW_ENV': JSON.stringify(argv.PREVIEW_ENV),
+        // Studio license backend (legacy -> studio migration). Defined here
+        // with a fallback so builds from .env files predating the variable
+        // don't leave process.env.STUDIO_LICENSE_API_URL unreplaced.
+        'process.env.STUDIO_LICENSE_API_URL': JSON.stringify(process.env.STUDIO_LICENSE_API_URL || ''),
       }),
       new ForkTsCheckerWebpackPlugin({
         async: argv.mode === 'development',

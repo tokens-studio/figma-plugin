@@ -15,6 +15,7 @@ import OnboardingExplainer from '../OnboardingExplainer';
 import RemConfiguration from '../RemConfiguration';
 import { replay } from '@/app/sentry';
 import { sessionRecordingSelector } from '@/selectors/sessionRecordingSelector';
+import { studioLicenseValidationSelector } from '@/selectors/studioLicenseValidationSelector';
 import { ExplainerModal } from '../ExplainerModal';
 import { Tabs } from '@/constants/Tabs';
 
@@ -33,6 +34,7 @@ function Settings() {
   const uiState = useSelector(uiStateSelector);
   const dispatch = useDispatch<Dispatch>();
   const debugMode = useSelector(sessionRecordingSelector);
+  const studioLicenseValidation = useSelector(studioLicenseValidationSelector);
   const [debugSession, setDebugSession] = useState('');
 
   const toggleDebugMode = React.useCallback(async (checked: CheckedState) => {
@@ -90,6 +92,10 @@ function Settings() {
 
   const handleGoToSubscription = React.useCallback(() => {
     dispatch.uiState.setActiveTab(Tabs.SUBSCRIPTION);
+  }, [dispatch]);
+
+  const toggleStudioLicenseValidation = React.useCallback((checked: CheckedState) => {
+    dispatch.settings.setStudioLicenseValidation(!!checked);
   }, [dispatch]);
 
   return (
@@ -202,6 +208,29 @@ function Settings() {
                     <b>{debugSession}</b>
                   </Text>
                 )}
+              </Box>
+            </Stack>
+            <Stack direction="row" align="center" justify="between" gap={1}>
+              <Stack direction="row" gap={2} align="center">
+                <Label htmlFor="studioLicenseValidation">{t('studioLicenseValidation')}</Label>
+                <ExplainerModal title={t('studioLicenseValidation')}>
+                  <Box css={{
+                    color: '$fgMuted',
+                    fontSize: '$xsmall',
+                  }}
+                  >
+                    {t('studioLicenseValidationDescription')}
+                  </Box>
+                </ExplainerModal>
+              </Stack>
+              <Box css={{ flexShrink: 0 }}>
+                <Switch
+                  id="studioLicenseValidation"
+                  data-testid="studio-license-validation"
+                  checked={!!studioLicenseValidation}
+                  defaultChecked={studioLicenseValidation}
+                  onCheckedChange={toggleStudioLicenseValidation}
+                />
               </Box>
             </Stack>
             <Stack direction="row" justify="between" gap={2} align="center" css={{ width: '100%' }}>

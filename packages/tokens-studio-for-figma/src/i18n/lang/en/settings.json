@@ -32,5 +32,7 @@
   "liveSyncActive": "Live sync active",
   "liveSyncInactive": "Live sync inactive",
   "language": "Language",
-  "languageExplainer": "Tokens Studio has been machine translated, therefore translations may appear inaccurate. \n Don't see your language? Submit a feature request"
+  "languageExplainer": "Tokens Studio has been machine translated, therefore translations may appear inaccurate. \n Don't see your language? Submit a feature request",
+  "studioLicenseValidation": "Validate license against the new Tokens Studio platform",
+  "studioLicenseValidationDescription": "Opt in to validate your license key against the new Tokens Studio platform alongside the current license server. The current server remains the source of truth — if the new platform does not recognize your key yet, validation falls back automatically. This helps us test the migration with zero risk to your Pro access."
 }

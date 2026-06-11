@@ -2,6 +2,7 @@ import { Dispatch } from '@/app/store';
 import { AddLicenseSource } from '@/app/store/models/userState';
 import { LicenseStatus } from '@/constants/LicenseStatus';
 import validateLicense from './validateLicense';
+import validateLicenseWithStudio from './validateLicenseWithStudio';
 import { notifyToUI } from '@/plugin/notifiers';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
@@ -9,15 +10,20 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 export async function addLicenseKey(dispatch: Dispatch, payload: { key: string; source: AddLicenseSource }, user: {
   userId: string | null;
   userName?: string;
+}, options?: {
+  // Opt-in: validate against the new studio backend in parallel with
+  // legacy (legacy stays the fallback) — see validateLicenseWithStudio
+  studioValidation?: boolean;
 }) {
   dispatch.userState.setLicenseStatus(LicenseStatus.VERIFYING);
 
   const { userId, userName } = user;
   const { key, source } = payload;
 
+  const validate = options?.studioValidation ? validateLicenseWithStudio : validateLicense;
   const {
     error, plan, email: clientEmail, entitlements,
-  } = await validateLicense(key, userId, userName);
+  } = await validate(key, userId, userName);
 
   if (error) {
     dispatch.userState.setLicenseStatus(LicenseStatus.ERROR);

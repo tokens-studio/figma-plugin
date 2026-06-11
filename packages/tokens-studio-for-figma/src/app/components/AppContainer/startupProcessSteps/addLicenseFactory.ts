@@ -25,6 +25,8 @@ export function addLicenseFactory(dispatch: Dispatch, params: StartupMessage) {
       }, {
         userId: user!.figmaId,
         userName: user!.name,
+      }, {
+        studioValidation: params.settings?.studioLicenseValidation,
       });
     } else {
       dispatch.userState.setLicenseStatus(LicenseStatus.NO_LICENSE);

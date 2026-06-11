@@ -43,6 +43,7 @@ export async function updateUISettings(uiSettings: Partial<SavedSettings>) {
       autoApplyThemeOnDrop: uiSettings.autoApplyThemeOnDrop ?? data?.autoApplyThemeOnDrop,
       seenGenericVersionedHeaderMigrationDialog: uiSettings.seenGenericVersionedHeaderMigrationDialog ?? data?.seenGenericVersionedHeaderMigrationDialog,
       seenTermsUpdate2026: uiSettings.seenTermsUpdate2026 ?? data?.seenTermsUpdate2026,
+      studioLicenseValidation: uiSettings.studioLicenseValidation ?? data?.studioLicenseValidation,
     });
   } catch (err) {
     notifyUI('There was an issue saving your credentials. Please try again.');
@@ -87,6 +88,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
     let autoApplyThemeOnDrop: boolean;
     let seenGenericVersionedHeaderMigrationDialog: boolean;
     let seenTermsUpdate2026: boolean;
+    let studioLicenseValidation: boolean;
 
     if (data) {
       width = data.width || 400;
@@ -122,6 +124,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
       autoApplyThemeOnDrop = typeof data.autoApplyThemeOnDrop === 'undefined' ? false : data.autoApplyThemeOnDrop;
       seenGenericVersionedHeaderMigrationDialog = typeof data.seenGenericVersionedHeaderMigrationDialog === 'undefined' ? false : data.seenGenericVersionedHeaderMigrationDialog;
       seenTermsUpdate2026 = typeof data.seenTermsUpdate2026 === 'undefined' ? false : data.seenTermsUpdate2026;
+      studioLicenseValidation = typeof data.studioLicenseValidation === 'undefined' ? false : data.studioLicenseValidation;
       settings = {
         language,
         width: Math.max(300, width),
@@ -156,6 +159,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
         autoApplyThemeOnDrop,
         seenGenericVersionedHeaderMigrationDialog,
         seenTermsUpdate2026,
+        studioLicenseValidation,
       };
 
       if (notify) {

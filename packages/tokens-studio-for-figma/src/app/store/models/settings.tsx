@@ -58,6 +58,12 @@ export interface SettingsState {
   autoApplyThemeOnDrop?: boolean;
   seenGenericVersionedHeaderMigrationDialog?: boolean;
   seenTermsUpdate2026?: boolean;
+  /**
+   * Opt-in: validate the license key against the new Tokens Studio
+   * platform backend in parallel with the legacy license server
+   * (legacy stays the fallback during the migration)
+  */
+  studioLicenseValidation?: boolean;
 }
 
 const setUI = (state: SettingsState) => {
@@ -78,6 +84,7 @@ export const settings = createModel<RootModel>()({
     seenTermsUpdate2026: false,
     language: 'en',
     sessionRecording: false,
+    studioLicenseValidation: false,
     updateMode: UpdateMode.SELECTION,
     updateRemote: true,
     updateOnChange: false,
@@ -253,6 +260,12 @@ export const settings = createModel<RootModel>()({
         seenGenericVersionedHeaderMigrationDialog: payload,
       };
     },
+    setStudioLicenseValidation(state, payload: boolean) {
+      return {
+        ...state,
+        studioLicenseValidation: payload,
+      };
+    },
   },
   effects: () => ({
     setLanguage: (payload: string, rootState) => {
@@ -319,6 +332,10 @@ export const settings = createModel<RootModel>()({
       setUI(rootState.settings);
     },
     setSeenTermsUpdate2026: (payload: boolean, rootState) => {
+      setUI(rootState.settings);
+    },
+    setStudioLicenseValidation: (payload: boolean, rootState) => {
+      track('Studio license validation opt-in', { enabled: payload });
       setUI(rootState.settings);
     },
     ...Object.fromEntries(

@@ -19,6 +19,7 @@ import { userIdSelector } from '@/selectors/userIdSelector';
 import { ErrorMessage } from '../ErrorMessage';
 import { addLicenseKey } from '@/utils/addLicenseKey';
 import { useAuthStore } from '@/app/store/useAuthStore';
+import { studioLicenseValidationSelector } from '@/selectors/studioLicenseValidationSelector';
 
 const SectionTitle = styled('div', {
   fontSize: '12px',
@@ -52,6 +53,7 @@ export default function AddLicenseKey({ isCompact }: Props) {
   const [newKey, setLicenseKey] = useState(existingKey);
   const { confirm } = useConfirm();
   const userId = useSelector(userIdSelector);
+  const studioLicenseValidation = useSelector(studioLicenseValidationSelector);
   const { t } = useTranslation(['licence', 'subscription']);
   const [isMasked, setIsMasked] = useState(true);
 
@@ -67,9 +69,12 @@ export default function AddLicenseKey({ isCompact }: Props) {
         {
           userId,
         },
+        {
+          studioValidation: studioLicenseValidation,
+        },
       );
     }
-  }, [newKey, dispatch, userId]);
+  }, [newKey, dispatch, userId, studioLicenseValidation]);
 
   const removeKey = useCallback(async () => {
     if (licenseKeyError) {
