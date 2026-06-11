@@ -54,7 +54,7 @@ export default function ColorTokenForm({
   const [modifyVisible, setModifyVisible] = React.useState(false);
   const isProUser = useIsProUser();
   const storageType = useSelector(storageTypeSelector);
-  const isTokensStudioOAuth = storageType?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH;
+  const modifiersSupported = storageType?.provider !== StorageProviderType.TOKENS_STUDIO_OAUTH;
 
   React.useEffect(() => {
     if (internalEditToken?.$extensions?.['studio.tokens']?.modify) {
@@ -219,7 +219,7 @@ export default function ColorTokenForm({
       {inputHelperOpen && (
         <ColorPicker value={internalEditToken.value} onChange={handleColorValueChange} />
       )}
-      {!isTokensStudioOAuth && (
+      {modifiersSupported && (
         <>
           <Box css={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Box css={{ display: 'flex', gap: '$3', alignItems: 'center' }}>
@@ -313,7 +313,7 @@ export default function ColorTokenForm({
           }
         </>
       )}
-      {(checkIfContainsAlias(internalEditToken.value) || (!isTokensStudioOAuth && internalEditToken?.$extensions?.['studio.tokens']?.modify)) && (
+      {(checkIfContainsAlias(internalEditToken.value) || (modifiersSupported && internalEditToken?.$extensions?.['studio.tokens']?.modify)) && (
         <Box css={{
           display: 'flex', gap: '$3', background: '$bgSubtle', color: '$fgMuted', padding: '$3', borderRadius: '$2',
         }}
