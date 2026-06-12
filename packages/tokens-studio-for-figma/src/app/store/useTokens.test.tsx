@@ -322,6 +322,24 @@ describe('useToken test', () => {
     });
   });
 
+  it('handleJSONUpdate test', async () => {
+    const messageSpy = jest.spyOn(AsyncMessageChannel.ReactInstance, 'message');
+    await act(async () => {
+      result.current.handleJSONUpdate(JSON.stringify({
+        global: {
+          red: {
+            value: '#ff0000',
+            type: 'color',
+          },
+        },
+      }));
+    });
+
+    expect(messageSpy).toBeCalledWith(expect.objectContaining({
+      type: AsyncMessageTypes.UPDATE,
+    }));
+  });
+
   it('removeTokensByValue test', async () => {
     const messageSpy = jest.spyOn(AsyncMessageChannel.ReactInstance, 'message');
     const data = [
