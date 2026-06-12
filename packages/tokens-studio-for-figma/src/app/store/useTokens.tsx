@@ -145,8 +145,10 @@ export default function useTokens() {
     (newTokens: string) => {
       track('Update JSON');
       dispatch.tokenState.setJSONData(newTokens);
+      // @ts-ignore
+      dispatch.tokenState.updateDocument({ shouldUpdateNodes: settings.updateOnChange });
     },
-    [dispatch.tokenState],
+    [dispatch.tokenState, settings.updateOnChange],
   );
 
   // Handles the update operation
