@@ -191,8 +191,12 @@ export function pullTokensFactory(
     } else if (params.localTokenData) {
       const checkForChanges = params.localTokenData.checkForChanges ?? false;
 
+      // Studio providers sync every change immediately via REST — never treat stale local storage as "unsaved changes"
+      const isStudioProvider = storageType.provider === StorageProviderType.TOKENS_STUDIO_OAUTH;
+
       if (
         !checkForChanges
+        || isStudioProvider
         || (
           isRemoteStorage
           && checkForChanges && (!await askUserIfRecoverLocalChanges())
