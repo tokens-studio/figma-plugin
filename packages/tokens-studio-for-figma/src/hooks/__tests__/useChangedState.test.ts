@@ -23,7 +23,6 @@ jest.mock('react-redux', () => ({
       tokens: mockTokens,
       themes: mockThemes,
       lastSyncedState: mockLastSyncedState,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       tokenFormat: mockTokenFormat,
       tokenSetMetadata: {},
     },
