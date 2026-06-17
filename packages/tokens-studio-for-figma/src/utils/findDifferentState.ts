@@ -23,7 +23,7 @@ export function findDifferentState(baseState: CompareStateType, compareState: Co
     values.forEach((token) => {
       const oldValue = baseState.tokens[tokenSet]?.find((t) => t.name === token.name);
       if (oldValue) {
-        if (!isEqual(oldValue.value, token.value)) {
+        if (!isEqual(oldValue.value, token.value) || !isEqual(oldValue.$extensions, token.$extensions)) {
           const updatedToken: ImportToken = { ...token };
           updatedToken.oldValue = oldValue.value;
           updatedToken.importType = 'UPDATE';
