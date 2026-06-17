@@ -151,7 +151,7 @@
   },
   "devDependencies": {
     "0x": "^5.7.0",
-    "@babel/core": "^7.12.16",
+    "@babel/core": "^7.29.6",
     "@babel/plugin-proposal-private-methods": "^7.18.6",
     "@babel/plugin-transform-export-namespace-from": "^7.24.1",
     "@babel/preset-env": "^7.23.3",
