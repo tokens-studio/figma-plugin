@@ -59,6 +59,6 @@ describe('removeStylesFromPlugin', () => {
   runAfter.push(AsyncMessageChannel.PluginInstance.connect());
 
   it('should remove styles from plugin', async () => {
-    expect(await removeStylesFromPlugin(tokenToDelete)).toEqual(['456']);
+    expect(await removeStylesFromPlugin(tokenToDelete, { prefixStylesWithThemeName: true })).toEqual(['456']);
   });
 });
