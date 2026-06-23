@@ -772,8 +772,8 @@ export default function useTokens() {
     async (tokenName: string) => {
       track('removeVariables', { tokenName });
 
-      const { themes } = store.getState().tokenState;
-      const variableKeys = themes.reduce<string[]>((acc, theme) => {
+      const { themes: tokenStateThemes } = store.getState().tokenState;
+      const variableKeys = tokenStateThemes.reduce<string[]>((acc, theme) => {
         const key = theme.$figmaVariableReferences?.[tokenName];
         if (key && !acc.includes(key)) {
           acc.push(key);
