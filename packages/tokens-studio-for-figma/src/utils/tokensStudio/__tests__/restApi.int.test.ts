@@ -214,9 +214,15 @@ describe('Tokens Studio REST API Integration', () => {
       if (skipIntegration) return;
 
       const result = await batchCreateTokensRest(authToken, API_BASE_URL, projectId, [
-        { name: 'color.brand', value: '#7B61FF', type: 'color', token_set_id: primitiveSetId, description: 'Imported from Figma variable' },
-        { name: 'spacing.sm', value: '8', type: 'dimension', token_set_id: primitiveSetId },
-        { name: 'color.bg', value: '{color.brand}', type: 'color', token_set_id: semanticSetId },
+        {
+          name: 'color.brand', value: '#7B61FF', type: 'color', token_set_id: primitiveSetId, description: 'Imported from Figma variable',
+        },
+        {
+          name: 'spacing.sm', value: '8', type: 'dimension', token_set_id: primitiveSetId,
+        },
+        {
+          name: 'color.bg', value: '{color.brand}', type: 'color', token_set_id: semanticSetId,
+        },
       ], changeSetId);
       expect(result.data).toBeDefined();
       expect(result.data.created_count).toBe(3);
@@ -312,9 +318,15 @@ describe('Tokens Studio REST API Integration', () => {
       if (skipIntegration) return;
 
       const result = await batchCreateTokensRest(authToken, API_BASE_URL, projectId, [
-        { name: 'color.primary', value: '#0D99FF', type: 'color', token_set_id: styleSetId, description: 'Imported from Figma color style' },
-        { name: 'typography.heading', value: { fontFamily: 'Inter', fontWeight: '700', fontSize: '32' }, type: 'typography', token_set_id: styleSetId, description: 'Imported from Figma text style' },
-        { name: 'spacing.md', value: '16', type: 'dimension', token_set_id: styleSetId },
+        {
+          name: 'color.primary', value: '#0D99FF', type: 'color', token_set_id: styleSetId, description: 'Imported from Figma color style',
+        },
+        {
+          name: 'typography.heading', value: { fontFamily: 'Inter', fontWeight: '700', fontSize: '32' }, type: 'typography', token_set_id: styleSetId, description: 'Imported from Figma text style',
+        },
+        {
+          name: 'spacing.md', value: '16', type: 'dimension', token_set_id: styleSetId,
+        },
       ], changeSetId);
       expect(result.data).toBeDefined();
       expect(result.data.created_count).toBe(3);
@@ -326,7 +338,9 @@ describe('Tokens Studio REST API Integration', () => {
 
       // Simulates createMultipleTokens reusing an existing set ID rather than re-creating it.
       const result = await batchCreateTokensRest(authToken, API_BASE_URL, projectId, [
-        { name: 'color.secondary', value: '#FF6250', type: 'color', token_set_id: styleSetId },
+        {
+          name: 'color.secondary', value: '#FF6250', type: 'color', token_set_id: styleSetId,
+        },
       ], changeSetId);
       expect(result.data).toBeDefined();
       expect(result.data.created_count).toBe(1);

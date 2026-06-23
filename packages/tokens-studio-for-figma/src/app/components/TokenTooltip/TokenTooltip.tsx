@@ -13,7 +13,8 @@ export const TokenTooltip: React.FC<React.PropsWithChildren<React.PropsWithChild
   children,
   token,
 }) => {
-  // When we open the token edit form we don't want tooltips to show through, which is happening sometimes
+  // When we open the token edit form, pass an empty but truthy label to keep tooltip mounted
+  // This prevents the remount issue where pointerenter doesn't fire after edit form closes
   const showEditForm = useSelector(showEditFormSelector);
 
   if (!children || !React.isValidElement(children)) {
@@ -23,11 +24,7 @@ export const TokenTooltip: React.FC<React.PropsWithChildren<React.PropsWithChild
   return (
     <Tooltip
       side="bottom"
-      label={showEditForm ? '' : (
-        <TokenTooltipContent
-          token={token}
-        />
-      )}
+      label={showEditForm ? <div /> : <TokenTooltipContent token={token} />}
     >
       {children}
     </Tooltip>

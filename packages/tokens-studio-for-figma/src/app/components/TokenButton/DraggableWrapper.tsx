@@ -35,6 +35,16 @@ export const DraggableWrapper: React.FC<React.PropsWithChildren<React.PropsWithC
   const handleDragEnd = React.useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.stopPropagation();
     setDragOverToken(null);
+    // Restore pointer state: after drag ends, manually restore hover for the tooltip system
+    // The browser doesn't re-fire pointerenter after drag, so we trigger a synthetic pointerenter
+    const target = e.currentTarget;
+    if (target) {
+      const enterEvent = new PointerEvent('pointerenter', {
+        bubbles: true,
+        cancelable: true,
+      });
+      target.dispatchEvent(enterEvent);
+    }
   }, [setDragOverToken]);
 
   const handleDragOver = React.useCallback((e: React.DragEvent<HTMLDivElement>) => {

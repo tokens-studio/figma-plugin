@@ -62,7 +62,7 @@ export const startup = async () => {
   root.render(
     <Sentry.ErrorBoundary fallback={ErrorFallback}>
       <Provider store={store}>
-        <Tooltip.Provider>
+        <Tooltip.Provider skipDelayDuration={0}>
           <StartupApp />
         </Tooltip.Provider>
       </Provider>
