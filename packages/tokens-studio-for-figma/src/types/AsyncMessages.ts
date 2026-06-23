@@ -384,7 +384,7 @@ export type RemoveVariablesAsyncMessage = AsyncMessage<AsyncMessageTypes.REMOVE_
   variableKeys: string[];
 }>;
 export type RemoveVariablesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.REMOVE_VARIABLES, {
-  variableIds: string[];
+  variableKeys: string[];
 }>;
 
 export type UpdateVariablesAsyncMessage = AsyncMessage<AsyncMessageTypes.UPDATE_VARIABLES, {

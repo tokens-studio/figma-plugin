@@ -1,7 +1,7 @@
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
-import { SettingsState } from '@/app/store/models/settings';
+import type { SettingsState } from '@/app/store/models/settings';
 import { DeleteTokenPayload } from '@/types/payloads';
 import { convertTokenNameToPath } from '@/utils/convertTokenNameToPath';
 import { isMatchingStyle } from '@/utils/is/isMatchingStyle';
