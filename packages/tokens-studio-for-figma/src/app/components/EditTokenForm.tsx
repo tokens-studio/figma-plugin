@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import {
-  Button, Heading, Textarea, Label, Stack,
+  Button, Heading, Textarea, Label, Stack, Checkbox,
 } from '@tokens-studio/ui';
 import { track } from '@/utils/analytics';
 import { Dispatch } from '../store';
@@ -19,6 +19,7 @@ import {
   SingleDimensionToken,
   SingleToken,
   SingleTypographyToken,
+  DeprecatedProperty,
 } from '@/types/tokens';
 import { checkIfAlias, checkIfContainsAlias, getAliasValue } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
@@ -44,6 +45,7 @@ import { MultiSelectDropdown } from './MultiSelectDropdown';
 import { tokenTypesToCreateVariable } from '@/constants/VariableTypes';
 import { ModalOptions } from '@/constants/ModalOptions';
 import FigmaVariableForm from './FigmaVariableForm';
+import DeprecatedBadge from './DeprecatedBadge';
 
 let lastUsedRenameOption: UpdateMode = UpdateMode.SELECTION;
 let lastUsedRenameStyles = false;
@@ -414,6 +416,71 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken],
   );
 
+  const handleDeprecatedToggle = React.useCallback(
+    (isDeprecated: boolean) => {
+      if (internalEditToken) {
+        if (isDeprecated) {
+          setInternalEditToken({
+            ...internalEditToken,
+            $deprecated: {
+              severity: 'warning',
+              message: '',
+            },
+          });
+        } else {
+          setInternalEditToken({
+            ...internalEditToken,
+            $deprecated: undefined,
+          });
+        }
+      }
+    },
+    [internalEditToken],
+  );
+
+  const handleDeprecatedChange = React.useCallback(
+    (property: keyof DeprecatedProperty, value: string) => {
+      if (internalEditToken?.$deprecated) {
+        setInternalEditToken({
+          ...internalEditToken,
+          $deprecated: {
+            ...internalEditToken.$deprecated,
+            [property]: value,
+          },
+        });
+      }
+    },
+    [internalEditToken],
+  );
+
+  const handleDeprecatedSeverityChange = React.useCallback(
+    (value: string) => {
+      handleDeprecatedChange('severity', value);
+    },
+    [handleDeprecatedChange],
+  );
+
+  const handleDeprecatedSeveritySelectChange = React.useCallback<React.ChangeEventHandler<HTMLSelectElement>>(
+    (e) => {
+      handleDeprecatedSeverityChange(e.target.value);
+    },
+    [handleDeprecatedSeverityChange],
+  );
+
+  const handleDeprecatedMessageChange = React.useCallback(
+    (value: string) => {
+      handleDeprecatedChange('message', value);
+    },
+    [handleDeprecatedChange],
+  );
+
+  const handleDeprecatedCheckboxChange = React.useCallback(
+    (checked: boolean | string) => {
+      handleDeprecatedToggle(checked === true);
+    },
+    [handleDeprecatedToggle],
+  );
+
   const resolvedValue = React.useMemo(() => {
     if (internalEditToken) {
       return typeof internalEditToken?.value === 'string'
@@ -425,7 +492,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
 
   // @TODO update to useCallback
   const submitTokenValue = async ({
-    type, value, name, $extensions,
+    type, value, name, $extensions, $deprecated,
   }: EditTokenObject) => {
     if (internalEditToken && value && name) {
       let oldName: string | undefined;
@@ -446,6 +513,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
           type,
           value: trimmedValue as SingleToken['value'],
           ...($extensions ? { $extensions } : {}),
+          ...($deprecated ? { $deprecated } : {}),
         });
       } else if (internalEditToken.status === EditTokenFormStatus.EDIT) {
         editSingleToken({
@@ -456,6 +524,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
           type,
           value: trimmedValue as SingleToken['value'],
           ...($extensions ? { $extensions } : {}),
+          ...($deprecated ? { $deprecated } : {}),
         });
         if (themes.length > 0 && tokenTypesToCreateVariable.includes(internalEditToken.type)) {
           updateVariablesFromToken({
@@ -555,6 +624,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
           value: trimmedValue as SingleToken['value'],
           tokenSets: selectedTokenSets,
           ...($extensions ? { $extensions } : {}),
+          ...($deprecated ? { $deprecated } : {}),
         });
       }
     }
@@ -747,6 +817,52 @@ function EditTokenForm({ resolvedTokens }: Props) {
             rows={3}
             css={{ fontSize: '$xsmall', padding: '$3' }}
           />
+        </Box>
+        <Box>
+          <Stack direction="column" gap={2}>
+            <Stack direction="row" align="center" gap={2}>
+              <Checkbox
+                checked={!!internalEditToken?.$deprecated}
+                onCheckedChange={handleDeprecatedCheckboxChange}
+              />
+              <Heading size="small">Mark as deprecated</Heading>
+              {internalEditToken?.$deprecated && (
+                <DeprecatedBadge deprecated={internalEditToken.$deprecated} />
+              )}
+            </Stack>
+            {internalEditToken?.$deprecated && (
+              <Stack direction="column" gap={2}>
+                <Box>
+                  <Label htmlFor="deprecated-severity">Severity</Label>
+                  <select
+                    id="deprecated-severity"
+                    value={internalEditToken.$deprecated.severity}
+                    onChange={handleDeprecatedSeveritySelectChange}
+                    style={{
+                      width: '100%',
+                      padding: '8px',
+                      borderRadius: '4px',
+                      border: '1px solid var(--border-default)',
+                      fontSize: '12px',
+                    }}
+                  >
+                    <option value="warning">Warning</option>
+                    <option value="error">Error</option>
+                  </select>
+                </Box>
+                <Box>
+                  <Heading size="small">Message</Heading>
+                  <Textarea
+                    value={internalEditToken.$deprecated.message}
+                    placeholder="Why is this token deprecated? What should be used instead?"
+                    onChange={handleDeprecatedMessageChange}
+                    rows={2}
+                    css={{ fontSize: '$xsmall', padding: '$3' }}
+                  />
+                </Box>
+              </Stack>
+            )}
+          </Stack>
         </Box>
         <FigmaVariableForm
           internalEditToken={internalEditToken}

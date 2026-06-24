@@ -29,6 +29,7 @@ export default function convertTokensToObject(tokens: Record<string, AnyTokenLis
         if (tokenWithoutTypeLevel.description) {
           setTokenKey(tokenWithoutTypeLevel, FormatSensitiveTokenKeys.DESCRIPTION);
         }
+        // $deprecated is already in the correct format, preserve as-is
         set(tokenGroupObj, name, tokenWithoutTypeLevel, { merge: true });
       } else {
         // For tokens without inheritTypeLevel, directly add type, value, and description to preserve order
@@ -38,6 +39,7 @@ export default function convertTokensToObject(tokens: Record<string, AnyTokenLis
         if (tokenWithoutName.description) {
           setTokenKey(tokenWithoutName, FormatSensitiveTokenKeys.DESCRIPTION);
         }
+        // $deprecated is already in the correct format, preserve as-is
         set(tokenGroupObj, name, tokenWithoutName, { merge: true });
       }
     });

@@ -1,6 +1,11 @@
 import { TokenTypes } from '@/constants/TokenTypes';
 import { ColorModifier } from '../Modifier';
 
+export type DeprecatedProperty = {
+  severity: 'warning' | 'error';
+  message: string;
+};
+
 export type SingleGenericToken<T extends TokenTypes, V = string, Named extends boolean = true, P = unknown> = {
   type: T;
   value: V;
@@ -11,6 +16,7 @@ export type SingleGenericToken<T extends TokenTypes, V = string, Named extends b
   oldValue?: V;
   internal__Parent?: string;
   inheritTypeLevel?: number;
+  $deprecated?: DeprecatedProperty;
   $extensions?: {
     [key: string]: any;
     'studio.tokens'?: {
