@@ -79,6 +79,7 @@ export interface UIState {
   showPushDialog: { state: string | false, overrides?: PushOverrides };
   showPullDialog: string | false;
   showEmptyGroups: boolean;
+  hideDeprecatedTokens: boolean;
   collapsed: boolean;
   selectedLayers: number;
   manageThemesModalOpen: boolean;
@@ -146,6 +147,7 @@ export const uiState = createModel<RootModel>()({
     showPushDialog: { state: false },
     showPullDialog: false,
     showEmptyGroups: true,
+    hideDeprecatedTokens: false,
     collapsed: false,
     selectedLayers: 0,
     manageThemesModalOpen: false,
@@ -351,6 +353,12 @@ export const uiState = createModel<RootModel>()({
         showEmptyGroups: payload == null ? !state.showEmptyGroups : payload,
       };
     },
+    toggleHideDeprecatedTokens(state, payload: boolean | null) {
+      return {
+        ...state,
+        hideDeprecatedTokens: payload == null ? !state.hideDeprecatedTokens : payload,
+      };
+    },
     toggleCollapsed(state) {
       return {
         ...state,
@@ -478,6 +486,12 @@ export const uiState = createModel<RootModel>()({
       AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.SET_SHOW_EMPTY_GROUPS,
         showEmptyGroups: payload == null ? rootState.uiState.showEmptyGroups : payload,
+      });
+    },
+    toggleHideDeprecatedTokens(payload: null | boolean, rootState) {
+      AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.SET_HIDE_DEPRECATED_TOKENS,
+        hideDeprecatedTokens: payload == null ? rootState.uiState.hideDeprecatedTokens : payload,
       });
     },
     setSelectedExportThemes: (payload: string[]) => {

@@ -15,6 +15,7 @@ export async function updateUISettings(uiSettings: Partial<SavedSettings>) {
       language: uiSettings.language ?? data?.language,
       height: uiSettings.height ?? data?.height,
       showEmptyGroups: uiSettings.showEmptyGroups ?? data?.showEmptyGroups,
+      hideDeprecatedTokens: uiSettings.hideDeprecatedTokens ?? data?.hideDeprecatedTokens,
       updateMode: uiSettings.updateMode ?? data?.updateMode,
       updateRemote: uiSettings.updateRemote ?? data?.updateRemote,
       updateOnChange: uiSettings.updateOnChange ?? data?.updateOnChange,
@@ -57,6 +58,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
     let width: number;
     let height: number;
     let showEmptyGroups: boolean;
+    let hideDeprecatedTokens: boolean;
     let updateMode: UpdateMode;
     let updateRemote: boolean;
     let updateOnChange: boolean;
@@ -93,6 +95,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
       height = data.height || 600;
       language = data.language || 'en';
       showEmptyGroups = typeof data.showEmptyGroups === 'undefined' ? true : data.showEmptyGroups;
+      hideDeprecatedTokens = typeof data.hideDeprecatedTokens === 'undefined' ? false : data.hideDeprecatedTokens;
       updateMode = data.updateMode || UpdateMode.PAGE;
       updateRemote = typeof data.updateRemote === 'undefined' ? true : data.updateRemote;
       updateOnChange = typeof data.updateOnChange === 'undefined' ? true : data.updateOnChange;
@@ -128,6 +131,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
         height: Math.max(200, height),
         sessionRecording,
         showEmptyGroups,
+        hideDeprecatedTokens,
         updateMode,
         updateOnChange,
         applyVariablesStylesOrRawValue,

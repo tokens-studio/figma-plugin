@@ -51,6 +51,7 @@ export enum AsyncMessageTypes {
   CANCEL_OPERATION = 'async/cancel-operation',
   RESIZE_WINDOW = 'async/resize-window',
   SET_SHOW_EMPTY_GROUPS = 'async/set-show-empty-groups',
+  SET_HIDE_DEPRECATED_TOKENS = 'async/set-hide-deprecated-tokens',
   SET_UI = 'async/set-ui',
   CREATE_ANNOTATION = 'async/create-annotation',
   UPDATE = 'async/update',
@@ -180,6 +181,9 @@ export type CancelOperationAsyncMessageResult = AsyncMessage<AsyncMessageTypes.C
 
 export type SetShowEmptyGroupsAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_SHOW_EMPTY_GROUPS, { showEmptyGroups: boolean; }>;
 export type SetShowEmptyGroupsAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_SHOW_EMPTY_GROUPS>;
+
+export type SetHideDeprecatedTokensAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_HIDE_DEPRECATED_TOKENS, { hideDeprecatedTokens: boolean; }>;
+export type SetHideDeprecatedTokensAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_HIDE_DEPRECATED_TOKENS>;
 
 export type SetUiAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_UI, SettingsState>;
 export type SetUiAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_UI>;
@@ -429,6 +433,7 @@ export type AsyncMessages =
   | ResizeWindowAsyncMessage
   | CancelOperationAsyncMessage
   | SetShowEmptyGroupsAsyncMessage
+  | SetHideDeprecatedTokensAsyncMessage
   | SetUiAsyncMessage
   | CreateAnnotationAsyncMessage
   | CreateLivingDocumentationAsyncMessage
@@ -483,6 +488,7 @@ export type AsyncMessageResults =
   | ResizeWindowAsyncMessageResult
   | CancelOperationAsyncMessage
   | SetShowEmptyGroupsAsyncMessageResult
+  | SetHideDeprecatedTokensAsyncMessageResult
   | SetUiAsyncMessageResult
   | CreateAnnotationAsyncMessageResult
   | CreateLivingDocumentationAsyncMessageResult

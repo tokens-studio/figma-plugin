@@ -30,6 +30,7 @@ export * from './inspectStateSelector';
 export * from './inspectDeepSelector';
 export * from './backgroundJobsSelector';
 export * from './showEmptyGroupsSelector';
+export * from './hideDeprecatedTokensSelector';
 export * from './updateModeSelector';
 export * from './displayTypeSelector';
 export * from './collapsedSelector';
