@@ -481,6 +481,34 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [handleDeprecatedToggle],
   );
 
+  const handleDeprecatedReplacementTokenChange = React.useCallback(
+    (value: string) => {
+      handleDeprecatedChange('replacementToken', value);
+    },
+    [handleDeprecatedChange],
+  );
+
+  const handleDeprecatedRemoveAfterChange = React.useCallback(
+    (value: string) => {
+      handleDeprecatedChange('removeAfter', value);
+    },
+    [handleDeprecatedChange],
+  );
+
+  const handleReplacementTokenInputChange = React.useCallback(
+    (value: string) => {
+      handleDeprecatedReplacementTokenChange(value);
+    },
+    [handleDeprecatedReplacementTokenChange],
+  );
+
+  const handleRemoveAfterInputChange = React.useCallback(
+    (value: string) => {
+      handleDeprecatedRemoveAfterChange(value);
+    },
+    [handleDeprecatedRemoveAfterChange],
+  );
+
   const resolvedValue = React.useMemo(() => {
     if (internalEditToken) {
       return typeof internalEditToken?.value === 'string'
@@ -847,16 +875,38 @@ function EditTokenForm({ resolvedTokens }: Props) {
                     }}
                   >
                     <option value="warning">Warning</option>
-                    <option value="error">Error</option>
+                    <option value="error">Error (blocks build)</option>
                   </select>
                 </Box>
                 <Box>
-                  <Heading size="small">Message</Heading>
+                  <Heading size="small">Deprecation Message</Heading>
                   <Textarea
                     value={internalEditToken.$deprecated.message}
                     placeholder="Why is this token deprecated? What should be used instead?"
                     onChange={handleDeprecatedMessageChange}
                     rows={2}
+                    css={{ fontSize: '$xsmall', padding: '$3' }}
+                  />
+                </Box>
+                <Box>
+                  <Label htmlFor="replacement-token">Replacement Token</Label>
+                  <Textarea
+                    id="replacement-token"
+                    value={internalEditToken.$deprecated.replacementToken ?? ''}
+                    placeholder="{color.brand.primary}"
+                    onChange={handleReplacementTokenInputChange}
+                    rows={1}
+                    css={{ fontSize: '$xsmall', padding: '$3' }}
+                  />
+                </Box>
+                <Box>
+                  <Label htmlFor="remove-after">Remove After</Label>
+                  <Textarea
+                    id="remove-after"
+                    value={internalEditToken.$deprecated.removeAfter ?? ''}
+                    placeholder="v3.0 or 2026-06-01"
+                    onChange={handleRemoveAfterInputChange}
+                    rows={1}
                     css={{ fontSize: '$xsmall', padding: '$3' }}
                   />
                 </Box>

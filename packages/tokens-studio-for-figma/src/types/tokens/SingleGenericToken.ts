@@ -4,6 +4,8 @@ import { ColorModifier } from '../Modifier';
 export type DeprecatedProperty = {
   severity: 'warning' | 'error';
   message: string;
+  replacementToken?: string;
+  removeAfter?: string;
 };
 
 export type SingleGenericToken<T extends TokenTypes, V = string, Named extends boolean = true, P = unknown> = {
