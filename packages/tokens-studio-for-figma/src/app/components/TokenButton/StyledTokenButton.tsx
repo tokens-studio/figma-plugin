@@ -66,6 +66,11 @@ export const StyledTokenButton = styled('button', {
         borderColor: '$borderDefault',
       },
     },
+    deprecated: {
+      true: {
+        border: '1px dashed $borderMuted',
+      },
+    },
   },
   compoundVariants: [
     {
