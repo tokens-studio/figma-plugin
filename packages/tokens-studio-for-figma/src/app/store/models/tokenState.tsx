@@ -852,6 +852,7 @@ export const tokenState = createModel<RootModel>()({
               type: token.type,
               description: token.description,
               token_set_id: (rootState.tokenState.tokenSetMetadata[payload.parent] as any)?.id,
+              ...(token.$deprecated && { $deprecated: token.$deprecated }),
             },
           });
         }

@@ -115,6 +115,12 @@ export async function batchCreateTokensRest(
     type: string;
     token_set_id: string;
     description?: string;
+    $deprecated?: {
+      severity: 'warning' | 'error';
+      message: string;
+      replacementToken?: string;
+      removeAfter?: string;
+    };
   }>,
   changeSetId: string,
 ) {
@@ -137,6 +143,12 @@ export async function createTokenRest(
     type: string;
     token_set_id: string;
     description?: string;
+    $deprecated?: {
+      severity: 'warning' | 'error';
+      message: string;
+      replacementToken?: string;
+      removeAfter?: string;
+    };
   },
   branch?: string,
   changeSetId?: string,
@@ -150,6 +162,7 @@ export async function createTokenRest(
         type: data.type,
         token_set_id: data.token_set_id,
         description: data.description,
+        ...(data.$deprecated && { $deprecated: data.$deprecated }),
       },
     },
     query: changeSetId ? { change_set_id: changeSetId } : undefined,
@@ -167,6 +180,12 @@ export async function updateTokenRest(
     type?: string;
     description?: string;
     token_set_id?: string;
+    $deprecated?: {
+      severity: 'warning' | 'error';
+      message: string;
+      replacementToken?: string;
+      removeAfter?: string;
+    } | null;
   },
   branch?: string,
   changeSetId?: string,
@@ -180,6 +199,7 @@ export async function updateTokenRest(
         type: data.type,
         description: data.description,
         token_set_id: data.token_set_id,
+        ...(data.$deprecated !== undefined && { $deprecated: data.$deprecated }),
       },
     },
     query: changeSetId ? { change_set_id: changeSetId } : undefined,
