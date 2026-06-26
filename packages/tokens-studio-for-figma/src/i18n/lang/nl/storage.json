@@ -69,7 +69,8 @@
       "projectName": "Projectnaam (optioneel)",
       "repository": "Repository (werkruimte/repository)",
       "username": "Gebruiker e-mail",
-      "usernameAppPassword": "Gebruikersnaam"
+      "usernameAppPassword": "Gebruikersnaam",
+      "appPassword": "App-wachtwoord"
     },
     "tokensstudio": {
       "name": "Name",
@@ -79,6 +80,26 @@
       "id": "Verbindings-ID",
       "selectOrgLabel": "Kies organisatie",
       "selectProjectLabel": "Kies Project"
+    },
+    "bitbucketMigration": {
+      "title": "Bitbucket-app-wachtwoordmigratie vereist",
+      "description": "Bitbucket-appwachtwoorden worden door Atlassian beëindigd en zullen niet meer worden gebruikt. U heeft {{count}} Bitbucket-synchronisatie(s) met app-wachtwoorden die moeten worden gemigreerd naar API-tokens.",
+      "affectedSyncs": "Betrokken synchronisaties:",
+      "instructions": "API-tokens bieden betere beveiliging en blijven werken nadat app-wachtwoorden zijn stopgezet. U kunt uw bestaande synchronisaties migreren of nieuwe maken met API-tokens.",
+      "migrationInProgress": "Migreren van app-wachtwoord naar API-token. Voer uw nieuwe API-token in.",
+      "learnMore": "Lees hier de migratiegids →",
+      "remindLater": "Herinner me er later aan",
+      "migrate": "Migreer naar API-tokens",
+      "appPasswordDeprecated": "Atlassian heeft app-wachtwoorden beëindigd, migreer naar API-tokens.",
+      "apiTokenRequired": "API-tokens zijn vereist voor nieuwe Bitbucket-synchronisaties.",
+      "migrationNeeded": "Bitbucket-migratie vereist",
+      "helperDescription": "U heeft {{count}} Bitbucket-synchronisatie(s) met verouderde app-wachtwoorden. Migreer ze naar API-tokens om voortdurende toegang te garanderen.",
+      "syncsToMigrate": "Synchronisaties om te migreren:",
+      "appPasswordWarning": "Migratie van app-wachtwoorden vereist",
+      "clickToMigrate": "Klik om te migreren",
+      "calloutDescription": "App-wachtwoorden worden beëindigd door Atlassian. Migreer naar API-tokens voor betere beveiliging en voortdurende toegang.",
+      "switchToMigrationMode": "Migreren",
+      "migrationGuide": "Lees de migratiegids →"
     }
   },
   "selectALayerToSeeAppliedTokens": "Selecteer een laag om de toegepaste tokens te zien",

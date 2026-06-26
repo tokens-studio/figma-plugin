@@ -69,7 +69,8 @@
       "projectName": "Nombre del proyecto (opcional)",
       "repository": "Repositorio (espacio de trabajo/repositorio)",
       "username": "Email del usuario",
-      "usernameAppPassword": "Nombre de usuario"
+      "usernameAppPassword": "Nombre de usuario",
+      "appPassword": "Contraseña de la aplicación"
     },
     "tokensstudio": {
       "name": "Name",
@@ -79,6 +80,26 @@
       "id": "ID de conexión",
       "selectOrgLabel": "Elija la organización",
       "selectProjectLabel": "Elija Proyecto"
+    },
+    "bitbucketMigration": {
+      "title": "Se requiere migración de contraseña de la aplicación Bitbucket",
+      "description": "Atlassian está desaprobando las contraseñas de aplicaciones de Bitbucket y se suspenderán. Tiene sincronizaciones de {{count}} Bitbucket utilizando contraseñas de aplicaciones que deben migrarse a tokens API.",
+      "affectedSyncs": "Sincronizaciones afectadas:",
+      "instructions": "Los tokens API brindan mayor seguridad y continuarán funcionando después de que se suspendan las contraseñas de aplicaciones. Puede migrar sus sincronizaciones existentes o crear otras nuevas con tokens API.",
+      "migrationInProgress": "Migración de la contraseña de la aplicación al token API. Ingrese su nuevo token API.",
+      "learnMore": "Lea la guía de migración aquí →",
+      "remindLater": "Recuérdamelo más tarde",
+      "migrate": "Migrar a tokens API",
+      "appPasswordDeprecated": "Atlassian desaprobó las contraseñas de aplicaciones, migre a tokens de API.",
+      "apiTokenRequired": "Se requieren tokens API para nuevas sincronizaciones de Bitbucket.",
+      "migrationNeeded": "Se necesita migración de Bitbucket",
+      "helperDescription": "Tienes sincronizaciones de {{count}} Bitbucket usando contraseñas de aplicaciones obsoletas. Migrelos a tokens API para garantizar el acceso continuo.",
+      "syncsToMigrate": "Sincronizaciones para migrar:",
+      "appPasswordWarning": "Se requiere migración de contraseña de la aplicación",
+      "clickToMigrate": "Haga clic para migrar",
+      "calloutDescription": "Atlassian está desaprobando las contraseñas de aplicaciones. Migre a tokens API para obtener mayor seguridad y acceso continuo.",
+      "switchToMigrationMode": "Emigrar",
+      "migrationGuide": "Lea la guía de migración →"
     }
   },
   "selectALayerToSeeAppliedTokens": "Seleccione una capa para ver los tokens aplicados",

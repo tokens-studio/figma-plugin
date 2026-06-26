@@ -69,7 +69,8 @@
       "projectName": "Nom du projet (facultatif)",
       "repository": "Dépôt (espace de travail/dépôt)",
       "username": "Email utilisateur",
-      "usernameAppPassword": "Nom d'utilisateur"
+      "usernameAppPassword": "Nom d'utilisateur",
+      "appPassword": "Mot de passe de l'application"
     },
     "tokensstudio": {
       "name": "Name",
@@ -79,6 +80,26 @@
       "id": "ID de connexion",
       "selectOrgLabel": "Choisir l'organisation",
       "selectProjectLabel": "Choisir le projet"
+    },
+    "bitbucketMigration": {
+      "title": "Migration du mot de passe de l'application Bitbucket requise",
+      "description": "Les mots de passe de l'application Bitbucket sont obsolètes par Atlassian et seront abandonnés. Vous disposez de {{count}} synchronisation(s) Bitbucket utilisant des mots de passe d'application qui doivent être migrés vers des jetons API.",
+      "affectedSyncs": "Synchronisations concernées :",
+      "instructions": "Les jetons API offrent une meilleure sécurité et continueront à fonctionner après l'arrêt des mots de passe d'application. Vous pouvez migrer vos synchronisations existantes ou en créer de nouvelles avec des jetons API.",
+      "migrationInProgress": "Migration du mot de passe de l'application vers le jeton API. Veuillez saisir votre nouveau jeton API.",
+      "learnMore": "Lire le guide de migration ici →",
+      "remindLater": "Rappelle-moi plus tard",
+      "migrate": "Migrer vers les jetons API",
+      "appPasswordDeprecated": "Mots de passe d'application obsolètes Atlassian, migrez vers les jetons API.",
+      "apiTokenRequired": "Les jetons API sont requis pour les nouvelles synchronisations Bitbucket.",
+      "migrationNeeded": "Migration Bitbucket nécessaire",
+      "helperDescription": "Vous disposez de {{count}} synchronisation(s) Bitbucket utilisant des mots de passe d'application obsolètes. Migrez-les vers des jetons API pour garantir un accès continu.",
+      "syncsToMigrate": "Synchronisations à migrer :",
+      "appPasswordWarning": "Migration du mot de passe de l'application requise",
+      "clickToMigrate": "Cliquez pour migrer",
+      "calloutDescription": "Les mots de passe d'application sont obsolètes par Atlassian. Migrez vers les jetons API pour une meilleure sécurité et un accès continu.",
+      "switchToMigrationMode": "Émigrer",
+      "migrationGuide": "Lire le guide de migration →"
     }
   },
   "selectALayerToSeeAppliedTokens": "Sélectionnez un calque pour voir les jetons appliqués",
