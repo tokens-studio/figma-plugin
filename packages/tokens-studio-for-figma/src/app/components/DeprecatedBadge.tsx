@@ -12,7 +12,7 @@ export default function DeprecatedBadge({ deprecated }: Props) {
 
   const isError = deprecated.severity === 'error';
   const bgColor = isError ? '$bgDanger' : '$bgWarning';
-  const textColor = isError ? '#D32F2F' : '#F57F17';
+  const textColor = '$fgDefault';
 
   return (
     <Tooltip label={deprecated.message || 'This token is deprecated'} side="top">

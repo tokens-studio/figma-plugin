@@ -167,9 +167,9 @@ export default function SettingsDropdown() {
             <DropdownMenu.ItemIndicator>
               <Check />
             </DropdownMenu.ItemIndicator>
-            Hide deprecated tokens
+            {t('hideDeprecatedTokens')}
             <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>
-              Hides tokens marked as deprecated from the token list
+              {t('hideDeprecatedTokensDescription')}
             </Box>
           </DropdownMenu.CheckboxItem>
         </DropdownMenu.Content>

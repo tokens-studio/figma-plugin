@@ -68,7 +68,7 @@ export const StyledTokenButton = styled('button', {
     },
     deprecated: {
       true: {
-        border: '2px dashed #FFA500',
+        border: '2px dashed $dangerBorder',
       },
     },
   },

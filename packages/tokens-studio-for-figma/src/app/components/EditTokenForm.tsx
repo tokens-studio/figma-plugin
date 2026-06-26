@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import {
-  Button, Heading, Textarea, Label, Stack, Checkbox,
+  Button, Heading, Textarea, Label, Stack, Checkbox, Select,
 } from '@tokens-studio/ui';
 import { track } from '@/utils/analytics';
 import { Dispatch } from '../store';
@@ -861,37 +861,33 @@ function EditTokenForm({ resolvedTokens }: Props) {
             {internalEditToken?.$deprecated && (
               <Stack direction="column" gap={2}>
                 <Box>
-                  <Label htmlFor="deprecated-severity">Severity</Label>
-                  <select
-                    id="deprecated-severity"
+                  <Label>{t('deprecatedSeverity')}</Label>
+                  <Select
                     value={internalEditToken.$deprecated.severity}
-                    onChange={handleDeprecatedSeveritySelectChange}
-                    style={{
-                      width: '100%',
-                      padding: '8px',
-                      borderRadius: '4px',
-                      border: '1px solid var(--border-default)',
-                      fontSize: '12px',
-                    }}
+                    onValueChange={(value) => handleDeprecatedSeveritySelectChange({
+                      target: { value },
+                    } as any)}
                   >
-                    <option value="warning">Warning</option>
-                    <option value="error">Error (blocks build)</option>
-                  </select>
+                    <Select.Trigger data-testid="deprecated-severity" />
+                    <Select.Content>
+                      <Select.Item value="warning">{t('deprecatedSeverityWarning')}</Select.Item>
+                      <Select.Item value="error">{t('deprecatedSeverityError')}</Select.Item>
+                    </Select.Content>
+                  </Select>
                 </Box>
                 <Box>
-                  <Heading size="small">Deprecation Message</Heading>
+                  <Heading size="small">{t('deprecatedMessage')}</Heading>
                   <Textarea
                     value={internalEditToken.$deprecated.message}
-                    placeholder="Why is this token deprecated? What should be used instead?"
+                    placeholder={t('deprecatedMessagePlaceholder')}
                     onChange={handleDeprecatedMessageChange}
                     rows={2}
                     css={{ fontSize: '$xsmall', padding: '$3' }}
                   />
                 </Box>
                 <Box>
-                  <Label htmlFor="replacement-token">Replacement Token</Label>
+                  <Label>{t('deprecatedReplacementToken')}</Label>
                   <Textarea
-                    id="replacement-token"
                     value={internalEditToken.$deprecated.replacementToken ?? ''}
                     placeholder="{color.brand.primary}"
                     onChange={handleReplacementTokenInputChange}
@@ -900,9 +896,8 @@ function EditTokenForm({ resolvedTokens }: Props) {
                   />
                 </Box>
                 <Box>
-                  <Label htmlFor="remove-after">Remove After</Label>
+                  <Label>{t('deprecatedRemoveAfter')}</Label>
                   <Textarea
-                    id="remove-after"
                     value={internalEditToken.$deprecated.removeAfter ?? ''}
                     placeholder="v3.0 or 2026-06-01"
                     onChange={handleRemoveAfterInputChange}
