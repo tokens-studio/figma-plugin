@@ -460,9 +460,9 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [handleDeprecatedChange],
   );
 
-  const handleDeprecatedSeveritySelectChange = React.useCallback<React.ChangeEventHandler<HTMLSelectElement>>(
-    (e) => {
-      handleDeprecatedSeverityChange(e.target.value);
+  const handleDeprecatedSeveritySelectValueChange = React.useCallback(
+    (value: string) => {
+      handleDeprecatedSeverityChange(value);
     },
     [handleDeprecatedSeverityChange],
   );
@@ -864,9 +864,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
                   <Label>{t('deprecatedSeverity')}</Label>
                   <Select
                     value={internalEditToken.$deprecated.severity}
-                    onValueChange={(value) => handleDeprecatedSeveritySelectChange({
-                      target: { value },
-                    } as any)}
+                    onValueChange={handleDeprecatedSeveritySelectValueChange}
                   >
                     <Select.Trigger data-testid="deprecated-severity" />
                     <Select.Content>
