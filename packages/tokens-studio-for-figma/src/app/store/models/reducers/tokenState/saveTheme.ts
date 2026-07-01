@@ -56,14 +56,14 @@ export function saveTheme(state: TokenState, data: Payload): TokenState {
     // Preserve extended collection metadata
     // $figmaIsExtension is derived from $figmaParentThemeId — a theme with a parent ID is always an extension,
     // even if the flag was absent (e.g. themes created before the flag was introduced)
-    ...(data.$figmaParentThemeId ? { $figmaIsExtension: true } : data.$figmaIsExtension !== undefined ? { $figmaIsExtension: data.$figmaIsExtension } : {}),
+    $figmaIsExtension: data.$figmaParentThemeId ? true : data.$figmaIsExtension,
     ...(data.$figmaParentCollectionId ? { $figmaParentCollectionId: data.$figmaParentCollectionId } : {}),
     ...(data.$figmaParentThemeId ? { $figmaParentThemeId: data.$figmaParentThemeId } : {}),
     ...(data.$figmaMirrorParentSets !== undefined ? { $figmaMirrorParentSets: data.$figmaMirrorParentSets } : {}),
     // Preserve other Figma metadata
-    ...(data.$figmaCollectionId ? { $figmaCollectionId: data.$figmaCollectionId } : {}),
-    ...(data.$figmaModeId ? { $figmaModeId: data.$figmaModeId } : {}),
-    ...(data.$figmaVariableReferences ? { $figmaVariableReferences: data.$figmaVariableReferences } : {}),
+    $figmaCollectionId: data.$figmaCollectionId ?? state.themes[themeObjectIndex]?.$figmaCollectionId,
+    $figmaModeId: data.$figmaModeId ?? state.themes[themeObjectIndex]?.$figmaModeId,
+    $figmaVariableReferences: data.$figmaVariableReferences ?? state.themes[themeObjectIndex]?.$figmaVariableReferences ?? {},
   });
 
   let finalThemes = updatedThemes;
