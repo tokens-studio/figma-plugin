@@ -26,6 +26,7 @@ import {
   stylesTypographySelector,
   exportExtendedCollectionsSelector,
   stylesGradientSelector,
+  isFigmaEnterpriseSelector,
 } from '@/selectors';
 import ignoreFirstPartImage from '@/app/assets/hints/ignoreFirstPartForStyles.png';
 import prefixStylesImage from '@/app/assets/hints/prefixStyles.png';
@@ -55,6 +56,7 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
   const stylesEffect = useSelector(stylesEffectSelector);
   const exportExtendedCollections = useSelector(exportExtendedCollectionsSelector);
   const stylesGradient = useSelector(stylesGradientSelector);
+  const isFigmaEnterprise = useSelector(isFigmaEnterpriseSelector);
 
   const dispatch = useDispatch<Dispatch>();
 
@@ -284,8 +286,11 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
                 checked={!!exportExtendedCollections}
                 defaultChecked={exportExtendedCollections}
                 onCheckedChange={handleExportExtendedCollectionsChange}
+                disabled={!isFigmaEnterprise}
               />
-              <Label css={{ fontWeight: '$sansRegular', fontSize: '$xsmall' }} htmlFor="exportExtendedCollections">Export extended collections</Label>
+              <Label css={{ fontWeight: '$sansRegular', fontSize: '$xsmall', ...(!isFigmaEnterprise ? { color: '$fgDisabled', opacity: 0.5 } : {}) }} htmlFor="exportExtendedCollections">
+                Export extended collections{!isFigmaEnterprise && ' (Enterprise only)'}
+              </Label>
               <ExplainerModal title="Export extended collections">
                 <Box>When enabled, themes marked as "extended" will be exported as extended variable collections in Figma, inheriting from their parent collections. This is useful for creating brand variants or theme extensions. Requires Figma Enterprise plan.</Box>
               </ExplainerModal>

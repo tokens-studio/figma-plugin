@@ -68,23 +68,18 @@ export async function startup() {
     };
   }
 
-  // Detect Figma Enterprise by checking if VariableCollection has the .extend() method.
-  // .extend() is Enterprise-only; .isExtension exists on all plans so cannot be used for detection.
+  // Detect Figma Enterprise by attempting to call .extend(), which is Enterprise-only.
+  // We create a temp collection, try to extend it, then clean up regardless of outcome.
   let isFigmaEnterprise = false;
+  const probe = figma.variables.createVariableCollection('__ts_probe__');
   try {
-    const collections = await figma.variables.getLocalVariableCollectionsAsync();
-    let probe: VariableCollection | null = null;
-    let isTemp = false;
-    if (collections.length > 0) {
-      probe = collections[0];
-    } else {
-      probe = figma.variables.createVariableCollection('__ts_probe__');
-      isTemp = true;
-    }
-    isFigmaEnterprise = typeof (probe as any).extend === 'function';
-    if (isTemp) probe.remove();
+    const extended = await (probe as any).extend('__ts_ext_probe__');
+    isFigmaEnterprise = true;
+    if (extended && typeof extended.remove === 'function') extended.remove();
   } catch {
     isFigmaEnterprise = false;
+  } finally {
+    try { probe.remove(); } catch { /* ignore */ }
   }
 
   return {
