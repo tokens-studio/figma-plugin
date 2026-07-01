@@ -102,18 +102,18 @@ export const SingleThemeEntry: React.FC<React.PropsWithChildren<React.PropsWithC
           </StyledCountLabel>
         ) : <StyledCountLabel variant="danger">No sets defined</StyledCountLabel>}
         {stylesCount > 0 && (
-        <StyledCountLabel>
-          {stylesCount}
-          {' '}
-          {stylesCount === 1 ? 'style' : 'styles'}
-        </StyledCountLabel>
+          <StyledCountLabel>
+            {stylesCount}
+            {' '}
+            {stylesCount === 1 ? 'style' : 'styles'}
+          </StyledCountLabel>
         )}
         {variablesCount > 0 && (
-        <StyledCountLabel>
-          {variablesCount}
-          {' '}
-          {variablesCount === 1 ? 'variable' : 'variables'}
-        </StyledCountLabel>
+          <StyledCountLabel>
+            {variablesCount}
+            {' '}
+            {variablesCount === 1 ? 'variable' : 'variables'}
+          </StyledCountLabel>
         )}
       </Stack>
 

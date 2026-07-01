@@ -15,6 +15,25 @@ type Payload = Omit<ThemeObject, 'id' | '$figmaStyleReferences'> & {
   }
 };
 
+/**
+ * Find all extended child groups of a parent group
+ * @param parentGroup - The parent group name
+ * @param allThemes - All themes to search through
+ * @returns Array of immediate child group names
+ */
+function findExtendedChildGroups(parentGroup: string, allThemes: ThemeObject[]): string[] {
+  const childGroups = new Set<string>();
+  const parentThemeIds = new Set(allThemes.filter((t) => t.group === parentGroup).map((t) => t.id));
+
+  allThemes.forEach((theme) => {
+    if (theme.group && theme.$figmaParentThemeId && parentThemeIds.has(theme.$figmaParentThemeId)) {
+      childGroups.add(theme.group);
+    }
+  });
+
+  return Array.from(childGroups);
+}
+
 export function saveTheme(state: TokenState, data: Payload): TokenState {
   const isNewTheme = !data.id;
   const themeId = data.id || hash([Date.now(), data]);
@@ -32,12 +51,57 @@ export function saveTheme(state: TokenState, data: Payload): TokenState {
     id: themeId,
     name: data.name,
     $figmaStyleReferences: state.themes[themeObjectIndex]?.$figmaStyleReferences ?? {},
-    $figmaVariableReferences: state.themes[themeObjectIndex]?.$figmaVariableReferences ?? {},
-    $figmaCollectionId: state.themes[themeObjectIndex]?.$figmaCollectionId,
-    $figmaModeId: state.themes[themeObjectIndex]?.$figmaModeId,
     selectedTokenSets,
     ...(data?.group ? { group: data.group } : {}),
+    // Preserve extended collection metadata
+    // $figmaIsExtension is derived from $figmaParentThemeId — a theme with a parent ID is always an extension,
+    // even if the flag was absent (e.g. themes created before the flag was introduced)
+    ...(data.$figmaParentThemeId ? { $figmaIsExtension: true } : data.$figmaIsExtension !== undefined ? { $figmaIsExtension: data.$figmaIsExtension } : {}),
+    ...(data.$figmaParentCollectionId ? { $figmaParentCollectionId: data.$figmaParentCollectionId } : {}),
+    ...(data.$figmaParentThemeId ? { $figmaParentThemeId: data.$figmaParentThemeId } : {}),
+    ...(data.$figmaMirrorParentSets !== undefined ? { $figmaMirrorParentSets: data.$figmaMirrorParentSets } : {}),
+    // Preserve other Figma metadata
+    ...(data.$figmaCollectionId ? { $figmaCollectionId: data.$figmaCollectionId } : {}),
+    ...(data.$figmaModeId ? { $figmaModeId: data.$figmaModeId } : {}),
+    ...(data.$figmaVariableReferences ? { $figmaVariableReferences: data.$figmaVariableReferences } : {}),
   });
+
+  let finalThemes = updatedThemes;
+
+  // If this is a new theme in a parent group (not an extended theme), cascade to children
+  if (isNewTheme && data.group && !data.$figmaIsExtension) {
+    const extendedChildGroups = findExtendedChildGroups(data.group, updatedThemes);
+
+    extendedChildGroups.forEach((childGroup) => {
+      const childThemeId = hash([Date.now(), childGroup, data.name, Math.random()]);
+      const childTheme: ThemeObject = {
+        id: childThemeId,
+        name: data.name,
+        group: childGroup,
+        selectedTokenSets: data.selectedTokenSets || {},
+        $figmaStyleReferences: {},
+        $figmaIsExtension: true,
+        $figmaParentThemeId: themeId,
+        $figmaMirrorParentSets: true, // Enable mirroring by default
+      };
+
+      finalThemes.push(childTheme);
+    });
+  }
+
+  // If updating an existing parent theme, update all mirrored child themes
+  if (!isNewTheme && !data.$figmaIsExtension) {
+    finalThemes = finalThemes.map((theme) => {
+      // Check if this theme is a child of the current theme and has mirroring enabled
+      if (theme.$figmaParentThemeId === themeId && theme.$figmaMirrorParentSets) {
+        return {
+          ...theme,
+          selectedTokenSets: selectedTokenSets,
+        };
+      }
+      return theme;
+    });
+  }
 
   const newActiveTheme = state.activeTheme;
   if (!isActiveTheme) {
@@ -51,7 +115,7 @@ export function saveTheme(state: TokenState, data: Payload): TokenState {
   }
   const nextState: TokenState = {
     ...state,
-    themes: updatedThemes,
+    themes: finalThemes,
   };
 
   if (isActiveTheme || isNewTheme) {

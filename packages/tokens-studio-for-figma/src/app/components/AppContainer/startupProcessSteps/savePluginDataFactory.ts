@@ -7,7 +7,7 @@ import pjs from '../../../../../package.json';
 
 export function savePluginDataFactory(dispatch: Dispatch, params: StartupMessage) {
   return async () => {
-    const { user, usedEmail } = params;
+    const { user, usedEmail, isFigmaEnterprise } = params;
     if (user) {
       // initiate analytics
       if (user.userId) {
@@ -30,6 +30,7 @@ export function savePluginDataFactory(dispatch: Dispatch, params: StartupMessage
       };
       dispatch.userState.setUserId(user.figmaId);
       dispatch.userState.setUsedEmail(usedEmail ?? undefined);
+      dispatch.userState.setIsFigmaEnterprise(isFigmaEnterprise ?? false);
       dispatch.uiState.setLastOpened(params.lastOpened);
       dispatch.uiState.setOnboardingExplainerSets(params.onboardingExplainer.sets);
       dispatch.uiState.setOnboardingExplainerExportSets(params.onboardingExplainer.exportSets);

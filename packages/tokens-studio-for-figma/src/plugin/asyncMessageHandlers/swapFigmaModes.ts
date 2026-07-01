@@ -13,6 +13,41 @@ function isFigmaThemeWithCollectionAndMode(
   );
 }
 
+/**
+ * Filter out parent collections when their extended collections are active.
+ * Figma's rule: Extended collections override their parent collections - they cannot both be active.
+ * 
+ * @param activeThemeObjects - All currently active theme objects with collection metadata
+ * @returns Filtered list with parent collections removed when their extended versions are active
+ */
+function filterMutuallyExclusiveCollections(
+  activeThemeObjects: Array<ThemeObject & { $figmaCollectionId: string; $figmaModeId: string }>,
+): Array<ThemeObject & { $figmaCollectionId: string; $figmaModeId: string }> {
+  const result: Array<ThemeObject & { $figmaCollectionId: string; $figmaModeId: string }> = [];
+  const parentCollectionIdsToExclude = new Set<string>();
+
+  // First pass: identify which parent collections have active extended collections
+  for (const theme of activeThemeObjects) {
+    if (theme.$figmaIsExtension && theme.$figmaParentCollectionId) {
+      // This extended collection is active, so exclude its parent
+      parentCollectionIdsToExclude.add(theme.$figmaParentCollectionId);
+    }
+  }
+
+  // Second pass: filter out parent collections that should be overridden by extensions
+  for (const theme of activeThemeObjects) {
+    const isOverriddenParent = !theme.$figmaIsExtension
+      && theme.$figmaCollectionId
+      && parentCollectionIdsToExclude.has(theme.$figmaCollectionId);
+
+    if (!isOverriddenParent) {
+      result.push(theme);
+    }
+  }
+
+  return result;
+}
+
 function getRootNode(updateMode: UpdateMode) {
   const rootNode: (SceneNode | PageNode)[] = [];
   switch (updateMode) {
@@ -47,10 +82,19 @@ export async function swapFigmaModes(activeTheme: Record<string, string>, themes
     return;
   }
 
+  // Filter out parent collections when their extended collections are active
+  // This ensures extended collections override their parents (Figma's mutual exclusivity rule)
+  const filteredThemeObjects = filterMutuallyExclusiveCollections(activeThemeObjects);
+
+  if (filteredThemeObjects.length === 0) {
+    // All themes were filtered out (shouldn't happen, but handle gracefully)
+    return;
+  }
+
   // Validate all collections and modes, collecting valid ones
   const validCollectionModePairs: Array<{ collection: VariableCollection; modeId: string }> = [];
 
-  for (const themeObject of activeThemeObjects) {
+  for (const themeObject of filteredThemeObjects) {
     const { $figmaCollectionId: collectionId, $figmaModeId: modeId } = themeObject;
 
     // Validate that the collection exists and contains the mode

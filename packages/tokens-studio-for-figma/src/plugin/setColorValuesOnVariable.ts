@@ -18,7 +18,7 @@ function isFigmaColorObject(obj: VariableValue): obj is RGBOrRGBA {
   );
 }
 
-export default function setColorValuesOnVariable(variable: Variable, mode: string, value: string, forceUpdate = false) {
+export default function setColorValuesOnVariable(variable: Variable, mode: string, value: string, collection?: VariableCollection, forceUpdate = false) {
   try {
     const { color, opacity } = convertToFigmaColor(value);
     const existingVariableValue = variable.valuesByMode[mode];
@@ -29,8 +29,26 @@ export default function setColorValuesOnVariable(variable: Variable, mode: strin
 
     const newValue = { ...color, a: opacity };
 
-    // For direct color values, compare the actual color values using threshold
-    if (isFigmaColorObject(existingVariableValue)) {
+    // Handle extended collections: if value matches parent mode, clear override
+    const modeObj = collection?.modes.find((m) => m.modeId === mode);
+    const parentModeId = (modeObj as any)?.parentModeId;
+
+    if (parentModeId) {
+      const parentValue = variable.valuesByMode[parentModeId];
+      if (isFigmaColorObject(parentValue)) {
+        const parentColor = {
+          ...parentValue,
+          a: 'a' in parentValue ? parentValue.a : 1,
+        };
+        if (isColorApproximatelyEqual(parentColor, newValue)) {
+          (variable as any).clearValueForMode(mode);
+          return;
+        }
+      }
+    }
+
+    // Only compare if there's an existing value
+    if (existingVariableValue && isFigmaColorObject(existingVariableValue)) {
       const existingValue = {
         ...existingVariableValue,
         a: 'a' in existingVariableValue ? existingVariableValue.a : 1,

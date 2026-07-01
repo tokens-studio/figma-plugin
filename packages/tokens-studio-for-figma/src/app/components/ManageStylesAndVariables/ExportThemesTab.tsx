@@ -12,6 +12,36 @@ import { useIsProUser } from '@/app/hooks/useIsProUser';
 import { ThemeObject } from '@/types';
 import { LabelledCheckbox } from './LabelledCheckbox';
 import { SearchInputWithToggle } from '../SearchInputWithToggle';
+import { sortThemesForDisplay } from '@/utils/themeListToTree';
+
+function getHierarchicalThemes(themes: ThemeObject[]): ThemeObject[] {
+  const themesById = new Map(themes.map((t) => [t.id, t]));
+  const childrenByParent = new Map<string, string[]>();
+  const roots: string[] = [];
+
+  themes.forEach((t) => {
+    if (t.$figmaParentThemeId && themesById.has(t.$figmaParentThemeId)) {
+      const children = childrenByParent.get(t.$figmaParentThemeId) || [];
+      children.push(t.id);
+      childrenByParent.set(t.$figmaParentThemeId, children);
+    } else {
+      roots.push(t.id);
+    }
+  });
+
+  const result: ThemeObject[] = [];
+  function pushWithChildren(id: string) {
+    const theme = themesById.get(id);
+    if (theme) {
+      result.push(theme);
+      const children = childrenByParent.get(id) || [];
+      children.forEach(pushWithChildren);
+    }
+  }
+
+  roots.forEach(pushWithChildren);
+  return result;
+}
 
 export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: { selectedThemes: string[], setSelectedThemes: (themes: string[]) => void }) {
   const { t } = useTranslation(['manageStylesAndVariables']);
@@ -40,17 +70,35 @@ export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: {
       || (theme.group && theme.group.toLowerCase().includes(lowerSearchTerm)));
   }, [themes, searchTerm, isSearchActive]);
 
+  const sortedFilteredThemes = React.useMemo(() => sortThemesForDisplay(filteredThemes), [filteredThemes]);
+
   const ThemeGroups = React.useMemo(() => {
-    const uniqueGroups: string[] = filteredThemes.reduce((unique: string[], theme) => {
+    const uniqueGroups: string[] = sortedFilteredThemes.reduce((unique: string[], theme) => {
       if (theme.group && !unique.includes(theme.group)) {
         unique.push(theme.group);
       }
       return unique;
     }, []);
     return uniqueGroups;
-  }, [filteredThemes]);
+  }, [sortedFilteredThemes]);
 
-  const ungroupedThemes = React.useMemo(() => filteredThemes.filter((theme) => !theme.group), [filteredThemes]);
+  // Map each group to its parent group (for extended collections)
+  const themeGroupParentMap = React.useMemo(() => {
+    const themeById = new Map(sortedFilteredThemes.map((t) => [t.id, t]));
+    const map = new Map<string, string | null>();
+    ThemeGroups.forEach((group) => {
+      const firstInGroup = sortedFilteredThemes.find((t) => (t.group ?? '') === group);
+      if (firstInGroup?.$figmaParentThemeId) {
+        const parentGroup = themeById.get(firstInGroup.$figmaParentThemeId)?.group ?? null;
+        map.set(group, parentGroup);
+      } else {
+        map.set(group, null);
+      }
+    });
+    return map;
+  }, [ThemeGroups, sortedFilteredThemes]);
+
+  const ungroupedThemes = React.useMemo(() => sortedFilteredThemes.filter((theme) => !theme.group), [sortedFilteredThemes]);
 
   const excludedSelectedThemesCount = useMemo(() => {
     if (!isSearchActive || !searchTerm) {
@@ -70,7 +118,7 @@ export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: {
 
   const handleSelectAllThemes = React.useCallback(() => {
     // When filtering, select/deselect all visible (filtered) themes
-    const themesToToggle = filteredThemes;
+    const themesToToggle = sortedFilteredThemes;
     const allFilteredSelected = themesToToggle.every((theme) => selectedThemes.includes(theme.id));
 
     if (allFilteredSelected) {
@@ -86,13 +134,15 @@ export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: {
       });
       setSelectedThemes(newSelection);
     }
-  }, [filteredThemes, selectedThemes, setSelectedThemes]);
+  }, [sortedFilteredThemes, selectedThemes, setSelectedThemes]);
 
   function createThemeRow(theme: ThemeObject) {
     return (
       <Stack
         gap={3}
         key={theme.id}
+        direction="row"
+        align="center"
       >
         {/* eslint-disable-next-line react/jsx-no-bind */}
         <LabelledCheckbox id={theme.id} checked={selectedThemes.includes(theme.id)} onChange={() => handleSelectTheme(theme.id)} label={theme.name} />
@@ -159,25 +209,33 @@ export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: {
             <p>{t('exportThemesTab.combinationsOfSetsMakeThemes')}</p>
             <Stack direction="column" width="full" gap={4}>
               <Stack direction="row" gap={3} align="center">
-                <Checkbox id="check-all-themes" checked={filteredThemes.length > 0 && filteredThemes.every((theme) => selectedThemes.includes(theme.id))} onCheckedChange={handleSelectAllThemes} />
+                <Checkbox id="check-all-themes" checked={sortedFilteredThemes.length > 0 && sortedFilteredThemes.every((theme) => selectedThemes.includes(theme.id))} onCheckedChange={handleSelectAllThemes} />
                 <Label htmlFor="check-all-themes">{t('generic.selectAll')}</Label>
               </Stack>
-              {filteredThemes.length === 0 && isSearchActive && searchTerm ? (
+              {sortedFilteredThemes.length === 0 && isSearchActive && searchTerm ? (
                 <Box css={{ padding: '$4', textAlign: 'center', color: '$fgMuted' }}>
                   {t('noThemesFound')}
                 </Box>
               ) : (
                 <>
-                  {ThemeGroups.map((group) => (
-                    <Stack direction="column" gap={2} key={group}>
-                      <Heading size="small">{group}</Heading>
-                      {filteredThemes.filter((theme) => theme.group === group).map((theme) => createThemeRow(theme))}
-                    </Stack>
-                  ))}
+                  {(() => {
+                    const renderGroup = (group: string, depth: number): React.ReactNode => {
+                      const childGroups = ThemeGroups.filter((g) => themeGroupParentMap.get(g) === group);
+                      return (
+                        <Stack direction="column" gap={2} key={group} css={{ paddingLeft: depth > 0 ? `${depth * 16}px` : undefined }}>
+                          <Heading size="small">{group}</Heading>
+                          {getHierarchicalThemes(sortedFilteredThemes.filter((theme) => theme.group === group)).map((theme) => createThemeRow(theme))}
+                          {childGroups.map((child) => renderGroup(child, depth + 1))}
+                        </Stack>
+                      );
+                    };
+                    const rootGroups = ThemeGroups.filter((g) => !themeGroupParentMap.get(g));
+                    return rootGroups.map((group) => renderGroup(group, 0));
+                  })()}
                   {ungroupedThemes.length ? (
                     <Stack direction="column" gap={2}>
                       <Heading size="small">{t('generic.noGroup')}</Heading>
-                      {ungroupedThemes.map((theme) => createThemeRow(theme))}
+                      {getHierarchicalThemes(ungroupedThemes).map((theme) => createThemeRow(theme))}
                     </Stack>
                   ) : null}
                 </>

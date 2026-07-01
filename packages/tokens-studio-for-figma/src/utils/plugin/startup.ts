@@ -68,6 +68,25 @@ export async function startup() {
     };
   }
 
+  // Detect Figma Enterprise by checking if VariableCollection has the .extend() method.
+  // .extend() is Enterprise-only; .isExtension exists on all plans so cannot be used for detection.
+  let isFigmaEnterprise = false;
+  try {
+    const collections = await figma.variables.getLocalVariableCollectionsAsync();
+    let probe: VariableCollection | null = null;
+    let isTemp = false;
+    if (collections.length > 0) {
+      probe = collections[0];
+    } else {
+      probe = figma.variables.createVariableCollection('__ts_probe__');
+      isTemp = true;
+    }
+    isFigmaEnterprise = typeof (probe as any).extend === 'function';
+    if (isTemp) probe.remove();
+  } catch {
+    isFigmaEnterprise = false;
+  }
+
   return {
     settings: finalSettings,
     activeTheme,
@@ -91,5 +110,6 @@ export async function startup() {
     usedEmail,
     selectedExportThemes,
     activeOrganizationId,
+    isFigmaEnterprise,
   };
 }

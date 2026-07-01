@@ -6,6 +6,7 @@ import setNumberValuesOnVariable from './setNumberValuesOnVariable';
 import setStringValuesOnVariable from './setStringValuesOnVariable';
 import { convertTokenTypeToVariableType } from '@/utils/convertTokenTypeToVariableType';
 import { checkCanReferenceVariable } from '@/utils/alias/checkCanReferenceVariable';
+import { AliasRegex } from '@/constants/AliasRegex';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { transformValue } from './helpers';
 import { variableWorker } from './Worker';
@@ -16,6 +17,7 @@ export type ReferenceVariableType = {
   variable: Variable;
   modeId: string;
   referenceVariable: string;
+  collection?: VariableCollection;
 };
 
 export default async function setValuesOnVariable(
@@ -26,6 +28,7 @@ export default async function setValuesOnVariable(
   baseFontSize: string,
   shouldRename = false,
   progressTracker?: ProgressTracker | null,
+  isExtendedCollection = false,
   metadataUpdateTracker?: Record<string, boolean>,
   providedPlatformsByVariable?: Record<string, Set<string>>,
 ) {
@@ -55,11 +58,15 @@ export default async function setValuesOnVariable(
     Array.from(variableIdsToFetch).map(async (variableId) => {
       try {
         const variable = await figma.variables.getVariableByIdAsync(variableId);
-        if (variable && variable.variableCollectionId === collection.id) {
-          variableIdCache.set(variableId, variable);
-          // Add to local cache if not already present
-          if (!variablesInFigma.some((v) => v.id === variable.id)) {
-            variablesInFigma.push(variable);
+        if (variable) {
+          // For extended collections, skip collection ID check since inherited variables belong to parent
+          const belongsToCollection = isExtendedCollection || variable.variableCollectionId === collection.id;
+          if (belongsToCollection) {
+            variableIdCache.set(variableId, variable);
+            // Add to local cache if not already present
+            if (!variablesInFigma.some((v) => v.id === variable.id)) {
+              variablesInFigma.push(variable);
+            }
           }
         }
       } catch (e) {
@@ -75,6 +82,10 @@ export default async function setValuesOnVariable(
         try {
           const flatScopes = token.$extensions?.['com.figma.scopes'] as VariableScope[] | undefined;
           const variableType = convertTokenTypeToVariableType(token.type, token.value, flatScopes);
+
+          if (isExtendedCollection) {
+            console.log(`    Processing token: "${token.path}"`);
+          }
           // If id matches the variableId, or name matches the token path, we can use it to update the variable instead of re-creating.
           // Prioritize finding by variableId (key) when present, otherwise fall back to name matching
           // This has the nasty side-effect that if font weight changes from string to number, it will not update the variable given we cannot change type.
@@ -90,10 +101,24 @@ export default async function setValuesOnVariable(
 
           // If still no variable, try one more time to find by name in case it was just created
           if (!variable) {
-            variable = variablesInFigma.find((v) => v.name === token.path && v.variableCollectionId === collection.id);
+            // For extended collections, don't check collection ID since variables belong to parent
+            variable = isExtendedCollection
+              ? variablesInFigma.find((v) => v.name === token.path)
+              : variablesInFigma.find((v) => v.name === token.path && v.variableCollectionId === collection.id);
           }
 
           if (!variable) {
+            // For extended collections, variables should have been found from parent
+            if (isExtendedCollection) {
+              console.warn(
+                `⚠️  Variable "${token.path}" not found in extended collection "${collection.name}". `
+                + 'Extended collections can only update inherited variables from their parent collection. '
+                + 'Skipping this token.',
+              );
+              return; // Skip this token entirely
+            }
+
+            // Regular collection - create new variable
             try {
               variable = figma.variables.createVariable(token.path, collection, variableType);
               // Add to local cache immediately
@@ -201,35 +226,36 @@ export default async function setValuesOnVariable(
             // Check if the variable already has the correct alias reference before updating
             if (!hasMetadataChanged && checkVariableAliasEquality(existingVariableValue, rawValue)) {
               // The alias already points to the correct variable, no update needed
+
               return;
             }
 
             switch (variableType) {
               case 'BOOLEAN':
                 if (typeof token.value === 'string' && !token.value.includes('{')) {
-                  setBooleanValuesOnVariable(variable, mode, token.value, hasMetadataChanged);
+                  setBooleanValuesOnVariable(variable, mode, token.value, collection, hasMetadataChanged);
                 }
                 break;
               case 'COLOR':
                 if (typeof token.value === 'string' && !token.value.includes('{')) {
-                  setColorValuesOnVariable(variable, mode, token.value, hasMetadataChanged);
+                  setColorValuesOnVariable(variable, mode, token.value, collection, hasMetadataChanged);
                 }
                 break;
               case 'FLOAT': {
                 const value = String(token.value);
                 if (typeof value === 'string' && !value.includes('{')) {
                   const transformedValue = transformValue(value, token.type, baseFontSize, true);
-                  setNumberValuesOnVariable(variable, mode, Number(transformedValue), hasMetadataChanged);
+                  setNumberValuesOnVariable(variable, mode, Number(transformedValue), collection, hasMetadataChanged);
                 }
                 break;
               }
               case 'STRING':
                 if (typeof token.value === 'string' && !token.value.includes('{')) {
-                  setStringValuesOnVariable(variable, mode, token.value, hasMetadataChanged);
+                  setStringValuesOnVariable(variable, mode, token.value, collection, hasMetadataChanged);
                   // Given we cannot determine the combined family of a variable, we cannot use fallback weights from our estimates.
                   // This is not an issue because users can set numerical font weights with variables, so we opt-out of the guesswork and just apply the numerical weight.
                 } else if (token.type === TokenTypes.FONT_WEIGHTS && Array.isArray(token.value)) {
-                  setStringValuesOnVariable(variable, mode, token.value[0], hasMetadataChanged);
+                  setStringValuesOnVariable(variable, mode, token.value[0], collection, hasMetadataChanged);
                 }
                 break;
               default:
@@ -355,11 +381,35 @@ export default async function setValuesOnVariable(
             }
 
             if (token && checkCanReferenceVariable(token)) {
+              if (isExtendedCollection) {
+                console.log(`[setValuesOnVariable] Queuing alias candidate: "${token.path}" → "${referenceTokenName}" (rawValue: "${token.rawValue}")`);
+              }
               referenceVariableCandidates.push({
                 variable,
                 modeId: mode,
                 referenceVariable: referenceTokenName,
+                collection,
               });
+            } else if (typeof token.rawValue === 'string' && token.rawValue.includes('{')) {
+              // DIAGNOSTIC: The token's raw value contains a reference (e.g. "{color.brand}")
+              // but it was NOT queued as an alias candidate. This variable will be written as a
+              // RESOLVED value only — it will never link back to the referenced variable.
+              const hasModifier = !!token?.$extensions?.['studio.tokens']?.modify;
+              const aliasMatches = token.rawValue.toString().match(AliasRegex)?.length ?? 0;
+              let reason = 'unknown';
+              if (hasModifier) {
+                reason = 'token has a studio.tokens.modify extension (math/transform), which cannot be expressed as a Figma variable alias';
+              } else if (aliasMatches === 0) {
+                reason = 'rawValue contains "{" but does not match the alias pattern (malformed reference?)';
+              } else if (aliasMatches > 1) {
+                reason = `rawValue contains ${aliasMatches} references (composite value) — Figma variables can only alias a single variable`;
+              }
+              console.log(
+                `[RESOLVED-ONLY @ candidate stage] "${token.path}" in collection "${collection.name}"${isExtendedCollection ? ' (extended)' : ''}`,
+                `\n  rawValue: "${token.rawValue}"`,
+                `\n  resolved value: "${token.value}"`,
+                `\n  reason: ${reason}`,
+              );
             }
           }
         } catch (e) {

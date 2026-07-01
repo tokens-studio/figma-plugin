@@ -65,14 +65,27 @@ export default async function updateVariables({
     }
   }
 
-  // Do not use getVariablesWithoutZombies. It's not working.
-  // There seems to be a bug with getLocalVariablesAsync. It's not returning the variables in the collection - when they're being created.
-  // We could also get the current collection with figma.variables.getVariableCollectionByIdAsync(collection.id) and then fetch each variable,
-  // but that feels costly? We might need to double check this though.
-  // e.g. this wont work.
-  // const variablesInCollection = (await figma.variables.getLocalVariablesAsync()).filter((v) => v.variableCollectionId === collection.id);
-  const variablesInCollection = figma.variables.getLocalVariables()
-    .filter((v) => v.variableCollectionId === collection.id);
+  // Check if this collection is an extended collection using Figma's actual API properties
+  const isExtendedCollection = 'isExtension' in collection && (collection as any).isExtension;
+
+  // For extended collections, variables are inherited from the parent collection
+  // Extended collections have an 'isExtension' property and 'parentVariableCollectionId' pointing to their parent
+  let variablesInCollection: Variable[];
+
+  if (isExtendedCollection) {
+    // Extended collections have their own variable objects (variableCollectionId === collection.id)
+    // that are aware of the extended collection's modes. Use those first.
+    // Fall back to parent collection variables for inherited-only scenarios.
+    const parentCollectionId = (collection as any).parentVariableCollectionId;
+    const extendedVars = figma.variables.getLocalVariables().filter((v) => v.variableCollectionId === collection.id);
+    console.log(`[updateVariables] Extended collection "${collection.name}": found ${extendedVars.length} own vars, ${figma.variables.getLocalVariables().filter((v) => v.variableCollectionId === parentCollectionId).length} parent vars`);
+    variablesInCollection = extendedVars.length > 0
+      ? extendedVars
+      : figma.variables.getLocalVariables().filter((v) => v.variableCollectionId === parentCollectionId);
+  } else {
+    // Regular collection: get variables from this collection
+    variablesInCollection = figma.variables.getLocalVariables().filter((v) => v.variableCollectionId === collection.id);
+  }
 
   const variablesToCreate: VariableToken[] = [];
   // Reverse iterate to keep the last occurrence (override)
@@ -98,10 +111,11 @@ export default async function updateVariables({
     variablesInCollection,
     variablesToCreate,
     collection,
-    mode,
+    mode, // Use extended collection's own mode ID
     themeBaseFontSize,
     settings.renameExistingStylesAndVariables,
     progressTracker,
+    isExtendedCollection,
     metadataUpdateTracker,
     providedPlatformsByVariable,
   );
@@ -109,7 +123,10 @@ export default async function updateVariables({
   const removedVariables: string[] = [];
 
   // Remove variables not handled in the current theme
-  if (settings.removeStylesAndVariablesWithoutConnection) {
+  // CRITICAL: NEVER remove variables for extended collections!
+  // Extended collections only override a SUBSET of parent variables.
+  // Removing non-matches would delete the parent's variables!
+  if (!isExtendedCollection && settings.removeStylesAndVariablesWithoutConnection) {
     variablesInCollection
       .filter((variable) => !Object.values(variableObj.variableKeyMap).includes(variable.key))
       .forEach((variable) => {

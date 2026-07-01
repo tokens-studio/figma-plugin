@@ -29,7 +29,26 @@ describe('getAvailableVariableCollections', () => {
     const result = await getAvailableVariableCollections();
 
     expect(result).toEqual({
-      collections: mockCollections,
+      collections: [
+        {
+          ...mockCollections[0],
+          isExtension: false,
+          parentCollectionId: undefined,
+          modes: mockCollections[0].modes.map((mode) => ({
+            ...mode,
+            parentModeId: undefined,
+          })),
+        },
+        {
+          ...mockCollections[1],
+          isExtension: false,
+          parentCollectionId: undefined,
+          modes: mockCollections[1].modes.map((mode) => ({
+            ...mode,
+            parentModeId: undefined,
+          })),
+        },
+      ],
     });
   });
 

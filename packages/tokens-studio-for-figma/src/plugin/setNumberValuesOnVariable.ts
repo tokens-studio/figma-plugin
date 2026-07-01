@@ -9,16 +9,31 @@ function isNumberApproximatelyEqual(
   return Math.abs(num1 - num2) < threshold;
 }
 
-export default function setNumberValuesOnVariable(variable: Variable, mode: string, value: number, forceUpdate = false) {
+export default function setNumberValuesOnVariable(variable: Variable, mode: string, value: number, collection?: VariableCollection, forceUpdate = false) {
   try {
     if (isNaN(value)) {
       throw new Error(`Skipping due to invalid value: ${value}`);
     }
     const existingVariableValue = variable.valuesByMode[mode];
+
     if (
       existingVariableValue !== undefined
       && !(typeof existingVariableValue === 'number' || isVariableWithAliasReference(existingVariableValue))
     ) return;
+
+    // Handle extended collections: if value matches parent mode, clear override
+    const modeObj = collection?.modes.find((m) => m.modeId === mode);
+    const parentModeId = (modeObj as any)?.parentModeId;
+
+    if (parentModeId) {
+      const parentValue = variable.valuesByMode[parentModeId];
+      if (typeof parentValue === 'number') {
+        if (isNumberApproximatelyEqual(parentValue, value)) {
+          (variable as any).clearValueForMode(mode);
+          return;
+        }
+      }
+    }
 
     // For direct number values, compare using threshold
     if (typeof existingVariableValue === 'number') {

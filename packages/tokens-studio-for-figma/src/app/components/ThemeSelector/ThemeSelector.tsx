@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Check, NavArrowRight } from 'iconoir-react';
 import { useTranslation } from 'react-i18next';
 import { DropdownMenu, Button } from '@tokens-studio/ui';
-import { activeThemeSelector, themeOptionsSelector } from '@/selectors';
+import { activeThemeSelector, themeOptionsSelector, themesListSelector } from '@/selectors';
 import Text from '../Text';
 import { Dispatch } from '@/app/store';
 import ProBadge from '../ProBadge';
@@ -24,6 +24,7 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
   const { t } = useTranslation(['tokens']);
   const activeTheme = useSelector(activeThemeSelector);
   const availableThemes = useSelector(themeOptionsSelector);
+  const allThemes = useSelector(themesListSelector);
   const groupNames = useMemo(() => ([...new Set(availableThemes.map((theme) => theme.group || INTERNAL_THEMES_NO_GROUP))]), [availableThemes]);
 
   const handleClearTheme = useCallback(() => {
@@ -32,19 +33,67 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
 
   const handleSelectTheme = useCallback((themeId: string) => {
     const groupOfTheme = availableThemes.find((theme) => theme.value === themeId)?.group ?? INTERNAL_THEMES_NO_GROUP;
-    const nextTheme = activeTheme;
-    if (typeof nextTheme[groupOfTheme] !== 'undefined' && nextTheme[groupOfTheme] === themeId) {
+    const selectedTheme = allThemes.find((theme) => theme.id === themeId);
+    const nextTheme = { ...activeTheme };
+
+    // Check if we're toggling off the theme
+    const isTogglingOff = typeof nextTheme[groupOfTheme] !== 'undefined' && nextTheme[groupOfTheme] === themeId;
+
+    if (isTogglingOff) {
       delete nextTheme[groupOfTheme];
     } else {
+      // We're activating a theme - check for parent/extended relationships
       nextTheme[groupOfTheme] = themeId;
+
+      // If this is an extended theme, deactivate its parent collection's themes
+      // Extended themes have hierarchical group names like "ParentGroup/ExtendedGroup"
+      // If this is an extended theme, deactivate its parent collection's themes
+      // Extended themes have hierarchical group names like "ParentGroup/ExtendedGroup"
+      if (selectedTheme?.$figmaIsExtension || (selectedTheme?.group && selectedTheme.group.includes('/'))) {
+        const parentGroupName = selectedTheme.group?.split('/')[0];
+
+        // Find parent themes by group name (more reliable than collection IDs which can become stale)
+        const parentThemes = allThemes.filter((t) => {
+          // Parent theme has the parent group name and is NOT an extension
+          const matchesByGroup = t.group === parentGroupName && !t.group?.includes('/');
+          const matchesByMetadata = !t.$figmaIsExtension && t.group === parentGroupName;
+          return matchesByGroup || matchesByMetadata;
+        });
+
+        // Deactivate all parent collection themes from any group
+        for (const [group, activeThemeId] of Object.entries(nextTheme)) {
+          if (parentThemes.some((pt) => pt.id === activeThemeId)) {
+            delete nextTheme[group];
+          }
+        }
+      }
+
+      // If this is a parent theme, deactivate any active extended collection themes that extend it
+      if (selectedTheme && !selectedTheme.$figmaIsExtension && selectedTheme.group && !selectedTheme.group.includes('/')) {
+        // Find all extended themes by checking if their group starts with "ParentGroup/"
+        const extendedThemes = allThemes.filter((t) => {
+          // Extended theme group format: "ParentGroup/ExtendedGroup"
+          const matchesByGroup = selectedTheme.group && t.group?.startsWith(`${selectedTheme.group}/`);
+          const matchesByMetadata = t.$figmaIsExtension && selectedTheme.$figmaCollectionId && t.$figmaParentCollectionId === selectedTheme.$figmaCollectionId;
+          return matchesByGroup || matchesByMetadata;
+        });
+
+        // Deactivate all extended themes from any group
+        for (const [group, activeThemeId] of Object.entries(nextTheme)) {
+          if (extendedThemes.some((et) => et.id === activeThemeId)) {
+            delete nextTheme[group];
+          }
+        }
+      }
     }
-    if (nextTheme) {
+
+    if (Object.keys(nextTheme).length > 0) {
       track('Apply theme', { id: nextTheme });
     } else {
       track('Reset theme');
     }
     dispatch.tokenState.setActiveTheme({ newActiveTheme: nextTheme, shouldUpdateNodes: true });
-  }, [dispatch, activeTheme, availableThemes]);
+  }, [dispatch, activeTheme, availableThemes, allThemes]);
 
   const handleManageThemes = useCallback(() => {
     dispatch.uiState.setManageThemesModalOpen(true);

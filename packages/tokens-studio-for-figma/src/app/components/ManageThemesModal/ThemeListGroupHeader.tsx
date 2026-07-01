@@ -2,9 +2,10 @@ import React, {
   useCallback, useContext, useState,
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { IconButton } from '@tokens-studio/ui';
+import { IconButton, DropdownMenu } from '@tokens-studio/ui';
 import { Xmark, Check } from 'iconoir-react';
-import { editProhibitedSelector } from '@/selectors';
+import { DotsVerticalIcon } from '@radix-ui/react-icons';
+import { editProhibitedSelector, isFigmaEnterpriseSelector } from '@/selectors';
 import { DragControlsContext } from '@/context';
 import { StyledDragButton } from '../StyledDragger/StyledDragButton';
 import { DragGrabber } from '../StyledDragger/DragGrabber';
@@ -18,15 +19,24 @@ import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
 type Props = React.PropsWithChildren<{
   groupName: string
   label: string
+  onExtendThemeGroup: (groupName: string) => void
+  onDeleteThemeGroup: (groupName: string) => void
+  indentationDepth?: number
+  isExtendedGroup?: boolean
 }>;
 
 export function ThemeListGroupHeader({
   groupName,
   label,
+  onExtendThemeGroup,
+  onDeleteThemeGroup,
+  indentationDepth = 0,
+  isExtendedGroup = false,
 }: Props) {
   const dispatch = useDispatch<Dispatch>();
   const dragContext = useContext(DragControlsContext);
   const editProhibited = useSelector(editProhibitedSelector);
+  const isFigmaEnterprise = useSelector(isFigmaEnterpriseSelector);
   const [currentGroupName, setCurrentGroupName] = useState<string>(groupName === INTERNAL_THEMES_NO_GROUP ? '' : groupName);
   const handleDragStart = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
     dragContext.controls?.start(event);
@@ -59,6 +69,14 @@ export function ThemeListGroupHeader({
     setCurrentGroupName(event.target.value);
   }, []);
 
+  const handleExtendGroup = useCallback(() => {
+    onExtendThemeGroup(groupName);
+  }, [groupName, onExtendThemeGroup]);
+
+  const handleDeleteGroup = useCallback(() => {
+    onDeleteThemeGroup(groupName);
+  }, [groupName, onDeleteThemeGroup]);
+
   return (
     <StyledDragButton
       type="button"
@@ -69,6 +87,8 @@ export function ThemeListGroupHeader({
         display: 'flex',
         cursor: 'inherit',
         '&:not(:first-of-type)': { marginTop: '$4' },
+        // Progressive indentation based on depth level (each level adds $6 padding)
+        paddingLeft: `calc($6 * ${indentationDepth})`,
       }}
     >
       <DragGrabber
@@ -96,13 +116,46 @@ export function ThemeListGroupHeader({
             >
               {label}
             </Text>
-            <IconButton
-              onClick={handleEditButtonClick}
-              icon={<IconPencil />}
-              size="small"
-              variant="invisible"
-              tooltip="Rename group"
-            />
+            <DropdownMenu>
+              <DropdownMenu.Trigger asChild>
+                <IconButton
+                  icon={<Box css={{ transform: 'scale(0.75)' }}><DotsVerticalIcon /></Box>}
+                  size="small"
+                  variant="invisible"
+                  tooltip="More options"
+                />
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Portal>
+                <DropdownMenu.Content side="bottom">
+                  <DropdownMenu.Item onSelect={handleEditButtonClick}>
+                    <span>Rename Theme Group</span>
+                  </DropdownMenu.Item>
+                  {groupName !== INTERNAL_THEMES_NO_GROUP && (
+                    <DropdownMenu.Item
+                      onSelect={isExtendedGroup || !isFigmaEnterprise ? undefined : handleExtendGroup}
+                      disabled={isExtendedGroup || !isFigmaEnterprise}
+                    >
+                      <Box css={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '$2',
+                        ...((isExtendedGroup || !isFigmaEnterprise) ? { color: '$fgDisabled', cursor: 'not-allowed' } : {})
+                      }}>
+                        <span>Extend Theme Group</span>
+                        {!isFigmaEnterprise && (
+                          <span style={{ fontSize: '10px', opacity: 0.7 }}>(Enterprise only)</span>
+                        )}
+                      </Box>
+                    </DropdownMenu.Item>
+                  )}
+                  {isExtendedGroup && groupName !== INTERNAL_THEMES_NO_GROUP && (
+                    <DropdownMenu.Item onSelect={handleDeleteGroup}>
+                      <span>Delete Theme Group</span>
+                    </DropdownMenu.Item>
+                  )}
+                </DropdownMenu.Content>
+              </DropdownMenu.Portal>
+            </DropdownMenu>
           </>
         ) : (
           <>
