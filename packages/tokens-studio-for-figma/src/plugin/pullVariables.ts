@@ -14,6 +14,15 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { processExtendedCollectionImport, separateCollectionsByType } from './extendedCollections';
 
+type CollectionEntry = {
+  id: string,
+  name: string,
+  modes: { name: string, modeId: string, parentModeId?: string }[],
+  isExtension?: boolean,
+  parentCollectionId?: string,
+  variableOverrides?: { [variableId: string]: { [modeId: string]: any } }
+};
+
 export default async function pullVariables(options: PullVariablesOptions, themes: ThemeObjectsList, proUser: boolean): Promise<void> {
   // @TODO should be specifically typed according to their type
   const colors: VariableToCreateToken[] = [];
@@ -37,60 +46,40 @@ export default async function pullVariables(options: PullVariablesOptions, theme
 
   const localVariables = await getVariablesWithoutZombies();
 
-  // CRITICAL FIX: Fetch ALL collections upfront
-  // Extended collections don't have their own variables (only overrides),
-  // so we can't discover them by iterating through variables
+  // Fetch all collections upfront to detect extended collections (Enterprise-only)
   const allFigmaCollections = await figma.variables.getLocalVariableCollectionsAsync();
+  const hasExtendedCollections = allFigmaCollections.some((c) => (c as any).isExtension);
 
-
-
-  const collections = new Map<string, {
-    id: string,
-    name: string,
-    modes: { name: string, modeId: string, parentModeId?: string }[],
-    isExtension?: boolean,
-    parentCollectionId?: string,
-    variableOverrides?: { [variableId: string]: { [modeId: string]: any } }
-  }>();
-
-  // Process all collections
-  for (const collectionData of allFigmaCollections) {
-    const extendedCollection = collectionData as any;
-
-    // DEBUG: Log all properties to see what Figma exposes
-
-
-    const collection = {
-      id: collectionData.id,
-      name: collectionData.name,
-      modes: collectionData.modes.map((mode) => ({
-        name: mode.name,
-        modeId: mode.modeId,
-        parentModeId: (mode as any).parentModeId,
-      })),
-      isExtension: extendedCollection.isExtension || false,
-      parentCollectionId: extendedCollection.isExtension
-        ? extendedCollection.parentVariableCollectionId
-        : undefined,
-      // Store variable overrides for extended collections  
-      variableOverrides: extendedCollection.isExtension
-        ? extendedCollection.variableOverrides
-        : undefined,
-    };
-
-    // Debug logging for extended collections
-    if (collection.isExtension) {
-
-    }
-
-    collections.set(collection.name, collection);
-  }
+  // Keyed by collection name for theme processing; by ID in collectionsCache for variable lookup
+  const collections = new Map<string, CollectionEntry>();
 
   // Cache for collection lookups by ID
-  const collectionsCache = new Map<string, typeof collections extends Map<string, infer T> ? T : never>();
-  collections.forEach((collection) => {
-    collectionsCache.set(collection.id, collection);
-  });
+  const collectionsCache = new Map<string, CollectionEntry>();
+
+  if (hasExtendedCollections) {
+    // Enterprise path: eagerly load all collections including extended ones
+    for (const collectionData of allFigmaCollections) {
+      const extendedCollection = collectionData as any;
+      const collection: CollectionEntry = {
+        id: collectionData.id,
+        name: collectionData.name,
+        modes: collectionData.modes.map((mode) => ({
+          name: mode.name,
+          modeId: mode.modeId,
+          parentModeId: (mode as any).parentModeId,
+        })),
+        isExtension: extendedCollection.isExtension || false,
+        parentCollectionId: extendedCollection.isExtension
+          ? extendedCollection.parentVariableCollectionId
+          : undefined,
+        variableOverrides: extendedCollection.isExtension
+          ? extendedCollection.variableOverrides
+          : undefined,
+      };
+      collections.set(collection.name, collection);
+      collectionsCache.set(collection.id, collection);
+    }
+  }
 
   const createFigmaExtensions = (variable: Variable) => {
     const extensions: Record<string, any> = {};
@@ -128,7 +117,23 @@ export default async function pullVariables(options: PullVariablesOptions, theme
   };
 
   for (const variable of localVariables) {
-    const collection = collectionsCache.get(variable.variableCollectionId);
+    let collection = collectionsCache.get(variable.variableCollectionId);
+
+    if (!collection) {
+      if (!hasExtendedCollections) {
+        // Standard path: lazy lookup per variable (original behaviour, keeps tests working)
+        const collectionData = await figma.variables.getVariableCollectionByIdAsync(variable.variableCollectionId);
+        if (collectionData) {
+          collection = {
+            id: collectionData.id,
+            name: collectionData.name,
+            modes: collectionData.modes.map((mode) => ({ name: mode.name, modeId: mode.modeId })),
+          };
+          collectionsCache.set(collectionData.id, collection);
+          collections.set(collectionData.name, collection);
+        }
+      }
+    }
 
     // Filter collections and modes based on selectedCollections option
     if (options.selectedCollections && collection) {
@@ -139,28 +144,21 @@ export default async function pullVariables(options: PullVariablesOptions, theme
       }
     }
 
-    // CRITICAL: Also process this variable for extended collections that inherit from this collection
-    // Extended collections don't have their own variables, they just override mode values
-    const collectionsToProcess: typeof collection[] = collection ? [collection] : [];
+    // For extended collections: also process child collections that inherit from this collection
+    const collectionsToProcess: CollectionEntry[] = collection ? [collection] : [];
 
-    // Find extended collections that extend this collection
-    if (collection) {
+    if (hasExtendedCollections && collection) {
       collections.forEach((extCollection) => {
-        if (extCollection.isExtension && extCollection.parentCollectionId === collection.id) {
-          // BUGFIX: Only include extended collections if they are selected
+        if (extCollection.isExtension && extCollection.parentCollectionId === collection!.id) {
           if (options.selectedCollections) {
             const isExtendedCollectionSelected = options.selectedCollections[extCollection.id];
             if (!isExtendedCollectionSelected) {
-              return; // Skip this extended collection if it's not selected
+              return;
             }
           }
           collectionsToProcess.push(extCollection);
         }
       });
-    }
-
-    if (collectionsToProcess.length > 1) {
-
     }
 
     const variableName = normalizeVariableName(variable.name);
@@ -171,25 +169,22 @@ export default async function pullVariables(options: PullVariablesOptions, theme
         switch (variable.resolvedType) {
           case 'COLOR':
             Object.entries(variable.valuesByMode).forEach(([parentModeId, value]) => {
-              // For extended collections, we need to map parent mode ID to child mode ID
               let actualModeId = parentModeId;
               if (collectionToProcess?.isExtension) {
                 const childMode = collectionToProcess.modes.find((m) => m.parentModeId === parentModeId);
                 if (!childMode) {
-                  return; // Skip this mode for this collection
+                  return;
                 }
                 actualModeId = childMode.modeId;
               }
 
-              // Filter modes based on selectedCollections option
               if (options.selectedCollections && collectionToProcess) {
                 const selectedCollection = options.selectedCollections[collectionToProcess.id];
                 if (selectedCollection && !selectedCollection.selectedModes.includes(actualModeId)) {
-                  return; // Skip this mode if it's not selected
+                  return;
                 }
               }
 
-              // CRITICAL: For extended collections, check for overridden values first
               let actualValue = value;
               if (collectionToProcess?.isExtension && collectionToProcess.variableOverrides) {
                 const override = collectionToProcess.variableOverrides[variable.id]?.[actualModeId];
@@ -225,7 +220,6 @@ export default async function pullVariables(options: PullVariablesOptions, theme
 
           case 'BOOLEAN':
             Object.entries(variable.valuesByMode).forEach(([parentModeId, value]) => {
-              // Map parent mode ID to child mode ID for extended collections
               let actualModeId = parentModeId;
               if (collectionToProcess?.isExtension) {
                 const childMode = collectionToProcess.modes.find((m) => m.parentModeId === parentModeId);
@@ -235,15 +229,13 @@ export default async function pullVariables(options: PullVariablesOptions, theme
                 actualModeId = childMode.modeId;
               }
 
-              // Filter modes based on selectedCollections option
               if (options.selectedCollections && collectionToProcess) {
                 const selectedCollection = options.selectedCollections[collectionToProcess.id];
                 if (selectedCollection && !selectedCollection.selectedModes.includes(actualModeId)) {
-                  return; // Skip this mode if it's not selected
+                  return;
                 }
               }
 
-              // CRITICAL: For extended collections, check for overridden values first
               let actualValue = value;
               if (collectionToProcess?.isExtension && collectionToProcess.variableOverrides) {
                 const override = collectionToProcess.variableOverrides[variable.id]?.[actualModeId];
@@ -275,7 +267,6 @@ export default async function pullVariables(options: PullVariablesOptions, theme
 
           case 'STRING':
             Object.entries(variable.valuesByMode).forEach(([parentModeId, value]) => {
-              // Map parent mode ID to child mode ID for extended collections
               let actualModeId = parentModeId;
               if (collectionToProcess?.isExtension) {
                 const childMode = collectionToProcess.modes.find((m) => m.parentModeId === parentModeId);
@@ -285,15 +276,13 @@ export default async function pullVariables(options: PullVariablesOptions, theme
                 actualModeId = childMode.modeId;
               }
 
-              // Filter modes based on selectedCollections option
               if (options.selectedCollections && collectionToProcess) {
                 const selectedCollection = options.selectedCollections[collectionToProcess.id];
                 if (selectedCollection && !selectedCollection.selectedModes.includes(actualModeId)) {
-                  return; // Skip this mode if it's not selected
+                  return;
                 }
               }
 
-              // CRITICAL: For extended collections, check for overridden values first
               let actualValue = value;
               if (collectionToProcess?.isExtension && collectionToProcess.variableOverrides) {
                 const override = collectionToProcess.variableOverrides[variable.id]?.[actualModeId];
@@ -325,7 +314,6 @@ export default async function pullVariables(options: PullVariablesOptions, theme
 
           case 'FLOAT':
             Object.entries(variable.valuesByMode).forEach(([parentModeId, value]) => {
-              // Map parent mode ID to child mode ID for extended collections
               let actualModeId = parentModeId;
               if (collectionToProcess?.isExtension) {
                 const childMode = collectionToProcess.modes.find((m) => m.parentModeId === parentModeId);
@@ -335,15 +323,13 @@ export default async function pullVariables(options: PullVariablesOptions, theme
                 actualModeId = childMode.modeId;
               }
 
-              // Filter modes based on selectedCollections option
               if (options.selectedCollections && collectionToProcess) {
                 const selectedCollection = options.selectedCollections[collectionToProcess.id];
                 if (selectedCollection && !selectedCollection.selectedModes.includes(actualModeId)) {
-                  return; // Skip this mode if it's not selected
+                  return;
                 }
               }
 
-              // CRITICAL: For extended collections, check for overridden values first
               let actualValue = value;
               if (collectionToProcess?.isExtension && collectionToProcess.variableOverrides) {
                 const override = collectionToProcess.variableOverrides[variable.id]?.[actualModeId];
@@ -428,36 +414,34 @@ export default async function pullVariables(options: PullVariablesOptions, theme
     themeInfo.themes?.forEach((theme) => {
       Object.entries(theme.selectedTokenSets || {}).forEach(([tokenSet, status]) => {
         existingTokenSets.add(tokenSet);
-        // Track which token sets are active
         if (status === TokenSetStatus.ENABLED) {
           activeTokenSets.add(tokenSet);
         }
       });
     });
 
-    // Process collections in two passes to ensure parent themes are created before child themes
-    const { regularCollections, extendedCollections } = separateCollectionsByType(
-      Array.from(collections.values()),
-    );
-
-
+    // For extended collections: process regular collections first, then extended ones
+    const regularCollections = hasExtendedCollections
+      ? Array.from(collections.values()).filter((c) => !c.isExtension)
+      : Array.from(collections.values());
+    const extendedCollections = hasExtendedCollections
+      ? Array.from(collections.values()).filter((c) => c.isExtension)
+      : [];
 
     // Helper function to process a collection and create themes
-    const processCollection = async (collection: typeof regularCollections[0]) => {
-      // Filter collections based on selectedCollections option
+    const processCollection = async (collection: CollectionEntry) => {
       if (options.selectedCollections) {
         const selectedCollection = options.selectedCollections[collection.id];
         if (!selectedCollection) {
-          return; // Skip this collection if it's not selected
+          return;
         }
       }
 
       await Promise.all(collection.modes.map(async (mode) => {
-        // Filter modes based on selectedCollections option
         if (options.selectedCollections) {
           const selectedCollection = options.selectedCollections[collection.id];
           if (selectedCollection && !selectedCollection.selectedModes.includes(mode.modeId)) {
-            return; // Skip this mode if it's not selected
+            return;
           }
         }
 
@@ -473,12 +457,10 @@ export default async function pullVariables(options: PullVariablesOptions, theme
 
         processedThemes.add(`${collection.id}:${mode.modeId}`);
 
-        // Check if there's an existing theme with the same collection ID and mode ID but different token set name
         const matchingTheme = themeInfo.themes?.find((t) => t.$figmaCollectionId === collection.id
           && t.$figmaModeId === mode.modeId);
 
         if (matchingTheme) {
-          // Find token sets in this theme that are different from the current token set name
           Object.keys(matchingTheme.selectedTokenSets || {}).forEach((existingTokenSet) => {
             if (existingTokenSet !== tokenSetName
               && existingTokenSet.includes('/')
@@ -489,7 +471,6 @@ export default async function pullVariables(options: PullVariablesOptions, theme
           });
         }
 
-        // Track this collection/mode combination
         const themeObj: ThemeObject = {
           id: themeId,
           name: mode.name,
@@ -503,20 +484,21 @@ export default async function pullVariables(options: PullVariablesOptions, theme
           $figmaCollectionId: collection.id,
         };
 
-        // Handle extended collections using helper function
-        processExtendedCollectionImport(themeObj, collection, mode, themesToCreate);
-
-
+        if (hasExtendedCollections) {
+          processExtendedCollectionImport(themeObj, collection, mode, themesToCreate);
+        }
 
         themesToCreate.push(themeObj);
       }));
     };
 
-    // Pass 1: Process all regular collections first
+    // Pass 1: regular collections
     await Promise.all(regularCollections.map(processCollection));
 
-    // Pass 2: Process extended collections (parent themes now exist)
-    await Promise.all(extendedCollections.map(processCollection));
+    // Pass 2: extended collections (parent themes now exist)
+    if (hasExtendedCollections) {
+      await Promise.all(extendedCollections.map(processCollection));
+    }
 
     const currentTokenSets = new Set(themesToCreate.map((theme) => `${theme.group}/${theme.name}`));
     for (const existingSet of existingTokenSets) {
@@ -525,7 +507,6 @@ export default async function pullVariables(options: PullVariablesOptions, theme
       }
 
       if (existingSet.includes('/') && !currentTokenSets.has(existingSet)) {
-        // Find matching theme by collection ID and mode ID only
         const matchingTheme = themeInfo.themes?.find((t) => {
           if (!t.$figmaCollectionId || !t.$figmaModeId) {
             return false;
