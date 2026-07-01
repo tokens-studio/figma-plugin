@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { StyledCard } from './StyledCard';
 import {
   themesListSelector,
+  exportExtendedCollectionsSelector,
 } from '@/selectors';
 import { useIsProUser } from '@/app/hooks/useIsProUser';
 import { ThemeObject } from '@/types';
@@ -45,7 +46,12 @@ function getHierarchicalThemes(themes: ThemeObject[]): ThemeObject[] {
 
 export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: { selectedThemes: string[], setSelectedThemes: (themes: string[]) => void }) {
   const { t } = useTranslation(['manageStylesAndVariables']);
-  const themes = useSelector(themesListSelector);
+  const allThemes = useSelector(themesListSelector);
+  const exportExtendedCollections = useSelector(exportExtendedCollectionsSelector);
+  const themes = useMemo(
+    () => (exportExtendedCollections ? allThemes : allThemes.filter((t) => !t.$figmaParentThemeId)),
+    [allThemes, exportExtendedCollections],
+  );
   const isProUser = useIsProUser();
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
