@@ -388,7 +388,7 @@ export default async function setValuesOnVariable(
                 variable,
                 modeId: mode,
                 referenceVariable: referenceTokenName,
-                collection,
+                ...(isExtendedCollection ? { collection } : {}),
               });
             } else if (typeof token.rawValue === 'string' && token.rawValue.includes('{')) {
               // DIAGNOSTIC: The token's raw value contains a reference (e.g. "{color.brand}")
