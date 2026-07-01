@@ -87,7 +87,7 @@ describe('Extended Collections', () => {
             getVariablesWithoutZombiesMock.mockResolvedValue([
                 {
                     id: 'var-color-primary',
-                    name: 'color/primary',
+                    name: 'color.primary',
                     resolvedType: 'COLOR',
                     variableCollectionId: 'parent-coll-id',
                     valuesByMode: {
@@ -140,14 +140,14 @@ describe('Extended Collections', () => {
             // Parent collection should have tokens
             expect(tokens.colors).toContainEqual(
                 expect.objectContaining({
-                    name: 'color/primary',
+                    name: 'color.primary',
                     parent: 'Mode/Light',
                     value: '#00ff00', // Green
                 })
             );
             expect(tokens.colors).toContainEqual(
                 expect.objectContaining({
-                    name: 'color/primary',
+                    name: 'color.primary',
                     parent: 'Mode/Dark',
                     value: '#008000', // Dark green
                 })
@@ -163,14 +163,14 @@ describe('Extended Collections', () => {
             // Extended collection A should have RED override
             expect(tokens.colors).toContainEqual(
                 expect.objectContaining({
-                    name: 'color/primary',
+                    name: 'color.primary',
                     parent: 'Mode (Brand A)/Light',
                     value: '#ff0000', // Red override
                 })
             );
             expect(tokens.colors).toContainEqual(
                 expect.objectContaining({
-                    name: 'color/primary',
+                    name: 'color.primary',
                     parent: 'Mode (Brand A)/Dark',
                     value: '#800000', // Dark red override
                 })
@@ -179,14 +179,14 @@ describe('Extended Collections', () => {
             // Extended collection B should have BLUE override
             expect(tokens.colors).toContainEqual(
                 expect.objectContaining({
-                    name: 'color/primary',
+                    name: 'color.primary',
                     parent: 'Mode (Brand B)/Light',
                     value: '#0000ff', // Blue override
                 })
             );
             expect(tokens.colors).toContainEqual(
                 expect.objectContaining({
-                    name: 'color/primary',
+                    name: 'color.primary',
                     parent: 'Mode (Brand B)/Dark',
                     value: '#000080', // Dark blue override
                 })

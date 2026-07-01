@@ -56,29 +56,28 @@ export default async function pullVariables(options: PullVariablesOptions, theme
   // Cache for collection lookups by ID
   const collectionsCache = new Map<string, CollectionEntry>();
 
-  if (hasExtendedCollections) {
-    // Enterprise path: eagerly load all collections including extended ones
-    for (const collectionData of allFigmaCollections) {
-      const extendedCollection = collectionData as any;
-      const collection: CollectionEntry = {
-        id: collectionData.id,
-        name: collectionData.name,
-        modes: collectionData.modes.map((mode) => ({
-          name: mode.name,
-          modeId: mode.modeId,
-          parentModeId: (mode as any).parentModeId,
-        })),
-        isExtension: extendedCollection.isExtension || false,
-        parentCollectionId: extendedCollection.isExtension
-          ? extendedCollection.parentVariableCollectionId
-          : undefined,
-        variableOverrides: extendedCollection.isExtension
-          ? extendedCollection.variableOverrides
-          : undefined,
-      };
-      collections.set(collection.name, collection);
-      collectionsCache.set(collection.id, collection);
-    }
+  // Always pre-populate cache from getLocalVariableCollectionsAsync results —
+  // avoids a separate getVariableCollectionByIdAsync call per variable on the standard path
+  for (const collectionData of allFigmaCollections) {
+    const extendedCollection = collectionData as any;
+    const collection: CollectionEntry = {
+      id: collectionData.id,
+      name: collectionData.name,
+      modes: collectionData.modes.map((mode) => ({
+        name: mode.name,
+        modeId: mode.modeId,
+        parentModeId: (mode as any).parentModeId,
+      })),
+      isExtension: extendedCollection.isExtension || false,
+      parentCollectionId: extendedCollection.isExtension
+        ? extendedCollection.parentVariableCollectionId
+        : undefined,
+      variableOverrides: extendedCollection.isExtension
+        ? extendedCollection.variableOverrides
+        : undefined,
+    };
+    collections.set(collection.name, collection);
+    collectionsCache.set(collection.id, collection);
   }
 
   const createFigmaExtensions = (variable: Variable) => {

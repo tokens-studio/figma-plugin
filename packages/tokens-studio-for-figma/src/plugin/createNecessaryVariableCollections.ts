@@ -18,18 +18,23 @@ export async function createNecessaryVariableCollections(themes: ThemeObjectsLis
 
   for (const currentTheme of collectionsToCreateOrUpdate) {
     //  Handle extended collections - only if the setting is enabled
-    // A theme is an extension if it has a $figmaParentThemeId — $figmaIsExtension is derived/optional and may be absent on older themes
-    if (settings.exportExtendedCollections && currentTheme.$figmaParentThemeId) {
+    // A theme is an extension if it has $figmaParentThemeId or $figmaIsExtension
+    if (settings.exportExtendedCollections && (currentTheme.$figmaParentThemeId || currentTheme.$figmaIsExtension)) {
       // Find parent theme to get its collection name
       const parentTheme = themes.find((t) => t.id === currentTheme.$figmaParentThemeId);
       const parentGroupName = parentTheme ? (parentTheme.group ?? parentTheme.name) : undefined;
 
-      // Find parent collection by NAME (not by ID, since IDs change between exports)
-      const parentCollection = parentGroupName ? acc.find((c) => c.name === truncateCollectionName(parentGroupName)) : undefined;
+      // Find parent collection: first by name via parentTheme, then by $figmaParentCollectionId
+      const parentCollection = (parentGroupName ? acc.find((c) => c.name === truncateCollectionName(parentGroupName)) : undefined)
+        ?? allCollections.find((c) => c.id === currentTheme.$figmaParentCollectionId);
 
       if (parentCollection) {
-        // Use theme's own group/name as child collection name, allowing arbitrary names
-        const childCollectionName = currentTheme.group ?? currentTheme.name;
+        // Use theme's own group/name as child collection name, stripping parent prefix if present
+        const rawChildName = currentTheme.group ?? currentTheme.name;
+        const parentPrefix = parentGroupName ?? parentCollection.name;
+        const childCollectionName = parentPrefix && rawChildName.startsWith(`${parentPrefix}/`)
+          ? rawChildName.slice(parentPrefix.length + 1)
+          : rawChildName;
         const truncatedChildName = truncateCollectionName(childCollectionName);
 
         // Check if extended collection already exists
@@ -79,8 +84,7 @@ export async function createNecessaryVariableCollections(themes: ThemeObjectsLis
           continue;
         } catch (error) {
           // Handle Enterprise plan limitation or other errors
-          console.error('Failed to create extended collection:', error);
-          console.warn('Extended collections require Figma Enterprise plan. Skipping this extended theme.');
+          console.warn('Cannot create extended collection — extend() API not available. Requires Figma Enterprise.', error);
           // Don't fall through - skip this theme entirely to avoid duplicate regular collections
           continue;
         }
