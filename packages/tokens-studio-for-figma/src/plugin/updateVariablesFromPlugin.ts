@@ -24,14 +24,14 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
 
   const metadataUpdateTracker: Record<string, boolean> = {};
 
-  themeInfo.themes.forEach((theme) => {
+  for (const theme of themeInfo.themes) {
     if (
       Object.entries(theme.selectedTokenSets).some(
         ([tokenSet, status]) => status === TokenSetStatus.ENABLED && tokenSet === payload.parent,
       )
     ) {
       // Filter themes which contains this token
-      if (theme.$figmaVariableReferences?.[payload.name] && theme.$figmaModeId && theme.$figmaCollectionId) {
+      if (theme.$figmaVariableReferences?.[payload.name] && theme.$figmaModeId) {
         const variable = variableMap[theme?.$figmaVariableReferences?.[payload.name]];
         if (variable && Object.values(themeInfo.activeTheme).includes(theme.id)) {
           if (!metadataUpdateTracker[variable.id]) {
@@ -76,75 +76,79 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
             metadataUpdateTracker[variable.id] = true;
           }
 
-          figma.variables.getVariableCollectionByIdAsync(theme.$figmaCollectionId).then((collection) => {
-            if (!collection) return;
+          // Fetch collection only when needed for extended-collection parent-mode checks
+          const collection = theme.$figmaCollectionId
+            ? await figma.variables.getVariableCollectionByIdAsync(theme.$figmaCollectionId)
+            : null;
 
-            if (checkCanReferenceVariable(payload)) {
-              // If new token reference to another token, we update the variable to reference to another variable
-              let referenceTokenName: string = '';
-              if (payload.rawValue && payload.rawValue?.toString().startsWith('{')) {
-                referenceTokenName = payload.rawValue?.toString().slice(1, payload.rawValue.toString().length - 1);
-              } else {
-                referenceTokenName = payload.rawValue!.toString().substring(1);
-              }
-              const referenceVariable = nameToVariableMap[referenceTokenName.split('.').join('/')];
-              if (referenceVariable) {
-                const newValue: any = {
-                  type: 'VARIABLE_ALIAS',
-                  id: referenceVariable.id,
-                };
-
-                // Handle extended collections: if alias matches parent mode, clear override
-                const modeObj = collection.modes.find((m) => m.modeId === theme.$figmaModeId);
-                const parentModeId = (modeObj as any)?.parentModeId;
-
-                if (parentModeId) {
-                  const parentValue = variable.valuesByMode[parentModeId];
-                  if (
-                    typeof parentValue === 'object'
-                    && parentValue !== null
-                    && (parentValue as any).type === 'VARIABLE_ALIAS'
-                    && (parentValue as any).id === referenceVariable.id
-                  ) {
-                    (variable as any).clearValueForMode(theme.$figmaModeId!);
-                    return;
-                  }
-                }
-
-                variable.setValueForMode(theme.$figmaModeId!, newValue);
-              }
+          if (checkCanReferenceVariable(payload)) {
+            let referenceTokenName: string = '';
+            if (payload.rawValue && payload.rawValue?.toString().startsWith('{')) {
+              referenceTokenName = payload.rawValue?.toString().slice(1, payload.rawValue.toString().length - 1);
             } else {
-              switch (payload.type) {
-                case TokenTypes.COLOR:
-                  if (typeof payload.value === 'string') {
-                    setColorValuesOnVariable(variable, theme.$figmaModeId!, payload.value, collection);
-                  }
-                  break;
-                case TokenTypes.BOOLEAN:
-                  if (typeof payload.value === 'string') {
-                    setBooleanValuesOnVariable(variable, theme.$figmaModeId!, payload.value, collection);
-                  }
-                  break;
-                case TokenTypes.TEXT:
-                  if (typeof payload.value === 'string') {
-                    setStringValuesOnVariable(variable, theme.$figmaModeId!, payload.value, collection);
-                  }
-                  break;
-                case TokenTypes.SIZING:
-                case TokenTypes.DIMENSION:
-                case TokenTypes.BORDER_RADIUS:
-                case TokenTypes.BORDER_WIDTH:
-                case TokenTypes.SPACING:
-                case TokenTypes.NUMBER:
-                  setNumberValuesOnVariable(variable, theme.$figmaModeId!, Number(payload.value), collection);
-                  break;
-                default:
-                  break;
-              }
+              referenceTokenName = payload.rawValue!.toString().substring(1);
             }
-          });
+            const referenceVariable = nameToVariableMap[referenceTokenName.split('.').join('/')];
+            if (referenceVariable) {
+              const newValue: any = {
+                type: 'VARIABLE_ALIAS',
+                id: referenceVariable.id,
+              };
+
+              // Extended collections: if alias matches parent mode value, clear override
+              const modeObj = collection?.modes?.find((m) => m.modeId === theme.$figmaModeId);
+              const parentModeId = (modeObj as any)?.parentModeId;
+              if (parentModeId) {
+                const parentValue = variable.valuesByMode[parentModeId];
+                if (
+                  typeof parentValue === 'object'
+                  && parentValue !== null
+                  && (parentValue as any).type === 'VARIABLE_ALIAS'
+                  && (parentValue as any).id === referenceVariable.id
+                ) {
+                  (variable as any).clearValueForMode(theme.$figmaModeId!);
+                  return;
+                }
+              }
+
+              variable.setValueForMode(theme.$figmaModeId!, newValue);
+            }
+          } else {
+            const modeId = theme.$figmaModeId!;
+            switch (payload.type) {
+              case TokenTypes.COLOR:
+                if (typeof payload.value === 'string') {
+                  if (collection) setColorValuesOnVariable(variable, modeId, payload.value, collection);
+                  else setColorValuesOnVariable(variable, modeId, payload.value);
+                }
+                break;
+              case TokenTypes.BOOLEAN:
+                if (typeof payload.value === 'string') {
+                  if (collection) setBooleanValuesOnVariable(variable, modeId, payload.value, collection);
+                  else setBooleanValuesOnVariable(variable, modeId, payload.value);
+                }
+                break;
+              case TokenTypes.TEXT:
+                if (typeof payload.value === 'string') {
+                  if (collection) setStringValuesOnVariable(variable, modeId, payload.value, collection);
+                  else setStringValuesOnVariable(variable, modeId, payload.value);
+                }
+                break;
+              case TokenTypes.SIZING:
+              case TokenTypes.DIMENSION:
+              case TokenTypes.BORDER_RADIUS:
+              case TokenTypes.BORDER_WIDTH:
+              case TokenTypes.SPACING:
+              case TokenTypes.NUMBER:
+                if (collection) setNumberValuesOnVariable(variable, modeId, Number(payload.value), collection);
+                else setNumberValuesOnVariable(variable, modeId, Number(payload.value));
+                break;
+              default:
+                break;
+            }
+          }
         }
       }
     }
-  });
+  }
 }
