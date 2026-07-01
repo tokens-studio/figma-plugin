@@ -9,7 +9,7 @@ import {
 } from './extendedCollections';
 
 // Takes a given theme input and creates required variable collections with modes, or updates existing ones and renames / adds modes
-export async function createNecessaryVariableCollections(themes: ThemeObjectsList, selectedThemes: string[], settings: SettingsState): Promise<VariableCollection[]> {
+export async function createNecessaryVariableCollections(themes: ThemeObjectsList, selectedThemes: string[], settings: Partial<SettingsState> = {}): Promise<VariableCollection[]> {
   const allCollections = await figma.variables.getLocalVariableCollectionsAsync();
   const collectionsToCreateOrUpdate = themes.filter((theme) => selectedThemes.includes(theme.id));
 
