@@ -53,7 +53,6 @@ const SyncSettings = () => {
     {
       text: 'BitBucket',
       type: StorageProviderType.BITBUCKET,
-      beta: true,
     },
     {
       text: 'Supernova',
