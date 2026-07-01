@@ -7,9 +7,6 @@ const OK = 'ok';
 const UNKNOWN_ERROR = 'unknown_error';
 
 const shouldProfile = () => {
-  if (process.env.NODE_ENV === 'test') {
-    return true;
-  }
   switch (process.env.ENVIRONMENT) {
     case 'production':
     case 'beta':
