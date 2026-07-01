@@ -30,7 +30,7 @@ export default function setColorValuesOnVariable(variable: Variable, mode: strin
     const newValue = { ...color, a: opacity };
 
     // Handle extended collections: if value matches parent mode, clear override
-    const modeObj = collection?.modes.find((m) => m.modeId === mode);
+    const modeObj = collection?.modes?.find((m) => m.modeId === mode);
     const parentModeId = (modeObj as any)?.parentModeId;
 
     if (parentModeId) {

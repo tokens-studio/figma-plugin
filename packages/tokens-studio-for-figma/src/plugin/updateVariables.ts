@@ -115,9 +115,9 @@ export default async function updateVariables({
     themeBaseFontSize,
     settings.renameExistingStylesAndVariables,
     progressTracker,
-    isExtendedCollection,
     metadataUpdateTracker,
     providedPlatformsByVariable,
+    isExtendedCollection,
   );
 
   const removedVariables: string[] = [];

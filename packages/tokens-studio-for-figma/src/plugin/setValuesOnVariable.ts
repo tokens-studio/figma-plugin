@@ -28,9 +28,9 @@ export default async function setValuesOnVariable(
   baseFontSize: string,
   shouldRename = false,
   progressTracker?: ProgressTracker | null,
-  isExtendedCollection = false,
   metadataUpdateTracker?: Record<string, boolean>,
   providedPlatformsByVariable?: Record<string, Set<string>>,
+  isExtendedCollection = false,
 ) {
   const variableKeyMap: Record<string, string> = {};
   const referenceVariableCandidates: ReferenceVariableType[] = [];
