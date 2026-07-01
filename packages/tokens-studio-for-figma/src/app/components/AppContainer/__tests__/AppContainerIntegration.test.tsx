@@ -147,7 +147,6 @@ const mockStartupParams: Omit<StartupMessage, 'licenseKey'> = {
   authData: null,
   selectedExportThemes: [],
   activeOrganizationId: null,
-  isFigmaEnterprise: false,
 };
 
 // #region helpers

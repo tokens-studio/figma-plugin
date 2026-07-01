@@ -68,20 +68,6 @@ export async function startup() {
     };
   }
 
-  // Detect Figma Enterprise by attempting to call .extend(), which is Enterprise-only.
-  // We create a temp collection, try to extend it, then clean up regardless of outcome.
-  let isFigmaEnterprise = false;
-  const probe = figma.variables.createVariableCollection('__ts_probe__');
-  try {
-    const extended = await (probe as any).extend('__ts_ext_probe__');
-    isFigmaEnterprise = true;
-    if (extended && typeof extended.remove === 'function') extended.remove();
-  } catch {
-    isFigmaEnterprise = false;
-  } finally {
-    try { probe.remove(); } catch { /* ignore */ }
-  }
-
   return {
     settings: finalSettings,
     activeTheme,
@@ -105,6 +91,5 @@ export async function startup() {
     usedEmail,
     selectedExportThemes,
     activeOrganizationId,
-    isFigmaEnterprise,
   };
 }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Stack, Label, Box, Button, Switch, Text,
@@ -8,6 +8,8 @@ import {
   ChevronLeftIcon,
 } from '@primer/octicons-react';
 import { useDispatch, useSelector } from 'react-redux';
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { Modal } from '../Modal/Modal';
 import { LabelledCheckbox } from './LabelledCheckbox';
 import { ExplainerModal } from '../ExplainerModal';
@@ -59,6 +61,12 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
   const isFigmaEnterprise = useSelector(isFigmaEnterpriseSelector);
 
   const dispatch = useDispatch<Dispatch>();
+
+  useEffect(() => {
+    AsyncMessageChannel.ReactInstance.message({ type: AsyncMessageTypes.CHECK_FIGMA_ENTERPRISE })
+      .then((result) => { dispatch.userState.setIsFigmaEnterprise(result.isFigmaEnterprise); })
+      .catch(() => { dispatch.userState.setIsFigmaEnterprise(false); });
+  }, [dispatch.userState]);
 
   const handleIgnoreChange = React.useCallback(
     (state: CheckedState) => {

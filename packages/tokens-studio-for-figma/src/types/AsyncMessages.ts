@@ -81,6 +81,7 @@ export enum AsyncMessageTypes {
   SET_INITIAL_LOAD = 'async/set-initial-load',
   PREVIEW_REQUEST_STARTUP = 'async/preview-request-startup',
   GET_AVAILABLE_VARIABLE_COLLECTIONS = 'async/get-available-variable-collections',
+  CHECK_FIGMA_ENTERPRISE = 'async/check-figma-enterprise',
 }
 
 export type AsyncMessage<T extends AsyncMessageTypes, P = unknown> = P & { type: T };
@@ -305,6 +306,11 @@ export type GetAvailableVariableCollectionsMessageResult = AsyncMessage<AsyncMes
   collections: VariableCollectionInfo[]
 }>;
 
+export type CheckFigmaEnterpriseMessage = AsyncMessage<AsyncMessageTypes.CHECK_FIGMA_ENTERPRISE>;
+export type CheckFigmaEnterpriseMessageResult = AsyncMessage<AsyncMessageTypes.CHECK_FIGMA_ENTERPRISE, {
+  isFigmaEnterprise: boolean;
+}>;
+
 export type RemoveStylesWithoutConnectionMessage = AsyncMessage<AsyncMessageTypes.REMOVE_STYLES_WITHOUT_CONNECTION, {
   usedStyleIds: string[]
 }>;
@@ -443,6 +449,7 @@ export type AsyncMessages =
   | SetNoneValuesOnNodeAsyncMessage
   | GetFigmaFontsMessage
   | GetAvailableVariableCollectionsMessage
+  | CheckFigmaEnterpriseMessage
   | SetAuthDataMessage
   | SetUsedEmailMessage
   | CreateLocalVariablesAsyncMessage
@@ -497,6 +504,7 @@ export type AsyncMessageResults =
   | SetNoneValuesOnNodeAsyncMessageResult
   | GetFigmaFontsMessageResult
   | GetAvailableVariableCollectionsMessageResult
+  | CheckFigmaEnterpriseMessageResult
   | SetAuthDataMessageResult
   | SetUsedEmailMessageResult
   | CreateLocalVariablesAsyncMessageResult

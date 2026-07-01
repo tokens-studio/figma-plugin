@@ -8,6 +8,8 @@ import { Button, EmptyState } from '@tokens-studio/ui';
 import { styled } from '@stitches/react';
 import { useTranslation } from 'react-i18next';
 import { activeThemeSelector, themesListSelector } from '@/selectors';
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import Modal from '../Modal';
 import { Dispatch } from '@/app/store';
 import Stack from '../Stack';
@@ -365,6 +367,16 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
       themeListRef.current.scrollTop = themeListScrollPosition;
     }
   }, [themeEditorOpen, themeListScrollPosition]);
+
+  useEffect(() => {
+    AsyncMessageChannel.ReactInstance.message({ type: AsyncMessageTypes.CHECK_FIGMA_ENTERPRISE })
+      .then((result) => {
+        dispatch.userState.setIsFigmaEnterprise(result.isFigmaEnterprise);
+      })
+      .catch(() => {
+        dispatch.userState.setIsFigmaEnterprise(false);
+      });
+  }, [dispatch.userState]);
 
   const handleThemeListScroll = useCallback(() => {
     if (themeListRef.current) {
