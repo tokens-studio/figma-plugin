@@ -49,7 +49,7 @@ export default async function updateVariablesToReference(figmaVariables: Map<str
       // (for extended collections, source and target share the same parent collection ID)
       const sameCollectionVariable = candidateVariables.find(
         (v) => v.variableCollectionId === aliasVariable.variable.variableCollectionId
-          && v.id !== aliasVariable.variable.id,
+          && v !== aliasVariable.variable,
       );
 
       let referenceVariableKey: string | undefined;
