@@ -98,20 +98,17 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
               // Extended collections: if alias matches parent mode value, clear override
               const modeObj = collection?.modes?.find((m) => m.modeId === theme.$figmaModeId);
               const parentModeId = (modeObj as any)?.parentModeId;
-              if (parentModeId) {
-                const parentValue = variable.valuesByMode[parentModeId];
-                if (
-                  typeof parentValue === 'object'
-                  && parentValue !== null
-                  && (parentValue as any).type === 'VARIABLE_ALIAS'
-                  && (parentValue as any).id === referenceVariable.id
-                ) {
-                  (variable as any).clearValueForMode(theme.$figmaModeId!);
-                  return;
-                }
-              }
+              const parentValue = parentModeId ? variable.valuesByMode[parentModeId] : undefined;
+              const parentAlreadyMatches = typeof parentValue === 'object'
+                && parentValue !== null
+                && (parentValue as any).type === 'VARIABLE_ALIAS'
+                && (parentValue as any).id === referenceVariable.id;
 
-              variable.setValueForMode(theme.$figmaModeId!, newValue);
+              if (parentAlreadyMatches) {
+                (variable as any).clearValueForMode(theme.$figmaModeId!);
+              } else {
+                variable.setValueForMode(theme.$figmaModeId!, newValue);
+              }
             }
           } else {
             const modeId = theme.$figmaModeId!;

@@ -87,7 +87,7 @@ export function ThemeListGroupHeader({
         cursor: 'inherit',
         '&:not(:first-of-type)': { marginTop: '$4' },
         // Progressive indentation based on depth level (each level adds $6 padding)
-        paddingLeft: `calc($6 * ${indentationDepth})`,
+        paddingLeft: `calc(${indentationDepth} * var(--space-6))`,
       }}
     >
       <DragGrabber

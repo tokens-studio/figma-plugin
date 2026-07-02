@@ -202,11 +202,18 @@ export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: {
       // Deselect all filtered themes
       setSelectedThemes(selectedThemes.filter((id) => !themesToToggle.some((theme) => theme.id === id)));
     } else {
-      // Select all filtered themes (add to existing selection)
+      // Select all filtered themes (add to existing selection), including their ancestors
       const newSelection = [...selectedThemes];
       themesToToggle.forEach((theme) => {
         if (!newSelection.includes(theme.id)) {
           newSelection.push(theme.id);
+        }
+        let current = parentByThemeId.get(theme.id);
+        while (current) {
+          if (!newSelection.includes(current)) {
+            newSelection.push(current);
+          }
+          current = parentByThemeId.get(current);
         }
       });
       setSelectedThemes(newSelection);

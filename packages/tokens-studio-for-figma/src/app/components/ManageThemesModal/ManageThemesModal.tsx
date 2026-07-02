@@ -267,6 +267,9 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
       }
     });
 
+    // Capture pre-sort indexes so the comparator doesn't read a mutating array
+    const originalIndex = new Map(updatedThemes.map((t, i) => [t.id, i]));
+
     // Sort extended themes based on their parent's new order
     const finalThemes = updatedThemes.sort((a, b) => {
       const aIsExtended = !!a.$figmaParentThemeId;
@@ -274,7 +277,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
 
       // If neither is extended, keep original order
       if (!aIsExtended && !bIsExtended) {
-        return updatedThemes.indexOf(a) - updatedThemes.indexOf(b);
+        return (originalIndex.get(a.id) ?? 0) - (originalIndex.get(b.id) ?? 0);
       }
 
       // If only one is extended, prioritize parent themes first
@@ -294,7 +297,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
       }
 
       // Same parent order, maintain original relative order
-      return updatedThemes.indexOf(a) - updatedThemes.indexOf(b);
+      return (originalIndex.get(a.id) ?? 0) - (originalIndex.get(b.id) ?? 0);
     });
 
     const newActiveTheme = activeTheme;
