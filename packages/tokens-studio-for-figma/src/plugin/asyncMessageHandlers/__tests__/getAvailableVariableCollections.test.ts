@@ -33,6 +33,7 @@ describe('getAvailableVariableCollections', () => {
         {
           ...mockCollections[0],
           isExtension: false,
+          extensionDepth: 0,
           parentCollectionId: undefined,
           modes: mockCollections[0].modes.map((mode) => ({
             ...mode,
@@ -42,6 +43,7 @@ describe('getAvailableVariableCollections', () => {
         {
           ...mockCollections[1],
           isExtension: false,
+          extensionDepth: 0,
           parentCollectionId: undefined,
           modes: mockCollections[1].modes.map((mode) => ({
             ...mode,
