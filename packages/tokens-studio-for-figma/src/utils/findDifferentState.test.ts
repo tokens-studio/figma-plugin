@@ -168,6 +168,7 @@ describe('findDifferentState', () => {
 
     expect(result.tokens.set1).toHaveLength(1);
     expect(result.tokens.set1[0]).toMatchObject({ name: 'color.primary', importType: 'UPDATE' });
+    expect(result.tokens.set1[0].oldValue).toBeUndefined();
   });
 
   it('does not flag a change when $extensions modifier is identical', () => {
@@ -183,7 +184,8 @@ describe('findDifferentState', () => {
       },
     };
     const baseState: CompareStateType = { tokens: { set1: [token] }, themes: [], metadata: null };
-    const compareState: CompareStateType = { tokens: { set1: [{ ...token }] }, themes: [], metadata: null };
+    const compareToken = JSON.parse(JSON.stringify(token));
+    const compareState: CompareStateType = { tokens: { set1: [compareToken] }, themes: [], metadata: null };
 
     const result = findDifferentState(baseState, compareState);
 
