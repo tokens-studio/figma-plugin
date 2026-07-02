@@ -1131,7 +1131,9 @@ export const tokenState = createModel<RootModel>()({
         }
 
         // Check if there are unsaved changes before updating
-        if (rootState.uiState.storageType.provider !== StorageProviderType.TOKENS_STUDIO) {
+        // Tokens Studio (including OAuth) pushes every change immediately via REST — skip local-change tracking
+        if (rootState.uiState.storageType.provider !== StorageProviderType.TOKENS_STUDIO
+          && rootState.uiState.storageType.provider !== StorageProviderType.TOKENS_STUDIO_OAUTH) {
           const { lastSyncedState } = rootState.tokenState;
           const hasChanges = !compareLastSyncedState(
             rootState.tokenState.tokens,
