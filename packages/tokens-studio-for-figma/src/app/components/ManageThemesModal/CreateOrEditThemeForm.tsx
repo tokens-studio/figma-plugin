@@ -49,7 +49,7 @@ type Props = {
 };
 
 export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
-  id, defaultValues, onSubmit, onCancel, isExtendMode = false, setIsExtendMode,
+  id, defaultValues, onSubmit, onCancel, isExtendMode = false, setIsExtendMode: _setIsExtendMode,
 }) => {
   const store = useStore<RootState>();
   const [activeTab, setActiveTab] = useState(ThemeFormTabs.SETS);
@@ -72,8 +72,8 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
         return false;
       }
       // Exclude groups where any theme has $figmaParentThemeId
-      const themesInGroup = themes.filter(t => t.group === group);
-      return !themesInGroup.some(t => t.$figmaParentThemeId);
+      const themesInGroup = themes.filter((t) => t.group === group);
+      return !themesInGroup.some((t) => t.$figmaParentThemeId);
     });
   }, [themes]);
 
@@ -96,8 +96,8 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
           return false;
         }
         // Exclude groups where any theme has $figmaParentThemeId (extended theme)
-        const themesInGroup = themes.filter(t => t.group === group);
-        return !themesInGroup.some(t => t.$figmaParentThemeId);
+        const themesInGroup = themes.filter((t) => t.group === group);
+        return !themesInGroup.some((t) => t.$figmaParentThemeId);
       })
       .sort();
   }, [themes]);
@@ -106,14 +106,14 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
   // Get current theme if editing
   const currentTheme = useMemo(() => {
     if (!id) return null;
-    return themes.find(t => t.id === id);
+    return themes.find((t) => t.id === id);
   }, [id, themes]);
 
   // Check if current theme is extended and find parent
   const isExtendedTheme = useMemo(() => !!currentTheme?.$figmaParentThemeId, [currentTheme]);
   const parentTheme = useMemo(() => {
     if (!isExtendedTheme || !currentTheme?.$figmaParentThemeId) return null;
-    return themes.find(t => t.id === currentTheme.$figmaParentThemeId);
+    return themes.find((t) => t.id === currentTheme.$figmaParentThemeId);
   }, [isExtendedTheme, currentTheme, themes]);
 
   const treeOrListItems = useMemo(() => (
@@ -334,13 +334,15 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
                     <Box css={{
                       fontSize: '$xsmall',
                       color: '$fgSubtle',
-                      fontWeight: '$sansMedium'
-                    }}>
+                      fontWeight: '$sansMedium',
+                    }}
+                    >
                       Extend from
                     </Box>
                     <Controller
                       name="parentThemeId"
                       control={control}
+                      // eslint-disable-next-line react/jsx-no-bind
                       render={({ field }) => (
                         <Select
                           data-testid="create-theme-form--select--parent"
@@ -364,8 +366,9 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
                   <Box css={{
                     fontSize: '$xsmall',
                     color: '$fgSubtle',
-                    fontWeight: '$sansMedium'
-                  }}>
+                    fontWeight: '$sansMedium',
+                  }}
+                  >
                     {t('themeName')}
                   </Box>
                   <Input
@@ -535,6 +538,7 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
             <Controller
               name="$figmaMirrorParentSets"
               control={control}
+              // eslint-disable-next-line react/jsx-no-bind
               render={({ field }) => (
                 <Stack direction="row" justify="between" align="center">
                   <Stack direction="column" gap={1}>
@@ -542,7 +546,10 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
                       Mirror Parent Theme
                     </Box>
                     <Box css={{ fontSize: '$xsmall', color: '$fgMuted' }}>
-                      Automatically sync token sets from {parentTheme.group ? `${parentTheme.group}/` : ''}{parentTheme.name}
+                      Automatically sync token sets from
+                      {' '}
+                      {parentTheme.group ? `${parentTheme.group}/` : ''}
+                      {parentTheme.name}
                     </Box>
                   </Stack>
                   <Switch

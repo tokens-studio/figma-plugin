@@ -12,7 +12,7 @@ import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { normalizeVariableName } from '@/utils/normalizeVariableName';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
-import { processExtendedCollectionImport, separateCollectionsByType } from './extendedCollections';
+import { processExtendedCollectionImport } from './extendedCollections';
 
 type CollectionEntry = {
   id: string,

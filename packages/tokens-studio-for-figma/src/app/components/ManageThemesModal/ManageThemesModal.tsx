@@ -80,31 +80,6 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
     return 0;
   }, [themes, getThemeDepth]);
 
-  // Available parent theme GROUPS (not individual themes)
-  const availableParentGroups = useMemo(() => {
-    // Get all unique theme groups, excluding extended ones
-    const allGroups = new Set<string>();
-
-    themes.forEach((theme) => {
-      if (theme.group) {
-        allGroups.add(theme.group);
-      }
-    });
-
-    // Filter out extended theme groups
-    return Array.from(allGroups)
-      .filter((group) => {
-        // Exclude groups with "/" (hierarchical extended format like "Parent/Extended")
-        if (group.includes('/')) {
-          return false;
-        }
-        // Exclude groups where any theme has $figmaParentThemeId (extended theme)
-        const themesInGroup = themes.filter(t => t.group === group);
-        return !themesInGroup.some(t => t.$figmaParentThemeId);
-      })
-      .sort();
-  }, [themes]);
-
   const themeEditorDefaultValues: Partial<FormValues> = useMemo(() => {
     const themeObject = themes.find(({ id }) => id === themeEditorOpen);
     if (themeObject) {
@@ -196,12 +171,12 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
       track('Edit theme', { id, values });
 
       // If this is an extended theme with mirror enabled, use parent's token sets
-      const currentTheme = themes.find(t => t.id === id);
+      const currentTheme = themes.find((t) => t.id === id);
       const shouldMirror = values.$figmaMirrorParentSets ?? currentTheme?.$figmaMirrorParentSets ?? false;
       let tokenSetsToUse = values.tokenSets;
 
       if (shouldMirror && currentTheme?.$figmaParentThemeId) {
-        const parentTheme = themes.find(t => t.id === currentTheme.$figmaParentThemeId);
+        const parentTheme = themes.find((t) => t.id === currentTheme.$figmaParentThemeId);
         if (parentTheme) {
           tokenSetsToUse = parentTheme.selectedTokenSets;
         }
@@ -227,7 +202,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
 
     const parentGroupName = values.parentThemeId; // Group name to extend from
     const parentThemes = parentGroupName
-      ? themes.filter(t => t.group === parentGroupName) // Include all themes in the parent group, even if already extended
+      ? themes.filter((t) => t.group === parentGroupName) // Include all themes in the parent group, even if already extended
       : [];
 
     if (parentThemes.length > 0) {
@@ -339,8 +314,8 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
       return true;
     }
     // Also check if any theme in this group has $figmaParentThemeId
-    const themesInGroup = themes.filter(t => t.group === groupName);
-    return themesInGroup.some(t => t.$figmaParentThemeId);
+    const themesInGroup = themes.filter((t) => t.group === groupName);
+    return themesInGroup.some((t) => t.$figmaParentThemeId);
   }, [themes]);
 
   const handleCheckReorder = React.useCallback((
@@ -386,6 +361,15 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
 
   const debouncedHandleThemeListScroll = useMemo(() => debounce(handleThemeListScroll, 200), [handleThemeListScroll]);
 
+  const handleExtendThemeGroup = useCallback((groupName: string) => {
+    setSelectedParentGroup(groupName);
+    setIsExtendMode(true);
+    setThemeEditorOpen(true);
+  }, [setSelectedParentGroup, setIsExtendMode, setThemeEditorOpen]);
+
+  const isEditingNonExtendedTheme = typeof themeEditorOpen === 'string'
+    && !themes.find((t) => t.id === themeEditorOpen)?.$figmaIsExtension;
+
   return (
     <Modal
       id="manage-themes-modal"
@@ -397,35 +381,28 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
       footer={(
         <Stack gap={2} direction="row" justify="end">
           {!themeEditorOpen && (
-            <>
-              <Button
-                data-testid="button-manage-themes-modal-new-theme"
-                variant="secondary"
-                icon={<IconPlus />}
-                onClick={handleToggleOpenThemeEditor}
-              >
+            <Button
+              data-testid="button-manage-themes-modal-new-theme"
+              variant="secondary"
+              icon={<IconPlus />}
+              onClick={handleToggleOpenThemeEditor}
+            >
                 {t('newTheme')}
-              </Button>
-            </>
+            </Button>
           )}
           {themeEditorOpen && (
             <>
               <Box css={{ marginRight: 'auto' }}>
-                {typeof themeEditorOpen === 'string' && (() => {
-                  const currentTheme = themes.find((t) => t.id === themeEditorOpen);
-                  const isExtendedTheme = currentTheme?.$figmaIsExtension;
-
-                  return !isExtendedTheme ? (
-                    <Button
-                      data-testid="button-manage-themes-modal-delete-theme"
-                      variant="danger"
-                      type="submit"
-                      onClick={handleDeleteTheme}
-                    >
-                      {t('delete')}
-                    </Button>
-                  ) : null;
-                })()}
+                {isEditingNonExtendedTheme && (
+                  <Button
+                    data-testid="button-manage-themes-modal-delete-theme"
+                    variant="danger"
+                    type="submit"
+                    onClick={handleDeleteTheme}
+                  >
+                    {t('delete')}
+                  </Button>
+                )}
               </Box>
               <Stack direction="row" gap={4}>
                 <Button
@@ -493,11 +470,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
                           groupName={item.value as string}
                           indentationDepth={getGroupDepth(item.value as string)}
                           isExtendedGroup={isExtended}
-                          onExtendThemeGroup={(groupName) => {
-                            setSelectedParentGroup(groupName);
-                            setIsExtendMode(true);
-                            setThemeEditorOpen(true);
-                          }}
+                          onExtendThemeGroup={handleExtendThemeGroup}
                           onDeleteThemeGroup={handleDeleteThemeGroup}
                         />
                       )

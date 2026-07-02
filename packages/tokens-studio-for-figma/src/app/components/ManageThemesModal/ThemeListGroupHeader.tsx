@@ -12,7 +12,6 @@ import { DragGrabber } from '../StyledDragger/DragGrabber';
 import Text from '../Text';
 import Box from '../Box';
 import Input from '../Input';
-import IconPencil from '@/icons/pencil.svg';
 import { Dispatch } from '@/app/store';
 import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
 

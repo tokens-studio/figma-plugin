@@ -297,10 +297,11 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
                 disabled={!isFigmaEnterprise}
               />
               <Label css={{ fontWeight: '$sansRegular', fontSize: '$xsmall', ...(!isFigmaEnterprise ? { color: '$fgDisabled', opacity: 0.5 } : {}) }} htmlFor="exportExtendedCollections">
-                Export extended collections{!isFigmaEnterprise && ' (Enterprise only)'}
+                Export extended collections
+                {!isFigmaEnterprise && ' (Enterprise only)'}
               </Label>
               <ExplainerModal title="Export extended collections">
-                <Box>When enabled, themes marked as "extended" will be exported as extended variable collections in Figma, inheriting from their parent collections. This is useful for creating brand variants or theme extensions. Requires Figma Enterprise plan.</Box>
+                <Box>When enabled, themes marked as &quot;extended&quot; will be exported as extended variable collections in Figma, inheriting from their parent collections. This is useful for creating brand variants or theme extensions. Requires Figma Enterprise plan.</Box>
               </ExplainerModal>
             </StyledCheckboxGrid>
           </Stack>
