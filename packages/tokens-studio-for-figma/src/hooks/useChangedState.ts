@@ -52,8 +52,13 @@ export function useChangedState() {
 
   // Move the dispatch call to useEffect to avoid setState during render
   useEffect(() => {
+    // Studio OAuth pushes every change immediately via REST — no local-only changes exist
+    if (storageType.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
+      dispatch.tokenState.updateCheckForChanges(false);
+      return;
+    }
     dispatch.tokenState.updateCheckForChanges(hasChanges);
-  }, [hasChanges, dispatch.tokenState]);
+  }, [hasChanges, dispatch.tokenState, storageType.provider]);
 
   return { changedPushState, changedPullState, hasChanges };
 }

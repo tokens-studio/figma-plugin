@@ -385,6 +385,66 @@ describe('pullTokensFactory', () => {
     expect(state.uiState.activeTab).toEqual(Tabs.START);
   });
 
+  it('should pull from Studio OAuth without showing local-changes dialog even when checkForChanges is true', async () => {
+    const mockOAuthStorageType: StorageType = {
+      id: 'my-project',
+      internalId: 'my-project',
+      name: 'Tokens Studio OAuth',
+      provider: StorageProviderType.TOKENS_STUDIO_OAUTH,
+    } as StorageType;
+
+    const mockStore = createMockStore({
+      uiState: {
+        storageType: mockOAuthStorageType,
+      },
+    });
+
+    const mockParams = {
+      localTokenData: {
+        checkForChanges: true,
+        values: {
+          global: [
+            {
+              type: TokenTypes.COLOR,
+              name: 'colors.red',
+              value: '#ff0000',
+              $extensions: {
+                'studio.tokens': {
+                  id: 'mock-uuid',
+                },
+              },
+            },
+          ],
+        },
+      },
+      localApiProviders: [
+        { ...mockOAuthStorageType, secret: 'secret' },
+      ],
+    } as unknown as StartupMessage;
+
+    const fn = pullTokensFactory(
+      mockStore,
+      mockStore.dispatch,
+      mockParams,
+      mockUseConfirm,
+      mockUseRemoteTokens,
+    );
+
+    mockFetchBranches.mockResolvedValueOnce(['main']);
+    mockPullTokens.mockResolvedValueOnce({
+      tokens: { global: [] },
+      themes: [],
+      metadata: {},
+    });
+
+    await fn();
+
+    // Dialog should never appear for Studio OAuth — changes are always in sync via REST
+    expect(mockConfirm).not.toBeCalled();
+    // Should pull from remote, not recover local state
+    expect(mockUseRemoteTokens.pullTokens).toBeCalledTimes(1);
+  });
+
   it('should categorize JSON parsing errors correctly', () => {
     const jsonError = new SyntaxError('Unexpected token } in JSON at position 10');
 
