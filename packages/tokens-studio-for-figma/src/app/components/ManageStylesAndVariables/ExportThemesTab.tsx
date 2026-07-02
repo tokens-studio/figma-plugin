@@ -15,6 +15,34 @@ import { LabelledCheckbox } from './LabelledCheckbox';
 import { SearchInputWithToggle } from '../SearchInputWithToggle';
 import { sortThemesForDisplay } from '@/utils/themeListToTree';
 
+function ThemeRow({
+  theme,
+  selectedThemes,
+  descendantsByThemeId,
+  onSelect,
+}: {
+  theme: ThemeObject;
+  selectedThemes: string[];
+  descendantsByThemeId: Map<string, Set<string>>;
+  onSelect: (id: string) => void;
+}) {
+  const descendants = descendantsByThemeId.get(theme.id) || new Set<string>();
+  const isLockedByChild = selectedThemes.includes(theme.id)
+    && [...descendants].some((id) => selectedThemes.includes(id));
+  const handleChange = React.useCallback(() => onSelect(theme.id), [onSelect, theme.id]);
+  return (
+    <Stack gap={3} direction="row" align="center">
+      <LabelledCheckbox
+        id={theme.id}
+        checked={selectedThemes.includes(theme.id)}
+        onChange={handleChange}
+        label={theme.name}
+        disabled={isLockedByChild}
+      />
+    </Stack>
+  );
+}
+
 function getHierarchicalThemes(themes: ThemeObject[]): ThemeObject[] {
   const themesById = new Map(themes.map((t) => [t.id, t]));
   const childrenByParent = new Map<string, string[]>();
@@ -114,13 +142,56 @@ export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: {
     return selectedThemes.filter((themeId) => !filteredThemeIds.has(themeId)).length;
   }, [selectedThemes, filteredThemes, isSearchActive, searchTerm]);
 
+  // Build a map from themeId → parentThemeId for ancestor traversal
+  const parentByThemeId = React.useMemo(() => {
+    const map = new Map<string, string>();
+    allThemes.forEach((t) => {
+      if (t.$figmaParentThemeId) map.set(t.id, t.$figmaParentThemeId);
+    });
+    return map;
+  }, [allThemes]);
+
+  // Build a map from themeId → Set of all descendant theme IDs
+  const descendantsByThemeId = React.useMemo(() => {
+    const childrenMap = new Map<string, string[]>();
+    allThemes.forEach((t) => {
+      if (t.$figmaParentThemeId) {
+        const list = childrenMap.get(t.$figmaParentThemeId) || [];
+        list.push(t.id);
+        childrenMap.set(t.$figmaParentThemeId, list);
+      }
+    });
+    const getAllDescendants = (id: string): string[] => {
+      const children = childrenMap.get(id) || [];
+      return children.flatMap((c) => [c, ...getAllDescendants(c)]);
+    };
+    const result = new Map<string, Set<string>>();
+    allThemes.forEach((t) => {
+      result.set(t.id, new Set(getAllDescendants(t.id)));
+    });
+    return result;
+  }, [allThemes]);
+
   const handleSelectTheme = React.useCallback((themeId: string) => {
     if (selectedThemes.includes(themeId)) {
+      // Block unchecking if any descendant is still selected
+      const descendants = descendantsByThemeId.get(themeId) || new Set<string>();
+      const hasCheckedDescendant = [...descendants].some((id) => selectedThemes.includes(id));
+      if (hasCheckedDescendant) return;
       setSelectedThemes(selectedThemes.filter((id) => id !== themeId));
     } else {
-      setSelectedThemes([...selectedThemes, themeId]);
+      // When checking, also check all ancestors
+      const ancestors: string[] = [];
+      let current = parentByThemeId.get(themeId);
+      while (current) {
+        if (!selectedThemes.includes(current) && !ancestors.includes(current)) {
+          ancestors.push(current);
+        }
+        current = parentByThemeId.get(current);
+      }
+      setSelectedThemes([...selectedThemes, themeId, ...ancestors]);
     }
-  }, [selectedThemes, setSelectedThemes]);
+  }, [selectedThemes, setSelectedThemes, parentByThemeId, descendantsByThemeId]);
 
   const handleSelectAllThemes = React.useCallback(() => {
     // When filtering, select/deselect all visible (filtered) themes
@@ -141,23 +212,6 @@ export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: {
       setSelectedThemes(newSelection);
     }
   }, [sortedFilteredThemes, selectedThemes, setSelectedThemes]);
-
-  function createThemeRow(theme: ThemeObject) {
-    return (
-      <Stack
-        gap={3}
-        key={theme.id}
-        direction="row"
-        align="center"
-      >
-        {/* eslint-disable-next-line react/jsx-no-bind */}
-        <LabelledCheckbox id={theme.id} checked={selectedThemes.includes(theme.id)} onChange={() => handleSelectTheme(theme.id)} label={theme.name} />
-        {/* TODO: Add theme details */}
-        {/* <ThemeDetails /> */}
-        {/* <IconButton variant="invisible" size="small" tooltip="Details" icon={<ChevronRightIcon />} /> */}
-      </Stack>
-    );
-  }
 
   return (
     <Tabs.Content value="useThemes">
@@ -230,7 +284,9 @@ export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: {
                       return (
                         <Stack direction="column" gap={2} key={group} css={{ paddingLeft: depth > 0 ? `${depth * 16}px` : undefined }}>
                           <Heading size="small">{group}</Heading>
-                          {getHierarchicalThemes(sortedFilteredThemes.filter((theme) => theme.group === group)).map((theme) => createThemeRow(theme))}
+                          {getHierarchicalThemes(sortedFilteredThemes.filter((theme) => theme.group === group)).map((theme) => (
+                            <ThemeRow key={theme.id} theme={theme} selectedThemes={selectedThemes} descendantsByThemeId={descendantsByThemeId} onSelect={handleSelectTheme} />
+                          ))}
                           {childGroups.map((child) => renderGroup(child, depth + 1))}
                         </Stack>
                       );
@@ -241,7 +297,9 @@ export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: {
                   {ungroupedThemes.length ? (
                     <Stack direction="column" gap={2}>
                       <Heading size="small">{t('generic.noGroup')}</Heading>
-                      {getHierarchicalThemes(ungroupedThemes).map((theme) => createThemeRow(theme))}
+                      {getHierarchicalThemes(ungroupedThemes).map((theme) => (
+                        <ThemeRow key={theme.id} theme={theme} selectedThemes={selectedThemes} descendantsByThemeId={descendantsByThemeId} onSelect={handleSelectTheme} />
+                      ))}
                     </Stack>
                   ) : null}
                 </>
