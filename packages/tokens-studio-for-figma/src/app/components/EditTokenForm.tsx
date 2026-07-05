@@ -45,7 +45,6 @@ import { MultiSelectDropdown } from './MultiSelectDropdown';
 import { tokenTypesToCreateVariable } from '@/constants/VariableTypes';
 import { ModalOptions } from '@/constants/ModalOptions';
 import FigmaVariableForm from './FigmaVariableForm';
-import DeprecatedBadge from './DeprecatedBadge';
 
 let lastUsedRenameOption: UpdateMode = UpdateMode.SELECTION;
 let lastUsedRenameStyles = false;
@@ -460,12 +459,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [handleDeprecatedChange],
   );
 
-  const handleDeprecatedSeveritySelectValueChange = React.useCallback(
-    (value: string) => {
-      handleDeprecatedSeverityChange(value);
-    },
-    [handleDeprecatedSeverityChange],
-  );
 
   const handleDeprecatedMessageChange = React.useCallback(
     (value: string) => {
@@ -853,28 +846,45 @@ function EditTokenForm({ resolvedTokens }: Props) {
                 checked={!!internalEditToken?.$deprecated}
                 onCheckedChange={handleDeprecatedCheckboxChange}
               />
-              <Heading size="small">Mark as deprecated</Heading>
-              {internalEditToken?.$deprecated && (
-                <DeprecatedBadge deprecated={internalEditToken.$deprecated} />
-              )}
+              <Label>{t('markAsDeprecated')}</Label>
             </Stack>
             {internalEditToken?.$deprecated && (
-              <Stack direction="column" gap={2}>
+              <Box
+                css={{
+                  border: '1px solid $borderDefault',
+                  borderRadius: '$medium',
+                  padding: '$3',
+                  gap: '$2',
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
                 <Box>
                   <Label>{t('deprecatedSeverity')}</Label>
-                  <Select
+                  <select
                     value={internalEditToken.$deprecated.severity}
-                    onValueChange={handleDeprecatedSeveritySelectValueChange}
+                    onChange={(e) => handleDeprecatedSeverityChange(e.target.value)}
+                    style={{
+                      width: 'auto',
+                      minWidth: '150px',
+                      padding: '8px',
+                      borderRadius: '4px',
+                      border: '1px solid var(--colors-borderDefault)',
+                      fontSize: '12px',
+                      backgroundColor: 'var(--colors-bgDefault)',
+                      color: 'var(--colors-fgDefault)',
+                    }}
                   >
-                    <Select.Trigger data-testid="deprecated-severity" />
-                    <Select.Content>
-                      <Select.Item value="warning">{t('deprecatedSeverityWarning')}</Select.Item>
-                      <Select.Item value="error">{t('deprecatedSeverityError')}</Select.Item>
-                    </Select.Content>
-                  </Select>
+                    <option value="warning">{t('deprecatedSeverityWarning')}</option>
+                    <option value="error">{t('deprecatedSeverityError')}</option>
+                  </select>
                 </Box>
                 <Box>
-                  <Heading size="small">{t('deprecatedMessage')}</Heading>
+                  <Label>
+                    {t('deprecatedMessage')}
+                    {' '}
+                    {t('optional')}
+                  </Label>
                   <Textarea
                     value={internalEditToken.$deprecated.message}
                     placeholder={t('deprecatedMessagePlaceholder')}
@@ -884,7 +894,11 @@ function EditTokenForm({ resolvedTokens }: Props) {
                   />
                 </Box>
                 <Box>
-                  <Label>{t('deprecatedReplacementToken')}</Label>
+                  <Label>
+                    {t('deprecatedReplacementToken')}
+                    {' '}
+                    {t('optional')}
+                  </Label>
                   <Textarea
                     value={internalEditToken.$deprecated.replacementToken ?? ''}
                     placeholder="{color.brand.primary}"
@@ -894,7 +908,11 @@ function EditTokenForm({ resolvedTokens }: Props) {
                   />
                 </Box>
                 <Box>
-                  <Label>{t('deprecatedRemoveAfter')}</Label>
+                  <Label>
+                    {t('deprecatedRemoveAfter')}
+                    {' '}
+                    {t('optional')}
+                  </Label>
                   <Textarea
                     value={internalEditToken.$deprecated.removeAfter ?? ''}
                     placeholder="v3.0 or 2026-06-01"
@@ -903,7 +921,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
                     css={{ fontSize: '$xsmall', padding: '$3' }}
                   />
                 </Box>
-              </Stack>
+              </Box>
             )}
           </Stack>
         </Box>
