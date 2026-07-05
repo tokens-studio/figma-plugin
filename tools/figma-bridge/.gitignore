@@ -1,0 +1,9 @@
+# figma-bridge runtime state lives in ~/.figma-bridge/, never in the repo.
+# This is a safety net in case anyone runs the tool with a local state dir.
+FigmaDebug.app/
+*.asar
+*.asar.bak
+figma.log
+state.json
+shot.png
+*.png
