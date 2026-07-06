@@ -1,4 +1,20 @@
 const MockEnv = () => {
+  const branches = [
+    {
+      name: 'main',
+      commit: {
+        sha: 'main-sha',
+        url: 'http://localhost:58630/six7/api/v3/repos/122/figma-tokens/commits/main-sha'
+      }
+    },
+    {
+      name: 'development',
+      commit: {
+        sha: 'development-sha',
+        url: 'http://localhost:58630/six7/api/v3/repos/122/figma-tokens/commits/development-sha'
+      }
+    },
+  ];
   cy.intercept('GET', 'http://localhost:58630/six7/api/v3/user', {
     type: 'User',
     id: 1000,
@@ -48,22 +64,7 @@ const MockEnv = () => {
     ]
   })).as('getContent');
 
-  cy.intercept('GET', '**/repos/122/figma-tokens/branches*', [
-    {
-      name: 'main',
-      commit: {
-        sha: 'main-sha',
-        url: 'http://localhost:58630/six7/api/v3/repos/122/figma-tokens/commits/main-sha'
-      }
-    },
-    {
-      name: 'development',
-      commit: {
-        sha: 'development-sha',
-        url: 'http://localhost:58630/six7/api/v3/repos/122/figma-tokens/commits/development-sha'
-      }
-    },
-  ]).as('getBranches');
+  cy.intercept('GET', '**/repos/122/figma-tokens/branches*', () => branches).as('getBranches');
 
   cy.intercept('GET', 'http://localhost:58630/six7/api/v3/repos/122/figma-tokens/git/ref/heads%2Fmain', {
     object: {
@@ -71,8 +72,22 @@ const MockEnv = () => {
     },
   }).as('getMainRef');
 
-  cy.intercept('POST', 'http://localhost:58630/six7/api/v3/repos/122/figma-tokens/git/refs', {
-    ref: 'new-branch',
+  cy.intercept('POST', 'http://localhost:58630/six7/api/v3/repos/122/figma-tokens/git/refs', (req) => {
+    const createdBranchName = req.body?.ref?.replace('refs/heads/', '') || 'new-branch';
+    const createdBranch = {
+      name: createdBranchName,
+      commit: {
+        sha: `${createdBranchName}-sha`,
+        url: `http://localhost:58630/six7/api/v3/repos/122/figma-tokens/commits/${createdBranchName}-sha`
+      }
+    };
+    if (!branches.find((branch) => branch.name === createdBranchName)) {
+      branches.push(createdBranch);
+    }
+
+    req.reply({
+      ref: createdBranchName,
+    });
   }).as('createRef');
 
   cy.intercept('GET', 'http://localhost:58630/six7/api/v3/repos/122/figma-tokens/contents/tokens.json?ref=new-branch', {}).as(
