@@ -1,6 +1,8 @@
 import { isVariableWithAliasReference } from '@/utils/isAliasReference';
 import { convertToFigmaColor } from './figmaTransforms/colors';
 import { isColorApproximatelyEqual } from '@/utils/isColorApproximatelyEqual';
+import { resolveCollectionContext } from './extendedCollections/collectionContext';
+import { applyChildModeValue } from './extendedCollections/applyChildModeValue';
 
 type RGB = { r: number; g: number; b: number };
 type RGBOrRGBA = RGB | RGBA;
@@ -29,22 +31,11 @@ export default function setColorValuesOnVariable(variable: Variable, mode: strin
 
     const newValue = { ...color, a: opacity };
 
-    // Handle extended collections: if value matches parent mode, clear override
-    const modeObj = collection?.modes?.find((m) => m.modeId === mode);
-    const parentModeId = (modeObj as any)?.parentModeId;
-
+    // Extended collections: inherit-vs-override decided in one shared place
+    const { parentModeId } = resolveCollectionContext(collection, mode);
     if (parentModeId) {
-      const parentValue = variable.valuesByMode[parentModeId];
-      if (isFigmaColorObject(parentValue)) {
-        const parentColor = {
-          ...parentValue,
-          a: 'a' in parentValue ? parentValue.a : 1,
-        };
-        if (isColorApproximatelyEqual(parentColor, newValue)) {
-          (variable as any).clearValueForMode(mode);
-          return;
-        }
-      }
+      applyChildModeValue(variable, mode, parentModeId, newValue);
+      return;
     }
 
     // Only compare if there's an existing value

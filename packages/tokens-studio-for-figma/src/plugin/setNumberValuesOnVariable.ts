@@ -1,4 +1,6 @@
 import { isVariableWithAliasReference } from '@/utils/isAliasReference';
+import { resolveCollectionContext } from './extendedCollections/collectionContext';
+import { applyChildModeValue } from './extendedCollections/applyChildModeValue';
 
 // Helper function to check if two numbers are approximately equal within a threshold
 function isNumberApproximatelyEqual(
@@ -21,18 +23,11 @@ export default function setNumberValuesOnVariable(variable: Variable, mode: stri
       && !(typeof existingVariableValue === 'number' || isVariableWithAliasReference(existingVariableValue))
     ) return;
 
-    // Handle extended collections: if value matches parent mode, clear override
-    const modeObj = collection?.modes?.find((m) => m.modeId === mode);
-    const parentModeId = (modeObj as any)?.parentModeId;
-
+    // Extended collections: inherit-vs-override decided in one shared place
+    const { parentModeId } = resolveCollectionContext(collection, mode);
     if (parentModeId) {
-      const parentValue = variable.valuesByMode[parentModeId];
-      if (typeof parentValue === 'number') {
-        if (isNumberApproximatelyEqual(parentValue, value)) {
-          (variable as any).clearValueForMode(mode);
-          return;
-        }
-      }
+      applyChildModeValue(variable, mode, parentModeId, value);
+      return;
     }
 
     // For direct number values, compare using threshold

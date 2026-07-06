@@ -7,6 +7,7 @@ import setValuesOnVariable from './setValuesOnVariable';
 import { mapTokensToVariableInfo } from '@/utils/mapTokensToVariableInfo';
 import { TokenResolver } from '@/utils/TokenResolver';
 import { getAliasValue } from '@/utils/alias';
+import { resolveCollectionContext } from './extendedCollections/collectionContext';
 
 import { ProgressTracker } from './ProgressTracker';
 
@@ -65,24 +66,40 @@ export default async function updateVariables({
     }
   }
 
-  // Check if this collection is an extended collection using Figma's actual API properties
-  const isExtendedCollection = 'isExtension' in collection && (collection as any).isExtension;
+  // Reliable extended-collection detection: theme metadata first, then the Figma
+  // runtime property, then structural (any mode carrying a parentModeId).
+  const isExtendedCollection = resolveCollectionContext(collection, mode, theme).isExtended
+    || Boolean(collection.modes?.some((m) => (m as any).parentModeId !== undefined));
 
   // For extended collections, variables are inherited from the parent collection
-  // Extended collections have an 'isExtension' property and 'parentVariableCollectionId' pointing to their parent
   let variablesInCollection: Variable[];
 
   if (isExtendedCollection) {
-    // Extended collections have their own variable objects (variableCollectionId === collection.id)
-    // that are aware of the extended collection's modes. Use those first.
-    // Fall back to parent collection variables for inherited-only scenarios.
+    // Union of the extended collection's own variables and the parent's variables,
+    // deduped by name with the child's own variables taking priority. Using only
+    // one source drops inherited-only variables as soon as the child has any own
+    // variable of its own.
     const parentCollectionId = (collection as any).parentVariableCollectionId;
-    const extendedVars = figma.variables.getLocalVariables().filter((v) => v.variableCollectionId === collection.id);
-    console.log(`[updateVariables] Extended collection "${collection.name}": found ${extendedVars.length} own vars, ${figma.variables.getLocalVariables().filter((v) => v.variableCollectionId === parentCollectionId).length} parent vars`);
-    variablesInCollection = extendedVars.length > 0
-      ? extendedVars
-      : figma.variables.getLocalVariables().filter((v) => v.variableCollectionId === parentCollectionId);
+    const allLocalVariables = figma.variables.getLocalVariables();
+    const extendedVars = allLocalVariables.filter((v) => v.variableCollectionId === collection.id);
+    const parentVars = parentCollectionId
+      ? allLocalVariables.filter((v) => v.variableCollectionId === parentCollectionId)
+      : [];
+    const byName = new Map<string, Variable>();
+    parentVars.forEach((v) => byName.set(v.name, v));
+    extendedVars.forEach((v) => byName.set(v.name, v));
+    variablesInCollection = Array.from(byName.values());
+    // eslint-disable-next-line no-console
+    console.log(
+      `[updateVariables] EXTENDED collection "${collection.name}" (id: ${collection.id})`,
+      `\n  mode: ${mode}`,
+      `\n  parentCollectionId: ${parentCollectionId}`,
+      `\n  own vars: ${extendedVars.length}, parent vars: ${parentVars.length}, union: ${variablesInCollection.length}`,
+      `\n  collection.modes: ${JSON.stringify(collection.modes?.map((m) => ({ modeId: m.modeId, parentModeId: (m as any).parentModeId })))}`,
+    );
   } else {
+    // eslint-disable-next-line no-console
+    console.log(`[updateVariables] REGULAR collection "${collection.name}" (id: ${collection.id}), mode: ${mode}, isExtension prop: ${(collection as any).isExtension}, theme.$figmaIsExtension: ${theme.$figmaIsExtension}`);
     // Regular collection: get variables from this collection
     variablesInCollection = figma.variables.getLocalVariables().filter((v) => v.variableCollectionId === collection.id);
   }

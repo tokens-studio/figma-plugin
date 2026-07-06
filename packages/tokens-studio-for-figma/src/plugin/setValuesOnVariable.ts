@@ -230,31 +230,41 @@ export default async function setValuesOnVariable(
               return;
             }
 
+            // For extended (child) collections a token that will be linked as an
+            // alias in the reference pass must NOT be written as a resolved raw
+            // value here. token.value is often the resolved value (no braces) even
+            // when token.rawValue is a reference, so the brace guards below don't
+            // catch it. Writing raw would create an explicit child override that
+            // the reference pass can no longer convert to inherited — Figma has no
+            // per-mode clear API — leaving a stale raw "blue" override. Skip the
+            // raw write and let the reference pass set the alias (or inherit).
+            const willBeAliased = isExtendedCollection && checkCanReferenceVariable(token);
+
             switch (variableType) {
               case 'BOOLEAN':
-                if (typeof token.value === 'string' && !token.value.includes('{')) {
+                if (!willBeAliased && typeof token.value === 'string' && !token.value.includes('{')) {
                   setBooleanValuesOnVariable(variable, mode, token.value, collection, hasMetadataChanged);
                 }
                 break;
               case 'COLOR':
-                if (typeof token.value === 'string' && !token.value.includes('{')) {
+                if (!willBeAliased && typeof token.value === 'string' && !token.value.includes('{')) {
                   setColorValuesOnVariable(variable, mode, token.value, collection, hasMetadataChanged);
                 }
                 break;
               case 'FLOAT': {
                 const value = String(token.value);
-                if (typeof value === 'string' && !value.includes('{')) {
+                if (!willBeAliased && typeof value === 'string' && !value.includes('{')) {
                   const transformedValue = transformValue(value, token.type, baseFontSize, true);
                   setNumberValuesOnVariable(variable, mode, Number(transformedValue), collection, hasMetadataChanged);
                 }
                 break;
               }
               case 'STRING':
-                if (typeof token.value === 'string' && !token.value.includes('{')) {
+                if (!willBeAliased && typeof token.value === 'string' && !token.value.includes('{')) {
                   setStringValuesOnVariable(variable, mode, token.value, collection, hasMetadataChanged);
                   // Given we cannot determine the combined family of a variable, we cannot use fallback weights from our estimates.
                   // This is not an issue because users can set numerical font weights with variables, so we opt-out of the guesswork and just apply the numerical weight.
-                } else if (token.type === TokenTypes.FONT_WEIGHTS && Array.isArray(token.value)) {
+                } else if (!willBeAliased && token.type === TokenTypes.FONT_WEIGHTS && Array.isArray(token.value)) {
                   setStringValuesOnVariable(variable, mode, token.value[0], collection, hasMetadataChanged);
                 }
                 break;

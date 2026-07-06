@@ -11,6 +11,8 @@ import { UpdateTokenVariablePayload } from '@/types/payloads/UpdateTokenVariable
 import { CodeSyntax, VariableScope } from '@/types/tokens';
 import { FIGMA_PLATFORMS, normalizeVariableScopes, getCodeSyntaxValue } from '@/utils/figma';
 import { checkCanReferenceVariable } from '@/utils/alias/checkCanReferenceVariable';
+import { resolveCollectionContext } from './extendedCollections/collectionContext';
+import { applyChildModeValue } from './extendedCollections/applyChildModeValue';
 
 export default async function updateVariablesFromPlugin(payload: UpdateTokenVariablePayload) {
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
@@ -90,22 +92,15 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
             }
             const referenceVariable = nameToVariableMap[referenceTokenName.split('.').join('/')];
             if (referenceVariable) {
-              const newValue: any = {
+              const newValue: VariableAlias = {
                 type: 'VARIABLE_ALIAS',
                 id: referenceVariable.id,
               };
 
-              // Extended collections: if alias matches parent mode value, clear override
-              const modeObj = collection?.modes?.find((m) => m.modeId === theme.$figmaModeId);
-              const parentModeId = (modeObj as any)?.parentModeId;
-              const parentValue = parentModeId ? variable.valuesByMode[parentModeId] : undefined;
-              const parentAlreadyMatches = typeof parentValue === 'object'
-                && parentValue !== null
-                && (parentValue as any).type === 'VARIABLE_ALIAS'
-                && (parentValue as any).id === referenceVariable.id;
-
-              if (parentAlreadyMatches) {
-                (variable as any).clearValueForMode(theme.$figmaModeId!);
+              // Extended collections: one shared inherit-vs-override decision
+              const { parentModeId } = resolveCollectionContext(collection, theme.$figmaModeId!, theme);
+              if (parentModeId) {
+                applyChildModeValue(variable, theme.$figmaModeId!, parentModeId, newValue);
               } else {
                 variable.setValueForMode(theme.$figmaModeId!, newValue);
               }
