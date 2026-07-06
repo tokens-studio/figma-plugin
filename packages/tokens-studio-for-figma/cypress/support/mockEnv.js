@@ -64,7 +64,9 @@ const MockEnv = () => {
     ]
   })).as('getContent');
 
-  cy.intercept('GET', '**/repos/122/figma-tokens/branches*', () => branches).as('getBranches');
+  cy.intercept('GET', '**/repos/122/figma-tokens/branches*', (req) => {
+    req.reply(branches);
+  }).as('getBranches');
 
   cy.intercept('GET', 'http://localhost:58630/six7/api/v3/repos/122/figma-tokens/git/ref/heads%2Fmain', {
     object: {
