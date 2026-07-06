@@ -32,19 +32,5 @@ export function resolveCollectionContext(
     || parentModeId !== undefined,
   );
 
-  // Failure signature: we believe this is an extended collection, but we cannot
-  // resolve a parentModeId for the given mode. Every value write then falls
-  // through to an explicit setValueForMode (blue override) instead of the
-  // inherit-vs-override diff. Log the mismatch so the mode-ID form can be checked.
-  if (isExtended && parentModeId === undefined) {
-    // eslint-disable-next-line no-console
-    console.warn(
-      `[resolveCollectionContext] EXTENDED but NO parentModeId for mode "${modeId}"`,
-      `\n  collection: ${collection?.name} (id: ${collection?.id})`,
-      `\n  isExtension prop: ${collection ? (collection as any).isExtension : 'n/a'}, theme.$figmaIsExtension: ${theme?.$figmaIsExtension}`,
-      `\n  available modes: ${JSON.stringify(collection?.modes?.map((m) => ({ modeId: m.modeId, parentModeId: (m as any).parentModeId })))}`,
-    );
-  }
-
   return { isExtended, parentModeId };
 }

@@ -89,17 +89,7 @@ export default async function updateVariables({
     parentVars.forEach((v) => byName.set(v.name, v));
     extendedVars.forEach((v) => byName.set(v.name, v));
     variablesInCollection = Array.from(byName.values());
-    // eslint-disable-next-line no-console
-    console.log(
-      `[updateVariables] EXTENDED collection "${collection.name}" (id: ${collection.id})`,
-      `\n  mode: ${mode}`,
-      `\n  parentCollectionId: ${parentCollectionId}`,
-      `\n  own vars: ${extendedVars.length}, parent vars: ${parentVars.length}, union: ${variablesInCollection.length}`,
-      `\n  collection.modes: ${JSON.stringify(collection.modes?.map((m) => ({ modeId: m.modeId, parentModeId: (m as any).parentModeId })))}`,
-    );
   } else {
-    // eslint-disable-next-line no-console
-    console.log(`[updateVariables] REGULAR collection "${collection.name}" (id: ${collection.id}), mode: ${mode}, isExtension prop: ${(collection as any).isExtension}, theme.$figmaIsExtension: ${theme.$figmaIsExtension}`);
     // Regular collection: get variables from this collection
     variablesInCollection = figma.variables.getLocalVariables().filter((v) => v.variableCollectionId === collection.id);
   }

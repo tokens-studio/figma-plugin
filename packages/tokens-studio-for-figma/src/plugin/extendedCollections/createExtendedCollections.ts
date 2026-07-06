@@ -35,7 +35,6 @@ function createNewExtendedCollection(
       truncateModeName(currentTheme.name),
     );
 
-    console.log(`✓ Created extended collection: ${truncatedChildName}`);
     return extendedCollection;
   } catch (error) {
     console.warn(`Cannot create extended collection "${truncatedChildName}":`, error);

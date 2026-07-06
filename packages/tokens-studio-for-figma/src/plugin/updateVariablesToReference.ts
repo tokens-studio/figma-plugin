@@ -10,15 +10,6 @@ import { applyChildModeValue } from './extendedCollections/applyChildModeValue';
 export default async function updateVariablesToReference(figmaVariables: Map<string, string>, referenceVariableCandidates: ReferenceVariableType[]): Promise<Variable[]> {
   const updatedVariables: Variable[] = [];
 
-  // DIAGNOSTIC: collect candidates that wanted to reference a variable but ended up resolved-only
-  // (the alias could not be linked). Reported as a consolidated summary at the end.
-  const resolvedOnlyFailures: Array<{
-    variableName: string;
-    referenceVariable: string;
-    collectionName?: string;
-    reason: string;
-  }> = [];
-
   // Get all local variables to enable collection-aware lookup
   const allLocalVariables = await getVariablesWithoutZombies();
 
@@ -75,20 +66,6 @@ export default async function updateVariablesToReference(figmaVariables: Map<str
     }
 
     if (!referenceVariableKey) {
-      console.log(
-        `[updateVariablesToReference] ❌ No referenceVariableKey found for variable "${aliasVariable.variable.name}" → ref "${aliasVariable.referenceVariable}"`,
-        `\n  normalizedRefName: "${normalizedRefName}"`,
-        `\n  candidateVariables (from normalizedVariableMap): ${candidateVariables.length}`,
-        `\n  sameCollectionVariable: ${sameCollectionVariable?.name ?? 'none'}`,
-        `\n  figmaVariables has key (dot): ${figmaVariables.has(normalizedRefName)}`,
-        `\n  figmaVariables has key (raw): ${figmaVariables.has(aliasVariable.referenceVariable)}`,
-      );
-      resolvedOnlyFailures.push({
-        variableName: aliasVariable.variable.name,
-        referenceVariable: aliasVariable.referenceVariable,
-        collectionName: aliasVariable.collection?.name,
-        reason: 'referenced token has no matching variable (not created in any accessible collection)',
-      });
       return;
     }
 
@@ -115,17 +92,6 @@ export default async function updateVariablesToReference(figmaVariables: Map<str
     }
 
     if (!variable) {
-      console.log(
-        `[updateVariablesToReference] ❌ Variable import failed for "${aliasVariable.variable.name}" → ref "${aliasVariable.referenceVariable}"`,
-        `\n  referenceVariableKey: "${referenceVariableKey}"`,
-        `\n  candidateVariables: ${candidateVariables.map((v) => v.name).join(', ')}`,
-      );
-      resolvedOnlyFailures.push({
-        variableName: aliasVariable.variable.name,
-        referenceVariable: aliasVariable.referenceVariable,
-        collectionName: aliasVariable.collection?.name,
-        reason: 'reference variable key found but importVariableByKeyAsync failed (remote/library variable not importable)',
-      });
       return;
     }
 
@@ -135,10 +101,6 @@ export default async function updateVariablesToReference(figmaVariables: Map<str
     // Regular collections use plain mode IDs ("25:4"). Stripping the composite form breaks
     // extended collections, so we pass the raw mode ID through unchanged.
     const effectiveModeId = aliasVariable.modeId;
-
-    console.log(
-      `[updateVariablesToReference] ✅ Setting alias "${aliasVariable.variable.name}" → "${variable.name}" (mode: ${effectiveModeId})`,
-    );
 
     try {
       const newValue: VariableAlias = {
@@ -195,53 +157,6 @@ export default async function updateVariablesToReference(figmaVariables: Map<str
   progressOffset = regularCandidates.length;
   // Pass 2: extended collections — child modes now compare against final parent values
   await processBatches(extendedCandidates, 100, processCandidate, reportProgress);
-
-  // DIAGNOSTIC SUMMARY: report every variable that stayed resolved-only at the linking stage,
-  // grouped by collection, plus actionable suggestions for improving the (extended) theme config.
-  if (resolvedOnlyFailures.length > 0) {
-    const byCollection = new Map<string, typeof resolvedOnlyFailures>();
-    resolvedOnlyFailures.forEach((f) => {
-      const key = f.collectionName ?? '(unknown collection)';
-      const list = byCollection.get(key) || [];
-      list.push(f);
-      byCollection.set(key, list);
-    });
-
-    console.log(`\n========== RESOLVED-ONLY VARIABLES (${resolvedOnlyFailures.length}) ==========`);
-    console.log('These variables wanted to reference another variable but were written as raw values instead.\n');
-    byCollection.forEach((failures, collectionName) => {
-      console.log(`Collection "${collectionName}" — ${failures.length} unreferenced:`);
-      failures.forEach((f) => {
-        console.log(`  • "${f.variableName}" → wanted ref "{${f.referenceVariable}}"  (${f.reason})`);
-      });
-    });
-
-    console.log('\n---------- How to improve your extended theme config ----------');
-    console.log([
-      '1. Make sure every referenced token resolves to a token that ALSO becomes a variable.',
-      '   A reference like "{color.brand.500}" only links if "color.brand.500" exists AND its',
-      '   token set is enabled (source or enabled) in this theme. If the target set is "disabled"',
-      '   the value resolves but no variable is created to alias to.',
-      '',
-      '2. For extended collections specifically: the referenced variable must live in the SAME',
-      '   collection or its PARENT collection. Cross-collection references (to a collection that',
-      "   isn't the parent) cannot be aliased and will fall back to resolved values.",
-      '',
-      '3. Process order matters — parent themes must be exported before extended themes so the',
-      '   parent variables exist to reference. Confirm the parent theme is included in the export.',
-      '',
-      '4. Avoid math/modifiers on tokens you want linked. A "studio.tokens.modify" extension',
-      "   (e.g. lighten/darken/multiply) cannot map to a Figma alias — Figma can't store a computed",
-      '   reference, so the value is baked in. Move the math upstream into a referenced base token.',
-      '',
-      '5. Avoid composite values for linked tokens. "{spacing.sm} {spacing.lg}" has 2 references;',
-      '   a Figma variable can alias exactly one variable. Split into single-reference tokens.',
-      '',
-      '6. If the target is a remote/library variable, ensure the library is enabled in the file so',
-      '   importVariableByKeyAsync can resolve it.',
-    ].join('\n'));
-    console.log('===============================================================\n');
-  }
 
   return updatedVariables;
 }

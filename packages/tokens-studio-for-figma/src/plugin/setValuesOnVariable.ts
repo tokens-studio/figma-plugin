@@ -6,7 +6,6 @@ import setNumberValuesOnVariable from './setNumberValuesOnVariable';
 import setStringValuesOnVariable from './setStringValuesOnVariable';
 import { convertTokenTypeToVariableType } from '@/utils/convertTokenTypeToVariableType';
 import { checkCanReferenceVariable } from '@/utils/alias/checkCanReferenceVariable';
-import { AliasRegex } from '@/constants/AliasRegex';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { transformValue } from './helpers';
 import { variableWorker } from './Worker';
@@ -391,35 +390,12 @@ export default async function setValuesOnVariable(
             }
 
             if (token && checkCanReferenceVariable(token)) {
-              if (isExtendedCollection) {
-                console.log(`[setValuesOnVariable] Queuing alias candidate: "${token.path}" → "${referenceTokenName}" (rawValue: "${token.rawValue}")`);
-              }
               referenceVariableCandidates.push({
                 variable,
                 modeId: mode,
                 referenceVariable: referenceTokenName,
                 ...(isExtendedCollection ? { collection } : {}),
               });
-            } else if (typeof token.rawValue === 'string' && token.rawValue.includes('{')) {
-              // DIAGNOSTIC: The token's raw value contains a reference (e.g. "{color.brand}")
-              // but it was NOT queued as an alias candidate. This variable will be written as a
-              // RESOLVED value only — it will never link back to the referenced variable.
-              const hasModifier = !!token?.$extensions?.['studio.tokens']?.modify;
-              const aliasMatches = token.rawValue.toString().match(AliasRegex)?.length ?? 0;
-              let reason = 'unknown';
-              if (hasModifier) {
-                reason = 'token has a studio.tokens.modify extension (math/transform), which cannot be expressed as a Figma variable alias';
-              } else if (aliasMatches === 0) {
-                reason = 'rawValue contains "{" but does not match the alias pattern (malformed reference?)';
-              } else if (aliasMatches > 1) {
-                reason = `rawValue contains ${aliasMatches} references (composite value) — Figma variables can only alias a single variable`;
-              }
-              console.log(
-                `[RESOLVED-ONLY @ candidate stage] "${token.path}" in collection "${collection.name}"${isExtendedCollection ? ' (extended)' : ''}`,
-                `\n  rawValue: "${token.rawValue}"`,
-                `\n  resolved value: "${token.value}"`,
-                `\n  reason: ${reason}`,
-              );
             }
           }
         } catch (e) {
