@@ -64,9 +64,17 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
 
   useEffect(() => {
     AsyncMessageChannel.ReactInstance.message({ type: AsyncMessageTypes.CHECK_FIGMA_ENTERPRISE })
-      .then((result) => { dispatch.userState.setIsFigmaEnterprise(result.isFigmaEnterprise); })
+      .then((result) => {
+        dispatch.userState.setIsFigmaEnterprise(result.isFigmaEnterprise);
+        // Auto-reset the setting when the file isn't Enterprise. Otherwise a file
+        // that was Enterprise (setting persisted as true) but no longer is would
+        // leave the toggle checked AND disabled — the user could never turn it off.
+        if (!result.isFigmaEnterprise) {
+          dispatch.settings.setExportExtendedCollections(false);
+        }
+      })
       .catch(() => { dispatch.userState.setIsFigmaEnterprise(false); });
-  }, [dispatch.userState]);
+  }, [dispatch.userState, dispatch.settings]);
 
   const handleIgnoreChange = React.useCallback(
     (state: CheckedState) => {
@@ -297,11 +305,11 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
                 disabled={!isFigmaEnterprise}
               />
               <Label css={{ fontWeight: '$sansRegular', fontSize: '$xsmall', ...(!isFigmaEnterprise ? { color: '$fgDisabled', opacity: 0.5 } : {}) }} htmlFor="exportExtendedCollections">
-                Export extended collections
-                {!isFigmaEnterprise && ' (Enterprise only)'}
+                {t('options.exportExtendedCollections')}
+                {!isFigmaEnterprise && t('options.exportExtendedCollectionsEnterpriseSuffix')}
               </Label>
-              <ExplainerModal title="Export extended collections">
-                <Box>When enabled, themes marked as &quot;extended&quot; will be exported as extended variable collections in Figma, inheriting from their parent collections. This is useful for creating brand variants or theme extensions. Requires Figma Enterprise plan.</Box>
+              <ExplainerModal title={t('options.exportExtendedCollections')}>
+                <Box>{t('options.exportExtendedCollectionsExplanation')}</Box>
               </ExplainerModal>
             </StyledCheckboxGrid>
           </Stack>

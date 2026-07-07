@@ -152,7 +152,8 @@ export default async function pullVariables(options: PullVariablesOptions, theme
     const collectionsToProcess: CollectionEntry[] = collection ? [collection] : [];
 
     if (hasExtendedCollections && collection) {
-      collections.forEach((extCollection) => {
+      // Scan the id-keyed cache so duplicate collection names don't drop a child.
+      collectionsCache.forEach((extCollection) => {
         if (extCollection.isExtension && extCollection.parentCollectionId === collection!.id) {
           if (options.selectedCollections) {
             const isExtendedCollectionSelected = options.selectedCollections[extCollection.id];
@@ -429,12 +430,16 @@ export default async function pullVariables(options: PullVariablesOptions, theme
       });
     });
 
+    // Iterate the id-keyed cache, not the name-keyed map: two collections can
+    // legally share a name in Figma, and the name-keyed map would silently drop
+    // one of them (and its themes).
+    const allCollectionEntries = Array.from(collectionsCache.values());
     // For extended collections: process regular collections first, then extended ones
     const regularCollections = hasExtendedCollections
-      ? Array.from(collections.values()).filter((c) => !c.isExtension)
-      : Array.from(collections.values());
+      ? allCollectionEntries.filter((c) => !c.isExtension)
+      : allCollectionEntries;
     const extendedCollections = hasExtendedCollections
-      ? Array.from(collections.values()).filter((c) => c.isExtension)
+      ? allCollectionEntries.filter((c) => c.isExtension)
       : [];
 
     // Helper function to process a collection and create themes
@@ -461,7 +466,14 @@ export default async function pullVariables(options: PullVariablesOptions, theme
           }
         }
 
-        const collectionVariables = localVariables.filter((v) => v.variableCollectionId === collection.id);
+        // Extended collections inherit their variables from the parent collection
+        // (variables carry the parent's variableCollectionId). Source references
+        // from the parent so extended themes get populated $figmaVariableReferences —
+        // otherwise single-token edits via updateVariablesFromPlugin never match them.
+        const variableSourceCollectionId = collection.isExtension && collection.parentCollectionId
+          ? collection.parentCollectionId
+          : collection.id;
+        const collectionVariables = localVariables.filter((v) => v.variableCollectionId === variableSourceCollectionId);
 
         const variableReferences = collectionVariables.reduce((acc, variable) => ({
           ...acc,

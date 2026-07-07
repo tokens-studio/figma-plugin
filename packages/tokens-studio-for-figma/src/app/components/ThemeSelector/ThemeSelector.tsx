@@ -11,6 +11,9 @@ import { track } from '@/utils/analytics';
 import { INTERNAL_THEMES_NO_GROUP, INTERNAL_THEMES_NO_GROUP_LABEL } from '@/constants/InternalTokenGroup';
 import Box from '../Box';
 import { useIsProUser } from '@/app/hooks/useIsProUser';
+import {
+  buildChildrenMap, buildParentMap, collectAncestors, collectDescendants,
+} from '@/utils/themeHierarchy';
 
 type AvailableTheme = {
   value: string
@@ -33,7 +36,6 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
 
   const handleSelectTheme = useCallback((themeId: string) => {
     const groupOfTheme = availableThemes.find((theme) => theme.value === themeId)?.group ?? INTERNAL_THEMES_NO_GROUP;
-    const selectedTheme = allThemes.find((theme) => theme.id === themeId);
     const nextTheme = { ...activeTheme };
 
     // Check if we're toggling off the theme
@@ -42,47 +44,22 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
     if (isTogglingOff) {
       delete nextTheme[groupOfTheme];
     } else {
-      // We're activating a theme - check for parent/extended relationships
+      // We're activating a theme - enforce mutual exclusion along its lineage.
       nextTheme[groupOfTheme] = themeId;
 
-      // If this is an extended theme, deactivate its parent collection's themes
-      // Extended themes have hierarchical group names like "ParentGroup/ExtendedGroup"
-      // If this is an extended theme, deactivate its parent collection's themes
-      // Extended themes have hierarchical group names like "ParentGroup/ExtendedGroup"
-      if (selectedTheme?.$figmaIsExtension || (selectedTheme?.group && selectedTheme.group.includes('/'))) {
-        const parentGroupName = selectedTheme.group?.split('/')[0];
+      // A theme and any of its ancestors/descendants cannot be active together:
+      // an extended (child) collection overrides its parent, so activating one
+      // must deactivate the other. Keyed off $figmaParentThemeId (cycle-safe),
+      // not the display group's slash convention. Siblings are independent
+      // collections and may stay active.
+      const conflicting = new Set([
+        ...collectAncestors(themeId, buildParentMap(allThemes)),
+        ...collectDescendants(themeId, buildChildrenMap(allThemes)),
+      ]);
 
-        // Find parent themes by group name (more reliable than collection IDs which can become stale)
-        const parentThemes = allThemes.filter((t) => {
-          // Parent theme has the parent group name and is NOT an extension
-          const matchesByGroup = t.group === parentGroupName && !t.group?.includes('/');
-          const matchesByMetadata = !t.$figmaIsExtension && t.group === parentGroupName;
-          return matchesByGroup || matchesByMetadata;
-        });
-
-        // Deactivate all parent collection themes from any group
-        for (const [group, activeThemeId] of Object.entries(nextTheme)) {
-          if (parentThemes.some((pt) => pt.id === activeThemeId)) {
-            delete nextTheme[group];
-          }
-        }
-      }
-
-      // If this is a parent theme, deactivate any active extended collection themes that extend it
-      if (selectedTheme && !selectedTheme.$figmaIsExtension && selectedTheme.group && !selectedTheme.group.includes('/')) {
-        // Find all extended themes by checking if their group starts with "ParentGroup/"
-        const extendedThemes = allThemes.filter((t) => {
-          // Extended theme group format: "ParentGroup/ExtendedGroup"
-          const matchesByGroup = selectedTheme.group && t.group?.startsWith(`${selectedTheme.group}/`);
-          const matchesByMetadata = t.$figmaIsExtension && selectedTheme.$figmaCollectionId && t.$figmaParentCollectionId === selectedTheme.$figmaCollectionId;
-          return matchesByGroup || matchesByMetadata;
-        });
-
-        // Deactivate all extended themes from any group
-        for (const [group, activeThemeId] of Object.entries(nextTheme)) {
-          if (extendedThemes.some((et) => et.id === activeThemeId)) {
-            delete nextTheme[group];
-          }
+      for (const [group, activeThemeId] of Object.entries(nextTheme)) {
+        if (conflicting.has(activeThemeId)) {
+          delete nextTheme[group];
         }
       }
     }

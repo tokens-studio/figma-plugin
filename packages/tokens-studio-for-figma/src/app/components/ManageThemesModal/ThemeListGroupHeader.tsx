@@ -2,6 +2,7 @@ import React, {
   useCallback, useContext, useState,
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { IconButton, DropdownMenu } from '@tokens-studio/ui';
 import { Xmark, Check } from 'iconoir-react';
 import { DotsVerticalIcon } from '@radix-ui/react-icons';
@@ -33,6 +34,7 @@ export function ThemeListGroupHeader({
   isExtendedGroup = false,
 }: Props) {
   const dispatch = useDispatch<Dispatch>();
+  const { t } = useTranslation(['tokens']);
   const dragContext = useContext(DragControlsContext);
   const editProhibited = useSelector(editProhibitedSelector);
   const isFigmaEnterprise = useSelector(isFigmaEnterpriseSelector);
@@ -127,7 +129,7 @@ export function ThemeListGroupHeader({
               <DropdownMenu.Portal>
                 <DropdownMenu.Content side="bottom">
                   <DropdownMenu.Item onSelect={handleEditButtonClick}>
-                    <span>Rename Theme Group</span>
+                    <span>{t('renameThemeGroup')}</span>
                   </DropdownMenu.Item>
                   {groupName !== INTERNAL_THEMES_NO_GROUP && (
                     <DropdownMenu.Item
@@ -138,18 +140,19 @@ export function ThemeListGroupHeader({
                         display: 'flex',
                         alignItems: 'center',
                         gap: '$2',
-                        ...((isExtendedGroup || !isFigmaEnterprise) ? { color: '$fgDisabled', cursor: 'not-allowed' } : {})
-                      }}>
-                        <span>Extend Theme Group</span>
+                        ...((isExtendedGroup || !isFigmaEnterprise) ? { color: '$fgDisabled', cursor: 'not-allowed' } : {}),
+                      }}
+                      >
+                        <span>{t('extendThemeGroup')}</span>
                         {!isFigmaEnterprise && (
-                          <span style={{ fontSize: '10px', opacity: 0.7 }}>(Enterprise only)</span>
+                          <span style={{ fontSize: '10px', opacity: 0.7 }}>{t('enterpriseOnly')}</span>
                         )}
                       </Box>
                     </DropdownMenu.Item>
                   )}
                   {isExtendedGroup && groupName !== INTERNAL_THEMES_NO_GROUP && (
                     <DropdownMenu.Item onSelect={handleDeleteGroup}>
-                      <span>Delete Theme Group</span>
+                      <span>{t('deleteThemeGroup')}</span>
                     </DropdownMenu.Item>
                   )}
                 </DropdownMenu.Content>

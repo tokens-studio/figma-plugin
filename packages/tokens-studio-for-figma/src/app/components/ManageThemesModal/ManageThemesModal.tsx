@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { activeThemeSelector, themesListSelector } from '@/selectors';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
+import { notifyToUI } from '@/plugin/notifiers';
 import Modal from '../Modal';
 import { Dispatch } from '@/app/store';
 import Stack from '../Stack';
@@ -25,7 +26,11 @@ import { ReorderGroup } from '@/motion/ReorderGroup';
 import { ThemeListGroupHeader } from './ThemeListGroupHeader';
 import { INTERNAL_THEMES_NO_GROUP, INTERNAL_THEMES_NO_GROUP_LABEL } from '@/constants/InternalTokenGroup';
 import { TreeItem, themeListToTree } from '@/utils/themeListToTree';
-import { getThemeDepth as getThemeHierarchyDepth } from '@/utils/themeHierarchy';
+import {
+  getThemeDepth as getThemeHierarchyDepth,
+  buildChildrenMap as buildThemeChildrenMap,
+  collectDescendants as collectThemeDescendants,
+} from '@/utils/themeHierarchy';
 import { ItemData } from '@/context';
 import { checkReorder } from '@/utils/motion';
 import { ensureFolderIsTogether, findOrderableTargetIndexesInThemeList } from '@/utils/dragDropOrder';
@@ -111,18 +116,35 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
 
   const handleDeleteTheme = useCallback(async () => {
     if (typeof themeEditorOpen === 'string') {
-      const confirmDelete = await confirm({ text: t('confirmDeleteTheme'), confirmAction: t('delete'), variant: 'danger' });
+      // Deleting a theme cascades to its extension (child) themes — warn if any exist.
+      const childCount = collectThemeDescendants(themeEditorOpen, buildThemeChildrenMap(themes)).length;
+      const text = childCount > 0
+        ? t('confirmDeleteThemeWithChildren', { count: childCount })
+        : t('confirmDeleteTheme');
+      const confirmDelete = await confirm({ text, confirmAction: t('delete'), variant: 'danger' });
       if (confirmDelete) {
         track('Delete theme', { id: themeEditorOpen });
         dispatch.tokenState.deleteTheme(themeEditorOpen);
         setThemeEditorOpen(false);
       }
     }
-  }, [confirm, dispatch.tokenState, t, themeEditorOpen]);
+  }, [confirm, dispatch.tokenState, t, themeEditorOpen, themes]);
 
   const handleDeleteThemeGroup = useCallback(async (groupName: string) => {
     const themesInGroup = themes.filter((t) => t.group === groupName);
-    const confirmText = `Delete theme group "${groupName}" with ${themesInGroup.length} theme(s)?`;
+    // Count extension descendants that live outside this group and will also be removed.
+    const childrenMap = buildThemeChildrenMap(themes);
+    const groupThemeIds = new Set(themesInGroup.map((t) => t.id));
+    const cascadedChildren = new Set<string>();
+    themesInGroup.forEach((t) => {
+      collectThemeDescendants(t.id, childrenMap).forEach((id) => {
+        if (!groupThemeIds.has(id)) cascadedChildren.add(id);
+      });
+    });
+
+    const confirmText = cascadedChildren.size > 0
+      ? t('confirmDeleteThemeGroupWithChildren', { group: groupName, count: themesInGroup.length, childCount: cascadedChildren.size })
+      : t('confirmDeleteThemeGroup', { group: groupName, count: themesInGroup.length });
 
     const confirmDelete = await confirm({
       text: confirmText,
@@ -136,20 +158,27 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
     }
   }, [themes, confirm, dispatch, t]);
 
-  const handleCancelEdit = useCallback(() => {
+  // Reset all theme-editor state. Must run on EVERY close/submit path, otherwise
+  // stale extend-mode state leaks into the next "New Theme" and silently creates
+  // another extension of the previously selected group.
+  const closeThemeEditor = useCallback(() => {
     setThemeEditorOpen(false);
     setIsExtendMode(false);
     setSelectedParentGroup(undefined);
   }, []);
 
+  const handleCancelEdit = useCallback(() => {
+    closeThemeEditor();
+  }, [closeThemeEditor]);
+
   const handleEscapeKeyDown = useCallback((event: KeyboardEvent) => {
     // If we're inside a theme editor, prevent closing the modal and go back to theme list
     if (themeEditorOpen) {
       event.preventDefault();
-      setThemeEditorOpen(false);
+      closeThemeEditor();
     }
     // If themeEditorOpen is false, let default behavior close the modal
-  }, [themeEditorOpen]);
+  }, [themeEditorOpen, closeThemeEditor]);
 
   const handleSubmit = useCallback((values: FormValues) => {
     const id = typeof themeEditorOpen === 'string' ? themeEditorOpen : undefined;
@@ -181,14 +210,28 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
           oldGroup: themeEditorDefaultValues?.group,
         },
       });
-      setThemeEditorOpen(false);
+      closeThemeEditor();
       return;
     }
 
     // CREATING NEW THEME(S)
+    const parentGroupName = values.parentThemeId; // Group name to extend from
+
+    // In extend mode a parent group is required, and the new extended group name
+    // must not collide with an existing theme group.
+    if (isExtendMode) {
+      if (!parentGroupName) {
+        notifyToUI(t('extendModeRequiresParentGroup'), { error: true });
+        return;
+      }
+      if (values.name && themes.some((theme) => theme.group === values.name)) {
+        notifyToUI(t('themeGroupNameCollision', { group: values.name }), { error: true });
+        return;
+      }
+    }
+
     track('Create theme', { values });
 
-    const parentGroupName = values.parentThemeId; // Group name to extend from
     const parentThemes = parentGroupName
       ? themes.filter((t) => t.group === parentGroupName) // Include all themes in the parent group, even if already extended
       : [];
@@ -227,8 +270,8 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
       dispatch.tokenState.saveTheme(themeData);
     }
 
-    setThemeEditorOpen(false);
-  }, [themeEditorOpen, dispatch.tokenState, themeEditorDefaultValues, themes]);
+    closeThemeEditor();
+  }, [themeEditorOpen, dispatch.tokenState, themeEditorDefaultValues, themes, isExtendMode, closeThemeEditor, t]);
 
   const handleReorder = React.useCallback((reorderedItems: TreeItem[]) => {
     let currentGroup = '';

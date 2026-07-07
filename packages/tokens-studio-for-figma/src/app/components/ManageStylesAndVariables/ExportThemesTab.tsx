@@ -1,4 +1,6 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, {
+  useState, useCallback, useMemo, useEffect,
+} from 'react';
 import { useSelector } from 'react-redux';
 import {
   Button, Heading, Tabs, Box, Stack, Checkbox, Label,
@@ -83,6 +85,18 @@ export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: {
     () => (exportExtendedCollections ? allThemes : allThemes.filter((t) => !t.$figmaParentThemeId)),
     [allThemes, exportExtendedCollections],
   );
+
+  // Prune selection to themes that still exist and are currently exportable.
+  // Without this, toggling "export extended collections" off leaves child themes
+  // selected (and passed to export) while hidden from the list, and deleted
+  // themes linger in the selection.
+  useEffect(() => {
+    const visibleIds = new Set(themes.map((theme) => theme.id));
+    if (selectedThemes.some((id) => !visibleIds.has(id))) {
+      setSelectedThemes(selectedThemes.filter((id) => visibleIds.has(id)));
+    }
+  }, [themes, selectedThemes, setSelectedThemes]);
+
   const isProUser = useIsProUser();
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -179,8 +193,15 @@ export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: {
     const allFilteredSelected = themesToToggle.every((theme) => selectedThemes.includes(theme.id));
 
     if (allFilteredSelected) {
-      // Deselect all filtered themes
-      setSelectedThemes(selectedThemes.filter((id) => !themesToToggle.some((theme) => theme.id === id)));
+      // Deselect all filtered themes, plus every descendant of each — otherwise a
+      // hidden child could stay selected while its parent is deselected, breaking
+      // the child⇒parent invariant the per-row lock enforces.
+      const toRemove = new Set<string>();
+      themesToToggle.forEach((theme) => {
+        toRemove.add(theme.id);
+        (descendantsByThemeId.get(theme.id) ?? new Set<string>()).forEach((id) => toRemove.add(id));
+      });
+      setSelectedThemes(selectedThemes.filter((id) => !toRemove.has(id)));
     } else {
       // Select all filtered themes (add to existing selection), including their ancestors (cycle-safe)
       const newSelection = [...selectedThemes];
@@ -196,7 +217,7 @@ export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: {
       });
       setSelectedThemes(newSelection);
     }
-  }, [sortedFilteredThemes, selectedThemes, setSelectedThemes, parentByThemeId]);
+  }, [sortedFilteredThemes, selectedThemes, setSelectedThemes, parentByThemeId, descendantsByThemeId]);
 
   return (
     <Tabs.Content value="useThemes">

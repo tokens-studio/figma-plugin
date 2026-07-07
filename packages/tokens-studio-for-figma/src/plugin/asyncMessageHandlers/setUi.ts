@@ -22,6 +22,7 @@ export const setUi: AsyncMessageChannelHandlers[AsyncMessageTypes.SET_UI] = asyn
     prefixStylesWithThemeName: msg.prefixStylesWithThemeName,
     renameExistingStylesAndVariables: msg.renameExistingStylesAndVariables,
     removeStylesAndVariablesWithoutConnection: msg.removeStylesAndVariablesWithoutConnection,
+    exportExtendedCollections: msg.exportExtendedCollections,
     variablesBoolean: msg.variablesBoolean,
     variablesColor: msg.variablesColor,
     variablesNumber: msg.variablesNumber,

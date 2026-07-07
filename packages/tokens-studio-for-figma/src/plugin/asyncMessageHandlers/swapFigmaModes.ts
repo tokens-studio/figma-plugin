@@ -16,13 +16,16 @@ function isFigmaThemeWithCollectionAndMode(
 /**
  * Filter out parent collections when their extended collections are active.
  * Figma's rule: Extended collections override their parent collections - they cannot both be active.
- * 
+ *
  * @param activeThemeObjects - All currently active theme objects with collection metadata
  * @returns Filtered list with parent collections removed when their extended versions are active
  */
 function filterMutuallyExclusiveCollections(
   activeThemeObjects: Array<ThemeObject & { $figmaCollectionId: string; $figmaModeId: string }>,
-): Array<ThemeObject & { $figmaCollectionId: string; $figmaModeId: string }> {
+): {
+    filtered: Array<ThemeObject & { $figmaCollectionId: string; $figmaModeId: string }>;
+    parentCollectionIdsToExclude: Set<string>;
+  } {
   const result: Array<ThemeObject & { $figmaCollectionId: string; $figmaModeId: string }> = [];
   const parentCollectionIdsToExclude = new Set<string>();
 
@@ -45,7 +48,7 @@ function filterMutuallyExclusiveCollections(
     }
   }
 
-  return result;
+  return { filtered: result, parentCollectionIdsToExclude };
 }
 
 function getRootNode(updateMode: UpdateMode) {
@@ -84,11 +87,22 @@ export async function swapFigmaModes(activeTheme: Record<string, string>, themes
 
   // Filter out parent collections when their extended collections are active
   // This ensures extended collections override their parents (Figma's mutual exclusivity rule)
-  const filteredThemeObjects = filterMutuallyExclusiveCollections(activeThemeObjects);
+  const { filtered: filteredThemeObjects, parentCollectionIdsToExclude } = filterMutuallyExclusiveCollections(activeThemeObjects);
 
   if (filteredThemeObjects.length === 0) {
     // All themes were filtered out (shouldn't happen, but handle gracefully)
     return;
+  }
+
+  // Resolve the parent collections we need to clear so a previously-set explicit
+  // parent mode doesn't linger on the node once its extended collection is active.
+  const parentCollectionsToClear: VariableCollection[] = [];
+  for (const parentCollectionId of parentCollectionIdsToExclude) {
+    // eslint-disable-next-line no-await-in-loop
+    const parentCollection = await figma.variables.getVariableCollectionByIdAsync(parentCollectionId);
+    if (parentCollection) {
+      parentCollectionsToClear.push(parentCollection);
+    }
   }
 
   // Validate all collections and modes, collecting valid ones
@@ -130,6 +144,15 @@ export async function swapFigmaModes(activeTheme: Record<string, string>, themes
   // Apply all valid collection/mode pairs to each root node
   // Batch operations to reduce iterations: apply all collections to a node at once
   for (const node of rootNodes) {
+    // Clear any stale explicit mode on parent collections overridden by an active
+    // extended collection, otherwise both would resolve on the node at once.
+    for (const parentCollection of parentCollectionsToClear) {
+      try {
+        (node as any).clearExplicitVariableModeForCollection(parentCollection);
+      } catch {
+        // Node may have no explicit mode for this collection — safe to ignore.
+      }
+    }
     for (const { collection, modeId } of validCollectionModePairs) {
       try {
         // Pass the collection object instead of ID (new API)
