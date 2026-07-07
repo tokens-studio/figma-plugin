@@ -1,6 +1,7 @@
 import { ThemeObjectsList, ThemeObject } from '@/types';
 import { SettingsState } from '@/app/store/models/settings';
 import createVariableMode from './createVariableMode';
+import { notifyUI } from './notifiers';
 import { truncateCollectionName, truncateModeName } from '@/utils/truncateName';
 
 async function processTheme(
@@ -59,6 +60,7 @@ async function processTheme(
         return;
       } catch (error) {
         console.warn('Cannot create extended collection — extend() API not available. Requires Figma Enterprise.', error);
+        notifyUI(`Could not create extended collection for theme "${currentTheme.name}" — extending collections requires a Figma Enterprise plan. The theme was skipped.`, { error: true });
         return;
       }
     }
@@ -93,10 +95,32 @@ async function processTheme(
   acc.push(newCollection);
 }
 
+// Sort so every theme comes after its (transitive) ancestors. Child collections
+// need the parent collection to exist before extend() can be called, and the
+// selection list order follows the user's drag-reorder, which allows a child
+// to appear before its parent.
+function sortParentsFirst(themesToSort: ThemeObject[]): ThemeObject[] {
+  const byId = new Map(themesToSort.map((t) => [t.id, t]));
+  const depthOf = (theme: ThemeObject): number => {
+    let depth = 0;
+    const visited = new Set<string>([theme.id]);
+    let parentId = theme.$figmaParentThemeId;
+    while (parentId && byId.has(parentId) && !visited.has(parentId)) {
+      depth += 1;
+      visited.add(parentId);
+      parentId = byId.get(parentId)!.$figmaParentThemeId;
+    }
+    return depth;
+  };
+  const originalIndex = new Map(themesToSort.map((t, i) => [t.id, i]));
+  return [...themesToSort].sort((a, b) => depthOf(a) - depthOf(b)
+    || (originalIndex.get(a.id)! - originalIndex.get(b.id)!));
+}
+
 // Takes a given theme input and creates required variable collections with modes, or updates existing ones and renames / adds modes
 export async function createNecessaryVariableCollections(themes: ThemeObjectsList, selectedThemes: string[], settings: Partial<SettingsState> = {}): Promise<VariableCollection[]> {
   const allCollections = await figma.variables.getLocalVariableCollectionsAsync();
-  const collectionsToCreateOrUpdate = themes.filter((theme) => selectedThemes.includes(theme.id));
+  const collectionsToCreateOrUpdate = sortParentsFirst(themes.filter((theme) => selectedThemes.includes(theme.id)));
   const acc: VariableCollection[] = [];
 
   for (const currentTheme of collectionsToCreateOrUpdate) {

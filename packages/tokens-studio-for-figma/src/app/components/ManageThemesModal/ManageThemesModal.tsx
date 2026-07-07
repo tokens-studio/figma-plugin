@@ -25,6 +25,7 @@ import { ReorderGroup } from '@/motion/ReorderGroup';
 import { ThemeListGroupHeader } from './ThemeListGroupHeader';
 import { INTERNAL_THEMES_NO_GROUP, INTERNAL_THEMES_NO_GROUP_LABEL } from '@/constants/InternalTokenGroup';
 import { TreeItem, themeListToTree } from '@/utils/themeListToTree';
+import { getThemeDepth as getThemeHierarchyDepth } from '@/utils/themeHierarchy';
 import { ItemData } from '@/context';
 import { checkReorder } from '@/utils/motion';
 import { ensureFolderIsTogether, findOrderableTargetIndexesInThemeList } from '@/utils/dragDropOrder';
@@ -57,20 +58,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
 
   const themesById = useMemo(() => new Map(themes.map((t) => [t.id, t])), [themes]);
 
-  const getThemeDepth = useCallback((themeId: string) => {
-    let depth = 0;
-    let currentId = themeId;
-    while (true) {
-      const theme = themesById.get(currentId);
-      if (theme?.$figmaParentThemeId && themesById.has(theme.$figmaParentThemeId)) {
-        depth += 1;
-        currentId = theme.$figmaParentThemeId;
-      } else {
-        break;
-      }
-    }
-    return depth;
-  }, [themesById]);
+  const getThemeDepth = useCallback((themeId: string) => getThemeHierarchyDepth(themeId, themesById), [themesById]);
 
   const getGroupDepth = useCallback((groupName: string) => {
     const firstThemeInGroup = themes.find((t) => t.group === groupName);

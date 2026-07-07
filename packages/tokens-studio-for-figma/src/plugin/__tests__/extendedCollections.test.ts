@@ -268,6 +268,8 @@ describe('Extended Collections', () => {
   describe('Export Extended Collections', () => {
     beforeEach(() => {
       global.figma = {
+        notify: jest.fn(),
+        ui: { postMessage: jest.fn() },
         variables: {
           getLocalVariableCollectionsAsync: jest.fn().mockResolvedValue([]),
         },

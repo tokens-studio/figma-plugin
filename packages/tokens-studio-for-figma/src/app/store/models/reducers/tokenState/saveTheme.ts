@@ -44,21 +44,28 @@ export function saveTheme(state: TokenState, data: Payload): TokenState {
   );
   const themeObjectIndex = state.themes.findIndex((theme) => theme.id === themeId);
   const startIndex = themeObjectIndex > -1 ? themeObjectIndex : state.themes.length;
+  const existingTheme = state.themes[themeObjectIndex];
+
+  // Extension metadata must survive edits that don't carry it in the payload
+  // (e.g. a rename from the theme modal). Fall back to the stored theme.
+  const parentThemeId = data.$figmaParentThemeId ?? existingTheme?.$figmaParentThemeId;
+  const parentCollectionId = data.$figmaParentCollectionId ?? existingTheme?.$figmaParentCollectionId;
+  // $figmaIsExtension is derived from $figmaParentThemeId — a theme with a parent ID is always an extension,
+  // even if the flag was absent (e.g. themes created before the flag was introduced)
+  const isExtension = parentThemeId ? true : (data.$figmaIsExtension ?? existingTheme?.$figmaIsExtension);
 
   const updatedThemes = [...state.themes];
   updatedThemes.splice(startIndex, 1, {
-    ...omit(state.themes[themeObjectIndex], 'group'),
+    ...omit(existingTheme, 'group'),
     id: themeId,
     name: data.name,
-    $figmaStyleReferences: state.themes[themeObjectIndex]?.$figmaStyleReferences ?? {},
+    $figmaStyleReferences: existingTheme?.$figmaStyleReferences ?? {},
     selectedTokenSets,
     ...(data?.group ? { group: data.group } : {}),
     // Preserve extended collection metadata
-    // $figmaIsExtension is derived from $figmaParentThemeId — a theme with a parent ID is always an extension,
-    // even if the flag was absent (e.g. themes created before the flag was introduced)
-    $figmaIsExtension: data.$figmaParentThemeId ? true : data.$figmaIsExtension,
-    ...(data.$figmaParentCollectionId ? { $figmaParentCollectionId: data.$figmaParentCollectionId } : {}),
-    ...(data.$figmaParentThemeId ? { $figmaParentThemeId: data.$figmaParentThemeId } : {}),
+    $figmaIsExtension: isExtension,
+    ...(parentCollectionId ? { $figmaParentCollectionId: parentCollectionId } : {}),
+    ...(parentThemeId ? { $figmaParentThemeId: parentThemeId } : {}),
     ...(data.$figmaMirrorParentSets !== undefined ? { $figmaMirrorParentSets: data.$figmaMirrorParentSets } : {}),
     // Preserve other Figma metadata
     $figmaCollectionId: data.$figmaCollectionId ?? state.themes[themeObjectIndex]?.$figmaCollectionId,
@@ -69,7 +76,7 @@ export function saveTheme(state: TokenState, data: Payload): TokenState {
   let finalThemes = updatedThemes;
 
   // If this is a new theme in a parent group (not an extended theme), cascade to children
-  if (isNewTheme && data.group && !data.$figmaIsExtension) {
+  if (isNewTheme && data.group && !isExtension) {
     const extendedChildGroups = findExtendedChildGroups(data.group, updatedThemes);
 
     extendedChildGroups.forEach((childGroup) => {
@@ -90,13 +97,13 @@ export function saveTheme(state: TokenState, data: Payload): TokenState {
   }
 
   // If updating an existing parent theme, update all mirrored child themes
-  if (!isNewTheme && !data.$figmaIsExtension) {
+  if (!isNewTheme && !isExtension) {
     finalThemes = finalThemes.map((theme) => {
       // Check if this theme is a child of the current theme and has mirroring enabled
       if (theme.$figmaParentThemeId === themeId && theme.$figmaMirrorParentSets) {
         return {
           ...theme,
-          selectedTokenSets: selectedTokenSets,
+          selectedTokenSets,
         };
       }
       return theme;

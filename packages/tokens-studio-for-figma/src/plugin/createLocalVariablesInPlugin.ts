@@ -11,6 +11,7 @@ import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { mergeVariableReferencesWithLocalVariables } from './mergeVariableReferences';
 import { findCollectionAndModeIdForTheme } from './findCollectionAndModeIdForTheme';
 import { createNecessaryVariableCollections } from './createNecessaryVariableCollections';
+import { truncateModeName } from '@/utils/truncateName';
 import { getVariablesWithoutZombies } from './getVariablesWithoutZombies';
 import { getCodeSyntaxValue } from '@/utils/figma';
 import { getOverallConfig } from '@/utils/tokenHelpers';
@@ -141,7 +142,22 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
 
     // Process themes sequentially
     for (const theme of sortedThemeObjects) {
-      const { collection, modeId } = findCollectionAndModeIdForTheme(theme.group ?? theme.name, theme.name, collections);
+      const lookup = findCollectionAndModeIdForTheme(theme.group ?? theme.name, theme.name, collections);
+      let collection: VariableCollection | undefined = lookup.collection;
+      let modeId: string | undefined = lookup.modeId;
+
+      // Extended (child) collections are named WITHOUT the parent-group prefix
+      // ("Brand", not "Colors/Brand"), so the name-based lookup misses themes
+      // whose group carries the imported "Parent/Child" form. Fall back to the
+      // collection id backfilled during collection creation.
+      if ((!collection || !modeId) && theme.$figmaCollectionId) {
+        const collectionById = collections.find((c) => c.id === theme.$figmaCollectionId);
+        if (collectionById) {
+          collection = collectionById;
+          modeId = (collectionById.modes.find((m) => m.modeId === theme.$figmaModeId)
+            ?? collectionById.modes.find((m) => m.name === theme.name || m.name === truncateModeName(theme.name)))?.modeId;
+        }
+      }
 
       if (collection && modeId) {
         // Use overallConfig to allow cross-theme token references

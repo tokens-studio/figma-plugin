@@ -115,6 +115,11 @@ export default async function pullVariables(options: PullVariablesOptions, theme
     return Object.keys(extensions).length > 0 ? extensions : undefined;
   };
 
+  // Collections that at least one variable contributes to (directly, or via
+  // inheritance for extended child collections). Used to skip empty collections
+  // in the theme pass.
+  const collectionIdsWithVariables = new Set<string>();
+
   for (const variable of localVariables) {
     let collection = collectionsCache.get(variable.variableCollectionId);
 
@@ -159,6 +164,11 @@ export default async function pullVariables(options: PullVariablesOptions, theme
         }
       });
     }
+
+    // Mark every collection this variable contributes to as non-empty — the
+    // theme pass skips collections that never appear here (empty scratch
+    // collections would otherwise produce phantom themes).
+    collectionsToProcess.forEach((c) => collectionIdsWithVariables.add(c.id));
 
     const variableName = normalizeVariableName(variable.name);
 
@@ -354,7 +364,7 @@ export default async function pullVariables(options: PullVariablesOptions, theme
               const modeName = collectionToProcess?.modes.find((m) => m.modeId === actualModeId)?.name;
               const figmaExtensions = createFigmaExtensions(variable);
 
-              if ((options.useDimensions || options.useRem) && typeof tokenValue === 'string' && (tokenValue.endsWith('px') || tokenValue.endsWith('rem'))) {
+              if (options.useDimensions || options.useRem) {
                 dimensions.push({
                   name: variableName,
                   value: tokenValue as string,
@@ -434,6 +444,13 @@ export default async function pullVariables(options: PullVariablesOptions, theme
         if (!selectedCollection) {
           return;
         }
+      }
+
+      // Skip collections without any variables — the collections map is
+      // pre-populated with ALL local collections, so an empty scratch
+      // collection would otherwise produce a phantom theme per mode.
+      if (!collectionIdsWithVariables.has(collection.id)) {
+        return;
       }
 
       await Promise.all(collection.modes.map(async (mode) => {

@@ -15,8 +15,15 @@ export const getAvailableVariableCollections: AsyncMessageChannelHandlers[AsyncM
 
       let extensionDepth = 0;
       let current: any = extendedCollection;
-      while (current?.isExtension && current?.parentVariableCollectionId && byId.has(current.parentVariableCollectionId)) {
+      const visited = new Set<string>([collection.id]);
+      while (
+        current?.isExtension
+        && current?.parentVariableCollectionId
+        && byId.has(current.parentVariableCollectionId)
+        && !visited.has(current.parentVariableCollectionId)
+      ) {
         extensionDepth += 1;
+        visited.add(current.parentVariableCollectionId);
         current = byId.get(current.parentVariableCollectionId);
       }
 

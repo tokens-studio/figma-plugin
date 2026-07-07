@@ -82,9 +82,6 @@ export default async function setValuesOnVariable(
           const flatScopes = token.$extensions?.['com.figma.scopes'] as VariableScope[] | undefined;
           const variableType = convertTokenTypeToVariableType(token.type, token.value, flatScopes);
 
-          if (isExtendedCollection) {
-            console.log(`    Processing token: "${token.path}"`);
-          }
           // If id matches the variableId, or name matches the token path, we can use it to update the variable instead of re-creating.
           // Prioritize finding by variableId (key) when present, otherwise fall back to name matching
           // This has the nasty side-effect that if font weight changes from string to number, it will not update the variable given we cannot change type.

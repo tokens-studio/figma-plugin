@@ -14,6 +14,9 @@ import { ThemeObject } from '@/types';
 import { LabelledCheckbox } from './LabelledCheckbox';
 import { SearchInputWithToggle } from '../SearchInputWithToggle';
 import { sortThemesForDisplay } from '@/utils/themeListToTree';
+import {
+  buildChildrenMap, buildParentMap, collectAncestors, collectDescendants,
+} from '@/utils/themeHierarchy';
 
 function ThemeRow({
   theme,
@@ -143,31 +146,14 @@ export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: {
   }, [selectedThemes, filteredThemes, isSearchActive, searchTerm]);
 
   // Build a map from themeId → parentThemeId for ancestor traversal
-  const parentByThemeId = React.useMemo(() => {
-    const map = new Map<string, string>();
-    allThemes.forEach((t) => {
-      if (t.$figmaParentThemeId) map.set(t.id, t.$figmaParentThemeId);
-    });
-    return map;
-  }, [allThemes]);
+  const parentByThemeId = React.useMemo(() => buildParentMap(allThemes), [allThemes]);
 
-  // Build a map from themeId → Set of all descendant theme IDs
+  // Build a map from themeId → Set of all descendant theme IDs (cycle-safe)
   const descendantsByThemeId = React.useMemo(() => {
-    const childrenMap = new Map<string, string[]>();
-    allThemes.forEach((t) => {
-      if (t.$figmaParentThemeId) {
-        const list = childrenMap.get(t.$figmaParentThemeId) || [];
-        list.push(t.id);
-        childrenMap.set(t.$figmaParentThemeId, list);
-      }
-    });
-    const getAllDescendants = (id: string): string[] => {
-      const children = childrenMap.get(id) || [];
-      return children.flatMap((c) => [c, ...getAllDescendants(c)]);
-    };
+    const childrenMap = buildChildrenMap(allThemes);
     const result = new Map<string, Set<string>>();
     allThemes.forEach((t) => {
-      result.set(t.id, new Set(getAllDescendants(t.id)));
+      result.set(t.id, new Set(collectDescendants(t.id, childrenMap)));
     });
     return result;
   }, [allThemes]);
@@ -180,15 +166,9 @@ export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: {
       if (hasCheckedDescendant) return;
       setSelectedThemes(selectedThemes.filter((id) => id !== themeId));
     } else {
-      // When checking, also check all ancestors
-      const ancestors: string[] = [];
-      let current = parentByThemeId.get(themeId);
-      while (current) {
-        if (!selectedThemes.includes(current) && !ancestors.includes(current)) {
-          ancestors.push(current);
-        }
-        current = parentByThemeId.get(current);
-      }
+      // When checking, also check all ancestors (cycle-safe walk)
+      const ancestors = collectAncestors(themeId, parentByThemeId)
+        .filter((id) => !selectedThemes.includes(id));
       setSelectedThemes([...selectedThemes, themeId, ...ancestors]);
     }
   }, [selectedThemes, setSelectedThemes, parentByThemeId, descendantsByThemeId]);
@@ -202,23 +182,21 @@ export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: {
       // Deselect all filtered themes
       setSelectedThemes(selectedThemes.filter((id) => !themesToToggle.some((theme) => theme.id === id)));
     } else {
-      // Select all filtered themes (add to existing selection), including their ancestors
+      // Select all filtered themes (add to existing selection), including their ancestors (cycle-safe)
       const newSelection = [...selectedThemes];
       themesToToggle.forEach((theme) => {
         if (!newSelection.includes(theme.id)) {
           newSelection.push(theme.id);
         }
-        let current = parentByThemeId.get(theme.id);
-        while (current) {
-          if (!newSelection.includes(current)) {
-            newSelection.push(current);
+        collectAncestors(theme.id, parentByThemeId).forEach((ancestorId) => {
+          if (!newSelection.includes(ancestorId)) {
+            newSelection.push(ancestorId);
           }
-          current = parentByThemeId.get(current);
-        }
+        });
       });
       setSelectedThemes(newSelection);
     }
-  }, [sortedFilteredThemes, selectedThemes, setSelectedThemes]);
+  }, [sortedFilteredThemes, selectedThemes, setSelectedThemes, parentByThemeId]);
 
   return (
     <Tabs.Content value="useThemes">
