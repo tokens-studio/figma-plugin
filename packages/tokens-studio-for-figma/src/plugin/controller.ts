@@ -73,6 +73,7 @@ AsyncMessageChannel.PluginInstance.handle(
   asyncHandlers.attachLocalVariablesToTheme,
 );
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RENAME_VARIABLES, asyncHandlers.renameVariables);
+AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.REMOVE_VARIABLES, asyncHandlers.removeVariables);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.UPDATE_VARIABLES, asyncHandlers.updateVariables);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_USED_EMAIL, asyncHandlers.setUsedEmail);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.PREVIEW_REQUEST_STARTUP, asyncHandlers.previewRequestStartup);

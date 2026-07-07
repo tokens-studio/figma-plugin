@@ -130,7 +130,7 @@ describe('ConfirmDialog', () => {
     // expect(result.queryByText('Save Credentials')).toBeInTheDocument();
   });
 
-  it('should show beta badge for providers with beta flag', async () => {
+  it('should not show any beta badges', async () => {
     const mockStore = createMockStore(defaultStore);
     const result = render(
       <Provider store={mockStore}>
@@ -144,36 +144,7 @@ describe('ConfirmDialog', () => {
       await userEvent.keyboard('[Enter]');
     });
 
-    // Should have BETA badges for providers with beta: true
     const betaBadges = result.queryAllByText('BETA');
-    expect(betaBadges.length).toBeGreaterThan(0);
-  });
-
-  it('should not show beta badge for Tokens Studio provider after fix', async () => {
-    const mockStore = createMockStore(defaultStore);
-    const result = render(
-      <Provider store={mockStore}>
-        <SyncSettings />
-      </Provider>,
-    );
-
-    await act(async () => {
-      const trigger = await result.getByTestId('add-storage-item-button');
-      trigger?.focus();
-      await userEvent.keyboard('[Enter]');
-    });
-
-    // Find the Tokens Studio provider button
-    const tokensStudioButton = await result.queryByTestId('add-Tokens Studio-credential');
-    expect(tokensStudioButton).toBeInTheDocument();
-
-    // BitBucket still has beta badge, so there should be at least one BETA badge
-    // But specifically Tokens Studio should not have a beta badge
-    const betaBadges = result.queryAllByText('BETA');
-    // Should still have at least one because BitBucket has beta: true
-    expect(betaBadges.length).toBeGreaterThanOrEqual(1);
-
-    // The test is that the total number of BETA badges should be exactly 1 (BitBucket only)
-    expect(betaBadges.length).toBe(1);
+    expect(betaBadges.length).toBe(0);
   });
 });
