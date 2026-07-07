@@ -5,7 +5,6 @@ import { Heading, ContextMenu } from '@tokens-studio/ui';
 import Stack from '../Stack';
 import useManageTokens from '../../store/useManageTokens';
 import {
-  activeApiProviderSelector,
   activeTokenSetReadOnlySelector,
   editProhibitedSelector,
   activeTokenSetSelector,
@@ -22,7 +21,6 @@ import { ShowNewFormOptions } from '@/types';
 import useTokens from '../../store/useTokens';
 import RenameTokenGroupModal from '../modals/RenameTokenGroupModal';
 import DuplicateTokenGroupModal from '../modals/DuplicateTokenGroupModal';
-import { StorageProviderType } from '@/constants/StorageProviderType';
 import { useGenerateDocumentation } from '@/app/hooks/useGenerateDocumentation';
 import ProBadge from '../ProBadge';
 
@@ -40,7 +38,6 @@ export function TokenGroupHeading({
   const { t } = useTranslation(['tokens']);
   const editProhibited = useSelector(editProhibitedSelector);
   const activeTokenSetReadOnly = useSelector(activeTokenSetReadOnlySelector);
-  const activeApiProvider = useSelector(activeApiProviderSelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const [newTokenGroupName, setNewTokenGroupName] = React.useState<string>(path);
   const [showRenameTokenGroupModal, setShowRenameTokenGroupModal] = React.useState<boolean>(false);
@@ -49,9 +46,8 @@ export function TokenGroupHeading({
   const dispatch = useDispatch<Dispatch>();
   const collapsed = useSelector(collapsedTokensSelector);
   const { remapTokensInGroup } = useTokens();
-  const isTokensStudioProvider = activeApiProvider === StorageProviderType.TOKENS_STUDIO;
 
-  const canEdit = !editProhibited && !activeTokenSetReadOnly && !isTokensStudioProvider;
+  const canEdit = !editProhibited && !activeTokenSetReadOnly;
 
   const { handleGenerateDocumentation, modals } = useGenerateDocumentation({
     initialTokenSet: activeTokenSet,

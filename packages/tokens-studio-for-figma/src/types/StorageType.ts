@@ -74,16 +74,6 @@ StorageProviderType.BITBUCKET,
 }
 >;
 
-export type TokensStudioStorageType = GenericStorageType<
-StorageProviderType.TOKENS_STUDIO,
-{
-  name: string; // this is only for reference
-  orgId: string; // this is the organization id
-  id: string; // this is the project id
-  baseUrl?: string; // this is the base URL for the Studio instance (optional for backward compatibility)
-}
->;
-
 export type TokensStudioOAuthStorageType = GenericStorageType<
 StorageProviderType.TOKENS_STUDIO_OAUTH,
 {
@@ -137,7 +127,6 @@ export type StorageType =
   | ADOStorageType
   | BitbucketStorageType
   | SupernovaStorageType
-  | TokensStudioStorageType
   | TokensStudioOAuthStorageType;
 
 export type StorageTypeCredentials =
@@ -149,7 +138,6 @@ export type StorageTypeCredentials =
   | StorageTypeCredential<BitbucketStorageType>
   | StorageTypeCredential<ADOStorageType>
   | StorageTypeCredential<SupernovaStorageType>
-  | StorageTypeCredential<TokensStudioStorageType>
   | StorageTypeCredential<TokensStudioOAuthStorageType, false>;
 
 export type StorageTypeFormValues<Incomplete extends boolean = false> =
@@ -184,10 +172,6 @@ export type StorageTypeFormValues<Incomplete extends boolean = false> =
   | ({ new?: boolean; id?: string; provider: StorageProviderType.GENERIC_VERSIONED_STORAGE } & OptionalPartial<
   Incomplete,
   Omit<StorageTypeCredential<GenericVersionedStorageType>, 'provider'>
-  >)
-  | ({ new?: boolean; provider: StorageProviderType.TOKENS_STUDIO } & OptionalPartial<
-  Incomplete,
-  Omit<StorageTypeCredential<TokensStudioStorageType>, 'provider'>
   >)
   | ({ new?: boolean; provider: StorageProviderType.TOKENS_STUDIO_OAUTH } & OptionalPartial<
   Incomplete,

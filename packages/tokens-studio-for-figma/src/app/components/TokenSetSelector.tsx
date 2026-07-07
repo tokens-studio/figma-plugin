@@ -12,10 +12,9 @@ import IconAdd from '@/icons/add.svg';
 import Modal from './Modal';
 import TokenSetTree from './TokenSetTree';
 import {
-  editProhibitedSelector, tokensSelector, uiStateSelector, storageTypeSelector,
+  editProhibitedSelector, tokensSelector, uiStateSelector,
 } from '@/selectors';
 import OnboardingExplainer from './OnboardingExplainer';
-import { StorageProviderType } from '@/constants/StorageProviderType';
 
 export default function TokenSetSelector({ saveScrollPositionSet }: { saveScrollPositionSet: (tokenSet: string) => void }) {
   const { t } = useTranslation(['tokens']);
@@ -31,7 +30,6 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
   const uiState = useSelector(uiStateSelector);
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
-  const storageType = useSelector(storageTypeSelector);
 
   const [showNewTokenSetFields, setShowNewTokenSetFields] = React.useState(false);
   const [showRenameTokenSetFields, setShowRenameTokenSetFields] = React.useState(false);
@@ -65,12 +63,12 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
 
     const userConfirmation = await confirm({
       text: t('sets.delete', { tokenSet }) as string,
-      description: storageType.provider === StorageProviderType.TOKENS_STUDIO ? t('sets.deleteConfirmationStudio') : t('sets.deleteConfirmation'),
+      description: t('sets.deleteConfirmation'),
     });
     if (userConfirmation) {
       dispatch.tokenState.deleteTokenSet(tokenSet);
     }
-  }, [confirm, dispatch, t, storageType]);
+  }, [confirm, dispatch, t]);
 
   const handleRenameTokenSet = React.useCallback((tokenSet: string) => {
     track('Renamed token set');

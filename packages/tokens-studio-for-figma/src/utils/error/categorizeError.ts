@@ -41,8 +41,6 @@ export function categorizeError(error: any, context?: {
           return ErrorMessages.JSONBIN_CREDENTIAL_ERROR;
         case StorageProviderType.SUPERNOVA:
           return ErrorMessages.SUPERNOVA_CREDENTIAL_ERROR;
-        case StorageProviderType.TOKENS_STUDIO:
-          return ErrorMessages.TOKENSSTUDIO_CREDENTIAL_ERROR;
         case StorageProviderType.TOKENS_STUDIO_OAUTH:
           return ErrorMessages.TOKENSSTUDIO_OAUTH_CREDENTIAL_ERROR;
         default:
@@ -60,8 +58,6 @@ export function categorizeError(error: any, context?: {
           return ErrorMessages.BITBUCKET_CONNECTIVITY_ERROR;
         case StorageProviderType.ADO:
           return ErrorMessages.ADO_CONNECTIVITY_ERROR;
-        case StorageProviderType.TOKENS_STUDIO:
-          return ErrorMessages.TOKENSSTUDIO_CONNECTIVITY_ERROR;
         case StorageProviderType.TOKENS_STUDIO_OAUTH:
           return ErrorMessages.TOKENSSTUDIO_OAUTH_CONNECTIVITY_ERROR;
         case StorageProviderType.JSONBIN:

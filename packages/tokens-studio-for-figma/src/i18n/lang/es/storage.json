@@ -70,15 +70,6 @@
       "repository": "Repositorio (espacio de trabajo/repositorio)",
       "username": "Email del usuario",
       "usernameAppPassword": "Nombre de usuario"
-    },
-    "tokensstudio": {
-      "name": "Name",
-      "apikey": "API key",
-      "urn": "Connection URN",
-      "pat": "Token de acceso personal",
-      "id": "ID de conexión",
-      "selectOrgLabel": "Elija la organización",
-      "selectProjectLabel": "Elija Proyecto"
     }
   },
   "selectALayerToSeeAppliedTokens": "Seleccione una capa para ver los tokens aplicados",
@@ -105,19 +96,6 @@
   "gitHubExplained": "Conecte su repositorio de código de GitHub con Tokens Studio para el almacenamiento remoto de tokens con control de versiones y sincronización bidireccional controlada dentro del complemento.",
   "bitBucketExplained": "Conecte su repositorio de código de Bitbucket con Tokens Studio para el almacenamiento remoto de tokens con control de versiones y sincronización bidireccional controlada dentro del complemento.",
   "nameHelpText": "Nombre cómo aparecerá en la página de configuración",
-  "tokensStudioForm": {
-    "heading": "Los sistemas de diseño no se detienen en las herramientas de diseño. Nosotros tampoco.",
-    "description": "Los tokens de diseño son poderosos, pero solo si están estructurados. La mayoría de los sistemas se detienen en los valores de estilo. Vamos más allá: condiciones, herencia, temas multi-marca y salidas listas para desarrolladores.",
-    "description2": "Con Tokens Studio, los tokens de diseño se convierten en un lenguaje compartido. Y se usa en herramientas, plataformas y equipos.",
-    "learnMore": "Leer más",
-    "migrationGuide": "guía de migración",
-    "startFreeTrial": "Comenzar prueba gratuita",
-    "studioBaseUrl": "URL base de Studio (opcional)",
-    "baseUrlTooltip": "Si necesita conectarse a una instancia personalizada",
-    "validatingBaseUrl": "Validando URL base...",
-    "chooseOrganization": "Elegir organización",
-    "chooseProject": "Elegir proyecto"
-  },
   "readMoreBitBucket": "Lea la guía de sincronización de Bitbucket.",
   "readMoreGitHub": "Lea la guía de sincronización de GitHub.",
   "readMoreGitLab": "Lea la guía de sincronización de GitLab.",
