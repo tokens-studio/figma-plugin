@@ -10,6 +10,6 @@ export async function applyBackgroundBlurValuesOnNode(
   baseFontSize: string,
 ) {
   if ('effects' in node && typeof values.backgroundBlur !== 'undefined' && isPrimitiveValue(values.backgroundBlur)) {
-    setBackgroundBlurOnTarget(node, { value: String(values.backgroundBlur) }, baseFontSize);
+    await setBackgroundBlurOnTarget(node, { value: String(values.backgroundBlur) }, baseFontSize, data.backgroundBlur);
   }
 }
