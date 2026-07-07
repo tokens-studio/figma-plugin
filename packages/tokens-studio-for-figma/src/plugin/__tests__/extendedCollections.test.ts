@@ -364,6 +364,13 @@ describe('Extended Collections', () => {
         expect.anything(),
       );
 
+      // The user must see a toast when a theme is silently skipped, otherwise
+      // exports look successful while missing extended themes entirely.
+      expect(global.figma.notify).toHaveBeenCalledWith(
+        expect.stringMatching(/extended collection.*Light/i),
+        expect.objectContaining({ error: true }),
+      );
+
       consoleSpy.mockRestore();
     });
 
