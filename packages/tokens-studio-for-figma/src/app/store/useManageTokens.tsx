@@ -11,6 +11,7 @@ import {
 } from '@/types/payloads';
 import useTokens from './useTokens';
 import { StyleOptions } from '@/constants/StyleOptions';
+import { tokenTypesToCreateVariable } from '@/constants/VariableTypes';
 import { ColorModifier } from '@/types/Modifier';
 import { wrapTransaction } from '@/profiling/transaction';
 
@@ -56,7 +57,7 @@ export default function useManageTokens() {
   const store = useStore<RootState>();
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
-  const { removeStylesFromTokens } = useTokens();
+  const { removeStylesFromTokens, removeVariablesFromToken } = useTokens();
   const {
     editToken, createToken, deleteToken, duplicateToken, deleteTokenGroup, renameTokenGroup, duplicateTokenGroup, renameTokenAcrossSets, deleteDuplicateTokens,
   } = dispatch.tokenState;
@@ -132,9 +133,17 @@ export default function useManageTokens() {
 
   const deleteSingleToken = useCallback(async (data: DeleteTokenPayload) => {
     const choices: Choice[] = [];
-    if (store.getState().tokenState.themes.length > 0 && data.type && [TokenTypes.COLOR, TokenTypes.TYPOGRAPHY, TokenTypes.BOX_SHADOW].includes(data?.type)) {
+    const themes = store.getState().tokenState.themes;
+    const hasConnectedStyle = themes.some((theme) => !!theme.$figmaStyleReferences?.[data.path]);
+    if (hasConnectedStyle && data.type && [TokenTypes.COLOR, TokenTypes.TYPOGRAPHY, TokenTypes.BOX_SHADOW].includes(data?.type)) {
       choices.push({
         key: StyleOptions.REMOVE, label: 'Delete associated style',
+      });
+    }
+    const hasConnectedVariable = themes.some((theme) => !!theme.$figmaVariableReferences?.[data.path]);
+    if (hasConnectedVariable && data.type && tokenTypesToCreateVariable.includes(data.type as TokenTypes)) {
+      choices.push({
+        key: StyleOptions.REMOVE_VARIABLE, label: 'Delete connected variable',
       });
     }
 
@@ -162,11 +171,14 @@ export default function useManageTokens() {
       if (Array.isArray(userConfirmation.data) && userConfirmation.data.includes(StyleOptions.REMOVE)) {
         removeStylesFromTokens(data);
       }
+      if (Array.isArray(userConfirmation.data) && userConfirmation.data.includes(StyleOptions.REMOVE_VARIABLE)) {
+        removeVariablesFromToken(data.path);
+      }
       dispatch.uiState.completeJob(BackgroundJobs.UI_DELETETOKEN);
       dispatch.tokenState.removeStyleNamesFromThemes(data.path, data.parent); // TODO: This triggers an updateDocument call
       dispatch.tokenState.removeVariableNamesFromThemes(data.path, data.parent); // TODO: This triggers an updateDocument call - its own!
     }
-  }, [confirm, deleteToken, dispatch.uiState]);
+  }, [confirm, deleteToken, dispatch.uiState, removeVariablesFromToken, removeStylesFromTokens]);
 
   const deleteGroup = useCallback(async (path: string, type: string) => {
     const userConfirmation = await confirm({

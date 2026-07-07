@@ -768,6 +768,29 @@ export default function useTokens() {
     [dispatch.tokenState],
   );
 
+  const removeVariablesFromToken = useCallback(
+    async (tokenName: string) => {
+      track('removeVariables', { tokenName });
+
+      const { themes: tokenStateThemes } = store.getState().tokenState;
+      const variableKeys = tokenStateThemes.reduce<string[]>((acc, theme) => {
+        const key = theme.$figmaVariableReferences?.[tokenName];
+        if (key && !acc.includes(key)) {
+          acc.push(key);
+        }
+        return acc;
+      }, []);
+
+      if (variableKeys.length === 0) return;
+
+      await wrapTransaction({ name: 'removeVariables' }, async () => AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.REMOVE_VARIABLES,
+        variableKeys,
+      }));
+    },
+    [store],
+  );
+
   const updateVariablesFromToken = useCallback(async (payload: UpdateTokenVariablePayload) => {
     track('updateVariables', payload);
 
@@ -799,6 +822,7 @@ export default function useTokens() {
       createVariables,
       createVariablesFromSets,
       renameVariablesFromToken,
+      removeVariablesFromToken,
       createVariablesFromThemes,
       updateVariablesFromToken,
       filterMultiValueTokens,
@@ -825,6 +849,7 @@ export default function useTokens() {
       createVariablesFromSets,
       createVariablesFromThemes,
       renameVariablesFromToken,
+      removeVariablesFromToken,
       updateVariablesFromToken,
       filterMultiValueTokens,
     ],
