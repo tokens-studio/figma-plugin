@@ -65,6 +65,7 @@ type ProjectData = {
     [tokenSetName: string]: { isDynamic: boolean };
   };
   tokenSetOrder: string[];
+  currentUserRole?: string;
 };
 
 function normalizeTokens(tokens: any) {
@@ -146,7 +147,12 @@ async function getProjectData(id: string, orgId: string, client: any): Promise<P
       });
     }
 
-    return { ...returnData, tokenSetOrder, themes };
+    // Extract current user role from the project data
+    const { currentUserRole } = data.data.project;
+
+    return {
+      ...returnData, tokenSetOrder, themes, currentUserRole,
+    };
   } catch (e) {
     Sentry.captureException(e);
     console.error('Error fetching tokens from Tokens Studio', e);
@@ -186,6 +192,8 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
   private baseUrl?: string;
 
   private client: any;
+
+  private currentUserRole?: string;
 
   public actionsQueue: any[];
 
@@ -237,6 +245,35 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
     }
   }
 
+  public async canWrite(): Promise<boolean> {
+    try {
+      await this.ensureClient();
+
+      // If we haven't fetched project data yet, fetch it to determine role
+      if (this.currentUserRole === undefined) {
+        const projectData = await getProjectData(this.id, this.orgId, this.client);
+        if (projectData?.currentUserRole !== undefined) {
+          this.currentUserRole = projectData.currentUserRole;
+        }
+      }
+
+      // Check if user has write permissions based on their role
+      // Common roles in Tokens Studio: 'viewer' (read-only), 'editor', 'admin', 'owner'
+      // If role is 'viewer', user should not have write access
+      if (this.currentUserRole) {
+        const role = this.currentUserRole.toLowerCase();
+        return role !== 'viewer' && role !== 'read-only';
+      }
+
+      // If role is undefined or not set, assume write access (backward compatible)
+      return true;
+    } catch (error) {
+      console.error('Error checking write permissions:', error);
+      // If there's an error checking permissions, assume no write access for safety
+      return false;
+    }
+  }
+
   public async read(): Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage> {
     let tokens: AnyTokenSet | null | undefined = {};
     let themes: ThemeObjectsList = [];
@@ -255,6 +292,11 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
 
       tokens = projectData?.tokens;
       themes = projectData?.themes || [];
+
+      // Store the current user role for canWrite() method
+      if (projectData?.currentUserRole !== undefined) {
+        this.currentUserRole = projectData.currentUserRole;
+      }
 
       if (projectData?.tokenSets) {
         metadata.tokenSetsData = projectData.tokenSets;
