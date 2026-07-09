@@ -22,6 +22,16 @@ function processTokenValue(value: any, tokenType: string): any {
   return value;
 }
 
+// Move $deprecated to the end so metadata follows $value (DTCG convention).
+// No-op for tokens without $deprecated, so existing output is unaffected.
+function reorderDeprecatedLast(token: Record<string, any>): void {
+  if ('$deprecated' in token) {
+    const deprecated = token.$deprecated;
+    delete token.$deprecated;
+    token.$deprecated = deprecated;
+  }
+}
+
 export default function stringifyTokens(
   tokens: Record<string, AnyTokenList>,
   activeTokenSet: string,
@@ -44,6 +54,7 @@ export default function stringifyTokens(
         delete tokenInJSON.description;
       }
       delete tokenInJSON.type;
+      reorderDeprecatedLast(tokenInJSON);
       set(tokenObj, token.name, tokenInJSON, { merge: true });
     } else {
       const tokenInJSON: TokenInJSON = tokenWithoutName;
@@ -55,6 +66,7 @@ export default function stringifyTokens(
         delete tokenInJSON.value;
         delete tokenInJSON.description;
       }
+      reorderDeprecatedLast(tokenInJSON);
       set(tokenObj, token.name, tokenInJSON, { merge: true });
     }
   });

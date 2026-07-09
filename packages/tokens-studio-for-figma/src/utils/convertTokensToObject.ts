@@ -5,6 +5,16 @@ import { getGroupTypeName } from './stringifyTokens';
 import removeTokenId from './removeTokenId';
 import { setTokenKey, FormatSensitiveTokenKeys } from './setTokenKey';
 
+// Move $deprecated to the end so metadata follows $value (DTCG convention).
+// No-op for tokens without $deprecated, so existing output is unaffected.
+function reorderDeprecatedLast(token: Record<string, any>): void {
+  if ('$deprecated' in token) {
+    const deprecated = token.$deprecated;
+    delete token.$deprecated;
+    token.$deprecated = deprecated;
+  }
+}
+
 export default function convertTokensToObject(tokens: Record<string, AnyTokenList>, storeTokenIdInJsonEditor: boolean) {
   const tokenObj = Object.entries(tokens).reduce<Record<string, AnyTokenSet<false>>>((acc, [key, val]) => {
     const tokenGroupObj: AnyTokenSet<false> = {};
@@ -29,7 +39,8 @@ export default function convertTokensToObject(tokens: Record<string, AnyTokenLis
         if (tokenWithoutTypeLevel.description) {
           setTokenKey(tokenWithoutTypeLevel, FormatSensitiveTokenKeys.DESCRIPTION);
         }
-        // $deprecated is already in the correct format, preserve as-is
+        // $deprecated is already in the correct format; move it after $value (DTCG convention)
+        reorderDeprecatedLast(tokenWithoutTypeLevel);
         set(tokenGroupObj, name, tokenWithoutTypeLevel, { merge: true });
       } else {
         // For tokens without inheritTypeLevel, directly add type, value, and description to preserve order
@@ -39,7 +50,8 @@ export default function convertTokensToObject(tokens: Record<string, AnyTokenLis
         if (tokenWithoutName.description) {
           setTokenKey(tokenWithoutName, FormatSensitiveTokenKeys.DESCRIPTION);
         }
-        // $deprecated is already in the correct format, preserve as-is
+        // $deprecated is already in the correct format; move it after $value (DTCG convention)
+        reorderDeprecatedLast(tokenWithoutName);
         set(tokenGroupObj, name, tokenWithoutName, { merge: true });
       }
     });
