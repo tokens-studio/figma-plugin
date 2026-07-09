@@ -8,6 +8,7 @@ import BrokenReferenceIndicator from '../BrokenReferenceIndicator';
 import { displayTypeSelector, uiDisabledSelector } from '@/selectors';
 import { StyledTokenButton, StyledTokenButtonText } from './StyledTokenButton';
 import useTokens from '@/app/store/useTokens';
+import { gradientTokenToCss, isGradientTokenValue } from '@/utils/color';
 
 type Props = {
   active: boolean;
@@ -30,7 +31,7 @@ export default function TokenButtonContent({
 
   const showValue = React.useMemo(() => {
     let show = true;
-    if (type === TokenTypes.COLOR) {
+    if (type === TokenTypes.COLOR || type === TokenTypes.GRADIENT) {
       show = false;
       if (displayType === 'LIST') {
         show = true;
@@ -58,6 +59,12 @@ export default function TokenButtonContent({
           '--borderColor': '$colors$borderMuted',
         };
       }
+      case TokenTypes.GRADIENT: {
+        return {
+          '--backgroundColor': isGradientTokenValue(displayValue) ? gradientTokenToCss(displayValue) : String(displayValue),
+          '--borderColor': '$colors$borderMuted',
+        };
+      }
       case TokenTypes.BORDER_RADIUS: {
         return {
           borderRadius: `${displayValue}px`,
@@ -71,7 +78,7 @@ export default function TokenButtonContent({
 
   return (
     <TokenTooltip token={token}>
-      <StyledTokenButton tokenType={type as TokenTypes.COLOR} displayType={type === TokenTypes.COLOR ? displayType : 'GRID'} active={active} disabled={uiDisabled} type="button" onClick={handleButtonClick} css={cssOverrides}>
+      <StyledTokenButton tokenType={type as TokenTypes.COLOR} displayType={type === TokenTypes.COLOR || type === TokenTypes.GRADIENT ? displayType : 'GRID'} active={active} disabled={uiDisabled} type="button" onClick={handleButtonClick} css={cssOverrides}>
         <BrokenReferenceIndicator token={token} />
         <StyledTokenButtonText>{showValue && <span>{visibleName}</span>}</StyledTokenButtonText>
       </StyledTokenButton>

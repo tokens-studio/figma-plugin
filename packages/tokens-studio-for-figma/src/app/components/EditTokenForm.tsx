@@ -20,6 +20,7 @@ import {
   SingleToken,
   SingleTypographyToken,
 } from '@/types/tokens';
+import { TokenGradientValue } from '@/types/values';
 import { checkIfAlias, checkIfContainsAlias, getAliasValue } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
 import {
@@ -36,6 +37,7 @@ import BoxShadowInput from './BoxShadowInput';
 import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
 import { StyleOptions } from '@/constants/StyleOptions';
 import BorderTokenForm from './BorderTokenForm';
+import GradientTokenForm from './GradientTokenForm';
 import Box from './Box';
 import ColorTokenForm from './ColorTokenForm';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
@@ -315,6 +317,16 @@ function EditTokenForm({ resolvedTokens }: Props) {
           ...internalEditToken,
           value: { ...newBorderValue },
         });
+      }
+    },
+    [internalEditToken],
+  );
+
+  const handleGradientValueChange = React.useCallback(
+    (newGradientValue: TokenGradientValue) => {
+      setError(null);
+      if (internalEditToken?.type === TokenTypes.GRADIENT) {
+        setInternalEditToken({ ...internalEditToken, value: newGradientValue });
       }
     },
     [internalEditToken],
@@ -656,6 +668,18 @@ function EditTokenForm({ resolvedTokens }: Props) {
             handleBorderAliasValueChange={handleChange}
             handleDownShiftInputChange={handleDownShiftInputChange}
             setBorderValue={setBorderValue}
+            onSubmit={checkAndSubmitTokenValue}
+          />
+        );
+      }
+      case TokenTypes.GRADIENT: {
+        return (
+          <GradientTokenForm
+            internalEditToken={internalEditToken}
+            resolvedTokens={resolvedTokens}
+            handleGradientValueChange={handleGradientValueChange}
+            handleGradientAliasValueChange={handleChange}
+            handleDownShiftInputChange={handleDownShiftInputChange}
             onSubmit={checkAndSubmitTokenValue}
           />
         );

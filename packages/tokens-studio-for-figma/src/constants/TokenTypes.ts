@@ -1,6 +1,7 @@
 export enum TokenTypes {
   OTHER = 'other',
   COLOR = 'color',
+  GRADIENT = 'gradient',
   BORDER_RADIUS = 'borderRadius',
   SIZING = 'sizing',
   SPACING = 'spacing',
