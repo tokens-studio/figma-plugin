@@ -2,8 +2,8 @@ import { transformProviderName } from './transformProviderName';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 
 describe('transformProviderName', () => {
-  it('should return "Tokens Studio" without beta for TOKENS_STUDIO provider', () => {
-    expect(transformProviderName(StorageProviderType.TOKENS_STUDIO)).toBe('Tokens Studio');
+  it('should return "Tokens Studio" for TOKENS_STUDIO_OAUTH provider', () => {
+    expect(transformProviderName(StorageProviderType.TOKENS_STUDIO_OAUTH)).toBe('Tokens Studio');
   });
 
   it('should return "Bitbucket (Beta)" for BITBUCKET provider', () => {

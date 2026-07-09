@@ -69,37 +69,7 @@
       "projectName": "项目名称（可选）",
       "repository": "存储库（工作区/存储库）",
       "username": "用户邮箱",
-      "usernameAppPassword": "用户名",
-      "appPassword": "应用程序密码"
-    },
-    "tokensstudio": {
-      "name": "名称",
-      "apikey": "API 密钥",
-      "urn": "连接 URN",
-      "pat": "个人访问令牌",
-      "id": "连接ID",
-      "selectOrgLabel": "选择组织",
-      "selectProjectLabel": "选择项目"
-    },
-    "bitbucketMigration": {
-      "title": "需要 Bitbucket 应用程序密码迁移",
-      "description": "Bitbucket 应用程序密码已被 Atlassian 弃用并将停止使用。您有 {{count}} Bitbucket 同步（使用需要迁移到 API 令牌的应用程序密码）。",
-      "affectedSyncs": "受影响的同步：",
-      "instructions": "API 令牌提供更好的安全性，并且在应用程序密码停用后将继续有效。您可以迁移现有同步或使用 API 令牌创建新同步。",
-      "migrationInProgress": "从应用程序密码迁移到 API 令牌。请输入您的新 API 令牌。",
-      "learnMore": "请在此处阅读迁移指南 →",
-      "remindLater": "稍后提醒我",
-      "migrate": "迁移到 API 令牌",
-      "appPasswordDeprecated": "Atlassian 已弃用应用程序密码，迁移到 API 令牌。",
-      "apiTokenRequired": "新的 Bitbucket 同步需要 API 令牌。",
-      "migrationNeeded": "需要迁移 Bitbucket",
-      "helperDescription": "您有 {{count}} Bitbucket 同步，使用已弃用的应用程序密码。将它们迁移到 API 令牌以确保持续访问。",
-      "syncsToMigrate": "同步迁移：",
-      "appPasswordWarning": "需要迁移应用程序密码",
-      "clickToMigrate": "点击迁移",
-      "calloutDescription": "Atlassian 已弃用应用程序密码。迁移到 API 令牌以获得更好的安全性和持续访问。",
-      "switchToMigrationMode": "迁移",
-      "migrationGuide": "阅读迁移指南 →"
+      "usernameAppPassword": "用户名"
     }
   },
   "selectALayerToSeeAppliedTokens": "选择一个图层以查看应用的令牌",
@@ -126,19 +96,6 @@
   "gitHubExplained": "将 GitHub 代码存储库与 Tokens Studio 连接，以通过插件内的版本控制和双向同步进行远程令牌存储。",
   "bitBucketExplained": "将您的 Bitbucket 代码存储库与 Tokens Studio 连接，以通过插件内的版本控制和双向同步进行远程令牌存储。",
   "nameHelpText": "名称将如何显示在设置页面上",
-  "tokensStudioForm": {
-    "heading": "设计系统不会在设计工具上停止。我们也不会。",
-    "description": "设计令牌很强大，但前提是它们是有结构的。大多数系统在样式值上就停止了。我们走得更远：条件、继承、多品牌主题和开发者就绪的输出。",
-    "description2": "使用 Tokens Studio，设计令牌成为共享语言。并在工具、平台和团队中使用。",
-    "learnMore": "了解更多",
-    "migrationGuide": "迁移指南",
-    "startFreeTrial": "开始免费试用",
-    "studioBaseUrl": "Studio 基础 URL（可选）",
-    "baseUrlTooltip": "如果您需要连接到自定义实例",
-    "validatingBaseUrl": "正在验证基础 URL...",
-    "chooseOrganization": "选择组织",
-    "chooseProject": "选择项目"
-  },
   "readMoreBitBucket": "阅读 Bitbucket 同步指南。",
   "readMoreGitHub": "阅读 GitHub 同步指南。",
   "readMoreGitLab": "阅读 GitLab 同步指南。",

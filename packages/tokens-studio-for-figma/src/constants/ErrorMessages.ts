@@ -8,8 +8,6 @@ export enum ErrorMessages {
   JSONBIN_CREDENTIAL_ERROR = 'Error fetching from JSONbin, check console (F12)',
   SUPERNOVA_CREDENTIAL_ERROR = 'Error syncing with Supernova, check credentials or your mapping configuration',
   SUPERNOVA_NOT_UPLOADED_YET_ERROR = 'There were no tokens imported from Tokens Studio to Supernova previously, please push your tokens first',
-  TOKENSSTUDIO_CREDENTIAL_ERROR = 'Error syncing with Tokens Studio, check credentials',
-  TOKENSSTUDIO_READ_ERROR = 'Unable to read from Tokens Studio, check console (F12)',
   FILE_CREDENTIAL_ERROR = 'Error fetching from file, check console (F12)',
   REMOTE_VERSION_NEWER = 'Remote version is newer than local version',
   REMOTE_CREDENTIAL_ERROR = 'Error fetching from remote, check console (F12)',
@@ -25,8 +23,7 @@ export enum ErrorMessages {
   GITLAB_CONNECTIVITY_ERROR = 'Unable to connect to GitLab. Please check your internet connection or try again later.',
   BITBUCKET_CONNECTIVITY_ERROR = 'Unable to connect to Bitbucket. Please check your internet connection or try again later.',
   ADO_CONNECTIVITY_ERROR = 'Unable to connect to Azure DevOps. Please check your internet connection or try again later.',
-  TOKENSSTUDIO_CONNECTIVITY_ERROR = 'Unable to connect to Tokens Studio. Please check your internet connection or try again later.',
   TOKENSSTUDIO_OAUTH_CREDENTIAL_ERROR = 'Error syncing with Tokens Studio. Please login again.',
-  TOKENSSTUDIO_OAUTH_CONNECTIVITY_ERROR = 'Unable to connect to Tokens Studio OAuth. Please check your internet connection or try again later.',
+  TOKENSSTUDIO_OAUTH_CONNECTIVITY_ERROR = 'Unable to connect to Tokens Studio. Please check your internet connection or try again later.',
   JSONBIN_CONNECTIVITY_ERROR = 'Unable to connect to JSONbin. Please check your internet connection or try again later.',
 }

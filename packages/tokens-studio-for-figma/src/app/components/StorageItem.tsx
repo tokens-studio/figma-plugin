@@ -225,7 +225,7 @@ const StorageItem = ({
         <Box css={{ marginRight: '$1' }}>
           {isActive() ? (
             <Stack gap={2} align="center">
-              {storageType.provider !== StorageProviderType.TOKENS_STUDIO && storageType.provider !== StorageProviderType.TOKENS_STUDIO_OAUTH && (
+              {storageType.provider !== StorageProviderType.TOKENS_STUDIO_OAUTH && (
                 <TokenFormatBadge extended />
               )}
               {isOAuth ? (
