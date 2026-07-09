@@ -10,19 +10,6 @@
   "gitHubExplained": "Connect your GitHub code repository with Tokens Studio for remote token storage with version control and two-way sync controlled within the plugin.",
   "bitBucketExplained": "Connect your Bitbucket code repository with Tokens Studio for remote token storage with version control and two-way sync controlled within the plugin.",
   "nameHelpText": "Name how it will appear on the settings page",
-  "tokensStudioForm": {
-    "heading": "Design Systems don't stop at design tools. Neither do we.",
-    "description": "Design tokens are powerful, but only if they're structured. Most systems stop at style values. We go further: conditions, inheritance, multi-brand theming, and developer-ready outputs.",
-    "description2": "With Tokens Studio, design tokens become shared language. And used across tools, platforms, and teams.",
-    "learnMore": "Learn more",
-    "migrationGuide": "migration guide",
-    "startFreeTrial": "Start free trial",
-    "studioBaseUrl": "Studio Base URL (optional)",
-    "baseUrlTooltip": "If you need to connect to a custom instance",
-    "validatingBaseUrl": "Validating base URL...",
-    "chooseOrganization": "Choose an organization",
-    "chooseProject": "Choose a project"
-  },
   "readMoreBitBucket": "Read the Bitbucket sync guide.",
   "readMoreGitHub": "Read the GitHub sync guide.",
   "readMoreGitLab": "Read the GitLab sync guide.",
@@ -111,14 +98,6 @@
       "calloutDescription": "App Passwords are being deprecated by Atlassian. Migrate to API Tokens for better security and continued access.",
       "switchToMigrationMode": "Migrate",
       "migrationGuide": "Read the migration guide →"
-    },
-    "tokensstudio": {
-      "name": "Name",
-      "apikey": "API key",
-      "pat": "Personal Access Token",
-      "id": "Connection ID",
-      "selectOrgLabel": "Choose organization",
-      "selectProjectLabel": "Choose project"
     }
   },
   "selectALayerToSeeAppliedTokens": "Select a layer to see applied tokens",

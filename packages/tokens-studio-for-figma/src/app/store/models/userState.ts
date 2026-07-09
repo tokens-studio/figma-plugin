@@ -25,7 +25,6 @@ export interface UserState {
   userName: string;
   licenseDetails: LicenseDetails;
   usedEmail: string | undefined;
-  tokensStudioPAT: string | null;
 }
 
 interface LicenseDetails {
@@ -48,7 +47,6 @@ export const userState = createModel<RootModel>()({
       clientEmail: undefined,
       entitlements: [],
     },
-    tokensStudioPAT: null,
   } as UserState,
   reducers: {
     setUserId(state, payload: string | null) {
@@ -91,12 +89,6 @@ export const userState = createModel<RootModel>()({
       return {
         ...state,
         initialLoad: payload,
-      };
-    },
-    setTokensStudioPAT(state, payload: string | null) {
-      return {
-        ...state,
-        tokensStudioPAT: payload,
       };
     },
     ...userStateReducers,

@@ -181,7 +181,7 @@ export default {
   // },
   // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
   transformIgnorePatterns: [
-    '/node_modules/(?!(@figma-plugin|react-dnd|@react-dnd|react-colorful|dnd-core|react-dnd-html5-backend|culori|dot-prop|@tokens-studio/sdk|@apollo/client)/)',
+    '/node_modules/(?!(@figma-plugin|react-dnd|@react-dnd|react-colorful|dnd-core|react-dnd-html5-backend|culori|dot-prop)/)',
     '\\.pnp\\.[^\\/]+$',
   ],
 

@@ -121,7 +121,6 @@ async function updateRemoteTokens({
     case StorageProviderType.SUPERNOVA: {
       break;
     }
-    case StorageProviderType.TOKENS_STUDIO:
     case StorageProviderType.TOKENS_STUDIO_OAUTH: {
       break;
     }
@@ -178,8 +177,6 @@ export default async function updateTokensOnSources({
   const mergedTokens = locallyResolved
     ? mergeServerResolvedTokens(locallyResolved, serverResolvedTokens)
     : null;
-
-
 
   const tokensSize = (compressedTokens.length / 1024) * 2; // UTF-16 uses 2 bytes per character
   const themesSize = (compressedThemes.length / 1024) * 2;
