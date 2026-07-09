@@ -7,7 +7,7 @@ import useTokens from './useTokens';
 import { AnyTokenList, SingleToken } from '@/types/tokens';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes, GetThemeInfoMessageResult } from '@/types/AsyncMessages';
-import { createStyles, renameStyles, removeStyles } from '@/plugin/asyncMessageHandlers';
+import { createStyles, renameStyles, removeStyles, removeVariables } from '@/plugin/asyncMessageHandlers';
 import { AllTheProviders, createMockStore, resetStore } from '../../../tests/config/setupTest';
 import { store } from '../store';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
@@ -472,6 +472,7 @@ describe('useToken test', () => {
     AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CREATE_STYLES, createStyles);
     AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RENAME_STYLES, renameStyles);
     AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.REMOVE_STYLES, removeStyles);
+    AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.REMOVE_VARIABLES, removeVariables);
 
     it('creates all styles', async () => {
       const tokens = [
@@ -741,6 +742,66 @@ describe('useToken test', () => {
         token: tokenToDelete,
         settings: store.getState().settings,
       });
+    });
+
+    it('removeVariablesFromToken sends REMOVE_VARIABLES with deduped keys from themes', async () => {
+      const storeWithRefs = createMockStore({
+        tokenState: {
+          themes: [
+            {
+              id: 'light',
+              name: 'Light',
+              selectedTokenSets: { global: TokenSetStatus.ENABLED },
+              $figmaVariableReferences: { 'color.red': 'key-abc' },
+            },
+            {
+              id: 'dark',
+              name: 'Dark',
+              selectedTokenSets: { global: TokenSetStatus.ENABLED },
+              $figmaVariableReferences: { 'color.red': 'key-abc' },
+            },
+          ],
+        },
+      });
+      const { result: hookResult } = renderHook(() => useTokens(), {
+        wrapper: ({ children }: { children?: React.ReactNode }) => (
+          <Provider store={storeWithRefs}>{children}</Provider>
+        ),
+      });
+      await act(async () => {
+        await hookResult.current.removeVariablesFromToken('color.red');
+      });
+      expect(messageSpy).toBeCalledWith({
+        type: AsyncMessageTypes.REMOVE_VARIABLES,
+        variableKeys: ['key-abc'],
+      });
+    });
+
+    it('removeVariablesFromToken does not send message when no variable keys found', async () => {
+      messageSpy.mockClear();
+      const storeWithNoRefs = createMockStore({
+        tokenState: {
+          themes: [
+            {
+              id: 'light',
+              name: 'Light',
+              selectedTokenSets: { global: TokenSetStatus.ENABLED },
+              $figmaVariableReferences: {},
+            },
+          ],
+        },
+      });
+      const { result: hookResult } = renderHook(() => useTokens(), {
+        wrapper: ({ children }: { children?: React.ReactNode }) => (
+          <Provider store={storeWithNoRefs}>{children}</Provider>
+        ),
+      });
+      await act(async () => {
+        await hookResult.current.removeVariablesFromToken('color.red');
+      });
+      expect(messageSpy).not.toBeCalledWith(
+        expect.objectContaining({ type: AsyncMessageTypes.REMOVE_VARIABLES }),
+      );
     });
   });
 

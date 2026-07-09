@@ -16,7 +16,6 @@ import useRemoteTokens from '../store/remoteTokens';
 import { StorageTypeCredentials } from '@/types/StorageType';
 import LocalStorageItem from './LocalStorageItem';
 import { getProviderIcon } from '@/utils/getProviderIcon';
-import { StyledBetaBadge } from './StyledBetaBadge';
 import { useAuthStore } from '@/app/store/useAuthStore';
 
 const SyncSettings = () => {
@@ -53,7 +52,6 @@ const SyncSettings = () => {
     {
       text: 'BitBucket',
       type: StorageProviderType.BITBUCKET,
-      beta: true,
     },
     {
       text: 'Supernova',
@@ -198,7 +196,6 @@ const SyncSettings = () => {
                             >
                               <Box css={{ color: '$fgMuted' }}>{getProviderIcon(provider.type)}</Box>
                               {provider.text}
-                              {provider.beta && <StyledBetaBadge>BETA</StyledBetaBadge>}
                             </Box>
                           </Stack>
                           <Button

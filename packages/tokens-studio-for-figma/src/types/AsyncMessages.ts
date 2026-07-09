@@ -78,6 +78,7 @@ export enum AsyncMessageTypes {
   RESOLVE_VARIABLE_INFO = 'async/resolve-variable-info',
   ATTACH_LOCAL_VARIABLES_TO_THEME = 'async/attach-local-variables-to-theme',
   RENAME_VARIABLES = 'async/rename-variables',
+  REMOVE_VARIABLES = 'async/remove-variables',
   UPDATE_VARIABLES = 'async/update-variables',
   SET_INITIAL_LOAD = 'async/set-initial-load',
   PREVIEW_REQUEST_STARTUP = 'async/preview-request-startup',
@@ -383,6 +384,13 @@ export type RenameVariablesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.R
   renameVariableToken: RenameVariableToken[];
 }>;
 
+export type RemoveVariablesAsyncMessage = AsyncMessage<AsyncMessageTypes.REMOVE_VARIABLES, {
+  variableKeys: string[];
+}>;
+export type RemoveVariablesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.REMOVE_VARIABLES, {
+  variableKeys: string[];
+}>;
+
 export type UpdateVariablesAsyncMessage = AsyncMessage<AsyncMessageTypes.UPDATE_VARIABLES, {
   payload: UpdateTokenVariablePayload
 }>;
@@ -455,6 +463,7 @@ export type AsyncMessages =
   | ResolveVariableInfo
   | AttachLocalVariablesToTheme
   | RenameVariablesAsyncMessage
+  | RemoveVariablesAsyncMessage
   | UpdateVariablesAsyncMessage
   | PreviewRequestStartupAsyncMessage
   | RemoveRelaunchDataMessage
@@ -510,6 +519,7 @@ export type AsyncMessageResults =
   | ResolveVariableInfoResult
   | AttachLocalVariablesToThemeResult
   | RenameVariablesAsyncMessageResult
+  | RemoveVariablesAsyncMessageResult
   | UpdateVariablesAsyncMessageResult
   | PreviewRequestStartupAsyncMessageResult
   | RemoveRelaunchDataMessageResult
