@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import {
-  Button, Heading, Textarea, Label, Stack, Checkbox, Select,
+  Button, Heading, Textarea, Label, Stack, Checkbox,
 } from '@tokens-studio/ui';
 import { track } from '@/utils/analytics';
 import { Dispatch } from '../store';
@@ -45,6 +45,7 @@ import { MultiSelectDropdown } from './MultiSelectDropdown';
 import { tokenTypesToCreateVariable } from '@/constants/VariableTypes';
 import { ModalOptions } from '@/constants/ModalOptions';
 import FigmaVariableForm from './FigmaVariableForm';
+import { StyledIconDisclosure } from './StyledInputSuffix';
 
 let lastUsedRenameOption: UpdateMode = UpdateMode.SELECTION;
 let lastUsedRenameStyles = false;
@@ -459,6 +460,12 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [handleDeprecatedChange],
   );
 
+  const handleDeprecatedSeveritySelectChange = React.useCallback<React.ChangeEventHandler<HTMLSelectElement>>(
+    (e) => {
+      handleDeprecatedSeverityChange(e.target.value);
+    },
+    [handleDeprecatedSeverityChange],
+  );
 
   const handleDeprecatedMessageChange = React.useCallback(
     (value: string) => {
@@ -861,23 +868,43 @@ function EditTokenForm({ resolvedTokens }: Props) {
               >
                 <Box>
                   <Label>{t('deprecatedSeverity')}</Label>
-                  <select
-                    value={internalEditToken.$deprecated.severity}
-                    onChange={(e) => handleDeprecatedSeverityChange(e.target.value)}
-                    style={{
-                      width: 'auto',
-                      minWidth: '150px',
-                      padding: '8px',
-                      borderRadius: '4px',
-                      border: '1px solid var(--colors-borderDefault)',
-                      fontSize: '12px',
-                      backgroundColor: 'var(--colors-bgDefault)',
-                      color: 'var(--colors-fgDefault)',
-                    }}
-                  >
-                    <option value="warning">{t('deprecatedSeverityWarning')}</option>
-                    <option value="error">{t('deprecatedSeverityError')}</option>
-                  </select>
+                  <Box css={{ position: 'relative', marginTop: '$1' }}>
+                    <select
+                      value={internalEditToken.$deprecated.severity}
+                      onChange={handleDeprecatedSeveritySelectChange}
+                      style={{
+                        width: '100%',
+                        height: '32px',
+                        padding: '0 28px 0 8px',
+                        boxSizing: 'border-box',
+                        borderRadius: '4px',
+                        border: '1px solid var(--colors-borderDefault)',
+                        fontSize: '11px',
+                        backgroundColor: 'var(--colors-bgDefault)',
+                        color: 'var(--colors-fgDefault)',
+                        cursor: 'pointer',
+                        appearance: 'none',
+                        WebkitAppearance: 'none',
+                        MozAppearance: 'none',
+                      }}
+                    >
+                      <option value="warning">{t('deprecatedSeverityWarning')}</option>
+                      <option value="error">{t('deprecatedSeverityError')}</option>
+                    </select>
+                    <Box
+                      css={{
+                        position: 'absolute',
+                        right: '$3',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        display: 'flex',
+                        pointerEvents: 'none',
+                        color: '$fgDefault',
+                      }}
+                    >
+                      <StyledIconDisclosure />
+                    </Box>
+                  </Box>
                 </Box>
                 <Box>
                   <Label>
