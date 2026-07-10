@@ -3,11 +3,27 @@ import { TokenGradientValue } from '@/types/values';
 // Ported from Studio's gradientPreview.ts so gradient tokens render the same
 // in the plugin as they do in the Studio app.
 
+function resolveStopColor(color: unknown): string {
+  if (typeof color === 'string') return color;
+  if (color && typeof color === 'object') {
+    const c = color as Record<string, unknown>;
+    // Prefer precomputed hex; fall back to sRGB components
+    if (typeof c.hex === 'string') return c.hex;
+    if (Array.isArray(c.components) && c.components.length >= 3) {
+      const [r, g, b] = (c.components as number[]).map((v) => Math.round(v * 255));
+      const alpha = typeof c.alpha === 'number' ? c.alpha : 1;
+      if (alpha < 1) return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+      return `rgb(${r}, ${g}, ${b})`;
+    }
+  }
+  return 'transparent';
+}
+
 function sortedCssStops(value: TokenGradientValue): string {
   const stops = Array.isArray(value.stops) ? [...value.stops] : [];
   return stops
     .sort((a, b) => a.position - b.position)
-    .map((stop) => `${stop.color} ${stop.position * 100}%`)
+    .map((stop) => `${resolveStopColor(stop.color)} ${stop.position * 100}%`)
     .join(', ');
 }
 

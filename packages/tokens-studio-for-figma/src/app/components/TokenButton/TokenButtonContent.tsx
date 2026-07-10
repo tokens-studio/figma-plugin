@@ -60,8 +60,12 @@ export default function TokenButtonContent({
         };
       }
       case TokenTypes.GRADIENT: {
-        return {
-          '--backgroundColor': isGradientTokenValue(displayValue) ? gradientTokenToCss(displayValue) : String(displayValue),
+        const gradVal = isGradientTokenValue(displayValue) ? displayValue
+          : isGradientTokenValue(token.value) ? token.value
+            : null;
+        const bg = gradVal ? gradientTokenToCss(gradVal) : typeof displayValue === 'string' ? displayValue : 'transparent';
+return {
+          '--backgroundColor': bg,
           '--borderColor': '$colors$borderMuted',
         };
       }
@@ -74,7 +78,7 @@ export default function TokenButtonContent({
         return {};
       }
     }
-  }, [type, displayValue]);
+  }, [type, displayValue, token]);
 
   return (
     <TokenTooltip token={token}>
