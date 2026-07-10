@@ -9,6 +9,7 @@ import { displayTypeSelector, uiDisabledSelector } from '@/selectors';
 import { StyledTokenButton, StyledTokenButtonText } from './StyledTokenButton';
 import useTokens from '@/app/store/useTokens';
 import { gradientTokenToCss, isGradientTokenValue } from '@/utils/color';
+import { TokenGradientValue } from '@/types/values';
 
 type Props = {
   active: boolean;
@@ -60,7 +61,7 @@ export default function TokenButtonContent({
         };
       }
       case TokenTypes.GRADIENT: {
-        let gradVal = null;
+        let gradVal: TokenGradientValue | null = null;
         if (isGradientTokenValue(displayValue)) {
           gradVal = displayValue;
         } else if (isGradientTokenValue(token.value)) {
