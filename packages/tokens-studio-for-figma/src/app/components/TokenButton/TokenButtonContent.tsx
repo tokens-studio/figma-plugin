@@ -60,11 +60,19 @@ export default function TokenButtonContent({
         };
       }
       case TokenTypes.GRADIENT: {
-        const gradVal = isGradientTokenValue(displayValue) ? displayValue
-          : isGradientTokenValue(token.value) ? token.value
-            : null;
-        const bg = gradVal ? gradientTokenToCss(gradVal) : typeof displayValue === 'string' ? displayValue : 'transparent';
-return {
+        let gradVal = null;
+        if (isGradientTokenValue(displayValue)) {
+          gradVal = displayValue;
+        } else if (isGradientTokenValue(token.value)) {
+          gradVal = token.value;
+        }
+        let bg = 'transparent';
+        if (gradVal) {
+          bg = gradientTokenToCss(gradVal);
+        } else if (typeof displayValue === 'string') {
+          bg = displayValue;
+        }
+        return {
           '--backgroundColor': bg,
           '--borderColor': '$colors$borderMuted',
         };
