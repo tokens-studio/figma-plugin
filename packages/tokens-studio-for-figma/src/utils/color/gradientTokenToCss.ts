@@ -3,6 +3,8 @@ import { TokenGradientValue } from '@/types/values';
 // Ported from Studio's gradientPreview.ts so gradient tokens render the same
 // in the plugin as they do in the Studio app.
 
+// Stop colors from the Studio REST API may arrive as color objects
+// ({colorSpace, components, hex?, alpha?}) rather than plain strings.
 function resolveStopColor(color: unknown): string {
   if (typeof color === 'string') return color;
   if (color && typeof color === 'object') {
@@ -23,7 +25,7 @@ function sortedCssStops(value: TokenGradientValue): string {
   const stops = Array.isArray(value.stops) ? [...value.stops] : [];
   return stops
     .sort((a, b) => a.position - b.position)
-    .map((stop) => `${resolveStopColor(stop.color)} ${stop.position * 100}%`)
+    .map((stop) => `${resolveStopColor(stop.color as unknown)} ${stop.position * 100}%`)
     .join(', ');
 }
 

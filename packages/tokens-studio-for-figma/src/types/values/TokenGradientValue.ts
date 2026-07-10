@@ -1,12 +1,5 @@
-export type TokenGradientColorObject = {
-  colorSpace?: string;
-  components?: number[];
-  alpha?: number;
-  hex?: string;
-};
-
 export type TokenGradientStop = {
-  color: string | TokenGradientColorObject;
+  color: string;
   position: number;
   midpoint?: number;
 };
