@@ -1,5 +1,6 @@
 import { isPaintEqual } from '@/utils/isPaintEqual';
 import { gradientTokenToCss, isGradientTokenValue } from '@/utils/color/gradientTokenToCss';
+import { TokenGradientValue } from '@/types/values';
 import { convertStringToFigmaGradient } from '../../figmaTransforms/gradients';
 import { convertToFigmaColor } from '../../figmaTransforms/colors';
 
@@ -8,7 +9,7 @@ const isGradient = (value: string): boolean => value?.startsWith?.('linear-gradi
   || value?.startsWith?.('radial-gradient')
   || value?.startsWith?.('conic-gradient');
 
-export function paintStyleMatchesColorToken(paintStyle: PaintStyle | undefined, colorToken: string) {
+export function paintStyleMatchesColorToken(paintStyle: PaintStyle | undefined, colorToken: string | TokenGradientValue) {
   // Gradient-type tokens hold a structured value, flatten it to a CSS string
   const normalizedColorToken = isGradientTokenValue(colorToken) ? gradientTokenToCss(colorToken) : colorToken;
   const stylePaint = paintStyle?.paints[0] ?? null;

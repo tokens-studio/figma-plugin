@@ -50,10 +50,7 @@ export default async function updateStyles(
       return settings.stylesGradient ?? false;
     }
     return settings.stylesColor ?? true;
-  }) as Extract<
-    typeof styleTokens[number],
-  { type: TokenTypes.COLOR }
-  >[];
+  }) as Extract<typeof styleTokens[number], { type: TokenTypes.COLOR | TokenTypes.GRADIENT }>[];
   const textTokens = styleTokens.filter((n) => [TokenTypes.TYPOGRAPHY].includes(n.type) && (settings.stylesTypography ?? true)) as Extract<
     typeof styleTokens[number],
   { type: TokenTypes.TYPOGRAPHY }

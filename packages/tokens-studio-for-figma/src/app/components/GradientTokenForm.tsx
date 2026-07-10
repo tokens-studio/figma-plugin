@@ -196,7 +196,7 @@ function GradientStopItem({
         </Stack>
         <DownshiftInput
           name="color"
-          value={stop.color}
+          value={typeof stop.color === 'string' ? stop.color : resolvedColor}
           type={TokenTypes.COLOR}
           resolvedTokens={resolvedTokens}
           handleChange={handleColorInputChange}
@@ -278,13 +278,24 @@ export default function GradientTokenForm({
     setAlias('');
   }, [mode, internalEditToken.value, selectedToken, handleGradientValueChange]);
 
-  // CSS color per stop so references like {color.brand.500} render resolved
+  // CSS color per stop so references like {color.brand.500} render resolved.
+  // Stop colors from the Studio REST API may also arrive as color objects.
   const stopCssColors = React.useMemo(() => stops.map((stop) => {
-    if (typeof stop.color === 'string' && stop.color.startsWith('{')) {
-      const aliasValue = getAliasValue(stop.color, resolvedTokens);
+    const color = stop.color as unknown;
+    if (typeof color === 'string' && color.startsWith('{')) {
+      const aliasValue = getAliasValue(color, resolvedTokens);
       return aliasValue ? String(aliasValue) : '#888888';
     }
-    return stop.color || '#000000';
+    if (color && typeof color === 'object') {
+      const c = color as Record<string, unknown>;
+      if (typeof c.hex === 'string') return c.hex;
+      if (Array.isArray(c.components) && c.components.length >= 3) {
+        const [r, g, b] = (c.components as number[]).map((v) => Math.round(v * 255));
+        const alpha = typeof c.alpha === 'number' ? c.alpha : 1;
+        return alpha < 1 ? `rgba(${r}, ${g}, ${b}, ${alpha})` : `rgb(${r}, ${g}, ${b})`;
+      }
+    }
+    return typeof color === 'string' ? color : '#000000';
   }), [stops, resolvedTokens]);
 
   const previewCss = React.useMemo(() => gradientTokenToCss({

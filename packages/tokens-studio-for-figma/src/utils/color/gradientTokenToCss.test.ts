@@ -98,6 +98,42 @@ describe('gradientTokenSummary', () => {
   });
 });
 
+describe('gradientTokenToCss with object stop colors (Studio REST API)', () => {
+  it('resolves a stop color with a hex field', () => {
+    const value = {
+      kind: 'linear' as const,
+      angle: 90,
+      stops: [
+        { color: { colorSpace: 'sRGB', components: [1, 0, 0], hex: '#ff0000' } as unknown as string, position: 0 },
+        { color: '#0000ff', position: 1 },
+      ],
+    };
+    expect(gradientTokenToCss(value)).toBe('linear-gradient(90deg, #ff0000 0%, #0000ff 100%)');
+  });
+
+  it('resolves a stop color from components when hex is absent', () => {
+    const value = {
+      kind: 'linear' as const,
+      angle: 0,
+      stops: [
+        { color: { colorSpace: 'sRGB', components: [1, 0, 0], alpha: 0.5 } as unknown as string, position: 0 },
+        { color: '#ffffff', position: 1 },
+      ],
+    };
+    expect(gradientTokenToCss(value)).toBe('linear-gradient(0deg, rgba(255, 0, 0, 0.5) 0%, #ffffff 100%)');
+  });
+
+  it('falls back to transparent for an unrecognised object', () => {
+    const value = {
+      kind: 'linear' as const,
+      stops: [
+        { color: {} as unknown as string, position: 0 },
+      ],
+    };
+    expect(gradientTokenToCss(value)).toBe('linear-gradient(180deg, transparent 0%)');
+  });
+});
+
 describe('isGradientTokenValue', () => {
   it('accepts gradient objects', () => {
     expect(isGradientTokenValue({ kind: 'linear', stops: [] })).toBe(true);
