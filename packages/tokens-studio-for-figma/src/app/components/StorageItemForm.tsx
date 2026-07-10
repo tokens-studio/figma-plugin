@@ -10,7 +10,6 @@ import { ChangeEventHandler } from './StorageItemForm/types';
 import { StorageTypeFormValues } from '@/types/StorageType';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import SupernovaForm from './StorageItemForm/SupernovaForm';
-import TokensStudioForm from './StorageItemForm/TokensStudioForm';
 
 type Props = {
   values: StorageTypeFormValues<true>;
@@ -104,18 +103,6 @@ export default function StorageItemForm({
     case StorageProviderType.SUPERNOVA: {
       return (
         <SupernovaForm
-          onChange={onChange}
-          onSubmit={onSubmit}
-          onCancel={onCancel}
-          values={values}
-          hasErrored={hasErrored}
-          errorMessage={errorMessage}
-        />
-      );
-    }
-    case StorageProviderType.TOKENS_STUDIO: {
-      return (
-        <TokensStudioForm
           onChange={onChange}
           onSubmit={onSubmit}
           onCancel={onCancel}

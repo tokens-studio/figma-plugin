@@ -41,25 +41,6 @@ describe('Navbar', () => {
     });
   });
 
-  it('displays the token flow button if user has access to it via Studio PAT', () => {
-    const mockStore = createMockStore({});
-    const result = render(
-      <Provider store={mockStore}>
-        <Navbar />
-      </Provider>,
-    );
-
-    expect(() => {
-      result.getByTestId('token-flow-button');
-    }).toThrowError();
-
-    mockStore.dispatch.userState.setTokensStudioPAT('studio-pat-token-123');
-    waitFor(() => {
-      const tokenFlowButton = result.getByTestId('token-flow-button');
-      expect(tokenFlowButton).toBeInTheDocument();
-    });
-  });
-
   it('should open the token flow page when the button is clicked', async () => {
     global.open = jest.fn();
 
@@ -90,23 +71,6 @@ describe('Navbar', () => {
     expect(result.queryByLabelText('Second Screen')).not.toBeInTheDocument();
 
     mockStore.dispatch.userState.setLicenseKey('test-key-123');
-    waitFor(() => {
-      const secondScreenButton = result.getByLabelText('Second Screen');
-      expect(secondScreenButton).toBeInTheDocument();
-    });
-  });
-
-  it('displays the second screen icon if user has access to it via Studio PAT', () => {
-    const mockStore = createMockStore({});
-    const result = render(
-      <Provider store={mockStore}>
-        <Navbar />
-      </Provider>,
-    );
-
-    expect(result.queryByLabelText('Second Screen')).not.toBeInTheDocument();
-
-    mockStore.dispatch.userState.setTokensStudioPAT('studio-pat-token-123');
     waitFor(() => {
       const secondScreenButton = result.getByLabelText('Second Screen');
       expect(secondScreenButton).toBeInTheDocument();

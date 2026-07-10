@@ -24,7 +24,7 @@ describe('isSameCredentials', () => {
     };
     const storedTokensStudio = {
       id: '789',
-      provider: StorageProviderType.TOKENS_STUDIO,
+      provider: StorageProviderType.TOKENS_STUDIO_OAUTH,
       orgId: 'org123',
       baseUrl: 'https://app.tokens.studio',
     };
@@ -61,7 +61,7 @@ describe('isSameCredentials', () => {
     };
     const correctTokensStudioCredentials = {
       id: '789',
-      provider: StorageProviderType.TOKENS_STUDIO,
+      provider: StorageProviderType.TOKENS_STUDIO_OAUTH,
       secret: 'ghi',
       name: 'tokensstudio',
       orgId: 'org123',

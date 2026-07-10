@@ -56,10 +56,7 @@ export function pullTokensFactory(
       // This lets us cleanly reuse the existing sync architecture without writing separate OAuth-specific code paths.
       if (
         !matchingSet
-        && (
-          isTokensStudioOAuthType(storageType)
-          || (storageType.provider === StorageProviderType.TOKENS_STUDIO && typeof (storageType as { internalId?: string }).internalId === 'string' && (storageType as { internalId?: string }).internalId!.startsWith('tokens-studio-'))
-        )
+        && isTokensStudioOAuthType(storageType)
         && params.oauthTokens
       ) {
         matchingSet = {
@@ -84,7 +81,6 @@ export function pullTokensFactory(
             || matchingSet.provider === StorageProviderType.ADO
             || matchingSet.provider === StorageProviderType.BITBUCKET
             || isTokensStudioOAuthType(matchingSet)
-            || (matchingSet.provider === StorageProviderType.TOKENS_STUDIO && typeof (matchingSet as { internalId?: string }).internalId === 'string' && (matchingSet as { internalId?: string }).internalId!.startsWith('tokens-studio-'))
           ) {
             const branches = await useRemoteTokensResult.fetchBranches(matchingSet);
             if (branches) dispatch.branchState.setBranches(branches);
@@ -177,7 +173,6 @@ export function pullTokensFactory(
       StorageProviderType.GENERIC_VERSIONED_STORAGE,
       StorageProviderType.URL,
       StorageProviderType.SUPERNOVA,
-      StorageProviderType.TOKENS_STUDIO,
       StorageProviderType.TOKENS_STUDIO_OAUTH,
     ].includes(storageType.provider);
 
