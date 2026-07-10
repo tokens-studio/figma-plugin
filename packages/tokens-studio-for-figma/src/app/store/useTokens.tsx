@@ -395,7 +395,7 @@ export default function useTokens() {
       );
 
       const tokensToCreate = withoutSourceTokens.reduce((acc: SingleToken[], curr) => {
-        const isGradient = curr.type === TokenTypes.COLOR && isGradientValue(curr.value);
+        const isGradient = curr.type === TokenTypes.GRADIENT || (curr.type === TokenTypes.COLOR && isGradientValue(curr.value));
 
         const shouldCreate = [
           settings.stylesTypography && curr.type === TokenTypes.TYPOGRAPHY,
@@ -481,7 +481,7 @@ export default function useTokens() {
             );
 
             const tokensToCreate = tokensFromEnabledSets.reduce((acc: SingleToken[], curr) => {
-              const isGradient = curr.type === TokenTypes.COLOR && isGradientValue(curr.value);
+              const isGradient = curr.type === TokenTypes.GRADIENT || (curr.type === TokenTypes.COLOR && isGradientValue(curr.value));
 
               const shouldCreate = [
                 settings.stylesTypography && curr.type === TokenTypes.TYPOGRAPHY,

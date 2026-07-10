@@ -100,7 +100,7 @@ export default async function setColorValuesOnTarget({
       existingPaint = target.strokes[0] ?? null;
     }
 
-    if (isGradient(resolvedValue)) {
+    if (isGradient(resolvedValue) || isGradientTokenValue(resolvedValue)) {
       const fallbackValue = defaultTokenValueRetriever.get(token)?.value;
       const newPaint = await getGradientPaint(fallbackValue, token);
       applyPaintIfNotEqual(key, existingPaint, newPaint, target);
