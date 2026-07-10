@@ -102,6 +102,19 @@ function EditTokenForm({ resolvedTokens }: Props) {
     if (internalEditToken.type === TokenTypes.COLOR) {
       return isValidColorToken;
     }
+    if (internalEditToken.type === TokenTypes.GRADIENT) {
+      const { value } = internalEditToken;
+      // Alias reference is valid; a structured value needs at least 2 non-empty stops.
+      if (typeof value === 'string') return Boolean(value) && Boolean(internalEditToken.name) && !error;
+      if (!value || typeof value !== 'object') return false;
+      const stops = Array.isArray((value as TokenGradientValue).stops) ? (value as TokenGradientValue).stops : [];
+      if (stops.length < 2) return false;
+      const stopsValid = stops.every((s) => {
+        if (typeof s.color === 'string') return s.color.trim().length > 0;
+        return s.color != null && typeof s.color === 'object';
+      });
+      return stopsValid && Boolean(internalEditToken.name) && !error;
+    }
     return internalEditToken?.value && internalEditToken.name && !error;
   }, [internalEditToken, error, isValidColorToken, isValidDimensionToken]);
 
@@ -510,7 +523,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
           }
           if (
             themes.length > 0
-            && [TokenTypes.COLOR, TokenTypes.TYPOGRAPHY, TokenTypes.BOX_SHADOW].includes(internalEditToken.type)
+            && [TokenTypes.COLOR, TokenTypes.TYPOGRAPHY, TokenTypes.BOX_SHADOW, TokenTypes.GRADIENT].includes(internalEditToken.type)
           ) {
             choices.push({
               key: StyleOptions.RENAME,

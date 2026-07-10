@@ -127,7 +127,7 @@ export default async function setColorValuesOnTarget({
 
       if (!successfullyAppliedVariable) {
         let newPaint: SolidPaint | GradientPaint;
-        if (isGradient(valueToApply)) {
+        if (isGradient(valueToApply) || isGradientTokenValue(valueToApply)) {
           newPaint = await getGradientPaint(fallbackValue, token);
         } else {
           const { color, opacity } = convertToFigmaColor(typeof valueToApply === 'string' ? valueToApply : valueToApply?.color || givenValue || '');

@@ -12,19 +12,20 @@ export function isSingleGradientToken(
   if (typeof token !== 'object') return false;
   const tokenTypeKey = getTokenTypeKey(ignoreTokenFormat);
   const tokenValueKey = getTokenValueKey(ignoreTokenFormat);
+  const value = token[tokenValueKey];
   return (
     token[tokenTypeKey] === TokenTypes.GRADIENT
-    && (typeof token[tokenValueKey] === 'string'
-      || (typeof token[tokenValueKey] === 'object' && !(tokenValueKey in token[tokenValueKey])))
+    && (typeof value === 'string'
+      || (typeof value === 'object' && value !== null && !(tokenValueKey in value)))
   );
 }
 
 export function isSingleGradientTokenInJSON(token: TokenInJSON | Tokens): token is SingleGradientTokenInJSON {
   if (typeof token !== 'object') return false;
+  const value = token[TokenFormat.tokenValueKey];
   return (
     token[TokenFormat.tokenTypeKey] === TokenTypes.GRADIENT
-    && (typeof token[TokenFormat.tokenValueKey] === 'string'
-      || (typeof token[TokenFormat.tokenValueKey] === 'object'
-        && !(TokenFormat.tokenValueKey in token[TokenFormat.tokenValueKey])))
+    && (typeof value === 'string'
+      || (typeof value === 'object' && value !== null && !(TokenFormat.tokenValueKey in value)))
   );
 }

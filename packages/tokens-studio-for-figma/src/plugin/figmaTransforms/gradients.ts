@@ -333,7 +333,7 @@ function convertConicGradient(parts: string[]): {
   if (parts.length > 0 && (parts[0].includes('from') || parts[0].includes('at'))) {
     if (parts[0].includes('from') && parts[0].includes('deg')) {
       // Extract angle from "from Xdeg" syntax
-      const angleMatch = parts[0].match(/from\s+(\d+(?:\.\d+)?)deg/);
+      const angleMatch = parts[0].match(/from\s+(-?\d*\.?\d+)deg/);
       if (angleMatch) {
         startAngle = parseFloat(angleMatch[1]);
       }

@@ -105,28 +105,55 @@ function GradientNumberInput({
   label,
   value,
   placeholder,
+  min,
+  max,
   onChange,
 }: {
   name: string;
   label: string;
   value: number | undefined;
   placeholder?: string;
+  min?: number;
+  max?: number;
   onChange: (name: string, value: number) => void;
 }) {
+  const [draft, setDraft] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    // Reset local draft when the committed value changes upstream
+    setDraft(null);
+  }, [value]);
+
   const handleChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((event) => {
-    onChange(event.target.name, Number(event.target.value) || 0);
-  }, [onChange]);
+    const raw = event.target.value;
+    setDraft(raw);
+    // Only commit when parseable; empty / '-' / '.' stays in the draft
+    if (raw === '' || raw === '-' || raw === '.') return;
+    const parsed = Number(raw);
+    if (!Number.isFinite(parsed)) return;
+    let next = parsed;
+    if (typeof min === 'number' && next < min) next = min;
+    if (typeof max === 'number' && next > max) next = max;
+    onChange(event.target.name, next);
+  }, [onChange, min, max]);
+
+  const handleBlur = React.useCallback(() => {
+    setDraft(null);
+  }, []);
 
   return (
     <Input
       full
       name={name}
       label={label}
-      value={value ?? ''}
+      value={draft ?? value ?? ''}
       placeholder={placeholder}
       onChange={handleChange}
+      onBlur={handleBlur}
       type="number"
       step="any"
+      min={min}
+      max={max}
     />
   );
 }
@@ -270,9 +297,15 @@ export default function GradientTokenForm({
 
   const handleMode = React.useCallback(() => {
     if (mode === 'alias' && typeof internalEditToken.value === 'string') {
-      handleGradientValueChange(
-        isGradientTokenValue(selectedToken?.rawValue) ? selectedToken?.rawValue as TokenGradientValue : DEFAULT_GRADIENT_VALUE,
-      );
+      // Prefer the resolved value: rawValue may itself be an alias for a chained
+      // reference, in which case only `.value` holds the concrete gradient.
+      let candidate: TokenGradientValue = DEFAULT_GRADIENT_VALUE;
+      if (isGradientTokenValue(selectedToken?.value)) {
+        candidate = selectedToken?.value as TokenGradientValue;
+      } else if (isGradientTokenValue(selectedToken?.rawValue)) {
+        candidate = selectedToken?.rawValue as TokenGradientValue;
+      }
+      handleGradientValueChange(candidate);
     }
     setMode(mode === 'input' ? 'alias' : 'input');
     setAlias('');
@@ -284,7 +317,9 @@ export default function GradientTokenForm({
     const color = stop.color as unknown;
     if (typeof color === 'string' && color.startsWith('{')) {
       const aliasValue = getAliasValue(color, resolvedTokens);
-      return aliasValue ? String(aliasValue) : '#888888';
+      // Alias may resolve to a color object or a non-color token; only accept strings.
+      if (typeof aliasValue === 'string' && aliasValue.length > 0) return aliasValue;
+      return '#888888';
     }
     if (color && typeof color === 'object') {
       const c = color as Record<string, unknown>;
@@ -332,11 +367,14 @@ export default function GradientTokenForm({
   }, [stops, updateStops]);
 
   const handleStopNumberChange = React.useCallback((index: number, property: 'position' | 'midpoint', value: number) => {
-    updateStops(stops.map((stop, i) => (i === index ? { ...stop, [property]: value } : stop)));
+    // Positions must live in [0, 1] to produce a valid Figma ColorStop.
+    const clamped = Math.max(0, Math.min(1, value));
+    updateStops(stops.map((stop, i) => (i === index ? { ...stop, [property]: clamped } : stop)));
   }, [stops, updateStops]);
 
   const handleStopPositionDrag = React.useCallback((index: number, position: number) => {
-    updateStops(stops.map((stop, i) => (i === index ? { ...stop, position } : stop)));
+    const clamped = Math.max(0, Math.min(1, position));
+    updateStops(stops.map((stop, i) => (i === index ? { ...stop, position: clamped } : stop)));
   }, [stops, updateStops]);
 
   const handleAddStop = React.useCallback((position: number) => {
@@ -361,7 +399,11 @@ export default function GradientTokenForm({
   const handleRemoveStop = React.useCallback((index: number) => {
     if (stops.length <= 2) return;
     const newStops = stops.filter((_, i) => i !== index);
-    setSelectedStopIndex(Math.min(selectedStopIndex, newStops.length - 1));
+    // Keep selection anchored to the same stop when removing one before it.
+    let nextSelected = selectedStopIndex;
+    if (index < selectedStopIndex) nextSelected -= 1;
+    else if (index === selectedStopIndex) nextSelected = Math.min(selectedStopIndex, newStops.length - 1);
+    setSelectedStopIndex(Math.max(0, Math.min(nextSelected, newStops.length - 1)));
     updateStops(newStops);
   }, [stops, selectedStopIndex, updateStops]);
 
@@ -501,7 +543,9 @@ export default function GradientTokenForm({
             <Box css={{ border: '1px solid $borderMuted', borderRadius: '$small', overflow: 'hidden' }}>
               {stops.map((stop, index) => (
                 <GradientStopItem
-                  key={`gradient-stop-${seed(index)}`}
+                  // Key by the stop object identity so per-item state (e.g. the
+                  // color picker toggle) follows the stop when the list reorders.
+                  key={`gradient-stop-${seed(stop)}`}
                   index={index}
                   stop={stop}
                   resolvedColor={stopCssColors[index]}

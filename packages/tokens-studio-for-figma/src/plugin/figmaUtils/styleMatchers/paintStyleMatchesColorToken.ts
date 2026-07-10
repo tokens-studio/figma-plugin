@@ -14,23 +14,23 @@ export function paintStyleMatchesColorToken(paintStyle: PaintStyle | undefined, 
   const normalizedColorToken = isGradientTokenValue(colorToken) ? gradientTokenToCss(colorToken) : colorToken;
   const stylePaint = paintStyle?.paints[0] ?? null;
   if (stylePaint?.type === 'SOLID') {
+    // A gradient value can never match a solid paint; skip the color conversion.
+    if (isGradient(normalizedColorToken)) return false;
     const { color, opacity } = convertToFigmaColor(normalizedColorToken);
     const tokenPaint: SolidPaint = { color, opacity, type: 'SOLID' };
     return isPaintEqual(stylePaint, tokenPaint);
   }
-  if (stylePaint?.type === 'GRADIENT_LINEAR' && isGradient(normalizedColorToken)) {
-    const { gradientStops, gradientTransform } = convertStringToFigmaGradient(normalizedColorToken);
+  if (
+    (stylePaint?.type === 'GRADIENT_LINEAR'
+      || stylePaint?.type === 'GRADIENT_RADIAL'
+      || stylePaint?.type === 'GRADIENT_ANGULAR'
+      || stylePaint?.type === 'GRADIENT_DIAMOND')
+    && isGradient(normalizedColorToken)
+  ) {
+    const { gradientStops, gradientTransform, type } = convertStringToFigmaGradient(normalizedColorToken);
+    if (type !== stylePaint.type) return false;
     const tokenPaint: GradientPaint = {
-      type: 'GRADIENT_LINEAR',
-      gradientTransform,
-      gradientStops,
-    };
-    return isPaintEqual(stylePaint, tokenPaint);
-  }
-  if (stylePaint?.type === 'GRADIENT_RADIAL' && isGradient(normalizedColorToken)) {
-    const { gradientStops, gradientTransform } = convertStringToFigmaGradient(normalizedColorToken);
-    const tokenPaint: GradientPaint = {
-      type: 'GRADIENT_RADIAL',
+      type,
       gradientTransform,
       gradientStops,
     };

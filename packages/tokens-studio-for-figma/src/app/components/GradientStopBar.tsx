@@ -118,8 +118,18 @@ export default function GradientStopBar({
     event.stopPropagation();
     event.preventDefault();
     activeDragCleanup.current?.();
-    const index = Number((event.currentTarget as HTMLButtonElement).dataset.index);
+    const thumb = event.currentTarget as HTMLButtonElement;
+    const index = Number(thumb.dataset.index);
     onSelectStop(index);
+
+    // Capture the pointer on the thumb so we still receive pointerup/cancel if
+    // the cursor leaves the iframe or window mid-drag.
+    const { pointerId } = event;
+    try {
+      thumb.setPointerCapture(pointerId);
+    } catch {
+      // setPointerCapture can throw if the element is unmounted; ignore.
+    }
 
     const handleMove = (moveEvent: PointerEvent) => {
       const position = positionFromEvent(moveEvent);
@@ -127,15 +137,22 @@ export default function GradientStopBar({
         latestOnStopPositionChange.current(index, position);
       }
     };
-    const handleUp = () => activeDragCleanup.current?.();
+    const handleEnd = () => activeDragCleanup.current?.();
 
     activeDragCleanup.current = () => {
       document.removeEventListener('pointermove', handleMove);
-      document.removeEventListener('pointerup', handleUp);
+      document.removeEventListener('pointerup', handleEnd);
+      document.removeEventListener('pointercancel', handleEnd);
+      try {
+        thumb.releasePointerCapture(pointerId);
+      } catch {
+        // Element may already be detached; ignore.
+      }
       activeDragCleanup.current = null;
     };
     document.addEventListener('pointermove', handleMove);
-    document.addEventListener('pointerup', handleUp);
+    document.addEventListener('pointerup', handleEnd);
+    document.addEventListener('pointercancel', handleEnd);
   }, [onSelectStop, positionFromEvent]);
 
   const onTrackPointerDown = React.useCallback((event: React.PointerEvent<HTMLDivElement>) => {
