@@ -453,60 +453,29 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken],
   );
 
-  const handleDeprecatedSeverityChange = React.useCallback(
-    (value: string) => {
-      handleDeprecatedChange('severity', value);
-    },
+  const handleDeprecatedSeveritySelectChange = React.useCallback<React.ChangeEventHandler<HTMLSelectElement>>(
+    (e) => handleDeprecatedChange('severity', e.target.value),
     [handleDeprecatedChange],
   );
 
-  const handleDeprecatedSeveritySelectChange = React.useCallback<React.ChangeEventHandler<HTMLSelectElement>>(
-    (e) => {
-      handleDeprecatedSeverityChange(e.target.value);
-    },
-    [handleDeprecatedSeverityChange],
-  );
-
   const handleDeprecatedMessageChange = React.useCallback(
-    (value: string) => {
-      handleDeprecatedChange('message', value);
-    },
+    (value: string) => handleDeprecatedChange('message', value),
     [handleDeprecatedChange],
   );
 
   const handleDeprecatedCheckboxChange = React.useCallback(
-    (checked: boolean | string) => {
-      handleDeprecatedToggle(checked === true);
-    },
+    (checked: boolean | string) => handleDeprecatedToggle(checked === true),
     [handleDeprecatedToggle],
   );
 
-  const handleDeprecatedReplacementTokenChange = React.useCallback(
-    (value: string) => {
-      handleDeprecatedChange('replacementToken', value);
-    },
-    [handleDeprecatedChange],
-  );
-
-  const handleDeprecatedRemoveAfterChange = React.useCallback(
-    (value: string) => {
-      handleDeprecatedChange('removeAfter', value);
-    },
-    [handleDeprecatedChange],
-  );
-
   const handleReplacementTokenInputChange = React.useCallback(
-    (value: string) => {
-      handleDeprecatedReplacementTokenChange(value);
-    },
-    [handleDeprecatedReplacementTokenChange],
+    (value: string) => handleDeprecatedChange('replacementToken', value),
+    [handleDeprecatedChange],
   );
 
   const handleRemoveAfterInputChange = React.useCallback(
-    (value: string) => {
-      handleDeprecatedRemoveAfterChange(value);
-    },
-    [handleDeprecatedRemoveAfterChange],
+    (value: string) => handleDeprecatedChange('removeAfter', value),
+    [handleDeprecatedChange],
   );
 
   const resolvedValue = React.useMemo(() => {

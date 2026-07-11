@@ -24,7 +24,7 @@ function processTokenValue(value: any, tokenType: string): any {
 
 // Move $deprecated to the end so metadata follows $value (DTCG convention).
 // No-op for tokens without $deprecated, so existing output is unaffected.
-function reorderDeprecatedLast(token: Record<string, any>): void {
+export function reorderDeprecatedLast(token: Record<string, any>): void {
   if ('$deprecated' in token) {
     const deprecated = token.$deprecated;
     delete token.$deprecated;

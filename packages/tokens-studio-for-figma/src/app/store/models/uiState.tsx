@@ -491,7 +491,7 @@ export const uiState = createModel<RootModel>()({
     toggleHideDeprecatedTokens(payload: null | boolean, rootState) {
       AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.SET_HIDE_DEPRECATED_TOKENS,
-        hideDeprecatedTokens: payload === null ? !rootState.uiState.hideDeprecatedTokens : payload,
+        hideDeprecatedTokens: payload === null ? rootState.uiState.hideDeprecatedTokens : payload,
       });
     },
     setSelectedExportThemes: (payload: string[]) => {
