@@ -53,15 +53,16 @@ export function ThemeListItemContent({
         cursor: 'inherit',
         position: 'relative',
         '&:not(:first-of-type)': { marginTop: '$4' },
-        // Progressive indentation based on depth level:
-        // Base indentation of 1 for all themes, plus additional indentation for extended themes
-        paddingLeft: `calc(${indentationDepth + 1} * var(--space-6))`,
-        // Visual hierarchy line for extended groups
+        // Root-level themes get no indentation (the grabber aligns with the group
+        // label); each extension level indents by one unit.
+        paddingLeft: `calc(${indentationDepth} * var(--space-6))`,
+        // Visual hierarchy line for extended groups, drawn in the gutter created
+        // by this row's own indentation step
         ...(isUnderExtendedGroup ? {
           '&::before': {
-            content: '',
+            content: '""',
             position: 'absolute',
-            left: `calc(${indentationDepth} * var(--space-6) + 12px)`,
+            left: `calc(${Math.max(indentationDepth - 1, 0)} * var(--space-6) + 8px)`,
             top: 0,
             bottom: 0,
             width: '1px',
@@ -73,7 +74,7 @@ export function ThemeListItemContent({
             borderBottom: '1px solid $borderMuted',
             borderLeft: '1px solid $borderMuted',
             width: '4px',
-            left: `calc(${indentationDepth} * var(--space-6) + 12px)`,
+            left: `calc(${Math.max(indentationDepth - 1, 0)} * var(--space-6) + 8px)`,
             backgroundColor: 'transparent',
           },
         } : {}),
