@@ -662,9 +662,17 @@ describe('SetValuesOnVariable', () => {
         variableId: 'fg-key',
       }] as SingleToken<true, { path: string; variableId: string }>[];
 
-      const result = await setValuesOnVariable(
-        variables, tokens, childCollection, CHILD_MODE, baseFontSize,
-        false, null, undefined, undefined, true,
+      await setValuesOnVariable(
+        variables,
+        tokens,
+        childCollection,
+        CHILD_MODE,
+        baseFontSize,
+        false,
+        null,
+        undefined,
+        undefined,
+        true,
       );
 
       // Raw color should be written since reference target doesn't exist
@@ -718,7 +726,7 @@ describe('SetValuesOnVariable', () => {
         variableId: 'sp-key',
       }] as SingleToken<true, { path: string; variableId: string }>[];
 
-      const result = await setValuesOnVariable(
+      await setValuesOnVariable(
         [spacing], tokens, childCollection, CHILD_MODE, baseFontSize,
         false, null, undefined, undefined, true,
       );
