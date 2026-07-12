@@ -221,8 +221,6 @@ export default async function setValuesOnVariable(
 
             // Check if the variable already has the correct alias reference before updating
             if (!hasMetadataChanged && checkVariableAliasEquality(existingVariableValue, rawValue)) {
-              // eslint-disable-next-line no-console
-              if (isExtendedCollection) console.log(`[setValuesOnVariable] EARLY RETURN (alias already correct): "${token.path}" rawValue="${rawValue}" mode=${mode} — NOT queued as ref candidate`);
               return;
             }
 
@@ -252,8 +250,6 @@ export default async function setValuesOnVariable(
                 willBeAliased = false;
               }
             }
-            // eslint-disable-next-line no-console
-            if (isExtendedCollection) console.log(`[setValuesOnVariable] token "${token.path}" willBeAliased=${willBeAliased} canRef=${checkCanReferenceVariable(token)} rawValue="${token.rawValue}" mode=${mode}`);
 
             switch (variableType) {
               case 'BOOLEAN':
@@ -412,8 +408,6 @@ export default async function setValuesOnVariable(
                 referenceVariable: referenceTokenName,
                 ...(isExtendedCollection ? { collection } : {}),
               });
-              // eslint-disable-next-line no-console
-              if (isExtendedCollection) console.log(`[setValuesOnVariable] QUEUED ref candidate: "${token.path}" → "${referenceTokenName}" (extended, mode=${mode})`);
             }
           }
         } catch (e) {

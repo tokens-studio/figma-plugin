@@ -34,8 +34,6 @@ export default async function updateVariablesToReference(figmaVariables: Map<str
   // groups run as separate sequential passes.
   const regularCandidates = referenceVariableCandidates.filter((c) => !c.collection);
   const extendedCandidates = referenceVariableCandidates.filter((c) => c.collection);
-  // eslint-disable-next-line no-console
-  console.log(`[updateVariablesToReference] total=${referenceVariableCandidates.length} regular=${regularCandidates.length} extended=${extendedCandidates.length}`);
 
   // Process references in batches to avoid overwhelming Figma's API and provide progress updates
   let lastReported = 0;
@@ -115,10 +113,7 @@ export default async function updateVariablesToReference(figmaVariables: Map<str
       // from previous exports self-heal back to inherited.
       const { parentModeId } = resolveCollectionContext(aliasVariable.collection, effectiveModeId);
       if (parentModeId) {
-        const parentVal = aliasVariable.variable.valuesByMode[parentModeId];
         const result = applyChildModeValue(aliasVariable.variable, effectiveModeId, parentModeId, newValue);
-        // eslint-disable-next-line no-console
-        console.log(`[updateVariablesToReference] EXTENDED: "${aliasVariable.variable.name}" mode=${effectiveModeId} parentMode=${parentModeId} → result=${result} (desired alias id=${variable.id}, parentVal=${JSON.stringify(parentVal)})`);
         if (result !== 'unchanged') {
           updatedVariables.push(aliasVariable.variable);
         }

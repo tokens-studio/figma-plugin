@@ -70,8 +70,6 @@ export default async function updateVariables({
   // runtime property, then structural (any mode carrying a parentModeId).
   const isExtendedCollection = resolveCollectionContext(collection, mode, theme).isExtended
     || Boolean(collection.modes?.some((m) => (m as any).parentModeId !== undefined));
-  // eslint-disable-next-line no-console
-  console.log(`[updateVariables] collection="${collection.name}" mode=${mode} theme="${theme.name}" isExtended=${isExtendedCollection} tokensToCreate=${tokensToCreate.length}`);
 
   // For extended collections, variables are inherited from the parent collection
   let variablesInCollection: Variable[];
