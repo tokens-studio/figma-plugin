@@ -95,12 +95,6 @@ export const userState = createModel<RootModel>()({
         initialLoad: payload,
       };
     },
-    setTokensStudioPAT(state, payload: string | null) {
-      return {
-        ...state,
-        tokensStudioPAT: payload,
-      };
-    },
     setIsFigmaEnterprise(state, payload: boolean) {
       return {
         ...state,

@@ -34,7 +34,6 @@ function isSameCredentials(
         && credential.designSystemUrl === stored.designSystemUrl
         && JSON.stringify(credential.mapping) === JSON.stringify(stored.mapping)
       );
-    case StorageProviderType.TOKENS_STUDIO:
     case StorageProviderType.TOKENS_STUDIO_OAUTH:
       return (
         credential.id === stored.id

@@ -29,7 +29,7 @@ export function getProviderIcon(provider: StorageProviderType) {
       return <SupernovaIcon />;
     case StorageProviderType.GENERIC_VERSIONED_STORAGE:
       return <ArchiveIcon />;
-    case StorageProviderType.TOKENS_STUDIO:
+    case StorageProviderType.TOKENS_STUDIO_OAUTH:
       return <TokensStudioIcon />;
     default:
       return null;
