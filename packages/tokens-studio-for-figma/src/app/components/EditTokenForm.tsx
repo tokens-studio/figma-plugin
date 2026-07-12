@@ -79,7 +79,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
       && (internalEditToken.value?.endsWith('px')
         || internalEditToken.value?.endsWith('rem')
         || checkIfAlias(internalEditToken as SingleDimensionToken, resolvedTokens)),
-    [internalEditToken, resolvedTokens, checkIfAlias],
+    [internalEditToken, resolvedTokens],
   );
   const isValidColorToken = React.useMemo(() => {
     if (internalEditToken?.$extensions?.['studio.tokens']?.modify?.type === ColorModifierTypes.MIX) {
@@ -103,25 +103,25 @@ function EditTokenForm({ resolvedTokens }: Props) {
       return isValidColorToken;
     }
     return internalEditToken?.value && internalEditToken.name && !error;
-  }, [internalEditToken, error, isValidColorToken, isValidDimensionToken]);
+  }, [internalEditToken, error, isValidColorToken]);
 
   const hasNameThatExistsAlready = React.useMemo(() => {
-    const editToken = resolvedTokens
-      .filter((t) => selectedTokenSets.includes(t.internal__Parent ?? ''))
-      .find((t) => t.name === internalEditToken?.name);
+    const existingToken = resolvedTokens
+      .filter((token) => selectedTokenSets.includes(token.internal__Parent ?? ''))
+      .find((token) => token.name === internalEditToken?.name);
 
-    if (editToken) {
-      editToken.description = internalEditToken.description;
+    if (existingToken) {
+      existingToken.description = internalEditToken.description;
     }
 
-    return editToken;
-  }, [internalEditToken, resolvedTokens, activeTokenSet, selectedTokenSets]);
+    return existingToken;
+  }, [internalEditToken, resolvedTokens, selectedTokenSets]);
 
   const hasAnotherTokenThatStartsWithName = React.useMemo(
     () => resolvedTokens
-      .filter((t) => t.internal__Parent === activeTokenSet)
-      .filter((t) => t.name !== internalEditToken?.initialName)
-      .find((t) => t.name.startsWith(`${internalEditToken?.name}.`)),
+      .filter((token) => token.internal__Parent === activeTokenSet)
+      .filter((token) => token.name !== internalEditToken?.initialName)
+      .find((token) => token.name.startsWith(`${internalEditToken?.name}.`)),
     [internalEditToken, resolvedTokens, activeTokenSet],
   );
 
@@ -216,7 +216,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     if (internalEditToken.type === TokenTypes.DIMENSION && !isValidDimensionToken) {
       setError(t('valueMustIncludePxOrRem', { ns: 'errors' }));
     }
-  }, [internalEditToken, isValidDimensionToken]);
+  }, [internalEditToken, isValidDimensionToken, t]);
 
   const handleBoxShadowValueChange = React.useCallback(
     (shadow: SingleBoxShadowToken['value']) => {
@@ -487,8 +487,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     return null;
   }, [internalEditToken, resolvedTokens]);
 
-  // @TODO update to useCallback
-  const submitTokenValue = async ({
+  const submitTokenValue = React.useCallback(async ({
     type, value, name, $extensions, $deprecated,
   }: EditTokenObject) => {
     if (internalEditToken && value && name) {
@@ -625,7 +624,23 @@ function EditTokenForm({ resolvedTokens }: Props) {
         });
       }
     }
-  };
+  }, [
+    internalEditToken,
+    activeTokenSet,
+    selectedTokenSets,
+    themes,
+    tokens,
+    resolvedValue,
+    createSingleToken,
+    editSingleToken,
+    duplicateSingleToken,
+    updateVariablesFromToken,
+    renameTokensAcrossSets,
+    renameStylesFromTokens,
+    renameVariablesFromToken,
+    remapToken,
+    confirm,
+  ]);
 
   const checkAndSubmitTokenValue = React.useCallback(() => {
     if (internalEditToken.type === TokenTypes.DIMENSION && !isValidDimensionToken) {
@@ -636,7 +651,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
       submitTokenValue(internalEditToken);
       dispatch.uiState.setShowEditForm(false);
     }
-  }, [dispatch, isValid, internalEditToken, submitTokenValue, isValidDimensionToken]);
+  }, [dispatch, isValid, internalEditToken, submitTokenValue, isValidDimensionToken, t]);
 
   const handleFormSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

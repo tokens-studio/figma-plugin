@@ -98,7 +98,9 @@ describe('findDifferentState', () => {
     const result = findDifferentState(baseState, compareState);
 
     expect(result.tokens.set1).toEqual([
-      expect.objectContaining({ name: 'token1', value: '#00ff00', oldValue: '#ff0000', importType: 'UPDATE' }),
+      expect.objectContaining({
+        name: 'token1', value: '#00ff00', oldValue: '#ff0000', importType: 'UPDATE',
+      }),
     ]);
   });
 
@@ -106,8 +108,12 @@ describe('findDifferentState', () => {
     const baseState: CompareStateType = {
       tokens: {
         set1: [
-          { name: 'token1', value: 'value1', description: '', type: TokenTypes.COLOR },
-          { name: 'token2', value: 'value2', description: '', type: TokenTypes.COLOR },
+          {
+            name: 'token1', value: 'value1', description: '', type: TokenTypes.COLOR,
+          },
+          {
+            name: 'token2', value: 'value2', description: '', type: TokenTypes.COLOR,
+          },
         ],
       },
       themes: [],
@@ -115,7 +121,9 @@ describe('findDifferentState', () => {
     };
     const compareState: CompareStateType = {
       tokens: {
-        set1: [{ name: 'token1', value: 'value1', description: '', type: TokenTypes.COLOR }],
+        set1: [{
+          name: 'token1', value: 'value1', description: '', type: TokenTypes.COLOR,
+        }],
       },
       themes: [],
       metadata: null,
@@ -195,7 +203,9 @@ describe('findDifferentState', () => {
   it('detects when opacity modifier is added to a token', () => {
     const baseState: CompareStateType = {
       tokens: {
-        set1: [{ name: 'color.primary', value: '#ff0000', description: '', type: TokenTypes.COLOR }],
+        set1: [{
+          name: 'color.primary', value: '#ff0000', description: '', type: TokenTypes.COLOR,
+        }],
       },
       themes: [],
       metadata: null,
@@ -236,7 +246,9 @@ describe('findDifferentState', () => {
     };
     const compareState: CompareStateType = {
       tokens: {
-        set1: [{ name: 'color.primary', value: '#ff0000', description: '', type: TokenTypes.COLOR }],
+        set1: [{
+          name: 'color.primary', value: '#ff0000', description: '', type: TokenTypes.COLOR,
+        }],
       },
       themes: [],
       metadata: null,
