@@ -26,6 +26,12 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
 
   const metadataUpdateTracker: Record<string, boolean> = {};
 
+  // eslint-disable-next-line no-console
+  console.log(
+    `[updateVariablesFromPlugin] token "${payload.name}" (set: ${payload.parent}, rawValue: ${payload.rawValue})`,
+    `\n  active themes: ${JSON.stringify(themeInfo.activeTheme)}`,
+  );
+
   for (const theme of themeInfo.themes) {
     if (
       Object.entries(theme.selectedTokenSets).some(
@@ -33,6 +39,18 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
       )
     ) {
       // Filter themes which contains this token
+      {
+        const refKey = theme.$figmaVariableReferences?.[payload.name];
+        // eslint-disable-next-line no-console
+        console.log(
+          `[updateVariablesFromPlugin] theme "${theme.group ?? ''}/${theme.name}" (id: ${theme.id})${theme.$figmaIsExtension ? ' [EXTENDED]' : ''}`,
+          `\n  set enabled: true`,
+          `\n  $figmaVariableReferences["${payload.name}"]: ${refKey ?? 'MISSING → theme skipped'}`,
+          `\n  $figmaModeId: ${theme.$figmaModeId ?? 'MISSING → theme skipped'}`,
+          `\n  variable found for key: ${refKey ? Boolean(variableMap[refKey]) : 'n/a'}`,
+          `\n  theme active: ${Object.values(themeInfo.activeTheme).includes(theme.id)} (inactive → theme skipped)`,
+        );
+      }
       if (theme.$figmaVariableReferences?.[payload.name] && theme.$figmaModeId) {
         const variable = variableMap[theme?.$figmaVariableReferences?.[payload.name]];
         if (variable && Object.values(themeInfo.activeTheme).includes(theme.id)) {
@@ -100,13 +118,25 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
               // Extended collections: one shared inherit-vs-override decision
               const { parentModeId } = resolveCollectionContext(collection, theme.$figmaModeId!, theme);
               if (parentModeId) {
-                applyChildModeValue(variable, theme.$figmaModeId!, parentModeId, newValue);
+                const result = applyChildModeValue(variable, theme.$figmaModeId!, parentModeId, newValue);
+                // eslint-disable-next-line no-console
+                console.log(
+                  `[updateVariablesFromPlugin] ALIAS write "${variable.name}" → "${referenceVariable.name}" on CHILD mode ${theme.$figmaModeId}: ${result.toUpperCase()}`,
+                  `\n  parent mode ${parentModeId} value: ${JSON.stringify(variable.valuesByMode[parentModeId])}`,
+                );
               } else {
                 variable.setValueForMode(theme.$figmaModeId!, newValue);
+                // eslint-disable-next-line no-console
+                console.log(`[updateVariablesFromPlugin] ALIAS write "${variable.name}" → "${referenceVariable.name}" on mode ${theme.$figmaModeId}: SET`);
               }
+            } else {
+              // eslint-disable-next-line no-console
+              console.log(`[updateVariablesFromPlugin] ALIAS write "${variable.name}": reference target "${referenceTokenName}" has NO matching variable — nothing written`);
             }
           } else {
             const modeId = theme.$figmaModeId!;
+            // eslint-disable-next-line no-console
+            console.log(`[updateVariablesFromPlugin] RAW write "${variable.name}" on mode ${modeId} (type: ${payload.type}, value: ${payload.value})`);
             switch (payload.type) {
               case TokenTypes.COLOR:
                 if (typeof payload.value === 'string') {

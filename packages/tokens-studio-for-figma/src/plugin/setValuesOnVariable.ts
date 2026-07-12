@@ -221,8 +221,8 @@ export default async function setValuesOnVariable(
 
             // Check if the variable already has the correct alias reference before updating
             if (!hasMetadataChanged && checkVariableAliasEquality(existingVariableValue, rawValue)) {
-              // The alias already points to the correct variable, no update needed
-
+              // eslint-disable-next-line no-console
+              if (isExtendedCollection) console.log(`[setValuesOnVariable] EARLY RETURN (alias already correct): "${token.path}" rawValue="${rawValue}" mode=${mode} — NOT queued as ref candidate`);
               return;
             }
 
@@ -234,7 +234,26 @@ export default async function setValuesOnVariable(
             // the reference pass can no longer convert to inherited — Figma has no
             // per-mode clear API — leaving a stale raw "blue" override. Skip the
             // raw write and let the reference pass set the alias (or inherit).
-            const willBeAliased = isExtendedCollection && checkCanReferenceVariable(token);
+            // Check if the reference target actually exists as a variable before
+            // skipping the raw write. If the target doesn't exist (e.g. a primitive
+            // token like "colors.black" that isn't exported as a variable), the
+            // reference pass will silently do nothing and we'd lose the value.
+            let willBeAliased = isExtendedCollection && checkCanReferenceVariable(token);
+            if (willBeAliased) {
+              let refName = '';
+              if (token.rawValue?.toString().startsWith('{')) {
+                refName = token.rawValue.toString().slice(1, -1);
+              } else if (token.rawValue?.toString().startsWith('$')) {
+                refName = token.rawValue.toString().substring(1);
+              }
+              const refPath = refName.split('.').join('/');
+              const targetExists = variablesInFigma.some((v) => v.name === refPath);
+              if (!targetExists) {
+                willBeAliased = false;
+              }
+            }
+            // eslint-disable-next-line no-console
+            if (isExtendedCollection) console.log(`[setValuesOnVariable] token "${token.path}" willBeAliased=${willBeAliased} canRef=${checkCanReferenceVariable(token)} rawValue="${token.rawValue}" mode=${mode}`);
 
             switch (variableType) {
               case 'BOOLEAN':
@@ -393,6 +412,8 @@ export default async function setValuesOnVariable(
                 referenceVariable: referenceTokenName,
                 ...(isExtendedCollection ? { collection } : {}),
               });
+              // eslint-disable-next-line no-console
+              if (isExtendedCollection) console.log(`[setValuesOnVariable] QUEUED ref candidate: "${token.path}" → "${referenceTokenName}" (extended, mode=${mode})`);
             }
           }
         } catch (e) {
