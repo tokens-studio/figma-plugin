@@ -62,7 +62,7 @@ export function ThemeListItemContent({
           '&::before': {
             content: '""',
             position: 'absolute',
-            left: `calc(${Math.max(indentationDepth - 1, 0)} * var(--space-6) + 8px)`,
+            left: `calc(${Math.max(indentationDepth - 1, 0)} * var(--space-6) + 24px)`,
             top: 0,
             bottom: 0,
             width: '1px',
@@ -74,7 +74,7 @@ export function ThemeListItemContent({
             borderBottom: '1px solid $borderMuted',
             borderLeft: '1px solid $borderMuted',
             width: '4px',
-            left: `calc(${Math.max(indentationDepth - 1, 0)} * var(--space-6) + 8px)`,
+            left: `calc(${Math.max(indentationDepth - 1, 0)} * var(--space-6) + 24px)`,
             backgroundColor: 'transparent',
           },
         } : {}),
