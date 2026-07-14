@@ -63,7 +63,7 @@ export default function TermsUpdateModal() {
     >
       <div style={{ lineHeight: 1.6 }}>
         <span>
-          We have updated our Terms & Conditions. These changes will come into effect in 30 days. We have also updated our Subprocessors. This includes adding Render.com and improving our license portal.
+          We have updated our Terms and Conditions, which will come into effect in 30 days. The changes include adding a new Subprocess (Render.com) and improvements around our license portal.
         </span>
         <span style={{ display: 'block', marginTop: '16px', fontSize: '12px' }}>
           July 15th, 2026
