@@ -26,12 +26,12 @@ export default function TermsUpdateModal() {
   useEffect(() => {
     // Skip showing modal in Cypress tests
     const isCypress = typeof window !== 'undefined' && (window as any).Cypress;
-    if (seenFlag !== false || !isProUser || activeTab !== Tabs.START || isCypress) {
+    if (seenFlag !== false || !isProUser || activeTab === Tabs.LOADING || isCypress) {
       setOpen(false);
       return undefined;
     }
 
-    // Let the start screen settle before showing the announcement.
+    // Let the application settle before showing the announcement.
     const timer = setTimeout(() => setOpen(true), 1000);
     return () => clearTimeout(timer);
   }, [activeTab, isProUser, seenFlag]);
@@ -62,12 +62,12 @@ export default function TermsUpdateModal() {
       )}
     >
       <div style={{ lineHeight: 1.6 }}>
-        <p>
-          We have updated our Terms & Conditions. These changes will come into effect in 30 days.
-        </p>
-        <p>
-          We have also updated our Subprocessors. This includes adding Render.com and improving our license portal.
-        </p>
+        <span>
+          We have updated our Terms & Conditions. These changes will come into effect in 30 days. We have also updated our Subprocessors. This includes adding Render.com and improving our license portal.
+        </span>
+        <span style={{ display: 'block', marginTop: '16px', fontSize: '12px' }}>
+          July 15th, 2026
+        </span>
       </div>
     </Modal>
   );

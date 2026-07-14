@@ -55,6 +55,7 @@ describe('TermsUpdateModal', () => {
     expect(screen.getByText('Terms & Conditions Update')).toBeInTheDocument();
     expect(screen.getByText(/30 days/)).toBeInTheDocument();
     expect(screen.getByText(/Render\.com/)).toBeInTheDocument();
+    expect(screen.getByText('July 15th, 2026')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'View the terms' })).toHaveAttribute('href', 'https://tokens.studio/terms');
   });
 
@@ -69,8 +70,18 @@ describe('TermsUpdateModal', () => {
     expect(screen.queryByText('Terms & Conditions Update')).not.toBeInTheDocument();
   });
 
-  it('does not show the announcement outside the start screen', () => {
+  it('shows the announcement for Pro users with an existing file', () => {
     renderModal(Tabs.TOKENS);
+
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+
+    expect(screen.getByText('Terms & Conditions Update')).toBeInTheDocument();
+  });
+
+  it('does not show the announcement while the application is loading', () => {
+    renderModal(Tabs.LOADING);
 
     act(() => {
       jest.advanceTimersByTime(1000);
