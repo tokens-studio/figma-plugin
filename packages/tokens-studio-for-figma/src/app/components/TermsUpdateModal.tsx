@@ -65,9 +65,9 @@ export default function TermsUpdateModal() {
     >
       <div style={{ lineHeight: 1.6 }}>
         <p>
-          We have updated our Terms and Conditions, which will come into effect in 30 days, on August 14th, 2026. The
-          changes include adding a new Subprocess (Render.com) and improvements around our license portal. This notice
-          is dated July 15th, 2026.
+          We have updated our Terms and Conditions, which will come into effect on August 14th, 2026. The changes
+          include adding a new Subprocessor (Render.com) and improvements around our license portal. This notice is
+          dated July 15th, 2026.
         </p>
       </div>
     </Modal>
