@@ -6,6 +6,7 @@ import { Modal } from './Modal/Modal';
 import { useIsProUser } from '@/app/hooks/useIsProUser';
 import { activeTabSelector } from '@/selectors/activeTabSelector';
 import { Tabs } from '@/constants/Tabs';
+import { useAuthStore } from '@/app/store/useAuthStore';
 
 const ModalFooterRight = styled('div', {
   display: 'flex',
@@ -19,6 +20,7 @@ const TERMS_URL = 'https://tokens.studio/terms';
 export default function TermsUpdateModal() {
   const dispatch = useDispatch();
   const isProUser = useIsProUser();
+  const { isAuthenticated } = useAuthStore();
   const activeTab = useSelector(activeTabSelector);
   const seenFlag = useSelector((state: any) => state.settings?.[TERMS_UPDATE_MODAL_KEY]);
   const [open, setOpen] = useState(false);
@@ -26,7 +28,7 @@ export default function TermsUpdateModal() {
   useEffect(() => {
     // Skip showing modal in Cypress tests
     const isCypress = typeof window !== 'undefined' && (window as any).Cypress;
-    if (seenFlag !== false || !isProUser || activeTab === Tabs.LOADING || isCypress) {
+    if (seenFlag !== false || !isProUser || isAuthenticated || activeTab === Tabs.LOADING || isCypress) {
       setOpen(false);
       return undefined;
     }
@@ -34,7 +36,7 @@ export default function TermsUpdateModal() {
     // Let the application settle before showing the announcement.
     const timer = setTimeout(() => setOpen(true), 1000);
     return () => clearTimeout(timer);
-  }, [activeTab, isProUser, seenFlag]);
+  }, [activeTab, isAuthenticated, isProUser, seenFlag]);
 
   const handleClose = useCallback(() => {
     dispatch.settings.setSeenTermsUpdate2026Subprocessors(true);

@@ -5,6 +5,7 @@ import {
 } from '../../../tests/config/setupTest';
 import { Tabs } from '@/constants/Tabs';
 import { useIsProUser } from '@/app/hooks/useIsProUser';
+import { useAuthStore } from '@/app/store/useAuthStore';
 import TermsUpdateModal from './TermsUpdateModal';
 
 jest.mock('@/app/hooks/useIsProUser', () => ({
@@ -17,11 +18,17 @@ describe('TermsUpdateModal', () => {
   beforeEach(() => {
     jest.useFakeTimers();
     useIsProUserMock.mockReturnValue(true);
+    act(() => {
+      useAuthStore.setState({ isAuthenticated: false });
+    });
   });
 
   afterEach(() => {
     jest.useRealTimers();
     useIsProUserMock.mockReset();
+    act(() => {
+      useAuthStore.setState({ isAuthenticated: false });
+    });
   });
 
   const renderModal = (activeTab = Tabs.START) => {
@@ -60,6 +67,19 @@ describe('TermsUpdateModal', () => {
 
   it('does not show the announcement to non-Pro users', () => {
     useIsProUserMock.mockReturnValue(false);
+    renderModal();
+
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+
+    expect(screen.queryByText('Terms & Conditions Update')).not.toBeInTheDocument();
+  });
+
+  it('does not show the announcement to Tokens Studio subscription users', () => {
+    act(() => {
+      useAuthStore.setState({ isAuthenticated: true });
+    });
     renderModal();
 
     act(() => {
