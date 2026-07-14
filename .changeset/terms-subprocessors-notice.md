@@ -2,4 +2,4 @@
 "@tokens-studio/figma-plugin": patch
 ---
 
-Add a Pro-only start screen notice for the updated terms and subprocessors.
+We have updated our Terms and Conditions, which will come into effect in 30 days. The changes include adding a new Subprocess (Render.com) and improvements around our license portal.
