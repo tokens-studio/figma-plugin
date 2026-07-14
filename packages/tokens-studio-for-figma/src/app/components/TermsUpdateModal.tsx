@@ -3,33 +3,41 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Button } from '@tokens-studio/ui';
 import { styled } from '@/stitches.config';
 import { Modal } from './Modal/Modal';
-import Link from './Link';
+import { useIsProUser } from '@/app/hooks/useIsProUser';
+import { activeTabSelector } from '@/selectors/activeTabSelector';
+import { Tabs } from '@/constants/Tabs';
 
 const ModalFooterRight = styled('div', {
   display: 'flex',
   justifyContent: 'flex-end',
+  gap: '$3',
 });
 
-export const TERMS_UPDATE_MODAL_KEY = 'seenTermsUpdate2026';
+export const TERMS_UPDATE_MODAL_KEY = 'seenTermsUpdate2026Subprocessors';
+const TERMS_URL = 'https://tokens.studio/terms';
 
 export default function TermsUpdateModal() {
   const dispatch = useDispatch();
-  const seenFlag = useSelector((state: any) => state.settings?.seenTermsUpdate2026);
+  const isProUser = useIsProUser();
+  const activeTab = useSelector(activeTabSelector);
+  const seenFlag = useSelector((state: any) => state.settings?.[TERMS_UPDATE_MODAL_KEY]);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
     // Skip showing modal in Cypress tests
     const isCypress = typeof window !== 'undefined' && (window as any).Cypress;
-    // Only show modal if settings have been loaded (seenFlag is not undefined) and it's false
-    if (seenFlag === false && !isCypress) {
-      setOpen(true);
-    } else if (seenFlag === true) {
+    if (seenFlag !== false || !isProUser || activeTab !== Tabs.START || isCypress) {
       setOpen(false);
+      return undefined;
     }
-  }, [seenFlag]);
+
+    // Let the start screen settle before showing the announcement.
+    const timer = setTimeout(() => setOpen(true), 1000);
+    return () => clearTimeout(timer);
+  }, [activeTab, isProUser, seenFlag]);
 
   const handleClose = useCallback(() => {
-    dispatch.settings.setSeenTermsUpdate2026(true);
+    dispatch.settings.setSeenTermsUpdate2026Subprocessors(true);
     setOpen(false);
   }, [dispatch]);
 
@@ -43,25 +51,22 @@ export default function TermsUpdateModal() {
       showClose={false}
       footer={(
         <ModalFooterRight>
-          <Button variant="primary" onClick={handleClose}>Continue</Button>
+          {/* @ts-ignore Exception for Button to accept target */}
+          <Button as="a" href={TERMS_URL} target="_blank" rel="noreferrer" variant="secondary">
+            View the terms
+          </Button>
+          <Button variant="primary" onClick={handleClose}>
+            Continue
+          </Button>
         </ModalFooterRight>
       )}
     >
       <div style={{ lineHeight: 1.6 }}>
         <p>
-          We have made updates to our
-          {' '}
-          <Link href="https://tokens.studio/terms/plugin">Terms & Conditions</Link>
-          {' '}
-          and our
-          {' '}
-          <Link href="https://tokens.studio/privacy/plugin">Privacy Policy</Link>
-          {', Please review these documents which will come into effect on '}
-          <b>15 January 2026</b>
-          .
+          We have updated our Terms & Conditions. These changes will come into effect in 30 days.
         </p>
         <p>
-          These updates add details about our subprocessors and their compliance, and incorporate a Data Processing Addendum (DPA) into our Terms & Conditions.
+          We have also updated our Subprocessors. This includes adding Render.com and improving our license portal.
         </p>
       </div>
     </Modal>
