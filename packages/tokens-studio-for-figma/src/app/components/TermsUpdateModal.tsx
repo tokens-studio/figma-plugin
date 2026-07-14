@@ -20,7 +20,7 @@ const TERMS_URL = 'https://tokens.studio/terms';
 export default function TermsUpdateModal() {
   const dispatch = useDispatch();
   const isProUser = useIsProUser();
-  const { isAuthenticated } = useAuthStore();
+  const { isPro: hasTokensStudioSubscription } = useAuthStore();
   const activeTab = useSelector(activeTabSelector);
   const seenFlag = useSelector((state: any) => state.settings?.[TERMS_UPDATE_MODAL_KEY]);
   const [open, setOpen] = useState(false);
@@ -28,7 +28,7 @@ export default function TermsUpdateModal() {
   useEffect(() => {
     // Skip showing modal in Cypress tests
     const isCypress = typeof window !== 'undefined' && (window as any).Cypress;
-    if (seenFlag !== false || !isProUser || isAuthenticated || activeTab === Tabs.LOADING || isCypress) {
+    if (seenFlag !== false || !isProUser || hasTokensStudioSubscription || activeTab === Tabs.LOADING || isCypress) {
       setOpen(false);
       return undefined;
     }
@@ -36,7 +36,7 @@ export default function TermsUpdateModal() {
     // Let the application settle before showing the announcement.
     const timer = setTimeout(() => setOpen(true), 1000);
     return () => clearTimeout(timer);
-  }, [activeTab, isAuthenticated, isProUser, seenFlag]);
+  }, [activeTab, hasTokensStudioSubscription, isProUser, seenFlag]);
 
   const handleClose = useCallback(() => {
     dispatch.settings.setSeenTermsUpdate2026Subprocessors(true);
@@ -68,7 +68,7 @@ export default function TermsUpdateModal() {
           We have updated our Terms and Conditions, which will come into effect in 30 days. The changes include adding a new Subprocess (Render.com) and improvements around our license portal.
         </span>
         <span style={{ display: 'block', marginTop: '16px', fontSize: '12px' }}>
-          July 15th, 2026
+          Notice date: July 15th, 2026
         </span>
       </div>
     </Modal>

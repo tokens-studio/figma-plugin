@@ -19,7 +19,7 @@ describe('TermsUpdateModal', () => {
     jest.useFakeTimers();
     useIsProUserMock.mockReturnValue(true);
     act(() => {
-      useAuthStore.setState({ isAuthenticated: false });
+      useAuthStore.setState({ isAuthenticated: false, isPro: false });
     });
   });
 
@@ -27,7 +27,7 @@ describe('TermsUpdateModal', () => {
     jest.useRealTimers();
     useIsProUserMock.mockReset();
     act(() => {
-      useAuthStore.setState({ isAuthenticated: false });
+      useAuthStore.setState({ isAuthenticated: false, isPro: false });
     });
   });
 
@@ -61,7 +61,7 @@ describe('TermsUpdateModal', () => {
 
     expect(screen.getByText('Terms & Conditions Update')).toBeInTheDocument();
     expect(screen.getByText('We have updated our Terms and Conditions, which will come into effect in 30 days. The changes include adding a new Subprocess (Render.com) and improvements around our license portal.')).toBeInTheDocument();
-    expect(screen.getByText('July 15th, 2026')).toBeInTheDocument();
+    expect(screen.getByText('Notice date: July 15th, 2026')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'View the terms' })).toHaveAttribute('href', 'https://tokens.studio/terms');
   });
 
@@ -78,7 +78,7 @@ describe('TermsUpdateModal', () => {
 
   it('does not show the announcement to Tokens Studio subscription users', () => {
     act(() => {
-      useAuthStore.setState({ isAuthenticated: true });
+      useAuthStore.setState({ isAuthenticated: true, isPro: true });
     });
     renderModal();
 
@@ -87,6 +87,19 @@ describe('TermsUpdateModal', () => {
     });
 
     expect(screen.queryByText('Terms & Conditions Update')).not.toBeInTheDocument();
+  });
+
+  it('shows the announcement for an authenticated user with a standalone license', () => {
+    act(() => {
+      useAuthStore.setState({ isAuthenticated: true, isPro: false });
+    });
+    renderModal();
+
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+
+    expect(screen.getByText('Terms & Conditions Update')).toBeInTheDocument();
   });
 
   it('shows the announcement for Pro users with an existing file', () => {
