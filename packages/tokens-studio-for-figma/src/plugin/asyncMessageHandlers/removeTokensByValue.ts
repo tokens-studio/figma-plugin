@@ -14,7 +14,13 @@ export const removeTokensByValue: AsyncMessageChannelHandlers[AsyncMessageTypes.
     }));
   });
 
-  if (nodesToRemove.length) await removePluginDataByMap({ nodeKeyMap: nodesToRemove });
+  if (nodesToRemove.length) {
+    // Commit undo point before removing tokens by value
+    if (typeof figma !== 'undefined' && figma.commitUndo) {
+      figma.commitUndo();
+    }
+    await removePluginDataByMap({ nodeKeyMap: nodesToRemove });
+  }
 
   sendSelectionChange();
 };
