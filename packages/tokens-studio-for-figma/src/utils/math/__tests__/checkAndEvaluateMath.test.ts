@@ -53,4 +53,16 @@ describe('checkAndEvaluateMath', () => {
     expect(checkAndEvaluateMath('sample(cubicBezier1D(0.45,0.34),0.2)')).toEqual(0.213);
     expect(checkAndEvaluateMath('sample(cubicBezier1D(0.45,0.34),0.2)')).toEqual(0.213);
   });
+
+  it('handles boolean values correctly', () => {
+    expect(checkAndEvaluateMath('true')).toEqual(true);
+    expect(checkAndEvaluateMath('false')).toEqual(false);
+    expect(checkAndEvaluateMath('3 > 2')).toEqual(true);
+    expect(checkAndEvaluateMath('3 < 2')).toEqual(false);
+    expect(checkAndEvaluateMath('3 == 3')).toEqual(true);
+  });
+
+  it('handles string values correctly', () => {
+    expect(checkAndEvaluateMath(`true ? 'yes' : 'no'`)).toEqual('yes');
+  });
 });
