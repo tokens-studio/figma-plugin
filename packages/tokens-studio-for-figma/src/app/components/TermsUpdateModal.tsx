@@ -15,7 +15,7 @@ const ModalFooterRight = styled('div', {
 });
 
 export const TERMS_UPDATE_MODAL_KEY = 'seenTermsUpdate2026Subprocessors';
-const TERMS_URL = 'https://tokens.studio/terms';
+const TERMS_URL = 'https://production.tokens.studio/legal/terms-of-service';
 
 export default function TermsUpdateModal() {
   const dispatch = useDispatch();
