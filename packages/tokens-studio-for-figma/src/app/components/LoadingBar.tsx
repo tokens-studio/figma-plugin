@@ -4,7 +4,6 @@ import { useSelector } from 'react-redux';
 import {
   Box, Button, Spinner, Stack, Text,
 } from '@tokens-studio/ui';
-import { useDelayedFlag } from '@/hooks';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { backgroundJobsSelector, windowSizeSelector } from '@/selectors';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
@@ -44,16 +43,13 @@ export default function LoadingBar() {
   const expectedWaitTimeInSeconds = React.useMemo(() => (
     Math.round(expectedWaitTime / 1000)
   ), [expectedWaitTime]);
-    // Only delay showing the loading bar, hide immediately when jobs are cleared
-  const shouldShow = useDelayedFlag(
-    !(
-      (!backgroundJobs.length || expectedWaitTime < 100)
-        && !hasInfiniteJobs
-    ),
-    200,
-    true,
-    false,
-  );
+  // Compute shouldShow directly from jobs. We previously used useDelayedFlag to
+  // add a 200ms show-delay (to avoid flashing on sub-100ms operations), but that
+  // wrapper had a race where a throttled setTimeout could flip the flag to true
+  // AFTER the queue emptied — leaving the bar visible forever with no jobs, and
+  // therefore no title, showing the "Hold on, updating..." fallback text. The
+  // sub-100ms flash is already avoided by the `expectedWaitTime >= 100` guard.
+  const shouldShow = backgroundJobs.length > 0 && (hasInfiniteJobs || expectedWaitTime >= 100);
   const completedTasks = React.useMemo(() => backgroundJobs.reduce((total, job) => (
     total + (job.completedTasks ?? 0)
   ), 0), [backgroundJobs]);
