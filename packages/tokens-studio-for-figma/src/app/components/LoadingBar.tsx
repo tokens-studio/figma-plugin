@@ -43,12 +43,12 @@ export default function LoadingBar() {
   const expectedWaitTimeInSeconds = React.useMemo(() => (
     Math.round(expectedWaitTime / 1000)
   ), [expectedWaitTime]);
-  // Compute shouldShow directly from jobs. We previously used useDelayedFlag to
-  // add a 200ms show-delay (to avoid flashing on sub-100ms operations), but that
-  // wrapper had a race where a throttled setTimeout could flip the flag to true
-  // AFTER the queue emptied — leaving the bar visible forever with no jobs, and
-  // therefore no title, showing the "Hold on, updating..." fallback text. The
-  // sub-100ms flash is already avoided by the `expectedWaitTime >= 100` guard.
+  // Compute shouldShow directly from jobs. The previous useDelayedFlag wrapper
+  // added a 200ms show-delay to suppress brief flashes, but its internal timer
+  // could fire after the queue had already cleared (browser timer throttling),
+  // leaving the bar rendering with no jobs — which then showed the empty-title
+  // "Hold on, updating..." fallback text. Tradeoff: short-lived infinite jobs
+  // (<200ms) may now briefly flash the bar; imperceptible in practice.
   const shouldShow = backgroundJobs.length > 0 && (hasInfiniteJobs || expectedWaitTime >= 100);
   const completedTasks = React.useMemo(() => backgroundJobs.reduce((total, job) => (
     total + (job.completedTasks ?? 0)
