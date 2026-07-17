@@ -15,7 +15,7 @@ const ModalFooterRight = styled('div', {
 });
 
 export const TERMS_UPDATE_MODAL_KEY = 'seenTermsUpdate2026Subprocessors';
-const TERMS_URL = 'https://tokens.studio/terms';
+const TERMS_URL = 'https://production.tokens.studio/legal/terms-of-service';
 
 export default function TermsUpdateModal() {
   const dispatch = useDispatch();
@@ -65,9 +65,9 @@ export default function TermsUpdateModal() {
     >
       <div style={{ lineHeight: 1.6 }}>
         <p>
-          We have updated our Terms and Conditions, which will come into effect on August 14th, 2026. The changes
+          We have updated our Terms and Conditions, which will come into effect on August 16th, 2026. The changes
           include adding a new Subprocessor (Render.com) and improvements around our license portal. This notice is
-          dated July 15th, 2026.
+          dated July 17th, 2026.
         </p>
       </div>
     </Modal>
