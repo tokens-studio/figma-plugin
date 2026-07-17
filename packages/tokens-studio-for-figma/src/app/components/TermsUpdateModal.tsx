@@ -67,7 +67,7 @@ export default function TermsUpdateModal() {
         <p>
           We have updated our Terms and Conditions, which will come into effect on August 16th, 2026. The changes
           include adding a new Subprocessor (Render.com) and improvements around our license portal. This notice is
-          dated July 15th, 2026.
+          dated July 17th, 2026.
         </p>
       </div>
     </Modal>
