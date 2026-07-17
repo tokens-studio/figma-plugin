@@ -116,7 +116,7 @@
     "path": "^0.12.7",
     "polished": "^4.1.3",
     "popmotion": "^11.0.0",
-    "postcss": "^8.4.31",
+    "postcss": "^8.5.10",
     "postcss-calc-ast-parser": "^0.1.4",
     "rc-mentions": "^2.2.0",
     "re-resizable": "6.9.11",
