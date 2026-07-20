@@ -60,7 +60,8 @@
   "styles": {
     "color": "Couleur",
     "typography": "Typographie",
-    "effects": "Effets"
+    "effects": "Effets",
+    "gradients": "Dégradés"
   },
   "exportThemesTab": {
     "headingPro": "Créez des thèmes pour commencer",
@@ -78,5 +79,9 @@
     "intro": "Vous pouvez utiliser des ensembles de jetons pour gérer vos styles et vos variables. Utilisez les thèmes (Pro) pour créer plusieurs collections de variables ou de styles pour basculer facilement entre des concepts de design.",
     "setsSelectedForExport": "Ensembles sélectionnés pour l'exportation"
   },
-  "optionsModalTitle": "Exporter vers Figma : Options"
+  "optionsModalTitle": "Exporter vers Figma : Options",
+  "searchThemes": "Thèmes de recherche",
+  "searchSets": "Ensembles de recherche",
+  "noThemesFound": "Aucun thème trouvé",
+  "noSetsFound": "Aucun ensemble trouvé"
 }

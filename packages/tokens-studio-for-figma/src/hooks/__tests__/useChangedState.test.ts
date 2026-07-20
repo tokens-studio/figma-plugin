@@ -74,5 +74,4 @@ describe('useChangedState', () => {
     expect(mockUpdateCheckForChanges).toHaveBeenCalledWith(false);
     expect(mockUpdateCheckForChanges).not.toHaveBeenCalledWith(true);
   });
-
 });

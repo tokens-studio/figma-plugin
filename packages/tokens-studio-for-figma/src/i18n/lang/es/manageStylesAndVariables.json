@@ -60,7 +60,8 @@
   "styles": {
     "color": "Color",
     "typography": "Tipografía",
-    "effects": "Efectos"
+    "effects": "Efectos",
+    "gradients": "Degradados"
   },
   "exportThemesTab": {
     "headingPro": "Crea Temas para comenzar",
@@ -78,5 +79,9 @@
     "intro": "Puedes usar conjuntos de tokens para administrar tus estilos y variables. Usa Temas (Pro) para crear múltiples colecciones de variables o estilos para cambiar fácilmente entre conceptos de diseño.",
     "setsSelectedForExport": "Conjuntos seleccionados para exportar"
   },
-  "optionsModalTitle": "Exportar a Figma: Opciones"
+  "optionsModalTitle": "Exportar a Figma: Opciones",
+  "searchThemes": "Buscar temas",
+  "searchSets": "Conjuntos de búsqueda",
+  "noThemesFound": "No se encontraron temas",
+  "noSetsFound": "No se encontraron conjuntos"
 }

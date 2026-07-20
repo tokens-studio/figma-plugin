@@ -33,7 +33,7 @@ export async function fetchServerResolvedTokens(
   try {
     // Build query string: change_set_id + each theme selection as a flat param
     // e.g. ?change_set_id=abc&color-scheme=blue&foundation=base
-    const params = new URLSearchParams({ 
+    const params = new URLSearchParams({
       change_set_id: changeSetId,
       t: Date.now().toString(), // Cache buster
     });
@@ -56,7 +56,6 @@ export async function fetchServerResolvedTokens(
     );
 
     if (!response.ok) {
-
       return null;
     }
 
@@ -70,14 +69,11 @@ export async function fetchServerResolvedTokens(
     );
 
     if (!flatMap) {
-
       return null;
     }
 
-
     return flatMap;
   } catch (error) {
-
     return null;
   }
 }
