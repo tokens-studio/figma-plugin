@@ -228,7 +228,12 @@ export default async function setValuesOnVariable(
                   setStringValuesOnVariable(variable, mode, token.value, hasMetadataChanged);
                   // Given we cannot determine the combined family of a variable, we cannot use fallback weights from our estimates.
                   // This is not an issue because users can set numerical font weights with variables, so we opt-out of the guesswork and just apply the numerical weight.
-                } else if (token.type === TokenTypes.FONT_WEIGHTS && Array.isArray(token.value)) {
+                } else if (
+                  (token.type === TokenTypes.FONT_WEIGHTS || token.type === TokenTypes.FONT_FAMILIES)
+                  && Array.isArray(token.value)
+                  && typeof token.value[0] === 'string'
+                ) {
+                  // Figma variables only support a single font family; use the first entry as the primary.
                   setStringValuesOnVariable(variable, mode, token.value[0], hasMetadataChanged);
                 }
                 break;
