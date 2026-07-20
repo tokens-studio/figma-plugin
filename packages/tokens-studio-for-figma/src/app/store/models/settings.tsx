@@ -55,6 +55,7 @@ export interface SettingsState {
   createStylesWithVariableReferences?: boolean;
   renameExistingStylesAndVariables?: boolean;
   removeStylesAndVariablesWithoutConnection?: boolean;
+  exportExtendedCollections?: boolean;
   autoApplyThemeOnDrop?: boolean;
   seenGenericVersionedHeaderMigrationDialog?: boolean;
   seenTermsUpdate2026?: boolean;
@@ -90,6 +91,7 @@ export const settings = createModel<RootModel>()({
     renameExistingStylesAndVariables: false,
     removeStylesAndVariablesWithoutConnection: false,
     createStylesWithVariableReferences: false,
+    exportExtendedCollections: false,
     autoApplyThemeOnDrop: false,
     inspectDeep: false,
     shouldSwapStyles: false,

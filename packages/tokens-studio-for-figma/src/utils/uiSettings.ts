@@ -25,6 +25,7 @@ export async function updateUISettings(uiSettings: Partial<SavedSettings>) {
       prefixStylesWithThemeName: uiSettings.prefixStylesWithThemeName ?? data?.prefixStylesWithThemeName,
       renameExistingStylesAndVariables: uiSettings.renameExistingStylesAndVariables ?? data?.renameExistingStylesAndVariables,
       removeStylesAndVariablesWithoutConnection: uiSettings.removeStylesAndVariablesWithoutConnection ?? data?.removeStylesAndVariablesWithoutConnection,
+      exportExtendedCollections: uiSettings.exportExtendedCollections ?? data?.exportExtendedCollections,
       variablesBoolean: uiSettings.variablesBoolean ?? data?.variablesBoolean,
       variablesColor: uiSettings.variablesColor ?? data?.variablesColor,
       variablesNumber: uiSettings.variablesNumber ?? data?.variablesNumber,
@@ -77,6 +78,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
     let prefixStylesWithThemeName: boolean;
     let renameExistingStylesAndVariables: boolean;
     let removeStylesAndVariablesWithoutConnection: boolean;
+    let exportExtendedCollections: boolean;
     let inspectDeep: boolean;
     let shouldSwapStyles: boolean;
     let shouldSwapFigmaModes: boolean;
@@ -114,6 +116,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
       prefixStylesWithThemeName = typeof data.prefixStylesWithThemeName === 'undefined' ? false : data.prefixStylesWithThemeName;
       renameExistingStylesAndVariables = typeof data.renameExistingStylesAndVariables === 'undefined' ? false : data.renameExistingStylesAndVariables;
       removeStylesAndVariablesWithoutConnection = typeof data.removeStylesAndVariablesWithoutConnection === 'undefined' ? false : data.removeStylesAndVariablesWithoutConnection;
+      exportExtendedCollections = typeof data.exportExtendedCollections === 'undefined' ? false : data.exportExtendedCollections;
       baseFontSize = typeof data.baseFontSize === 'undefined' ? defaultBaseFontSize : data.baseFontSize;
       aliasBaseFontSize = typeof data.aliasBaseFontSize === 'undefined' ? defaultBaseFontSize : data.aliasBaseFontSize;
       inspectDeep = typeof data.inspectDeep === 'undefined' ? false : data.inspectDeep;
@@ -150,6 +153,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
         prefixStylesWithThemeName,
         renameExistingStylesAndVariables,
         removeStylesAndVariablesWithoutConnection,
+        exportExtendedCollections,
         inspectDeep,
         shouldSwapStyles,
         shouldSwapFigmaModes,

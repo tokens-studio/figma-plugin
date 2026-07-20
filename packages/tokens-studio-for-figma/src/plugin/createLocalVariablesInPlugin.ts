@@ -11,6 +11,7 @@ import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { mergeVariableReferencesWithLocalVariables } from './mergeVariableReferences';
 import { findCollectionAndModeIdForTheme } from './findCollectionAndModeIdForTheme';
 import { createNecessaryVariableCollections } from './createNecessaryVariableCollections';
+import { truncateModeName } from '@/utils/truncateName';
 import { getVariablesWithoutZombies } from './getVariablesWithoutZombies';
 import { getCodeSyntaxValue } from '@/utils/figma';
 import { getOverallConfig } from '@/utils/tokenHelpers';
@@ -58,7 +59,7 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
     });
 
     const overallConfig = getOverallConfig(themeInfo.themes, selectedThemes);
-    const collections = await createNecessaryVariableCollections(themeInfo.themes, selectedThemes);
+    const collections = await createNecessaryVariableCollections(themeInfo.themes, selectedThemes, settings);
 
     // Calculate total number of variables for progress tracking
     const totalVariableTokens = selectedThemeObjects.reduce((total, theme) => {
@@ -102,6 +103,16 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
       });
     }
 
+    // Sort themes: process parent themes before extended themes
+    // Extended collections need parent variables to exist first
+    const sortedThemeObjects = [...selectedThemeObjects].sort((a, b) => {
+      // Extended themes should come after their parents
+      if (a.$figmaIsExtension && !b.$figmaIsExtension) return 1;
+      if (!a.$figmaIsExtension && b.$figmaIsExtension) return -1;
+      // Both same type, maintain order
+      return 0;
+    });
+
     /**
      * We perform a pre-flight scan across ALL selected themes. We build a global map
      * (`providedPlatformsByVariable`) of every platform that HAS a value defined
@@ -130,8 +141,23 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
     });
 
     // Process themes sequentially
-    for (const theme of selectedThemeObjects) {
-      const { collection, modeId } = findCollectionAndModeIdForTheme(theme.group ?? theme.name, theme.name, collections);
+    for (const theme of sortedThemeObjects) {
+      const lookup = findCollectionAndModeIdForTheme(theme.group ?? theme.name, theme.name, collections);
+      let collection: VariableCollection | undefined = lookup.collection;
+      let modeId: string | undefined = lookup.modeId;
+
+      // Extended (child) collections are named WITHOUT the parent-group prefix
+      // ("Brand", not "Colors/Brand"), so the name-based lookup misses themes
+      // whose group carries the imported "Parent/Child" form. Fall back to the
+      // collection id backfilled during collection creation.
+      if ((!collection || !modeId) && theme.$figmaCollectionId) {
+        const collectionById = collections.find((c) => c.id === theme.$figmaCollectionId);
+        if (collectionById) {
+          collection = collectionById;
+          modeId = (collectionById.modes.find((m) => m.modeId === theme.$figmaModeId)
+            ?? collectionById.modes.find((m) => m.name === theme.name || m.name === truncateModeName(theme.name)))?.modeId;
+        }
+      }
 
       if (collection && modeId) {
         // Use overallConfig to allow cross-theme token references

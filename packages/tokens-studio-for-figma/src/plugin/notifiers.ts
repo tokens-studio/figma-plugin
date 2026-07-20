@@ -84,6 +84,7 @@ export type SavedSettings = {
   prefixStylesWithThemeName: boolean;
   renameExistingStylesAndVariables: boolean;
   removeStylesAndVariablesWithoutConnection: boolean;
+  exportExtendedCollections: boolean;
   inspectDeep: boolean;
   shouldSwapStyles: boolean;
   shouldSwapFigmaModes: boolean;
@@ -129,6 +130,7 @@ export function notifyUISettings(
     tokenFormat,
     renameExistingStylesAndVariables,
     removeStylesAndVariablesWithoutConnection,
+    exportExtendedCollections,
     seenGenericVersionedHeaderMigrationDialog,
     seenTermsUpdate2026,
     seenTermsUpdate2026Subprocessors,
@@ -169,6 +171,7 @@ export function notifyUISettings(
       tokenFormat,
       renameExistingStylesAndVariables,
       removeStylesAndVariablesWithoutConnection,
+      exportExtendedCollections,
       seenGenericVersionedHeaderMigrationDialog,
       seenTermsUpdate2026,
       seenTermsUpdate2026Subprocessors,
