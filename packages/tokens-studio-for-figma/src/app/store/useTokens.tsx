@@ -12,6 +12,7 @@ import { track } from '@/utils/analytics';
 import { checkIfAlias, getAliasValue } from '@/utils/alias';
 import {
   activeTokenSetSelector,
+  activeThemeSelector,
   storeTokenIdInJsonEditorSelector,
   inspectStateSelector,
   settingsStateSelector,
@@ -21,6 +22,8 @@ import {
   themesListSelector,
   storageTypeSelector,
 } from '@/selectors';
+import { useAuthStore } from '@/app/store/useAuthStore';
+import { fetchServerResolvedTokensPerTheme } from '@/utils/tokensStudio/fetchServerResolvedTokensPerTheme';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { TokenTypes } from '@/constants/TokenTypes';
@@ -358,6 +361,8 @@ export default function useTokens() {
   );
 
   const serverResolvedTokens = useSelector((state: RootState) => state.tokenState.serverResolvedTokens);
+  const serverResolverContext = useSelector((state: RootState) => state.tokenState.serverResolverContext);
+  const activeTheme = useSelector(activeThemeSelector);
 
   // Asks user which styles to create, then calls Figma with all tokens to create styles
   const createStylesFromSelectedTokenSets = useCallback(
@@ -645,12 +650,14 @@ export default function useTokens() {
         type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES,
         tokens: multiValueFilteredTokens,
         settings,
-        serverResolvedTokens: storageType.provider === StorageProviderType.TOKENS_STUDIO_OAUTH ? serverResolvedTokens : null,
+        // No selectedThemes here → the plugin no-ops, so a per-theme delta is
+        // unnecessary and we skip the server round-trip.
+        serverResolvedTokens: null,
       }),
     );
     dispatch.tokenState.assignVariableIdsToTheme(createVariableResult.variableIds);
     dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
-  }, [dispatch.tokenState, dispatch.uiState, tokens, settings, serverResolvedTokens, storageType]);
+  }, [dispatch.tokenState, dispatch.uiState, tokens, settings]);
 
   const createVariablesFromSets = useCallback(
     async (selectedSets: ExportTokenSet[]) => {
@@ -713,6 +720,31 @@ export default function useTokens() {
         name: BackgroundJobs.UI_CREATEVARIABLES,
         isInfinite: true,
       });
+
+      // For Tokens Studio OAuth projects, fetch the server-resolved delta
+      // ONCE PER SELECTED THEME so each mode gets the correct values. The
+      // Redux `serverResolvedTokens` is a single flat map built for the
+      // currently active theme — using it for every mode clobbers each mode
+      // with the active theme's values.
+      let perThemeServerResolvedTokens: Record<string, Record<string, string>> | null = null;
+      if (storageType.provider === StorageProviderType.TOKENS_STUDIO_OAUTH && serverResolverContext) {
+        const { oauthTokens } = useAuthStore.getState();
+        if (oauthTokens?.accessToken) {
+          const selectedThemeObjects = themes.filter((t) => selectedThemes.includes(t.id));
+          perThemeServerResolvedTokens = await fetchServerResolvedTokensPerTheme(
+            selectedThemeObjects,
+            activeTheme,
+            themes,
+            {
+              apiBaseUrl: serverResolverContext.apiBaseUrl,
+              projectId: serverResolverContext.projectId,
+              changeSetId: serverResolverContext.changeSetId,
+              authToken: oauthTokens.accessToken,
+            },
+          );
+        }
+      }
+
       const createVariableResult = await wrapTransaction(
         {
           name: 'createVariables',
@@ -739,14 +771,14 @@ export default function useTokens() {
           tokens,
           settings,
           selectedThemes,
-          serverResolvedTokens: storageType.provider === StorageProviderType.TOKENS_STUDIO_OAUTH ? serverResolvedTokens : null,
+          serverResolvedTokens: perThemeServerResolvedTokens,
         }),
       );
       dispatch.tokenState.assignVariableIdsToTheme(createVariableResult.variableIds);
       dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
       Promise.resolve();
     },
-    [dispatch.tokenState, dispatch.uiState, tokens, settings, serverResolvedTokens, storageType],
+    [dispatch.tokenState, dispatch.uiState, tokens, settings, storageType, serverResolverContext, themes, activeTheme],
   );
 
   const renameVariablesFromToken = useCallback(

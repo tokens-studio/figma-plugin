@@ -337,7 +337,9 @@ export type CreateLocalVariablesAsyncMessage = AsyncMessage<AsyncMessageTypes.CR
   tokens: Record<string, AnyTokenList>;
   settings: SettingsState,
   selectedThemes?: string[]
-  serverResolvedTokens?: Record<string, string> | null;
+  // Keyed by theme.id — one flat delta per mode, so multi-mode export writes
+  // per-mode values instead of clobbering every mode with the active theme.
+  serverResolvedTokens?: Record<string, Record<string, string>> | null;
 }>;
 export type CreateLocalVariablesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_LOCAL_VARIABLES, {
   variableIds: Record<string, LocalVariableInfo>

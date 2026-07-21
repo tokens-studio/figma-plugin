@@ -31,7 +31,7 @@ export type LocalVariableInfo = {
 * - Then goes on to update variables for each theme
 * - There's another step that we perform where we check if any variables need to be using references to other variables. This is a second step, as we need to have all variables created first before we can reference them.
 * */
-export default async function createLocalVariablesInPlugin(tokens: Record<string, AnyTokenList>, settings: SettingsState, selectedThemes?: string[], serverResolvedTokens?: Record<string, string> | null) {
+export default async function createLocalVariablesInPlugin(tokens: Record<string, AnyTokenList>, settings: SettingsState, selectedThemes?: string[], serverResolvedTokens?: Record<string, Record<string, string>> | null) {
   // Big O (n * m * x): (n: amount of themes, m: amount of variableCollections, x: amount of modes)
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
     type: AsyncMessageTypes.GET_THEME_INFO,
@@ -63,7 +63,7 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
     // Calculate total number of variables for progress tracking
     const totalVariableTokens = selectedThemeObjects.reduce((total, theme) => {
       const { tokensToCreate } = generateTokensToCreate({
-        theme, tokens, overallConfig, serverResolvedTokens,
+        theme, tokens, overallConfig, serverResolvedTokens: serverResolvedTokens?.[theme.id] ?? null,
       });
       const variableTokenCount = tokensToCreate.filter((token) => checkIfTokenCanCreateVariable(token, settings)).length;
       return total + variableTokenCount;
@@ -112,7 +112,7 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
      */
     selectedThemeObjects.forEach((theme) => {
       const { tokensToCreate } = generateTokensToCreate({
-        theme, tokens, overallConfig, serverResolvedTokens,
+        theme, tokens, overallConfig, serverResolvedTokens: serverResolvedTokens?.[theme.id] ?? null,
       });
       tokensToCreate.forEach((token) => {
         const figmaExtensions = token.$extensions?.['com.figma'] as FigmaExtensions;
@@ -145,7 +145,7 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
           progressTracker: globalProgressTracker,
           metadataUpdateTracker,
           providedPlatformsByVariable,
-          serverResolvedTokens,
+          serverResolvedTokens: serverResolvedTokens?.[theme.id] ?? null,
         });
 
         figmaVariablesAfterCreate += allVariableObj.removedVariables.length;
