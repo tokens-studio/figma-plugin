@@ -21,6 +21,8 @@ import {
   themesListSelector,
   storageTypeSelector,
 } from '@/selectors';
+import { useAuthStore } from '@/app/store/useAuthStore';
+import { fetchServerResolvedTokensPerTheme } from '@/utils/tokensStudio/fetchServerResolvedTokensPerTheme';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { TokenTypes } from '@/constants/TokenTypes';
@@ -358,6 +360,7 @@ export default function useTokens() {
   );
 
   const serverResolvedTokens = useSelector((state: RootState) => state.tokenState.serverResolvedTokens);
+  const serverResolverContext = useSelector((state: RootState) => state.tokenState.serverResolverContext);
 
   // Asks user which styles to create, then calls Figma with all tokens to create styles
   const createStylesFromSelectedTokenSets = useCallback(
@@ -645,12 +648,14 @@ export default function useTokens() {
         type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES,
         tokens: multiValueFilteredTokens,
         settings,
-        serverResolvedTokens: storageType.provider === StorageProviderType.TOKENS_STUDIO_OAUTH ? serverResolvedTokens : null,
+        // No selectedThemes here → the plugin no-ops, so a per-theme delta is
+        // unnecessary and we skip the server round-trip.
+        serverResolvedTokens: null,
       }),
     );
     dispatch.tokenState.assignVariableIdsToTheme(createVariableResult.variableIds);
     dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
-  }, [dispatch.tokenState, dispatch.uiState, tokens, settings, serverResolvedTokens, storageType]);
+  }, [dispatch.tokenState, dispatch.uiState, tokens, settings]);
 
   const createVariablesFromSets = useCallback(
     async (selectedSets: ExportTokenSet[]) => {
@@ -691,13 +696,18 @@ export default function useTokens() {
           tokens,
           settings,
           selectedSets,
-          serverResolvedTokens: storageType.provider === StorageProviderType.TOKENS_STUDIO_OAUTH ? serverResolvedTokens : null,
+          // No theme dimension here — each set becomes its own single-mode
+          // collection. The Redux server-resolved delta is scoped to the
+          // currently active theme, so applying it here would leak active-
+          // theme values into unrelated sets. Local resolution is the source
+          // of truth for per-set exports.
+          serverResolvedTokens: null,
         }),
       );
       dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
       Promise.resolve();
     },
-    [dispatch.uiState, tokens, settings, serverResolvedTokens, storageType],
+    [dispatch.uiState, tokens, settings],
   );
 
   const createVariablesFromThemes = useCallback(
@@ -713,40 +723,76 @@ export default function useTokens() {
         name: BackgroundJobs.UI_CREATEVARIABLES,
         isInfinite: true,
       });
-      const createVariableResult = await wrapTransaction(
-        {
-          name: 'createVariables',
-          statExtractor: async (result, transaction) => {
-            const data = await result;
-            if (data) {
-              track('createVariables', {
-                type: 'themes',
-                totalVariables: data.totalVariables,
-                themeCount: selectedThemes.length,
-                variablesColor: settings.variablesColor,
-                variablesNumber: settings.variablesNumber,
-                variablesString: settings.variablesString,
-                variablesBoolean: settings.variablesBoolean,
-                removeStylesAndVariablesWithoutConnection: settings.removeStylesAndVariablesWithoutConnection,
-                renameExistingStylesAndVariables: settings.renameExistingStylesAndVariables,
-              });
-              transaction.setMeasurement('variables', data.totalVariables, '');
+
+      try {
+        // For Tokens Studio OAuth projects, fetch the server-resolved delta
+        // ONCE PER SELECTED THEME so each mode gets the correct values. The
+        // Redux `serverResolvedTokens` is a single flat map built for the
+        // currently active theme — using it for every mode clobbers each mode
+        // with the active theme's values.
+        //
+        // Snapshot the resolver context up front so an in-flight project
+        // switch can't cause us to dispatch A's deltas against B's Redux.
+        const snapshotContext = serverResolverContext;
+        let perThemeServerResolvedTokens: Record<string, Record<string, string>> | null = null;
+        if (storageType.provider === StorageProviderType.TOKENS_STUDIO_OAUTH && snapshotContext) {
+          const { oauthTokens } = useAuthStore.getState();
+          if (oauthTokens?.accessToken) {
+            const selectedThemeObjects = themes.filter((t) => selectedThemes.includes(t.id));
+            perThemeServerResolvedTokens = await fetchServerResolvedTokensPerTheme(
+              selectedThemeObjects,
+              {
+                apiBaseUrl: snapshotContext.apiBaseUrl,
+                projectId: snapshotContext.projectId,
+                changeSetId: snapshotContext.changeSetId,
+                authToken: oauthTokens.accessToken,
+              },
+            );
+            // Bail out of the write if the user switched projects mid-fetch —
+            // our snapshot no longer describes current state.
+            if (serverResolverContext?.projectId !== snapshotContext.projectId) {
+              return;
             }
+          }
+        }
+
+        const createVariableResult = await wrapTransaction(
+          {
+            name: 'createVariables',
+            statExtractor: async (result, transaction) => {
+              const data = await result;
+              if (data) {
+                track('createVariables', {
+                  type: 'themes',
+                  totalVariables: data.totalVariables,
+                  themeCount: selectedThemes.length,
+                  variablesColor: settings.variablesColor,
+                  variablesNumber: settings.variablesNumber,
+                  variablesString: settings.variablesString,
+                  variablesBoolean: settings.variablesBoolean,
+                  removeStylesAndVariablesWithoutConnection: settings.removeStylesAndVariablesWithoutConnection,
+                  renameExistingStylesAndVariables: settings.renameExistingStylesAndVariables,
+                });
+                transaction.setMeasurement('variables', data.totalVariables, '');
+              }
+            },
           },
-        },
-        async () => await AsyncMessageChannel.ReactInstance.message({
-          type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES,
-          tokens,
-          settings,
-          selectedThemes,
-          serverResolvedTokens: storageType.provider === StorageProviderType.TOKENS_STUDIO_OAUTH ? serverResolvedTokens : null,
-        }),
-      );
-      dispatch.tokenState.assignVariableIdsToTheme(createVariableResult.variableIds);
-      dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
-      Promise.resolve();
+          async () => await AsyncMessageChannel.ReactInstance.message({
+            type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES,
+            tokens,
+            settings,
+            selectedThemes,
+            serverResolvedTokens: perThemeServerResolvedTokens,
+          }),
+        );
+        dispatch.tokenState.assignVariableIdsToTheme(createVariableResult.variableIds);
+      } finally {
+        // Always tear down the spinner — otherwise a thrown fetch/dispatch
+        // leaves the infinite UI_CREATEVARIABLES job stuck forever.
+        dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
+      }
     },
-    [dispatch.tokenState, dispatch.uiState, tokens, settings, serverResolvedTokens, storageType],
+    [dispatch.tokenState, dispatch.uiState, tokens, settings, storageType, serverResolverContext, themes],
   );
 
   const renameVariablesFromToken = useCallback(
