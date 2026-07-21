@@ -44,40 +44,26 @@ describe('generateTokensToCreate', () => {
     ]);
   });
 
-  it('applies serverResolvedTokens delta on top of local resolution (per-mode invariant)', () => {
-    // Regression guard for the multi-mode variable export bug: each theme in a
-    // multi-mode export must receive its OWN server-resolved delta so modes get
-    // distinct values. A shared delta across themes would clobber every mode
-    // with the same value.
-    const lightTheme: ThemeObject = {
-      id: 'light',
-      name: 'Light',
-      group: 'Mode',
-      selectedTokenSets: { core: TokenSetStatus.ENABLED },
+  it('applies a flat serverResolvedTokens delta on top of local resolution', () => {
+    // Leaf-level check: given a delta, the resolved value wins over local.
+    // The per-theme *slicing* invariant is guarded at the caller layer, in
+    // createLocalVariablesInPlugin.perThemeDelta.test.ts — this test would
+    // still pass if the caller ever regressed to sharing one map across
+    // themes, so it is deliberately scoped narrow.
+    const singleTheme: ThemeObject = {
+      id: 'x', name: 'X', selectedTokenSets: { core: TokenSetStatus.ENABLED },
     };
-    const darkTheme: ThemeObject = {
-      id: 'dark',
-      name: 'Dark',
-      group: 'Mode',
-      selectedTokenSets: { core: TokenSetStatus.ENABLED },
-    };
-    const tokensForMultiMode: Record<string, AnyTokenList> = {
+    const singleToken: Record<string, AnyTokenList> = {
       core: [{ name: 'color.bg', value: '#local', type: TokenTypes.COLOR }],
     };
 
-    const light = generateTokensToCreate({
-      theme: lightTheme,
-      tokens: tokensForMultiMode,
+    const { tokensToCreate } = generateTokensToCreate({
+      theme: singleTheme,
+      tokens: singleToken,
       serverResolvedTokens: { 'color.bg': '#ffffff' },
     });
-    const dark = generateTokensToCreate({
-      theme: darkTheme,
-      tokens: tokensForMultiMode,
-      serverResolvedTokens: { 'color.bg': '#000000' },
-    });
 
-    expect(light.tokensToCreate[0].value).toBe('#ffffff');
-    expect(dark.tokensToCreate[0].value).toBe('#000000');
+    expect(tokensToCreate[0].value).toBe('#ffffff');
   });
 
   it('does not create tokens if their type is not in tokenTypesToCreateVariable', () => {

@@ -24,6 +24,16 @@ export type LocalVariableInfo = {
   variableIds: Record<string, string>
 };
 
+// Pick the server-resolved delta for a single theme from the per-theme map.
+// Centralised so the theme.id key convention has exactly one owner — a
+// future rename only has to update this helper.
+function deltaFor(
+  serverResolvedTokens: Record<string, Record<string, string>> | null | undefined,
+  themeId: string,
+): Record<string, string> | null {
+  return serverResolvedTokens?.[themeId] ?? null;
+}
+
 /**
 * This function is used to create and update variables based on themes
 * - It first creates the necessary variable collections and modes or returns existing ones
@@ -63,7 +73,7 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
     // Calculate total number of variables for progress tracking
     const totalVariableTokens = selectedThemeObjects.reduce((total, theme) => {
       const { tokensToCreate } = generateTokensToCreate({
-        theme, tokens, overallConfig, serverResolvedTokens: serverResolvedTokens?.[theme.id] ?? null,
+        theme, tokens, overallConfig, serverResolvedTokens: deltaFor(serverResolvedTokens, theme.id),
       });
       const variableTokenCount = tokensToCreate.filter((token) => checkIfTokenCanCreateVariable(token, settings)).length;
       return total + variableTokenCount;
@@ -112,7 +122,7 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
      */
     selectedThemeObjects.forEach((theme) => {
       const { tokensToCreate } = generateTokensToCreate({
-        theme, tokens, overallConfig, serverResolvedTokens: serverResolvedTokens?.[theme.id] ?? null,
+        theme, tokens, overallConfig, serverResolvedTokens: deltaFor(serverResolvedTokens, theme.id),
       });
       tokensToCreate.forEach((token) => {
         const figmaExtensions = token.$extensions?.['com.figma'] as FigmaExtensions;
@@ -145,7 +155,7 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
           progressTracker: globalProgressTracker,
           metadataUpdateTracker,
           providedPlatformsByVariable,
-          serverResolvedTokens: serverResolvedTokens?.[theme.id] ?? null,
+          serverResolvedTokens: deltaFor(serverResolvedTokens, theme.id),
         });
 
         figmaVariablesAfterCreate += allVariableObj.removedVariables.length;

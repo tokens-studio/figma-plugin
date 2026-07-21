@@ -23,12 +23,6 @@ const themes: ThemeObject[] = [
     group: 'Mode',
     selectedTokenSets: { core: TokenSetStatus.ENABLED, dark: TokenSetStatus.ENABLED },
   },
-  {
-    id: 'base-id',
-    name: 'Base',
-    group: 'Foundation',
-    selectedTokenSets: { foundation: TokenSetStatus.ENABLED },
-  },
 ];
 
 describe('fetchServerResolvedTokensPerTheme', () => {
@@ -43,7 +37,7 @@ describe('fetchServerResolvedTokensPerTheme', () => {
   });
 
   it('returns null when no themes are selected', async () => {
-    const result = await fetchServerResolvedTokensPerTheme([], { 'Mode': 'light-id' }, themes, CONTEXT);
+    const result = await fetchServerResolvedTokensPerTheme([], CONTEXT);
     expect(result).toBeNull();
     expect(fetchSpy).not.toHaveBeenCalled();
   });
@@ -55,12 +49,7 @@ describe('fetchServerResolvedTokensPerTheme', () => {
         : { 'color.bg': '#000000' }
     ));
 
-    const result = await fetchServerResolvedTokensPerTheme(
-      [themes[0], themes[1]],
-      { Mode: 'light-id' },
-      themes,
-      CONTEXT,
-    );
+    const result = await fetchServerResolvedTokensPerTheme([themes[0], themes[1]], CONTEXT);
 
     expect(fetchSpy).toHaveBeenCalledTimes(2);
     expect(result).toEqual({
@@ -69,75 +58,51 @@ describe('fetchServerResolvedTokensPerTheme', () => {
     });
   });
 
-  it('forces the target theme option for that theme, even when activeTheme picks another option in the same group', async () => {
+  it('sends ONLY the target theme\'s own group in themeSelections — no active-theme baseline', async () => {
     fetchSpy.mockResolvedValue({});
 
-    await fetchServerResolvedTokensPerTheme(
-      [themes[0], themes[1]],
-      { Mode: 'light-id' }, // active theme picks Light for Mode
-      themes,
-      CONTEXT,
-    );
+    await fetchServerResolvedTokensPerTheme([themes[0], themes[1]], CONTEXT);
 
-    const selections = fetchSpy.mock.calls.map((c) => c[0].themeSelections);
-    expect(selections[0]).toEqual({ Mode: 'Light' });
-    expect(selections[1]).toEqual({ Mode: 'Dark' });
+    expect(fetchSpy.mock.calls[0][0].themeSelections).toEqual({ Mode: 'Light' });
+    expect(fetchSpy.mock.calls[1][0].themeSelections).toEqual({ Mode: 'Dark' });
   });
 
-  it('layers active-theme selections for OTHER groups so the server has full context', async () => {
+  it('falls back to theme.name as group key when theme.group is absent (no internal-id leak)', async () => {
     fetchSpy.mockResolvedValue({});
+    const ungrouped: ThemeObject = {
+      id: 'ungrouped-id',
+      name: 'Solo',
+      selectedTokenSets: { core: TokenSetStatus.ENABLED },
+    };
 
-    await fetchServerResolvedTokensPerTheme(
-      [themes[1]], // export only Dark from group "Mode"
-      { Mode: 'light-id', Foundation: 'base-id' },
-      themes,
-      CONTEXT,
-    );
+    await fetchServerResolvedTokensPerTheme([ungrouped], CONTEXT);
 
-    expect(fetchSpy.mock.calls[0][0].themeSelections).toEqual({
-      Mode: 'Dark', // target theme's group overridden
-      Foundation: 'Base', // other group carried over from activeTheme
-    });
+    expect(fetchSpy.mock.calls[0][0].themeSelections).toEqual({ Solo: 'Solo' });
   });
 
   it('passes only ENABLED sets from each theme (excludes DISABLED)', async () => {
     fetchSpy.mockResolvedValue({});
 
-    await fetchServerResolvedTokensPerTheme(
-      [themes[0], themes[1]],
-      {},
-      themes,
-      CONTEXT,
-    );
+    await fetchServerResolvedTokensPerTheme([themes[0], themes[1]], CONTEXT);
 
     expect(fetchSpy.mock.calls[0][0].activeSets).toEqual(['core']);
     expect(fetchSpy.mock.calls[1][0].activeSets).toEqual(['core', 'dark']);
   });
 
-  it('skips null results from failed fetches and keeps the rest', async () => {
+  it('returns null (all-or-nothing) when any theme fetch fails, to avoid mixing server-resolved and local resolution across modes', async () => {
     fetchSpy
       .mockResolvedValueOnce({ 'color.bg': '#ffffff' })
       .mockResolvedValueOnce(null);
 
-    const result = await fetchServerResolvedTokensPerTheme(
-      [themes[0], themes[1]],
-      {},
-      themes,
-      CONTEXT,
-    );
+    const result = await fetchServerResolvedTokensPerTheme([themes[0], themes[1]], CONTEXT);
 
-    expect(result).toEqual({ 'light-id': { 'color.bg': '#ffffff' } });
+    expect(result).toBeNull();
   });
 
   it('returns null when every fetch fails', async () => {
     fetchSpy.mockResolvedValue(null);
 
-    const result = await fetchServerResolvedTokensPerTheme(
-      [themes[0], themes[1]],
-      {},
-      themes,
-      CONTEXT,
-    );
+    const result = await fetchServerResolvedTokensPerTheme([themes[0], themes[1]], CONTEXT);
 
     expect(result).toBeNull();
   });
@@ -145,7 +110,7 @@ describe('fetchServerResolvedTokensPerTheme', () => {
   it('forwards apiBaseUrl / projectId / changeSetId / authToken to the underlying fetch', async () => {
     fetchSpy.mockResolvedValue({});
 
-    await fetchServerResolvedTokensPerTheme([themes[0]], {}, themes, CONTEXT);
+    await fetchServerResolvedTokensPerTheme([themes[0]], CONTEXT);
 
     expect(fetchSpy).toHaveBeenCalledWith(
       expect.objectContaining({
