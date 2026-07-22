@@ -36,4 +36,28 @@ describe('convertFontFamilyToFigma', () => {
     const result = convertFontFamilyToFigma(value, true);
     expect(result).toBe('Arial');
   });
+
+  it('strips brackets and returns the first family for a JSON-array-shaped string', () => {
+    const value = '["Arial","Helvetica","sans-serif"]';
+    const result = convertFontFamilyToFigma(value, true);
+    expect(result).toBe('Arial');
+  });
+
+  it('strips brackets and returns the first family for an unquoted bracket list', () => {
+    const value = '[Arial, Helvetica, sans-serif]';
+    const result = convertFontFamilyToFigma(value, true);
+    expect(result).toBe('Arial');
+  });
+
+  it('strips brackets and returns the first family for a single-quoted bracket list', () => {
+    const value = "['Arial', 'Helvetica']";
+    const result = convertFontFamilyToFigma(value, true);
+    expect(result).toBe('Arial');
+  });
+
+  it('preserves brackets when shouldOutputForVariables is false', () => {
+    const value = '["Arial","Helvetica"]';
+    const result = convertFontFamilyToFigma(value, false);
+    expect(result).toBe(value);
+  });
 });

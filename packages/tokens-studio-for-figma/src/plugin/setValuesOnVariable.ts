@@ -235,7 +235,9 @@ export default async function setValuesOnVariable(
                   // hold a single string, so extract and take the first entry.
                   const trimmed = token.value.trim();
                   if (isFontMultiValueType && trimmed.startsWith('[') && trimmed.endsWith(']')) {
-                    const parsed = tryParseJson<unknown[]>(trimmed);
+                    // tryParseJson logs on failure; skip the attempt when the string clearly isn't JSON
+                    // (e.g. "[Arial, sans-serif]" or "['Arial']") to avoid noisy console errors.
+                    const parsed = trimmed.includes('"') ? tryParseJson<unknown[]>(trimmed) : null;
                     if (Array.isArray(parsed) && typeof parsed[0] === 'string') {
                       stringValue = parsed[0].trim();
                     } else {
