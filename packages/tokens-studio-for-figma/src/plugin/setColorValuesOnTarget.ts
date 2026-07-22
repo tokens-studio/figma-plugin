@@ -5,6 +5,7 @@ import { defaultTokenValueRetriever } from './TokenValueRetriever';
 import { ColorPaintType, tryApplyColorVariableId } from '@/utils/tryApplyColorVariableId';
 import { unbindVariableFromTarget } from './unbindVariableFromTarget';
 import { getReferenceTokensFromGradient } from '@/utils/color';
+import { gradientTokenToCss, isGradientTokenValue } from '@/utils/color/gradientTokenToCss';
 import { SingleToken } from '@/types/tokens';
 
 function hasModifier(token: SingleToken) {
@@ -25,13 +26,22 @@ const isGradient = (value: string): boolean => value?.startsWith?.('linear-gradi
   || value?.startsWith?.('conic-gradient');
 
 const getGradientPaint = async (fallbackValue, token) => {
-  const gradientString = typeof fallbackValue === 'object' && fallbackValue.fill
+  let gradientString = typeof fallbackValue === 'object' && fallbackValue.fill
     ? fallbackValue.fill
     : fallbackValue;
+  // Gradient-type tokens hold a structured value, flatten it to a CSS string
+  if (isGradientTokenValue(gradientString)) {
+    gradientString = gradientTokenToCss(gradientString);
+  }
   const gradientResult = convertStringToFigmaGradient(gradientString);
   const { gradientStops, gradientTransform, type } = gradientResult;
 
-  const rawValue = defaultTokenValueRetriever.get(token)?.rawValue;
+  let rawValue = defaultTokenValueRetriever.get(token)?.rawValue;
+  // Keep raw stop colors (incl. references) as a string so reference
+  // extraction below works for gradient-type tokens too
+  if (isGradientTokenValue(rawValue)) {
+    rawValue = gradientTokenToCss(rawValue);
+  }
   let gradientStopsWithReferences = gradientStops;
 
   const { createStylesWithVariableReferences } = defaultTokenValueRetriever;
@@ -90,7 +100,7 @@ export default async function setColorValuesOnTarget({
       existingPaint = target.strokes[0] ?? null;
     }
 
-    if (isGradient(resolvedValue)) {
+    if (isGradient(resolvedValue) || isGradientTokenValue(resolvedValue)) {
       const fallbackValue = defaultTokenValueRetriever.get(token)?.value;
       const newPaint = await getGradientPaint(fallbackValue, token);
       applyPaintIfNotEqual(key, existingPaint, newPaint, target);
@@ -117,7 +127,7 @@ export default async function setColorValuesOnTarget({
 
       if (!successfullyAppliedVariable) {
         let newPaint: SolidPaint | GradientPaint;
-        if (isGradient(valueToApply)) {
+        if (isGradient(valueToApply) || isGradientTokenValue(valueToApply)) {
           newPaint = await getGradientPaint(fallbackValue, token);
         } else {
           const { color, opacity } = convertToFigmaColor(typeof valueToApply === 'string' ? valueToApply : valueToApply?.color || givenValue || '');
