@@ -1,5 +1,18 @@
 # @tokens-studio/figma-plugin
 
+## 2.11.10
+
+### Patch Changes
+
+- e17e02d8c: Background blur tokens now bind the radius as a Figma variable instead of a static value, consistent with how box shadow effects handle variable binding.
+- c831c61a3: Fix tokens edited via the JSON editor not being persisted to local document storage, causing them to be lost when the plugin is closed and reopened
+- d90271f86: Fixed the loading bar getting stuck on "Hold on, updating…" after operations finished, especially when exporting variables on files with font-family tokens.
+- 97c55cafa: When you delete a token, we now ask you if you want to delete the associated variable in Figma
+- e15a93048: Color token modifiers are not available to Studio users, so the modifier section is now hidden when the active storage provider is Studio. Instead, Studio users would use TokenScript, read more at https://documentation-v2.tokens.studio/getting-started/glossary.html#schema-defined-function
+- 1c881fd40: Fixed tooltips sometimes getting stuck on screen after moving the cursor away.
+- c897e2ec2: We have updated our Terms and Conditions, which will come into effect on August 14th, 2026. The changes include adding a new Subprocessor (Render.com) and improvements around our license portal. This notice is dated July 15th, 2026.
+- 058256e01: Opacity modifier changes are now correctly detected in the sync diff and will appear as pending changes ready to commit.
+
 ## 2.11.9
 
 ### Patch Changes

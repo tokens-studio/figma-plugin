@@ -667,6 +667,7 @@ describe('Initiator', () => {
       autoApplyThemeOnDrop: false,
       seenGenericVersionedHeaderMigrationDialog: false,
       seenTermsUpdate2026: false,
+      seenTermsUpdate2026Subprocessors: false,
     });
   });
 
