@@ -265,6 +265,51 @@ describe('SetValuesOnVariable', () => {
     expect(mockSetValueForModeLocal).toHaveBeenCalledWith(mode, 'Bold');
   });
 
+  describe('array-shaped fontFamilies / fontWeights values', () => {
+    const buildStringVariable = (name: string, setValueForMode: jest.Mock) => ({
+      id: `VariableID:${name}:1`,
+      key: `${name}-key-1`,
+      name,
+      resolvedType: 'STRING',
+      description: '',
+      variableCollectionId: collection.id,
+      valuesByMode: { [mode]: 'Placeholder' },
+      scopes: ['ALL_SCOPES'] as VariableScope[],
+      setValueForMode,
+      setVariableCodeSyntax: jest.fn(),
+      remove: jest.fn(),
+    } as unknown as Variable);
+
+    // Note: JSON-array-shaped STRING values are normalized upstream by
+    // convertFontFamilyToFigma / convertFontWeightToFigma (see their own tests),
+    // so setValuesOnVariable only ever sees plain strings or actual arrays here.
+    const cases: { label: string; type: TokenTypes; value: unknown; expected: string }[] = [
+      {
+        label: 'FONT_FAMILIES real array', type: TokenTypes.FONT_FAMILIES, value: ['Arial', 'Helvetica', 'sans-serif'], expected: 'Arial',
+      },
+      {
+        label: 'FONT_WEIGHTS real array', type: TokenTypes.FONT_WEIGHTS, value: ['Bold', 'Regular'], expected: 'Bold',
+      },
+    ];
+
+    it.each(cases)('writes the first entry for $label', async ({ type, value, expected }) => {
+      const setValueForMode = jest.fn();
+      const variable = buildStringVariable('global/font', setValueForMode);
+
+      const tokens = [{
+        name: 'global.font',
+        path: 'global/font',
+        value,
+        rawValue: value,
+        type,
+        variableId: variable.key,
+      }];
+
+      await setValuesOnVariable([variable], tokens as any, collection, mode, baseFontSize);
+      expect(setValueForMode).toHaveBeenCalledWith(mode, expected);
+    });
+  });
+
   describe('Variable Scopes and Code Syntax Updates', () => {
     const mockSetVariableCodeSyntax = jest.fn();
     let testVariable: Variable;

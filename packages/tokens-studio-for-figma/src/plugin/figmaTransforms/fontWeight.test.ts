@@ -48,4 +48,26 @@ describe('fontWeight', () => {
       expect(convertFontWeightToFigma(fontWeight.input)).toEqual(fontWeight.output);
     });
   });
+
+  describe('shouldOutputForVariables', () => {
+    it('wraps a plain value in an array', () => {
+      expect(convertFontWeightToFigma('Bold', true)).toEqual(['Bold']);
+    });
+
+    it('strips brackets and returns the first weight for a JSON-array string', () => {
+      expect(convertFontWeightToFigma('["Bold","Regular"]', true)).toEqual(['Bold']);
+    });
+
+    it('strips brackets for an unquoted bracket list', () => {
+      expect(convertFontWeightToFigma('[Bold, Regular]', true)).toEqual(['Bold']);
+    });
+
+    it('strips brackets for a single-quoted bracket list', () => {
+      expect(convertFontWeightToFigma("['Bold', 'Regular']", true)).toEqual(['Bold']);
+    });
+
+    it('falls back to the raw value when the bracket list is empty', () => {
+      expect(convertFontWeightToFigma('[]', true)).toEqual(['[]']);
+    });
+  });
 });

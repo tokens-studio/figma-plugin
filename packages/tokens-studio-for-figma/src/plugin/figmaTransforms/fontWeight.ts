@@ -1,5 +1,14 @@
 export function convertFontWeightToFigma(value: string, shouldOutputForVariables = false): string[] {
   if (shouldOutputForVariables) {
+    // Studio's server resolver returns fontWeights as an array-shaped string
+    // (e.g. '["Bold","Regular"]'). Strip surrounding brackets and take the first
+    // entry so we don't end up writing the raw JSON literal to the variable.
+    const trimmed = value.trim();
+    if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+      const inner = trimmed.slice(1, -1);
+      const first = inner.split(',')[0]?.trim().replace(/^['"]|['"]$/g, '').trim() ?? '';
+      return [first.length > 0 ? first : value];
+    }
     return [value];
   }
 
