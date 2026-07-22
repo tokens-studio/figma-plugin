@@ -280,14 +280,16 @@ describe('SetValuesOnVariable', () => {
       remove: jest.fn(),
     } as unknown as Variable);
 
+    // Note: JSON-array-shaped STRING values are normalized upstream by
+    // convertFontFamilyToFigma / convertFontWeightToFigma (see their own tests),
+    // so setValuesOnVariable only ever sees plain strings or actual arrays here.
     const cases: { label: string; type: TokenTypes; value: unknown; expected: string }[] = [
-      { label: 'FONT_FAMILIES real array', type: TokenTypes.FONT_FAMILIES, value: ['Arial', 'Helvetica', 'sans-serif'], expected: 'Arial' },
-      { label: 'FONT_FAMILIES JSON-array string', type: TokenTypes.FONT_FAMILIES, value: '["Arial","Helvetica","sans-serif"]', expected: 'Arial' },
-      { label: 'FONT_FAMILIES single-quoted bracket string', type: TokenTypes.FONT_FAMILIES, value: "['Arial', 'Helvetica']", expected: 'Arial' },
-      { label: 'FONT_FAMILIES unquoted bracket string', type: TokenTypes.FONT_FAMILIES, value: '[Arial, Helvetica, sans-serif]', expected: 'Arial' },
-      { label: 'FONT_WEIGHTS real array', type: TokenTypes.FONT_WEIGHTS, value: ['Bold', 'Regular'], expected: 'Bold' },
-      { label: 'FONT_WEIGHTS JSON-array string', type: TokenTypes.FONT_WEIGHTS, value: '["Bold","Regular"]', expected: 'Bold' },
-      { label: 'FONT_WEIGHTS unquoted bracket string', type: TokenTypes.FONT_WEIGHTS, value: '[Bold, Regular]', expected: 'Bold' },
+      {
+        label: 'FONT_FAMILIES real array', type: TokenTypes.FONT_FAMILIES, value: ['Arial', 'Helvetica', 'sans-serif'], expected: 'Arial',
+      },
+      {
+        label: 'FONT_WEIGHTS real array', type: TokenTypes.FONT_WEIGHTS, value: ['Bold', 'Regular'], expected: 'Bold',
+      },
     ];
 
     it.each(cases)('writes the first entry for $label', async ({ type, value, expected }) => {

@@ -60,4 +60,10 @@ describe('convertFontFamilyToFigma', () => {
     const result = convertFontFamilyToFigma(value, false);
     expect(result).toBe(value);
   });
+
+  it('preserves a quoted family name containing a comma', () => {
+    const value = '["Font, Name","Arial"]';
+    const result = convertFontFamilyToFigma(value, true);
+    expect(result).toBe('Font, Name');
+  });
 });

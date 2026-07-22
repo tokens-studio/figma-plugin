@@ -11,7 +11,6 @@ import { transformValue } from './helpers';
 import { variableWorker } from './Worker';
 import { ProgressTracker } from './ProgressTracker';
 import { checkVariableAliasEquality } from '@/utils/checkVariableAliasEquality';
-import { tryParseJson } from '@/utils/tryParseJson';
 
 export type ReferenceVariableType = {
   variable: Variable;
@@ -229,35 +228,15 @@ export default async function setValuesOnVariable(
                 let stringValue: string | undefined;
 
                 if (typeof token.value === 'string' && !token.value.includes('{')) {
-                  // Studio's server-resolved fontFamilies/fontWeights arrive as an array-shaped string.
-                  // Usually JSON (e.g. '["Arial","Helvetica"]') but can also be single-quoted or unquoted
-                  // (e.g. "['Arial', 'Helvetica']" or "[Arial, Helvetica, sans-serif]"). Figma variables
-                  // hold a single string, so extract and take the first entry.
-                  const trimmed = token.value.trim();
-                  if (isFontMultiValueType && trimmed.startsWith('[') && trimmed.endsWith(']')) {
-                    // tryParseJson logs on failure; skip the attempt when the string clearly isn't JSON
-                    // (e.g. "[Arial, sans-serif]" or "['Arial']") to avoid noisy console errors.
-                    const parsed = trimmed.includes('"') ? tryParseJson<unknown[]>(trimmed) : null;
-                    if (Array.isArray(parsed) && typeof parsed[0] === 'string') {
-                      stringValue = parsed[0].trim();
-                    } else {
-                      const inner = trimmed.slice(1, -1);
-                      const firstRaw = inner.split(',')[0]?.trim() ?? '';
-                      const firstUnquoted = firstRaw.replace(/^['"]|['"]$/g, '').trim();
-                      stringValue = firstUnquoted.length > 0 ? firstUnquoted : token.value;
-                    }
-                  } else {
-                    stringValue = token.value;
-                  }
+                  stringValue = token.value;
                   // Given we cannot determine the combined family of a variable, we cannot use fallback weights from our estimates.
                   // This is not an issue because users can set numerical font weights with variables, so we opt-out of the guesswork and just apply the numerical weight.
-                } else if (
-                  isFontMultiValueType
-                  && Array.isArray(token.value)
-                  && typeof token.value[0] === 'string'
-                ) {
-                  // Local/JSON-resolved multi-value fonts arrive as an actual array.
-                  stringValue = token.value[0];
+                } else if (isFontMultiValueType && Array.isArray(token.value) && token.value[0] !== undefined) {
+                  // Multi-value fonts arrive here as an actual array (either resolved locally, or
+                  // wrapped by transformValue → convertFontFamilyToFigma / convertFontWeightToFigma).
+                  // Figma variables hold a single string, so take the first entry and coerce
+                  // (numeric font weights on a STRING variable were previously written as-is).
+                  stringValue = String(token.value[0]);
                 }
 
                 if (stringValue !== undefined) {
