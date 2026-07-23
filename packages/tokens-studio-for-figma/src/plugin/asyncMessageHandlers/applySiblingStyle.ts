@@ -4,6 +4,7 @@ import { StyleIdMap, StyleThemeMap } from '@/types/StyleIdMap';
 // Goes through all styleable properties of a node and swaps the style - this traverses the whole tree of a node
 export async function applySiblingStyleId(node: BaseNode, styleIds: StyleIdMap, styleMap: StyleThemeMap, activeThemes: string[]) {
   try {
+    if (node.removed) return;
     switch (node.type) {
       // Text layers can have stroke, effects and fill styles.
       case 'TEXT':
@@ -80,7 +81,7 @@ export async function applySiblingStyleId(node: BaseNode, styleIds: StyleIdMap, 
             node.effectStyleId = newEffectStyleId;
           }
           if (['COMPONENT', 'COMPONENT_SET', 'SECTION', 'INSTANCE', 'FRAME', 'SLOT', 'BOOLEAN_OPERATION'].includes(node.type) && 'children' in node) {
-            await Promise.all(node.children.map((child) => applySiblingStyleId(child, styleIds, styleMap, activeThemes)));
+            await Promise.all(node.children.filter((child) => !child.removed).map((child) => applySiblingStyleId(child, styleIds, styleMap, activeThemes)));
           }
         }
         break;
