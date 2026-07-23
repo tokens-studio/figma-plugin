@@ -169,7 +169,10 @@ export default function TokenSetTree({
         if (itemIsCollapsed && !item.isLeaf) {
           // also include all children
           return acc.concat(items.filter((possibleChild) => (
-            possibleChild.parent && possibleChild.parent.startsWith(item.path)
+            possibleChild.parent && (
+              possibleChild.parent === item.path
+              || possibleChild.parent.startsWith(`${item.path}/`)
+            )
           )));
         }
       }
