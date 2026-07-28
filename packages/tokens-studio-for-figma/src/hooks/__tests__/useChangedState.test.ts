@@ -1,5 +1,6 @@
 import { renderHook } from '@testing-library/react';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import { findDifferentState } from '@/utils/findDifferentState';
 
 import { useChangedState } from '../useChangedState';
 
@@ -10,11 +11,12 @@ const mockDispatch = {
   },
 };
 
-const mockTokens = {};
+let mockTokens: Record<string, unknown[]> = {};
 const mockThemes = [];
 let mockStorageType = { provider: StorageProviderType.LOCAL };
 const mockLastSyncedState = null;
 const mockTokenFormat = 'dtcg';
+let mockTokenSetMetadata: Record<string, unknown> = {};
 
 jest.mock('react-redux', () => ({
   useDispatch: () => mockDispatch,
@@ -24,7 +26,7 @@ jest.mock('react-redux', () => ({
       themes: mockThemes,
       lastSyncedState: mockLastSyncedState,
       tokenFormat: mockTokenFormat,
-      tokenSetMetadata: {},
+      tokenSetMetadata: mockTokenSetMetadata,
     },
     uiState: {
       storageType: mockStorageType,
@@ -57,9 +59,14 @@ jest.mock('@/utils/findDifferentState', () => ({
 }));
 
 describe('useChangedState', () => {
+  const findDifferentStateMock = findDifferentState as jest.Mock;
+
   beforeEach(() => {
     mockUpdateCheckForChanges.mockClear();
+    findDifferentStateMock.mockClear();
     mockStorageType = { provider: StorageProviderType.LOCAL };
+    mockTokens = {};
+    mockTokenSetMetadata = {};
   });
 
   it('dispatches hasChanges=true for LOCAL provider when state differs from lastSyncedState', () => {
@@ -75,4 +82,63 @@ describe('useChangedState', () => {
     expect(mockUpdateCheckForChanges).not.toHaveBeenCalledWith(true);
   });
 
+  describe('buildMetadata shape passed to findDifferentState', () => {
+    // The push-path metadata must match what the provider actually writes to disk.
+    // Git providers persist only { tokenSetOrder }; including tokenSetsData produced a
+    // permanent metadata diff that caused empty commits (see #<PR>).
+    const gitProviders = [
+      StorageProviderType.GITHUB,
+      StorageProviderType.GITLAB,
+      StorageProviderType.ADO,
+      StorageProviderType.BITBUCKET,
+    ];
+
+    beforeEach(() => {
+      mockTokens = { core: [], semantic: [] };
+      mockTokenSetMetadata = { core: { isDynamic: false }, semantic: { isDynamic: true } };
+    });
+
+    gitProviders.forEach((provider) => {
+      it(`passes { tokenSetOrder } only for ${provider} (no tokenSetsData)`, () => {
+        mockStorageType = { provider };
+        renderHook(() => useChangedState());
+
+        // Both push (compareState arg) and pull (baseState arg) calls should have the trimmed shape.
+        expect(findDifferentStateMock).toHaveBeenCalled();
+        const pushCall = findDifferentStateMock.mock.calls[0];
+        const pullCall = findDifferentStateMock.mock.calls[1];
+
+        expect(pushCall[1].metadata).toEqual({ tokenSetOrder: ['core', 'semantic'] });
+        expect(pushCall[1].metadata).not.toHaveProperty('tokenSetsData');
+
+        expect(pullCall[0].metadata).toEqual({ tokenSetOrder: ['core', 'semantic'] });
+        expect(pullCall[0].metadata).not.toHaveProperty('tokenSetsData');
+      });
+    });
+
+    it('passes { tokenSetOrder, tokenSetsData } for TOKENS_STUDIO_OAUTH', () => {
+      mockStorageType = { provider: StorageProviderType.TOKENS_STUDIO_OAUTH };
+      renderHook(() => useChangedState());
+
+      const pushCall = findDifferentStateMock.mock.calls[0];
+      const pullCall = findDifferentStateMock.mock.calls[1];
+
+      expect(pushCall[1].metadata).toEqual({
+        tokenSetOrder: ['core', 'semantic'],
+        tokenSetsData: mockTokenSetMetadata,
+      });
+      expect(pullCall[0].metadata).toEqual({
+        tokenSetOrder: ['core', 'semantic'],
+        tokenSetsData: mockTokenSetMetadata,
+      });
+    });
+
+    it('passes empty metadata for LOCAL provider', () => {
+      mockStorageType = { provider: StorageProviderType.LOCAL };
+      renderHook(() => useChangedState());
+
+      const pushCall = findDifferentStateMock.mock.calls[0];
+      expect(pushCall[1].metadata).toEqual({});
+    });
+  });
 });
