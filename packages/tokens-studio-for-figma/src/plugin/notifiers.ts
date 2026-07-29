@@ -95,6 +95,7 @@ export type SavedSettings = {
   autoApplyThemeOnDrop: boolean;
   seenGenericVersionedHeaderMigrationDialog?: boolean;
   seenTermsUpdate2026?: boolean;
+  seenTermsUpdate2026Subprocessors?: boolean;
 };
 
 export function notifyUISettings(
@@ -132,6 +133,7 @@ export function notifyUISettings(
     removeStylesAndVariablesWithoutConnection,
     seenGenericVersionedHeaderMigrationDialog,
     seenTermsUpdate2026,
+    seenTermsUpdate2026Subprocessors,
   }: SavedSettings,
 ) {
   postToUI({
@@ -171,6 +173,7 @@ export function notifyUISettings(
       removeStylesAndVariablesWithoutConnection,
       seenGenericVersionedHeaderMigrationDialog,
       seenTermsUpdate2026,
+      seenTermsUpdate2026Subprocessors,
     },
   });
   postToUI({

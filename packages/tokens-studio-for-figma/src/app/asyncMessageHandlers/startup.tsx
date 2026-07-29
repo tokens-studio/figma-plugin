@@ -12,6 +12,7 @@ import { RootState, store } from '../store';
 import { AppContainer } from '../components/AppContainer';
 import PreviewApp from '../preview/preview';
 import FigmaLoading from '../components/FigmaLoading';
+import TooltipWatchdog from '../components/TooltipWatchdog';
 
 // eslint-disable-next-line
 const PREVIEW_ENV = process.env.PREVIEW_ENV;
@@ -63,6 +64,7 @@ export const startup = async () => {
     <Sentry.ErrorBoundary fallback={ErrorFallback}>
       <Provider store={store}>
         <Tooltip.Provider>
+          <TooltipWatchdog />
           <StartupApp />
         </Tooltip.Provider>
       </Provider>

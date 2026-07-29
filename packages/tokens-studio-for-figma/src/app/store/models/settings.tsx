@@ -58,6 +58,7 @@ export interface SettingsState {
   autoApplyThemeOnDrop?: boolean;
   seenGenericVersionedHeaderMigrationDialog?: boolean;
   seenTermsUpdate2026?: boolean;
+  seenTermsUpdate2026Subprocessors?: boolean;
 }
 
 const setUI = (state: SettingsState) => {
@@ -76,6 +77,7 @@ export const settings = createModel<RootModel>()({
     },
     seenGenericVersionedHeaderMigrationDialog: false,
     seenTermsUpdate2026: false,
+    seenTermsUpdate2026Subprocessors: false,
     language: 'en',
     sessionRecording: false,
     updateMode: UpdateMode.SELECTION,
@@ -247,6 +249,12 @@ export const settings = createModel<RootModel>()({
         seenTermsUpdate2026: payload,
       };
     },
+    setSeenTermsUpdate2026Subprocessors(state, payload: boolean) {
+      return {
+        ...state,
+        seenTermsUpdate2026Subprocessors: payload,
+      };
+    },
     setSeenGenericVersionedHeaderMigrationDialog(state, payload: boolean) {
       return {
         ...state,
@@ -319,6 +327,9 @@ export const settings = createModel<RootModel>()({
       setUI(rootState.settings);
     },
     setSeenTermsUpdate2026: (payload: boolean, rootState) => {
+      setUI(rootState.settings);
+    },
+    setSeenTermsUpdate2026Subprocessors: (payload: boolean, rootState) => {
       setUI(rootState.settings);
     },
     ...Object.fromEntries(

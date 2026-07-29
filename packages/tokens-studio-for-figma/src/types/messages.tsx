@@ -74,6 +74,7 @@ export type UiSettingsFromPluginMessage = {
     tokenFormat: TokenFormatOptions;
     seenGenericVersionedHeaderMigrationDialog?: boolean;
     seenTermsUpdate2026?: boolean;
+    seenTermsUpdate2026Subprocessors?: boolean;
   };
 };
 
