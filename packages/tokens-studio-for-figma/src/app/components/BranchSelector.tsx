@@ -138,6 +138,13 @@ export default function BranchSelector() {
           // one. The stale `apiData` closure still holds the old branch's changeSetId,
           // so we must not spread it back over the freshly resolved value.
           const changeSetId = remoteData?.status === 'success' ? remoteData.metadata?.changeSetId : undefined;
+          if (isTokensStudioProvider && !changeSetId) {
+            // We couldn't resolve the new branch's change set (e.g. the pull failed).
+            // Don't switch the branch context: doing so would leave writes scoped to the
+            // previous branch's changeSetId (or, if cleared, to the server default) — either
+            // way silently targeting the wrong branch. pullTokens has already surfaced the error.
+            return;
+          }
           const nextApiData = { ...apiData, branch, ...(changeSetId ? { changeSetId } : {}) } as StorageTypeCredentials;
           // Now update UI state to show the new branch with already-loaded tokens
           setCurrentBranch(branch);
