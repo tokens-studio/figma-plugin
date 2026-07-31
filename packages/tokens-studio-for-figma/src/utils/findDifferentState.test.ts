@@ -98,7 +98,9 @@ describe('findDifferentState', () => {
     const result = findDifferentState(baseState, compareState);
 
     expect(result.tokens.set1).toEqual([
-      expect.objectContaining({ name: 'token1', value: '#00ff00', oldValue: '#ff0000', importType: 'UPDATE' }),
+      expect.objectContaining({
+        name: 'token1', value: '#00ff00', oldValue: '#ff0000', importType: 'UPDATE',
+      }),
     ]);
   });
 
@@ -106,8 +108,12 @@ describe('findDifferentState', () => {
     const baseState: CompareStateType = {
       tokens: {
         set1: [
-          { name: 'token1', value: 'value1', description: '', type: TokenTypes.COLOR },
-          { name: 'token2', value: 'value2', description: '', type: TokenTypes.COLOR },
+          {
+            name: 'token1', value: 'value1', description: '', type: TokenTypes.COLOR,
+          },
+          {
+            name: 'token2', value: 'value2', description: '', type: TokenTypes.COLOR,
+          },
         ],
       },
       themes: [],
@@ -115,7 +121,9 @@ describe('findDifferentState', () => {
     };
     const compareState: CompareStateType = {
       tokens: {
-        set1: [{ name: 'token1', value: 'value1', description: '', type: TokenTypes.COLOR }],
+        set1: [{
+          name: 'token1', value: 'value1', description: '', type: TokenTypes.COLOR,
+        }],
       },
       themes: [],
       metadata: null,
@@ -195,7 +203,9 @@ describe('findDifferentState', () => {
   it('detects when opacity modifier is added to a token', () => {
     const baseState: CompareStateType = {
       tokens: {
-        set1: [{ name: 'color.primary', value: '#ff0000', description: '', type: TokenTypes.COLOR }],
+        set1: [{
+          name: 'color.primary', value: '#ff0000', description: '', type: TokenTypes.COLOR,
+        }],
       },
       themes: [],
       metadata: null,
@@ -236,7 +246,9 @@ describe('findDifferentState', () => {
     };
     const compareState: CompareStateType = {
       tokens: {
-        set1: [{ name: 'color.primary', value: '#ff0000', description: '', type: TokenTypes.COLOR }],
+        set1: [{
+          name: 'color.primary', value: '#ff0000', description: '', type: TokenTypes.COLOR,
+        }],
       },
       themes: [],
       metadata: null,
@@ -246,5 +258,111 @@ describe('findDifferentState', () => {
 
     expect(result.tokens.set1).toHaveLength(1);
     expect(result.tokens.set1[0]).toMatchObject({ name: 'color.primary', importType: 'UPDATE' });
+  });
+
+  it('does not report tokenSetChanges when the same sets exist on both sides', () => {
+    const baseState: CompareStateType = {
+      tokens: {
+        set1: [{
+          name: 'token1', value: 'value1', description: '', type: TokenTypes.COLOR,
+        }],
+      },
+      themes: [],
+      metadata: null,
+    };
+    const compareState: CompareStateType = {
+      tokens: {
+        set1: [{
+          name: 'token1', value: 'value2', description: '', type: TokenTypes.COLOR,
+        }],
+      },
+      themes: [],
+      metadata: null,
+    };
+
+    const result = findDifferentState(baseState, compareState);
+
+    expect(result.tokenSetChanges).toBeUndefined();
+  });
+
+  it('marks a newly added empty token set as a NEW set-level change', () => {
+    const baseState: CompareStateType = {
+      tokens: {
+        set1: [{
+          name: 'token1', value: 'value1', description: '', type: TokenTypes.COLOR,
+        }],
+      },
+      themes: [],
+      metadata: { tokenSetOrder: ['set1'] },
+    };
+    const compareState: CompareStateType = {
+      tokens: {
+        set1: [{
+          name: 'token1', value: 'value1', description: '', type: TokenTypes.COLOR,
+        }],
+        emptySet: [],
+      },
+      themes: [],
+      metadata: { tokenSetOrder: ['set1', 'emptySet'] },
+    };
+
+    const result = findDifferentState(baseState, compareState);
+
+    expect(result.tokenSetChanges).toEqual({ emptySet: 'NEW' });
+    // no token-level changes exist for an empty set
+    expect(result.tokens.emptySet).toBeUndefined();
+  });
+
+  it('marks a removed empty token set as a REMOVE set-level change', () => {
+    const baseState: CompareStateType = {
+      tokens: {
+        set1: [{
+          name: 'token1', value: 'value1', description: '', type: TokenTypes.COLOR,
+        }],
+        emptySet: [],
+      },
+      themes: [],
+      metadata: { tokenSetOrder: ['set1', 'emptySet'] },
+    };
+    const compareState: CompareStateType = {
+      tokens: {
+        set1: [{
+          name: 'token1', value: 'value1', description: '', type: TokenTypes.COLOR,
+        }],
+      },
+      themes: [],
+      metadata: { tokenSetOrder: ['set1'] },
+    };
+
+    const result = findDifferentState(baseState, compareState);
+
+    expect(result.tokenSetChanges).toEqual({ emptySet: 'REMOVE' });
+  });
+
+  it('marks added and removed non-empty token sets at the set level alongside token changes', () => {
+    const baseState: CompareStateType = {
+      tokens: {
+        oldSet: [{
+          name: 'token1', value: 'value1', description: '', type: TokenTypes.COLOR,
+        }],
+      },
+      themes: [],
+      metadata: null,
+    };
+    const compareState: CompareStateType = {
+      tokens: {
+        newSet: [{
+          name: 'token2', value: 'value2', description: '', type: TokenTypes.COLOR,
+        }],
+      },
+      themes: [],
+      metadata: null,
+    };
+
+    const result = findDifferentState(baseState, compareState);
+
+    expect(result.tokenSetChanges).toEqual({ newSet: 'NEW', oldSet: 'REMOVE' });
+    expect(result.tokens.newSet).toEqual([expect.objectContaining({ name: 'token2', importType: 'NEW' })]);
+    expect(result.tokens.oldSet).toEqual([expect.objectContaining({ name: 'token1', importType: 'REMOVE' })]);
   });
 });
