@@ -129,18 +129,30 @@ export default function BranchSelector() {
           // Clear local token state BEFORE pulling to prevent bleed
           dispatch.tokenState.setEmptyTokens();
           // Pull tokens from new branch BEFORE switching UI state
-          await pullTokens({
+          const remoteData = await pullTokens({
             context: { ...apiData, branch }, usedTokenSet, activeTheme, updateLocalTokens: true, skipConfirmation: true,
           });
+          // The Tokens Studio backend identifies a branch by changeSetId, not by name.
+          // Carry over the changeSetId the pull just resolved for `branch`, otherwise
+          // writes keep targeting whichever branch was selected at connect time.
+          const changeSetId = isTokensStudioProvider && remoteData?.status === 'success'
+            ? remoteData.metadata?.changeSetId
+            : undefined;
+          const updatedApiData = {
+            ...apiData, branch, ...(changeSetId ? { changeSetId } : {}),
+          } as StorageTypeCredentials;
+          const updatedLocalApiState = {
+            ...localApiState, branch, ...(changeSetId ? { changeSetId } : {}),
+          } as StorageTypeCredentials;
           // Now update UI state to show the new branch with already-loaded tokens
           setCurrentBranch(branch);
-          dispatch.uiState.setApiData({ ...apiData, branch });
-          dispatch.uiState.setLocalApiState({ ...localApiState, branch });
+          dispatch.uiState.setApiData(updatedApiData);
+          dispatch.uiState.setLocalApiState(updatedLocalApiState);
           AsyncMessageChannel.ReactInstance.message({
             type: AsyncMessageTypes.CREDENTIALS,
-            credential: { ...apiData, branch },
+            credential: updatedApiData,
           });
-          setStorageType({ provider: { ...apiData, branch } as StorageTypeCredentials, shouldSetInDocument: true });
+          setStorageType({ provider: updatedApiData, shouldSetInDocument: true });
         } finally {
           setIsSwitchingBranch(false);
         }
