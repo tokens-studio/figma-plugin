@@ -23,7 +23,9 @@ export function findDifferentState(baseState: CompareStateType, compareState: Co
   const entries: [string, ImportToken[]][] = [];
   const tokenSetChanges: Record<string, TokenSetChangeType> = {};
   Object.entries(compareState.tokens)?.forEach(([tokenSet, values]) => {
-    if (typeof baseState.tokens[tokenSet] === 'undefined') {
+    // Only track empty new sets in tokenSetChanges — non-empty sets produce
+    // NEW token entries that are already visible to the GitSyncOptimizer.
+    if (typeof baseState.tokens[tokenSet] === 'undefined' && values.length === 0) {
       tokenSetChanges[tokenSet] = 'NEW';
     }
     const newTokens: ImportToken[] = [];
@@ -67,7 +69,11 @@ export function findDifferentState(baseState: CompareStateType, compareState: Co
   Object.entries(baseState.tokens).forEach(([tokenSet, values]) => {
     const isTokenSetRemoved = typeof compareState.tokens[tokenSet] === 'undefined';
     if (isTokenSetRemoved) {
-      tokenSetChanges[tokenSet] = 'REMOVE';
+      // Only track empty removed sets in tokenSetChanges — non-empty sets produce
+      // REMOVE token entries that are already visible to the GitSyncOptimizer.
+      if (values.length === 0) {
+        tokenSetChanges[tokenSet] = 'REMOVE';
+      }
       entries.push([tokenSet, values.map((token) => ({ ...token, importType: 'REMOVE' }))]);
     }
   });

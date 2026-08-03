@@ -339,7 +339,9 @@ describe('findDifferentState', () => {
     expect(result.tokenSetChanges).toEqual({ emptySet: 'REMOVE' });
   });
 
-  it('marks added and removed non-empty token sets at the set level alongside token changes', () => {
+  it('does NOT add non-empty sets to tokenSetChanges — their token entries are sufficient', () => {
+    // Non-empty added/removed sets already produce token-level NEW/REMOVE entries
+    // visible to the GitSyncOptimizer; tokenSetChanges is reserved for empty sets only.
     const baseState: CompareStateType = {
       tokens: {
         oldSet: [{
@@ -361,7 +363,8 @@ describe('findDifferentState', () => {
 
     const result = findDifferentState(baseState, compareState);
 
-    expect(result.tokenSetChanges).toEqual({ newSet: 'NEW', oldSet: 'REMOVE' });
+    // tokenSetChanges should be undefined — non-empty sets are already visible via token entries
+    expect(result.tokenSetChanges).toBeUndefined();
     expect(result.tokens.newSet).toEqual([expect.objectContaining({ name: 'token2', importType: 'NEW' })]);
     expect(result.tokens.oldSet).toEqual([expect.objectContaining({ name: 'token1', importType: 'REMOVE' })]);
   });
