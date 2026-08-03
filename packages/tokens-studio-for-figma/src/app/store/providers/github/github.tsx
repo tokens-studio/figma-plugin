@@ -75,7 +75,10 @@ export function useGitHub() {
 
         // Check if we should use optimized multi-file sync
         const isMultiFileMode = isProUser && context.filePath && !context.filePath.endsWith('.json');
-        const hasChanges = Object.keys(changedPushState.tokens).length > 0 || changedPushState.themes.length > 0 || changedPushState.metadata;
+        const hasChanges = Object.keys(changedPushState.tokens).length > 0
+          || changedPushState.themes.length > 0
+          || !!changedPushState.metadata
+          || !!changedPushState.tokenSetChanges;
 
         if (isMultiFileMode && hasChanges) {
           // Use the optimized save method for multi-file mode
@@ -90,6 +93,7 @@ export function useGitHub() {
             tokens: changedPushState.tokens,
             themes: changedPushState.themes,
             metadata: changedPushState.metadata || null,
+            tokenSetChanges: changedPushState.tokenSetChanges,
           });
         } else {
           await storage.save({
