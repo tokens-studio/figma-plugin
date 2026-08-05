@@ -748,9 +748,17 @@ export default function useTokens() {
                 authToken: oauthTokens.accessToken,
               },
             );
-            // Bail out of the write if the user switched projects mid-fetch —
-            // our snapshot no longer describes current state.
-            if (serverResolverContext?.projectId !== snapshotContext.projectId) {
+            // Bail out of the write if the user switched project/change-set
+            // mid-fetch — our snapshot no longer describes current state. Read
+            // the LIVE context from the store (not the closure-captured
+            // `serverResolverContext`, which is frozen to the snapshot value
+            // and can never detect an in-flight switch).
+            const liveContext = store.getState().tokenState.serverResolverContext;
+            if (
+              liveContext?.projectId !== snapshotContext.projectId
+              || liveContext?.changeSetId !== snapshotContext.changeSetId
+              || liveContext?.apiBaseUrl !== snapshotContext.apiBaseUrl
+            ) {
               return;
             }
           }
@@ -792,7 +800,7 @@ export default function useTokens() {
         dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
       }
     },
-    [dispatch.tokenState, dispatch.uiState, tokens, settings, storageType, serverResolverContext, themes],
+    [dispatch.tokenState, dispatch.uiState, tokens, settings, storageType, serverResolverContext, themes, store],
   );
 
   const renameVariablesFromToken = useCallback(
