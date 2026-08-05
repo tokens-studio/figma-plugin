@@ -223,27 +223,15 @@ export default async function setValuesOnVariable(
                 }
                 break;
               }
-              case 'STRING': {
-                const isFontMultiValueType = token.type === TokenTypes.FONT_WEIGHTS || token.type === TokenTypes.FONT_FAMILIES;
-                let stringValue: string | undefined;
-
+              case 'STRING':
                 if (typeof token.value === 'string' && !token.value.includes('{')) {
-                  stringValue = token.value;
+                  setStringValuesOnVariable(variable, mode, token.value, hasMetadataChanged);
                   // Given we cannot determine the combined family of a variable, we cannot use fallback weights from our estimates.
                   // This is not an issue because users can set numerical font weights with variables, so we opt-out of the guesswork and just apply the numerical weight.
-                } else if (isFontMultiValueType && Array.isArray(token.value) && token.value[0] !== undefined) {
-                  // Multi-value fonts arrive here as an actual array (either resolved locally, or
-                  // wrapped by transformValue → convertFontFamilyToFigma / convertFontWeightToFigma).
-                  // Figma variables hold a single string, so take the first entry and coerce
-                  // (numeric font weights on a STRING variable were previously written as-is).
-                  stringValue = String(token.value[0]);
-                }
-
-                if (stringValue !== undefined) {
-                  setStringValuesOnVariable(variable, mode, stringValue, hasMetadataChanged);
+                } else if (token.type === TokenTypes.FONT_WEIGHTS && Array.isArray(token.value)) {
+                  setStringValuesOnVariable(variable, mode, token.value[0], hasMetadataChanged);
                 }
                 break;
-              }
               default:
                 break;
             }
