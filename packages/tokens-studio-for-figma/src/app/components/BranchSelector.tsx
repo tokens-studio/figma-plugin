@@ -129,18 +129,32 @@ export default function BranchSelector() {
           // Clear local token state BEFORE pulling to prevent bleed
           dispatch.tokenState.setEmptyTokens();
           // Pull tokens from new branch BEFORE switching UI state
-          await pullTokens({
+          const remoteData = await pullTokens({
             context: { ...apiData, branch }, usedTokenSet, activeTheme, updateLocalTokens: true, skipConfirmation: true,
           });
+          // For Tokens Studio, the branch is identified by its changeSetId, which
+          // pullTokens resolves for the newly selected branch. Carry it forward so
+          // subsequent edits (e.g. deletes) target this branch and not the previous
+          // one. The stale `apiData` closure still holds the old branch's changeSetId,
+          // so we must not spread it back over the freshly resolved value.
+          const changeSetId = remoteData?.status === 'success' ? remoteData.metadata?.changeSetId : undefined;
+          if (isTokensStudioProvider && !changeSetId) {
+            // We couldn't resolve the new branch's change set (e.g. the pull failed).
+            // Don't switch the branch context: doing so would leave writes scoped to the
+            // previous branch's changeSetId (or, if cleared, to the server default) — either
+            // way silently targeting the wrong branch. pullTokens has already surfaced the error.
+            return;
+          }
+          const nextApiData = { ...apiData, branch, ...(changeSetId ? { changeSetId } : {}) } as StorageTypeCredentials;
           // Now update UI state to show the new branch with already-loaded tokens
           setCurrentBranch(branch);
-          dispatch.uiState.setApiData({ ...apiData, branch });
+          dispatch.uiState.setApiData(nextApiData);
           dispatch.uiState.setLocalApiState({ ...localApiState, branch });
           AsyncMessageChannel.ReactInstance.message({
             type: AsyncMessageTypes.CREDENTIALS,
-            credential: { ...apiData, branch },
+            credential: nextApiData,
           });
-          setStorageType({ provider: { ...apiData, branch } as StorageTypeCredentials, shouldSetInDocument: true });
+          setStorageType({ provider: nextApiData, shouldSetInDocument: true });
         } finally {
           setIsSwitchingBranch(false);
         }
