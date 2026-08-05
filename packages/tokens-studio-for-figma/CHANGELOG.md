@@ -1,5 +1,11 @@
 # @tokens-studio/figma-plugin
 
+## 2.11.11
+
+### Patch Changes
+
+- 7d16e24d9: Fixed a bug where switching branches in the Studio provider could apply token edits to the previously selected branch instead of the one shown in the plugin.
+
 ## 2.11.10
 
 ### Patch Changes
