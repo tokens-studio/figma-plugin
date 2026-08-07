@@ -1,4 +1,4 @@
-import { useMemo, useEffect } from 'react';
+import { useCallback, useMemo, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   lastSyncedStateSelector,
@@ -23,14 +23,25 @@ export function useChangedState() {
   const tokenSetMetadata = useSelector(tokenSetMetadataSelector);
   const dispatch = useDispatch();
 
+  // Only Tokens Studio OAuth persists tokenSetsData in its metadata payload; git-based
+  // providers write only { tokenSetOrder }, so including tokenSetsData here would produce
+  // a permanent metadata diff (baseState from remote lacks it), triggering empty pushes.
+  const buildMetadata = useCallback((tokenSetOrder: string[]) => {
+    if (storageType.provider === StorageProviderType.LOCAL) return {};
+    if (storageType.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
+      return { tokenSetOrder, tokenSetsData: tokenSetMetadata };
+    }
+    return { tokenSetOrder };
+  }, [storageType.provider, tokenSetMetadata]);
+
   const changedPushState = useMemo(() => {
     const tokenSetOrder = Object.keys(tokens);
     return findDifferentState(remoteData, {
       tokens,
       themes,
-      metadata: storageType.provider !== StorageProviderType.LOCAL ? { tokenSetOrder, tokenSetsData: tokenSetMetadata } : {},
+      metadata: buildMetadata(tokenSetOrder),
     });
-  }, [remoteData, tokens, themes, storageType, tokenSetMetadata]);
+  }, [remoteData, tokens, themes, buildMetadata]);
 
   const changedPullState = useMemo(() => {
     const tokenSetOrder = Object.keys(tokens);
@@ -38,11 +49,11 @@ export function useChangedState() {
       {
         tokens,
         themes,
-        metadata: storageType.provider !== StorageProviderType.LOCAL ? { tokenSetOrder, tokenSetsData: tokenSetMetadata } : {},
+        metadata: buildMetadata(tokenSetOrder),
       },
       remoteData,
     );
-  }, [remoteData, tokens, themes, storageType, tokenSetMetadata]);
+  }, [remoteData, tokens, themes, buildMetadata]);
 
   const hasChanges = useMemo(() => {
     const hasChanged = !compareLastSyncedState(tokens, themes, lastSyncedState, tokenFormat);

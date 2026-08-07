@@ -24,6 +24,7 @@ import { PushOverrides } from '../../remoteTokens';
 import { useIsProUser } from '@/app/hooks/useIsProUser';
 import { categorizeError } from '@/utils/error/categorizeError';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
+import removeIdPropertyFromTokens from '@/utils/removeIdPropertyFromTokens';
 
 type GithubCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITHUB; }>;
 type GithubFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITHUB }>;
@@ -74,7 +75,10 @@ export function useGitHub() {
 
         // Check if we should use optimized multi-file sync
         const isMultiFileMode = isProUser && context.filePath && !context.filePath.endsWith('.json');
-        const hasChanges = Object.keys(changedPushState.tokens).length > 0 || changedPushState.themes.length > 0 || changedPushState.metadata;
+        const hasChanges = Object.keys(changedPushState.tokens).length > 0
+          || changedPushState.themes.length > 0
+          || !!changedPushState.metadata
+          || !!changedPushState.tokenSetChanges;
 
         if (isMultiFileMode && hasChanges) {
           // Use the optimized save method for multi-file mode
@@ -89,6 +93,7 @@ export function useGitHub() {
             tokens: changedPushState.tokens,
             themes: changedPushState.themes,
             metadata: changedPushState.metadata || null,
+            tokenSetChanges: changedPushState.tokenSetChanges,
           });
         } else {
           await storage.save({
@@ -115,7 +120,7 @@ export function useGitHub() {
           themes,
           metadata,
         });
-        const stringifiedRemoteTokens = JSON.stringify(compact([tokens, themes, TokenFormat.format]), null, 2);
+        const stringifiedRemoteTokens = JSON.stringify(compact([removeIdPropertyFromTokens(tokens), themes, TokenFormat.format]), null, 2);
         dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
         pushDialog({ state: 'success' });
         return {
