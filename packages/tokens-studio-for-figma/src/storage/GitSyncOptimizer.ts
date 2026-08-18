@@ -16,6 +16,10 @@ export type ChangedState = {
   // Set-level additions/removals (see findDifferentState). Empty sets produce
   // no token-level changes, so without this they would never be written or deleted.
   tokenSetChanges?: Record<string, 'NEW' | 'REMOVE'>;
+  // A legacy↔DTCG conversion doesn't mutate any in-memory SingleToken (the format
+  // is applied at serialization time), so per-token diffs never fire. When true,
+  // every token-set file is included in the changeset so on-disk keys are rewritten.
+  tokenFormatChanged?: boolean;
 };
 
 /**
@@ -44,7 +48,7 @@ export class GitSyncOptimizer {
     Object.entries(tokenSetObjects).forEach(([name, tokenSet]) => {
       const hasChanges = changedState.tokens[name];
       const isNewTokenSet = changedState.tokenSetChanges?.[name] === 'NEW';
-      if ((hasChanges && hasChanges.length > 0) || isNewTokenSet) {
+      if ((hasChanges && hasChanges.length > 0) || isNewTokenSet || changedState.tokenFormatChanged) {
         filteredFiles.push({
           type: 'tokenSet',
           name,

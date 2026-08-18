@@ -35,7 +35,7 @@ export function useGitHub() {
   const localApiState = useSelector(localApiStateSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
-  const { changedPushState } = useChangedState();
+  const { changedPushState, tokenFormatChanged } = useChangedState();
   const isProUser = useIsProUser();
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
@@ -71,14 +71,22 @@ export function useGitHub() {
         if (customBranch) storage.selectBranch(customBranch);
         const metadata = {
           tokenSetOrder: Object.keys(tokens),
+          tokenFormat: TokenFormat.format,
         };
+
+        // Prefer the explicit override from callers who know a format flip just happened
+        // (e.g. ConvertToDTCGModal). The hook-derived tokenFormatChanged is unreliable in
+        // that path because setTokenFormat + pushTokens run in the same event handler, so
+        // this closure captured tokenFormatChanged before the state update took effect.
+        const isTokenFormatChanged = overrides?.tokenFormatChanged ?? tokenFormatChanged;
 
         // Check if we should use optimized multi-file sync
         const isMultiFileMode = isProUser && context.filePath && !context.filePath.endsWith('.json');
         const hasChanges = Object.keys(changedPushState.tokens).length > 0
           || changedPushState.themes.length > 0
           || !!changedPushState.metadata
-          || !!changedPushState.tokenSetChanges;
+          || !!changedPushState.tokenSetChanges
+          || isTokenFormatChanged;
 
         if (isMultiFileMode && hasChanges) {
           // Use the optimized save method for multi-file mode
@@ -94,6 +102,7 @@ export function useGitHub() {
             themes: changedPushState.themes,
             metadata: changedPushState.metadata || null,
             tokenSetChanges: changedPushState.tokenSetChanges,
+            tokenFormatChanged: isTokenFormatChanged,
           });
         } else {
           await storage.save({
@@ -168,6 +177,7 @@ export function useGitHub() {
     usedTokenSet,
     activeTheme,
     changedPushState,
+    tokenFormatChanged,
     isProUser,
     storeTokenIdInJsonEditor,
   ]);

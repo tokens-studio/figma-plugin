@@ -6,12 +6,14 @@ import parseTokenValues from '@/utils/parseTokenValues';
 import { SystemFilenames } from '@/constants/SystemFilenames';
 import { categorizeError } from '@/utils/error/categorizeError';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 
 export type RemoteTokenStorageMetadata = {
   tokenSetOrder?: string[];
   tokenSetsData?: Record<string, { isDynamic?: boolean }>;
   themeGroupsData?: Record<string, { id: string }>;
   changeSetId?: string;
+  tokenFormat?: TokenFormatOptions;
 };
 
 export type RemoteTokenStorageData<Metadata> = {

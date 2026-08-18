@@ -40,9 +40,11 @@ export function ConvertToDTCGModal() {
       overrides: isDTCG ? {
         branch: 'w3c-dtcg-conversion-revert',
         commitMessage: 'Revert conversion to W3C DTCG format',
+        tokenFormatChanged: true,
       } : {
         branch: 'w3c-dtcg-conversion',
         commitMessage: 'Convert to W3C DTCG format, read more at https://docs.tokens.studio/convert-to-dtcg-format',
+        tokenFormatChanged: true,
       },
     });
   }, [dispatch, pushTokens, isDTCG, storageType]);

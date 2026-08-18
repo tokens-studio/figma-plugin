@@ -14,8 +14,8 @@ const mockDispatch = {
 let mockTokens: Record<string, unknown[]> = {};
 const mockThemes = [];
 let mockStorageType = { provider: StorageProviderType.LOCAL };
-const mockLastSyncedState = null;
-const mockTokenFormat = 'dtcg';
+let mockLastSyncedState: string | null = null;
+let mockTokenFormat = 'dtcg';
 let mockTokenSetMetadata: Record<string, unknown> = {};
 
 jest.mock('react-redux', () => ({
@@ -67,6 +67,36 @@ describe('useChangedState', () => {
     mockStorageType = { provider: StorageProviderType.LOCAL };
     mockTokens = {};
     mockTokenSetMetadata = {};
+    mockLastSyncedState = null;
+    mockTokenFormat = 'dtcg';
+  });
+
+  describe('tokenFormatChanged', () => {
+    it('is false when lastSyncedState is missing (fresh install, avoids spurious full rewrite)', () => {
+      mockLastSyncedState = null;
+      const { result } = renderHook(() => useChangedState());
+      expect(result.current.tokenFormatChanged).toBe(false);
+    });
+
+    it('is false when lastSyncedState omits format (older sync, treat as aligned)', () => {
+      mockLastSyncedState = JSON.stringify([{}, []]);
+      const { result } = renderHook(() => useChangedState());
+      expect(result.current.tokenFormatChanged).toBe(false);
+    });
+
+    it('is false when the recorded format matches the current format', () => {
+      mockLastSyncedState = JSON.stringify([{}, [], 'dtcg']);
+      mockTokenFormat = 'dtcg';
+      const { result } = renderHook(() => useChangedState());
+      expect(result.current.tokenFormatChanged).toBe(false);
+    });
+
+    it('is true when the recorded format differs from the current format (legacy→DTCG conversion)', () => {
+      mockLastSyncedState = JSON.stringify([{}, [], 'legacy']);
+      mockTokenFormat = 'dtcg';
+      const { result } = renderHook(() => useChangedState());
+      expect(result.current.tokenFormatChanged).toBe(true);
+    });
   });
 
   it('dispatches hasChanges=true for LOCAL provider when state differs from lastSyncedState', () => {
@@ -99,19 +129,21 @@ describe('useChangedState', () => {
     });
 
     gitProviders.forEach((provider) => {
-      it(`passes { tokenSetOrder } only for ${provider} (no tokenSetsData)`, () => {
+      it(`passes { tokenSetOrder, tokenFormat } for ${provider} (no tokenSetsData)`, () => {
         mockStorageType = { provider };
         renderHook(() => useChangedState());
 
         // Both push (compareState arg) and pull (baseState arg) calls should have the trimmed shape.
+        // tokenFormat is included so a legacy↔DTCG conversion registers as a diff and the
+        // GitSyncOptimizer can force a full token-file rewrite.
         expect(findDifferentStateMock).toHaveBeenCalled();
         const pushCall = findDifferentStateMock.mock.calls[0];
         const pullCall = findDifferentStateMock.mock.calls[1];
 
-        expect(pushCall[1].metadata).toEqual({ tokenSetOrder: ['core', 'semantic'] });
+        expect(pushCall[1].metadata).toEqual({ tokenSetOrder: ['core', 'semantic'], tokenFormat: 'dtcg' });
         expect(pushCall[1].metadata).not.toHaveProperty('tokenSetsData');
 
-        expect(pullCall[0].metadata).toEqual({ tokenSetOrder: ['core', 'semantic'] });
+        expect(pullCall[0].metadata).toEqual({ tokenSetOrder: ['core', 'semantic'], tokenFormat: 'dtcg' });
         expect(pullCall[0].metadata).not.toHaveProperty('tokenSetsData');
       });
     });

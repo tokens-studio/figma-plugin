@@ -186,4 +186,28 @@ describe('GitSyncOptimizer', () => {
 
     expect(result.filesToDelete).toEqual(['test.json']);
   });
+
+  // Repro: legacy→DTCG conversion doesn't touch any in-memory SingleToken, so
+  // findDifferentState reports zero token-level diffs. Without the tokenFormatChanged
+  // flag, every token-set file was dropped from the commit, leaving only $metadata.json.
+  it('rewrites every token-set file when tokenFormatChanged is set', () => {
+    const data: RemoteTokenStorageData<GitStorageSaveOptions> = {
+      tokens: { global: [existingToken], other: [existingToken] },
+      themes: [],
+      metadata: { tokenSetOrder: ['global', 'other'] },
+    };
+    const changedState: ChangedState = {
+      tokens: {},
+      themes: [],
+      metadata: { tokenSetOrder: ['global', 'other'] },
+      tokenFormatChanged: true,
+    };
+
+    const result = GitSyncOptimizer.optimizeSync(data, saveOptions, changedState);
+
+    expect(result.filteredFiles.map((f) => f.path).sort()).toEqual(
+      ['$metadata.json', 'global.json', 'other.json'],
+    );
+    expect(result.hasChanges).toBe(true);
+  });
 });
