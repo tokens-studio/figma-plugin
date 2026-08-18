@@ -44,11 +44,15 @@ export class GitSyncOptimizer {
     const filesToDelete: string[] = [];
 
     // Convert tokens to files and filter based on changes
+    const forceRewriteAllTokenSets = Boolean(changedState.tokenFormatChanged);
     const tokenSetObjects = convertTokensToObject({ ...data.tokens }, saveOptions.storeTokenIdInJsonEditor);
     Object.entries(tokenSetObjects).forEach(([name, tokenSet]) => {
       const hasChanges = changedState.tokens[name];
       const isNewTokenSet = changedState.tokenSetChanges?.[name] === 'NEW';
-      if ((hasChanges && hasChanges.length > 0) || isNewTokenSet || changedState.tokenFormatChanged) {
+      const shouldInclude = forceRewriteAllTokenSets
+        || (hasChanges && hasChanges.length > 0)
+        || isNewTokenSet;
+      if (shouldInclude) {
         filteredFiles.push({
           type: 'tokenSet',
           name,

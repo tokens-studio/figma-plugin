@@ -29,7 +29,8 @@ export function useChangedState() {
   // providers write only { tokenSetOrder, tokenFormat }, so including tokenSetsData here would
   // produce a permanent metadata diff (baseState from remote lacks it), triggering empty pushes.
   // tokenFormat is included so a legacy↔DTCG conversion registers as a metadata change and can
-  // force a full rewrite in the optimized-sync path (see [[fix]] in GitSyncOptimizer).
+  // force a full rewrite in the optimized-sync path when tokenFormatChanged is true
+  // (see GitSyncOptimizer.optimizeSync).
   const buildMetadata = useCallback((tokenSetOrder: string[]) => {
     if (storageType.provider === StorageProviderType.LOCAL) return {};
     if (storageType.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
