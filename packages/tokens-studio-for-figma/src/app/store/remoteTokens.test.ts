@@ -691,12 +691,10 @@ describe('remoteTokens', () => {
               global: 'enabled',
             },
           }],
-          // GitHub records tokenFormat in metadata so the optimized-sync path can detect a
-          // legacy↔DTCG flip and force a full token-file rewrite. Other git providers use
-          // the unoptimized save and don't need it.
-          metadata: context === gitHubContext
-            ? { tokenSetOrder: ['global'], tokenFormat: 'dtcg' }
-            : { tokenSetOrder: ['global'] },
+          // All git providers persist tokenFormat in metadata via buildGitMetadata, so the
+          // diff shape produced by useChangedState.buildMetadata always matches what was
+          // written — no phantom "$metadata changed" chip in the push dialog.
+          metadata: { tokenSetOrder: ['global'], tokenFormat: 'dtcg' },
         });
 
         expect(mockPushDialog).toBeCalledTimes(2);

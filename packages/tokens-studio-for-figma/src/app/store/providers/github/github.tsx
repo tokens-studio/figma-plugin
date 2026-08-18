@@ -25,6 +25,7 @@ import { useIsProUser } from '@/app/hooks/useIsProUser';
 import { categorizeError } from '@/utils/error/categorizeError';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 import removeIdPropertyFromTokens from '@/utils/removeIdPropertyFromTokens';
+import { buildGitMetadata } from '@/utils/buildGitMetadata';
 
 type GithubCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITHUB; }>;
 type GithubFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITHUB }>;
@@ -69,16 +70,15 @@ export function useGitHub() {
       const { commitMessage, customBranch } = pushSettings;
       try {
         if (customBranch) storage.selectBranch(customBranch);
-        const metadata = {
-          tokenSetOrder: Object.keys(tokens),
-          tokenFormat: TokenFormat.format,
-        };
+        const metadata = buildGitMetadata(tokens);
 
         // Prefer the explicit override from callers who know a format flip just happened
         // (e.g. ConvertToDTCGModal). The hook-derived tokenFormatChanged is unreliable in
         // that path because setTokenFormat + pushTokens run in the same event handler, so
         // this closure captured tokenFormatChanged before the state update took effect.
-        const isTokenFormatChanged = overrides?.tokenFormatChanged ?? tokenFormatChanged;
+        // Use `||` (not `??`): the override is only ever set to true; a hypothetical `false`
+        // override should not defeat a real hook-detected flip.
+        const isTokenFormatChanged = overrides?.tokenFormatChanged || tokenFormatChanged;
 
         // Check if we should use optimized multi-file sync
         const isMultiFileMode = isProUser && context.filePath && !context.filePath.endsWith('.json');

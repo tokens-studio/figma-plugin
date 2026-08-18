@@ -97,6 +97,15 @@ describe('useChangedState', () => {
       const { result } = renderHook(() => useChangedState());
       expect(result.current.tokenFormatChanged).toBe(true);
     });
+
+    it('is false when lastSyncedState is a non-array JSON blob (corrupt storage)', () => {
+      // Without the Array.isArray guard, string-indexing `'legacy'[2]` → 'g' would trip
+      // spurious full-repo rewrites forever.
+      mockLastSyncedState = JSON.stringify('legacy');
+      mockTokenFormat = 'dtcg';
+      const { result } = renderHook(() => useChangedState());
+      expect(result.current.tokenFormatChanged).toBe(false);
+    });
   });
 
   it('dispatches hasChanges=true for LOCAL provider when state differs from lastSyncedState', () => {

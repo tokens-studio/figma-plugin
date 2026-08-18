@@ -14,6 +14,7 @@ import { compareLastSyncedState } from '@/utils/compareLastSyncedState';
 import { tokenFormatSelector } from '@/selectors/tokenFormatSelector';
 import { tryParseJson } from '@/utils/tryParseJson';
 import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
+import { buildGitMetadata } from '@/utils/buildGitMetadata';
 
 export function useChangedState() {
   const remoteData = useSelector(remoteDataSelector);
@@ -26,25 +27,28 @@ export function useChangedState() {
   const dispatch = useDispatch();
 
   // Only Tokens Studio OAuth persists tokenSetsData in its metadata payload; git-based
-  // providers write only { tokenSetOrder, tokenFormat }, so including tokenSetsData here would
-  // produce a permanent metadata diff (baseState from remote lacks it), triggering empty pushes.
-  // tokenFormat is included so a legacy↔DTCG conversion registers as a metadata change and can
-  // force a full rewrite in the optimized-sync path when tokenFormatChanged is true
-  // (see GitSyncOptimizer.optimizeSync).
+  // providers share the shape produced by buildGitMetadata (same helper the push callbacks
+  // use), so the diff and the on-disk write always agree. A mismatch here would produce a
+  // permanent phantom metadata diff, triggering empty pushes and a false "$metadata changed"
+  // row in the push dialog. tokenFormat is part of that shape so a legacy↔DTCG conversion
+  // registers as a metadata change (see GitSyncOptimizer.optimizeSync).
   const buildMetadata = useCallback((tokenSetOrder: string[]) => {
     if (storageType.provider === StorageProviderType.LOCAL) return {};
     if (storageType.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
       return { tokenSetOrder, tokenSetsData: tokenSetMetadata };
     }
-    return { tokenSetOrder, tokenFormat };
-  }, [storageType.provider, tokenSetMetadata, tokenFormat]);
+    return buildGitMetadata(tokens, tokenFormat);
+  }, [storageType.provider, tokenSetMetadata, tokenFormat, tokens]);
 
   // Detect a format flip since the last sync. lastSyncedState records [tokens, themes, format]
-  // (see compareLastSyncedState); format at index 2 is missing on very old syncs, in which case
-  // we treat the state as aligned to avoid a spurious full rewrite on first push after upgrade.
+  // (see compareLastSyncedState); format at index 2 is missing on very old syncs or a
+  // malformed blob, in which case we treat the state as aligned to avoid a spurious full
+  // rewrite on first push after upgrade.
   const tokenFormatChanged = useMemo(() => {
-    const parsed = tryParseJson<[unknown, unknown, TokenFormatOptions | undefined]>(lastSyncedState);
-    const lastFormat = parsed?.[2];
+    if (!lastSyncedState) return false;
+    const parsed = tryParseJson<unknown>(lastSyncedState);
+    if (!Array.isArray(parsed) || parsed.length < 3) return false;
+    const lastFormat = parsed[2] as TokenFormatOptions | undefined;
     if (!lastFormat) return false;
     return lastFormat !== tokenFormat;
   }, [lastSyncedState, tokenFormat]);

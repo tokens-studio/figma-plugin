@@ -8,7 +8,8 @@ import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 
 export type LastSyncedState =
   [Record<string, AnyTokenList>]
-  | [Record<string, AnyTokenList>, ThemeObjectsList];
+  | [Record<string, AnyTokenList>, ThemeObjectsList]
+  | [Record<string, AnyTokenList>, ThemeObjectsList, TokenFormatOptions];
 
 export function compareLastSyncedState(
   tokens: Record<string, AnyTokenList>,

@@ -71,8 +71,12 @@ export class GitSyncOptimizer {
       });
     }
 
-    // Add metadata file if present and has changes
-    if ('metadata' in data && data.metadata && changedState.metadata) {
+    // Add metadata file if present and has changes. tokenFormatChanged forces inclusion
+    // because the DTCG conversion happens in the same event handler as the push, so the
+    // React-derived changedState.metadata still reflects the pre-flip format and would
+    // otherwise be null — leaving the on-disk tokenFormat field stale.
+    const metadataNeedsWrite = Boolean(changedState.metadata) || forceRewriteAllTokenSets;
+    if ('metadata' in data && data.metadata && metadataNeedsWrite) {
       filteredFiles.push({
         type: 'metadata',
         path: `${SystemFilenames.METADATA}.json`,
