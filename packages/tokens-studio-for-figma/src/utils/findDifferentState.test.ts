@@ -259,4 +259,113 @@ describe('findDifferentState', () => {
     expect(result.tokens.set1).toHaveLength(1);
     expect(result.tokens.set1[0]).toMatchObject({ name: 'color.primary', importType: 'UPDATE' });
   });
+
+  it('does not report tokenSetChanges when the same sets exist on both sides', () => {
+    const baseState: CompareStateType = {
+      tokens: {
+        set1: [{
+          name: 'token1', value: 'value1', description: '', type: TokenTypes.COLOR,
+        }],
+      },
+      themes: [],
+      metadata: null,
+    };
+    const compareState: CompareStateType = {
+      tokens: {
+        set1: [{
+          name: 'token1', value: 'value2', description: '', type: TokenTypes.COLOR,
+        }],
+      },
+      themes: [],
+      metadata: null,
+    };
+
+    const result = findDifferentState(baseState, compareState);
+
+    expect(result.tokenSetChanges).toBeUndefined();
+  });
+
+  it('marks a newly added empty token set as a NEW set-level change', () => {
+    const baseState: CompareStateType = {
+      tokens: {
+        set1: [{
+          name: 'token1', value: 'value1', description: '', type: TokenTypes.COLOR,
+        }],
+      },
+      themes: [],
+      metadata: { tokenSetOrder: ['set1'] },
+    };
+    const compareState: CompareStateType = {
+      tokens: {
+        set1: [{
+          name: 'token1', value: 'value1', description: '', type: TokenTypes.COLOR,
+        }],
+        emptySet: [],
+      },
+      themes: [],
+      metadata: { tokenSetOrder: ['set1', 'emptySet'] },
+    };
+
+    const result = findDifferentState(baseState, compareState);
+
+    expect(result.tokenSetChanges).toEqual({ emptySet: 'NEW' });
+    // no token-level changes exist for an empty set
+    expect(result.tokens.emptySet).toBeUndefined();
+  });
+
+  it('marks a removed empty token set as a REMOVE set-level change', () => {
+    const baseState: CompareStateType = {
+      tokens: {
+        set1: [{
+          name: 'token1', value: 'value1', description: '', type: TokenTypes.COLOR,
+        }],
+        emptySet: [],
+      },
+      themes: [],
+      metadata: { tokenSetOrder: ['set1', 'emptySet'] },
+    };
+    const compareState: CompareStateType = {
+      tokens: {
+        set1: [{
+          name: 'token1', value: 'value1', description: '', type: TokenTypes.COLOR,
+        }],
+      },
+      themes: [],
+      metadata: { tokenSetOrder: ['set1'] },
+    };
+
+    const result = findDifferentState(baseState, compareState);
+
+    expect(result.tokenSetChanges).toEqual({ emptySet: 'REMOVE' });
+  });
+
+  it('does NOT add non-empty sets to tokenSetChanges — their token entries are sufficient', () => {
+    // Non-empty added/removed sets already produce token-level NEW/REMOVE entries
+    // visible to the GitSyncOptimizer; tokenSetChanges is reserved for empty sets only.
+    const baseState: CompareStateType = {
+      tokens: {
+        oldSet: [{
+          name: 'token1', value: 'value1', description: '', type: TokenTypes.COLOR,
+        }],
+      },
+      themes: [],
+      metadata: null,
+    };
+    const compareState: CompareStateType = {
+      tokens: {
+        newSet: [{
+          name: 'token2', value: 'value2', description: '', type: TokenTypes.COLOR,
+        }],
+      },
+      themes: [],
+      metadata: null,
+    };
+
+    const result = findDifferentState(baseState, compareState);
+
+    // tokenSetChanges should be undefined — non-empty sets are already visible via token entries
+    expect(result.tokenSetChanges).toBeUndefined();
+    expect(result.tokens.newSet).toEqual([expect.objectContaining({ name: 'token2', importType: 'NEW' })]);
+    expect(result.tokens.oldSet).toEqual([expect.objectContaining({ name: 'token1', importType: 'REMOVE' })]);
+  });
 });

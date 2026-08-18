@@ -1,5 +1,22 @@
 # @tokens-studio/figma-plugin
 
+## 2.11.12
+
+### Patch Changes
+
+- 70fbb0718: Fixed GitHub multi-file sync losing newly created empty token sets: pushing now writes the set's file to the repository (and deletes it when an empty set is removed), so the set no longer silently disappears after reopening the plugin.
+
+  Fixed GitHub/GitLab/ADO/Bitbucket sync so successful pushes clear the "unsynced changes" indicator and no longer produce empty commits.
+
+- 84c7af725: Fix Figma variable export writing the same values to every mode of a multi-mode theme group (Tokens Studio OAuth). Server-resolved token deltas are now fetched per theme so each mode resolves independently. Also fixes the analogous by-sets export where active-theme values could leak into unrelated sets.
+- ca9b4ebda: Fix Export to Variables writing malformed font-family values (e.g. `[Arial`) when a font-family token's resolved value is an array-shaped string. The bracket-shaped form (`["Arial","Helvetica"]`) is now normalized to the first entry, with JSON parsing so quoted family names containing commas survive intact.
+
+## 2.11.11
+
+### Patch Changes
+
+- 7d16e24d9: Fixed a bug where switching branches in the Studio provider could apply token edits to the previously selected branch instead of the one shown in the plugin.
+
 ## 2.11.10
 
 ### Patch Changes

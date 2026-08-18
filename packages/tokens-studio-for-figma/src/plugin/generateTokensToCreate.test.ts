@@ -44,6 +44,28 @@ describe('generateTokensToCreate', () => {
     ]);
   });
 
+  it('applies a flat serverResolvedTokens delta on top of local resolution', () => {
+    // Leaf-level check: given a delta, the resolved value wins over local.
+    // The per-theme *slicing* invariant is guarded at the caller layer, in
+    // createLocalVariablesInPlugin.perThemeDelta.test.ts — this test would
+    // still pass if the caller ever regressed to sharing one map across
+    // themes, so it is deliberately scoped narrow.
+    const singleTheme: ThemeObject = {
+      id: 'x', name: 'X', selectedTokenSets: { core: TokenSetStatus.ENABLED },
+    };
+    const singleToken: Record<string, AnyTokenList> = {
+      core: [{ name: 'color.bg', value: '#local', type: TokenTypes.COLOR }],
+    };
+
+    const { tokensToCreate } = generateTokensToCreate({
+      theme: singleTheme,
+      tokens: singleToken,
+      serverResolvedTokens: { 'color.bg': '#ffffff' },
+    });
+
+    expect(tokensToCreate[0].value).toBe('#ffffff');
+  });
+
   it('does not create tokens if their type is not in tokenTypesToCreateVariable', () => {
     const tokensWithInvalidType: Record<string, AnyTokenList> = {
       core: [
