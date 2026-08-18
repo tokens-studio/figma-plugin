@@ -211,15 +211,13 @@ describe('GitSyncOptimizer', () => {
     expect(result.hasChanges).toBe(true);
   });
 
-  // Repro of the same-tick stale-closure case: changedState.metadata is null because
-  // useChangedState memoized under the pre-flip tokenFormat. Without the tokenFormatChanged
-  // fallback in the metadata gate, $metadata.json is silently dropped from the conversion
-  // commit and remote's tokenFormat field stays stale.
-  it('includes $metadata.json when tokenFormatChanged is set even if changedState.metadata is null', () => {
+  // A format flip doesn't change $metadata.json content (tokenFormat is deliberately not
+  // persisted there), so only the token-set files are rewritten when metadata has no diff.
+  it('rewrites token-set files but not $metadata.json when only the format flipped', () => {
     const data: RemoteTokenStorageData<GitStorageSaveOptions> = {
       tokens: { global: [existingToken] },
       themes: [],
-      metadata: { tokenSetOrder: ['global'], tokenFormat: 'dtcg' },
+      metadata: { tokenSetOrder: ['global'] },
     };
     const changedState: ChangedState = {
       tokens: {},
@@ -230,10 +228,7 @@ describe('GitSyncOptimizer', () => {
 
     const result = GitSyncOptimizer.optimizeSync(data, saveOptions, changedState);
 
-    expect(result.filteredFiles.map((f) => f.path).sort()).toEqual(
-      ['$metadata.json', 'global.json'],
-    );
-    const metadataFile = result.filteredFiles.find((f) => f.path === '$metadata.json');
-    expect(metadataFile?.data).toEqual({ tokenSetOrder: ['global'], tokenFormat: 'dtcg' });
+    expect(result.filteredFiles.map((f) => f.path)).toEqual(['global.json']);
+    expect(result.hasChanges).toBe(true);
   });
 });

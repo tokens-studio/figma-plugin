@@ -691,10 +691,7 @@ describe('remoteTokens', () => {
               global: 'enabled',
             },
           }],
-          // All git providers persist tokenFormat in metadata via buildGitMetadata, so the
-          // diff shape produced by useChangedState.buildMetadata always matches what was
-          // written — no phantom "$metadata changed" chip in the push dialog.
-          metadata: { tokenSetOrder: ['global'], tokenFormat: 'dtcg' },
+          metadata: { tokenSetOrder: ['global'] },
         });
 
         expect(mockPushDialog).toBeCalledTimes(2);

@@ -138,21 +138,19 @@ describe('useChangedState', () => {
     });
 
     gitProviders.forEach((provider) => {
-      it(`passes { tokenSetOrder, tokenFormat } for ${provider} (no tokenSetsData)`, () => {
+      it(`passes { tokenSetOrder } only for ${provider} (no tokenSetsData)`, () => {
         mockStorageType = { provider };
         renderHook(() => useChangedState());
 
         // Both push (compareState arg) and pull (baseState arg) calls should have the trimmed shape.
-        // tokenFormat is included so a legacy↔DTCG conversion registers as a diff and the
-        // GitSyncOptimizer can force a full token-file rewrite.
         expect(findDifferentStateMock).toHaveBeenCalled();
         const pushCall = findDifferentStateMock.mock.calls[0];
         const pullCall = findDifferentStateMock.mock.calls[1];
 
-        expect(pushCall[1].metadata).toEqual({ tokenSetOrder: ['core', 'semantic'], tokenFormat: 'dtcg' });
+        expect(pushCall[1].metadata).toEqual({ tokenSetOrder: ['core', 'semantic'] });
         expect(pushCall[1].metadata).not.toHaveProperty('tokenSetsData');
 
-        expect(pullCall[0].metadata).toEqual({ tokenSetOrder: ['core', 'semantic'], tokenFormat: 'dtcg' });
+        expect(pullCall[0].metadata).toEqual({ tokenSetOrder: ['core', 'semantic'] });
         expect(pullCall[0].metadata).not.toHaveProperty('tokenSetsData');
       });
     });

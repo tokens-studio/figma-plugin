@@ -30,15 +30,14 @@ export function useChangedState() {
   // providers share the shape produced by buildGitMetadata (same helper the push callbacks
   // use), so the diff and the on-disk write always agree. A mismatch here would produce a
   // permanent phantom metadata diff, triggering empty pushes and a false "$metadata changed"
-  // row in the push dialog. tokenFormat is part of that shape so a legacy↔DTCG conversion
-  // registers as a metadata change (see GitSyncOptimizer.optimizeSync).
+  // row in the push dialog.
   const buildMetadata = useCallback((tokenSetOrder: string[]) => {
     if (storageType.provider === StorageProviderType.LOCAL) return {};
     if (storageType.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
       return { tokenSetOrder, tokenSetsData: tokenSetMetadata };
     }
-    return buildGitMetadata(tokens, tokenFormat);
-  }, [storageType.provider, tokenSetMetadata, tokenFormat, tokens]);
+    return buildGitMetadata(tokens);
+  }, [storageType.provider, tokenSetMetadata, tokens]);
 
   // Detect a format flip since the last sync. lastSyncedState records [tokens, themes, format]
   // (see compareLastSyncedState); format at index 2 is missing on very old syncs or a
