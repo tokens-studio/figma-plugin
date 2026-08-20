@@ -62,8 +62,13 @@ export class GitSyncOptimizer {
       }
     });
 
-    // Add themes file if there are theme changes
-    if (changedState.themes.length > 0) {
+    // Add themes file if there are theme changes, or when we're force-rewriting all files.
+    // The force branch matters for conversion pushes to a NEW branch: octokit's
+    // createOrUpdateFiles cuts a missing branch from the repo's default branch, so files we
+    // don't include come from THAT branch. For a user synced on a non-default branch, that
+    // would mean the conversion branch inherits stale themes/metadata. Include them so the
+    // conversion branch is a self-consistent snapshot of local state.
+    if (changedState.themes.length > 0 || forceRewriteAllTokenSets) {
       filteredFiles.push({
         type: 'themes',
         path: `${SystemFilenames.THEMES}.json`,
@@ -71,8 +76,8 @@ export class GitSyncOptimizer {
       });
     }
 
-    // Add metadata file if present and has changes
-    if ('metadata' in data && data.metadata && changedState.metadata) {
+    // Add metadata file if present and has changes (see themes comment for the force branch).
+    if ('metadata' in data && data.metadata && (changedState.metadata || forceRewriteAllTokenSets)) {
       filteredFiles.push({
         type: 'metadata',
         path: `${SystemFilenames.METADATA}.json`,

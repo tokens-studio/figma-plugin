@@ -190,7 +190,9 @@ describe('GitSyncOptimizer', () => {
   // Repro: legacy→DTCG conversion doesn't touch any in-memory SingleToken, so
   // findDifferentState reports zero token-level diffs. Without the tokenFormatChanged
   // flag, every token-set file was dropped from the commit, leaving only $metadata.json.
-  it('rewrites every token-set file when tokenFormatChanged is set', () => {
+  // Themes/metadata are ALSO force-included so a conversion push to a new branch cut from
+  // the repo default branch doesn't inherit stale $themes.json / $metadata.json.
+  it('rewrites every token-set file plus themes and metadata when tokenFormatChanged is set', () => {
     const data: RemoteTokenStorageData<GitStorageSaveOptions> = {
       tokens: { global: [existingToken], other: [existingToken] },
       themes: [],
@@ -206,14 +208,15 @@ describe('GitSyncOptimizer', () => {
     const result = GitSyncOptimizer.optimizeSync(data, saveOptions, changedState);
 
     expect(result.filteredFiles.map((f) => f.path).sort()).toEqual(
-      ['$metadata.json', 'global.json', 'other.json'],
+      ['$metadata.json', '$themes.json', 'global.json', 'other.json'],
     );
     expect(result.hasChanges).toBe(true);
   });
 
-  // A format flip doesn't change $metadata.json content (tokenFormat is deliberately not
-  // persisted there), so only the token-set files are rewritten when metadata has no diff.
-  it('rewrites token-set files but not $metadata.json when only the format flipped', () => {
+  // On a pure format flip, findDifferentState reports no token/theme/metadata diffs. The
+  // force branch still includes themes and metadata so the pushed branch is a self-consistent
+  // snapshot even when octokit cuts it from the repo default branch.
+  it('rewrites every file when only the format flipped even with null changedState.metadata', () => {
     const data: RemoteTokenStorageData<GitStorageSaveOptions> = {
       tokens: { global: [existingToken] },
       themes: [],
@@ -228,7 +231,9 @@ describe('GitSyncOptimizer', () => {
 
     const result = GitSyncOptimizer.optimizeSync(data, saveOptions, changedState);
 
-    expect(result.filteredFiles.map((f) => f.path)).toEqual(['global.json']);
+    expect(result.filteredFiles.map((f) => f.path).sort()).toEqual(
+      ['$metadata.json', '$themes.json', 'global.json'],
+    );
     expect(result.hasChanges).toBe(true);
   });
 });

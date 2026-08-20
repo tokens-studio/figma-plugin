@@ -21,7 +21,7 @@ export function ConvertToDTCGModal() {
   const dispatch = useDispatch<Dispatch>();
   const showConvertTokenFormatModal = useSelector(showConvertTokenFormatModalSelector);
   const tokenFormat = useSelector(tokenFormatSelector);
-  const { hasChanges } = useChangedState();
+  const { hasChanges, changedPushState, tokenFormatChanged } = useChangedState();
   const { pushTokens } = useRemoteTokens();
   const { t } = useTranslation(['storage']);
   const storageType = useSelector(storageTypeSelector);
@@ -50,7 +50,14 @@ export function ConvertToDTCGModal() {
     });
   }, [dispatch, pushTokens, isDTCG, storageType]);
 
-  const hasRemoteChanges = hasChanges && storageType.provider !== StorageProviderType.LOCAL;
+  // A pending format flip is itself a "change" (via compareLastSyncedState), which would
+  // otherwise disable the revert button — trapping the user with no way to undo through this
+  // UI if they cancelled or failed the push dialog. Exempt the format-only case so the
+  // reverse conversion stays reachable; token/theme edits still block as before.
+  const isFormatOnlyDiff = tokenFormatChanged
+    && Object.keys(changedPushState.tokens).length === 0
+    && changedPushState.themes.length === 0;
+  const hasRemoteChanges = hasChanges && !isFormatOnlyDiff && storageType.provider !== StorageProviderType.LOCAL;
 
   return (
     <Modal title={isDTCG ? t('w3cformatmodaltitle') : t('w3cconverttitle')} isOpen={showConvertTokenFormatModal} close={handleClose} showClose>

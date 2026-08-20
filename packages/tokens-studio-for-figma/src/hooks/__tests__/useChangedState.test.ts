@@ -50,9 +50,22 @@ jest.mock('@/selectors/tokenFormatSelector', () => ({
   tokenFormatSelector: (state: any) => state.tokenState.tokenFormat,
 }));
 
-jest.mock('@/utils/compareLastSyncedState', () => ({
-  compareLastSyncedState: jest.fn(() => false), // always "has changes" by default
-}));
+jest.mock('@/utils/compareLastSyncedState', () => {
+  const { TokenFormatOptions } = jest.requireActual('@/plugin/TokenFormatStoreClass');
+  const { tryParseJson } = jest.requireActual('@/utils/tryParseJson');
+  return {
+    compareLastSyncedState: jest.fn(() => false), // always "has changes" by default
+    // Reuse the real getLastSyncedFormat so tokenFormatChanged tests exercise real logic
+    // (module co-locates the helper with the tuple type).
+    getLastSyncedFormat: (state: string) => {
+      if (!state) return undefined;
+      const parsed = tryParseJson(state);
+      if (!Array.isArray(parsed) || parsed.length < 3) return undefined;
+      const format = parsed[2];
+      return Object.values(TokenFormatOptions).includes(format) ? format : undefined;
+    },
+  };
+});
 
 jest.mock('@/utils/findDifferentState', () => ({
   findDifferentState: jest.fn(() => []),
