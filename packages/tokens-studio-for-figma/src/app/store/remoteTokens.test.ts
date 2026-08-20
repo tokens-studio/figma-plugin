@@ -715,7 +715,6 @@ describe('remoteTokens', () => {
         const overrides = {
           branch: 'w3c-dtcg-conversion',
           commitMessage: 'Convert to W3C DTCG format',
-          tokenFormatChanged: true,
         };
 
         await waitFor(() => {

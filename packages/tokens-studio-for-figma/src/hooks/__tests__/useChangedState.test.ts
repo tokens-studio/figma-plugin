@@ -50,22 +50,9 @@ jest.mock('@/selectors/tokenFormatSelector', () => ({
   tokenFormatSelector: (state: any) => state.tokenState.tokenFormat,
 }));
 
-jest.mock('@/utils/compareLastSyncedState', () => {
-  const { TokenFormatOptions } = jest.requireActual('@/plugin/TokenFormatStoreClass');
-  const { tryParseJson } = jest.requireActual('@/utils/tryParseJson');
-  return {
-    compareLastSyncedState: jest.fn(() => false), // always "has changes" by default
-    // Reuse the real getLastSyncedFormat so tokenFormatChanged tests exercise real logic
-    // (module co-locates the helper with the tuple type).
-    getLastSyncedFormat: (state: string) => {
-      if (!state) return undefined;
-      const parsed = tryParseJson(state);
-      if (!Array.isArray(parsed) || parsed.length < 3) return undefined;
-      const format = parsed[2];
-      return Object.values(TokenFormatOptions).includes(format) ? format : undefined;
-    },
-  };
-});
+jest.mock('@/utils/compareLastSyncedState', () => ({
+  compareLastSyncedState: jest.fn(() => false), // always "has changes" by default
+}));
 
 jest.mock('@/utils/findDifferentState', () => ({
   findDifferentState: jest.fn(() => []),
@@ -84,42 +71,8 @@ describe('useChangedState', () => {
     mockTokenFormat = 'dtcg';
   });
 
-  describe('tokenFormatChanged', () => {
-    it('is false when lastSyncedState is missing (fresh install, avoids spurious full rewrite)', () => {
-      mockLastSyncedState = null;
-      const { result } = renderHook(() => useChangedState());
-      expect(result.current.tokenFormatChanged).toBe(false);
-    });
-
-    it('is false when lastSyncedState omits format (older sync, treat as aligned)', () => {
-      mockLastSyncedState = JSON.stringify([{}, []]);
-      const { result } = renderHook(() => useChangedState());
-      expect(result.current.tokenFormatChanged).toBe(false);
-    });
-
-    it('is false when the recorded format matches the current format', () => {
-      mockLastSyncedState = JSON.stringify([{}, [], 'dtcg']);
-      mockTokenFormat = 'dtcg';
-      const { result } = renderHook(() => useChangedState());
-      expect(result.current.tokenFormatChanged).toBe(false);
-    });
-
-    it('is true when the recorded format differs from the current format (legacy→DTCG conversion)', () => {
-      mockLastSyncedState = JSON.stringify([{}, [], 'legacy']);
-      mockTokenFormat = 'dtcg';
-      const { result } = renderHook(() => useChangedState());
-      expect(result.current.tokenFormatChanged).toBe(true);
-    });
-
-    it('is false when lastSyncedState is a non-array JSON blob (corrupt storage)', () => {
-      // Without the Array.isArray guard, string-indexing `'legacy'[2]` → 'g' would trip
-      // spurious full-repo rewrites forever.
-      mockLastSyncedState = JSON.stringify('legacy');
-      mockTokenFormat = 'dtcg';
-      const { result } = renderHook(() => useChangedState());
-      expect(result.current.tokenFormatChanged).toBe(false);
-    });
-  });
+  // Format-flip detection lives in getLastSyncedFormat (see compareLastSyncedState.test.ts)
+  // and is consumed imperatively at push time by pushTokensToGitHub — no hook derivation.
 
   it('dispatches hasChanges=true for LOCAL provider when state differs from lastSyncedState', () => {
     mockStorageType = { provider: StorageProviderType.LOCAL };

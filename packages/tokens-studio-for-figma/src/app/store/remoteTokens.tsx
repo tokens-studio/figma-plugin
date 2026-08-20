@@ -33,7 +33,7 @@ import { Tabs } from '@/constants/Tabs';
 import { useTokensStudioOAuth } from './providers/tokens-studio';
 import { notifyToUI } from '@/plugin/notifiers';
 
-export type PushOverrides = { branch: string; commitMessage: string; tokenFormatChanged?: boolean };
+export type PushOverrides = { branch: string; commitMessage: string };
 
 type PullTokensOptions = {
   context?: StorageTypeCredentials;
@@ -198,9 +198,11 @@ export default function useRemoteTokens() {
         // Do NOT write setLastSyncedState here. `storage.retrieve` mutated the TokenFormat
         // singleton via detectFormat (no Redux dispatch), so if we recorded lastSyncedState
         // now and the user then declined the pull, lastSyncedState[2] would carry the remote
-        // format while Redux tokenState.tokenFormat kept the old one — permanently flagging
-        // tokenFormatChanged and forcing a full rewrite that silently converts the repo.
-        // Only record it once the local state actually adopts the remote (see below).
+        // format while Redux tokenState.tokenFormat kept the old one — pushTokensToGitHub's
+        // format-flip detection (TokenFormat.format vs getLastSyncedFormat(lastSyncedState))
+        // would trip on the next push and silently rewrite every token file in the remote
+        // format the user just declined. Only record lastSyncedState once local state
+        // actually adopts the remote (see below).
         if (activeTab !== Tabs.LOADING) {
           if (updateLocalTokens) {
             const format = getFormat();

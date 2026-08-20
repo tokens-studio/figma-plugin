@@ -10,7 +10,7 @@ import {
 import { tokenSetMetadataSelector } from '@/selectors/tokenSetMetadataSelector';
 import { findDifferentState } from '@/utils/findDifferentState';
 import { StorageProviderType } from '@/constants/StorageProviderType';
-import { compareLastSyncedState, getLastSyncedFormat } from '@/utils/compareLastSyncedState';
+import { compareLastSyncedState } from '@/utils/compareLastSyncedState';
 import { tokenFormatSelector } from '@/selectors/tokenFormatSelector';
 import { buildGitMetadata } from '@/utils/buildGitMetadata';
 
@@ -36,15 +36,6 @@ export function useChangedState() {
     }
     return buildGitMetadata(tokens);
   }, [storageType.provider, tokenSetMetadata, tokens]);
-
-  // Detect a format flip since the last sync. getLastSyncedFormat validates the value is a
-  // known TokenFormatOptions; undefined (missing / malformed / pre-format 2-tuple sync) is
-  // treated as aligned to avoid a spurious full rewrite on first push after upgrade.
-  const tokenFormatChanged = useMemo(() => {
-    const lastFormat = getLastSyncedFormat(lastSyncedState);
-    if (!lastFormat) return false;
-    return lastFormat !== tokenFormat;
-  }, [lastSyncedState, tokenFormat]);
 
   const changedPushState = useMemo(() => findDifferentState(remoteData, {
     tokens,
@@ -77,7 +68,5 @@ export function useChangedState() {
     dispatch.tokenState.updateCheckForChanges(hasChanges);
   }, [hasChanges, dispatch.tokenState, storageType.provider]);
 
-  return {
-    changedPushState, changedPullState, hasChanges, tokenFormatChanged,
-  };
+  return { changedPushState, changedPullState, hasChanges };
 }

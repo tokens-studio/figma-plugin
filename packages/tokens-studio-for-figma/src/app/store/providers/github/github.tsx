@@ -8,9 +8,11 @@ import { notifyToUI } from '@/plugin/notifiers';
 import {
   activeThemeSelector,
   storeTokenIdInJsonEditorSelector,
+  lastSyncedStateSelector,
   localApiStateSelector, themesListSelector, tokensSelector, usedTokenSetSelector,
 } from '@/selectors';
 import { useChangedState } from '@/hooks/useChangedState';
+import { getLastSyncedFormat } from '@/utils/compareLastSyncedState';
 import { GithubTokenStorage } from '@/storage/GithubTokenStorage';
 import { isEqual } from '@/utils/isEqual';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
@@ -36,7 +38,8 @@ export function useGitHub() {
   const localApiState = useSelector(localApiStateSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
-  const { changedPushState, tokenFormatChanged } = useChangedState();
+  const lastSyncedState = useSelector(lastSyncedStateSelector);
+  const { changedPushState } = useChangedState();
   const isProUser = useIsProUser();
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
@@ -72,13 +75,14 @@ export function useGitHub() {
         if (customBranch) storage.selectBranch(customBranch);
         const metadata = buildGitMetadata(tokens);
 
-        // Prefer the explicit override from callers who know a format flip just happened
-        // (e.g. ConvertToDTCGModal). The hook-derived tokenFormatChanged is unreliable in
-        // that path because setTokenFormat + pushTokens run in the same event handler, so
-        // this closure captured tokenFormatChanged before the state update took effect.
-        // Use `||` (not `??`): the override is only ever set to true; a hypothetical `false`
-        // override should not defeat a real hook-detected flip.
-        const isTokenFormatChanged = overrides?.tokenFormatChanged || tokenFormatChanged;
+        // Detect a format flip imperatively at push time. TokenFormat.format is a module
+        // singleton mutated synchronously by the setTokenFormat Rematch effect, so it is
+        // always current here — including in the same-tick ConvertToDTCGModal flow where a
+        // hook-derived value would still be closure-captured from the pre-flip render.
+        // Compared against the format recorded in lastSyncedState[2], which only rewrites
+        // on push/pull success — so a flip since the last sync fires the flag regardless
+        // of which entry point triggered the push.
+        const isTokenFormatChanged = TokenFormat.format !== getLastSyncedFormat(lastSyncedState);
 
         // Check if we should use optimized multi-file sync
         const isMultiFileMode = isProUser && context.filePath && !context.filePath.endsWith('.json');
@@ -177,7 +181,7 @@ export function useGitHub() {
     usedTokenSet,
     activeTheme,
     changedPushState,
-    tokenFormatChanged,
+    lastSyncedState,
     isProUser,
     storeTokenIdInJsonEditor,
   ]);
