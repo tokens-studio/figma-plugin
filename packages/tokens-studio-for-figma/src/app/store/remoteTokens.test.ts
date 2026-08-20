@@ -39,6 +39,7 @@ const mockClosePullDialog = jest.fn();
 const mockShowPullDialogError = jest.fn();
 const mockCreateBranch = jest.fn();
 const mockSave = jest.fn();
+const mockSaveOptimized = jest.fn();
 const mockSetCollapsedTokenSets = jest.fn();
 const mocksetChangedState = jest.fn();
 const mockResetChangedState = jest.fn();
@@ -132,6 +133,7 @@ jest.mock('../../storage/GithubTokenStorage', () => ({
       getCommitSha: mockGetCommitSha,
       fetchBranches: mockFetchBranches,
       save: mockSave,
+      saveOptimized: mockSaveOptimized,
       createBranch: mockCreateBranch,
     }
   )),
@@ -1064,14 +1066,55 @@ describe('remoteTokens', () => {
     });
   });
 
+  // Regression: PR #3941 fixed the phantom `tokenSetsData` metadata diff that was making
+  // conversion pushes commit only $metadata.json. But any legitimate metadata-only diff
+  // (initial-sync where remoteData.metadata is undefined vs local {tokenSetOrder}, a set
+  // reorder, or a legacy↔DTCG format flip whose in-memory tokens don't change) would still
+  // route the push through saveOptimized with zero token diffs — dropping every token file
+  // from the commit. Fix: only take saveOptimized when there are real *content* changes
+  // (tokens/themes/tokenSetChanges). Pure metadata diffs fall through to storage.save,
+  // which writes every file correctly.
+  describe('pushTokensToGitHub optimized-path routing', () => {
+    beforeEach(() => {
+      mockSave.mockReset();
+      mockSaveOptimized.mockReset();
+      mockPushDialog.mockClear();
+      mockGetCommitSha.mockResolvedValue('sha');
+      mockFetchBranches.mockResolvedValue(['main']);
+      mockPushDialog.mockImplementation(() => Promise.resolve({
+        customBranch: 'main',
+        commitMessage: 'test',
+      }));
+    });
+
+    it('routes to storage.save (full write) when only metadata differs — e.g. format flip', async () => {
+      // remoteData.metadata is null (fresh sync per the top-of-file mockSelector),
+      // buildMetadata returns {tokenSetOrder} → changedPushState.metadata is truthy but no
+      // token content changed. Pre-fix, this hit saveOptimized with zero token diffs and
+      // committed only $metadata.json. Post-fix, saveOptimized is skipped and storage.save
+      // is called instead, writing every file correctly.
+      const proContext = {
+        ...gitHubContext,
+        filePath: 'tokens', // folder (not .json) → multi-file mode on Pro
+      };
+
+      await waitFor(() => {
+        result.current.pushTokens({ context: proContext as StorageTypeCredentials });
+      });
+
+      expect(mockSaveOptimized).not.toHaveBeenCalled();
+      expect(mockSave).toHaveBeenCalled();
+    });
+  });
+
   // Regression: pullTokens used to dispatch setLastSyncedState unconditionally right after
   // retrieve, BEFORE the user confirmed the pull dialog. storage.retrieve mutates the
   // TokenFormat singleton via detectFormat (no Redux dispatch), so recording lastSyncedState
   // at that point captured the REMOTE format at index 2 while Redux tokenState.tokenFormat
-  // still held the OLD format. Declining the pull left the two diverged, making
-  // tokenFormatChanged permanently true and forcing the next push to rewrite (and silently
-  // format-convert) every token file. Fix: only record lastSyncedState once local state has
-  // adopted the remote (setTokenData resyncs Redux format from the singleton).
+  // still held the OLD format. Declining the pull left the two diverged, making the next
+  // push force-rewrite (and silently format-convert) every token file. Fix: only record
+  // lastSyncedState once local state has adopted the remote (setTokenData resyncs Redux
+  // format from the singleton).
   describe('pullTokens lastSyncedState ordering (declined pull)', () => {
     beforeEach(() => {
       mockSetLastSyncedState.mockClear();

@@ -8,11 +8,9 @@ import { notifyToUI } from '@/plugin/notifiers';
 import {
   activeThemeSelector,
   storeTokenIdInJsonEditorSelector,
-  lastSyncedStateSelector,
   localApiStateSelector, themesListSelector, tokensSelector, usedTokenSetSelector,
 } from '@/selectors';
 import { useChangedState } from '@/hooks/useChangedState';
-import { getLastSyncedFormat } from '@/utils/compareLastSyncedState';
 import { GithubTokenStorage } from '@/storage/GithubTokenStorage';
 import { isEqual } from '@/utils/isEqual';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
@@ -38,7 +36,6 @@ export function useGitHub() {
   const localApiState = useSelector(localApiStateSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
-  const lastSyncedState = useSelector(lastSyncedStateSelector);
   const { changedPushState } = useChangedState();
   const isProUser = useIsProUser();
   const dispatch = useDispatch<Dispatch>();
@@ -75,24 +72,21 @@ export function useGitHub() {
         if (customBranch) storage.selectBranch(customBranch);
         const metadata = buildGitMetadata(tokens);
 
-        // Detect a format flip imperatively at push time. TokenFormat.format is a module
-        // singleton mutated synchronously by the setTokenFormat Rematch effect, so it is
-        // always current here — including in the same-tick ConvertToDTCGModal flow where a
-        // hook-derived value would still be closure-captured from the pre-flip render.
-        // Compared against the format recorded in lastSyncedState[2], which only rewrites
-        // on push/pull success — so a flip since the last sync fires the flag regardless
-        // of which entry point triggered the push.
-        const isTokenFormatChanged = TokenFormat.format !== getLastSyncedFormat(lastSyncedState);
-
-        // Check if we should use optimized multi-file sync
+        // Take the optimized path only when there are real content changes (tokens, themes,
+        // or set-level additions/removals). A pure metadata-only diff — first-sync where
+        // remoteData.metadata is undefined, a legitimate tokenSetOrder reordering, or a
+        // legacy↔DTCG format flip (which produces no in-memory token diff because format is
+        // a serialization-time concern) — falls through to storage.save. That writes every
+        // file correctly and is what pre-#3941 relied on before the optimized branch became
+        // reachable for these cases. #3941's guarantees still hold: empty commits are gated
+        // by useChangedState.hasChanges (compareLastSyncedState), and empty-set NEW/REMOVE
+        // still routes through tokenSetChanges below.
         const isMultiFileMode = isProUser && context.filePath && !context.filePath.endsWith('.json');
-        const hasChanges = Object.keys(changedPushState.tokens).length > 0
+        const hasContentChanges = Object.keys(changedPushState.tokens).length > 0
           || changedPushState.themes.length > 0
-          || !!changedPushState.metadata
-          || !!changedPushState.tokenSetChanges
-          || isTokenFormatChanged;
+          || !!changedPushState.tokenSetChanges;
 
-        if (isMultiFileMode && hasChanges) {
+        if (isMultiFileMode && hasContentChanges) {
           // Use the optimized save method for multi-file mode
           await (storage as GithubTokenStorage).saveOptimized({
             themes,
@@ -106,7 +100,6 @@ export function useGitHub() {
             themes: changedPushState.themes,
             metadata: changedPushState.metadata || null,
             tokenSetChanges: changedPushState.tokenSetChanges,
-            tokenFormatChanged: isTokenFormatChanged,
           });
         } else {
           await storage.save({
@@ -181,7 +174,6 @@ export function useGitHub() {
     usedTokenSet,
     activeTheme,
     changedPushState,
-    lastSyncedState,
     isProUser,
     storeTokenIdInJsonEditor,
   ]);

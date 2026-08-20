@@ -38,9 +38,10 @@ export function ConvertToDTCGModal() {
     dispatch.tokenState.setTokenFormat(isDTCG ? TokenFormatOptions.Legacy : TokenFormatOptions.DTCG);
     dispatch.uiState.setShowConvertTokenFormatModal(false);
     if (storageType.provider === StorageProviderType.LOCAL) return;
-    // No tokenFormatChanged plumbing: pushTokensToGitHub detects the flip imperatively by
-    // comparing TokenFormat.format (singleton, updated synchronously by the setTokenFormat
-    // effect) against getLastSyncedFormat(lastSyncedState) at push time.
+    // No format-flip signal needs to travel with the push: a pure metadata diff (which a
+    // format flip resolves to via compareLastSyncedState) routes to storage.save (full
+    // write) inside pushTokensToGitHub, so every token file gets re-serialized in the new
+    // format.
     pushTokens({
       overrides: isDTCG ? {
         branch: 'w3c-dtcg-conversion-revert',

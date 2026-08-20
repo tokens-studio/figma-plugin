@@ -16,10 +16,6 @@ export type ChangedState = {
   // Set-level additions/removals (see findDifferentState). Empty sets produce
   // no token-level changes, so without this they would never be written or deleted.
   tokenSetChanges?: Record<string, 'NEW' | 'REMOVE'>;
-  // A legacy↔DTCG conversion doesn't mutate any in-memory SingleToken (the format
-  // is applied at serialization time), so per-token diffs never fire. When true,
-  // every token-set file is included in the changeset so on-disk keys are rewritten.
-  tokenFormatChanged?: boolean;
 };
 
 /**
@@ -44,15 +40,11 @@ export class GitSyncOptimizer {
     const filesToDelete: string[] = [];
 
     // Convert tokens to files and filter based on changes
-    const forceRewriteAllTokenSets = Boolean(changedState.tokenFormatChanged);
     const tokenSetObjects = convertTokensToObject({ ...data.tokens }, saveOptions.storeTokenIdInJsonEditor);
     Object.entries(tokenSetObjects).forEach(([name, tokenSet]) => {
       const hasChanges = changedState.tokens[name];
       const isNewTokenSet = changedState.tokenSetChanges?.[name] === 'NEW';
-      const shouldInclude = forceRewriteAllTokenSets
-        || (hasChanges && hasChanges.length > 0)
-        || isNewTokenSet;
-      if (shouldInclude) {
+      if ((hasChanges && hasChanges.length > 0) || isNewTokenSet) {
         filteredFiles.push({
           type: 'tokenSet',
           name,
@@ -62,13 +54,8 @@ export class GitSyncOptimizer {
       }
     });
 
-    // Add themes file if there are theme changes, or when we're force-rewriting all files.
-    // The force branch matters for conversion pushes to a NEW branch: octokit's
-    // createOrUpdateFiles cuts a missing branch from the repo's default branch, so files we
-    // don't include come from THAT branch. For a user synced on a non-default branch, that
-    // would mean the conversion branch inherits stale themes/metadata. Include them so the
-    // conversion branch is a self-consistent snapshot of local state.
-    if (changedState.themes.length > 0 || forceRewriteAllTokenSets) {
+    // Add themes file if there are theme changes
+    if (changedState.themes.length > 0) {
       filteredFiles.push({
         type: 'themes',
         path: `${SystemFilenames.THEMES}.json`,
@@ -76,8 +63,8 @@ export class GitSyncOptimizer {
       });
     }
 
-    // Add metadata file if present and has changes (see themes comment for the force branch).
-    if ('metadata' in data && data.metadata && (changedState.metadata || forceRewriteAllTokenSets)) {
+    // Add metadata file if present and has changes
+    if ('metadata' in data && data.metadata && changedState.metadata) {
       filteredFiles.push({
         type: 'metadata',
         path: `${SystemFilenames.METADATA}.json`,
