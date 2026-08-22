@@ -200,6 +200,23 @@ describe('tryApplyTypographyCompositeVariable', () => {
     expect(target.letterSpacing).toEqual({ unit: 'PIXELS', value: 8 });
   });
 
+  it('does not rewrite fontName when the family and style already match', async () => {
+    const fontName = { family: 'Inter', style: 'Bold' };
+    target = { fontName } as TextNode | TextStyle;
+    value = {
+      fontFamily: 'Inter',
+      fontWeight: 'Bold',
+    };
+    resolvedValue = {};
+
+    await tryApplyTypographyCompositeVariable({
+      target, value, resolvedValue, baseFontSize,
+    });
+
+    // Same object reference — proves setFontStyleOnTarget did not reassign it.
+    expect(target.fontName).toBe(fontName);
+  });
+
   it('does not write a property again on a second call with the same resolved value', async () => {
     let fontSizeSetCount = 0;
     let storedFontSize: number | undefined;
