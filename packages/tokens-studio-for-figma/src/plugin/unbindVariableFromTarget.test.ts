@@ -10,7 +10,7 @@ describe('unbindVariableFromTarget', () => {
     const paints = [{ type: 'SOLID', color: { r: 1, g: 0, b: 0 }, opacity: 1 }] as unknown as Paint[];
     const target = { paints } as unknown as PaintStyle;
 
-    await unbindVariableFromTarget(target, 'paints', paints[0]);
+    await unbindVariableFromTarget(target, 'paints');
 
     // Same array reference — proves no redundant write happened when nothing needed unbinding.
     expect(target.paints).toBe(paints);
@@ -28,19 +28,27 @@ describe('unbindVariableFromTarget', () => {
     const target = { paints: originalPaints } as unknown as PaintStyle;
     mockSetBoundVariableForPaint.mockReturnValue({ type: 'SOLID', color: { r: 1, g: 0, b: 0 }, opacity: 1 });
 
-    await unbindVariableFromTarget(target, 'paints', boundPaint);
+    await unbindVariableFromTarget(target, 'paints');
 
     expect(target.paints).not.toBe(originalPaints);
     expect(mockSetBoundVariableForPaint).toHaveBeenCalledWith(boundPaint, 'color', null);
   });
 
   it('returns the existing value when the target has no matching key', async () => {
-    const paint = { type: 'SOLID', color: { r: 1, g: 0, b: 0 }, opacity: 1 } as unknown as Paint;
     const target = {} as unknown as PaintStyle;
 
-    const result = await unbindVariableFromTarget(target, 'paints', paint);
+    const result = await unbindVariableFromTarget(target, 'paints');
 
     expect(result).toBeUndefined();
+    expect(mockSetBoundVariableForPaint).not.toHaveBeenCalled();
+  });
+
+  it('does not touch a node with mixed fills', async () => {
+    const target = { fills: figma.mixed } as unknown as BaseNode;
+
+    const result = await unbindVariableFromTarget(target, 'fills');
+
+    expect(result).toBe(figma.mixed);
     expect(mockSetBoundVariableForPaint).not.toHaveBeenCalled();
   });
 });

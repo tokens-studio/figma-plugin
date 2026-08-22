@@ -1,6 +1,6 @@
 import { clone } from '@figma-plugin/helpers';
 
-export async function unbindVariableFromTarget(target: BaseNode | PaintStyle, key: 'paints' | 'fills' | 'strokes', newPaint: Paint) {
+export async function unbindVariableFromTarget(target: BaseNode | PaintStyle, key: 'paints' | 'fills' | 'strokes') {
   if (key in target) {
     const existingPaint = target[key] !== figma.mixed ? target[key][0] : undefined;
     // Nothing bound to unbind — skip the write so we don't touch a style/node that's already correct
@@ -8,7 +8,9 @@ export async function unbindVariableFromTarget(target: BaseNode | PaintStyle, ke
       return target[key];
     }
     const fillsCopy = clone(target[key]);
-    fillsCopy[0] = figma.variables.setBoundVariableForPaint(fillsCopy[0] ?? newPaint, 'color', null);
+    // existingPaint (fillsCopy[0]) is guaranteed defined here — we only reach this
+    // point when it already has a bound color variable to remove.
+    fillsCopy[0] = figma.variables.setBoundVariableForPaint(fillsCopy[0], 'color', null);
     target[key] = fillsCopy;
     return target[key];
   }
