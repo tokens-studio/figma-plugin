@@ -27,7 +27,7 @@ export default async function updateEffectStyles({
   await processBatches(effectTokens, 50, async (token) => {
     if (effectStylesToIdMap.has(token.styleId)) {
       const effectStyle = effectStylesToIdMap.get(token.styleId)!;
-      if (shouldRename) {
+      if (shouldRename && effectStyle.name !== token.path) {
         effectStyle.name = token.path;
       }
       tokenToStyleMap[token.name] = effectStyle.id;
