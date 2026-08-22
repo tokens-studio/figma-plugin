@@ -16,12 +16,40 @@ mutate nodes, manage variables/styles, export a node to a PNG, screenshot the ca
 - **Platform:** macOS only, for now. **Runtime:** Node 22+ (built-in `WebSocket`/`fetch` globals). **Zero npm deps.**
 - Steady state: always launch via `node cli.mjs start` (it clones/patches/signs once, then reuses).
 
+## Yes, you can drive a plugin's own UI
+
+The bridge is not limited to the raw Plugin API. **A Figma plugin's own UI is
+fully drivable** — launch the plugin, navigate its tabs, open its modals, fill its
+forms, click through its dialogs, and read its app state, all without a human.
+(Done end-to-end against the Tokens Studio plugin's React UI.) Don't conclude
+you're stuck at `figma.*`.
+
+Two facts decide whether this works for you:
+
+1. **The plugin UI is a separate execution context in the same CDP target** —
+   not a separate target. `client._contexts` lists them all; the plugin one has a
+   `data:text/html;base64,…` `location.href`, the document one has `figma`. `eval`
+   and every `cli.mjs` command talk to the *document* context only.
+2. **`Input.dispatchMouseEvent` coordinates are top-level-page coordinates**, while
+   rects measured inside the plugin iframe are iframe-relative. **Add the iframe's
+   offset** or your clicks land on the canvas and silently do nothing.
+
+Full recipes — finding the context, the offset, `realClick`/`evalIn` helpers,
+typing, launching a plugin via Cmd+P, reading `window.store.getState()` — are in
+[AGENT-GUIDE.md → Driving a plugin's UI](./docs/AGENT-GUIDE.md#driving-a-plugins-ui).
+
+**What still needs a human:** importing a plugin manifest the first time
+(*Plugins → Development → Import plugin from manifest…* opens a macOS
+`NSOpenPanel`, which CDP cannot touch) and re-pointing an existing registration at
+a different path. Everything after that registration is automatable.
+
 ## Start here
 
 1. **[README.md](./README.md)** — what it is, why it works, full command reference, setup.
 2. **[docs/BEST-PRACTICES.md](./docs/BEST-PRACTICES.md)** — how to operate it well. Read
    **the verification hierarchy** first; it's the single most important habit.
-3. **[docs/AGENT-GUIDE.md](./docs/AGENT-GUIDE.md)** — copy-paste recipes for read / create / verify.
+3. **[docs/AGENT-GUIDE.md](./docs/AGENT-GUIDE.md)** — copy-paste recipes for read / create /
+   verify, and for **driving a plugin's own UI**.
 
 ## Commands
 
@@ -40,12 +68,15 @@ last. (Full version in [BEST-PRACTICES.md](./docs/BEST-PRACTICES.md#the-verifica
 
 1. **Read the value with `eval`** (the Figma **Plugin API**, in-process over the bridge —
    _not_ the REST API). For any _"what is this?"_ — color, name, size, bound variable,
-   font, node tree — read it, never eyeball it. Structured data is assertable.
+   font, node tree — read it, never eyeball it. Structured data is assertable. This
+   extends to a **plugin's** own state: read `document.body.innerText` or the app's
+   store from the plugin context instead of screenshotting its UI.
 2. **`export <nodeId>` → PNG** to validate _a frame you drew_. `node.exportAsync` gives
    just that node's pixels, tight-cropped, full fidelity, zoom/panel-independent.
-3. **`shot` (whole-window screenshot)** _only_ for Figma's own UI (plugin iframes,
-   panels) or values the API genuinely can't expose. A full-window shot to check a
-   frame's content is almost always the wrong call.
+3. **`shot` (whole-window screenshot)** _only_ for Figma's own chrome (panels, native
+   menus/dialogs) or values nothing else can expose. A full-window shot to check a
+   frame's content — or a plugin's UI, which you can read directly — is almost always
+   the wrong call.
 
 ## Key facts & gotchas (learned building it)
 
@@ -74,6 +105,20 @@ last. (Full version in [BEST-PRACTICES.md](./docs/BEST-PRACTICES.md#the-verifica
 - **Mutations are real & cloud-synced** — `eval` edits the user's actual logged-in
   Figma; there's no sandbox. Work on a scratch file/page, prefer additive changes, write
   idempotent scripts (find-by-name before create), and never delete user content unasked.
+- **UI state does not survive between script invocations** — menus and flyouts close,
+  plugin dialogs reset. Do a whole interaction (open → navigate → click → assert) in
+  **one continuous script**, with retries/polling inside it. Splitting it across runs
+  is the biggest time sink when driving UI.
+- **Verify _which build_ of a dev plugin is running.** Figma keys development plugins
+  on the manifest **`id`** and keeps the path it was first registered from — so a
+  worktree can silently run the main repo's months-old build. Prove it's your build
+  (unique marker → rebuild → relaunch → confirm) before trusting any behaviour. Also
+  check for `Failed to load .env.` at build time: env-dependent features then fail
+  *silently at runtime*, and `.env` is gitignored so fresh worktrees lack it.
+- **The debug build crashes, especially on keyboard events.** Avoid
+  `Input.dispatchKeyEvent` **with modifiers** (Cmd+A repeatedly hard-crashed Figma).
+  After any CDP timeout, run `node cli.mjs status` — `running: false` is the tell —
+  then `node cli.mjs start` and re-run.
 - **Target a specific file** among many tabs by filtering on its **file key**:
   `connect({ targetUrl: "<key>" })` in an inline `node -e` script (the CLI itself doesn't
   expose targetUrl; it picks the first live design context). See
