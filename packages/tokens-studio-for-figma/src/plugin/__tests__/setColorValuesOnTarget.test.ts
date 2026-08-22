@@ -68,6 +68,23 @@ describe('setColorValuesOnTarget', () => {
     }]);
   });
 
+  it('does not rewrite paints or description on a second export with the same value', async () => {
+    const mockStyle = {
+      type: 'PAINT',
+      paints: [],
+      description: '',
+    } as unknown as PaintStyle;
+
+    await setColorValuesOnTarget({ target: mockStyle, token: 'red', key: 'paints' });
+    const paintsAfterFirstExport = mockStyle.paints;
+
+    await setColorValuesOnTarget({ target: mockStyle, token: 'red', key: 'paints' });
+
+    // Same array reference — re-exporting an unchanged token must not touch the style,
+    // otherwise Figma marks it as modified and it shows up as "ready to publish" again.
+    expect(mockStyle.paints).toBe(paintsAfterFirstExport);
+  });
+
   it('should be able to update the fills on a node', async () => {
     const mockNode = {
       type: 'RECTANGLE',

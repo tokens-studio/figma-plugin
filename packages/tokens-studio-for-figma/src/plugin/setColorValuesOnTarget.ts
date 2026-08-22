@@ -128,7 +128,7 @@ export default async function setColorValuesOnTarget({
         applyPaintIfNotEqual(key, existingPaint, newPaint, target);
       }
     }
-    if (description && 'description' in target) {
+    if (description && 'description' in target && target.description !== description) {
       target.description = description;
     }
     Promise.resolve();

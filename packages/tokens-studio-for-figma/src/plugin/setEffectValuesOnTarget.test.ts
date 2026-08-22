@@ -122,6 +122,17 @@ describe('setEffectValuesOnTarget', () => {
     } as unknown as RectangleNode;
   });
 
+  it('does not rewrite effects on a second export with the same token', async () => {
+    await setEffectValuesOnTarget(rectangleNodeMock, singleShadowToken.name, defaultBaseFontSize);
+    const effectsAfterFirstExport = rectangleNodeMock.effects;
+
+    await setEffectValuesOnTarget(rectangleNodeMock, singleShadowToken.name, defaultBaseFontSize);
+
+    // Same array reference — re-exporting an unchanged token must not touch the style,
+    // otherwise Figma marks it as modified and it shows up as "ready to publish" again.
+    expect(rectangleNodeMock.effects).toBe(effectsAfterFirstExport);
+  });
+
   it('sets single shadow token', async () => {
     await setEffectValuesOnTarget(rectangleNodeMock, singleShadowToken.name, defaultBaseFontSize);
     expect(rectangleNodeMock).toEqual({
