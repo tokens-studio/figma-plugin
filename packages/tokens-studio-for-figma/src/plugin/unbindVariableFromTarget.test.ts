@@ -33,4 +33,14 @@ describe('unbindVariableFromTarget', () => {
     expect(target.paints).not.toBe(originalPaints);
     expect(mockSetBoundVariableForPaint).toHaveBeenCalledWith(boundPaint, 'color', null);
   });
+
+  it('returns the existing value when the target has no matching key', async () => {
+    const paint = { type: 'SOLID', color: { r: 1, g: 0, b: 0 }, opacity: 1 } as unknown as Paint;
+    const target = {} as unknown as PaintStyle;
+
+    const result = await unbindVariableFromTarget(target, 'paints', paint);
+
+    expect(result).toBeUndefined();
+    expect(mockSetBoundVariableForPaint).not.toHaveBeenCalled();
+  });
 });
