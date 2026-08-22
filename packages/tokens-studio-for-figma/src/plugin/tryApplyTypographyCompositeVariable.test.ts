@@ -217,6 +217,36 @@ describe('tryApplyTypographyCompositeVariable', () => {
     expect(target.fontName).toBe(fontName);
   });
 
+  it('does not write an object-shaped property (letterSpacing) again when it already matches', async () => {
+    let letterSpacingSetCount = 0;
+    let storedLetterSpacing: { unit: string; value?: number } = { unit: 'PIXELS', value: 8 };
+    target = {
+      fontName: { family: 'Arial', style: 'Regular' },
+    } as TextNode | TextStyle;
+    Object.defineProperty(target, 'letterSpacing', {
+      get: () => storedLetterSpacing,
+      set: (v: { unit: string; value?: number }) => {
+        storedLetterSpacing = v;
+        letterSpacingSetCount += 1;
+      },
+    });
+    value = {
+      letterSpacing: '0.5em',
+    };
+    resolvedValue = {
+      letterSpacing: '0.5em',
+    };
+    defaultTokenValueRetriever.getVariableReference = jest.fn().mockResolvedValue(undefined);
+
+    await tryApplyTypographyCompositeVariable({
+      target, value, resolvedValue, baseFontSize,
+    });
+
+    // target.letterSpacing already equals the transformed value ({ unit: 'PIXELS', value: 8 }),
+    // so it must not be reassigned.
+    expect(letterSpacingSetCount).toBe(0);
+  });
+
   it('does not write a property again on a second call with the same resolved value', async () => {
     let fontSizeSetCount = 0;
     let storedFontSize: number | undefined;
