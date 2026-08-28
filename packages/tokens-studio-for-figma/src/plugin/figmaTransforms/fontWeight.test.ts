@@ -15,6 +15,10 @@ describe('fontWeight', () => {
       output: ['Light', 'Leicht'],
     },
     {
+      input: '350',
+      output: ['SemiLight', 'Semi Light', 'DemiLight', 'Demi Light'],
+    },
+    {
       input: '400',
       output: ['Regular', 'Normal', 'Book', 'Roman', 'Buch'],
     },
@@ -24,11 +28,11 @@ describe('fontWeight', () => {
     },
     {
       input: '600',
-      output: ['SemiBold', 'Semibold', 'Semi Bold', 'DemiBold', 'Demi Bold', 'Halbfett'],
+      output: ['SemiBold', 'Semibold', 'Semi Bold', 'DemiBold', 'Demi Bold', 'Halbfett', 'Demi'],
     },
     {
       input: '700',
-      output: ['Bold', 'Dreiviertelfett'],
+      output: ['Bold', 'Dreiviertelfett', 'Gras'],
     },
     {
       input: '800',
@@ -37,6 +41,10 @@ describe('fontWeight', () => {
     {
       input: '900',
       output: ['Black', 'Heavy', 'Super', 'Extrafett'],
+    },
+    {
+      input: '950',
+      output: ['ExtraBlack', 'Extra Black', 'UltraBlack', 'Ultra Black'],
     },
     {
       input: '450',
