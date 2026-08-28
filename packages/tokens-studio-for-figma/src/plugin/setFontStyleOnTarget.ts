@@ -1,6 +1,7 @@
 import { notifyUI } from './notifiers';
 import { ResolvedTypographyObject } from './ResolvedTypographyObject';
 import { fontWeightStyleCandidates } from './figmaTransforms/fontWeight';
+import { listAvailableFonts } from './listAvailableFonts';
 
 export async function setFontStyleOnTarget({ target, value }: { target: BaseNode | TextStyle; value: Pick<ResolvedTypographyObject, 'fontFamily' | 'fontWeight'>; baseFontSize: string }) {
   if (!('fontName' in target)) return;
@@ -24,7 +25,7 @@ export async function setFontStyleOnTarget({ target, value }: { target: BaseNode
       .map((candidateFontFamily) => candidateFontFamily.replace(/['"]/g, '').trim())
       .filter(Boolean);
     const weightCandidates = fontWeightStyleCandidates(style);
-    const available = await figma.listAvailableFontsAsync() || [];
+    const available = await listAvailableFonts();
 
     const fontsToTry: { family: string; style: string; }[] = [];
     families.forEach((candidateFamily) => {

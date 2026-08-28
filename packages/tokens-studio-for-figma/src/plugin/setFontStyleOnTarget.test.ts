@@ -1,5 +1,6 @@
 import { mockLoadFontAsync, mockNotify } from '../../tests/__mocks__/figmaMock';
 import { setFontStyleOnTarget } from './setFontStyleOnTarget';
+import { resetListAvailableFontsCache } from './listAvailableFonts';
 
 function mockAvailableFonts(family: string, styles: string[]) {
   (figma.listAvailableFontsAsync as jest.Mock).mockResolvedValue(
@@ -17,6 +18,7 @@ describe('setFontStyleOnTarget', () => {
   let target: { fontName: FontName };
 
   beforeEach(() => {
+    resetListAvailableFontsCache();
     target = {
       fontName: { family: 'Inter', style: 'Regular' },
     };
