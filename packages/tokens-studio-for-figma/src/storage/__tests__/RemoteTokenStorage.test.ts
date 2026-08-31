@@ -56,9 +56,8 @@ describe('RemoteTokenStorage.retrieve', () => {
 
     expect(result).not.toBeNull();
     expect(result?.status).toBe('success');
-    if (result?.status === 'success') {
-      expect(result.metadata).toEqual({ tokenSetOrder: ['global', 'semantic'] });
-    }
+    if (result?.status !== 'success') throw new Error('retrieve failed');
+    expect(result.metadata).toEqual({ tokenSetOrder: ['global', 'semantic'] });
   });
 
   it('preserves the file contents when a $metadata.json is present', async () => {
@@ -80,9 +79,9 @@ describe('RemoteTokenStorage.retrieve', () => {
 
     const result = await storage.retrieve();
 
-    if (result?.status === 'success') {
-      expect(result.metadata).toEqual({ tokenSetOrder: ['global'] });
-    }
+    expect(result?.status).toBe('success');
+    if (result?.status !== 'success') throw new Error('retrieve failed');
+    expect(result.metadata).toEqual({ tokenSetOrder: ['global'] });
   });
 
   it('preserves an empty metadata object rather than overwriting it', async () => {
@@ -106,8 +105,8 @@ describe('RemoteTokenStorage.retrieve', () => {
 
     const result = await storage.retrieve();
 
-    if (result?.status === 'success') {
-      expect(result.metadata).toEqual({});
-    }
+    expect(result?.status).toBe('success');
+    if (result?.status !== 'success') throw new Error('retrieve failed');
+    expect(result.metadata).toEqual({});
   });
 });

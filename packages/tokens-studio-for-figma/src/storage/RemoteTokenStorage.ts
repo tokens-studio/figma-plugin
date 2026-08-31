@@ -150,9 +150,14 @@ export abstract class RemoteTokenStorage<
       // undefined — isEqual(undefined, {tokenSetOrder}) is false, tripping a permanent
       // phantom diff that routes conversion pushes through saveOptimized with zero token
       // diffs and commits only $metadata.json (see PR #3941 for the corresponding
-      // buildMetadata normalization).
+      // buildMetadata normalization). Derive tokenSetOrder directly from the retrieved
+      // token-set files so the order matches the read()-side authoritative ordering,
+      // independent of how data.tokens happened to be constructed above.
       if (!data.metadata) {
-        data.metadata = { tokenSetOrder: Object.keys(data.tokens) } as RemoteTokenStorageMetadata & Metadata;
+        const tokenSetOrder = files
+          .filter((file): file is RemoteTokenStorageSingleTokenSetFile => file.type === 'tokenSet')
+          .map((file) => file.name);
+        data.metadata = { tokenSetOrder } as RemoteTokenStorageMetadata & Metadata;
       }
       return {
         status: 'success',
