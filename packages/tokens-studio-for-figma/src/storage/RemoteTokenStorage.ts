@@ -144,6 +144,16 @@ export abstract class RemoteTokenStorage<
           };
         }
       });
+      // Normalize metadata so the diff hook's baseState always has the same shape as
+      // what useChangedState.buildMetadata produces. Repos without a $metadata.json
+      // (fresh syncs, older repos predating the file) would otherwise leave metadata
+      // undefined — isEqual(undefined, {tokenSetOrder}) is false, tripping a permanent
+      // phantom diff that routes conversion pushes through saveOptimized with zero token
+      // diffs and commits only $metadata.json (see PR #3941 for the corresponding
+      // buildMetadata normalization).
+      if (!data.metadata) {
+        data.metadata = { tokenSetOrder: Object.keys(data.tokens) } as RemoteTokenStorageMetadata & Metadata;
+      }
       return {
         status: 'success',
         ...data,
