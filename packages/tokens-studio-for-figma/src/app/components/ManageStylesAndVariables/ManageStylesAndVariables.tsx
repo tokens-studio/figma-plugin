@@ -13,12 +13,14 @@ import { useIsProUser } from '@/app/hooks/useIsProUser';
 
 import OptionsModal from './OptionsModal';
 import useTokens from '@/app/store/useTokens';
+import useConfirm from '@/app/hooks/useConfirm';
 import ExportSetsTab from './ExportSetsTab';
 import ExportThemesTab from './ExportThemesTab';
-import { allTokenSetsSelector, themesListSelector } from '@/selectors';
+import { allTokenSetsSelector, themesListSelector, tokensSelector } from '@/selectors';
 import { ExportTokenSet } from '@/types/ExportTokenSet';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { Dispatch } from '@/app/store';
+import { TokenTypes } from '@/constants/TokenTypes';
 
 export default function ManageStylesAndVariables({ showModal, setShowModal }: { showModal: boolean, setShowModal: (show: boolean) => void }) {
   const { t } = useTranslation(['manageStylesAndVariables']);
@@ -53,7 +55,10 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
 
   const {
     createVariablesFromSets, createVariablesFromThemes, createStylesFromSelectedTokenSets, createStylesFromSelectedThemes,
+    removeVariablesFromToken,
   } = useTokens();
+  const { confirm } = useConfirm<string[]>();
+  const allTokens = useSelector(tokensSelector);
 
   // Save selected themes when they change and update redux state
   React.useEffect(() => {
@@ -72,7 +77,47 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
     setShowOptions(false);
   }, []);
 
+  // Color tokens that now hold a gradient value but still have a Figma variable
+  // bound from an earlier export. Figma variables can't store gradients, so a
+  // stale variable will keep overriding the new gradient style on any bound
+  // layer. Offer to delete these variables before we push.
+  const gradientTokensWithStaleVariable = React.useMemo(() => {
+    const isGradient = (v: unknown): v is string => typeof v === 'string'
+      && (v.startsWith('linear-gradient') || v.startsWith('radial-gradient') || v.startsWith('conic-gradient'));
+    const seen = new Set<string>();
+    const collected: string[] = [];
+    Object.values(allTokens).forEach((tokenList) => {
+      tokenList.forEach((token) => {
+        if (token.type !== TokenTypes.COLOR || !isGradient(token.value) || seen.has(token.name)) return;
+        const hasVariable = themes.some((theme) => Boolean(theme.$figmaVariableReferences?.[token.name]));
+        if (hasVariable) {
+          seen.add(token.name);
+          collected.push(token.name);
+        }
+      });
+    });
+    return collected;
+  }, [allTokens, themes]);
+
   const handleExportToFigma = React.useCallback(async () => {
+    if (gradientTokensWithStaleVariable.length > 0) {
+      const gradientConfirm = await confirm({
+        text: 'Delete Figma variables for gradient tokens?',
+        description: "Figma variables can't store gradients. These color tokens are now gradients but still have variables from a previous export — bound layers will keep showing the old color until the variable is removed. Uncheck any you'd rather keep.",
+        confirmAction: 'Delete selected & export',
+        cancelAction: 'Cancel',
+        variant: 'danger',
+        choices: gradientTokensWithStaleVariable.map((name) => ({
+          key: name,
+          label: name,
+          enabled: true,
+        })),
+      });
+      if (!gradientConfirm) return; // user cancelled — abort export entirely
+      const toDelete = gradientConfirm.data ?? [];
+      await Promise.all(toDelete.map((name) => removeVariablesFromToken(name)));
+    }
+
     setShowModal(false);
     if (activeTab === 'useSets') {
       await createVariablesFromSets(selectedSets);
@@ -81,7 +126,12 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
       await createVariablesFromThemes(selectedThemes);
       await createStylesFromSelectedThemes(selectedThemes);
     }
-  }, [setShowModal, activeTab, selectedThemes, selectedSets, createVariablesFromSets, createStylesFromSelectedTokenSets, createVariablesFromThemes, createStylesFromSelectedThemes]);
+  }, [
+    setShowModal, activeTab, selectedThemes, selectedSets,
+    createVariablesFromSets, createStylesFromSelectedTokenSets,
+    createVariablesFromThemes, createStylesFromSelectedThemes,
+    gradientTokensWithStaleVariable, confirm, removeVariablesFromToken,
+  ]);
   const canExportToFigma = activeTab === 'useSets' ? selectedSets.length > 0 : selectedThemes.length > 0;
 
   const handleTabChange = React.useCallback((tab: 'useThemes' | 'useSets') => {
