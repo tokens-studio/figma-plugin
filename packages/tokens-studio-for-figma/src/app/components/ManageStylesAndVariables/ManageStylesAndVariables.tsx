@@ -84,13 +84,18 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
   const gradientTokensWithStaleVariable = React.useMemo(() => {
     const isGradient = (v: unknown): v is string => typeof v === 'string'
       && (v.startsWith('linear-gradient') || v.startsWith('radial-gradient') || v.startsWith('conic-gradient'));
+    // Flatten variable-reference keys across all themes once so the token scan
+    // stays O(tokens + refs) rather than O(tokens × themes).
+    const referencedTokenNames = new Set<string>();
+    themes.forEach((theme) => {
+      Object.keys(theme.$figmaVariableReferences ?? {}).forEach((name) => referencedTokenNames.add(name));
+    });
     const seen = new Set<string>();
     const collected: string[] = [];
     Object.values(allTokens).forEach((tokenList) => {
       tokenList.forEach((token) => {
         if (token.type !== TokenTypes.COLOR || !isGradient(token.value) || seen.has(token.name)) return;
-        const hasVariable = themes.some((theme) => Boolean(theme.$figmaVariableReferences?.[token.name]));
-        if (hasVariable) {
+        if (referencedTokenNames.has(token.name)) {
           seen.add(token.name);
           collected.push(token.name);
         }
@@ -102,10 +107,10 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
   const handleExportToFigma = React.useCallback(async () => {
     if (gradientTokensWithStaleVariable.length > 0) {
       const gradientConfirm = await confirm({
-        text: 'Delete Figma variables for gradient tokens?',
-        description: "Figma variables can't store gradients. These color tokens are now gradients but still have variables from a previous export — bound layers will keep showing the old color until the variable is removed. Uncheck any you'd rather keep.",
-        confirmAction: 'Delete selected & export',
-        cancelAction: 'Cancel',
+        text: t('confirmDeleteGradientVariables.text', { defaultValue: 'Delete Figma variables for gradient tokens?' }),
+        description: t('confirmDeleteGradientVariables.description', { defaultValue: "Figma variables can't store gradients. These color tokens are now gradients but still have variables from a previous export — bound layers will keep showing the old color until the variable is removed. Uncheck any you'd rather keep." }),
+        confirmAction: t('confirmDeleteGradientVariables.confirmAction', { defaultValue: 'Delete selected & export' }),
+        cancelAction: t('confirmDeleteGradientVariables.cancelAction', { defaultValue: 'Cancel' }),
         variant: 'danger',
         choices: gradientTokensWithStaleVariable.map((name) => ({
           key: name,
@@ -115,7 +120,14 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
       });
       if (!gradientConfirm) return; // user cancelled — abort export entirely
       const toDelete = gradientConfirm.data ?? [];
-      await Promise.all(toDelete.map((name) => removeVariablesFromToken(name)));
+      // Sequential rather than Promise.all — each call posts a REMOVE_VARIABLES
+      // message and the plugin side processes them serially anyway, so this
+      // keeps behavior predictable without a burst of parallel requests.
+      // eslint-disable-next-line no-restricted-syntax
+      for (const name of toDelete) {
+        // eslint-disable-next-line no-await-in-loop
+        await removeVariablesFromToken(name);
+      }
     }
 
     setShowModal(false);
@@ -130,7 +142,7 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
     setShowModal, activeTab, selectedThemes, selectedSets,
     createVariablesFromSets, createStylesFromSelectedTokenSets,
     createVariablesFromThemes, createStylesFromSelectedThemes,
-    gradientTokensWithStaleVariable, confirm, removeVariablesFromToken,
+    gradientTokensWithStaleVariable, confirm, removeVariablesFromToken, t,
   ]);
   const canExportToFigma = activeTab === 'useSets' ? selectedSets.length > 0 : selectedThemes.length > 0;
 
