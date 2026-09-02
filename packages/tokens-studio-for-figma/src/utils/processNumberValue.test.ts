@@ -34,8 +34,8 @@ describe('processNumberValue', () => {
   });
 
   it('should handle empty strings', () => {
-    expect(processNumberValue('')).toBe('');
-    expect(processNumberValue('   ')).toBe('');
+    expect(processNumberValue('')).toBeUndefined();
+    expect(processNumberValue('   ')).toBeUndefined();
   });
 
   it('should handle edge cases with numeric patterns', () => {
