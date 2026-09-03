@@ -7,19 +7,16 @@ import { SingleToken } from '@/types/tokens';
  * @param value - The token value to process
  * @returns A number if the value is numeric, otherwise a trimmed string
  */
-export function processNumberValue(value: SingleToken['value']): number | string | undefined {
+export function processNumberValue(value: SingleToken['value']): number | string {
   if (typeof value === 'number') {
     return value;
   }
 
   if (typeof value === 'string') {
     const trimmedValue = value.trim();
-    if (trimmedValue === '') {
-      return undefined;
-    }
     const numericValue = Number(trimmedValue);
     // Check if the value is a valid number and not empty
-    if (!isNaN(numericValue) && isFinite(numericValue)) {
+    if (!isNaN(numericValue) && isFinite(numericValue) && trimmedValue !== '') {
       // Use regex to ensure it's a proper numeric format (optional minus, digits, optional decimal point, digits)
       // This prevents conversion of values like "1e5", "0x10", "Infinity", etc.
       if (/^-?\d*\.?\d+$/.test(trimmedValue)) {

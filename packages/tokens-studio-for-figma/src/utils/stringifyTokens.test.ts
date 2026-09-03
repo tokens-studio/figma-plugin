@@ -181,30 +181,32 @@ describe('stringfyTokens', () => {
     );
   });
 
-  it('serializes a fontWeights token with a literal numeric string value as a number, not a string', () => {
-   const input = {
-     global: [
-       {
-         name: 'fontWeights.bold',
-         value: '700',
-         type: 'fontWeights',
-       },
-     ],
-   };
-   setFormat(TokenFormatOptions.Legacy);
-   expect(stringifyTokens(input, activeTokenSet)).toEqual(
-     JSON.stringify(
-       {
-         fontWeights: {
-           bold: {
-             value: 700,
-             type: 'fontWeights',
-           },
-         },
-       },
-       null,
-       2,
-     ),
-   );
+  it('serializes a fontWeights token with a literal numeric string value as a number', () => {
+    const input = {
+      global: [
+        {
+          name: 'fontWeights.bold',
+          value: '700',
+          type: 'fontWeights',
+        },
+      ],
+    };
+
+    setFormat(TokenFormatOptions.DTCG);
+
+    expect(stringifyTokens(input, activeTokenSet)).toEqual(
+      JSON.stringify(
+        {
+          fontWeights: {
+            bold: {
+              $type: 'fontWeights',
+              $value: 700,
+            },
+          },
+        },
+        null,
+        2,
+      ),
+    );
   });
 });
