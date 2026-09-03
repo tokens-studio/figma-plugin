@@ -24,6 +24,9 @@ export enum TokenTypes {
   ASSET = 'asset',
   BOOLEAN = 'boolean',
   NUMBER = 'number',
+  DURATION = 'duration',
+  CUBIC_BEZIER = 'cubicBezier',
+  MOTION = 'motion',
 }
 
 export const ExportNumberVariablesTokenTypes = [
@@ -39,4 +42,5 @@ export const ExportNumberVariablesTokenTypes = [
   TokenTypes.PARAGRAPH_INDENT,
   TokenTypes.PARAGRAPH_SPACING,
   TokenTypes.OPACITY,
+  TokenTypes.DURATION,
 ];

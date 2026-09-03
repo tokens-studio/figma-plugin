@@ -234,5 +234,39 @@
     "schemas": {
       "value": { "type": "string" }
     }
+  },
+  "duration": {
+    "label": "Duration",
+    "property": "Duration",
+    "type": "duration",
+    "explainer": "e.g. 200ms or 0.2s",
+    "schemas": {
+      "value": { "type": "string" }
+    }
+  },
+  "cubicBezier": {
+    "label": "Cubic Bezier",
+    "property": "Cubic Bezier",
+    "type": "cubicBezier",
+    "explainer": "Four numbers between 0 and 1, e.g. 0.4, 0, 0.2, 1",
+    "schemas": {
+      "value": { "type": "string" }
+    }
+  },
+  "motion": {
+    "label": "Motion",
+    "property": "Motion",
+    "type": "motion",
+    "schemas": {
+      "value": {
+        "type": "object",
+        "properties": {
+          "property": { "type": "string" },
+          "duration": { "type": "string" },
+          "timingFunction": { "type": "string" },
+          "delay": { "type": "string" }
+        }
+      }
+    }
   }
 }

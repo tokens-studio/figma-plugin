@@ -19,7 +19,8 @@ function getReturnedValue(token: SingleToken | string | number) {
     && typeof token.value === 'object'
     && (token?.type === TokenTypes.BOX_SHADOW
       || token?.type === TokenTypes.TYPOGRAPHY
-      || token?.type === TokenTypes.BORDER)
+      || token?.type === TokenTypes.BORDER
+      || token?.type === TokenTypes.MOTION)
   ) {
     return token.value;
   }

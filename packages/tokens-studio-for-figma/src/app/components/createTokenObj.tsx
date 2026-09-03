@@ -47,6 +47,13 @@ export function transformName(name: string): TokenTypes {
       return TokenTypes.BORDER;
     case 'asset':
       return TokenTypes.ASSET;
+    case 'duration':
+      return TokenTypes.DURATION;
+    case 'cubicBezier':
+      return TokenTypes.CUBIC_BEZIER;
+    case 'motion':
+    case 'transition':
+      return TokenTypes.MOTION;
     default:
       return TokenTypes.OTHER;
   }

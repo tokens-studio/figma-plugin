@@ -9,14 +9,16 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { IconBorder, IconImage } from '@/icons';
 import { SingleToken } from '@/types/tokens';
 import { TokenTooltip } from './TokenTooltip';
-import { TokenTypographyValue, TokenBoxshadowValue, TokenBorderValue } from '@/types/values';
+import {
+  TokenTypographyValue, TokenBoxshadowValue, TokenBorderValue, TokenMotionValue, TokenDurationValue, TokenCubicBezierValue,
+} from '@/types/values';
 import { useResolvedBaseFontSize } from '@/app/hooks/useResolvedBaseFontSize';
 import { formatTokenValueForDisplay } from '@/utils/displayTokenValue';
 
 type Props = {
   name: string;
   value: SingleToken['value']
-  rawValue?: Partial<Record<TokenTypes, string | number | TokenTypographyValue | TokenBoxshadowValue | TokenBorderValue | TokenBoxshadowValue[]>>
+  rawValue?: Partial<Record<TokenTypes, string | number | TokenTypographyValue | TokenBoxshadowValue | TokenBorderValue | TokenMotionValue | TokenDurationValue | TokenCubicBezierValue | TokenBoxshadowValue[]>>
   type: string;
 };
 

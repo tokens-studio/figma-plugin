@@ -275,5 +275,43 @@ const tokenTypes = {
       },
     },
   },
+  duration: {
+    label: 'Duration',
+    property: 'Duration',
+    type: 'duration',
+    explainer: 'e.g. 200ms or 0.2s',
+    schema: {
+      options: {
+        description: '',
+      },
+    },
+  },
+  cubicBezier: {
+    label: 'Cubic Bezier',
+    property: 'Cubic Bezier',
+    type: 'cubicBezier',
+    explainer: 'Four numbers between 0 and 1, e.g. 0.4, 0, 0.2, 1',
+    schema: {
+      options: {
+        description: '',
+      },
+    },
+  },
+  motion: {
+    label: 'Motion',
+    property: 'Motion',
+    type: 'motion',
+    schema: {
+      value: {
+        property: 'all',
+        duration: '200ms',
+        timingFunction: '0.4, 0, 0.2, 1',
+        delay: '0ms',
+      },
+      options: {
+        description: '',
+      },
+    },
+  },
 };
 export default tokenTypes;

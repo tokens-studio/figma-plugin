@@ -21,6 +21,11 @@ export function convertTokenTypeToVariableType(type: TokenTypes, value: SingleTo
     case TokenTypes.FONT_WEIGHTS:
     case TokenTypes.TEXT:
       return 'STRING';
+    case TokenTypes.DURATION:
+      // Duration exports as a numeric variable (ms). Motion + cubicBezier
+      // are composite/non-scalar and fall through to FLOAT as a placeholder
+      // until Figma's TIMING/EASING variable types are supported here.
+      return 'FLOAT';
     default:
       return 'FLOAT';
   }
