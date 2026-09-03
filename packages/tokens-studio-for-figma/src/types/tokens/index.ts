@@ -36,3 +36,6 @@ export * from './SingleNumberToken';
 export * from './TokenToRename';
 export * from './CodeSyntax';
 export * from './FigmaExtensions';
+export * from './SingleDurationToken';
+export * from './SingleCubicBezierToken';
+export * from './SingleMotionToken';
