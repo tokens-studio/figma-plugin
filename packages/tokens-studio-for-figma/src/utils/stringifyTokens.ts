@@ -16,7 +16,7 @@ export function getGroupTypeName(tokenName: string, groupLevel: number): string 
 }
 
 function processTokenValue(value: any, tokenType: string): any {
-  if (tokenType === TokenTypes.NUMBER) {
+  if (tokenType === TokenTypes.NUMBER || tokenType === TokenTypes.FONT_WEIGHTS) {
     return processNumberValue(value);
   }
   return value;
