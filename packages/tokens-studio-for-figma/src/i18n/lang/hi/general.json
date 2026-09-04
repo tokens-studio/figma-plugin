@@ -17,5 +17,14 @@
   "close": "बंद करना",
   "secondScreen": "दूसरी स्क्रीन",
   "and": "और",
-  "more": "अधिक"
+  "more": "अधिक",
+  "multiSelect": {
+    "search": "खोजें",
+    "clearSearch": "खोज साफ़ करें",
+    "selectAll": "सभी चुनें",
+    "noResults": "आपकी खोज से कोई आइटम मेल नहीं खाता",
+    "noneSelected": "कोई भी चयनित नहीं",
+    "itemsSelected": "{{number}} चयनित",
+    "allSelected": "सभी ({{number}})"
+  }
 }
