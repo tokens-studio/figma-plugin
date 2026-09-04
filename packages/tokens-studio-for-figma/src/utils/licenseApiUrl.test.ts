@@ -16,6 +16,10 @@ describe('licenseApiUrl', () => {
     expect(() => normalizeLicenseApiUrl('   ')).toThrow('License API URL cannot be empty');
   });
 
+  it('rejects a protocol it cannot fetch over', () => {
+    expect(() => normalizeLicenseApiUrl('ftp://api-production.tokens.studio')).toThrow('License API URL must use http or https');
+  });
+
   it('tries the new production API before the legacy one', () => {
     expect(LICENSE_API_HOSTS[0]).toEqual(PRIMARY_LICENSE_API_URL);
     expect(PRIMARY_LICENSE_API_URL).toEqual('https://api-production.tokens.studio');
