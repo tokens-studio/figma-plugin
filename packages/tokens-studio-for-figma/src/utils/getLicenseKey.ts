@@ -1,24 +1,16 @@
-import { handleReactError } from './error/handleReactError';
+import { fetchLicenseApi } from './licenseApi';
 
 type GetLicenseKeyResponse =
   { key: string; }
   | { error: string; };
 
 export default async function getLicenseKey(userId: string | null): Promise<GetLicenseKeyResponse> {
-  try {
-    const res = await fetch(`${process.env.LICENSE_API_URL}/get-license?userId=${userId}`);
-    if (res.status === 200) {
-      return await res.json();
-    }
+  const result = await fetchLicenseApi<{ key: string }>(`/get-license?userId=${userId}`, {
+    endpoint: 'get-license',
+    figmaId: userId,
+  });
 
-    const { message } = await res.json();
-    return {
-      error: message,
-    };
-  } catch (e) {
-    handleReactError(e);
-    return {
-      error: 'Error fetching license',
-    };
-  }
+  if (result.ok) return result.data;
+
+  return { error: result.message ?? 'Error fetching license' };
 }
