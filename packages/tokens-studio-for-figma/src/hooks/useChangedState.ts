@@ -12,6 +12,7 @@ import { findDifferentState } from '@/utils/findDifferentState';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { compareLastSyncedState } from '@/utils/compareLastSyncedState';
 import { tokenFormatSelector } from '@/selectors/tokenFormatSelector';
+import { buildGitMetadata } from '@/utils/buildGitMetadata';
 
 export function useChangedState() {
   const remoteData = useSelector(remoteDataSelector);
@@ -24,36 +25,32 @@ export function useChangedState() {
   const dispatch = useDispatch();
 
   // Only Tokens Studio OAuth persists tokenSetsData in its metadata payload; git-based
-  // providers write only { tokenSetOrder }, so including tokenSetsData here would produce
-  // a permanent metadata diff (baseState from remote lacks it), triggering empty pushes.
-  const buildMetadata = useCallback((tokenSetOrder: string[]) => {
+  // providers share the shape produced by buildGitMetadata (same helper the push callbacks
+  // use), so the diff and the on-disk write always agree. A mismatch here would produce a
+  // permanent phantom metadata diff, triggering empty pushes and a false "$metadata changed"
+  // row in the push dialog.
+  const buildMetadata = useCallback(() => {
     if (storageType.provider === StorageProviderType.LOCAL) return {};
     if (storageType.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
-      return { tokenSetOrder, tokenSetsData: tokenSetMetadata };
+      return { tokenSetOrder: Object.keys(tokens), tokenSetsData: tokenSetMetadata };
     }
-    return { tokenSetOrder };
-  }, [storageType.provider, tokenSetMetadata]);
+    return buildGitMetadata(tokens);
+  }, [storageType.provider, tokenSetMetadata, tokens]);
 
-  const changedPushState = useMemo(() => {
-    const tokenSetOrder = Object.keys(tokens);
-    return findDifferentState(remoteData, {
+  const changedPushState = useMemo(() => findDifferentState(remoteData, {
+    tokens,
+    themes,
+    metadata: buildMetadata(),
+  }), [remoteData, tokens, themes, buildMetadata]);
+
+  const changedPullState = useMemo(() => findDifferentState(
+    {
       tokens,
       themes,
-      metadata: buildMetadata(tokenSetOrder),
-    });
-  }, [remoteData, tokens, themes, buildMetadata]);
-
-  const changedPullState = useMemo(() => {
-    const tokenSetOrder = Object.keys(tokens);
-    return findDifferentState(
-      {
-        tokens,
-        themes,
-        metadata: buildMetadata(tokenSetOrder),
-      },
-      remoteData,
-    );
-  }, [remoteData, tokens, themes, buildMetadata]);
+      metadata: buildMetadata(),
+    },
+    remoteData,
+  ), [remoteData, tokens, themes, buildMetadata]);
 
   const hasChanges = useMemo(() => {
     const hasChanged = !compareLastSyncedState(tokens, themes, lastSyncedState, tokenFormat);

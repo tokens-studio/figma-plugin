@@ -195,12 +195,14 @@ export default function useRemoteTokens() {
           metadata: remoteData.metadata,
         });
         dispatch.uiState.setHasRemoteChange(false);
-        const stringifiedRemoteTokens = JSON.stringify(
-          compact([remoteData.tokens, remoteData.themes, TokenFormat.format]),
-          null,
-          2,
-        );
-        dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
+        // Do NOT write setLastSyncedState here. `storage.retrieve` mutated the TokenFormat
+        // singleton via detectFormat (no Redux dispatch), so if we recorded lastSyncedState
+        // now and the user then declined the pull, lastSyncedState[2] would carry the remote
+        // format while Redux tokenState.tokenFormat kept the old one — pushTokensToGitHub's
+        // format-flip detection (TokenFormat.format vs getLastSyncedFormat(lastSyncedState))
+        // would trip on the next push and silently rewrite every token file in the remote
+        // format the user just declined. Only record lastSyncedState once local state
+        // actually adopts the remote (see below).
         if (activeTab !== Tabs.LOADING) {
           if (updateLocalTokens) {
             const format = getFormat();
@@ -281,6 +283,15 @@ export default function useRemoteTokens() {
               });
 
               dispatch.tokenState.setCollapsedTokenSets(collapsedTokenSets || []);
+              // Record lastSyncedState only now that local state has adopted the remote.
+              // The setTokenData effect resyncs Redux tokenFormat from the TokenFormat
+              // singleton, so lastSyncedState[2] and Redux tokenFormat land in agreement.
+              const stringifiedRemoteTokens = JSON.stringify(
+                compact([remoteData.tokens, remoteData.themes, TokenFormat.format]),
+                null,
+                2,
+              );
+              dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
             }
             track('Launched with token sets', {
               count: Object.keys(remoteData.tokens).length,
@@ -412,15 +423,15 @@ export default function useRemoteTokens() {
           break;
         }
         case StorageProviderType.GITLAB: {
-          pushResult = await pushTokensToGitLab(context);
+          pushResult = await pushTokensToGitLab(context, overrides);
           break;
         }
         case StorageProviderType.BITBUCKET: {
-          pushResult = await pushTokensToBitbucket(context);
+          pushResult = await pushTokensToBitbucket(context, overrides);
           break;
         }
         case StorageProviderType.ADO: {
-          pushResult = await pushTokensToADO(context);
+          pushResult = await pushTokensToADO(context, overrides);
           break;
         }
         case StorageProviderType.SUPERNOVA: {
