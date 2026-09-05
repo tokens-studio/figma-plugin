@@ -12,13 +12,6 @@ export function findOrCreateToken(
 ): StyleToCreateToken | undefined {
   const boundVariables = style.boundVariables as Record<string, { id: string; } | undefined>;
 
-  // Always check for existing token by value first (to preserve existing naming conventions)
-  const stringValue = String(value);
-  const existingTokenByValue = tokenArray.find((token) => String(token.value) === stringValue);
-  if (existingTokenByValue) {
-    return existingTokenByValue;
-  }
-
   // Check for bound variables
   if (boundVariables?.[propertyKey]?.id) {
     const variable = localVariables.find((v) => v.id === boundVariables[propertyKey]?.id);
@@ -48,9 +41,11 @@ export function findOrCreateToken(
   }
 
   // No bound variable or variable not found - look for existing token by value
-  const existingToken = tokenArray.find((token) => String(token.value) === stringValue);
-  if (existingToken) {
-    return existingToken;
+  // Always check for existing token by value first (to preserve existing naming conventions)
+  const stringValue = String(value);
+  const existingTokenByValue = tokenArray.find((token) => String(token.value) === stringValue);
+  if (existingTokenByValue) {
+    return existingTokenByValue;
   }
 
   // Create new token with default naming
