@@ -4,6 +4,15 @@
 
 Tokens Studio for Figma is a plugin for Figma allowing you to define and use design tokens in Figma. You can store your design tokens in JSON, sync them with a sync provider such as GitHub and define tokens even for properties that have no native support yet in Figma, such as borderRadius or spacing. You can create color and typography tokens in a granular way by extracting atomic decisions to tokens. You can also define aliases for every token, so that you can reuse your decisions. You can define and apply spacing tokens, allowing you to set the Auto Layout properties in Figma automatically. Think of it like Styles for everything.
 
+## Key Features
+
+- 🎨 **Design Tokens** - Create and manage color, typography, spacing, and more as reusable tokens
+- 🔄 **Multi-Provider Sync** - Sync with GitHub, GitLab, Azure DevOps, JSONBin, and more
+- 🎭 **Theme Management** - Define multiple theme sets and switch between them seamlessly
+- 🏷️ **Aliases & References** - Create semantic token names and reference other tokens
+- 📐 **Advanced Properties** - Support for border radius, spacing, opacity, and custom properties
+- 🔗 **Single Source of Truth** - Keep your design tokens centralized and always in sync
+
 ## Documentation
 
 For everything ranging from a quick start guide, to step by step instructions on how to keep your styles in sync (amongst other more complex use cases), you can visit our [main documentation site](https://docs.tokens.studio/).
