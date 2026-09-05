@@ -42,5 +42,11 @@ export const ExportNumberVariablesTokenTypes = [
   TokenTypes.PARAGRAPH_INDENT,
   TokenTypes.PARAGRAPH_SPACING,
   TokenTypes.OPACITY,
+];
+
+// Motion-related token types gated by the "Motion variables" export setting.
+// Duration -> FLOAT, CubicBezier -> STRING. Motion itself is composite and skipped.
+export const ExportMotionVariablesTokenTypes = [
   TokenTypes.DURATION,
+  TokenTypes.CUBIC_BEZIER,
 ];

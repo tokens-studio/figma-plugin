@@ -29,6 +29,7 @@ export async function updateUISettings(uiSettings: Partial<SavedSettings>) {
       variablesColor: uiSettings.variablesColor ?? data?.variablesColor,
       variablesNumber: uiSettings.variablesNumber ?? data?.variablesNumber,
       variablesString: uiSettings.variablesString ?? data?.variablesString,
+      variablesMotion: uiSettings.variablesMotion ?? data?.variablesMotion,
       stylesColor: uiSettings.stylesColor ?? data?.stylesColor,
       stylesEffect: uiSettings.stylesEffect ?? data?.stylesEffect,
       stylesTypography: uiSettings.stylesTypography ?? data?.stylesTypography,
@@ -68,6 +69,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
     let variablesBoolean: boolean;
     let variablesNumber: boolean;
     let variablesString: boolean;
+    let variablesMotion: boolean;
     let stylesColor: boolean;
     let stylesEffect: boolean;
     let stylesTypography: boolean;
@@ -105,6 +107,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
       variablesBoolean = typeof data.variablesBoolean === 'undefined' ? true : data.variablesBoolean;
       variablesNumber = typeof data.variablesNumber === 'undefined' ? true : data.variablesNumber;
       variablesString = typeof data.variablesString === 'undefined' ? true : data.variablesString;
+      variablesMotion = typeof data.variablesMotion === 'undefined' ? true : data.variablesMotion;
       stylesColor = typeof data.stylesColor === 'undefined' ? false : data.stylesColor;
       stylesTypography = typeof data.stylesTypography === 'undefined' ? true : data.stylesTypography;
       stylesEffect = typeof data.stylesEffect === 'undefined' ? true : data.stylesEffect;
@@ -141,6 +144,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
         variablesColor,
         variablesNumber,
         variablesString,
+        variablesMotion,
         stylesColor,
         stylesEffect,
         stylesTypography,
