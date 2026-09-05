@@ -614,4 +614,124 @@ describe('SetValuesOnVariable', () => {
       expect(mockSetVariableCodeSyntax).toHaveBeenCalledWith('ANDROID', 'androidCode');
     });
   });
+
+  describe('Extended collections: willBeAliased fallback', () => {
+    const PARENT_MODE = 'parent-mode';
+    const CHILD_MODE = 'child-composite-mode';
+    const PARENT_COLL_ID = 'parent-coll';
+    const CHILD_COLL_ID = 'child-coll';
+
+    const childCollection = {
+      id: CHILD_COLL_ID,
+      isExtension: true,
+      parentVariableCollectionId: PARENT_COLL_ID,
+      modes: [{ name: 'Light', modeId: CHILD_MODE, parentModeId: PARENT_MODE }],
+    } as unknown as VariableCollection;
+
+    const mockSetValue = jest.fn();
+
+    const makeVariable = (name: string, key: string) => ({
+      id: `VarID:${key}`,
+      key,
+      name,
+      resolvedType: 'COLOR',
+      description: '',
+      variableCollectionId: PARENT_COLL_ID,
+      valuesByMode: { [PARENT_MODE]: { r: 0, g: 0, b: 0, a: 1 } } as Record<string, unknown>,
+      scopes: [] as VariableScope[],
+      setValueForMode: mockSetValue,
+      setVariableCodeSyntax: jest.fn(),
+      removeVariableCodeSyntax: jest.fn(),
+    }) as unknown as Variable;
+
+    beforeEach(() => {
+      mockSetValue.mockClear();
+    });
+
+    it('writes resolved value when reference target has no variable (willBeAliased=false)', async () => {
+      // fg/default references {colors.red} but colors/red does NOT exist as a variable
+      const fgDefault = makeVariable('fg/default', 'fg-key');
+      const variables = [fgDefault];
+
+      const tokens = [{
+        name: 'fg.default',
+        path: 'fg/default',
+        rawValue: '{colors.red}',
+        value: '#ff0000',
+        type: TokenTypes.COLOR,
+        variableId: 'fg-key',
+      }] as SingleToken<true, { path: string; variableId: string }>[];
+
+      await setValuesOnVariable(
+        variables,
+        tokens,
+        childCollection,
+        CHILD_MODE,
+        baseFontSize,
+        false,
+        null,
+        undefined,
+        undefined,
+        true,
+      );
+
+      // Raw color should be written since reference target doesn't exist
+      expect(mockSetValue).toHaveBeenCalledWith(CHILD_MODE, { r: 1, g: 0, b: 0, a: 1 });
+    });
+
+    it('skips raw write and queues reference candidate when target variable exists (willBeAliased=true)', async () => {
+      // fg/default references {accent.default} and accent/default DOES exist
+      const fgDefault = makeVariable('fg/default', 'fg-key');
+      const accentDefault = makeVariable('accent/default', 'accent-key');
+      const variables = [fgDefault, accentDefault];
+
+      const tokens = [{
+        name: 'fg.default',
+        path: 'fg/default',
+        rawValue: '{accent.default}',
+        value: '#0000ff',
+        type: TokenTypes.COLOR,
+        variableId: 'fg-key',
+      }] as SingleToken<true, { path: string; variableId: string }>[];
+
+      const result = await setValuesOnVariable(
+        variables, tokens, childCollection, CHILD_MODE, baseFontSize,
+        false, null, undefined, undefined, true,
+      );
+
+      // Raw value should NOT be written — deferred to reference pass
+      expect(mockSetValue).not.toHaveBeenCalled();
+      // Should be queued as extended reference candidate
+      expect(result.referenceVariableCandidates).toHaveLength(1);
+      expect(result.referenceVariableCandidates[0]).toEqual(expect.objectContaining({
+        modeId: CHILD_MODE,
+        referenceVariable: 'accent.default',
+        collection: childCollection,
+      }));
+    });
+
+    it('writes resolved number value when reference target has no variable', async () => {
+      const spacing = {
+        ...makeVariable('spacing/md', 'sp-key'),
+        resolvedType: 'FLOAT',
+        valuesByMode: { [PARENT_MODE]: 16 },
+      } as unknown as Variable;
+
+      const tokens = [{
+        name: 'spacing.md',
+        path: 'spacing/md',
+        rawValue: '{base.spacing}',
+        value: '24',
+        type: TokenTypes.SPACING,
+        variableId: 'sp-key',
+      }] as SingleToken<true, { path: string; variableId: string }>[];
+
+      await setValuesOnVariable(
+        [spacing], tokens, childCollection, CHILD_MODE, baseFontSize,
+        false, null, undefined, undefined, true,
+      );
+
+      expect(mockSetValue).toHaveBeenCalledWith(CHILD_MODE, 24);
+    });
+  });
 });

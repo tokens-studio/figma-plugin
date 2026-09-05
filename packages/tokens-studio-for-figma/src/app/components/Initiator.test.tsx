@@ -665,6 +665,7 @@ describe('Initiator', () => {
       aliasBaseFontSize: '16',
       applyVariablesStylesOrRawValue: ApplyVariablesStylesOrRawValues.VARIABLES_STYLES,
       autoApplyThemeOnDrop: false,
+      exportExtendedCollections: false,
       seenGenericVersionedHeaderMigrationDialog: false,
       seenTermsUpdate2026: false,
       seenTermsUpdate2026Subprocessors: false,

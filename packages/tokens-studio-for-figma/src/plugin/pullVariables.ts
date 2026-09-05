@@ -2,7 +2,9 @@
 import { figmaRGBToHex } from '@figma-plugin/helpers';
 import { FIGMA_PLATFORMS } from '@/utils/figma';
 import { notifyVariableValues, notifyRenamedCollections, notifyException } from './notifiers';
-import { PullVariablesOptions, ThemeObjectsList } from '@/types';
+import {
+  PullVariablesOptions, ThemeObjectsList, ThemeObject,
+} from '@/types';
 import { VariableToCreateToken } from '@/types/payloads';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { getVariablesWithoutZombies } from './getVariablesWithoutZombies';
@@ -10,6 +12,16 @@ import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { normalizeVariableName } from '@/utils/normalizeVariableName';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
+import { processExtendedCollectionImport } from './extendedCollections';
+
+type CollectionEntry = {
+  id: string,
+  name: string,
+  modes: { name: string, modeId: string, parentModeId?: string }[],
+  isExtension?: boolean,
+  parentCollectionId?: string,
+  variableOverrides?: { [variableId: string]: { [modeId: string]: any } }
+};
 
 export default async function pullVariables(options: PullVariablesOptions, themes: ThemeObjectsList, proUser: boolean): Promise<void> {
   // @TODO should be specifically typed according to their type
@@ -34,18 +46,39 @@ export default async function pullVariables(options: PullVariablesOptions, theme
 
   const localVariables = await getVariablesWithoutZombies();
 
-  const collections = new Map<string, {
-    id: string,
-    name: string,
-    modes: { name: string, modeId: string }[]
-  }>();
+  // Fetch all collections upfront to detect extended collections (Enterprise-only)
+  const allFigmaCollections = await figma.variables.getLocalVariableCollectionsAsync();
+  const hasExtendedCollections = allFigmaCollections.some((c) => (c as any).isExtension);
 
-  // Cache for collection lookups
-  const collectionsCache = new Map<string, {
-    id: string,
-    name: string,
-    modes: { name: string, modeId: string }[]
-  }>();
+  // Keyed by collection name for theme processing; by ID in collectionsCache for variable lookup
+  const collections = new Map<string, CollectionEntry>();
+
+  // Cache for collection lookups by ID
+  const collectionsCache = new Map<string, CollectionEntry>();
+
+  // Always pre-populate cache from getLocalVariableCollectionsAsync results —
+  // avoids a separate getVariableCollectionByIdAsync call per variable on the standard path
+  for (const collectionData of allFigmaCollections) {
+    const extendedCollection = collectionData as any;
+    const collection: CollectionEntry = {
+      id: collectionData.id,
+      name: collectionData.name,
+      modes: collectionData.modes.map((mode) => ({
+        name: mode.name,
+        modeId: mode.modeId,
+        parentModeId: (mode as any).parentModeId,
+      })),
+      isExtension: extendedCollection.isExtension || false,
+      parentCollectionId: extendedCollection.isExtension
+        ? extendedCollection.parentVariableCollectionId
+        : undefined,
+      variableOverrides: extendedCollection.isExtension
+        ? extendedCollection.variableOverrides
+        : undefined,
+    };
+    collections.set(collection.name, collection);
+    collectionsCache.set(collection.id, collection);
+  }
 
   const createFigmaExtensions = (variable: Variable) => {
     const extensions: Record<string, any> = {};
@@ -82,17 +115,27 @@ export default async function pullVariables(options: PullVariablesOptions, theme
     return Object.keys(extensions).length > 0 ? extensions : undefined;
   };
 
+  // Collections that at least one variable contributes to (directly, or via
+  // inheritance for extended child collections). Used to skip empty collections
+  // in the theme pass.
+  const collectionIdsWithVariables = new Set<string>();
+
   for (const variable of localVariables) {
     let collection = collectionsCache.get(variable.variableCollectionId);
+
     if (!collection) {
-      const collectionData = await figma.variables.getVariableCollectionByIdAsync(variable.variableCollectionId);
-      if (collectionData) {
-        collection = {
-          id: collectionData.id,
-          name: collectionData.name,
-          modes: collectionData.modes.map((mode) => ({ name: mode.name, modeId: mode.modeId })),
-        };
-        collectionsCache.set(variable.variableCollectionId, collection);
+      if (!hasExtendedCollections) {
+        // Standard path: lazy lookup per variable (original behaviour, keeps tests working)
+        const collectionData = await figma.variables.getVariableCollectionByIdAsync(variable.variableCollectionId);
+        if (collectionData) {
+          collection = {
+            id: collectionData.id,
+            name: collectionData.name,
+            modes: collectionData.modes.map((mode) => ({ name: mode.name, modeId: mode.modeId })),
+          };
+          collectionsCache.set(collectionData.id, collection);
+          collections.set(collectionData.name, collection);
+        }
       }
     }
 
@@ -105,162 +148,252 @@ export default async function pullVariables(options: PullVariablesOptions, theme
       }
     }
 
-    if (collection) {
-      collections.set(collection.name, collection);
+    // For extended collections: also process child collections that inherit from this collection
+    const collectionsToProcess: CollectionEntry[] = collection ? [collection] : [];
+
+    if (hasExtendedCollections && collection) {
+      // Scan the id-keyed cache so duplicate collection names don't drop a child.
+      collectionsCache.forEach((extCollection) => {
+        if (extCollection.isExtension && extCollection.parentCollectionId === collection!.id) {
+          if (options.selectedCollections) {
+            const isExtendedCollectionSelected = options.selectedCollections[extCollection.id];
+            if (!isExtendedCollectionSelected) {
+              return;
+            }
+          }
+          collectionsToProcess.push(extCollection);
+        }
+      });
     }
+
+    // Mark every collection this variable contributes to as non-empty — the
+    // theme pass skips collections that never appear here (empty scratch
+    // collections would otherwise produce phantom themes).
+    collectionsToProcess.forEach((c) => collectionIdsWithVariables.add(c.id));
 
     const variableName = normalizeVariableName(variable.name);
-    try {
-      switch (variable.resolvedType) {
-        case 'COLOR':
-          Object.entries(variable.valuesByMode).forEach(([mode, value]) => {
-            // Filter modes based on selectedCollections option
-            if (options.selectedCollections && collection) {
-              const selectedCollection = options.selectedCollections[collection.id];
-              if (selectedCollection && !selectedCollection.selectedModes.includes(mode)) {
-                return; // Skip this mode if it's not selected
+
+    // Process the variable for each collection (parent + extended collections)
+    for (const collectionToProcess of collectionsToProcess) {
+      try {
+        switch (variable.resolvedType) {
+          case 'COLOR':
+            Object.entries(variable.valuesByMode).forEach(([parentModeId, value]) => {
+              let actualModeId = parentModeId;
+              if (collectionToProcess?.isExtension) {
+                const childMode = collectionToProcess.modes.find((m) => m.parentModeId === parentModeId);
+                if (!childMode) {
+                  return;
+                }
+                actualModeId = childMode.modeId;
               }
-            }
 
-            let tokenValue;
-
-            if (typeof value === 'object' && 'type' in value && value.type === 'VARIABLE_ALIAS') {
-              const alias = figma.variables.getVariableById(value.id);
-              tokenValue = `{${alias?.name.replace(/\//g, '.')}}`;
-            } else {
-              tokenValue = figmaRGBToHex(value as RGBA);
-            }
-
-            const modeName = collection?.modes.find((m) => m.modeId === mode)?.name;
-            if (tokenValue) {
-              const figmaExtensions = createFigmaExtensions(variable);
-              const token = {
-                name: variableName,
-                value: tokenValue as string,
-                type: TokenTypes.COLOR,
-                parent: `${collection?.name}/${modeName}`,
-                ...(variable.description ? { description: variable.description } : {}),
-                ...(figmaExtensions ? { $extensions: figmaExtensions } : {}),
-              };
-              colors.push(token);
-            }
-          });
-          break;
-        case 'BOOLEAN':
-          Object.entries(variable.valuesByMode).forEach(([mode, value]) => {
-            // Filter modes based on selectedCollections option
-            if (options.selectedCollections && collection) {
-              const selectedCollection = options.selectedCollections[collection.id];
-              if (selectedCollection && !selectedCollection.selectedModes.includes(mode)) {
-                return; // Skip this mode if it's not selected
+              if (options.selectedCollections && collectionToProcess) {
+                const selectedCollection = options.selectedCollections[collectionToProcess.id];
+                if (selectedCollection && !selectedCollection.selectedModes.includes(actualModeId)) {
+                  return;
+                }
               }
-            }
 
-            const modeName = collection?.modes.find((m) => m.modeId === mode)?.name;
-            let tokenValue;
-            if (typeof value === 'object' && 'type' in value && value.type === 'VARIABLE_ALIAS') {
-              const alias = figma.variables.getVariableById(value.id);
-              tokenValue = `{${alias?.name.replace(/\//g, '.')}}`;
-            } else {
-              tokenValue = JSON.stringify(value);
-            }
-
-            const figmaExtensions = createFigmaExtensions(variable);
-            const token = {
-              name: variableName,
-              value: tokenValue,
-              type: TokenTypes.BOOLEAN,
-              parent: `${collection?.name}/${modeName}`,
-              ...(variable.description ? { description: variable.description } : {}),
-              ...(figmaExtensions ? { $extensions: figmaExtensions } : {}),
-            };
-            booleans.push(token);
-          });
-          break;
-        case 'STRING':
-          Object.entries(variable.valuesByMode).forEach(([mode, value]) => {
-            // Filter modes based on selectedCollections option
-            if (options.selectedCollections && collection) {
-              const selectedCollection = options.selectedCollections[collection.id];
-              if (selectedCollection && !selectedCollection.selectedModes.includes(mode)) {
-                return; // Skip this mode if it's not selected
+              let actualValue = value;
+              if (collectionToProcess?.isExtension && collectionToProcess.variableOverrides) {
+                const override = collectionToProcess.variableOverrides[variable.id]?.[actualModeId];
+                if (override !== undefined) {
+                  actualValue = override;
+                }
               }
-            }
 
-            const modeName = collection?.modes.find((m) => m.modeId === mode)?.name;
-            let tokenValue;
-            if (typeof value === 'object' && 'type' in value && value.type === 'VARIABLE_ALIAS') {
-              const alias = figma.variables.getVariableById(value.id);
-              tokenValue = `{${alias?.name.replace(/\//g, '.')}}`;
-            } else {
-              tokenValue = value;
-            }
-
-            const figmaExtensions = createFigmaExtensions(variable);
-            strings.push({
-              name: variableName,
-              value: tokenValue as string,
-              type: TokenTypes.TEXT,
-              parent: `${collection?.name}/${modeName}`,
-              ...(variable.description ? { description: variable.description } : {}),
-              ...(figmaExtensions ? { $extensions: figmaExtensions } : {}),
-            });
-          });
-          break;
-        case 'FLOAT':
-          Object.entries(variable.valuesByMode).forEach(([mode, value]) => {
-            // Filter modes based on selectedCollections option
-            if (options.selectedCollections && collection) {
-              const selectedCollection = options.selectedCollections[collection.id];
-              if (selectedCollection && !selectedCollection.selectedModes.includes(mode)) {
-                return; // Skip this mode if it's not selected
-              }
-            }
-
-            let tokenValue: string | number = value as number;
-            if (typeof value === 'object' && 'type' in value && value.type === 'VARIABLE_ALIAS') {
-              const alias = figma.variables.getVariableById(value.id);
-              tokenValue = `{${alias?.name.replace(/\//g, '.')}}`;
-            } else if (typeof value === 'number') {
-              if (options.useRem) {
-                tokenValue = `${Number((Number(tokenValue) / parseFloat(String(baseRem))).toFixed(3))}rem`;
-              } else if (options.useDimensions) {
-                tokenValue = `${Number(tokenValue.toFixed(3))}px`;
+              let tokenValue;
+              if (typeof actualValue === 'object' && 'type' in actualValue && actualValue.type === 'VARIABLE_ALIAS') {
+                const alias = figma.variables.getVariableById(actualValue.id);
+                tokenValue = `{${alias?.name.replace(/\//g, '.')}}`;
               } else {
-                tokenValue = Number(tokenValue.toFixed(3));
+                tokenValue = figmaRGBToHex(actualValue as RGBA);
               }
-            }
-            const modeName = collection?.modes.find((m) => m.modeId === mode)?.name;
 
-            const figmaExtensions = createFigmaExtensions(variable);
-            if (options.useDimensions || options.useRem) {
-              dimensions.push({
+              const modeName = collectionToProcess?.modes.find((m) => m.modeId === actualModeId)?.name;
+              if (tokenValue) {
+                const figmaExtensions = createFigmaExtensions(variable);
+                const parent = `${collectionToProcess?.name}/${modeName}`;
+
+                colors.push({
+                  name: variableName,
+                  value: tokenValue as string,
+                  type: TokenTypes.COLOR,
+                  parent,
+                  ...(variable.description ? { description: variable.description } : {}),
+                  ...(figmaExtensions ? { $extensions: figmaExtensions } : {}),
+                });
+              }
+            });
+            break;
+
+          case 'BOOLEAN':
+            Object.entries(variable.valuesByMode).forEach(([parentModeId, value]) => {
+              let actualModeId = parentModeId;
+              if (collectionToProcess?.isExtension) {
+                const childMode = collectionToProcess.modes.find((m) => m.parentModeId === parentModeId);
+                if (!childMode) {
+                  return;
+                }
+                actualModeId = childMode.modeId;
+              }
+
+              if (options.selectedCollections && collectionToProcess) {
+                const selectedCollection = options.selectedCollections[collectionToProcess.id];
+                if (selectedCollection && !selectedCollection.selectedModes.includes(actualModeId)) {
+                  return;
+                }
+              }
+
+              let actualValue = value;
+              if (collectionToProcess?.isExtension && collectionToProcess.variableOverrides) {
+                const override = collectionToProcess.variableOverrides[variable.id]?.[actualModeId];
+                if (override !== undefined) {
+                  actualValue = override;
+                }
+              }
+
+              const modeName = collectionToProcess?.modes.find((m) => m.modeId === actualModeId)?.name;
+              let tokenValue;
+              if (typeof actualValue === 'object' && 'type' in actualValue && actualValue.type === 'VARIABLE_ALIAS') {
+                const alias = figma.variables.getVariableById(actualValue.id);
+                tokenValue = `{${alias?.name.replace(/\//g, '.')}}`;
+              } else {
+                tokenValue = JSON.stringify(actualValue);
+              }
+
+              const figmaExtensions = createFigmaExtensions(variable);
+              booleans.push({
                 name: variableName,
-                value: tokenValue as string,
-                type: TokenTypes.DIMENSION,
-                parent: `${collection?.name}/${modeName}`,
+                value: tokenValue,
+                type: TokenTypes.BOOLEAN,
+                parent: `${collectionToProcess?.name}/${modeName}`,
                 ...(variable.description ? { description: variable.description } : {}),
                 ...(figmaExtensions ? { $extensions: figmaExtensions } : {}),
               });
-            } else {
-              numbers.push({
+            });
+            break;
+
+          case 'STRING':
+            Object.entries(variable.valuesByMode).forEach(([parentModeId, value]) => {
+              let actualModeId = parentModeId;
+              if (collectionToProcess?.isExtension) {
+                const childMode = collectionToProcess.modes.find((m) => m.parentModeId === parentModeId);
+                if (!childMode) {
+                  return;
+                }
+                actualModeId = childMode.modeId;
+              }
+
+              if (options.selectedCollections && collectionToProcess) {
+                const selectedCollection = options.selectedCollections[collectionToProcess.id];
+                if (selectedCollection && !selectedCollection.selectedModes.includes(actualModeId)) {
+                  return;
+                }
+              }
+
+              let actualValue = value;
+              if (collectionToProcess?.isExtension && collectionToProcess.variableOverrides) {
+                const override = collectionToProcess.variableOverrides[variable.id]?.[actualModeId];
+                if (override !== undefined) {
+                  actualValue = override;
+                }
+              }
+
+              const modeName = collectionToProcess?.modes.find((m) => m.modeId === actualModeId)?.name;
+              let tokenValue;
+              if (typeof actualValue === 'object' && 'type' in actualValue && actualValue.type === 'VARIABLE_ALIAS') {
+                const alias = figma.variables.getVariableById(actualValue.id);
+                tokenValue = `{${alias?.name.replace(/\//g, '.')}}`;
+              } else {
+                tokenValue = String(actualValue);
+              }
+
+              const figmaExtensions = createFigmaExtensions(variable);
+              strings.push({
                 name: variableName,
                 value: tokenValue as string,
-                type: TokenTypes.NUMBER,
-                parent: `${collection?.name}/${modeName}`,
+                type: TokenTypes.TEXT,
+                parent: `${collectionToProcess?.name}/${modeName}`,
                 ...(variable.description ? { description: variable.description } : {}),
                 ...(figmaExtensions ? { $extensions: figmaExtensions } : {}),
               });
-            }
-          });
-          break;
-        default:
-          break;
+            });
+            break;
+
+          case 'FLOAT':
+            Object.entries(variable.valuesByMode).forEach(([parentModeId, value]) => {
+              let actualModeId = parentModeId;
+              if (collectionToProcess?.isExtension) {
+                const childMode = collectionToProcess.modes.find((m) => m.parentModeId === parentModeId);
+                if (!childMode) {
+                  return;
+                }
+                actualModeId = childMode.modeId;
+              }
+
+              if (options.selectedCollections && collectionToProcess) {
+                const selectedCollection = options.selectedCollections[collectionToProcess.id];
+                if (selectedCollection && !selectedCollection.selectedModes.includes(actualModeId)) {
+                  return;
+                }
+              }
+
+              let actualValue = value;
+              if (collectionToProcess?.isExtension && collectionToProcess.variableOverrides) {
+                const override = collectionToProcess.variableOverrides[variable.id]?.[actualModeId];
+                if (override !== undefined) {
+                  actualValue = override;
+                }
+              }
+
+              let tokenValue: string | number = actualValue as number;
+              if (typeof actualValue === 'object' && 'type' in actualValue && actualValue.type === 'VARIABLE_ALIAS') {
+                const alias = figma.variables.getVariableById(actualValue.id);
+                tokenValue = `{${alias?.name.replace(/\//g, '.')}}`;
+              } else if (typeof actualValue === 'number') {
+                if (options.useRem) {
+                  tokenValue = `${Number((Number(tokenValue) / parseFloat(String(baseRem))).toFixed(3))}rem`;
+                } else if (options.useDimensions) {
+                  tokenValue = `${Number(tokenValue.toFixed(3))}px`;
+                } else {
+                  tokenValue = Number(tokenValue.toFixed(3));
+                }
+              }
+
+              const modeName = collectionToProcess?.modes.find((m) => m.modeId === actualModeId)?.name;
+              const figmaExtensions = createFigmaExtensions(variable);
+
+              if (options.useDimensions || options.useRem) {
+                dimensions.push({
+                  name: variableName,
+                  value: tokenValue as string,
+                  type: TokenTypes.DIMENSION,
+                  parent: `${collectionToProcess?.name}/${modeName}`,
+                  ...(variable.description ? { description: variable.description } : {}),
+                  ...(figmaExtensions ? { $extensions: figmaExtensions } : {}),
+                });
+              } else {
+                numbers.push({
+                  name: variableName,
+                  value: tokenValue as string,
+                  type: TokenTypes.NUMBER,
+                  parent: `${collectionToProcess?.name}/${modeName}`,
+                  ...(variable.description ? { description: variable.description } : {}),
+                  ...(figmaExtensions ? { $extensions: figmaExtensions } : {}),
+                });
+              }
+            });
+            break;
+          default:
+            break;
+        }
+      } catch (error) {
+        console.error('Error while processing variable:', variableName, error);
       }
-    } catch (error) {
-      console.error('Error while processing variable:', variableName, error);
-    }
-  }
+    } // End of collectionsToProcess loop
+  } // End of localVariables loop
 
   const stylesObject = {
     colors,
@@ -291,32 +424,56 @@ export default async function pullVariables(options: PullVariablesOptions, theme
     themeInfo.themes?.forEach((theme) => {
       Object.entries(theme.selectedTokenSets || {}).forEach(([tokenSet, status]) => {
         existingTokenSets.add(tokenSet);
-        // Track which token sets are active
         if (status === TokenSetStatus.ENABLED) {
           activeTokenSets.add(tokenSet);
         }
       });
     });
 
-    await Promise.all(Array.from(collections.values()).map(async (collection) => {
-      // Filter collections based on selectedCollections option
+    // Iterate the id-keyed cache, not the name-keyed map: two collections can
+    // legally share a name in Figma, and the name-keyed map would silently drop
+    // one of them (and its themes).
+    const allCollectionEntries = Array.from(collectionsCache.values());
+    // For extended collections: process regular collections first, then extended ones
+    const regularCollections = hasExtendedCollections
+      ? allCollectionEntries.filter((c) => !c.isExtension)
+      : allCollectionEntries;
+    const extendedCollections = hasExtendedCollections
+      ? allCollectionEntries.filter((c) => c.isExtension)
+      : [];
+
+    // Helper function to process a collection and create themes
+    const processCollection = async (collection: CollectionEntry) => {
       if (options.selectedCollections) {
         const selectedCollection = options.selectedCollections[collection.id];
         if (!selectedCollection) {
-          return; // Skip this collection if it's not selected
+          return;
         }
       }
 
+      // Skip collections without any variables — the collections map is
+      // pre-populated with ALL local collections, so an empty scratch
+      // collection would otherwise produce a phantom theme per mode.
+      if (!collectionIdsWithVariables.has(collection.id)) {
+        return;
+      }
+
       await Promise.all(collection.modes.map(async (mode) => {
-        // Filter modes based on selectedCollections option
         if (options.selectedCollections) {
           const selectedCollection = options.selectedCollections[collection.id];
           if (selectedCollection && !selectedCollection.selectedModes.includes(mode.modeId)) {
-            return; // Skip this mode if it's not selected
+            return;
           }
         }
 
-        const collectionVariables = localVariables.filter((v) => v.variableCollectionId === collection.id);
+        // Extended collections inherit their variables from the parent collection
+        // (variables carry the parent's variableCollectionId). Source references
+        // from the parent so extended themes get populated $figmaVariableReferences —
+        // otherwise single-token edits via updateVariablesFromPlugin never match them.
+        const variableSourceCollectionId = collection.isExtension && collection.parentCollectionId
+          ? collection.parentCollectionId
+          : collection.id;
+        const collectionVariables = localVariables.filter((v) => v.variableCollectionId === variableSourceCollectionId);
 
         const variableReferences = collectionVariables.reduce((acc, variable) => ({
           ...acc,
@@ -328,12 +485,10 @@ export default async function pullVariables(options: PullVariablesOptions, theme
 
         processedThemes.add(`${collection.id}:${mode.modeId}`);
 
-        // Check if there's an existing theme with the same collection ID and mode ID but different token set name
         const matchingTheme = themeInfo.themes?.find((t) => t.$figmaCollectionId === collection.id
           && t.$figmaModeId === mode.modeId);
 
         if (matchingTheme) {
-          // Find token sets in this theme that are different from the current token set name
           Object.keys(matchingTheme.selectedTokenSets || {}).forEach((existingTokenSet) => {
             if (existingTokenSet !== tokenSetName
               && existingTokenSet.includes('/')
@@ -344,8 +499,7 @@ export default async function pullVariables(options: PullVariablesOptions, theme
           });
         }
 
-        // Track this collection/mode combination
-        themesToCreate.push({
+        const themeObj: ThemeObject = {
           id: themeId,
           name: mode.name,
           group: collection.name,
@@ -356,9 +510,23 @@ export default async function pullVariables(options: PullVariablesOptions, theme
           $figmaVariableReferences: variableReferences,
           $figmaModeId: mode.modeId,
           $figmaCollectionId: collection.id,
-        });
+        };
+
+        if (hasExtendedCollections) {
+          processExtendedCollectionImport(themeObj, collection, mode, themesToCreate);
+        }
+
+        themesToCreate.push(themeObj);
       }));
-    }));
+    };
+
+    // Pass 1: regular collections
+    await Promise.all(regularCollections.map(processCollection));
+
+    // Pass 2: extended collections (parent themes now exist)
+    if (hasExtendedCollections) {
+      await Promise.all(extendedCollections.map(processCollection));
+    }
 
     const currentTokenSets = new Set(themesToCreate.map((theme) => `${theme.group}/${theme.name}`));
     for (const existingSet of existingTokenSets) {
@@ -367,7 +535,6 @@ export default async function pullVariables(options: PullVariablesOptions, theme
       }
 
       if (existingSet.includes('/') && !currentTokenSets.has(existingSet)) {
-        // Find matching theme by collection ID and mode ID only
         const matchingTheme = themeInfo.themes?.find((t) => {
           if (!t.$figmaCollectionId || !t.$figmaModeId) {
             return false;

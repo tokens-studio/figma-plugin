@@ -50,7 +50,10 @@
   "createStylesWithVariableReferences": "Create styles with variable references",
   "createStylesWithVariableReferencesExplanation": "Styles will be created containing references to variables",
   "removeWithoutConnection": "Remove styles and variables without connection to a token",
-  "removeWithoutConnectionExplanation": "Styles and variables that are not connected to a token will be removed"
+  "removeWithoutConnectionExplanation": "Styles and variables that are not connected to a token will be removed",
+  "exportExtendedCollections": "Export extended collections",
+  "exportExtendedCollectionsEnterpriseSuffix": " (Enterprise only)",
+  "exportExtendedCollectionsExplanation": "When enabled, themes marked as \"extended\" will be exported as extended variable collections in Figma, inheriting from their parent collections. This is useful for creating brand variants or theme extensions. Requires Figma Enterprise plan."
 },
 "variables": {
   "color": "Color",

@@ -28,7 +28,18 @@ export default function MultiFilesExport({ onClose }: Props) {
     Object.entries(convertTokensToObject(tokens, storeTokenIdInJsonEditor)).forEach(([key, value]) => {
       changeObj[`${key}.json`] = JSON.stringify(value, null, 2);
     });
-    changeObj[`${SystemFilenames.THEMES}.json`] = JSON.stringify(themes, null, 2);
+    // Filter out internal metadata from themes before export
+    const cleanedThemes = themes.map((theme) => {
+      const {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        $figmaParentCollectionId,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        $figmaIsExtension,
+        ...rest
+      } = theme;
+      return rest;
+    });
+    changeObj[`${SystemFilenames.THEMES}.json`] = JSON.stringify(cleanedThemes, null, 2);
     const metadata = {
       tokenSetOrder: Object.keys(tokens),
     };

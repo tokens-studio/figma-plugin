@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import {
   Button, Checkbox, Label, Stack, Heading,
 } from '@tokens-studio/ui';
@@ -20,11 +20,27 @@ export default function ImportVariablesDialog({
   const [useDimensions, setUseDimensions] = useState(false);
   const [useRem, setUseRem] = useState(false);
 
-  // Initialize all collections as selected with all modes selected by default
+  // Filter out multi-level extensions (depth > 1)
+  const { allowedCollections, filteredCollections } = useMemo(() => {
+    const allowed: VariableCollectionInfo[] = [];
+    const filtered: VariableCollectionInfo[] = [];
+
+    collections.forEach((collection) => {
+      if (!collection.extensionDepth || collection.extensionDepth <= 1) {
+        allowed.push(collection);
+      } else {
+        filtered.push(collection);
+      }
+    });
+
+    return { allowedCollections: allowed, filteredCollections: filtered };
+  }, [collections]);
+
+  // Initialize all allowed collections as selected with all modes selected by default
   useEffect(() => {
-    if (collections.length > 0) {
+    if (allowedCollections.length > 0) {
       const initialSelection: SelectedCollections = {};
-      collections.forEach((collection) => {
+      allowedCollections.forEach((collection) => {
         initialSelection[collection.id] = {
           name: collection.name,
           selectedModes: collection.modes.map((mode) => mode.modeId),
@@ -32,7 +48,7 @@ export default function ImportVariablesDialog({
       });
       setSelectedCollections(initialSelection);
     }
-  }, [collections]);
+  }, [allowedCollections]);
 
   const handleCollectionToggle = useCallback((collectionId: string, collectionName: string, modes: { modeId: string; name: string }[]) => {
     setSelectedCollections((prev) => {
@@ -104,19 +120,19 @@ export default function ImportVariablesDialog({
   );
 
   const hasSelections = Object.keys(selectedCollections).length > 0;
-  const allCollectionsSelected = collections.every((collection) => selectedCollections[collection.id]);
+  const allCollectionsSelected = allowedCollections.every((collection) => selectedCollections[collection.id]);
 
   const handleToggleAllCollections = useCallback(() => {
     // If all collections are selected, deselect all; otherwise, select all
     if (allCollectionsSelected) {
       setSelectedCollections({});
     } else {
-      setSelectedCollections(collections.reduce((acc, collection) => ({
+      setSelectedCollections(allowedCollections.reduce((acc, collection) => ({
         ...acc,
         [collection.id]: { name: collection.name, selectedModes: collection.modes.map((mode) => mode.modeId) },
       }), {}));
     }
-  }, [collections, allCollectionsSelected]);
+  }, [allowedCollections, allCollectionsSelected]);
 
   return (
     <Modal
@@ -183,16 +199,18 @@ export default function ImportVariablesDialog({
               </Label>
             </Stack>
           </Stack>
-          {collections.length === 0 ? (
+          {allowedCollections.length === 0 ? (
             <Box css={{
               padding: '$3', backgroundColor: '$bgMuted', borderRadius: '$small', textAlign: 'center',
             }}
             >
-              There are no collections present in this file
+              {filteredCollections.length > 0
+                ? 'All collections in this file have more than one level of extension'
+                : 'There are no collections present in this file'}
             </Box>
           ) : (
             <Stack direction="column" gap={3} css={{ borderLeft: '2px solid $borderMuted' }}>
-              {collections.map((collection) => {
+              {allowedCollections.map((collection) => {
                 const isCollectionSelected = !!selectedCollections[collection.id];
                 const selectedModes = selectedCollections[collection.id]?.selectedModes || [];
 
@@ -233,6 +251,15 @@ export default function ImportVariablesDialog({
             </Stack>
           )}
         </Stack>
+
+        {filteredCollections.length > 0 && (
+          <Box css={{
+            padding: '$3', backgroundColor: '$warningBg', color: '$warningFg', borderRadius: '$small',
+          }}
+          >
+            ⚠️ {filteredCollections.length} collection(s) skipped: We only support one level of extension at the moment.
+          </Box>
+        )}
 
         {!hasSelections && (
           <Box css={{

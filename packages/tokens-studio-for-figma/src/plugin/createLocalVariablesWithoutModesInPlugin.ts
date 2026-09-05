@@ -56,7 +56,7 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
 
     const selectedSetIds = selectedSets.map((set) => set.set);
 
-    const collections = await createNecessaryVariableCollections(themesToCreateCollections, selectedSetIds);
+    const collections = await createNecessaryVariableCollections(themesToCreateCollections, selectedSetIds, settings);
 
     // Compute overallConfig once from all selected sets
     const overallConfig = selectedSets.reduce((acc, set) => {

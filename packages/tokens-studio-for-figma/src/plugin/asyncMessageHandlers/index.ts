@@ -32,6 +32,7 @@ export * from './setAuthData';
 export * from './setNoneValuesOnNode';
 export * from './getFigmaFonts';
 export * from './getAvailableVariableCollections';
+export * from './checkFigmaEnterprise';
 export * from './setUsedEmail';
 export * from './createLocalVariables';
 export * from './createLocalVariablesWithoutModes';
