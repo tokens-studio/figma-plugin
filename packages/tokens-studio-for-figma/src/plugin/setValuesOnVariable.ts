@@ -39,6 +39,27 @@ export default async function setValuesOnVariable(
   // Use the passed-in metadata tracker or a local one if not provided
   const codeSyntaxUpdateTracker = metadataUpdateTracker || {};
 
+  // Build indexes once so the hot loop can do O(1) lookups instead of scanning
+  // variablesInFigma with `.find()` for every token (mirrors the pattern used in
+  // consumer-plugins/create-variables/operateFromCollections.ts).
+  const variablesByKey = new Map<string, Variable>();
+  const variablesByName = new Map<string, Variable>();
+  const variablesById = new Set<string>();
+  variablesInFigma.forEach((v) => {
+    if (!v.remote) variablesByKey.set(v.key, v);
+    variablesByName.set(v.name, v);
+    variablesById.add(v.id);
+  });
+
+  const indexVariable = (v: Variable) => {
+    if (!v.remote && !variablesByKey.has(v.key)) variablesByKey.set(v.key, v);
+    if (!variablesByName.has(v.name)) variablesByName.set(v.name, v);
+    if (!variablesById.has(v.id)) {
+      variablesById.add(v.id);
+      variablesInFigma.push(v);
+    }
+  };
+
   // Pre-fetch all variables referenced by variableId to avoid individual async lookups
   // This is much more efficient than fetching one-by-one during token processing
   const variableIdCache = new Map<string, Variable>();
@@ -57,10 +78,7 @@ export default async function setValuesOnVariable(
         const variable = await figma.variables.getVariableByIdAsync(variableId);
         if (variable && variable.variableCollectionId === collection.id) {
           variableIdCache.set(variableId, variable);
-          // Add to local cache if not already present
-          if (!variablesInFigma.some((v) => v.id === variable.id)) {
-            variablesInFigma.push(variable);
-          }
+          indexVariable(variable);
         }
       } catch (e) {
         // Variable doesn't exist or can't be accessed - skip it
@@ -79,9 +97,7 @@ export default async function setValuesOnVariable(
           // Prioritize finding by variableId (key) when present, otherwise fall back to name matching
           // This has the nasty side-effect that if font weight changes from string to number, it will not update the variable given we cannot change type.
           // In that case, we should delete the variable and re-create it.
-          let variable = token.variableId
-            ? variablesInFigma.find((v) => v.key === token.variableId && !v.remote)
-            : variablesInFigma.find((v) => v.name === token.path);
+          let variable = token.variableId ? variablesByKey.get(token.variableId) : variablesByName.get(token.path);
 
           // If not found in local collection, check the pre-fetched cache
           if (!variable && token.variableId) {
@@ -90,14 +106,16 @@ export default async function setValuesOnVariable(
 
           // If still no variable, try one more time to find by name in case it was just created
           if (!variable) {
-            variable = variablesInFigma.find((v) => v.name === token.path && v.variableCollectionId === collection.id);
+            const candidate = variablesByName.get(token.path);
+            if (candidate && candidate.variableCollectionId === collection.id) {
+              variable = candidate;
+            }
           }
 
           if (!variable) {
             try {
               variable = figma.variables.createVariable(token.path, collection, variableType);
-              // Add to local cache immediately
-              variablesInFigma.push(variable);
+              indexVariable(variable);
             } catch (e) {
               // If creation fails (e.g., duplicate name), try to find the existing variable by name one more time
               // This can happen if the variable was created in a previous run but the reference wasn't saved
@@ -106,7 +124,7 @@ export default async function setValuesOnVariable(
               );
               if (existingVariable) {
                 variable = existingVariable;
-                variablesInFigma.push(variable);
+                indexVariable(variable);
               } else {
                 throw e; // Re-throw if we still can't find/create the variable
               }
