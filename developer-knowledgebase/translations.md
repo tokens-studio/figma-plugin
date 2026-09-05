@@ -7,6 +7,7 @@
 * Hindi
 * Dutch
 * Chinese
+* Japanese
 
 ## How to add a new language
 

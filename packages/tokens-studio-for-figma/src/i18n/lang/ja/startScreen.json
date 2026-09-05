@@ -1,0 +1,19 @@
+{
+  "intro": "Tokens Studio for Figmaを使用すると、Figmaでデザイントークンを使用し、GitHubなどの外部の信頼できるソースと同期できます。",
+  "gettingStarted": "はじめに",
+  "documentation": "ドキュメント",
+  "joinSlack": "Slackに参加",
+  "loadExample": "サンプルを読み込み",
+  "foundIssue": "問題が見つかりましたか？GitHubで報告してください！",
+  "newEmptyFile": "新しい空のファイル",
+  "version": "バージョン",
+  "guides": "ガイド",
+  "couldNotLoadTokens": "{{provider}}に保存されたトークンを読み込めませんでした",
+  "cancel": "キャンセル",
+  "loadingWait": "読み込み中、お待ちください",
+  "enterCredentials": "認証情報を入力",
+  "retry": "再試行",
+  "unableToFetchRemote": "リモートストレージからトークンを取得できません。まだ認証情報を追加していない場合は、次のステップで追加してください。そうでなければ、ファイルが存在し、アクセス権があることを確認してください。",
+  "unableToFetchRemoteNoCredentials": "リモートストレージからトークンを取得できません。このストレージプロバイダーにアクセスするには認証情報を追加する必要があります。",
+  "unableToFetchRemoteWithCredentials": "リモートストレージからトークンを取得できません。認証情報が正しくないか、ファイルが存在しないか、アクセス権がない可能性があります。"
+}

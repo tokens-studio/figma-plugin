@@ -1,0 +1,13 @@
+{
+  "ifYouCreate": "ローカルの変更をリポジトリにプッシュせずにブランチを作成または切り替えると、変更が失われます。",
+  "discardChanges": "変更を破棄",
+  "cancel": "キャンセル",
+  "createNewBranch": "新しいブランチを作成",
+  "currentChanges": "現在の変更",
+  "unSavedChanges": "未保存の変更があります",
+  "createNew": "新規作成",
+  "search": "検索...",
+  "noBranchesFound": "ブランチが見つかりません",
+  "branchingProFeature": "ブランチングはProサブスクリプションの機能です",
+  "upgradeToPro": "ブランチの作成と切り替えにはProにアップグレードしてください"
+}
