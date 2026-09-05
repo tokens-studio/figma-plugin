@@ -6,6 +6,17 @@ import convertOffsetToFigma from './figmaTransforms/offset';
 import { getShadowBehindNodeFromEffect } from './figmaUtils/getShadowBehindNodeFromEffect';
 import { defaultTokenValueRetriever } from './TokenValueRetriever';
 import { TokenBoxshadowValue } from '@/types/values';
+import { isEffectEqual } from '@/utils/isEffectEqual';
+
+function areEffectsEqual(existing: readonly Effect[] | undefined, next: readonly Effect[]): boolean {
+  if (!existing || existing.length !== next.length) return false;
+  // isEffectEqual intentionally ignores boundVariables, so check that separately —
+  // otherwise a variable being (re)bound or unbound would be silently skipped.
+  return existing.every((effect, i) => (
+    isEffectEqual(effect, next[i])
+    && JSON.stringify(effect.boundVariables ?? {}) === JSON.stringify(next[i].boundVariables ?? {})
+  ));
+}
 
 type ResolvedShadowObject = {
   color: string;
@@ -99,20 +110,25 @@ export default async function setEffectValuesOnTarget(
         return newEffect;
       }));
 
-      if ('effects' in target && key === 'effects') target.effects = effectsArray.reverse();
+      if ('effects' in target && key === 'effects') {
+        const newEffects = effectsArray.reverse();
+        if (!areEffectsEqual(target.effects, newEffects)) target.effects = newEffects;
+      }
     } else if (typeof value !== 'string') {
       if ('effects' in target && key === 'effects') {
         const newEffect = await tryApplyCompositeVariable({
           target, value, baseFontSize, resolvedValue,
         });
-        target.effects = [
-          newEffect,
-        ];
+        if (!areEffectsEqual(target.effects, [newEffect])) {
+          target.effects = [
+            newEffect,
+          ];
+        }
         Promise.resolve();
       }
     }
 
-    if (description && 'description' in target) {
+    if (description && 'description' in target && target.description !== description) {
       target.description = description;
     }
   } catch (e) {
