@@ -9,6 +9,7 @@ import { getThemeReferences } from './getThemeReferences';
 import { defaultTokenValueRetriever } from '../TokenValueRetriever';
 import { TokenFormatOptions } from '../TokenFormatStoreClass';
 import { ApplyVariablesStylesOrRawValues } from '@/constants/ApplyVariablesStyleOrder';
+import { UpdateMode } from '@/constants/UpdateMode';
 import updateStyles from '../updateStyles';
 
 export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = async (msg) => {
@@ -50,6 +51,7 @@ export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = asy
 
     allWithData = await defaultNodeManager.findBaseNodesWithData({
       updateMode: msg.settings.updateMode,
+      nodesWithoutPluginData: msg.settings.updateMode === UpdateMode.SELECTION,
     });
 
     await updateNodes(allWithData, String(msg.settings.baseFontSize || 16));
