@@ -25,9 +25,11 @@ export default async function setBackgroundBlurOnTarget(
           const variable = await defaultTokenValueRetriever.getVariableReference(tokenName);
           if (variable) {
             const updatedEffect = figma.variables.setBoundVariableForEffect(blurEffect, 'radius' as VariableBindableEffectField, variable);
-            // ShaderEffect (added in newer plugin-typings) has no boundVariables;
-            // every other Effect variant does. Narrow both sides before spreading.
-            if ('boundVariables' in updatedEffect && 'boundVariables' in blurEffect) {
+            // ShaderEffect (added in newer plugin-typings) has no
+            // boundVariables; every other Effect variant does. blurEffect is
+            // BACKGROUND_BLUR here, but TS widens it to `Effect`, so cast
+            // after copying the boundVariables from the API return value.
+            if ('boundVariables' in updatedEffect) {
               blurEffect = {
                 ...blurEffect,
                 boundVariables: updatedEffect.boundVariables,
