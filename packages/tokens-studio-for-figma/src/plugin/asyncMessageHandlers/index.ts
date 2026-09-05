@@ -17,6 +17,7 @@ export * from './notify';
 export * from './cancelOperation';
 export * from './resizeWindow';
 export * from './setShowEmptyGroups';
+export * from './setHideDeprecatedTokens';
 export * from './setUi';
 export * from './createAnnotation';
 export * from './createStyles';

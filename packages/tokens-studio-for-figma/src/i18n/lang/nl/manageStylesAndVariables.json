@@ -60,7 +60,8 @@
   "styles": {
     "color": "Kleur",
     "typography": "Typografie",
-    "effects": "Effecten"
+    "effects": "Effecten",
+    "gradients": "Verlopen"
   },
   "exportThemesTab": {
     "headingPro": "Maak Thema's om te beginnen",
@@ -78,5 +79,9 @@
     "intro": "Je kunt token sets gebruiken om je stijlen en variabelen te beheren. Gebruik Thema's (Pro) om meerdere verzamelingen van variabelen of stijlen te maken voor eenvoudig schakelen tussen ontwerpconcepten.",
     "setsSelectedForExport": "Sets geselecteerd voor export"
   },
-  "optionsModalTitle": "Exporteren naar Figma: Opties"
+  "optionsModalTitle": "Exporteren naar Figma: Opties",
+  "searchThemes": "Zoek thema's",
+  "searchSets": "Zoeksets",
+  "noThemesFound": "Geen thema's gevonden",
+  "noSetsFound": "Geen sets gevonden"
 }

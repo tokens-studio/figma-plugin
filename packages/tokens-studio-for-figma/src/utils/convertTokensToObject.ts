@@ -1,7 +1,7 @@
 import set from 'set-value';
 import { appendTypeToToken } from '@/app/components/createTokenObj';
 import { AnyTokenList, AnyTokenSet } from '@/types/tokens';
-import { getGroupTypeName } from './stringifyTokens';
+import { getGroupTypeName, reorderDeprecatedLast } from './stringifyTokens';
 import removeTokenId from './removeTokenId';
 import { setTokenKey, FormatSensitiveTokenKeys } from './setTokenKey';
 
@@ -29,6 +29,8 @@ export default function convertTokensToObject(tokens: Record<string, AnyTokenLis
         if (tokenWithoutTypeLevel.description) {
           setTokenKey(tokenWithoutTypeLevel, FormatSensitiveTokenKeys.DESCRIPTION);
         }
+        // $deprecated is already in the correct format; move it after $value (DTCG convention)
+        reorderDeprecatedLast(tokenWithoutTypeLevel);
         set(tokenGroupObj, name, tokenWithoutTypeLevel, { merge: true });
       } else {
         // For tokens without inheritTypeLevel, directly add type, value, and description to preserve order
@@ -38,6 +40,8 @@ export default function convertTokensToObject(tokens: Record<string, AnyTokenLis
         if (tokenWithoutName.description) {
           setTokenKey(tokenWithoutName, FormatSensitiveTokenKeys.DESCRIPTION);
         }
+        // $deprecated is already in the correct format; move it after $value (DTCG convention)
+        reorderDeprecatedLast(tokenWithoutName);
         set(tokenGroupObj, name, tokenWithoutName, { merge: true });
       }
     });

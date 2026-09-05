@@ -45,6 +45,7 @@ AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.NOTIFY, asyncHandler
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RESIZE_WINDOW, asyncHandlers.resizeWindow);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CANCEL_OPERATION, asyncHandlers.cancelOperation);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_SHOW_EMPTY_GROUPS, asyncHandlers.setShowEmptyGroups);
+AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_HIDE_DEPRECATED_TOKENS, asyncHandlers.setHideDeprecatedTokens);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_UI, asyncHandlers.setUi);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CREATE_ANNOTATION, asyncHandlers.createAnnotation);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CREATE_LIVING_DOCUMENTATION, asyncHandlers.createLivingDocumentation);

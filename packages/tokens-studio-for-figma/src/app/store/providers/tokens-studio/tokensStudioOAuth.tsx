@@ -240,7 +240,6 @@ export function useTokensStudioOAuth() {
             return localTheme ? alignObjectKeys(remoteTheme, localTheme) : remoteTheme;
           });
 
-
           return {
             status: 'success',
             tokens: sortedTokens,
@@ -399,7 +398,6 @@ export function useTokensStudioOAuth() {
             const localTheme = themes.find((t) => t.id === remoteTheme.id);
             return localTheme ? alignObjectKeys(remoteTheme, localTheme) : remoteTheme;
           });
-
 
           dispatch.tokenState.setTokenData({
             values: (newTokens || {}) as any,

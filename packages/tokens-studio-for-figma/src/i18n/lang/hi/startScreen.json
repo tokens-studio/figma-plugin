@@ -15,5 +15,9 @@
   "unableToFetchRemote": "रिमोट स्टोरेज से टोकन लाने में असमर्थ, यदि आपने अभी तक क्रेडेंशियल नहीं जोड़े हैं तो उन्हें अगले चरण में जोड़ें। अन्यथा सुनिश्चित करें कि फ़ाइल मौजूद है और आपके पास उस तक पहुंच है।",
   "unableToFetchRemoteNoCredentials": "Unable to fetch tokens from remote storage. You need to add credentials to access this storage provider.",
   "unableToFetchRemoteWithCredentials": "Unable to fetch tokens from remote storage. This may be due to incorrect credentials, or the file might not exist or you don't have access to it.",
-  "retry": "Retry"
+  "retry": "Retry",
+  "loadFromProvider": "सिंक प्रदाता से लोड करें",
+  "selectProvider": "एक प्रदाता चुनें",
+  "chooseProvider": "एक प्रदाता चुनें...",
+  "loadingTokens": "सिंक प्रदाता से टोकन लोड हो रहा है..."
 }
