@@ -24,6 +24,12 @@ export enum TokenTypes {
   ASSET = 'asset',
   BOOLEAN = 'boolean',
   NUMBER = 'number',
+  DURATION = 'duration',
+  CUBIC_BEZIER = 'cubicBezier',
+  // DTCG canonical name is `transition`. The JS identifier stays `MOTION`
+  // because the UI feature ("Motion variables") reads more naturally, and
+  // the plugin already accepts both `motion` and `transition` inbound.
+  MOTION = 'transition',
 }
 
 export const ExportNumberVariablesTokenTypes = [
@@ -39,4 +45,16 @@ export const ExportNumberVariablesTokenTypes = [
   TokenTypes.PARAGRAPH_INDENT,
   TokenTypes.PARAGRAPH_SPACING,
   TokenTypes.OPACITY,
+];
+
+// Motion-related token types gated by the "Motion variables" export setting.
+// Primary mapping: Duration -> TIMING, CubicBezier -> EASING (native Figma
+// motion variable types). When the current Figma runtime hasn't opened up
+// plugin-side creation of those types, setValuesOnVariable falls back to
+// FLOAT (ms) and STRING (comma-separated tuple) respectively. The composite
+// transition token is skipped either way — no single Figma variable type
+// fits that shape.
+export const ExportMotionVariablesTokenTypes = [
+  TokenTypes.DURATION,
+  TokenTypes.CUBIC_BEZIER,
 ];

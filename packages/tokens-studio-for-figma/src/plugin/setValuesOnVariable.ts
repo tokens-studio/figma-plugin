@@ -4,6 +4,7 @@ import setBooleanValuesOnVariable from './setBooleanValuesOnVariable';
 import setColorValuesOnVariable from './setColorValuesOnVariable';
 import setNumberValuesOnVariable from './setNumberValuesOnVariable';
 import setStringValuesOnVariable from './setStringValuesOnVariable';
+import { setEasingValueOnVariable, setTimingValueOnVariable } from './setMotionValuesOnVariable';
 import { convertTokenTypeToVariableType } from '@/utils/convertTokenTypeToVariableType';
 import { checkCanReferenceVariable } from '@/utils/alias/checkCanReferenceVariable';
 import { TokenTypes } from '@/constants/TokenTypes';
@@ -17,6 +18,25 @@ export type ReferenceVariableType = {
   modeId: string;
   referenceVariable: string;
 };
+
+// Figma gates plugin creation of EASING/TIMING variables behind a feature
+// flag. Probe once per run by creating and immediately removing a throwaway
+// variable; cache the result so we don't pay the round-trip per token.
+const motionSupportCache = new WeakMap<VariableCollection, boolean>();
+function motionCapabilityDetected(collection: VariableCollection): boolean {
+  const cached = motionSupportCache.get(collection);
+  if (cached !== undefined) return cached;
+  let supported = false;
+  try {
+    const probe = figma.variables.createVariable('__ts_motion_probe__', collection, 'EASING');
+    probe.remove();
+    supported = true;
+  } catch {
+    supported = false;
+  }
+  motionSupportCache.set(collection, supported);
+  return supported;
+}
 
 export default async function setValuesOnVariable(
   variablesInFigma: Variable[],
@@ -74,7 +94,12 @@ export default async function setValuesOnVariable(
       promises.add(variableWorker.schedule(async () => {
         try {
           const flatScopes = token.$extensions?.['com.figma.scopes'] as VariableScope[] | undefined;
-          const variableType = convertTokenTypeToVariableType(token.type, token.value, flatScopes);
+          let variableType = convertTokenTypeToVariableType(token.type, token.value, flatScopes);
+          if (variableType === 'EASING' || variableType === 'TIMING') {
+            if (!motionCapabilityDetected(collection)) {
+              variableType = variableType === 'EASING' ? 'STRING' : 'FLOAT';
+            }
+          }
           // If id matches the variableId, or name matches the token path, we can use it to update the variable instead of re-creating.
           // Prioritize finding by variableId (key) when present, otherwise fall back to name matching
           // This has the nasty side-effect that if font weight changes from string to number, it will not update the variable given we cannot change type.
@@ -122,11 +147,24 @@ export default async function setValuesOnVariable(
               variable.name = token.path;
             }
             if (variableType !== variable?.resolvedType) {
-              // TODO: There's an edge case where the user had created a variable based on a numerical weight leading to a float variable,
-              // if they later change it to a string, we cannot update the variable type. Theoretically we should remove and recreate, but that would lead to broken variables?
-              // If we decide to remove, the following would work.
-              // variable.remove();
-              // variable = figma.variables.createVariable(t.path, collection.id, variableType);
+              // Figma disallows changing an existing variable's resolvedType.
+              // For motion types this is a real blocker: a cubicBezier token
+              // that previously resolved to STRING (older builds) will stay
+              // STRING forever unless we recreate the variable. Recreate for
+              // the motion pair only — other types keep the existing "silent
+              // no-op" behavior to avoid breaking references cross-type.
+              if (variableType === 'TIMING' || variableType === 'EASING') {
+                try {
+                  variable.remove();
+                  const idx = variablesInFigma.indexOf(variable);
+                  if (idx >= 0) variablesInFigma.splice(idx, 1);
+                  variable = figma.variables.createVariable(token.path, collection, variableType);
+                  variablesInFigma.push(variable);
+                  variableKeyMap[token.name] = variable.key;
+                } catch (e) {
+                  console.error('Failed to recreate variable for type change:', e);
+                }
+              }
             }
 
             const currentDescription = variable.description ?? '';
@@ -216,10 +254,36 @@ export default async function setValuesOnVariable(
                 }
                 break;
               case 'FLOAT': {
-                const value = String(token.value);
+                // Duration fallback path (when Figma has no TIMING support):
+                // an object-form value { value, unit } would stringify to
+                // "[object Object]" and lose the number. Serialize back to the
+                // "<n><unit>" canonical form so transformValue can parse it.
+                let value: string;
+                if (token.type === TokenTypes.DURATION && token.value && typeof token.value === 'object' && !Array.isArray(token.value)) {
+                  const dv = token.value as { value?: unknown; unit?: unknown };
+                  value = `${dv.value}${dv.unit ?? 'ms'}`;
+                } else {
+                  value = String(token.value);
+                }
                 if (typeof value === 'string' && !value.includes('{')) {
                   const transformedValue = transformValue(value, token.type, baseFontSize, true);
                   setNumberValuesOnVariable(variable, mode, Number(transformedValue), hasMetadataChanged);
+                }
+                break;
+              }
+              case 'TIMING': {
+                // Duration accepts "200ms" / "0.2s" / a number / DTCG {value,unit}. Skip raw aliases.
+                const rawStr = typeof token.value === 'string' ? token.value : '';
+                if (!rawStr.includes('{')) {
+                  setTimingValueOnVariable(variable, mode, token.value, hasMetadataChanged);
+                }
+                break;
+              }
+              case 'EASING': {
+                // CubicBezier accepts [x1,y1,x2,y2] / "0.4,0,0.2,1" / MotionEasing. Skip raw aliases.
+                const rawStr = typeof token.value === 'string' ? token.value : '';
+                if (!rawStr.includes('{')) {
+                  setEasingValueOnVariable(variable, mode, token.value, hasMetadataChanged);
                 }
                 break;
               }
@@ -230,6 +294,10 @@ export default async function setValuesOnVariable(
                   // This is not an issue because users can set numerical font weights with variables, so we opt-out of the guesswork and just apply the numerical weight.
                 } else if (token.type === TokenTypes.FONT_WEIGHTS && Array.isArray(token.value)) {
                   setStringValuesOnVariable(variable, mode, token.value[0], hasMetadataChanged);
+                } else if (token.type === TokenTypes.CUBIC_BEZIER && Array.isArray(token.value)) {
+                  // CubicBezier fallback path (when Figma has no EASING support):
+                  // serialize the tuple so it survives as human-readable text.
+                  setStringValuesOnVariable(variable, mode, token.value.join(', '), hasMetadataChanged);
                 }
                 break;
               default:

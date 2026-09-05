@@ -56,7 +56,8 @@
   "color": "Color",
   "number": "Number",
   "boolean": "Boolean",
-  "string": "String"
+  "string": "String",
+  "motion": "Motion"
 },
 "styles": {
   "color": "Color",

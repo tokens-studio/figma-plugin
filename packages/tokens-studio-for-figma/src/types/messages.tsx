@@ -55,6 +55,7 @@ export type UiSettingsFromPluginMessage = {
     variablesString: boolean;
     variablesNumber: boolean;
     variablesBoolean: boolean;
+    variablesMotion: boolean;
     stylesColor: boolean;
     stylesTypography: boolean;
     stylesEffect: boolean;

@@ -6,6 +6,7 @@ import { AliasRegex } from '@/constants/AliasRegex';
 import { checkAndEvaluateMath } from './math';
 import { convertToRgb } from './color';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
+import { TokenTypes } from '@/constants/TokenTypes';
 import { convertModifiedColorToHex } from './convertModifiedColorToHex';
 import { getPathName } from './getPathName';
 import { ResolveTokenValuesResult } from './tokenHelpers';
@@ -75,7 +76,13 @@ class TokenResolver {
   private calculateTokenValue(token: SingleToken, resolvedReferences: Set<string> = new Set()): SingleToken['value'] | undefined {
     // Calculations only happen on strings.
     if (typeof token.value === 'string') {
-      const couldBeNumberValue = !this.isExponentialAndZero(token.value) ? checkAndEvaluateMath(token.value) : token.value;
+      // CubicBezier values are comma-separated tuples like "0.4, 0, 0.2, 1".
+      // The math parser reads that as a sequence expression and returns only
+      // the last value, collapsing the tuple. Skip math eval for this type.
+      const shouldSkipMath = token.type === TokenTypes.CUBIC_BEZIER;
+      const couldBeNumberValue = (!shouldSkipMath && !this.isExponentialAndZero(token.value))
+        ? checkAndEvaluateMath(token.value)
+        : token.value;
 
       // if it's a number, we don't need to do anything else and can return it
       if (typeof couldBeNumberValue === 'number') {

@@ -55,7 +55,8 @@
     "color": "रंग",
     "number": "संख्या",
     "boolean": "बूलियन",
-    "string": "स्ट्रिंग"
+    "string": "स्ट्रिंग",
+    "motion": "मोशन"
   },
   "styles": {
     "color": "रंग",

@@ -662,7 +662,8 @@ export default function useTokens() {
       const shouldCreateVariables = (settings.variablesBoolean
         || settings.variablesColor
         || settings.variablesNumber
-        || settings.variablesString)
+        || settings.variablesString
+        || settings.variablesMotion)
         && selectedSets.length > 0;
       if (!shouldCreateVariables) return;
 
@@ -715,7 +716,8 @@ export default function useTokens() {
       const shouldCreateVariables = (settings.variablesBoolean
         || settings.variablesColor
         || settings.variablesNumber
-        || settings.variablesString)
+        || settings.variablesString
+        || settings.variablesMotion)
         && selectedThemes.length > 0;
       if (!shouldCreateVariables) return;
 
