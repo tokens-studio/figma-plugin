@@ -48,7 +48,12 @@ export const ExportNumberVariablesTokenTypes = [
 ];
 
 // Motion-related token types gated by the "Motion variables" export setting.
-// Duration -> FLOAT, CubicBezier -> STRING. Motion itself is composite and skipped.
+// Primary mapping: Duration -> TIMING, CubicBezier -> EASING (native Figma
+// motion variable types). When the current Figma runtime hasn't opened up
+// plugin-side creation of those types, setValuesOnVariable falls back to
+// FLOAT (ms) and STRING (comma-separated tuple) respectively. The composite
+// transition token is skipped either way — no single Figma variable type
+// fits that shape.
 export const ExportMotionVariablesTokenTypes = [
   TokenTypes.DURATION,
   TokenTypes.CUBIC_BEZIER,
