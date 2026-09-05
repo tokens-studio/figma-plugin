@@ -217,6 +217,20 @@ const tokens: SingleToken[] = [
     failedToResolve: true,
   },
   {
+    name: 'spacing.none',
+    type: TokenTypes.SPACING,
+    value: 0,
+    rawValue: 0,
+    description: 'zero value token',
+  },
+  {
+    name: 'spacing.alias',
+    type: TokenTypes.SPACING,
+    value: 0,
+    rawValue: '{spacing.none}',
+    description: 'alias to zero value token',
+  },
+  {
     name: 'border.regular',
     type: TokenTypes.BORDER,
     value: {
@@ -419,5 +433,53 @@ describe('TokenTooltip alias', () => {
 
     expect(getByText(String('brokentoken'))).toBeInTheDocument();
     expect(getByTestId('not-found-badge')).toBeInTheDocument();
+  });
+
+  it('displays resolved value of 0 correctly', () => {
+    const { getByText } = render(
+      <TokensContext.Provider value={customStore}>
+        <TokenTooltipContent
+          token={{
+            name: 'spacing.alias',
+            type: TokenTypes.SPACING,
+            value: '{spacing.none}',
+            rawValue: '{spacing.none}',
+            description: 'alias to zero value token',
+          }}
+        />
+      </TokensContext.Provider>,
+    );
+
+    expect(getByText('0')).toBeInTheDocument();
+  });
+
+  it('displays zero values in composition token tooltip', () => {
+    const compositionZeroToken = {
+      name: 'card.zero',
+      type: TokenTypes.COMPOSITION,
+      value: {
+        spacing: 0,
+        borderRadius: 0,
+      },
+      rawValue: {
+        spacing: 0,
+        borderRadius: 0,
+      },
+      description: 'composition token with zero values',
+    } as SingleToken;
+
+    const store = {
+      resolvedTokens: [compositionZeroToken],
+    };
+
+    const { getAllByText, getByText } = render(
+      <TokensContext.Provider value={store}>
+        <TokenTooltipContent token={compositionZeroToken} />
+      </TokensContext.Provider>,
+    );
+
+    expect(getByText('spacing')).toBeInTheDocument();
+    expect(getByText('borderRadius')).toBeInTheDocument();
+    expect(getAllByText('0').length).toBeGreaterThanOrEqual(2);
   });
 });
