@@ -19,3 +19,10 @@ export const tokenTypesToCreateVariable = [
   TokenTypes.PARAGRAPH_INDENT,
   TokenTypes.OPACITY,
 ];
+
+// Token types that show the Figma metadata section (scopes, code syntax, etc.)
+// Gradient tokens can't be Figma Variables but still support scope metadata.
+export const tokenTypesWithFigmaSection = [
+  ...tokenTypesToCreateVariable,
+  TokenTypes.GRADIENT,
+];

@@ -138,7 +138,9 @@ export default function InspectorTokenSingle({
         >
           {token.appliedType === 'variable' && <Tooltip label={t('appliedVariable')}><IconVariable /></Tooltip>}
           {token.appliedType === 'style' && <Tooltip label={t('appliedStyle')}><StyleIcon /></Tooltip>}
-          <Box css={{ fontSize: '$small' }}>{token.value}</Box>
+          <Box css={{ fontSize: '$small' }}>
+            {typeof token.value === 'string' ? token.value : (tokenToDisplay?.name ?? '')}
+          </Box>
           {
             !token.resolvedValue && (
             <IconButton

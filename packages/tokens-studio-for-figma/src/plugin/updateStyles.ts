@@ -43,16 +43,15 @@ export default async function updateStyles(
   }).filter((token) => token.path);
 
   const colorTokens = styleTokens.filter((n) => {
-    if (![TokenTypes.COLOR].includes(n.type)) return false;
-    // Include gradient tokens only if gradient styles setting is enabled
+    if (n.type === TokenTypes.GRADIENT) return settings.stylesGradient ?? false;
+    if (n.type !== TokenTypes.COLOR) return false;
+    // COLOR tokens with a CSS gradient value require the gradient setting
     if (typeof n.value === 'string' && (n.value.startsWith('linear-gradient') || n.value.startsWith('radial-gradient') || n.value.startsWith('conic-gradient'))) {
       return settings.stylesGradient ?? false;
     }
     return settings.stylesColor ?? true;
-  }) as Extract<
-    typeof styleTokens[number],
-  { type: TokenTypes.COLOR }
-  >[];
+  // Cast includes GRADIENT tokens; updateColorStyles handles them via isGradientTokenValue internally
+  }) as SingleToken<true, { path: string, styleId: string }>[] as Extract<typeof styleTokens[number], { type: TokenTypes.COLOR }>[];
   const textTokens = styleTokens.filter((n) => [TokenTypes.TYPOGRAPHY].includes(n.type) && (settings.stylesTypography ?? true)) as Extract<
     typeof styleTokens[number],
   { type: TokenTypes.TYPOGRAPHY }
