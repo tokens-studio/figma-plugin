@@ -253,10 +253,10 @@
       "value": { "type": "string" }
     }
   },
-  "motion": {
+  "transition": {
     "label": "Motion",
     "property": "Motion",
-    "type": "motion",
+    "type": "transition",
     "schemas": {
       "value": {
         "type": "object",

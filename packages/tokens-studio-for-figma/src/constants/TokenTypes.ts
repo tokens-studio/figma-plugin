@@ -26,7 +26,10 @@ export enum TokenTypes {
   NUMBER = 'number',
   DURATION = 'duration',
   CUBIC_BEZIER = 'cubicBezier',
-  MOTION = 'motion',
+  // DTCG canonical name is `transition`. The JS identifier stays `MOTION`
+  // because the UI feature ("Motion variables") reads more naturally, and
+  // the plugin already accepts both `motion` and `transition` inbound.
+  MOTION = 'transition',
 }
 
 export const ExportNumberVariablesTokenTypes = [

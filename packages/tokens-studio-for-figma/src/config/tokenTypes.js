@@ -297,10 +297,10 @@ const tokenTypes = {
       },
     },
   },
-  motion: {
+  transition: {
     label: 'Motion',
     property: 'Motion',
-    type: 'motion',
+    type: 'transition',
     schema: {
       value: {
         property: 'all',
