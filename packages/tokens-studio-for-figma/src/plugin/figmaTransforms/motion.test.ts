@@ -17,9 +17,15 @@ describe('timingToSeconds', () => {
     expect(timingToSeconds('-100ms')).toBe(-0.1);
   });
 
-  it('treats bare numbers as already seconds', () => {
-    expect(timingToSeconds(0.2)).toBe(0.2);
-    expect(timingToSeconds(1)).toBe(1);
+  it('treats bare numbers as milliseconds (matches DTCG default unit)', () => {
+    expect(timingToSeconds(200)).toBe(0.2);
+    expect(timingToSeconds(1000)).toBe(1);
+  });
+
+  it('accepts uppercase units case-insensitively', () => {
+    expect(timingToSeconds('200MS')).toBe(0.2);
+    expect(timingToSeconds('2S')).toBe(2);
+    expect(timingToSeconds({ value: 2, unit: 'S' })).toBe(2);
   });
 
   it('parses the DTCG object form', () => {

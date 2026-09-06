@@ -13,18 +13,24 @@ const roundTo6 = (n: number) => Math.round(n * 1000000) / 1000000;
 // "200ms" | "0.2s" | 0.2 | { value, unit } -> seconds number.
 // Returns null on malformed input.
 export function timingToSeconds(value: unknown): number | null {
-  if (typeof value === 'number') return roundTo6(value);
+  // A bare number carries no unit; DTCG defaults to ms and the FLOAT
+  // fallback path treats it the same, so scale to seconds for consistency.
+  if (typeof value === 'number') return Number.isFinite(value) ? roundTo6(value / 1000) : null;
   if (value && typeof value === 'object' && !Array.isArray(value)) {
     const obj = value as { value?: unknown; unit?: unknown };
     const n = Number(obj.value);
     if (!Number.isFinite(n)) return null;
-    return roundTo6(obj.unit === 's' ? n : n / 1000);
+    const unit = typeof obj.unit === 'string' ? obj.unit.toLowerCase() : 'ms';
+    return roundTo6(unit === 's' ? n : n / 1000);
   }
   if (typeof value !== 'string') return null;
-  const match = value.trim().match(/^([+-]?\d*\.?\d+)\s*(ms|s)?$/);
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  const match = trimmed.match(/^([+-]?\d*\.?\d+)\s*(ms|s)?$/i);
   if (!match) return null;
   const n = parseFloat(match[1]);
-  return roundTo6(match[2] === 's' ? n : n / 1000);
+  const unit = match[2]?.toLowerCase();
+  return roundTo6(unit === 's' ? n : n / 1000);
 }
 
 const isNumber = (v: unknown): v is number => typeof v === 'number' && !Number.isNaN(v);

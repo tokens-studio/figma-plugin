@@ -19,6 +19,12 @@ export function updateAliasesInState(tokens: Record<string, AnyTokenList>, data:
           // Update if token is of type array, e.g. box shadows
           if (Array.isArray(newToken.value)) {
             const newTokenValue = newToken.value.map((t) => Object.entries(t).reduce<Record<string, string | number>>((a, [k, v]) => {
+              // Nullish sub-values would stringify to the literal
+              // "null"/"undefined"; preserve them as-is instead of corrupting.
+              if (v == null) {
+                a[k] = v as unknown as string | number;
+                return a;
+              }
               a[k] = replaceReferences(String(v), data.oldName, data.newName);
               return a;
             }, {}));
@@ -36,6 +42,12 @@ export function updateAliasesInState(tokens: Record<string, AnyTokenList>, data:
           // Update if we have a composite token value, e.g. typography
           if (typeof newToken.value === 'object') {
             const newTokenValue = Object.entries(newToken.value).reduce<Record<string, string | number>>((a, [k, v]) => {
+              // Nullish sub-values would stringify to the literal
+              // "null"/"undefined"; preserve them as-is instead of corrupting.
+              if (v == null) {
+                a[k] = v as unknown as string | number;
+                return a;
+              }
               a[k] = replaceReferences(String(v), data.oldName, data.newName);
               return a;
             }, {});

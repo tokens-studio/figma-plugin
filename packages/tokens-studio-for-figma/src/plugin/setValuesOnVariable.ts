@@ -5,6 +5,7 @@ import setColorValuesOnVariable from './setColorValuesOnVariable';
 import setNumberValuesOnVariable from './setNumberValuesOnVariable';
 import setStringValuesOnVariable from './setStringValuesOnVariable';
 import { setEasingValueOnVariable, setTimingValueOnVariable } from './setMotionValuesOnVariable';
+import { toFigmaEasing } from './figmaTransforms/motion';
 import { convertTokenTypeToVariableType } from '@/utils/convertTokenTypeToVariableType';
 import { checkCanReferenceVariable } from '@/utils/alias/checkCanReferenceVariable';
 import { TokenTypes } from '@/constants/TokenTypes';
@@ -27,12 +28,21 @@ function motionCapabilityDetected(collection: VariableCollection): boolean {
   const cached = motionSupportCache.get(collection);
   if (cached !== undefined) return cached;
   let supported = false;
+  let probe: Variable | null = null;
   try {
-    const probe = figma.variables.createVariable('__ts_motion_probe__', collection, 'EASING');
-    probe.remove();
+    probe = figma.variables.createVariable('__ts_motion_probe__', collection, 'EASING');
     supported = true;
   } catch {
     supported = false;
+  }
+  // Remove in a separate try so a create-success + remove-failure combo
+  // still clears the leaked variable path without flipping supported.
+  if (probe) {
+    try {
+      probe.remove();
+    } catch (e) {
+      console.error('Failed to remove motion capability probe', e);
+    }
   }
   motionSupportCache.set(collection, supported);
   return supported;
@@ -154,15 +164,48 @@ export default async function setValuesOnVariable(
               // the motion pair only — other types keep the existing "silent
               // no-op" behavior to avoid breaking references cross-type.
               if (variableType === 'TIMING' || variableType === 'EASING') {
+                // Snapshot metadata so the fresh variable inherits what the
+                // old one had (Figma cannot preserve these across a
+                // remove+create, and the token doesn't always carry them).
+                const carriedDescription = variable.description;
+                const carriedScopes = variable.scopes;
+                const carriedHiddenFromPublishing = variable.hiddenFromPublishing;
+                const carriedCodeSyntax = { ...(variable.codeSyntax || {}) };
+                const staleKey = variable.key;
+                const idx = variablesInFigma.indexOf(variable);
+                let recreated: Variable | null = null;
                 try {
                   variable.remove();
-                  const idx = variablesInFigma.indexOf(variable);
                   if (idx >= 0) variablesInFigma.splice(idx, 1);
-                  variable = figma.variables.createVariable(token.path, collection, variableType);
-                  variablesInFigma.push(variable);
-                  variableKeyMap[token.name] = variable.key;
+                  recreated = figma.variables.createVariable(token.path, collection, variableType);
                 } catch (e) {
                   console.error('Failed to recreate variable for type change:', e);
+                }
+                if (recreated) {
+                  // Rehydrate metadata before the switch below runs.
+                  try {
+                    if (carriedDescription) recreated.description = carriedDescription;
+                    if (carriedScopes?.length) recreated.scopes = carriedScopes;
+                    recreated.hiddenFromPublishing = carriedHiddenFromPublishing;
+                    (['WEB', 'ANDROID', 'iOS'] as const).forEach((platform) => {
+                      const syntax = carriedCodeSyntax[platform];
+                      if (syntax) recreated!.setVariableCodeSyntax(platform, syntax);
+                    });
+                  } catch (e) {
+                    console.error('Failed to restore metadata on recreated variable', e);
+                  }
+                  variablesInFigma.push(recreated);
+                  variable = recreated;
+                  variableKeyMap[token.name] = variable.key;
+                } else {
+                  // Recreate failed: the old variable is already gone. Drop
+                  // this token's metadata/value writes rather than operating
+                  // on a dead handle, and remove the stale key mapping so
+                  // downstream reference resolution won't point at a ghost.
+                  delete variableKeyMap[token.name];
+                  const renamedIdx = renamedVariableKeys.indexOf(staleKey);
+                  if (renamedIdx >= 0) renamedVariableKeys.splice(renamedIdx, 1);
+                  return;
                 }
               }
             }
@@ -288,16 +331,22 @@ export default async function setValuesOnVariable(
                 break;
               }
               case 'STRING':
-                if (typeof token.value === 'string' && !token.value.includes('{')) {
+                // CubicBezier fallback path (when Figma has no EASING support):
+                // normalize every accepted shape to "x1, y1, x2, y2" so the
+                // STRING variable value matches what the EASING path would
+                // canonicalize, regardless of the input form.
+                if (token.type === TokenTypes.CUBIC_BEZIER) {
+                  const easing = toFigmaEasing(token.value);
+                  const b = easing?.easingFunctionCubicBezier;
+                  if (b) {
+                    setStringValuesOnVariable(variable, mode, `${b.x1}, ${b.y1}, ${b.x2}, ${b.y2}`, hasMetadataChanged);
+                  }
+                } else if (typeof token.value === 'string' && !token.value.includes('{')) {
                   setStringValuesOnVariable(variable, mode, token.value, hasMetadataChanged);
                   // Given we cannot determine the combined family of a variable, we cannot use fallback weights from our estimates.
                   // This is not an issue because users can set numerical font weights with variables, so we opt-out of the guesswork and just apply the numerical weight.
                 } else if (token.type === TokenTypes.FONT_WEIGHTS && Array.isArray(token.value)) {
                   setStringValuesOnVariable(variable, mode, token.value[0], hasMetadataChanged);
-                } else if (token.type === TokenTypes.CUBIC_BEZIER && Array.isArray(token.value)) {
-                  // CubicBezier fallback path (when Figma has no EASING support):
-                  // serialize the tuple so it survives as human-readable text.
-                  setStringValuesOnVariable(variable, mode, token.value.join(', '), hasMetadataChanged);
                 }
                 break;
               default:

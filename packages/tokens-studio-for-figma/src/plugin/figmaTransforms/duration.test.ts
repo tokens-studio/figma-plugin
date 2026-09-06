@@ -29,4 +29,10 @@ describe('convertDurationToMs', () => {
     expect(Number.isNaN(convertDurationToMs(null))).toBe(true);
     expect(Number.isNaN(convertDurationToMs(undefined))).toBe(true);
   });
+
+  it('returns NaN for empty/whitespace input (not silent zero)', () => {
+    expect(Number.isNaN(convertDurationToMs(''))).toBe(true);
+    expect(Number.isNaN(convertDurationToMs('   '))).toBe(true);
+    expect(Number.isNaN(convertDurationToMs({ value: '', unit: 'ms' }))).toBe(true);
+  });
 });
