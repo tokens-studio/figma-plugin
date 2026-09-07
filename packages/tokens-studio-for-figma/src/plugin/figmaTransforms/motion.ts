@@ -63,8 +63,13 @@ export function toFigmaEasing(value: unknown): MotionEasing | null {
   if (Array.isArray(value)) {
     pts = value.map(Number);
   } else if (typeof value === 'string') {
-    const match = value.match(/cubic-bezier\(([^)]+)\)/i);
-    const raw = match ? match[1] : value;
+    // Accept "0.4,0.2,0.1,1", "cubic-bezier(...)", and the JSON-stringified
+    // array form "[0.4,0.2,0.1,1]" that tokens whose $value was an array
+    // get serialized as somewhere upstream.
+    const cbMatch = value.match(/cubic-bezier\(([^)]+)\)/i);
+    let raw = cbMatch ? cbMatch[1] : value;
+    raw = raw.trim();
+    if (raw.startsWith('[') && raw.endsWith(']')) raw = raw.slice(1, -1);
     pts = raw.split(',').map((p) => Number(p.trim()));
   }
   if (!pts || pts.length !== 4 || !pts.every(isNumber)) return null;

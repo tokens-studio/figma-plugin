@@ -52,6 +52,24 @@ describe('toFigmaEasing', () => {
     });
   });
 
+  it('parses JSON-stringified array form (with brackets)', () => {
+    expect(toFigmaEasing('[0.4,0.2,0.1,1]')).toEqual({
+      type: 'CUSTOM_CUBIC_BEZIER',
+      easingFunctionCubicBezier: {
+        x1: 0.4, y1: 0.2, x2: 0.1, y2: 1,
+      },
+    });
+  });
+
+  it('parses comma-separated strings with no spaces', () => {
+    expect(toFigmaEasing('0.4,0.2,0.1,1')).toEqual({
+      type: 'CUSTOM_CUBIC_BEZIER',
+      easingFunctionCubicBezier: {
+        x1: 0.4, y1: 0.2, x2: 0.1, y2: 1,
+      },
+    });
+  });
+
   it('parses comma-separated strings', () => {
     expect(toFigmaEasing('0.4, 0, 0.2, 1')).toEqual({
       type: 'CUSTOM_CUBIC_BEZIER',

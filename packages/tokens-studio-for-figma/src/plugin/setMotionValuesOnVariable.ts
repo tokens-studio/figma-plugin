@@ -18,7 +18,25 @@ export function setTimingValueOnVariable(variable: Variable, mode: string, value
 
 export function setEasingValueOnVariable(variable: Variable, mode: string, value: unknown, forceUpdate = false) {
   try {
-    const easing = toFigmaEasing(value) ?? defaultFigmaEasing();
+    const parsed = toFigmaEasing(value);
+    if (!parsed) {
+      // Surface the actual bad value instead of silently writing linear —
+      // otherwise the variable ends up as `cubic-bezier(0,0,1,1)` with no
+      // clue in the console. Only fall back to the linear default when the
+      // variable has never been written for this mode (Figma requires a
+      // value in every mode).
+      console.error(
+        `Could not parse cubicBezier value for variable ${variable.name} (mode ${mode}):`,
+        value,
+        `typeof=${typeof value}`,
+      );
+      const existing = variable.valuesByMode[mode];
+      if (existing === undefined) {
+        variable.setValueForMode(mode, defaultFigmaEasing());
+      }
+      return;
+    }
+    const easing = parsed;
     const existing = variable.valuesByMode[mode];
     if (existing !== undefined && !(typeof existing === 'object' || isVariableWithAliasReference(existing))) return;
     if (!forceUpdate && existing && typeof existing === 'object' && JSON.stringify(existing) === JSON.stringify(easing)) return;
