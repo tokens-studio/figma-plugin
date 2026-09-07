@@ -17,5 +17,14 @@
   "close": "关闭",
   "secondScreen": "第二屏",
   "and": "和",
-  "more": "更多的"
+  "more": "更多的",
+  "multiSelect": {
+    "search": "搜索",
+    "clearSearch": "清除搜索",
+    "selectAll": "全选",
+    "noResults": "没有与搜索匹配的项目",
+    "noneSelected": "未选择任何项",
+    "itemsSelected": "已选择 {{number}} 项",
+    "allSelected": "全部（{{number}}）"
+  }
 }
