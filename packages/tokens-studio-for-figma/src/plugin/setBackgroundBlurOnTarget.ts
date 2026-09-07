@@ -25,10 +25,12 @@ export default async function setBackgroundBlurOnTarget(
           const variable = await defaultTokenValueRetriever.getVariableReference(tokenName);
           if (variable) {
             const updatedEffect = figma.variables.setBoundVariableForEffect(blurEffect, 'radius' as VariableBindableEffectField, variable);
-            blurEffect = {
-              ...blurEffect,
-              boundVariables: updatedEffect.boundVariables,
-            };
+            if ('boundVariables' in updatedEffect) {
+              blurEffect = {
+                ...blurEffect,
+                boundVariables: updatedEffect.boundVariables,
+              };
+            }
           }
         } catch (e) {
           console.error('Error binding variable to background blur', e);
