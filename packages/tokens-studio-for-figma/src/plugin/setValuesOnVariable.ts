@@ -43,17 +43,21 @@ export default async function setValuesOnVariable(
   // variablesInFigma with `.find()` for every token (mirrors the pattern used in
   // consumer-plugins/create-variables/operateFromCollections.ts).
   const variablesByKey = new Map<string, Variable>();
+  // Name index is deliberately collection-scoped: variable names are only unique within
+  // a collection, so we never map a token.path to a variable from a different collection.
   const variablesByName = new Map<string, Variable>();
   const variablesById = new Set<string>();
   variablesInFigma.forEach((v) => {
     if (!v.remote) variablesByKey.set(v.key, v);
-    variablesByName.set(v.name, v);
+    if (v.variableCollectionId === collection.id) variablesByName.set(v.name, v);
     variablesById.add(v.id);
   });
 
   const indexVariable = (v: Variable) => {
     if (!v.remote && !variablesByKey.has(v.key)) variablesByKey.set(v.key, v);
-    if (!variablesByName.has(v.name)) variablesByName.set(v.name, v);
+    if (v.variableCollectionId === collection.id && !variablesByName.has(v.name)) {
+      variablesByName.set(v.name, v);
+    }
     if (!variablesById.has(v.id)) {
       variablesById.add(v.id);
       variablesInFigma.push(v);
