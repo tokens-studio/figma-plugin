@@ -250,9 +250,18 @@ export default function useRemoteTokens() {
               case StorageProviderType.TOKENS_STUDIO_OAUTH: {
                 dispatch.tokenState.setTokenSetMetadata(remoteData.metadata?.tokenSetsData ?? {});
                 if (remoteData.metadata?.changeSetId) {
-                  dispatch.uiState.setApiData({
+                  const nextCredentials = {
                     ...context,
                     changeSetId: remoteData.metadata.changeSetId,
+                  };
+                  dispatch.uiState.setApiData(nextCredentials);
+                  // Also persist to Figma pluginData so subsequent pushes have
+                  // the changeSetId available after a plugin reload — Redux
+                  // alone would drop it. Without this, the very first push
+                  // after reload hits 422 "change_set_id is required".
+                  AsyncMessageChannel.ReactInstance.message({
+                    type: AsyncMessageTypes.CREDENTIALS,
+                    credential: nextCredentials,
                   });
                 }
                 break;
