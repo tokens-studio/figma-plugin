@@ -55,7 +55,8 @@
     "color": "Kleur",
     "number": "Nummer",
     "boolean": "Boolean",
-    "string": "Tekst"
+    "string": "Tekst",
+    "motion": "Beweging"
   },
   "styles": {
     "color": "Kleur",

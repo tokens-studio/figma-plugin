@@ -37,6 +37,13 @@ export function normalizeTokenType(type: string | undefined): string | undefined
       return TokenTypes.PARAGRAPH_SPACING;
     case 'paragraphindent':
       return TokenTypes.PARAGRAPH_INDENT;
+    case 'duration':
+      return TokenTypes.DURATION;
+    case 'cubicbezier':
+      return TokenTypes.CUBIC_BEZIER;
+    case 'motion':
+    case 'transition':
+      return TokenTypes.MOTION;
     default:
       return type;
   }

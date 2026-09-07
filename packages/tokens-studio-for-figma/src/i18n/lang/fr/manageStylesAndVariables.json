@@ -55,7 +55,8 @@
     "color": "Couleur",
     "number": "Nombre",
     "boolean": "Booléen",
-    "string": "Chaîne de caractères"
+    "string": "Chaîne de caractères",
+    "motion": "Mouvement"
   },
   "styles": {
     "color": "Couleur",

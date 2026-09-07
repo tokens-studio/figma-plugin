@@ -21,6 +21,7 @@ import {
   variablesNumberSelector,
   variablesBooleanSelector,
   variablesStringSelector,
+  variablesMotionSelector,
   stylesColorSelector,
   stylesEffectSelector,
   stylesTypographySelector,
@@ -49,6 +50,7 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
   const variablesNumber = useSelector(variablesNumberSelector);
   const variablesBoolean = useSelector(variablesBooleanSelector);
   const variablesString = useSelector(variablesStringSelector);
+  const variablesMotion = useSelector(variablesMotionSelector);
   const stylesColor = useSelector(stylesColorSelector);
   const stylesTypography = useSelector(stylesTypographySelector);
   const stylesEffect = useSelector(stylesEffectSelector);
@@ -115,6 +117,12 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
   const handleExportVariablesString = React.useCallback(
     (state: CheckedState) => {
       dispatch.settings.setVariablesString(!!state);
+    },
+    [dispatch.settings],
+  );
+  const handleExportVariablesMotion = React.useCallback(
+    (state: CheckedState) => {
+      dispatch.settings.setVariablesMotion(!!state);
     },
     [dispatch.settings],
   );
@@ -197,6 +205,7 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
                   <LabelledCheckbox id="variablesString" onChange={handleExportVariablesString} checked={!!variablesString} label={t('variables.string')} />
                   <LabelledCheckbox id="variablesNumber" onChange={handleExportVariablesNumber} checked={!!variablesNumber} label={t('variables.number')} />
                   <LabelledCheckbox id="variablesBoolean" onChange={handleExportVariablesBoolean} checked={!!variablesBoolean} label={t('variables.boolean')} />
+                  <LabelledCheckbox id="variablesMotion" onChange={handleExportVariablesMotion} checked={!!variablesMotion} label={t('variables.motion')} />
                 </Stack>
                 <Box css={{ alignSelf: 'stretch', width: '1px', border: '1px solid $colors$borderSubtle' }} />
                 <Stack direction="column" gap={3}>

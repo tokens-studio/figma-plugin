@@ -18,4 +18,6 @@ export const tokenTypesToCreateVariable = [
   TokenTypes.PARAGRAPH_SPACING,
   TokenTypes.PARAGRAPH_INDENT,
   TokenTypes.OPACITY,
+  TokenTypes.DURATION,
+  TokenTypes.CUBIC_BEZIER,
 ];

@@ -65,10 +65,16 @@ async function tryApplyCompositeVariable({
         const variableToApply = await defaultTokenValueRetriever.getVariableReference(val.slice(1, -1));
         if (variableToApply) {
           const updatedEffect = figma.variables.setBoundVariableForEffect(effect, transformShadowKeyToFigmaVariable(key), variableToApply);
-          effect = {
-            ...effect,
-            boundVariables: updatedEffect.boundVariables,
-          };
+          // ShaderEffect (added in newer plugin-typings) has no
+          // boundVariables; every other Effect variant does. effect is a
+          // shadow variant here; cast to it after copying boundVariables
+          // from the API return value.
+          if ('boundVariables' in updatedEffect) {
+            effect = {
+              ...effect,
+              boundVariables: updatedEffect.boundVariables,
+            } as typeof effect;
+          }
         }
       }
     }

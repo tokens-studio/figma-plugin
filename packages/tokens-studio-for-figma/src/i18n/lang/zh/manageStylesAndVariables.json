@@ -55,7 +55,8 @@
     "color": "颜色",
     "number": "数字",
     "boolean": "布尔值",
-    "string": "字符串"
+    "string": "字符串",
+    "motion": "动效"
   },
   "styles": {
     "color": "颜色",

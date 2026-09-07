@@ -55,7 +55,8 @@
     "color": "Color",
     "number": "Número",
     "boolean": "Booleano",
-    "string": "Cadena"
+    "string": "Cadena",
+    "motion": "Movimiento"
   },
   "styles": {
     "color": "Color",

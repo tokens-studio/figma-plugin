@@ -76,12 +76,23 @@ export const pushToTokensStudioOAuth = async ({
   const { id: projectId, branch, changeSetId } = context;
   let result: any;
 
+  // Every mutating REST action below requires a changeSetId — the server
+  // rejects token/theme creation without it (422 "change_set_id is required").
+  // Fail fast with a clear message rather than firing doomed requests one by
+  // one and leaving the user staring at generic 422s in the console.
+  if (!changeSetId) {
+    console.error(
+      `Skipping Tokens Studio push (${action}): no changeSetId on the current branch credentials. `
+      + 'Try re-selecting the branch in the Branch Selector to refresh the change set.',
+    );
+    notifyToUI('Cannot sync: no change set is active for this branch. Re-select the branch to refresh.', { error: true });
+    return null;
+  }
+
   try {
     switch (action) {
       case 'BATCH_CREATE_TOKENS':
-        if (changeSetId) {
-          result = await batchCreateTokensRest(oauthTokens.accessToken, apiBaseUrl, projectId, data, changeSetId);
-        }
+        result = await batchCreateTokensRest(oauthTokens.accessToken, apiBaseUrl, projectId, data, changeSetId);
         break;
       case 'CREATE_TOKEN':
         result = await createTokenRest(oauthTokens.accessToken, apiBaseUrl, projectId, data, branch, changeSetId);
@@ -239,7 +250,6 @@ export function useTokensStudioOAuth() {
             const localTheme = themes.find((t) => t.id === remoteTheme.id);
             return localTheme ? alignObjectKeys(remoteTheme, localTheme) : remoteTheme;
           });
-
 
           return {
             status: 'success',
@@ -399,7 +409,6 @@ export function useTokensStudioOAuth() {
             const localTheme = themes.find((t) => t.id === remoteTheme.id);
             return localTheme ? alignObjectKeys(remoteTheme, localTheme) : remoteTheme;
           });
-
 
           dispatch.tokenState.setTokenData({
             values: (newTokens || {}) as any,

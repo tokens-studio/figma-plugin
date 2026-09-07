@@ -7,6 +7,7 @@ export * from './setVariablesBoolean';
 export * from './setVariablesColor';
 export * from './setVariablesNumber';
 export * from './setVariablesString';
+export * from './setVariablesMotion';
 export * from './setCreateStylesWithVariableReferences';
 export * from './setIgnoreFirstPartForStyles';
 export * from './setRenameExistingStylesAndVariables';
