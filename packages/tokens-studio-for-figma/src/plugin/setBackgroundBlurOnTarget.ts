@@ -28,6 +28,7 @@ export default async function setBackgroundBlurOnTarget(
             if ('boundVariables' in updatedEffect) {
               blurEffect = {
                 ...blurEffect,
+                // @ts-ignore ShaderEffect (added in newer typings) lacks boundVariables; guarded above at runtime
                 boundVariables: updatedEffect.boundVariables,
               };
             }

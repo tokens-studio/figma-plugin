@@ -62,7 +62,8 @@ export async function applySiblingStyleId(node: BaseNode, styleIds: StyleIdMap, 
       case 'INSTANCE':
       case 'COMPONENT_SET':
       case 'FRAME':
-      case 'SLOT':
+      // @ts-ignore SlotNode only exists in newer @figma/plugin-typings
+      case 'SLOT': // eslint-disable-line no-fallthrough
       case 'SECTION':
       case 'BOOLEAN_OPERATION':
         {
