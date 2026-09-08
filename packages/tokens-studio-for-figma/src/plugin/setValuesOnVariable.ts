@@ -109,11 +109,9 @@ export default async function setValuesOnVariable(
           }
 
           // If still no variable, try one more time to find by name in case it was just created
+          // (variablesByName is already collection-scoped, so no extra check needed).
           if (!variable) {
-            const candidate = variablesByName.get(token.path);
-            if (candidate && candidate.variableCollectionId === collection.id) {
-              variable = candidate;
-            }
+            variable = variablesByName.get(token.path);
           }
 
           if (!variable) {

@@ -62,8 +62,10 @@ export async function applySiblingStyleId(node: BaseNode, styleIds: StyleIdMap, 
       case 'INSTANCE':
       case 'COMPONENT_SET':
       case 'FRAME':
-      // @ts-ignore SlotNode only exists in newer @figma/plugin-typings
-      case 'SLOT': // eslint-disable-line no-fallthrough
+      // Cast narrows the suppression to the SLOT literal only; unlike a directive
+      // above the line, any other type error on this case still trips typecheck.
+      // Works whether or not @figma/plugin-typings knows about SlotNode.
+      case 'SLOT' as 'FRAME': // eslint-disable-line no-fallthrough
       case 'SECTION':
       case 'BOOLEAN_OPERATION':
         {

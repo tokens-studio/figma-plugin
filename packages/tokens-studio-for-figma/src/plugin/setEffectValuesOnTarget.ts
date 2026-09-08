@@ -71,6 +71,8 @@ async function tryApplyCompositeVariable({
               // @ts-ignore ShaderEffect (added in newer typings) lacks boundVariables; guarded above at runtime
               boundVariables: updatedEffect.boundVariables,
             };
+          } else {
+            console.warn('setBoundVariableForEffect returned an effect without boundVariables; binding dropped', updatedEffect);
           }
         }
       }
