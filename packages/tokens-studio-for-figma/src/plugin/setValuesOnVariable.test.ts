@@ -191,6 +191,46 @@ describe('SetValuesOnVariable', () => {
     expect(mockSetValueForMode).toHaveBeenCalledTimes(4);
   });
 
+  it('does not match a same-named variable from a different collection when caller passes an unfiltered list', async () => {
+    // Regression guard: variablesByName inside setValuesOnVariable must be scoped
+    // to the target collection, or a token would silently resolve to a namesake
+    // in another collection and overwrite it.
+    const setValueForModeForeign = jest.fn();
+    const setValueForModeLocal = jest.fn();
+    const foreignCollectionVariable = {
+      id: 'VariableID:999:1',
+      key: 'foreign-key',
+      name: 'button/primary/width',
+      variableCollectionId: 'VariableCollectionId:999:foreign',
+      setValueForMode: setValueForModeForeign,
+      valuesByMode: {},
+    } as unknown as Variable;
+    const localCollectionVariable = {
+      id: 'VariableID:309:99',
+      key: 'local-key',
+      name: 'button/primary/width',
+      variableCollectionId: collection.id,
+      setValueForMode: setValueForModeLocal,
+      valuesByMode: {},
+    } as unknown as Variable;
+    const mixed = [foreignCollectionVariable, localCollectionVariable] as Variable[];
+    const tokens = [
+      {
+        name: 'button.primary.width',
+        path: 'button/primary/width',
+        rawValue: 16,
+        value: '16',
+        type: TokenTypes.SIZING,
+      },
+    ] as SingleToken<true, { path: string, variableId: string }>[];
+
+    await setValuesOnVariable(mixed, tokens, collection, mode, baseFontSize);
+
+    expect(setValueForModeForeign).not.toHaveBeenCalled();
+    expect(mockCreateVariable).not.toHaveBeenCalled();
+    expect(setValueForModeLocal).toHaveBeenCalled();
+  });
+
   it('should create a new variable when there is no variable which is connected to the token', async () => {
     const tokens = [
       {
