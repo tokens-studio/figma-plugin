@@ -1,11 +1,24 @@
 import React from 'react';
 import { Provider } from 'react-redux';
+import userEvent from '@testing-library/user-event';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { AnyTokenList } from '@/types/tokens';
 import {
   createMockStore, render, waitFor,
 } from '../../../../tests/config/setupTest';
 import DuplicateTokenGroupModal from './DuplicateTokenGroupModal';
+
+const otherTokens: Record<string, AnyTokenList> = {
+  global: [
+    {
+      value: '#f0',
+      type: TokenTypes.COLOR,
+      name: 'foo.bar.something.bar',
+    },
+  ],
+  light: [],
+  dark: [],
+};
 
 const tokens: Record<string, AnyTokenList> = {
   global: [
@@ -76,5 +89,50 @@ describe('DuplicateTokenGroupModal', () => {
     waitFor(async () => {
       expect(getByText('duplicate')).not.toBeDisabled();
     });
+  });
+
+  it('should allow selecting multiple sets without closing the dropdown', async () => {
+    const multiSetStore = createMockStore({ tokenState: { tokens: otherTokens, activeTokenSet: 'global' } });
+
+    const { getByTestId } = render(
+      <Provider store={multiSetStore}>
+        <DuplicateTokenGroupModal
+          isOpen
+          type={TokenTypes.COLOR}
+          newName="foo-copy"
+          oldName="foo"
+        />
+      </Provider>,
+    );
+
+    await userEvent.click(getByTestId('duplicate-token-group-sets-trigger'), { pointerEventsCheck: 0 });
+    await userEvent.click(getByTestId('duplicate-token-group-sets-checkbox-light'), { pointerEventsCheck: 0 });
+    await userEvent.click(getByTestId('duplicate-token-group-sets-checkbox-dark'), { pointerEventsCheck: 0 });
+
+    expect(getByTestId('duplicate-token-group-sets-content')).toBeInTheDocument();
+    expect(getByTestId('duplicate-token-group-sets-checkbox-global')).toHaveAttribute('data-state', 'checked');
+    expect(getByTestId('duplicate-token-group-sets-checkbox-light')).toHaveAttribute('data-state', 'checked');
+    expect(getByTestId('duplicate-token-group-sets-checkbox-dark')).toHaveAttribute('data-state', 'checked');
+  });
+
+  it('should filter the sets through the search field', async () => {
+    const multiSetStore = createMockStore({ tokenState: { tokens: otherTokens, activeTokenSet: 'global' } });
+
+    const { getByTestId, queryByTestId } = render(
+      <Provider store={multiSetStore}>
+        <DuplicateTokenGroupModal
+          isOpen
+          type={TokenTypes.COLOR}
+          newName="foo-copy"
+          oldName="foo"
+        />
+      </Provider>,
+    );
+
+    await userEvent.click(getByTestId('duplicate-token-group-sets-trigger'), { pointerEventsCheck: 0 });
+    await userEvent.type(getByTestId('duplicate-token-group-sets-search'), 'light');
+
+    expect(getByTestId('duplicate-token-group-sets-item-light')).toBeInTheDocument();
+    expect(queryByTestId('duplicate-token-group-sets-item-dark')).not.toBeInTheDocument();
   });
 });
