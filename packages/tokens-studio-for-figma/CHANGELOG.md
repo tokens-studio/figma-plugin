@@ -1,5 +1,17 @@
 # @tokens-studio/figma-plugin
 
+## 2.12.0
+
+### Minor Changes
+
+- da5151c98: Duplicating a token or a token group no longer closes the set picker after every click. The picker is now a proper multi-select panel that stays open while you tick sets, has a search field at the top to filter long set lists, and a select-all toggle that acts on whatever the search currently shows.
+
+### Patch Changes
+
+- 246098691: Fix the default preset's box shadow token using `$type` instead of `type` for the shadow type of its individual layers, a leftover from the DTCG migration. The layer type was unreadable, so every layer was applied as a drop shadow instead of one drop and one inner shadow.
+- a3d0273c0: Optimize variable export process for faster performance on large token sets.
+- e70f7ec5d: Fix legacy↔DTCG token format conversion on GitHub silently committing only $metadata.json without rewriting any token files.
+
 ## 2.11.12
 
 ### Patch Changes
