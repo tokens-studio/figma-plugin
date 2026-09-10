@@ -1,4 +1,6 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, {
+  useState, useCallback, useMemo, useEffect,
+} from 'react';
 import { useSelector } from 'react-redux';
 import {
   Button, Heading, Tabs, Box, Stack, Checkbox, Label,
@@ -19,6 +21,12 @@ export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: {
   const isProUser = useIsProUser();
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+
+  useEffect(() => {
+    if (!isProUser && selectedThemes.length > 0) {
+      setSelectedThemes([]);
+    }
+  }, [isProUser, selectedThemes, setSelectedThemes]);
 
   const handleToggleSearch = useCallback(() => {
     setIsSearchActive(!isSearchActive);
@@ -95,7 +103,7 @@ export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: {
         key={theme.id}
       >
         {/* eslint-disable-next-line react/jsx-no-bind */}
-        <LabelledCheckbox id={theme.id} checked={selectedThemes.includes(theme.id)} onChange={() => handleSelectTheme(theme.id)} label={theme.name} />
+        <LabelledCheckbox id={theme.id} checked={selectedThemes.includes(theme.id)} onChange={() => handleSelectTheme(theme.id)} label={theme.name} disabled={!isProUser} />
         {/* TODO: Add theme details */}
         {/* <ThemeDetails /> */}
         {/* <IconButton variant="invisible" size="small" tooltip="Details" icon={<ChevronRightIcon />} /> */}
@@ -159,8 +167,8 @@ export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: {
             <p>{t('exportThemesTab.combinationsOfSetsMakeThemes')}</p>
             <Stack direction="column" width="full" gap={4}>
               <Stack direction="row" gap={3} align="center">
-                <Checkbox id="check-all-themes" checked={filteredThemes.length > 0 && filteredThemes.every((theme) => selectedThemes.includes(theme.id))} onCheckedChange={handleSelectAllThemes} />
-                <Label htmlFor="check-all-themes">{t('generic.selectAll')}</Label>
+                <Checkbox id="check-all-themes" checked={filteredThemes.length > 0 && filteredThemes.every((theme) => selectedThemes.includes(theme.id))} onCheckedChange={handleSelectAllThemes} disabled={!isProUser} />
+                <Label htmlFor="check-all-themes" css={{ cursor: isProUser ? 'pointer' : 'not-allowed', opacity: isProUser ? 1 : 0.5 }}>{t('generic.selectAll')}</Label>
               </Stack>
               {filteredThemes.length === 0 && isSearchActive && searchTerm ? (
                 <Box css={{ padding: '$4', textAlign: 'center', color: '$fgMuted' }}>
