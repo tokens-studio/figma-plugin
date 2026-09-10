@@ -142,7 +142,7 @@
     "set-value": "^3.0.3",
     "stream-browserify": "^3.0.0",
     "use-debounce": "^6.0.1",
-    "uuid": "^9.0.0",
+    "uuid": "^14.0.0",
     "vm-browserify": "^1.1.2",
     "zod": "^3.22.3",
     "zustand": "^5.0.11"
