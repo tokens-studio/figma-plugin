@@ -34,6 +34,6 @@
     "dist"
   ],
   "devDependencies": {
-    "jest": "^28.0.3"
+    "jest": "^30.4.2"
   }
 }
