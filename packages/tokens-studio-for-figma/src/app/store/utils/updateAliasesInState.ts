@@ -1,5 +1,6 @@
 import { AnyTokenList, SingleToken, TokenToRename } from '@/types/tokens';
 import { replaceReferences } from '@/utils/findReferences';
+import { isGradientTokenValue } from '@/utils/color/gradientTokenToCss';
 import { TokenState } from '../models/tokenState';
 import { updateModify } from './updateModify';
 
@@ -27,6 +28,25 @@ export function updateAliasesInState(tokens: Record<string, AnyTokenList>, data:
               if (!updatedSets.includes(key)) updatedSets.push(key);
             }
 
+            return {
+              ...newToken,
+              value: newTokenValue,
+            } as SingleToken;
+          }
+
+          // Gradient tokens hold nested {stops, angle, center, ...}; the generic
+          // composite branch below would flatten each property via toString(),
+          // corrupting stops into "[object Object]". Only stop.color strings can
+          // reference other tokens.
+          if (isGradientTokenValue(newToken.value)) {
+            const stops = Array.isArray(newToken.value.stops) ? newToken.value.stops : [];
+            const newStops = stops.map((stop) => (typeof stop.color === 'string'
+              ? { ...stop, color: replaceReferences(stop.color, data.oldName, data.newName) }
+              : stop));
+            const newTokenValue = { ...newToken.value, stops: newStops };
+            if (JSON.stringify(newTokenValue) !== JSON.stringify(newToken.value)) {
+              if (!updatedSets.includes(key)) updatedSets.push(key);
+            }
             return {
               ...newToken,
               value: newTokenValue,

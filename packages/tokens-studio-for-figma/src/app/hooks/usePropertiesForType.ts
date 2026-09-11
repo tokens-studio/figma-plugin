@@ -143,6 +143,18 @@ export function usePropertiesForTokenType(type: TokenTypes, value?: SingleToken[
           },
         );
         break;
+      case TokenTypes.GRADIENT:
+        properties.push(
+          {
+            label: 'Fill',
+            name: Properties.fill,
+          },
+          {
+            label: 'Border',
+            name: Properties.borderColor,
+          },
+        );
+        break;
       case TokenTypes.DIMENSION:
       case TokenTypes.NUMBER:
         if (type === TokenTypes.DIMENSION) {

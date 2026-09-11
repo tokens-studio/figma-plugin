@@ -6,10 +6,12 @@ import { SingleToken } from '@/types/tokens';
 import { SingleShadowValueDisplay } from './SingleShadowValueDisplay';
 import { TokensContext } from '@/context';
 import {
-  isSingleBoxShadowToken, isSingleTypographyToken, isSingleCompositionToken, isSingleBorderToken,
+  isSingleBoxShadowToken, isSingleTypographyToken, isSingleCompositionToken, isSingleBorderToken, isSingleGradientToken,
 } from '@/utils/is';
 import { SingleTypographyValueDisplay } from './SingleTypographyValueDisplay';
-import { TokenBorderValue, TokenBoxshadowValue, TokenTypographyValue } from '@/types/values';
+import {
+  TokenBorderValue, TokenBoxshadowValue, TokenTypographyValue, TokenGradientValue,
+} from '@/types/values';
 import { SingleCompositionValueDisplay } from './SingleCompositionValueDisplay';
 import TooltipProperty from './TooltipProperty';
 import Stack from '../Stack';
@@ -17,6 +19,7 @@ import { CompositionTokenValue } from '@/types/CompositionTokenProperty';
 import { SingleBorderValueDisplay } from './SingleBorderValueDisplay';
 import { isColorToken } from '@/utils/is/isColorToken';
 import { SingleColorValueDisplay } from './SingleColorValueDisplay';
+import { SingleGradientValueDisplay } from './SingleGradientValueDisplay';
 
 type Props = {
   token: SingleToken;
@@ -106,6 +109,15 @@ export const TokenTooltipContentValue: React.FC<React.PropsWithChildren<React.Pr
       <SingleBorderValueDisplay
         value={token.value as TokenBorderValue}
         resolvedValue={resolvedValue as TokenBorderValue}
+      />
+    );
+  }
+
+  if (isSingleGradientToken(token, true)) {
+    return (
+      <SingleGradientValueDisplay
+        value={token.value as TokenGradientValue | string}
+        resolvedValue={resolvedValue as TokenGradientValue | string}
       />
     );
   }

@@ -30,6 +30,9 @@ import SidebarIcon from '@/icons/sidebar.svg';
 import { defaultTokenResolver } from '@/utils/TokenResolver';
 import { tokenFormatSelector } from '@/selectors/tokenFormatSelector';
 import { IconJson } from '@/icons';
+import { storageTypeSelector } from '@/selectors/storageTypeSelector';
+import { StorageProviderType } from '@/constants/StorageProviderType';
+import { TokenTypes } from '@/constants/TokenTypes';
 
 const StatusToast = ({ open, error }: { open: boolean; error: string | null }) => {
   const [isOpen, setOpen] = React.useState(open);
@@ -94,6 +97,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
   const tokenFilter = useSelector(tokenFilterSelector);
   const aliasBaseFontSize = useSelector(aliasBaseFontSizeSelector);
   const serverResolvedTokens = useSelector((state: RootState) => state.tokenState.serverResolvedTokens);
+  const storageType = useSelector(storageTypeSelector);
   const dispatch = useDispatch<Dispatch>();
   const [tokenSetsVisible, setTokenSetsVisible] = React.useState(true);
   const { getStringTokens } = useTokens();
@@ -139,15 +143,24 @@ function Tokens({ isActive }: { isActive: boolean }) {
         }
         return 0;
       });
-      return mapped.map(([key, { values, isPro, ...schema }]) => ({
-        key,
-        values,
-        schema,
-        isPro,
-      }));
+      return mapped
+        // Gradient tokens are only supported on the Tokens Studio platform, so
+        // creating them is limited to the Studio provider. Sets that already
+        // contain gradient tokens still display them for any provider.
+        .filter(([key, { values }]) => (
+          key !== TokenTypes.GRADIENT
+          || storageType?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH
+          || Boolean(values)
+        ))
+        .map(([key, { values, isPro, ...schema }]) => ({
+          key,
+          values,
+          schema,
+          isPro,
+        }));
     }
     return [];
-  }, [tokens, activeTokenSet, tokenFilter]);
+  }, [tokens, activeTokenSet, tokenFilter, storageType]);
 
   const handleToggleTokenSetsVisibility = React.useCallback(() => {
     setTokenSetsVisible(!tokenSetsVisible);
