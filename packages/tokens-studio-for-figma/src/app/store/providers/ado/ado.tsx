@@ -22,6 +22,7 @@ import { useIsProUser } from '@/app/hooks/useIsProUser';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 import { categorizeError } from '@/utils/error/categorizeError';
 import removeIdPropertyFromTokens from '@/utils/removeIdPropertyFromTokens';
+import { buildGitMetadata } from '@/utils/buildGitMetadata';
 
 type AdoCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.ADO; }>;
 type AdoFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.ADO; }>;
@@ -66,9 +67,7 @@ export const useADO = () => {
       const { commitMessage, customBranch } = pushSettings;
       try {
         if (customBranch) storage.selectBranch(customBranch);
-        const metadata = {
-          tokenSetOrder: Object.keys(tokens),
-        };
+        const metadata = buildGitMetadata(tokens);
         await storage.save({
           themes,
           tokens,

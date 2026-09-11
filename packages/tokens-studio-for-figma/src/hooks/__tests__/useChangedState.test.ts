@@ -14,8 +14,8 @@ const mockDispatch = {
 let mockTokens: Record<string, unknown[]> = {};
 const mockThemes = [];
 let mockStorageType = { provider: StorageProviderType.LOCAL };
-const mockLastSyncedState = null;
-const mockTokenFormat = 'dtcg';
+let mockLastSyncedState: string | null = null;
+let mockTokenFormat = 'dtcg';
 let mockTokenSetMetadata: Record<string, unknown> = {};
 
 jest.mock('react-redux', () => ({
@@ -67,7 +67,12 @@ describe('useChangedState', () => {
     mockStorageType = { provider: StorageProviderType.LOCAL };
     mockTokens = {};
     mockTokenSetMetadata = {};
+    mockLastSyncedState = null;
+    mockTokenFormat = 'dtcg';
   });
+
+  // Format-flip detection lives in getLastSyncedFormat (see compareLastSyncedState.test.ts)
+  // and is consumed imperatively at push time by pushTokensToGitHub — no hook derivation.
 
   it('dispatches hasChanges=true for LOCAL provider when state differs from lastSyncedState', () => {
     mockStorageType = { provider: StorageProviderType.LOCAL };
