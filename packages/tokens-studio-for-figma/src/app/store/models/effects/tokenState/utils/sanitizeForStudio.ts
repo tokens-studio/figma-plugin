@@ -9,8 +9,18 @@
 // eslint-disable-next-line no-control-regex
 const UNSAFE_CHARS = /[{}\x00-\x1F\x7F]/g;
 
+// Strip brace/control characters and trim leading/trailing whitespace.
+// The trim is intentional: Figma variable names occasionally carry stray
+// whitespace around segment boundaries (e.g. `Foo / Bar`) and we want the
+// resulting path to be `Foo/Bar`, not `Foo /Bar `.
 function stripUnsafe(part: string): string {
   return part.replace(UNSAFE_CHARS, '').trim();
+}
+
+// Sanitize a plain display string (e.g. a theme name). Unlike
+// sanitizeTokenSetName, this does NOT split on `/` — a name is not a path.
+export function sanitizeDisplayName(name: string): string {
+  return stripUnsafe(name);
 }
 
 // Normalize a token name: split on `.`, strip unsafe chars from each segment,
@@ -89,11 +99,11 @@ export function sanitizeNewTokensForStudio<T extends { name: string; parent?: st
   tokens: T[],
 ): T[] {
   return tokens
-    .filter((t) => t.parent != null)
+    .filter((t): t is T & { parent: string } => t.parent != null)
     .map((t) => ({
       ...t,
       name: sanitizeTokenName(t.name),
-      parent: sanitizeTokenSetName(t.parent as string),
+      parent: sanitizeTokenSetName(t.parent),
       value: sanitizeReferencesInValue(t.value) as T['value'],
     }))
     .filter((t) => {
@@ -132,8 +142,10 @@ export function sanitizeThemeForStudio<T extends {
   });
   return {
     ...theme,
+    // `group` is a token-set-path segment (theme groups nest under it);
+    // `name` is a plain display string, so it must NOT be split on `/`.
     group: theme.group ? sanitizeTokenSetName(theme.group) : theme.group,
-    name: theme.name ? sanitizeTokenSetName(theme.name) : theme.name,
+    name: theme.name ? sanitizeDisplayName(theme.name) : theme.name,
     selectedTokenSets,
     $figmaVariableReferences,
   };

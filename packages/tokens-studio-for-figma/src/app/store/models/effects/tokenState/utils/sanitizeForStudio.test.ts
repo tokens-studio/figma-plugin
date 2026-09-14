@@ -55,6 +55,17 @@ describe('sanitizeReferencesInValue', () => {
   it('leaves strings without references untouched', () => {
     expect(sanitizeReferencesInValue('#ff0000')).toBe('#ff0000');
   });
+
+  // Truncation on unbalanced input is intentional — the studio parser rejects
+  // values with unmatched braces anyway, so dropping the trailing fragment is
+  // preferable to sending a value that will fail server-side.
+  it('drops the trailing fragment of an unbalanced opening brace', () => {
+    expect(sanitizeReferencesInValue('prefix {color.primary')).toBe('prefix ');
+  });
+
+  it('keeps balanced refs and drops a trailing unbalanced opener', () => {
+    expect(sanitizeReferencesInValue('a {b} c {d')).toBe('a {b} c ');
+  });
 });
 
 describe('hasEmptyReference', () => {
@@ -207,5 +218,17 @@ describe('sanitizeThemeForStudio', () => {
     } as any);
     expect((out as any).$figmaModeId).toBe('mode-1');
     expect((out as any).$figmaCollectionId).toBe('coll-1');
+  });
+
+  // `name` is a plain display string; a `/` in a theme name should NOT split
+  // it into path segments the way it would for `group` or a token-set path.
+  it('preserves `/` in theme name (not treated as a path)', () => {
+    const out = sanitizeThemeForStudio({ name: 'Dark / Compact' });
+    expect(out.name).toBe('Dark / Compact');
+  });
+
+  it('still strips brace chars from theme name', () => {
+    const out = sanitizeThemeForStudio({ name: '{Light}' });
+    expect(out.name).toBe('Light');
   });
 });
