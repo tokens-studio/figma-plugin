@@ -81,3 +81,60 @@ export function sanitizeReferencesInValue(value: unknown): unknown {
 export function hasEmptyReference(value: unknown): boolean {
   return typeof value === 'string' && /\{\s*\}/.test(value);
 }
+
+// Sanitize a batch of imported tokens for the studio push. Tokens missing a
+// parent, or whose name/parent normalize to empty, or whose value contains an
+// unresolvable `{}` reference, are dropped with a warning.
+export function sanitizeNewTokensForStudio<T extends { name: string; parent?: string | null; value: unknown }>(
+  tokens: T[],
+): T[] {
+  return tokens
+    .filter((t) => t.parent != null)
+    .map((t) => ({
+      ...t,
+      name: sanitizeTokenName(t.name),
+      parent: sanitizeTokenSetName(t.parent as string),
+      value: sanitizeReferencesInValue(t.value) as T['value'],
+    }))
+    .filter((t) => {
+      if (!t.name || !t.parent) {
+        // eslint-disable-next-line no-console
+        console.warn('[sanitizeNewTokensForStudio] Dropping token with empty name/parent:', t);
+        return false;
+      }
+      if (hasEmptyReference(t.value)) {
+        // eslint-disable-next-line no-console
+        console.warn('[sanitizeNewTokensForStudio] Dropping token whose alias target sanitizes to empty:', t.name);
+        return false;
+      }
+      return true;
+    });
+}
+
+// Sanitize an imported theme's names and its token-set / variable-reference
+// keys. Keys that sanitize to empty are dropped from the maps; the theme's own
+// `group` and `name` are cleaned in place so a theme push carries safe strings.
+export function sanitizeThemeForStudio<T extends {
+  group?: string;
+  name?: string;
+  selectedTokenSets?: Record<string, unknown>;
+  $figmaVariableReferences?: Record<string, unknown>;
+}>(theme: T): T {
+  const selectedTokenSets: Record<string, unknown> = {};
+  Object.entries(theme.selectedTokenSets || {}).forEach(([setName, status]) => {
+    const clean = sanitizeTokenSetName(setName);
+    if (clean) selectedTokenSets[clean] = status;
+  });
+  const $figmaVariableReferences: Record<string, unknown> = {};
+  Object.entries(theme.$figmaVariableReferences || {}).forEach(([tokenName, key]) => {
+    const clean = sanitizeTokenName(tokenName);
+    if (clean) $figmaVariableReferences[clean] = key;
+  });
+  return {
+    ...theme,
+    group: theme.group ? sanitizeTokenSetName(theme.group) : theme.group,
+    name: theme.name ? sanitizeTokenSetName(theme.name) : theme.name,
+    selectedTokenSets,
+    $figmaVariableReferences,
+  };
+}
