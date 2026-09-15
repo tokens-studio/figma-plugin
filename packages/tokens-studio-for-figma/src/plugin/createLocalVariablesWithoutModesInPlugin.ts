@@ -39,7 +39,7 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
 
   let figmaVariablesAfterCreate = 0;
 
-  const checkSetting = !settings.variablesBoolean && !settings.variablesColor && !settings.variablesNumber && !settings.variablesString;
+  const checkSetting = !settings.variablesBoolean && !settings.variablesColor && !settings.variablesNumber && !settings.variablesString && !settings.variablesMotion;
   if (!checkSetting) {
     const themesToCreateCollections = selectedSets.reduce((acc: ThemeObject[], curr: ExportTokenSet) => {
       if (curr.status === TokenSetStatus.ENABLED) {

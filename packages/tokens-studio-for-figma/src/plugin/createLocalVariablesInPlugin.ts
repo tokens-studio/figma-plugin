@@ -56,7 +56,7 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
 
   let figmaVariablesAfterCreate = 0;
 
-  const checkSetting = !settings.variablesBoolean && !settings.variablesColor && !settings.variablesNumber && !settings.variablesString;
+  const checkSetting = !settings.variablesBoolean && !settings.variablesColor && !settings.variablesNumber && !settings.variablesString && !settings.variablesMotion;
   if (!checkSetting && selectedThemes && selectedThemes.length > 0) {
     // Show preparation phase
     postToUI({

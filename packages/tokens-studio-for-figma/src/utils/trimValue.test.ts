@@ -73,6 +73,14 @@ describe('trimValue', () => {
     ]);
   });
 
+  it('preserves numeric array tuples like a cubicBezier value', () => {
+    expect(trimValue([0.4, 0, 0.2, 1] as any)).toEqual([0.4, 0, 0.2, 1]);
+  });
+
+  it('trims string array elements without wrapping them in an object', () => {
+    expect(trimValue([' 0.4 ', ' 0 '] as any)).toEqual(['0.4', '0']);
+  });
+
   describe('number token handling', () => {
     it('should return number for number tokens with numeric string values', () => {
       expect(trimValue('42', TokenTypes.NUMBER)).toBe(42);

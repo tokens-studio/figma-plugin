@@ -8,6 +8,7 @@ const settings: SettingsState = {
   variablesNumber: true,
   variablesString: true,
   variablesBoolean: true,
+  variablesMotion: true,
   renameExistingStylesAndVariables: true,
   removeStylesAndVariablesWithoutConnection: true,
 };
@@ -144,5 +145,22 @@ describe('checkIfTokenCanCreateVariable', () => {
       type: TokenTypes.NUMBER,
     } as ResolveTokenValuesResult;
     expect(checkIfTokenCanCreateVariable(validToken, settings)).toBe(true);
+  });
+
+  it('gates duration and cubicBezier tokens on variablesMotion', () => {
+    const duration = {
+      name: 'motion.fast',
+      value: '200ms',
+      type: TokenTypes.DURATION,
+    } as ResolveTokenValuesResult;
+    const bezier = {
+      name: 'motion.easing.emphasized',
+      value: '0.4, 0, 0.2, 1',
+      type: TokenTypes.CUBIC_BEZIER,
+    } as ResolveTokenValuesResult;
+    expect(checkIfTokenCanCreateVariable(duration, settings)).toBe(true);
+    expect(checkIfTokenCanCreateVariable(bezier, settings)).toBe(true);
+    expect(checkIfTokenCanCreateVariable(duration, { ...settings, variablesMotion: false })).toBe(false);
+    expect(checkIfTokenCanCreateVariable(bezier, { ...settings, variablesMotion: false })).toBe(false);
   });
 });

@@ -58,4 +58,10 @@ export enum Properties {
   rotation = 'rotation',
   x = 'x',
   y = 'y',
+  motion = 'motion',
+  duration = 'duration',
+  cubicBezier = 'cubicBezier',
+  delay = 'delay',
+  timingFunction = 'timingFunction',
+  property = 'property',
 }
