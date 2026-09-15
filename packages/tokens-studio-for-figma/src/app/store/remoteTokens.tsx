@@ -250,18 +250,15 @@ export default function useRemoteTokens() {
               case StorageProviderType.TOKENS_STUDIO_OAUTH: {
                 dispatch.tokenState.setTokenSetMetadata(remoteData.metadata?.tokenSetsData ?? {});
                 if (remoteData.metadata?.changeSetId) {
-                  const nextCredentials = {
+                  // In-session only: updateCredentials early-returns for OAuth
+                  // (see src/utils/credentials.ts), so we can't persist the
+                  // changeSetId to Figma pluginData here. After a plugin reload
+                  // the credentials come back without it and the first push
+                  // trips the "no changeSetId" guard in pushToTokensStudioOAuth.
+                  // Re-selecting the branch resolves a fresh changeSetId.
+                  dispatch.uiState.setApiData({
                     ...context,
                     changeSetId: remoteData.metadata.changeSetId,
-                  };
-                  dispatch.uiState.setApiData(nextCredentials);
-                  // Also persist to Figma pluginData so subsequent pushes have
-                  // the changeSetId available after a plugin reload — Redux
-                  // alone would drop it. Without this, the very first push
-                  // after reload hits 422 "change_set_id is required".
-                  AsyncMessageChannel.ReactInstance.message({
-                    type: AsyncMessageTypes.CREDENTIALS,
-                    credential: nextCredentials,
                   });
                 }
                 break;

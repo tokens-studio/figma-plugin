@@ -18,16 +18,29 @@ export function updateAliasesInState(tokens: Record<string, AnyTokenList>, data:
 
           // Update if token is of type array, e.g. box shadows
           if (Array.isArray(newToken.value)) {
-            const newTokenValue = newToken.value.map((t) => Object.entries(t).reduce<Record<string, string | number>>((a, [k, v]) => {
-              // Nullish sub-values would stringify to the literal
-              // "null"/"undefined"; preserve them as-is instead of corrupting.
-              if (v == null) {
-                a[k] = v as unknown as string | number;
-                return a;
+            const newTokenValue = newToken.value.map((t) => {
+              // Primitive elements (e.g. the numeric tuple of a cubicBezier
+              // `[0.4, 0, 0.2, 1]`) would otherwise get Object.entries'd into
+              // `{}`, wiping the value on any rename. Only reduce over object
+              // elements; primitives may still contain a `{ref}` inside a
+              // string, so pipe strings through replaceReferences.
+              if (t == null || typeof t !== 'object') {
+                if (typeof t === 'string') {
+                  return replaceReferences(t, data.oldName, data.newName);
+                }
+                return t;
               }
-              a[k] = replaceReferences(String(v), data.oldName, data.newName);
-              return a;
-            }, {}));
+              return Object.entries(t).reduce<Record<string, string | number>>((a, [k, v]) => {
+                // Nullish sub-values would stringify to the literal
+                // "null"/"undefined"; preserve them as-is instead of corrupting.
+                if (v == null) {
+                  a[k] = v as unknown as string | number;
+                  return a;
+                }
+                a[k] = replaceReferences(String(v), data.oldName, data.newName);
+                return a;
+              }, {});
+            });
 
             if (JSON.stringify(newTokenValue) !== JSON.stringify(newToken.value)) {
               if (!updatedSets.includes(key)) updatedSets.push(key);
