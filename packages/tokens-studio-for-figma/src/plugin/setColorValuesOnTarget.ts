@@ -26,9 +26,17 @@ const isGradient = (value: string): boolean => value?.startsWith?.('linear-gradi
   || value?.startsWith?.('conic-gradient');
 
 const getGradientPaint = async (fallbackValue, token) => {
-  let gradientString = typeof fallbackValue === 'object' && fallbackValue.fill
-    ? fallbackValue.fill
-    : fallbackValue;
+  // If the server-resolved value is a string but not a CSS gradient (e.g. the
+  // server returned a non-standard object notation), fall back to rawValue which
+  // is always the original structured TokenGradientValue from the token store.
+  let effectiveValue = fallbackValue;
+  if (typeof effectiveValue === 'string' && !isGradient(effectiveValue)) {
+    effectiveValue = defaultTokenValueRetriever.get(token)?.rawValue ?? effectiveValue;
+  }
+
+  let gradientString = typeof effectiveValue === 'object' && effectiveValue != null && effectiveValue.fill
+    ? effectiveValue.fill
+    : effectiveValue;
   // Gradient-type tokens hold a structured value, flatten it to a CSS string
   if (isGradientTokenValue(gradientString)) {
     gradientString = gradientTokenToCss(gradientString);
