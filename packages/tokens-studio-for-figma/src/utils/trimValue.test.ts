@@ -73,6 +73,26 @@ describe('trimValue', () => {
     ]);
   });
 
+  describe('gradient token handling', () => {
+    it('should pass gradient object values through untouched', () => {
+      const gradientValue = {
+        kind: 'linear',
+        angle: 180,
+        start: { x: 0, y: 0.5 },
+        end: { x: 1, y: 0.5 },
+        stops: [
+          { color: '#000000', position: 0, midpoint: 0.25 },
+          { color: '{color.brand.500}', position: 1 },
+        ],
+      };
+      expect(trimValue(gradientValue as any, TokenTypes.GRADIENT)).toEqual(gradientValue);
+    });
+
+    it('should trim gradient alias string values', () => {
+      expect(trimValue(' {gradient.primary} ', TokenTypes.GRADIENT)).toBe('{gradient.primary}');
+    });
+  });
+
   describe('number token handling', () => {
     it('should return number for number tokens with numeric string values', () => {
       expect(trimValue('42', TokenTypes.NUMBER)).toBe(42);

@@ -35,6 +35,18 @@ export const StyledTokenButton = styled('button', {
           borderColor: 'var(--borderColor)',
         },
       },
+      [TokenTypes.GRADIENT]: {
+        [`& ${StyledTokenButtonText}::before`]: {
+          width: '$6',
+          height: '$6',
+          flexShrink: 0,
+          border: '1px solid',
+          content: '',
+          borderRadius: '$full',
+          background: 'var(--backgroundColor)',
+          borderColor: 'var(--borderColor)',
+        },
+      },
     },
     displayType: {
       LIST: {
@@ -81,6 +93,32 @@ export const StyledTokenButton = styled('button', {
     {
       displayType: 'GRID',
       tokenType: TokenTypes.COLOR,
+      css: {
+        borderRadius: '$full',
+        backgroundColor: 'transparent',
+        '&:hover, &:focus': {
+          outline: 'none',
+          boxShadow: '$tokenFocus',
+          backgroundColor: 'transparent',
+        },
+        [`& ${StyledTokenButtonText}`]: {
+          padding: 0,
+        },
+      },
+    },
+    {
+      displayType: 'LIST',
+      tokenType: TokenTypes.GRADIENT,
+      css: {
+        width: '100%',
+        '&:hover, &:focus': {
+          backgroundColor: '$accentBg',
+        },
+      },
+    },
+    {
+      displayType: 'GRID',
+      tokenType: TokenTypes.GRADIENT,
       css: {
         borderRadius: '$full',
         backgroundColor: 'transparent',

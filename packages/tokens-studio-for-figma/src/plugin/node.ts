@@ -14,6 +14,7 @@ import {
 } from '@/figmaStorage';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { Properties } from '@/constants/Properties';
+import { gradientTokenToCss, isGradientTokenValue } from '@/utils/color/gradientTokenToCss';
 import { TokenFormatOptions } from './TokenFormatStoreClass';
 import { ClientStorageProperty } from '@/figmaStorage/ClientStorageProperty';
 import { getFileKey } from './helpers';
@@ -76,6 +77,14 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
       } else if (returnValueToLookFor(key) === 'description') {
         // Not all tokens have a description, so we need to treat it special
         acc[key] = resolvedToken.description ? resolvedToken.description : 'No description';
+      } else if (
+        resolvedToken.type === TokenTypes.GRADIENT
+        && returnValueToLookFor(key) === 'value'
+        && isGradientTokenValue(resolvedToken.value)
+      ) {
+        // Paints are created from CSS gradient strings, so flatten the
+        // gradient object using the resolved stop colors
+        acc[key] = gradientTokenToCss(resolvedToken.value);
       } else if (
         borderPropertyMap.get(key as Properties)
         && resolvedToken.type === TokenTypes.BORDER

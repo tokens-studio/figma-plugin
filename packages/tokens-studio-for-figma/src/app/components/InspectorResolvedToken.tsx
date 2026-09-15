@@ -12,6 +12,7 @@ import { TokenTooltip } from './TokenTooltip';
 import { TokenTypographyValue, TokenBoxshadowValue, TokenBorderValue } from '@/types/values';
 import { useResolvedBaseFontSize } from '@/app/hooks/useResolvedBaseFontSize';
 import { formatTokenValueForDisplay } from '@/utils/displayTokenValue';
+import { gradientTokenToCss, isGradientTokenValue } from '@/utils/color/gradientTokenToCss';
 
 type Props = {
   name: string;
@@ -51,6 +52,26 @@ export default function InspectorResolvedToken({ token }: { token: Props }) {
         <Box
           css={{
             background: String(token.value),
+            width: '24px',
+            height: '24px',
+            borderRadius: '100%',
+            border: '1px solid $borderMuted',
+            fontSize: 0,
+            flexShrink: 0,
+          }}
+        />
+      );
+    }
+    case TokenTypes.GRADIENT: {
+      // Value can be a TokenGradientValue object (applied token) or a CSS string
+      // (applied style resolved via convertFigmaGradientToString).
+      let background = 'transparent';
+      if (isGradientTokenValue(token.value)) background = gradientTokenToCss(token.value);
+      else if (typeof token.value === 'string') background = token.value;
+      return (
+        <Box
+          css={{
+            background,
             width: '24px',
             height: '24px',
             borderRadius: '100%',
