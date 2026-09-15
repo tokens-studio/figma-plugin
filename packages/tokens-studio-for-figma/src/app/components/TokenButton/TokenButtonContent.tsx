@@ -10,6 +10,7 @@ import { StyledTokenButton, StyledTokenButtonText } from './StyledTokenButton';
 import useTokens from '@/app/store/useTokens';
 import { gradientTokenToCss, isGradientTokenValue } from '@/utils/color';
 import { TokenGradientValue } from '@/types/values';
+import { getAliasValue } from '@/utils/alias';
 
 type Props = {
   active: boolean;
@@ -69,7 +70,16 @@ export default function TokenButtonContent({
         }
         let bg = 'transparent';
         if (gradVal) {
-          bg = gradientTokenToCss(gradVal);
+          // Resolve any stop colors that are token references (e.g. {color.brand}) so
+          // the swatch renders correctly when displayValue was corrupted by server merge.
+          const resolvedStops = gradVal.stops.map((stop) => {
+            if (typeof stop.color === 'string' && stop.color.startsWith('{')) {
+              const resolved = getAliasValue(stop.color, tokensContext.resolvedTokens as SingleToken[]);
+              return { ...stop, color: typeof resolved === 'string' ? resolved : stop.color };
+            }
+            return stop;
+          });
+          bg = gradientTokenToCss({ ...gradVal, stops: resolvedStops });
         } else if (typeof displayValue === 'string') {
           bg = displayValue;
         }
@@ -87,7 +97,7 @@ export default function TokenButtonContent({
         return {};
       }
     }
-  }, [type, displayValue, token]);
+  }, [type, displayValue, token.value, tokensContext.resolvedTokens]);
 
   return (
     <TokenTooltip token={token}>
