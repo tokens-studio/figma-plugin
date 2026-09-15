@@ -80,6 +80,12 @@
   "confirmSets": "Create styles or variables based on token sets",
   "intro": "You can use token sets to manage your styles, and variables. Use themes (Pro) to create multiple collections of variables or styles for easy switching between design concepts.",
   "setsSelectedForExport": "Sets selected for export"
+},
+"confirmDeleteGradientVariables": {
+  "text": "Delete Figma variables for gradient tokens?",
+  "description": "Figma variables can't store gradients. These color tokens are now gradients but still have variables from a previous export — bound layers will keep showing the old color until the variable is removed. Uncheck any you'd rather keep.",
+  "confirmAction": "Delete selected & export",
+  "cancelAction": "Cancel"
 }
 }
 
