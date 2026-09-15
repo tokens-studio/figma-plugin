@@ -70,10 +70,15 @@ async function tryApplyCompositeVariable({
           // shadow variant here; cast to it after copying boundVariables
           // from the API return value.
           if ('boundVariables' in updatedEffect) {
-            effect = {
-              ...effect,
-              boundVariables: updatedEffect.boundVariables,
-            } as typeof effect;
+            if ('boundVariables' in updatedEffect) {
+              effect = {
+                ...effect,
+                // @ts-ignore ShaderEffect (added in newer typings) lacks boundVariables; guarded above at runtime
+                boundVariables: updatedEffect.boundVariables,
+              } as typeof effect;
+            }
+          } else {
+            console.warn('setBoundVariableForEffect returned an effect without boundVariables; binding dropped', updatedEffect);
           }
         }
       }
