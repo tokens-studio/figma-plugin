@@ -6,15 +6,22 @@ and evaluates **Plugin-API** JavaScript (`figma.*`) directly in the renderer, so
 agent (or you) can read the document, mutate nodes, manage variables, export any node
 to a PNG, and screenshot the canvas entirely from the command line.
 
+The same CDP connection also reaches **a running plugin's own UI** — its iframe is a
+separate execution context in the same target, so you can launch a registered plugin,
+click through its interface, type into its forms and read its app state, all
+automated. See [Driving a plugin's UI](./docs/AGENT-GUIDE.md#driving-a-plugins-ui).
+
 > **Platform:** macOS only, for now. **Runtime:** Node 22+ (uses the built-in global
 > `WebSocket`/`fetch`; `WebSocket` is a stable global from Node 22). **Zero npm dependencies.**
 
 ## Why this exists
 
-Figma deliberately strips the `--remote-debugging-port` flag at launch, and its plugin
-sandbox can't be imported/run without a human clicking through the UI. This tool works
-around the first restriction with a one-byte patch to a **copy** of Figma.app and skips
-the plugin sandbox entirely — the agent talks to the real `figma` global over CDP.
+Figma deliberately strips the `--remote-debugging-port` flag at launch, and a plugin
+can't be *imported* without a human clicking through a native file dialog. This tool
+works around the first restriction with a one-byte patch to a **copy** of Figma.app,
+and sidesteps the second by not needing a plugin at all — the agent talks to the real
+`figma` global over CDP. (Once a plugin *has* been imported, launching it and driving
+its UI is automatable too; only that first import needs a human.)
 
 ## How it works
 
@@ -60,11 +67,12 @@ Two very different screenshots, and picking the right one matters:
   node's pixels** — tightly cropped, full fidelity, independent of zoom/viewport/panels.
   This is the right way to **validate a frame you built**. Default scale is `2` (@2x).
 - **`shot [file]`** captures the **entire Figma window** (toolbar, panels, canvas chrome)
-  at the current zoom. Reserve it for when the thing you need to see *is Figma's own UI* —
-  a plugin's iframe, the inspector/variables panels, etc.
+  at the current zoom. Reserve it for when the thing you need to see *is Figma's own
+  chrome* — the inspector/variables panels, a native menu or dialog.
 
 And when the question is *"what is this value?"* (a color, a name, a bound variable), don't
-screenshot at all — **read it with `eval`**. See
+screenshot at all — **read it with `eval`**. That holds for a plugin's UI too: its DOM and
+app state are readable directly, so it isn't a reason to reach for `shot`. See
 [docs/BEST-PRACTICES.md](./docs/BEST-PRACTICES.md#the-verification-hierarchy) for the full
 verification hierarchy.
 
@@ -93,8 +101,19 @@ verification hierarchy.
   reachable — that's where the `figma` global lives. `start` waits until a document's
   `figma` is actually evaluable before returning; restored/suspended background tabs are
   scanned and skipped automatically.
+- **Native file dialogs are off-limits to CDP.** *Plugins → Development → Import plugin
+  from manifest…* opens a macOS `NSOpenPanel`, which CDP can neither see nor click, so
+  **a human must do the one-time manifest import** (and any re-pointing of an existing
+  registration at a new path). Launching an already-registered plugin is automatable —
+  Cmd+P, type its name, Enter.
+- **Development plugins are identified by manifest `id`, not by path.** If the same `id`
+  is registered from another checkout, Figma keeps running *that* copy — easy to test a
+  stale build from a different branch for hours. Confirm which build is live before
+  drawing conclusions.
 - The debug copy is **ad-hoc signed**. That's fine for launching locally; it is not
-  distributable.
+  distributable. It is also noticeably **crash-prone** — especially around synthetic
+  keyboard events with modifiers. After a CDP timeout, check `node cli.mjs status` and
+  `start` again if it died.
 
 ## Fallback: patch the installed app (variant B)
 
@@ -143,7 +162,10 @@ This tool lives under `tools/` and is intentionally **outside** the npm workspac
   gotchas. Self-contained so it travels with the folder.
 - **[docs/BEST-PRACTICES.md](./docs/BEST-PRACTICES.md)** — how to operate the bridge well.
   Start with the verification hierarchy (read with `eval` → `export` a node → `shot` the
-  window), plus notes on idempotency, real/cloud-synced mutations, and file targeting.
+  window), plus notes on idempotency, real/cloud-synced mutations, file targeting,
+  keeping a UI interaction in one script run, and proving which build is loaded.
 - **[docs/AGENT-GUIDE.md](./docs/AGENT-GUIDE.md)** — copy-paste recipes for the
   build → run → verify loop: reading variables/styles, creating frames and text, the
-  auto-layout hug/wrap gotcha, exporting to verify, and targeting a specific file.
+  auto-layout hug/wrap gotcha, exporting to verify, targeting a specific file, and
+  **driving a plugin's own UI** (finding its context, the iframe offset, clicking,
+  typing, reading its store).

@@ -17,5 +17,14 @@
   "close": "Fermer",
   "secondScreen": "Deuxième écran",
   "and": "et",
-  "more": "plus"
+  "more": "plus",
+  "multiSelect": {
+    "search": "Rechercher",
+    "clearSearch": "Effacer la recherche",
+    "selectAll": "Tout sélectionner",
+    "noResults": "Aucun élément ne correspond à votre recherche",
+    "noneSelected": "Aucun sélectionné",
+    "itemsSelected": "{{number}} sélectionnés",
+    "allSelected": "Tous ({{number}})"
+  }
 }
