@@ -543,9 +543,7 @@ export default function GradientTokenForm({
             <Box css={{ border: '1px solid $borderMuted', borderRadius: '$small', overflow: 'hidden' }}>
               {stops.map((stop, index) => (
                 <GradientStopItem
-                  // Key by the stop object identity so per-item state (e.g. the
-                  // color picker toggle) follows the stop when the list reorders.
-                  key={`gradient-stop-${seed(stop)}`}
+                  key={`gradient-stop-${seed(index)}`}
                   index={index}
                   stop={stop}
                   resolvedColor={stopCssColors[index]}
