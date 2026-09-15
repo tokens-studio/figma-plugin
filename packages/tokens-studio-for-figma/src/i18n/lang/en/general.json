@@ -17,5 +17,14 @@
   "close": "Close",
   "secondScreen": "Second Screen",
   "and": "and",
-  "more": "more"
+  "more": "more",
+  "multiSelect": {
+    "search": "Search",
+    "clearSearch": "Clear search",
+    "selectAll": "Select all",
+    "noResults": "No items match your search",
+    "noneSelected": "None selected",
+    "itemsSelected": "{{number}} selected",
+    "allSelected": "All ({{number}})"
+  }
 }

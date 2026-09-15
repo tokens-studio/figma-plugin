@@ -65,10 +65,15 @@ async function tryApplyCompositeVariable({
         const variableToApply = await defaultTokenValueRetriever.getVariableReference(val.slice(1, -1));
         if (variableToApply) {
           const updatedEffect = figma.variables.setBoundVariableForEffect(effect, transformShadowKeyToFigmaVariable(key), variableToApply);
-          effect = {
-            ...effect,
-            boundVariables: updatedEffect.boundVariables,
-          };
+          if ('boundVariables' in updatedEffect) {
+            effect = {
+              ...effect,
+              // @ts-ignore ShaderEffect (added in newer typings) lacks boundVariables; guarded above at runtime
+              boundVariables: updatedEffect.boundVariables,
+            };
+          } else {
+            console.warn('setBoundVariableForEffect returned an effect without boundVariables; binding dropped', updatedEffect);
+          }
         }
       }
     }
