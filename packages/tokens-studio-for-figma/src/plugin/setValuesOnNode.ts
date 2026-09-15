@@ -34,6 +34,10 @@ export default async function setValuesOnNode({
   baseFontSize?: string; // The base font size to use, note that we should find a better way to pass this through
 }) {
   try {
+    // Commit undo point before applying token values to nodes
+    if (typeof figma !== 'undefined' && figma.commitUndo) {
+      figma.commitUndo();
+    }
     if (
       node.type !== 'CONNECTOR'
       && node.type !== 'SHAPE_WITH_TEXT'
