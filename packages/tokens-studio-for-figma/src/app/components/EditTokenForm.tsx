@@ -42,7 +42,7 @@ import Box from './Box';
 import ColorTokenForm from './ColorTokenForm';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { ColorModifier } from '@/types/Modifier';
-import { MultiSelectDropdown } from './MultiSelectDropdown';
+import { SearchableMultiSelect } from './SearchableMultiSelect';
 import { tokenTypesToCreateVariable } from '@/constants/VariableTypes';
 import { ModalOptions } from '@/constants/ModalOptions';
 import FigmaVariableForm from './FigmaVariableForm';
@@ -944,14 +944,16 @@ function EditTokenForm({ resolvedTokens }: Props) {
           handleRemoveFigmaVariable={removeFigmaVariable}
         />
         {internalEditToken.status === EditTokenFormStatus.DUPLICATE && (
-          <Box>
-            <Label>{t('set', { ns: 'general' })}</Label>
-            <MultiSelectDropdown
+          <Stack direction="column" gap={2}>
+            <Label>{t('selectTokenSets')}</Label>
+            <SearchableMultiSelect
               menuItems={Object.keys(tokens)}
               selectedItems={selectedTokenSets}
               handleSelectedItemChange={handleSelectedItemChange}
+              searchPlaceholder={t('searchSets') as string}
+              data-testid="duplicate-token-sets"
             />
-          </Box>
+          </Stack>
         )}
         <Stack direction="row" justify="end" gap={3}>
           <Button variant="secondary" type="button" onClick={handleReset}>

@@ -3,10 +3,10 @@ import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import {
   Button, TextInput, Stack, Text,
-  Tooltip,
+  Tooltip, Label,
 } from '@tokens-studio/ui';
 import Modal from '../Modal';
-import { MultiSelectDropdown } from '../MultiSelectDropdown';
+import { SearchableMultiSelect } from '../SearchableMultiSelect';
 import { ErrorMessage } from '../ErrorMessage';
 import { activeTokenSetSelector, tokensSelector } from '@/selectors';
 import useManageTokens from '@/app/store/useManageTokens';
@@ -150,7 +150,16 @@ export default function DuplicateTokenGroupModal({
             }[error.type]}
           </ErrorMessage>
         )}
-        <MultiSelectDropdown menuItems={Object.keys(tokens)} selectedItems={selectedTokenSets} handleSelectedItemChange={handleSelectedItemChange} />
+        <Stack direction="column" gap={2} css={{ width: '100%' }}>
+          <Label>{t('selectTokenSets')}</Label>
+          <SearchableMultiSelect
+            menuItems={Object.keys(tokens)}
+            selectedItems={selectedTokenSets}
+            handleSelectedItemChange={handleSelectedItemChange}
+            searchPlaceholder={t('searchSets') as string}
+            data-testid="duplicate-token-group-sets"
+          />
+        </Stack>
       </Stack>
     </Modal>
   );
