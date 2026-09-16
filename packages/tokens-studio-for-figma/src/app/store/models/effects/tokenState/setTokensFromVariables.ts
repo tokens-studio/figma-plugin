@@ -3,6 +3,10 @@ import type { RootModel } from '@/types/RootModel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { pushToTokensStudioOAuth } from '../../../providers/tokens-studio/tokensStudioOAuth';
 import { pushThemeToTokensStudioOAuth } from './utils/pushThemeToTokensStudioOAuth';
+import {
+  sanitizeNewTokensForStudio,
+  sanitizeThemeForStudio,
+} from './utils/sanitizeForStudio';
 import { store } from '@/app/store';
 import type { SetTokensFromVariablesPayload } from '@/types/payloads';
 
@@ -14,7 +18,10 @@ export function setTokensFromVariables(dispatch: RematchDispatch<RootModel>) {
     const context = currentState.uiState.api;
     const hasChangeSetId = !!(context as any)?.changeSetId;
     const { importedTokens } = currentState.tokenState;
-    const newTokens = (importedTokens?.newTokens || []).filter((t) => t.parent != null);
+    // Sanitize at the studio boundary: strip characters that would corrupt the
+    // ledger's reference or token-set parsing. Plugin-only flows still receive
+    // the raw names because this effect only runs for TOKENS_STUDIO_OAUTH.
+    const newTokens = sanitizeNewTokensForStudio(importedTokens?.newTokens || []);
 
     // Only create token sets and tokens if changeSetId is present — the REST API requires it.
     // changeSetId is populated after pulling from the REST API for a specific branch.
@@ -98,8 +105,8 @@ export function setTokensFromVariables(dispatch: RematchDispatch<RootModel>) {
     const stateAfterSets = store.getState();
     const { importedThemes } = stateAfterSets.tokenState;
     if (hasChangeSetId && importedThemes) {
-      const newThemesToPush = (importedThemes.newThemes || []).map((t: any) => ({ ...t, id: undefined }));
-      const updatedThemesToPush = importedThemes.updatedThemes || [];
+      const newThemesToPush = (importedThemes.newThemes || []).map((t: any) => sanitizeThemeForStudio({ ...t, id: undefined }));
+      const updatedThemesToPush = (importedThemes.updatedThemes || []).map((t: any) => sanitizeThemeForStudio(t));
       // Push themes sequentially so that a shared theme group (e.g. "appearances") is only created
       // once — concurrent pushes would both see groupId=null and create duplicate groups.
       for (const theme of [...newThemesToPush, ...updatedThemesToPush]) {
