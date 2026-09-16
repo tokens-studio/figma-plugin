@@ -1,6 +1,6 @@
 import { useDispatch, useStore } from 'react-redux';
 import { useCallback, useMemo } from 'react';
-import { SingleToken, TokenToRename } from '@/types/tokens';
+import { SingleToken, TokenToRename, DeprecatedProperty } from '@/types/tokens';
 import { Dispatch, RootState } from '../store';
 import useConfirm from '../hooks/useConfirm';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
@@ -25,6 +25,7 @@ export type EditSingleTokenData = {
   description?: string;
   oldName?: string;
   shouldUpdateDocument?: boolean;
+  $deprecated?: DeprecatedProperty;
   $extensions?: {
     [key: string]: any;
     'studio.tokens'?: {
@@ -42,6 +43,7 @@ export type CreateSingleTokenData = {
   value: SingleToken['value'];
   description?: string;
   shouldUpdateDocument?: boolean;
+  $deprecated?: DeprecatedProperty;
   $extensions?: {
     [key: string]: any;
     'studio.tokens'?: {
@@ -64,7 +66,7 @@ export default function useManageTokens() {
 
   const editSingleToken = useCallback(async (data: EditSingleTokenData) => {
     const {
-      parent, type, name, value, description, oldName, shouldUpdateDocument = true, $extensions,
+      parent, type, name, value, description, oldName, shouldUpdateDocument = true, $deprecated, $extensions,
     } = data;
     dispatch.uiState.startJob({
       name: BackgroundJobs.UI_EDITSINGLETOKEN,
@@ -82,6 +84,7 @@ export default function useManageTokens() {
         description,
         oldName,
         shouldUpdate: shouldUpdateDocument,
+        $deprecated,
         $extensions,
       } as UpdateTokenPayload);
       if (oldName) {
@@ -94,7 +97,7 @@ export default function useManageTokens() {
 
   const createSingleToken = useCallback(async (data: CreateSingleTokenData) => {
     const {
-      parent, type, name, value, description, shouldUpdateDocument = true, $extensions,
+      parent, type, name, value, description, shouldUpdateDocument = true, $deprecated, $extensions,
     } = data;
     dispatch.uiState.startJob({
       name: BackgroundJobs.UI_CREATESINGLETOKEN,
@@ -116,6 +119,7 @@ export default function useManageTokens() {
         value,
         description,
         shouldUpdate: shouldUpdateDocument,
+        $deprecated,
         $extensions,
       } as UpdateTokenPayload);
     }
@@ -133,7 +137,7 @@ export default function useManageTokens() {
 
   const deleteSingleToken = useCallback(async (data: DeleteTokenPayload) => {
     const choices: Choice[] = [];
-    const themes = store.getState().tokenState.themes;
+    const { themes } = store.getState().tokenState;
     const hasConnectedStyle = themes.some((theme) => !!theme.$figmaStyleReferences?.[data.path]);
     if (hasConnectedStyle && data.type && [TokenTypes.COLOR, TokenTypes.TYPOGRAPHY, TokenTypes.BOX_SHADOW].includes(data?.type)) {
       choices.push({

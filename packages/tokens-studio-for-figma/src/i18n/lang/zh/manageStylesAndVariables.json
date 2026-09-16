@@ -60,7 +60,8 @@
   "styles": {
     "color": "颜色",
     "typography": "排版",
-    "effects": "效果"
+    "effects": "效果",
+    "gradients": "渐变"
   },
   "exportThemesTab": {
     "headingPro": "创建主题以开始使用",
@@ -78,5 +79,9 @@
     "intro": "您可以使用令牌集合来管理样式和变量。使用主题（Pro）创建多个变量或样式的集合，以便在设计概念之间轻松切换。",
     "setsSelectedForExport": "选择导出的集"
   },
-  "optionsModalTitle": "导出到 Figma：选项"
+  "optionsModalTitle": "导出到 Figma：选项",
+  "searchThemes": "搜索主题",
+  "searchSets": "搜索集",
+  "noThemesFound": "没有找到主题",
+  "noSetsFound": "没有找到套装"
 }
