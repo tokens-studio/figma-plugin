@@ -1,6 +1,45 @@
 import { createMockStore } from '../../../../../../tests/config/setupTest';
 
 describe('assignVariableIdsToTheme', () => {
+  it('should merge new variable ids into $figmaVariableReferences, preserving existing key order (issue #3791)', async () => {
+    const mockStore = createMockStore({
+      tokenState: {
+        themes: [{
+          id: 'light',
+          name: 'Light',
+          selectedTokenSets: {},
+          $figmaCollectionId: 'VariableCollectionID:123',
+          $figmaModeId: 'modeID:123',
+          $figmaVariableReferences: {
+            'fg.default': 'variableID:aaa',
+            'colors.red': 'variableID:bbb',
+          },
+        }],
+      },
+    });
+    await mockStore.dispatch.tokenState.assignVariableIdsToTheme({
+      light: {
+        collectionId: 'VariableCollectionID:123',
+        modeId: 'modeID:123',
+        variableIds: {
+          'colors.red': 'variableID:bbb',
+          'colors.blue': 'variableID:ccc',
+        },
+      },
+    });
+    const [updatedTheme] = mockStore.getState().tokenState.themes;
+    expect(Object.keys(updatedTheme.$figmaVariableReferences ?? {})).toEqual([
+      'fg.default',
+      'colors.red',
+      'colors.blue',
+    ]);
+    expect(updatedTheme.$figmaVariableReferences).toEqual({
+      'fg.default': 'variableID:aaa',
+      'colors.red': 'variableID:bbb',
+      'colors.blue': 'variableID:ccc',
+    });
+  });
+
   it('should assign variables data to the theme', async () => {
     const mockStore = createMockStore({
       tokenState: {
