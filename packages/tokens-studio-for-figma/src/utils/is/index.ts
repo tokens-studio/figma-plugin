@@ -12,3 +12,5 @@ export * from './isSingleBoxShadowValue';
 export * from './isSingleTypographyValue';
 export * from './isMatchingStyle';
 export * from './isSingleBorderToken';
+export * from './isSingleMotionToken';
+export * from './isSingleMotionValue';

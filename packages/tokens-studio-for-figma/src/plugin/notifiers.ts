@@ -76,6 +76,7 @@ export type SavedSettings = {
   variablesNumber: boolean;
   variablesString: boolean;
   variablesBoolean: boolean;
+  variablesMotion: boolean;
   stylesColor: boolean;
   stylesTypography: boolean;
   stylesEffect: boolean;
@@ -114,6 +115,7 @@ export function notifyUISettings(
     variablesNumber,
     variablesString,
     variablesBoolean,
+    variablesMotion,
     stylesColor,
     stylesTypography,
     stylesEffect,
@@ -155,6 +157,7 @@ export function notifyUISettings(
       variablesBoolean,
       variablesNumber,
       variablesString,
+      variablesMotion,
       stylesColor,
       stylesEffect,
       stylesTypography,
