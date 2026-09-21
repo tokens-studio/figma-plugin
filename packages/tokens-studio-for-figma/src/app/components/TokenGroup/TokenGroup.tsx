@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { TokenGroupHeading } from './TokenGroupHeading';
 import { StyledTokenGroup, StyledTokenGroupItems } from './StyledTokenGroup';
 import { TokenButton } from '@/app/components/TokenButton';
-import { displayTypeSelector } from '@/selectors';
+import { displayTypeSelector, hideDeprecatedTokensSelector } from '@/selectors';
 import { DeepKeyTokenMap, SingleToken, TokenTypeSchema } from '@/types/tokens';
 import { isSingleToken } from '@/utils/is';
 import { collapsedTokensSelector } from '@/selectors/collapsedTokensSelector';
@@ -24,6 +24,7 @@ const TokenGroup: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props
 }) => {
   const collapsed = useSelector(collapsedTokensSelector);
   const displayType = useSelector(displayTypeSelector);
+  const hideDeprecatedTokens = useSelector(hideDeprecatedTokensSelector);
 
   const tokenValuesEntries = React.useMemo(() => (
     Object.entries(tokenValues).map(([name, value]) => {
@@ -42,14 +43,19 @@ const TokenGroup: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props
   ), [tokenValues, path]);
 
   const mappedItems = useMemo(() => (
-    tokenValuesEntries.filter((item) => (
+    tokenValuesEntries.filter((item) => {
       // remove items which are in a collapsed parent
-      (!collapsed.some((parentKey) => (item.parent?.startsWith(parentKey) && item.parent?.charAt(parentKey.length) === '.')
-      || item.parent === parentKey))
-    )).map((item) => ({
+      const isCollapsed = collapsed.some((parentKey) => (item.parent?.startsWith(parentKey) && item.parent?.charAt(parentKey.length) === '.')
+      || item.parent === parentKey);
+
+      // remove deprecated tokens if hideDeprecatedTokens is enabled
+      const isDeprecated = hideDeprecatedTokens && isSingleToken(item.value) && item.value.$deprecated;
+
+      return !isCollapsed && !isDeprecated;
+    }).map((item) => ({
       item,
     }))
-  ), [tokenValuesEntries, collapsed]);
+  ), [tokenValuesEntries, collapsed, hideDeprecatedTokens]);
 
   const [draggedToken, setDraggedToken] = useState<SingleToken | null>(null);
   const [dragOverToken, setDragOverToken] = useState<SingleToken | null>(null);

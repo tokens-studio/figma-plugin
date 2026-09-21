@@ -5,9 +5,12 @@ import { IconButton, Heading } from '@tokens-studio/ui';
 import {
   IconCollapseArrow, IconExpandArrow, IconList, IconGrid, IconAdd,
 } from '@/icons';
-import { activeTokenSetReadOnlySelector, displayTypeSelector, editProhibitedSelector } from '@/selectors';
+import {
+  activeTokenSetReadOnlySelector,
+  displayTypeSelector,
+  editProhibitedSelector,
+} from '@/selectors';
 import ProBadge from './ProBadge';
-
 import { Dispatch } from '../store';
 import Tooltip from './Tooltip';
 import Box from './Box';
@@ -41,6 +44,7 @@ export default function TokenListingHeading({
   const activeTokenSetReadOnly = useSelector(activeTokenSetReadOnlySelector);
 
   const displayType = useSelector(displayTypeSelector);
+
   const handleShowNewForm = React.useCallback(() => showNewForm({}), [showNewForm]);
 
   const handleToggleDisplayType = React.useCallback(() => {
@@ -50,7 +54,7 @@ export default function TokenListingHeading({
   const { t } = useTranslation(['tokens']);
 
   return (
-    <Stack direction="row" align="center" justify="between" gap={4} css={{ position: 'relative' }}>
+    <Stack direction="row" align="center" justify="between" gap={4}>
       <StyledTokenGroupHeadingButton
         isCollapsed={isCollapsed}
         type="button"
@@ -63,14 +67,7 @@ export default function TokenListingHeading({
         <Heading size="small">{label}</Heading>
         {isPro ? <ProBadge campaign={`${tokenKey}-listing`} /> : null}
       </StyledTokenGroupHeadingButton>
-      <Box
-        css={{
-          position: 'absolute',
-          right: 0,
-          display: 'flex',
-          marginRight: '$2',
-        }}
-      >
+      <Box css={{ display: 'flex', gap: '$1', alignItems: 'center' }}>
         {showDisplayToggle && (
           <IconButton
             icon={displayType === 'GRID' ? <IconList /> : <IconGrid />}
@@ -83,7 +80,6 @@ export default function TokenListingHeading({
 
         <IconButton
           data-testid="button-add-new-token"
-          // TODO: Add proper logic to disable adding a token type depending on flags
           disabled={editProhibited || activeTokenSetReadOnly || (isPro && !isProUser)}
           icon={<IconAdd />}
           tooltip={t('addNew')}

@@ -13,3 +13,5 @@ export * from './isSingleTypographyValue';
 export * from './isMatchingStyle';
 export * from './isSingleBorderToken';
 export * from './isSingleGradientToken';
+export * from './isSingleMotionToken';
+export * from './isSingleMotionValue';

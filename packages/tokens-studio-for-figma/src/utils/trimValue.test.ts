@@ -73,6 +73,14 @@ describe('trimValue', () => {
     ]);
   });
 
+  it('preserves numeric array tuples like a cubicBezier value', () => {
+    expect(trimValue([0.4, 0, 0.2, 1] as any)).toEqual([0.4, 0, 0.2, 1]);
+  });
+
+  it('trims string array elements without wrapping them in an object', () => {
+    expect(trimValue([' 0.4 ', ' 0 '] as any)).toEqual(['0.4', '0']);
+  });
+
   describe('gradient token handling', () => {
     it('should pass gradient object values through untouched', () => {
       const gradientValue = {
