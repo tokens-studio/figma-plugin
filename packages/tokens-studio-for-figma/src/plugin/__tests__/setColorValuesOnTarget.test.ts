@@ -44,6 +44,42 @@ describe('setColorValuesOnTarget', () => {
         },
         rawValue: '#ff0000' as any, // FIXME: Figure out why this is a string in the plugin, are the types incorrect, or should this be resolved as an object instead?
         description: 'Border',
+      }, {
+        // gradient token with a properly structured rawValue but a server-resolved
+        // value that is a non-standard object notation string (not a CSS gradient).
+        // Reproduces the bug: token.value = "{angle: 180, kind: linear, ...}".
+        name: 'gradient-token-server-string',
+        type: TokenTypes.GRADIENT,
+        value: '{angle: 180, kind: linear, stops: [{color: #000000, position: 0},{color: #ffffff, position: 1}]}' as any,
+        rawValue: {
+          kind: 'linear',
+          angle: 180,
+          stops: [
+            { color: '#000000', position: 0 },
+            { color: '#ffffff', position: 1 },
+          ],
+        } as any,
+      }, {
+        // gradient token where both value and rawValue are the structured object
+        // (no server resolution applied).
+        name: 'gradient-token-structured',
+        type: TokenTypes.GRADIENT,
+        value: {
+          kind: 'linear',
+          angle: 90,
+          stops: [
+            { color: '#ff0000', position: 0 },
+            { color: '#0000ff', position: 1 },
+          ],
+        } as any,
+        rawValue: {
+          kind: 'linear',
+          angle: 90,
+          stops: [
+            { color: '#ff0000', position: 0 },
+            { color: '#0000ff', position: 1 },
+          ],
+        } as any,
       }],
       variableReferences: new Map([['red', '123']]),
       createStylesWithVariableReferences: true,
@@ -214,6 +250,45 @@ describe('setColorValuesOnTarget', () => {
       opacity: 1,
       color: { r: 1, g: 0, b: 0 },
     }]);
+  });
+
+  // Regression test: server-resolved token.value may be a non-standard object
+  // notation string like "{angle: 180, kind: linear, stops: [...]}" rather than
+  // a valid CSS gradient. getGradientPaint must fall back to rawValue in this case.
+  it('should export a gradient token when token.value is a non-CSS server string', async () => {
+    const mockStyle = {
+      paints: [],
+    } as unknown as PaintStyle;
+
+    await setColorValuesOnTarget({ target: mockStyle, token: 'gradient-token-server-string', key: 'paints' });
+
+    expect(mockStyle.paints).toHaveLength(1);
+    expect(mockStyle.paints[0].type).toBe('GRADIENT_LINEAR');
+    expect((mockStyle.paints[0] as GradientPaint).gradientStops).toHaveLength(2);
+    expect((mockStyle.paints[0] as GradientPaint).gradientStops[0].color).toEqual({
+      r: 0, g: 0, b: 0, a: 1,
+    });
+    expect((mockStyle.paints[0] as GradientPaint).gradientStops[1].color).toEqual({
+      r: 1, g: 1, b: 1, a: 1,
+    });
+  });
+
+  it('should export a gradient token with a structured TokenGradientValue', async () => {
+    const mockStyle = {
+      paints: [],
+    } as unknown as PaintStyle;
+
+    await setColorValuesOnTarget({ target: mockStyle, token: 'gradient-token-structured', key: 'paints' });
+
+    expect(mockStyle.paints).toHaveLength(1);
+    expect(mockStyle.paints[0].type).toBe('GRADIENT_LINEAR');
+    expect((mockStyle.paints[0] as GradientPaint).gradientStops).toHaveLength(2);
+    expect((mockStyle.paints[0] as GradientPaint).gradientStops[0].color).toEqual({
+      r: 1, g: 0, b: 0, a: 1,
+    });
+    expect((mockStyle.paints[0] as GradientPaint).gradientStops[1].color).toEqual({
+      r: 0, g: 0, b: 1, a: 1,
+    });
   });
 
   test('setColorValuesOnTarget uses givenValue when provided', async () => {

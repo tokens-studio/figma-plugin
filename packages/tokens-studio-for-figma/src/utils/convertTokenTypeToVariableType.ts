@@ -21,6 +21,10 @@ export function convertTokenTypeToVariableType(type: TokenTypes, value: SingleTo
     case TokenTypes.FONT_WEIGHTS:
     case TokenTypes.TEXT:
       return 'STRING';
+    case TokenTypes.DURATION:
+      return 'TIMING';
+    case TokenTypes.CUBIC_BEZIER:
+      return 'EASING';
     default:
       return 'FLOAT';
   }

@@ -1,7 +1,30 @@
+import { DeprecatedProperty } from '@/types/tokens/SingleGenericToken';
+
 interface RestOptions {
   method?: 'GET' | 'POST' | 'PATCH' | 'DELETE';
   body?: any;
   query?: Record<string, string>;
+}
+
+// Converts DTCG $deprecated to the Studio API's flat snake_case fields.
+// undefined -> {} (don't touch), null -> nulled fields (clear), object -> populated fields.
+function toApiDeprecatedFields(deprecated: DeprecatedProperty | null | undefined) {
+  if (deprecated === undefined) return {};
+  if (deprecated === null) {
+    return {
+      deprecated_severity: null as string | null,
+      deprecated: null as string | null,
+      deprecated_metadata: null as Record<string, string> | null,
+    };
+  }
+  return {
+    deprecated_severity: deprecated.severity,
+    deprecated: deprecated.message,
+    deprecated_metadata: {
+      ...(deprecated.replacementToken && { replacement: deprecated.replacementToken }),
+      ...(deprecated.removeAfter && { remove_after: deprecated.removeAfter }),
+    },
+  };
 }
 
 async function restRequest(
@@ -115,14 +138,24 @@ export async function batchCreateTokensRest(
     type: string;
     token_set_id: string;
     description?: string;
+    $deprecated?: DeprecatedProperty;
   }>,
   changeSetId: string,
 ) {
+  const transformedTokens = tokens.map((token) => ({
+    name: token.name,
+    value: token.value,
+    type: token.type,
+    token_set_id: token.token_set_id,
+    description: token.description,
+    ...toApiDeprecatedFields(token.$deprecated),
+  }));
+
   return restRequest(authToken, apiBaseUrl, `/api/v1/projects/${projectId}/tokens/batch_create`, {
     method: 'POST',
     body: {
       change_set_id: changeSetId,
-      tokens,
+      tokens: transformedTokens,
     },
   });
 }
@@ -137,21 +170,23 @@ export async function createTokenRest(
     type: string;
     token_set_id: string;
     description?: string;
+    $deprecated?: DeprecatedProperty;
   },
   branch?: string,
   changeSetId?: string,
 ) {
+  const token = {
+    name: data.name,
+    value: data.value,
+    type: data.type,
+    token_set_id: data.token_set_id,
+    description: data.description,
+    ...toApiDeprecatedFields(data.$deprecated),
+  };
+
   return restRequest(authToken, apiBaseUrl, `/api/v1/projects/${projectId}/tokens`, {
     method: 'POST',
-    body: {
-      token: {
-        name: data.name,
-        value: data.value,
-        type: data.type,
-        token_set_id: data.token_set_id,
-        description: data.description,
-      },
-    },
+    body: { token },
     query: changeSetId ? { change_set_id: changeSetId } : undefined,
   });
 }
@@ -167,21 +202,23 @@ export async function updateTokenRest(
     type?: string;
     description?: string;
     token_set_id?: string;
+    $deprecated?: DeprecatedProperty | null;
   },
   branch?: string,
   changeSetId?: string,
 ) {
+  const token = {
+    name: data.name,
+    value: data.value,
+    type: data.type,
+    description: data.description,
+    token_set_id: data.token_set_id,
+    ...toApiDeprecatedFields(data.$deprecated),
+  };
+
   return restRequest(authToken, apiBaseUrl, `/api/v1/projects/${projectId}/tokens/${tokenId}`, {
     method: 'PATCH',
-    body: {
-      token: {
-        name: data.name,
-        value: data.value,
-        type: data.type,
-        description: data.description,
-        token_set_id: data.token_set_id,
-      },
-    },
+    body: { token },
     query: changeSetId ? { change_set_id: changeSetId } : undefined,
   });
 }
