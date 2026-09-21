@@ -46,6 +46,7 @@ export interface SettingsState {
   variablesString: boolean;
   variablesNumber: boolean;
   variablesBoolean: boolean;
+  variablesMotion: boolean;
   stylesColor: boolean;
   stylesTypography: boolean;
   stylesEffect: boolean;
@@ -102,6 +103,7 @@ export const settings = createModel<RootModel>()({
     variablesString: true,
     variablesNumber: true,
     variablesBoolean: true,
+    variablesMotion: true,
     stylesColor: true,
     stylesTypography: true,
     stylesEffect: true,

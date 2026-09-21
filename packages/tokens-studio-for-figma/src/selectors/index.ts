@@ -68,6 +68,7 @@ export * from './variablesColorSelector';
 export * from './variablesNumberSelector';
 export * from './variablesStringSelector';
 export * from './variablesBooleanSelector';
+export * from './variablesMotionSelector';
 export * from './stylesColorSelector';
 export * from './stylesTypographySelector';
 export * from './stylesEffectSelector';
