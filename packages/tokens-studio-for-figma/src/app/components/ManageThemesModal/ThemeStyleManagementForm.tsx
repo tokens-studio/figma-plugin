@@ -17,7 +17,7 @@ import type { StyleInfo } from './ThemeStyleManagementCategoryStyleEntry';
 import { track } from '@/utils/analytics';
 import { ThemeVariableManagement } from './ThemeVariableManagement';
 
-type StyleInfoPerCategory = Partial<Record<'typography' | 'colors' | 'effects', Record<string, StyleInfo>>>;
+type StyleInfoPerCategory = Partial<Record<'typography' | 'colors' | 'effects' | 'gradients', Record<string, StyleInfo>>>;
 
 type Props = {
   id: string
@@ -54,6 +54,7 @@ export const ThemeStyleManagementForm: React.FC<React.PropsWithChildren<React.Pr
       const typography: (typeof stylesInfo)[string][] = [];
       const colors: (typeof stylesInfo)[string][] = [];
       const effects: (typeof stylesInfo)[string][] = [];
+      const gradients: (typeof stylesInfo)[string][] = [];
       const entries = Object.entries(stylesInfo);
       entries.forEach(([,{ styleId, token }]) => {
         if (token.type === TokenTypes.TYPOGRAPHY) {
@@ -62,10 +63,14 @@ export const ThemeStyleManagementForm: React.FC<React.PropsWithChildren<React.Pr
           colors.push({ styleId, token });
         } else if (token.type === TokenTypes.BOX_SHADOW) {
           effects.push({ styleId, token });
+        } else if (token.type === TokenTypes.GRADIENT) {
+          gradients.push({ styleId, token });
         }
       });
 
-      return { typography, colors, effects };
+      return {
+        typography, colors, effects, gradients,
+      };
     }
 
     return null;
@@ -128,6 +133,10 @@ export const ThemeStyleManagementForm: React.FC<React.PropsWithChildren<React.Pr
 
   const handleAttachLocalEffectStyles = useCallback(() => {
     attachLocalStyles('effects');
+  }, [attachLocalStyles]);
+
+  const handleAttachLocalGradientStyles = useCallback(() => {
+    attachLocalStyles('gradients');
   }, [attachLocalStyles]);
 
   useEffect(() => {
@@ -201,6 +210,13 @@ export const ThemeStyleManagementForm: React.FC<React.PropsWithChildren<React.Pr
         label="Effects"
         styles={resolvedStyleInfo.effects ?? {}}
         onAttachLocalStyles={handleAttachLocalEffectStyles}
+        onDisconnectStyle={handleDisconnectStyle}
+        onDisconnectSelectedStyle={handleDisconnectSelectedStyle}
+      />
+      <ThemeStyleManagementCategory
+        label="Gradients"
+        styles={resolvedStyleInfo.gradients ?? {}}
+        onAttachLocalStyles={handleAttachLocalGradientStyles}
         onDisconnectStyle={handleDisconnectStyle}
         onDisconnectSelectedStyle={handleDisconnectSelectedStyle}
       />

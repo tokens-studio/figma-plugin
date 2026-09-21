@@ -22,6 +22,7 @@ import { SingleBorderToken } from './SingleBorderToken';
 import { SingleAssetToken } from './SingleAssetToken';
 import { SingleSizingToken } from './SingleSizingToken';
 import { SingleNumberToken } from './SingleNumberToken';
+import { SingleGradientToken } from './SingleGradientToken';
 import { SingleDurationToken } from './SingleDurationToken';
 import { SingleCubicBezierToken } from './SingleCubicBezierToken';
 import { SingleMotionToken } from './SingleMotionToken';
@@ -52,6 +53,7 @@ export type SingleToken<Named extends boolean = true, P = unknown> =
   | SingleAssetToken<Named, P>
   | SingleBooleanToken<Named, P>
   | SingleNumberToken<Named, P>
+  | SingleGradientToken<Named, P>
   | SingleDurationToken<Named, P>
   | SingleCubicBezierToken<Named, P>
   | SingleMotionToken<Named, P>;

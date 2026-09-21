@@ -270,7 +270,7 @@ export type SetInitialLoadMessageResult = AsyncMessage<AsyncMessageTypes.SET_INI
 export type AttachLocalStylesToTheme = AsyncMessage<AsyncMessageTypes.ATTACH_LOCAL_STYLES_TO_THEME, {
   theme: ThemeObject
   tokens: Record<string, AnyTokenList>
-  category: 'typography' | 'colors' | 'effects' | 'all'
+  category: 'typography' | 'colors' | 'effects' | 'gradients' | 'all'
   settings?: Partial<SettingsState>
 }>;
 export type AttachLocalStylesToThemeResult = AsyncMessage<AsyncMessageTypes.ATTACH_LOCAL_STYLES_TO_THEME, ThemeObject>;

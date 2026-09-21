@@ -22,6 +22,7 @@ import {
   SingleTypographyToken,
   DeprecatedProperty,
 } from '@/types/tokens';
+import { TokenGradientValue } from '@/types/values';
 import { checkIfAlias, checkIfContainsAlias, getAliasValue } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
 import {
@@ -38,6 +39,7 @@ import BoxShadowInput from './BoxShadowInput';
 import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
 import { StyleOptions } from '@/constants/StyleOptions';
 import BorderTokenForm from './BorderTokenForm';
+import GradientTokenForm from './GradientTokenForm';
 import Box from './Box';
 import ColorTokenForm from './ColorTokenForm';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
@@ -101,6 +103,19 @@ function EditTokenForm({ resolvedTokens }: Props) {
     }
     if (internalEditToken.type === TokenTypes.COLOR) {
       return isValidColorToken;
+    }
+    if (internalEditToken.type === TokenTypes.GRADIENT) {
+      const { value } = internalEditToken;
+      // Alias reference is valid; a structured value needs at least 2 non-empty stops.
+      if (typeof value === 'string') return Boolean(value) && Boolean(internalEditToken.name) && !error;
+      if (!value || typeof value !== 'object') return false;
+      const stops = Array.isArray((value as TokenGradientValue).stops) ? (value as TokenGradientValue).stops : [];
+      if (stops.length < 2) return false;
+      const stopsValid = stops.every((s) => {
+        if (typeof s.color === 'string') return s.color.trim().length > 0;
+        return s.color != null && typeof s.color === 'object';
+      });
+      return stopsValid && Boolean(internalEditToken.name) && !error;
     }
     return internalEditToken?.value && internalEditToken.name && !error;
   }, [internalEditToken, error, isValidColorToken]);
@@ -317,6 +332,16 @@ function EditTokenForm({ resolvedTokens }: Props) {
           ...internalEditToken,
           value: { ...newBorderValue },
         });
+      }
+    },
+    [internalEditToken],
+  );
+
+  const handleGradientValueChange = React.useCallback(
+    (newGradientValue: TokenGradientValue) => {
+      setError(null);
+      if (internalEditToken?.type === TokenTypes.GRADIENT) {
+        setInternalEditToken({ ...internalEditToken, value: newGradientValue });
       }
     },
     [internalEditToken],
@@ -568,7 +593,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
           }
           if (
             themes.length > 0
-            && [TokenTypes.COLOR, TokenTypes.TYPOGRAPHY, TokenTypes.BOX_SHADOW].includes(internalEditToken.type)
+            && [TokenTypes.COLOR, TokenTypes.TYPOGRAPHY, TokenTypes.BOX_SHADOW, TokenTypes.GRADIENT].includes(internalEditToken.type)
           ) {
             choices.push({
               key: StyleOptions.RENAME,
@@ -743,6 +768,18 @@ function EditTokenForm({ resolvedTokens }: Props) {
             handleBorderAliasValueChange={handleChange}
             handleDownShiftInputChange={handleDownShiftInputChange}
             setBorderValue={setBorderValue}
+            onSubmit={checkAndSubmitTokenValue}
+          />
+        );
+      }
+      case TokenTypes.GRADIENT: {
+        return (
+          <GradientTokenForm
+            internalEditToken={internalEditToken}
+            resolvedTokens={resolvedTokens}
+            handleGradientValueChange={handleGradientValueChange}
+            handleGradientAliasValueChange={handleChange}
+            handleDownShiftInputChange={handleDownShiftInputChange}
             onSubmit={checkAndSubmitTokenValue}
           />
         );

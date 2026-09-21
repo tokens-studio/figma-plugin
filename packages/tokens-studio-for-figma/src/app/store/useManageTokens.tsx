@@ -139,7 +139,7 @@ export default function useManageTokens() {
     const choices: Choice[] = [];
     const { themes } = store.getState().tokenState;
     const hasConnectedStyle = themes.some((theme) => !!theme.$figmaStyleReferences?.[data.path]);
-    if (hasConnectedStyle && data.type && [TokenTypes.COLOR, TokenTypes.TYPOGRAPHY, TokenTypes.BOX_SHADOW].includes(data?.type)) {
+    if (hasConnectedStyle && data.type && [TokenTypes.COLOR, TokenTypes.TYPOGRAPHY, TokenTypes.BOX_SHADOW, TokenTypes.GRADIENT].includes(data?.type)) {
       choices.push({
         key: StyleOptions.REMOVE, label: 'Delete associated style',
       });

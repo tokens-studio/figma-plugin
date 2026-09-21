@@ -33,6 +33,7 @@ export * from './SingleBorderToken';
 export * from './SingleAssetToken';
 export * from './SingleBooleanToken';
 export * from './SingleNumberToken';
+export * from './SingleGradientToken';
 export * from './TokenToRename';
 export * from './CodeSyntax';
 export * from './FigmaExtensions';
