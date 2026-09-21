@@ -1,8 +1,10 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
+import { Check, Filter } from 'iconoir-react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ToggleGroup, IconButton } from '@tokens-studio/ui';
+import { ToggleGroup, IconButton, DropdownMenu } from '@tokens-studio/ui';
 import { mergeTokenGroups, mergeServerResolvedTokens } from '@/utils/tokenHelpers';
 import TokenListing from './TokenListing';
 import TokensBottomBar from './TokensBottomBar';
@@ -19,7 +21,7 @@ import useTokens from '../store/useTokens';
 import AttentionIcon from '@/icons/attention.svg';
 import { TokensContext } from '@/context';
 import {
-  activeTokenSetSelector, aliasBaseFontSizeSelector, manageThemesModalOpenSelector, scrollPositionSetSelector, showEditFormSelector, tokenFilterSelector, tokensSelector, tokenTypeSelector, usedTokenSetSelector,
+  activeTokenSetSelector, aliasBaseFontSizeSelector, manageThemesModalOpenSelector, scrollPositionSetSelector, showEditFormSelector, tokenFilterSelector, tokensSelector, tokenTypeSelector, usedTokenSetSelector, hideDeprecatedTokensSelector,
 } from '@/selectors';
 import { ThemeSelector } from './ThemeSelector';
 import { ManageThemesModal } from './ManageThemesModal';
@@ -91,10 +93,12 @@ function Tokens({ isActive }: { isActive: boolean }) {
   const showEditForm = useSelector(showEditFormSelector);
   const manageThemesModalOpen = useSelector(manageThemesModalOpenSelector);
   const scrollPositionSet = useSelector(scrollPositionSetSelector);
+  const hideDeprecatedTokens = useSelector(hideDeprecatedTokensSelector);
   const tokenFilter = useSelector(tokenFilterSelector);
   const aliasBaseFontSize = useSelector(aliasBaseFontSizeSelector);
   const serverResolvedTokens = useSelector((state: RootState) => state.tokenState.serverResolvedTokens);
   const dispatch = useDispatch<Dispatch>();
+  const { t } = useTranslation(['tokens']);
   const [tokenSetsVisible, setTokenSetsVisible] = React.useState(true);
   const { getStringTokens } = useTokens();
   const tokenDiv = React.useRef<HTMLDivElement>(null);
@@ -161,6 +165,10 @@ function Tokens({ isActive }: { isActive: boolean }) {
       dispatch.uiState.setActiveTokensTab(tab);
     }
   }, [dispatch.uiState]);
+
+  const handleToggleHideDeprecated = React.useCallback(() => {
+    dispatch.uiState.toggleHideDeprecatedTokens(null);
+  }, [dispatch]);
 
   const tokensContextValue = React.useMemo(() => ({
     resolvedTokens,
@@ -236,6 +244,31 @@ function Tokens({ isActive }: { isActive: boolean }) {
               alignItems: 'center',
             }}
           >
+            <DropdownMenu>
+              <DropdownMenu.Trigger asChild>
+                <IconButton
+                  icon={<Filter />}
+                  tooltip="Filter"
+                  variant="invisible"
+                  size="small"
+                />
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Portal>
+                <DropdownMenu.Content side="bottom">
+                  <DropdownMenu.CheckboxItem
+                    checked={hideDeprecatedTokens}
+                    onCheckedChange={handleToggleHideDeprecated}
+                    css={{ display: 'flex', alignItems: 'center', gap: '$2' }}
+                  >
+                    <DropdownMenu.ItemIndicator>
+                      <Check />
+                    </DropdownMenu.ItemIndicator>
+                    {t('hideDeprecatedTokens')}
+                  </DropdownMenu.CheckboxItem>
+                </DropdownMenu.Content>
+              </DropdownMenu.Portal>
+            </DropdownMenu>
+
             <ToggleGroup
               size="small"
               type="single"

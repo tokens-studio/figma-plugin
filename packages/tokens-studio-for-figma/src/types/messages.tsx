@@ -17,6 +17,7 @@ export enum MessageFromPluginTypes {
   API_PROVIDERS = 'apiProviders',
   UI_SETTINGS = 'uiSettings',
   SHOW_EMPTY_GROUPS = 'show_empty_groups',
+  HIDE_DEPRECATED_TOKENS = 'hide_deprecated_tokens',
   START_JOB = 'start_job',
   COMPLETE_JOB = 'complete_job',
   CLEAR_JOBS = 'clear_jobs',
@@ -81,6 +82,10 @@ export type UiSettingsFromPluginMessage = {
 export type ShowEmptyGroupsFromPluginMessage = {
   type: MessageFromPluginTypes.SHOW_EMPTY_GROUPS;
   showEmptyGroups: boolean;
+};
+export type HideDeprecatedTokensFromPluginMessage = {
+  type: MessageFromPluginTypes.HIDE_DEPRECATED_TOKENS;
+  hideDeprecatedTokens: boolean;
 };
 export type ApiProvidersFromPluginMessage = {
   type: MessageFromPluginTypes.API_PROVIDERS;
@@ -153,6 +158,7 @@ export type PostToUIMessage =
   | SelectionFromPluginMessage
   | UiSettingsFromPluginMessage
   | ShowEmptyGroupsFromPluginMessage
+  | HideDeprecatedTokensFromPluginMessage
   | ApiProvidersFromPluginMessage
   | StylesFromPluginMessage
   | VariablesFromPluginMessage
