@@ -379,7 +379,7 @@ export default async function setValuesOnVariable(
                 }
                 if (!willBeAliased && typeof value === 'string' && !value.includes('{')) {
                   const transformedValue = transformValue(value, token.type, baseFontSize, true);
-                  setNumberValuesOnVariable(variable, mode, Number(transformedValue), hasMetadataChanged);
+                  setNumberValuesOnVariable(variable, mode, Number(transformedValue), collection, hasMetadataChanged);
                 }
                 break;
               }
@@ -408,10 +408,10 @@ export default async function setValuesOnVariable(
                   const easing = toFigmaEasing(token.value);
                   const b = easing?.easingFunctionCubicBezier;
                   if (b) {
-                    setStringValuesOnVariable(variable, mode, `${b.x1}, ${b.y1}, ${b.x2}, ${b.y2}`, hasMetadataChanged);
+                    setStringValuesOnVariable(variable, mode, `${b.x1}, ${b.y1}, ${b.x2}, ${b.y2}`, collection, hasMetadataChanged);
                   }
                 } else if (typeof token.value === 'string' && !token.value.includes('{')) {
-                  setStringValuesOnVariable(variable, mode, token.value, hasMetadataChanged);
+                  setStringValuesOnVariable(variable, mode, token.value, collection, hasMetadataChanged);
                   // Given we cannot determine the combined family of a variable, we cannot use fallback weights from our estimates.
                   // This is not an issue because users can set numerical font weights with variables, so we opt-out of the guesswork and just apply the numerical weight.
                 } else if (!willBeAliased && token.type === TokenTypes.FONT_WEIGHTS && Array.isArray(token.value)) {
