@@ -1,7 +1,7 @@
 import { createMockStore } from '../../../../../../tests/config/setupTest';
 
 describe('assignVariableIdsToTheme', () => {
-  it('should merge new variable ids into $figmaVariableReferences, preserving existing key order (issue #3791)', async () => {
+  it('should keep existing keys in their original order and append new ones', async () => {
     const mockStore = createMockStore({
       tokenState: {
         themes: [{
@@ -21,9 +21,11 @@ describe('assignVariableIdsToTheme', () => {
       light: {
         collectionId: 'VariableCollectionID:123',
         modeId: 'modeID:123',
+        // The export visits tokens in its own order, which differs from themes.json
         variableIds: {
           'colors.red': 'variableID:bbb',
           'colors.blue': 'variableID:ccc',
+          'fg.default': 'variableID:aaa',
         },
       },
     });
@@ -37,6 +39,39 @@ describe('assignVariableIdsToTheme', () => {
       'fg.default': 'variableID:aaa',
       'colors.red': 'variableID:bbb',
       'colors.blue': 'variableID:ccc',
+    });
+  });
+
+  it('should drop references for tokens the export no longer produced', async () => {
+    const mockStore = createMockStore({
+      tokenState: {
+        themes: [{
+          id: 'light',
+          name: 'Light',
+          selectedTokenSets: {},
+          $figmaCollectionId: 'VariableCollectionID:123',
+          $figmaModeId: 'modeID:123',
+          $figmaVariableReferences: {
+            'colors.red': 'variableID:aaa',
+            'colors.old': 'variableID:bbb',
+          },
+        }],
+      },
+    });
+    await mockStore.dispatch.tokenState.assignVariableIdsToTheme({
+      light: {
+        collectionId: 'VariableCollectionID:123',
+        modeId: 'modeID:123',
+        variableIds: {
+          'colors.red': 'variableID:aaa',
+          'colors.crimson': 'variableID:ccc',
+        },
+      },
+    });
+    const [updatedTheme] = mockStore.getState().tokenState.themes;
+    expect(updatedTheme.$figmaVariableReferences).toEqual({
+      'colors.red': 'variableID:aaa',
+      'colors.crimson': 'variableID:ccc',
     });
   });
 

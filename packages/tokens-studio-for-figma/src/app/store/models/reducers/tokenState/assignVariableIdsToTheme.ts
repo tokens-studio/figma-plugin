@@ -5,12 +5,16 @@ export function assignVariableIdsToTheme(state: TokenState, variableIds: Record<
   const updatedThemes = state.themes.map((theme) => {
     if (!variableIds[theme.id]) return theme;
     const incoming = variableIds[theme.id].variableIds;
-    // Merge into the previous map so existing entries keep their original key order
-    // and only truly new tokens get appended at the end. Replacing wholesale would
-    // shuffle themes.json every export (issue #3791).
-    const merged: Record<string, string> = { ...(theme.$figmaVariableReferences ?? {}) };
+    // Rebuild in the previous map's key order so themes.json stays stable across exports,
+    // keeping only tokens the export still produced — entries dropped here belong to tokens
+    // that no longer exist, whose Figma variables may already have been removed.
+    const previous = theme.$figmaVariableReferences ?? {};
+    const merged: Record<string, string> = {};
+    Object.keys(previous).forEach((key) => {
+      if (key in incoming) merged[key] = incoming[key];
+    });
     Object.keys(incoming).forEach((key) => {
-      merged[key] = incoming[key];
+      if (!(key in merged)) merged[key] = incoming[key];
     });
     return {
       ...theme,
