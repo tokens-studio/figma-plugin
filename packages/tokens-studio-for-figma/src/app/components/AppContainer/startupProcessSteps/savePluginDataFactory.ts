@@ -44,8 +44,12 @@ export function savePluginDataFactory(dispatch: Dispatch, params: StartupMessage
 
       // Restore OAuth tokens
       if (params.oauthTokens) {
-        if (params.activeOrganizationId) {
-          useAuthStore.setState({ activeOrganizationId: params.activeOrganizationId });
+        // A file synced with Studio uses the org it syncs with (so Pro and plan come from that org); other files use
+        // the org last picked in Settings, which is shared across files.
+        const fileOrgId = isTokensStudioOAuthType(params.storageType) ? params.storageType.orgId : undefined;
+        const activeOrganizationId = fileOrgId || params.activeOrganizationId;
+        if (activeOrganizationId) {
+          useAuthStore.setState({ activeOrganizationId });
         }
         useAuthStore.getState().setOAuthTokens(params.oauthTokens);
         const activeProjectId = params.storageType && isTokensStudioOAuthType(params.storageType) ? params.storageType.id : undefined;
