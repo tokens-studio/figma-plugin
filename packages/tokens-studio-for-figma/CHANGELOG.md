@@ -1,5 +1,56 @@
 # @tokens-studio/figma-plugin
 
+## 2.12.1
+
+### Patch Changes
+
+- 8ad16a0e3: Add deprecated token state with visual indicators and bidirectional sync to Tokens Studio, including metadata for severity, replacement tokens, and removal timelines.
+- 5c7fe785f: Add gradient token type support (Tokens Studio users only): create, inspect, and export gradient tokens as Figma paint styles.
+- bbb69632d: Add Prompt to delete stale Figma variables when exporting color tokens that have been converted to gradients. Figma variables can't hold gradient values, so a bound variable from a previous export keeps overriding the new gradient style on any layer that uses it. The export flow now scans for these mismatches and shows a checkbox confirm so you can clean them up in one step.
+- 09b51eff2: Added support for motion, duration, and cubicBezier token types. Duration and cubicBezier tokens can now be exported as native Figma motion variables (Number/Time and Easing) — a new "Motion" checkbox in the variable export options controls the export.
+
+## 2.12.0
+
+### Minor Changes
+
+- da5151c98: Duplicating a token or a token group no longer closes the set picker after every click. The picker is now a proper multi-select panel that stays open while you tick sets, has a search field at the top to filter long set lists, and a select-all toggle that acts on whatever the search currently shows.
+
+### Patch Changes
+
+- 246098691: Fix the default preset's box shadow token using `$type` instead of `type` for the shadow type of its individual layers, a leftover from the DTCG migration. The layer type was unreadable, so every layer was applied as a drop shadow instead of one drop and one inner shadow.
+- a3d0273c0: Optimize variable export process for faster performance on large token sets.
+- e70f7ec5d: Fix legacy↔DTCG token format conversion on GitHub silently committing only $metadata.json without rewriting any token files.
+
+## 2.11.12
+
+### Patch Changes
+
+- 70fbb0718: Fixed GitHub multi-file sync losing newly created empty token sets: pushing now writes the set's file to the repository (and deletes it when an empty set is removed), so the set no longer silently disappears after reopening the plugin.
+
+  Fixed GitHub/GitLab/ADO/Bitbucket sync so successful pushes clear the "unsynced changes" indicator and no longer produce empty commits.
+
+- 84c7af725: Fix Figma variable export writing the same values to every mode of a multi-mode theme group (Tokens Studio OAuth). Server-resolved token deltas are now fetched per theme so each mode resolves independently. Also fixes the analogous by-sets export where active-theme values could leak into unrelated sets.
+- ca9b4ebda: Fix Export to Variables writing malformed font-family values (e.g. `[Arial`) when a font-family token's resolved value is an array-shaped string. The bracket-shaped form (`["Arial","Helvetica"]`) is now normalized to the first entry, with JSON parsing so quoted family names containing commas survive intact.
+
+## 2.11.11
+
+### Patch Changes
+
+- 7d16e24d9: Fixed a bug where switching branches in the Studio provider could apply token edits to the previously selected branch instead of the one shown in the plugin.
+
+## 2.11.10
+
+### Patch Changes
+
+- e17e02d8c: Background blur tokens now bind the radius as a Figma variable instead of a static value, consistent with how box shadow effects handle variable binding.
+- c831c61a3: Fix tokens edited via the JSON editor not being persisted to local document storage, causing them to be lost when the plugin is closed and reopened
+- d90271f86: Fixed the loading bar getting stuck on "Hold on, updating…" after operations finished, especially when exporting variables on files with font-family tokens.
+- 97c55cafa: When you delete a token, we now ask you if you want to delete the associated variable in Figma
+- e15a93048: Color token modifiers are not available to Studio users, so the modifier section is now hidden when the active storage provider is Studio. Instead, Studio users would use TokenScript, read more at https://documentation-v2.tokens.studio/getting-started/glossary.html#schema-defined-function
+- 1c881fd40: Fixed tooltips sometimes getting stuck on screen after moving the cursor away.
+- c897e2ec2: We have updated our Terms and Conditions, which will come into effect on August 14th, 2026. The changes include adding a new Subprocessor (Render.com) and improvements around our license portal. This notice is dated July 15th, 2026.
+- 058256e01: Opacity modifier changes are now correctly detected in the sync diff and will appear as pending changes ready to commit.
+
 ## 2.11.9
 
 ### Patch Changes

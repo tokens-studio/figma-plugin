@@ -51,6 +51,7 @@ export enum AsyncMessageTypes {
   CANCEL_OPERATION = 'async/cancel-operation',
   RESIZE_WINDOW = 'async/resize-window',
   SET_SHOW_EMPTY_GROUPS = 'async/set-show-empty-groups',
+  SET_HIDE_DEPRECATED_TOKENS = 'async/set-hide-deprecated-tokens',
   SET_UI = 'async/set-ui',
   CREATE_ANNOTATION = 'async/create-annotation',
   UPDATE = 'async/update',
@@ -183,6 +184,9 @@ export type CancelOperationAsyncMessageResult = AsyncMessage<AsyncMessageTypes.C
 export type SetShowEmptyGroupsAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_SHOW_EMPTY_GROUPS, { showEmptyGroups: boolean; }>;
 export type SetShowEmptyGroupsAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_SHOW_EMPTY_GROUPS>;
 
+export type SetHideDeprecatedTokensAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_HIDE_DEPRECATED_TOKENS, { hideDeprecatedTokens: boolean; }>;
+export type SetHideDeprecatedTokensAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_HIDE_DEPRECATED_TOKENS>;
+
 export type SetUiAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_UI, SettingsState>;
 export type SetUiAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_UI>;
 
@@ -267,7 +271,7 @@ export type SetInitialLoadMessageResult = AsyncMessage<AsyncMessageTypes.SET_INI
 export type AttachLocalStylesToTheme = AsyncMessage<AsyncMessageTypes.ATTACH_LOCAL_STYLES_TO_THEME, {
   theme: ThemeObject
   tokens: Record<string, AnyTokenList>
-  category: 'typography' | 'colors' | 'effects' | 'all'
+  category: 'typography' | 'colors' | 'effects' | 'gradients' | 'all'
   settings?: Partial<SettingsState>
 }>;
 export type AttachLocalStylesToThemeResult = AsyncMessage<AsyncMessageTypes.ATTACH_LOCAL_STYLES_TO_THEME, ThemeObject>;
@@ -343,7 +347,9 @@ export type CreateLocalVariablesAsyncMessage = AsyncMessage<AsyncMessageTypes.CR
   tokens: Record<string, AnyTokenList>;
   settings: SettingsState,
   selectedThemes?: string[]
-  serverResolvedTokens?: Record<string, string> | null;
+  // Keyed by theme.id — one flat delta per mode, so multi-mode export writes
+  // per-mode values instead of clobbering every mode with the active theme.
+  serverResolvedTokens?: Record<string, Record<string, string>> | null;
 }>;
 export type CreateLocalVariablesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_LOCAL_VARIABLES, {
   variableIds: Record<string, LocalVariableInfo>
@@ -443,6 +449,7 @@ export type AsyncMessages =
   | ResizeWindowAsyncMessage
   | CancelOperationAsyncMessage
   | SetShowEmptyGroupsAsyncMessage
+  | SetHideDeprecatedTokensAsyncMessage
   | SetUiAsyncMessage
   | CreateAnnotationAsyncMessage
   | CreateLivingDocumentationAsyncMessage
@@ -499,6 +506,7 @@ export type AsyncMessageResults =
   | ResizeWindowAsyncMessageResult
   | CancelOperationAsyncMessage
   | SetShowEmptyGroupsAsyncMessageResult
+  | SetHideDeprecatedTokensAsyncMessageResult
   | SetUiAsyncMessageResult
   | CreateAnnotationAsyncMessageResult
   | CreateLivingDocumentationAsyncMessageResult

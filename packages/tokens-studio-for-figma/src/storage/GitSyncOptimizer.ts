@@ -13,6 +13,9 @@ export type ChangedState = {
   tokens: Record<string, any[]>;
   themes: any[];
   metadata: any;
+  // Set-level additions/removals (see findDifferentState). Empty sets produce
+  // no token-level changes, so without this they would never be written or deleted.
+  tokenSetChanges?: Record<string, 'NEW' | 'REMOVE'>;
 };
 
 /**
@@ -40,7 +43,8 @@ export class GitSyncOptimizer {
     const tokenSetObjects = convertTokensToObject({ ...data.tokens }, saveOptions.storeTokenIdInJsonEditor);
     Object.entries(tokenSetObjects).forEach(([name, tokenSet]) => {
       const hasChanges = changedState.tokens[name];
-      if (hasChanges && hasChanges.length > 0) {
+      const isNewTokenSet = changedState.tokenSetChanges?.[name] === 'NEW';
+      if ((hasChanges && hasChanges.length > 0) || isNewTokenSet) {
         filteredFiles.push({
           type: 'tokenSet',
           name,
@@ -75,6 +79,16 @@ export class GitSyncOptimizer {
         const existsInCurrentData = tokenSetName in data.tokens;
         if (!existsInCurrentData) {
           const filePath = `${tokenSetName}.json`;
+          filesToDelete.push(filePath);
+        }
+      }
+    });
+
+    // Removed empty sets have no REMOVE token entries, so they only appear in tokenSetChanges
+    Object.entries(changedState.tokenSetChanges ?? {}).forEach(([tokenSetName, changeType]) => {
+      if (changeType === 'REMOVE' && !(tokenSetName in data.tokens)) {
+        const filePath = `${tokenSetName}.json`;
+        if (!filesToDelete.includes(filePath)) {
           filesToDelete.push(filePath);
         }
       }

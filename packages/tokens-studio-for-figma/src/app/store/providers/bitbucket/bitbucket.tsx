@@ -21,6 +21,7 @@ import { PushOverrides } from '../../remoteTokens';
 import { useIsProUser } from '@/app/hooks/useIsProUser';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 import { categorizeError } from '@/utils/error/categorizeError';
+import removeIdPropertyFromTokens from '@/utils/removeIdPropertyFromTokens';
 
 type BitbucketCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.BITBUCKET }>;
 type BitbucketFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.BITBUCKET }>;
@@ -99,7 +100,7 @@ export function useBitbucket() {
           themes,
           metadata,
         });
-        const stringifiedRemoteTokens = JSON.stringify(compact([tokens, themes, TokenFormat.format]), null, 2);
+        const stringifiedRemoteTokens = JSON.stringify(compact([removeIdPropertyFromTokens(tokens), themes, TokenFormat.format]), null, 2);
         dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
         pushDialog({ state: 'success' });
         return {

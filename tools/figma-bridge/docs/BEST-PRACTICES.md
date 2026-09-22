@@ -54,14 +54,14 @@ which panels are open**. No toolbar, no sidebars, no canvas chrome. This is the
 right tool for _"validate what's on a frame"_ and it should be your default for
 visual checks.
 
-### 3. `shot` the whole window — _only for Figma's own UI_
+### 3. `shot` the whole window — _only for Figma's own chrome_
 
 `shot` captures the **entire Figma window as pixels** — toolbar, panels, canvas
 chrome, at the current zoom. Reserve it for the few cases where the thing you need
 to see _is_ Figma itself:
 
-- a plugin's own iframe/UI while you're building or debugging a plugin
 - the state of the variables / inspector / layers panels
+- native menus and dialogs you can't reach any other way
 - something the Plugin API genuinely can't expose
 
 ```bash
@@ -72,6 +72,22 @@ node cli.mjs shot /tmp/figma-window.png
 `shot`. Answering _"what is the value"_ → don't screenshot at all, `eval` and read
 it. A full-window screenshot to check a frame's colors is almost always the wrong
 call — it's zoom-dependent, cluttered, and lower fidelity than an `export`.
+
+### The hierarchy applies inside plugin UIs too
+
+It's tempting to treat a plugin's own UI as a reason to `shot` the window. **It
+isn't one.** The plugin UI is a real DOM in a separate execution context of the
+same CDP target, so you can read it directly — which puts it right back at level 1:
+
+- _"which tab / modal is showing, is there an error banner?"_ →
+  `document.body.innerText` from the plugin context. Fast, cheap, greppable.
+- _"is the app's state actually what I think?"_ → read the store, e.g.
+  `window.store.getState()` for a Redux app, and assert on real values.
+
+Reading state is the strongest habit available when debugging a plugin: it's how
+you compare what the plugin *believes* against what actually got written
+somewhere else. Pixels can't do that. Recipes are in
+[Driving a plugin's UI](./AGENT-GUIDE.md#driving-a-plugins-ui).
 
 ---
 
@@ -108,6 +124,67 @@ if (!page) {
   page.name = "My scratch page";
 }
 ```
+
+### Do a whole UI interaction in ONE script run
+
+**UI state does not survive between invocations.** Figma's menus and flyouts
+close, and plugin dialogs close or reset, between separate `node script.mjs`
+runs. So open the menu, navigate it, click, and assert **inside one continuous
+script** — and build the retries and polling *into* that script rather than
+re-running it to get one step further.
+
+Splitting an interaction across invocations is the single biggest source of
+wasted time when driving UI over this bridge. It also produces very convincing
+wrong conclusions ("the menu item isn't there") when the real cause is that the
+menu closed when the previous process exited.
+
+### Verify _which build_ is actually loaded
+
+Figma identifies a development plugin by its manifest **`id`**, and it keeps the
+**path it was originally registered from**. If the same `id` is registered from
+another checkout — the main repo vs. a git worktree, say — Figma keeps running
+that *other* copy. You can spend hours testing a months-old build from a
+different branch while believing you're testing your working tree.
+
+Before drawing any conclusion from plugin behaviour, **prove the running plugin
+is your build**: temporarily add a unique marker to the source, rebuild,
+relaunch, and confirm the marker appears. Check the displayed version too, if the
+plugin has one. Re-pointing a registration at a different path is a **human**
+step — they must re-import the manifest.
+
+Related trap: a build that printed `Failed to load .env.` produces a bundle where
+env-dependent features fail *silently at runtime*. In one case that disabled
+license validation, which took a whole paid code path down with it and made
+pushes fail for reasons that looked like a product bug. `.env` is gitignored, so
+a **fresh worktree won't have one** — copy it from another checkout of the same
+repo before concluding a feature is broken.
+
+### Instrument with a global, not console capture
+
+Capturing `Runtime.consoleAPICalled` is unreliable across plugin iframe reloads:
+the listener is attached to a context that gets replaced, and the logs are
+silently lost. Have the instrumented source push into a global instead, and read
+it back with an eval afterwards — it survives reloads and gives decisive evidence.
+
+```js
+((globalThis).__debug = (globalThis).__debug || []).push({ where: "push", ok, at: Date.now() });
+```
+
+### Expect the debug build to crash, and make re-runs cheap
+
+The patched debug Figma is noticeably crash-prone, especially around keyboard
+events — **avoid `Input.dispatchKeyEvent` with modifiers** (Cmd+A and friends
+repeatedly hard-crashed it). After any CDP timeout, and particularly
+`CDP Input.dispatchKeyEvent timed out`, don't debug the script: check whether
+Figma is still alive.
+
+```bash
+node cli.mjs status     # running: false right after a failure is the tell
+node cli.mjs start      # relaunch and re-run
+```
+
+Write scripts so that a restart-and-rerun costs nothing — idempotent, no manual
+setup steps in between.
 
 ### Target a specific file by key when many tabs are open
 

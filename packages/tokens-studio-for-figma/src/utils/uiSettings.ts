@@ -15,6 +15,7 @@ export async function updateUISettings(uiSettings: Partial<SavedSettings>) {
       language: uiSettings.language ?? data?.language,
       height: uiSettings.height ?? data?.height,
       showEmptyGroups: uiSettings.showEmptyGroups ?? data?.showEmptyGroups,
+      hideDeprecatedTokens: uiSettings.hideDeprecatedTokens ?? data?.hideDeprecatedTokens,
       updateMode: uiSettings.updateMode ?? data?.updateMode,
       updateRemote: uiSettings.updateRemote ?? data?.updateRemote,
       updateOnChange: uiSettings.updateOnChange ?? data?.updateOnChange,
@@ -30,6 +31,7 @@ export async function updateUISettings(uiSettings: Partial<SavedSettings>) {
       variablesColor: uiSettings.variablesColor ?? data?.variablesColor,
       variablesNumber: uiSettings.variablesNumber ?? data?.variablesNumber,
       variablesString: uiSettings.variablesString ?? data?.variablesString,
+      variablesMotion: uiSettings.variablesMotion ?? data?.variablesMotion,
       stylesColor: uiSettings.stylesColor ?? data?.stylesColor,
       stylesEffect: uiSettings.stylesEffect ?? data?.stylesEffect,
       stylesTypography: uiSettings.stylesTypography ?? data?.stylesTypography,
@@ -44,6 +46,8 @@ export async function updateUISettings(uiSettings: Partial<SavedSettings>) {
       autoApplyThemeOnDrop: uiSettings.autoApplyThemeOnDrop ?? data?.autoApplyThemeOnDrop,
       seenGenericVersionedHeaderMigrationDialog: uiSettings.seenGenericVersionedHeaderMigrationDialog ?? data?.seenGenericVersionedHeaderMigrationDialog,
       seenTermsUpdate2026: uiSettings.seenTermsUpdate2026 ?? data?.seenTermsUpdate2026,
+      seenTermsUpdate2026Subprocessors:
+        uiSettings.seenTermsUpdate2026Subprocessors ?? data?.seenTermsUpdate2026Subprocessors,
     });
   } catch (err) {
     notifyUI('There was an issue saving your credentials. Please try again.');
@@ -58,6 +62,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
     let width: number;
     let height: number;
     let showEmptyGroups: boolean;
+    let hideDeprecatedTokens: boolean;
     let updateMode: UpdateMode;
     let updateRemote: boolean;
     let updateOnChange: boolean;
@@ -67,6 +72,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
     let variablesBoolean: boolean;
     let variablesNumber: boolean;
     let variablesString: boolean;
+    let variablesMotion: boolean;
     let stylesColor: boolean;
     let stylesEffect: boolean;
     let stylesTypography: boolean;
@@ -89,12 +95,14 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
     let autoApplyThemeOnDrop: boolean;
     let seenGenericVersionedHeaderMigrationDialog: boolean;
     let seenTermsUpdate2026: boolean;
+    let seenTermsUpdate2026Subprocessors: boolean;
 
     if (data) {
       width = data.width || 400;
       height = data.height || 600;
       language = data.language || 'en';
       showEmptyGroups = typeof data.showEmptyGroups === 'undefined' ? true : data.showEmptyGroups;
+      hideDeprecatedTokens = typeof data.hideDeprecatedTokens === 'undefined' ? false : data.hideDeprecatedTokens;
       updateMode = data.updateMode || UpdateMode.PAGE;
       updateRemote = typeof data.updateRemote === 'undefined' ? true : data.updateRemote;
       updateOnChange = typeof data.updateOnChange === 'undefined' ? true : data.updateOnChange;
@@ -104,6 +112,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
       variablesBoolean = typeof data.variablesBoolean === 'undefined' ? true : data.variablesBoolean;
       variablesNumber = typeof data.variablesNumber === 'undefined' ? true : data.variablesNumber;
       variablesString = typeof data.variablesString === 'undefined' ? true : data.variablesString;
+      variablesMotion = typeof data.variablesMotion === 'undefined' ? true : data.variablesMotion;
       stylesColor = typeof data.stylesColor === 'undefined' ? false : data.stylesColor;
       stylesTypography = typeof data.stylesTypography === 'undefined' ? true : data.stylesTypography;
       stylesEffect = typeof data.stylesEffect === 'undefined' ? true : data.stylesEffect;
@@ -125,12 +134,14 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
       autoApplyThemeOnDrop = typeof data.autoApplyThemeOnDrop === 'undefined' ? false : data.autoApplyThemeOnDrop;
       seenGenericVersionedHeaderMigrationDialog = typeof data.seenGenericVersionedHeaderMigrationDialog === 'undefined' ? false : data.seenGenericVersionedHeaderMigrationDialog;
       seenTermsUpdate2026 = typeof data.seenTermsUpdate2026 === 'undefined' ? false : data.seenTermsUpdate2026;
+      seenTermsUpdate2026Subprocessors = typeof data.seenTermsUpdate2026Subprocessors === 'undefined' ? false : data.seenTermsUpdate2026Subprocessors;
       settings = {
         language,
         width: Math.max(300, width),
         height: Math.max(200, height),
         sessionRecording,
         showEmptyGroups,
+        hideDeprecatedTokens,
         updateMode,
         updateOnChange,
         applyVariablesStylesOrRawValue,
@@ -140,6 +151,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
         variablesColor,
         variablesNumber,
         variablesString,
+        variablesMotion,
         stylesColor,
         stylesEffect,
         stylesTypography,
@@ -160,6 +172,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
         autoApplyThemeOnDrop,
         seenGenericVersionedHeaderMigrationDialog,
         seenTermsUpdate2026,
+        seenTermsUpdate2026Subprocessors,
       };
 
       if (notify) {

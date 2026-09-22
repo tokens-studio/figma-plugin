@@ -27,6 +27,7 @@ export const setUi: AsyncMessageChannelHandlers[AsyncMessageTypes.SET_UI] = asyn
     variablesColor: msg.variablesColor,
     variablesNumber: msg.variablesNumber,
     variablesString: msg.variablesString,
+    variablesMotion: msg.variablesMotion,
     stylesColor: msg.stylesColor,
     stylesEffect: msg.stylesEffect,
     stylesTypography: msg.stylesTypography,
@@ -40,6 +41,7 @@ export const setUi: AsyncMessageChannelHandlers[AsyncMessageTypes.SET_UI] = asyn
     autoApplyThemeOnDrop: msg.autoApplyThemeOnDrop,
     seenGenericVersionedHeaderMigrationDialog: msg.seenGenericVersionedHeaderMigrationDialog,
     seenTermsUpdate2026: msg.seenTermsUpdate2026,
+    seenTermsUpdate2026Subprocessors: msg.seenTermsUpdate2026Subprocessors,
   });
   figma.ui.resize(width, height);
   if (store.inspectDeep !== msg.inspectDeep) {

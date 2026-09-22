@@ -721,7 +721,7 @@
             "spread": 3,
             "color": "rgba({shadows.default}, 0.15)",
             "blur": 5,
-            "$type": "dropShadow"
+            "type": "dropShadow"
           },
           {
             "x": 4,
@@ -729,7 +729,7 @@
             "spread": 6,
             "color": "#00000033",
             "blur": 5,
-            "$type": "innerShadow"
+            "type": "innerShadow"
           }
         ],
         "$type": "boxShadow"

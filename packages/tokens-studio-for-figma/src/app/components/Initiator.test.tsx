@@ -614,6 +614,7 @@ describe('Initiator', () => {
               variablesNumber: true,
               variablesString: true,
               variablesBoolean: true,
+              variablesMotion: true,
               stylesEffect: true,
               stylesTypography: true,
               stylesColor: true,
@@ -651,6 +652,7 @@ describe('Initiator', () => {
       variablesNumber: true,
       variablesString: true,
       variablesBoolean: true,
+      variablesMotion: true,
       stylesEffect: true,
       stylesTypography: true,
       stylesColor: true,
@@ -668,6 +670,7 @@ describe('Initiator', () => {
       exportExtendedCollections: false,
       seenGenericVersionedHeaderMigrationDialog: false,
       seenTermsUpdate2026: false,
+      seenTermsUpdate2026Subprocessors: false,
     });
   });
 

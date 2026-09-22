@@ -64,6 +64,7 @@ describe('uiSettings', () => {
       exportExtendedCollections: undefined,
       seenGenericVersionedHeaderMigrationDialog: undefined,
       seenTermsUpdate2026: undefined,
+      seenTermsUpdate2026Subprocessors: undefined,
     }));
   });
 
@@ -77,6 +78,7 @@ describe('uiSettings', () => {
       height: 1000,
       language: 'en',
       showEmptyGroups: true,
+      hideDeprecatedTokens: false,
       updateMode: UpdateMode.PAGE,
       updateRemote: true,
       updateOnChange: true,
@@ -86,6 +88,7 @@ describe('uiSettings', () => {
       variablesNumber: true,
       variablesString: true,
       variablesBoolean: true,
+      variablesMotion: true,
       stylesEffect: true,
       stylesTypography: true,
       stylesColor: false,
@@ -107,6 +110,7 @@ describe('uiSettings', () => {
       autoApplyThemeOnDrop: false,
       seenGenericVersionedHeaderMigrationDialog: false,
       seenTermsUpdate2026: false,
+      seenTermsUpdate2026Subprocessors: false,
     });
   });
 
@@ -145,6 +149,7 @@ describe('uiSettings', () => {
       height: 1000,
       language: 'en',
       showEmptyGroups: true,
+      hideDeprecatedTokens: false,
       updateMode: UpdateMode.PAGE,
       updateRemote: true,
       updateOnChange: true,
@@ -154,6 +159,7 @@ describe('uiSettings', () => {
       variablesNumber: true,
       variablesString: true,
       variablesBoolean: true,
+      variablesMotion: true,
       stylesEffect: true,
       stylesTypography: true,
       stylesColor: true,
@@ -175,6 +181,7 @@ describe('uiSettings', () => {
       autoApplyThemeOnDrop: false,
       seenGenericVersionedHeaderMigrationDialog: false,
       seenTermsUpdate2026: false,
+      seenTermsUpdate2026Subprocessors: false,
     });
   });
 

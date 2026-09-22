@@ -134,12 +134,14 @@ export default async function updateVariables({
   // Extended collections only override a SUBSET of parent variables.
   // Removing non-matches would delete the parent's variables!
   if (!isExtendedCollection && settings.removeStylesAndVariablesWithoutConnection) {
-    variablesInCollection
-      .filter((variable) => !Object.values(variableObj.variableKeyMap).includes(variable.key))
-      .forEach((variable) => {
+    // O(1) membership check — previous Array.includes was O(N*M) for N tokens x M variables.
+    const handledKeys = new Set(Object.values(variableObj.variableKeyMap));
+    variablesInCollection.forEach((variable) => {
+      if (!handledKeys.has(variable.key)) {
         removedVariables.push(variable.key);
         variable.remove();
-      });
+      }
+    });
   }
 
   return {

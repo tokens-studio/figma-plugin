@@ -327,7 +327,7 @@ describe('GithubTokenStorage', () => {
     mockGetContent.mockClear();
   });
 
-  it('can read from Git in a multi file format and return empty array when there is no content', async () => {
+  it('preserves empty token set files in multi-file mode so user-created empty sets survive a reopen', async () => {
     mockGetContent.mockImplementation((opts: { path: string }) => {
       if (opts.path === '') {
         return Promise.resolve({
@@ -367,7 +367,14 @@ describe('GithubTokenStorage', () => {
 
     storageProvider.enableMultiFile();
     storageProvider.changePath('data');
-    expect(await storageProvider.read()).toEqual([]);
+    expect(await storageProvider.read()).toEqual([
+      {
+        path: 'data/empty.json',
+        name: 'empty',
+        type: 'tokenSet',
+        data: {},
+      },
+    ]);
 
     mockGetContent.mockClear();
   });

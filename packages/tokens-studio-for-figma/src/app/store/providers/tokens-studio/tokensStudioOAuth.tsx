@@ -19,7 +19,7 @@ import { StorageTypeCredentials } from '@/types/StorageType';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { RemoteResponseData } from '../../../../types/RemoteResponseData';
 import { fetchProjectDataRest } from '../../../../utils/tokensStudio/fetchProjectDataRest';
-import { fetchBranchesListRest } from '../../../../utils/tokensStudio/fetchBranchesListRest';
+import { fetchBranchesListRest, fetchChangeSetIdForBranch } from '../../../../utils/tokensStudio/fetchBranchesListRest';
 import { useAuthStore } from '../../useAuthStore';
 import { OAuthService } from '../../../services/OAuthService';
 import { applyTokenSetOrder } from '@/utils/tokenset';
@@ -73,15 +73,39 @@ export const pushToTokensStudioOAuth = async ({
   if (!oauthTokens?.accessToken) return null;
   const studioUrl = TOKENS_STUDIO_APP_URL;
   const apiBaseUrl = OAuthService.getApiBaseUrl(studioUrl);
-  const { id: projectId, branch, changeSetId } = context;
+  const { id: projectId, branch } = context;
+  let { changeSetId } = context;
+
+  // The pull path hydrates changeSetId into Redux, but Redux state doesn't
+  // survive a plugin reload — and `updateCredentials` early-returns for
+  // OAuth, so the credential isn't persisted either. Rather than reworking
+  // OAuth persistence, resolve on demand from /branches when it's missing
+  // and push the resolved value back to Redux so subsequent pushes skip
+  // the round-trip.
+  if (!changeSetId) {
+    const resolved = await fetchChangeSetIdForBranch(
+      oauthTokens.accessToken,
+      apiBaseUrl,
+      projectId,
+      branch,
+    );
+    if (!resolved) {
+      console.error(
+        `Skipping Tokens Studio push (${action}): could not resolve changeSetId for `
+        + `project ${projectId} / branch ${branch ?? 'main'}. Re-select the branch to retry.`,
+      );
+      notifyToUI('Cannot sync: no change set is active for this branch. Re-select the branch to refresh.', { error: true });
+      return null;
+    }
+    changeSetId = resolved;
+    store.dispatch.uiState.setApiData({ ...context, changeSetId });
+  }
   let result: any;
 
   try {
     switch (action) {
       case 'BATCH_CREATE_TOKENS':
-        if (changeSetId) {
-          result = await batchCreateTokensRest(oauthTokens.accessToken, apiBaseUrl, projectId, data, changeSetId);
-        }
+        result = await batchCreateTokensRest(oauthTokens.accessToken, apiBaseUrl, projectId, data, changeSetId);
         break;
       case 'CREATE_TOKEN':
         result = await createTokenRest(oauthTokens.accessToken, apiBaseUrl, projectId, data, branch, changeSetId);
@@ -239,7 +263,6 @@ export function useTokensStudioOAuth() {
             const localTheme = themes.find((t) => t.id === remoteTheme.id);
             return localTheme ? alignObjectKeys(remoteTheme, localTheme) : remoteTheme;
           });
-
 
           return {
             status: 'success',
@@ -399,7 +422,6 @@ export function useTokensStudioOAuth() {
             const localTheme = themes.find((t) => t.id === remoteTheme.id);
             return localTheme ? alignObjectKeys(remoteTheme, localTheme) : remoteTheme;
           });
-
 
           dispatch.tokenState.setTokenData({
             values: (newTokens || {}) as any,
