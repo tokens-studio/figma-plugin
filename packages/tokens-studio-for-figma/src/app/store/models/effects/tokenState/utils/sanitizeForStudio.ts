@@ -3,11 +3,16 @@
 // and treats token-set paths structurally, so brace and control characters in
 // names would corrupt state that cannot be un-corrupted.
 //
-// Plugin-only users are unaffected — this only runs inside
-// `setTokensFromVariables` when the provider is TOKENS_STUDIO_OAUTH.
+// Because local state keeps the raw names, every lookup that crosses this
+// boundary must go through `lookupBySanitized` — comparing a sanitized key
+// against a raw-keyed map silently misses and creates duplicates server-side.
 
 // eslint-disable-next-line no-control-regex
 const UNSAFE_CHARS = /[{}\x00-\x1F\x7F]/g;
+
+// Characters that never appear in a token path but are common in JSON and CSS
+// payloads. A brace span carrying any of them is literal text, not a reference.
+const NON_REFERENCE_CHARS = /["':;()]/;
 
 // Strip brace/control characters and trim leading/trailing whitespace.
 // The trim is intentional: Figma variable names occasionally carry stray
@@ -17,15 +22,11 @@ function stripUnsafe(part: string): string {
   return part.replace(UNSAFE_CHARS, '').trim();
 }
 
-// Sanitize a plain display string (e.g. a theme name). Unlike
-// sanitizeTokenSetName, this does NOT split on `/` — a name is not a path.
 export function sanitizeDisplayName(name: string): string {
   return stripUnsafe(name);
 }
 
-// Normalize a token name: split on `.`, strip unsafe chars from each segment,
-// drop empties, rejoin. Returns empty when nothing survives — the caller must
-// decide whether to skip the token.
+// Returns empty when nothing survives — the caller must decide whether to skip.
 export function sanitizeTokenName(name: string): string {
   return name
     .split('.')
@@ -34,8 +35,8 @@ export function sanitizeTokenName(name: string): string {
     .join('.');
 }
 
-// Normalize a token-set path: same rules per segment, but preserve the `/`
-// separator that studio uses to nest sets.
+// Same rules per segment, but preserve the `/` separator that studio uses to
+// nest sets.
 export function sanitizeTokenSetName(setName: string): string {
   return setName
     .split('/')
@@ -44,20 +45,40 @@ export function sanitizeTokenSetName(setName: string): string {
     .join('/');
 }
 
-// Rewrite `{ref}` occurrences inside a token value so the referenced name is
-// sanitized the same way the target token's name will be. Non-reference values
-// pass through unchanged. If a ref sanitizes to empty, it is left as `{}` and
-// the caller should treat the containing token as unresolvable.
-export function sanitizeReferencesInValue(value: unknown): unknown {
-  if (typeof value !== 'string') return value;
+// Resolve a sanitized key against a map that may still be keyed by raw names,
+// returning the key as it actually appears. Callers writing back into the map
+// must use this key, or they add a second entry alongside the raw one.
+export function resolveSanitizedKey(
+  map: Record<string, unknown> | undefined | null,
+  sanitizedKey: string,
+  sanitize: (key: string) => string,
+): string | undefined {
+  if (!map) return undefined;
+  if (Object.prototype.hasOwnProperty.call(map, sanitizedKey)) return sanitizedKey;
+  return Object.keys(map).find((key) => sanitize(key) === sanitizedKey);
+}
 
-  // Walk the string with a brace-depth counter. Each `{` deepens; each `}`
-  // returns. When depth hits zero, that `}` closes the reference we opened.
-  // Any embedded braces inside the body are treated as garbage (they came
-  // from a Figma name like `foo/{bar}/baz` and the outer ref is the whole
-  // corrupted span); sanitizeTokenName strips them.
+// Lookup counterpart of `resolveSanitizedKey`, for callers that only read.
+export function lookupBySanitized<V>(
+  map: Record<string, V> | undefined | null,
+  sanitizedKey: string,
+  sanitize: (key: string) => string,
+): V | undefined {
+  const key = resolveSanitizedKey(map as Record<string, unknown>, sanitizedKey, sanitize);
+  return key === undefined ? undefined : map![key];
+}
+
+type ValueSanitizeResult = { value: unknown; hasUnresolvableReference: boolean };
+
+function isReferenceBody(body: string): boolean {
+  return body.length > 0 && !NON_REFERENCE_CHARS.test(body);
+}
+
+function sanitizeStringValue(value: string): ValueSanitizeResult {
   let out = '';
   let i = 0;
+  let hasUnresolvableReference = false;
+
   while (i < value.length) {
     const open = value.indexOf('{', i);
     if (open === -1) {
@@ -66,6 +87,8 @@ export function sanitizeReferencesInValue(value: unknown): unknown {
     }
     out += value.slice(i, open);
 
+    // Walk with a brace-depth counter so an embedded `{bar}` inside a corrupted
+    // Figma name resolves to the outer span rather than closing it early.
     let depth = 1;
     let j = open + 1;
     while (j < value.length && depth > 0) {
@@ -75,78 +98,120 @@ export function sanitizeReferencesInValue(value: unknown): unknown {
       j += 1;
     }
     if (depth !== 0) {
-      // Unbalanced — drop the trailing `{...`; without a matching close brace
-      // the studio parser would reject the whole value anyway.
+      // No closing brace, so this is not a reference and there is nothing to
+      // rewrite. Keep the remainder verbatim rather than discarding user data.
+      out += value.slice(open);
       break;
     }
+
     const body = value.slice(open + 1, j);
-    out += `{${sanitizeTokenName(body)}}`;
+    if (isReferenceBody(body)) {
+      const clean = sanitizeTokenName(body);
+      if (!clean) hasUnresolvableReference = true;
+      out += `{${clean}}`;
+    } else {
+      out += value.slice(open, j + 1);
+    }
     i = j + 1;
   }
-  return out;
+
+  return { value: out, hasUnresolvableReference };
 }
 
-// True when a value carries a reference whose sanitized target is empty
-// (`{}`) — such a token cannot resolve and should be skipped rather than sent.
-export function hasEmptyReference(value: unknown): boolean {
-  return typeof value === 'string' && /\{\s*\}/.test(value);
+// Composite tokens (typography, boxShadow, border, composition) hold their
+// references inside objects and arrays, so recursion is required — returning
+// non-strings untouched would let exactly those braces through unsanitized.
+function sanitizeValue(value: unknown): ValueSanitizeResult {
+  if (typeof value === 'string') return sanitizeStringValue(value);
+
+  if (Array.isArray(value)) {
+    let hasUnresolvableReference = false;
+    const out = value.map((entry) => {
+      const result = sanitizeValue(entry);
+      if (result.hasUnresolvableReference) hasUnresolvableReference = true;
+      return result.value;
+    });
+    return { value: out, hasUnresolvableReference };
+  }
+
+  if (value !== null && typeof value === 'object') {
+    let hasUnresolvableReference = false;
+    const out: Record<string, unknown> = {};
+    Object.entries(value as Record<string, unknown>).forEach(([key, entry]) => {
+      const result = sanitizeValue(entry);
+      if (result.hasUnresolvableReference) hasUnresolvableReference = true;
+      out[key] = result.value;
+    });
+    return { value: out, hasUnresolvableReference };
+  }
+
+  return { value, hasUnresolvableReference: false };
 }
 
-// Sanitize a batch of imported tokens for the studio push. Tokens missing a
-// parent, or whose name/parent normalize to empty, or whose value contains an
-// unresolvable `{}` reference, are dropped with a warning.
+export function sanitizeReferencesInValue(value: unknown): unknown {
+  return sanitizeValue(value).value;
+}
+
+// Tokens missing a parent, or whose name/parent normalize to empty, or whose
+// value carries a reference that sanitizes to nothing, are dropped with a warning.
 export function sanitizeNewTokensForStudio<T extends { name: string; parent?: string | null; value: unknown }>(
   tokens: T[],
 ): T[] {
-  return tokens
-    .filter((t): t is T & { parent: string } => t.parent != null)
-    .map((t) => ({
-      ...t,
-      name: sanitizeTokenName(t.name),
-      parent: sanitizeTokenSetName(t.parent),
-      value: sanitizeReferencesInValue(t.value) as T['value'],
-    }))
-    .filter((t) => {
-      if (!t.name || !t.parent) {
-        // eslint-disable-next-line no-console
-        console.warn('[sanitizeNewTokensForStudio] Dropping token with empty name/parent:', t);
-        return false;
-      }
-      if (hasEmptyReference(t.value)) {
-        // eslint-disable-next-line no-console
-        console.warn('[sanitizeNewTokensForStudio] Dropping token whose alias target sanitizes to empty:', t.name);
-        return false;
-      }
-      return true;
+  const sanitized: T[] = [];
+
+  tokens.forEach((token) => {
+    if (token.parent == null) return;
+
+    const name = sanitizeTokenName(token.name);
+    const parent = sanitizeTokenSetName(token.parent);
+    if (!name || !parent) {
+      // eslint-disable-next-line no-console
+      console.warn('[sanitizeNewTokensForStudio] Dropping token with empty name/parent:', token);
+      return;
+    }
+
+    const { value, hasUnresolvableReference } = sanitizeValue(token.value);
+    if (hasUnresolvableReference) {
+      // eslint-disable-next-line no-console
+      console.warn('[sanitizeNewTokensForStudio] Dropping token whose alias target sanitizes to empty:', name);
+      return;
+    }
+
+    sanitized.push({
+      ...token, name, parent, value: value as T['value'],
     });
+  });
+
+  return sanitized;
 }
 
-// Sanitize an imported theme's names and its token-set / variable-reference
-// keys. Keys that sanitize to empty are dropped from the maps; the theme's own
-// `group` and `name` are cleaned in place so a theme push carries safe strings.
+function sanitizeKeyedMap(
+  map: Record<string, unknown> | undefined,
+  sanitize: (key: string) => string,
+): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  Object.entries(map || {}).forEach(([key, entry]) => {
+    const clean = sanitize(key);
+    if (clean) out[clean] = entry;
+  });
+  return out;
+}
+
 export function sanitizeThemeForStudio<T extends {
   group?: string;
   name?: string;
   selectedTokenSets?: Record<string, unknown>;
   $figmaVariableReferences?: Record<string, unknown>;
+  $figmaStyleReferences?: Record<string, unknown>;
 }>(theme: T): T {
-  const selectedTokenSets: Record<string, unknown> = {};
-  Object.entries(theme.selectedTokenSets || {}).forEach(([setName, status]) => {
-    const clean = sanitizeTokenSetName(setName);
-    if (clean) selectedTokenSets[clean] = status;
-  });
-  const $figmaVariableReferences: Record<string, unknown> = {};
-  Object.entries(theme.$figmaVariableReferences || {}).forEach(([tokenName, key]) => {
-    const clean = sanitizeTokenName(tokenName);
-    if (clean) $figmaVariableReferences[clean] = key;
-  });
   return {
     ...theme,
-    // `group` is a token-set-path segment (theme groups nest under it);
-    // `name` is a plain display string, so it must NOT be split on `/`.
-    group: theme.group ? sanitizeTokenSetName(theme.group) : theme.group,
+    // Both `group` and `name` are display strings — a `/` in either is part of
+    // the name, not a path separator.
+    group: theme.group ? sanitizeDisplayName(theme.group) : theme.group,
     name: theme.name ? sanitizeDisplayName(theme.name) : theme.name,
-    selectedTokenSets,
-    $figmaVariableReferences,
+    selectedTokenSets: sanitizeKeyedMap(theme.selectedTokenSets, sanitizeTokenSetName),
+    $figmaVariableReferences: sanitizeKeyedMap(theme.$figmaVariableReferences, sanitizeTokenName),
+    $figmaStyleReferences: sanitizeKeyedMap(theme.$figmaStyleReferences, sanitizeTokenName),
   };
 }

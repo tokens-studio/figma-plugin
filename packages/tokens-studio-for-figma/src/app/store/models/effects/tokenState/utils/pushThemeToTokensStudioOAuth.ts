@@ -4,6 +4,11 @@ import { store } from '@/app/store';
 import { OAuthService } from '@/app/services/OAuthService';
 import { TOKENS_STUDIO_APP_URL } from '@/constants/TokensStudio';
 import { useAuthStore } from '@/app/store/useAuthStore';
+import {
+  lookupBySanitized,
+  sanitizeDisplayName,
+  sanitizeTokenSetName,
+} from './sanitizeForStudio';
 
 /**
  * Fetch existing theme groups from the REST API to resolve group name → ID.
@@ -27,7 +32,9 @@ async function fetchThemeGroupId(projectId: string, groupName: string, changeSet
     if (!res.ok) return null;
     const json = await res.json();
     const groups = json.data || [];
-    const match = groups.find((g: any) => (g.attributes?.name || g.name) === groupName);
+    // Server names are raw; `groupName` is sanitized. Compare sanitized forms so
+    // an existing group is matched instead of being re-created.
+    const match = groups.find((g: any) => sanitizeDisplayName(String(g.attributes?.name || g.name || '')) === groupName);
     return match?.id || null;
   } catch {
     return null;
@@ -42,7 +49,11 @@ export async function pushThemeToTokensStudioOAuth(payload: any, rootState: any,
     const { metadata } = liveState.tokenState?.remoteData || {};
     const { themeGroupsData, tokenSetsData } = metadata || {};
 
-    let themeGroupId = payload.group ? themeGroupsData?.[payload.group]?.id : null;
+    // `payload.group` is sanitized; themeGroupsData is keyed by the raw server
+    // name, so an exact lookup would miss and create a duplicate group.
+    let themeGroupId = payload.group
+      ? (lookupBySanitized(themeGroupsData, payload.group, sanitizeDisplayName) as any)?.id
+      : null;
 
     if (payload.group && !themeGroupId) {
       // Try to create the theme group
@@ -77,7 +88,8 @@ export async function pushThemeToTokensStudioOAuth(payload: any, rootState: any,
     // the Rails API accepts both UUIDs and names in selected_token_sets.
     const selectedTokenSets: Record<string, string> = {};
     Object.entries(payload?.selectedTokenSets || {}).forEach(([setName, status]) => {
-      const setId = (tokenSetsData?.[setName] as any)?.id;
+      // Set names arrive sanitized; tokenSetsData is keyed by the raw server name.
+      const setId = (lookupBySanitized(tokenSetsData, setName, sanitizeTokenSetName) as any)?.id;
       selectedTokenSets[setId || setName] = (status as string).toLowerCase();
     });
 
@@ -104,8 +116,12 @@ export async function pushThemeToTokensStudioOAuth(payload: any, rootState: any,
     if (!payload?.id && result?.data?.id) {
       // Re-read after the async create — the reducer has run by now and stored the theme with a local hash id.
       // Find it by name + group so we can swap it for the server-assigned id.
+      // Local themes keep their raw Figma names while `payload` carries sanitized
+      // ones, so compare sanitized forms — an exact match would fail and the
+      // server id would never be stored, re-creating the theme on every import.
       const localTheme = store.getState().tokenState.themes.find(
-        (t: any) => t.name === payload.name && t.group === (payload.group || undefined),
+        (t: any) => sanitizeDisplayName(t.name ?? '') === payload.name
+          && sanitizeDisplayName(t.group ?? '') === (payload.group || ''),
       );
       if (localTheme) {
         dispatch.tokenState.updateTheme({

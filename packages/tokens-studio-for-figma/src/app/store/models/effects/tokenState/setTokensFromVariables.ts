@@ -4,8 +4,10 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { pushToTokensStudioOAuth } from '../../../providers/tokens-studio/tokensStudioOAuth';
 import { pushThemeToTokensStudioOAuth } from './utils/pushThemeToTokensStudioOAuth';
 import {
+  resolveSanitizedKey,
   sanitizeNewTokensForStudio,
   sanitizeThemeForStudio,
+  sanitizeTokenSetName,
 } from './utils/sanitizeForStudio';
 import { store } from '@/app/store';
 import type { SetTokensFromVariablesPayload } from '@/types/payloads';
@@ -40,7 +42,12 @@ export function setTokensFromVariables(dispatch: RematchDispatch<RootModel>) {
       const allTokensToCreate: Array<{ name: string; value: any; type: string; description?: string; token_set_id: string }> = [];
 
       for (const [setName, tokens] of Object.entries(tokensBySet)) {
-        const existingMeta = store.getState().tokenState.tokenSetMetadata[setName] as any;
+        // `setName` is sanitized but the metadata map is still keyed by the raw
+        // Figma name, so an exact lookup would miss and create a duplicate set.
+        // Write back under the resolved key for the same reason.
+        const metadata = store.getState().tokenState.tokenSetMetadata as Record<string, any>;
+        const metaKey = resolveSanitizedKey(metadata, setName, sanitizeTokenSetName) ?? setName;
+        const existingMeta = metadata[metaKey];
         let tokenSetId = existingMeta?.id;
 
         if (tokenSetId) {
@@ -49,7 +56,7 @@ export function setTokensFromVariables(dispatch: RematchDispatch<RootModel>) {
           if (!existingMeta?.fromVariableImport) {
             dispatch.tokenState.setTokenSetMetadata({
               ...store.getState().tokenState.tokenSetMetadata,
-              [setName]: { ...existingMeta, fromVariableImport: true } as any,
+              [metaKey]: { ...existingMeta, fromVariableImport: true } as any,
             });
           }
         } else {

@@ -1,5 +1,7 @@
 import {
-  hasEmptyReference,
+  lookupBySanitized,
+  resolveSanitizedKey,
+  sanitizeDisplayName,
   sanitizeNewTokensForStudio,
   sanitizeReferencesInValue,
   sanitizeThemeForStudio,
@@ -47,7 +49,7 @@ describe('sanitizeReferencesInValue', () => {
     expect((s.match(/\}/g) || []).length).toBe(1);
   });
 
-  it('leaves non-string values untouched', () => {
+  it('leaves scalar values untouched', () => {
     expect(sanitizeReferencesInValue(42)).toBe(42);
     expect(sanitizeReferencesInValue(null)).toBeNull();
   });
@@ -56,27 +58,65 @@ describe('sanitizeReferencesInValue', () => {
     expect(sanitizeReferencesInValue('#ff0000')).toBe('#ff0000');
   });
 
-  // Truncation on unbalanced input is intentional — the studio parser rejects
-  // values with unmatched braces anyway, so dropping the trailing fragment is
-  // preferable to sending a value that will fail server-side.
-  it('drops the trailing fragment of an unbalanced opening brace', () => {
-    expect(sanitizeReferencesInValue('prefix {color.primary')).toBe('prefix ');
+  it('keeps an unbalanced opening brace verbatim rather than discarding data', () => {
+    expect(sanitizeReferencesInValue('prefix {color.primary')).toBe('prefix {color.primary');
   });
 
-  it('keeps balanced refs and drops a trailing unbalanced opener', () => {
-    expect(sanitizeReferencesInValue('a {b} c {d')).toBe('a {b} c ');
+  it('rewrites balanced refs and preserves a trailing unbalanced opener', () => {
+    expect(sanitizeReferencesInValue('a {b} c {d')).toBe('a {b} c {d');
+    expect(sanitizeReferencesInValue('a {x.{y}} c {d')).toBe('a {x.y} c {d');
+  });
+
+  it('leaves brace spans that are not references alone', () => {
+    // JSON payloads and code snippets must survive untouched — stripping their
+    // interior braces would turn valid content into invalid content.
+    expect(sanitizeReferencesInValue('{"a":{"b":1}}')).toBe('{"a":{"b":1}}');
+    expect(sanitizeReferencesInValue('function() {}')).toBe('function() {}');
+  });
+
+  it('recurses into object values so composite tokens are sanitized', () => {
+    expect(sanitizeReferencesInValue({
+      fontFamily: '{fonts.{brand}}',
+      fontSize: '16',
+    })).toEqual({
+      fontFamily: '{fonts.brand}',
+      fontSize: '16',
+    });
+  });
+
+  it('recurses into array values (e.g. boxShadow layers)', () => {
+    expect(sanitizeReferencesInValue([
+      { color: '{color.{brand}.shadow}', blur: 4 },
+      { color: '#000', blur: 2 },
+    ])).toEqual([
+      { color: '{color.brand.shadow}', blur: 4 },
+      { color: '#000', blur: 2 },
+    ]);
   });
 });
 
-describe('hasEmptyReference', () => {
-  it('flags `{}` as an unresolvable reference', () => {
-    expect(hasEmptyReference('{}')).toBe(true);
-    expect(hasEmptyReference('rgba({}, 0.5)')).toBe(true);
+describe('resolveSanitizedKey / lookupBySanitized', () => {
+  const sets = { 'Brand / Light': { id: 'set-1' }, 'Brand/Dark': { id: 'set-2' } };
+
+  it('returns the raw key when only a sanitized form is known', () => {
+    expect(resolveSanitizedKey(sets, 'Brand/Light', sanitizeTokenSetName)).toBe('Brand / Light');
+    expect(lookupBySanitized(sets, 'Brand/Light', sanitizeTokenSetName)).toEqual({ id: 'set-1' });
   });
 
-  it('does not flag well-formed references', () => {
-    expect(hasEmptyReference('{color.primary}')).toBe(false);
-    expect(hasEmptyReference('#ff0000')).toBe(false);
+  it('prefers an exact key match', () => {
+    expect(resolveSanitizedKey(sets, 'Brand/Dark', sanitizeTokenSetName)).toBe('Brand/Dark');
+  });
+
+  it('returns undefined when nothing matches or the map is absent', () => {
+    expect(resolveSanitizedKey(sets, 'Nope', sanitizeTokenSetName)).toBeUndefined();
+    expect(lookupBySanitized(undefined, 'Brand/Light', sanitizeTokenSetName)).toBeUndefined();
+  });
+});
+
+describe('sanitizeDisplayName', () => {
+  it('strips brace and control characters without splitting on separators', () => {
+    expect(sanitizeDisplayName('{Light}')).toBe('Light');
+    expect(sanitizeDisplayName('Dark / Compact')).toBe('Dark / Compact');
   });
 });
 
@@ -154,7 +194,7 @@ describe('sanitizeNewTokensForStudio', () => {
     );
   });
 
-  it('preserves non-string values (numbers, booleans) unchanged', () => {
+  it('preserves scalar values (numbers, booleans) unchanged', () => {
     const out = sanitizeNewTokensForStudio([
       {
         name: 'space', parent: 'Brand/Light', value: 16, type: 'number',
@@ -164,6 +204,40 @@ describe('sanitizeNewTokensForStudio', () => {
       } as any,
     ]);
     expect(out.map((t) => t.value)).toEqual([16, true]);
+  });
+
+  it('sanitizes references nested inside composite values', () => {
+    const out = sanitizeNewTokensForStudio([
+      {
+        name: 'type.heading',
+        parent: 'Brand/Light',
+        value: { fontFamily: '{fonts.{brand}}', fontSize: '{size.{lg}}' },
+        type: 'typography',
+      } as any,
+    ]);
+    expect(out[0].value).toEqual({ fontFamily: '{fonts.brand}', fontSize: '{size.lg}' });
+  });
+
+  it('drops a composite token whose nested alias target sanitizes to empty', () => {
+    const out = sanitizeNewTokensForStudio([
+      {
+        name: 'type.heading',
+        parent: 'Brand/Light',
+        value: { fontFamily: '{{}}', fontSize: '16' },
+        type: 'typography',
+      } as any,
+    ]);
+    expect(out).toEqual([]);
+  });
+
+  it('keeps string values that merely contain empty braces', () => {
+    // `{}` here is literal text, not a reference that failed to resolve.
+    const out = sanitizeNewTokensForStudio([
+      {
+        name: 'snippet', parent: 'Brand/Light', value: 'function() {}', type: 'other',
+      } as any,
+    ]);
+    expect(out.map((t) => t.value)).toEqual(['function() {}']);
   });
 });
 
@@ -208,6 +282,7 @@ describe('sanitizeThemeForStudio', () => {
     expect(out.name).toBeUndefined();
     expect(out.selectedTokenSets).toEqual({});
     expect(out.$figmaVariableReferences).toEqual({});
+    expect(out.$figmaStyleReferences).toEqual({});
   });
 
   it('preserves unrelated fields (spread) on the theme object', () => {
@@ -220,15 +295,24 @@ describe('sanitizeThemeForStudio', () => {
     expect((out as any).$figmaCollectionId).toBe('coll-1');
   });
 
-  // `name` is a plain display string; a `/` in a theme name should NOT split
-  // it into path segments the way it would for `group` or a token-set path.
-  it('preserves `/` in theme name (not treated as a path)', () => {
-    const out = sanitizeThemeForStudio({ name: 'Dark / Compact' });
+  // `name` and `group` are both plain display strings — a `/` in either is part
+  // of the name, not a path separator the way it is for a token-set path.
+  it('preserves `/` in theme name and group (not treated as paths)', () => {
+    const out = sanitizeThemeForStudio({ name: 'Dark / Compact', group: 'Brand / Mode' });
     expect(out.name).toBe('Dark / Compact');
+    expect(out.group).toBe('Brand / Mode');
   });
 
-  it('still strips brace chars from theme name', () => {
-    const out = sanitizeThemeForStudio({ name: '{Light}' });
+  it('still strips brace chars from theme name and group', () => {
+    const out = sanitizeThemeForStudio({ name: '{Light}', group: '{Brand}' });
     expect(out.name).toBe('Light');
+    expect(out.group).toBe('Brand');
+  });
+
+  it('sanitizes $figmaStyleReferences keys alongside variable references', () => {
+    const out = sanitizeThemeForStudio({
+      $figmaStyleReferences: { 'color.{brand}.primary': 'S:1', '{}': 'S:2' },
+    });
+    expect(out.$figmaStyleReferences).toEqual({ 'color.brand.primary': 'S:1' });
   });
 });
