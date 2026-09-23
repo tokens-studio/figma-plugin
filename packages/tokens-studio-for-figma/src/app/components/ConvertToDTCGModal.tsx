@@ -16,6 +16,7 @@ import w3cConvertImage from '@/app/assets/hints/w3cformat.png';
 import legacyConvertImage from '@/app/assets/hints/legacyformat.png';
 import { storageTypeSelector } from '@/selectors';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import { docUrls } from '@/constants/docUrls';
 
 export function ConvertToDTCGModal() {
   const dispatch = useDispatch<Dispatch>();
@@ -42,7 +43,7 @@ export function ConvertToDTCGModal() {
         commitMessage: 'Revert conversion to W3C DTCG format',
       } : {
         branch: 'w3c-dtcg-conversion',
-        commitMessage: 'Convert to W3C DTCG format, read more at https://docs.tokens.studio/manage-settings/token-format',
+        commitMessage: `Convert to W3C DTCG format, read more at ${docUrls.tokenFormat}`,
       },
     });
   }, [dispatch, pushTokens, isDTCG, storageType]);
@@ -60,7 +61,7 @@ export function ConvertToDTCGModal() {
           <Button variant="primary" onClick={handleConvert} disabled={hasRemoteChanges}>
             {isDTCG ? t('converttolegacy') : t('converttow3c')}
           </Button>
-          <Link href="https://docs.tokens.studio/manage-settings/token-format" target="_blank">{t('readmoreformat')}</Link>
+          <Link href={docUrls.tokenFormat} target="_blank">{t('readmoreformat')}</Link>
         </Stack>
         {hasRemoteChanges && <ErrorMessage>{t('pushfirsterror')}</ErrorMessage>}
       </Stack>

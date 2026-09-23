@@ -6,6 +6,9 @@ import {
 import { EyeClosedIcon, EyeOpenIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import { docUrls } from '@/constants/docUrls';
+import { DocsRef } from '@/constants/DocsRef';
+import { withDocsRef } from '@/utils/withDocsRef';
 import { StorageTypeFormValues } from '@/types/StorageType';
 import { generateId } from '@/utils/generateId';
 import { ChangeEventHandler } from './types';
@@ -63,7 +66,7 @@ export default function ADOForm({
         <Text muted>
           {t('providers.ado.description')}
           {' '}
-          <Link href="https://docs.tokens.studio/token-storage/remote/sync-git-azure-devops?ref=addprovider" target="_blank" rel="noreferrer">
+          <Link href={withDocsRef(docUrls.syncProviders[StorageProviderType.ADO], DocsRef.ADD_PROVIDER)} target="_blank" rel="noreferrer">
             {t('providers.ado.readMore')}
           </Link>
         </Text>

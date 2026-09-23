@@ -32,6 +32,8 @@ import { transformProviderName } from '@/utils/transformProviderName';
 import { DirtyStateBadgeWrapper } from './DirtyStateBadgeWrapper';
 import { useChangedState } from '@/hooks/useChangedState';
 import { docUrls } from '@/constants/docUrls';
+import { DocsRef } from '@/constants/DocsRef';
+import { withDocsRef } from '@/utils/withDocsRef';
 import { TokenFormatBadge } from './TokenFormatBadge';
 import { isEqual } from '@/utils/isEqual';
 import { useStorageSizeWarning } from '../hooks/useStorageSizeWarning';
@@ -166,7 +168,7 @@ export default function Footer() {
           <ProBadge campaign="footer" />
           <IconButton
             as="a"
-            href={docUrls.root}
+            href={withDocsRef(docUrls.root, DocsRef.FOOTER)}
             icon={<DocsIcon />}
             variant="invisible"
             size="small"
