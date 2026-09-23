@@ -73,7 +73,7 @@ export default function GitForm({
         <Text muted>{gitExplainedText}</Text>
         <Text muted css={{ marginTop: '$2' }}>
           <Link
-            href={`https://docs.tokens.studio/sync/${values.provider}?ref=addprovider`}
+            href={`https://docs.tokens.studio/token-storage/remote/sync-git-${values.provider}?ref=addprovider`}
             target="_blank"
             rel="noreferrer"
           >

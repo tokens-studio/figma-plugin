@@ -42,7 +42,7 @@ export function ConvertToDTCGModal() {
         commitMessage: 'Revert conversion to W3C DTCG format',
       } : {
         branch: 'w3c-dtcg-conversion',
-        commitMessage: 'Convert to W3C DTCG format, read more at https://docs.tokens.studio/convert-to-dtcg-format',
+        commitMessage: 'Convert to W3C DTCG format, read more at https://docs.tokens.studio/manage-settings/token-format',
       },
     });
   }, [dispatch, pushTokens, isDTCG, storageType]);

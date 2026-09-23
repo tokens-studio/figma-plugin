@@ -47,17 +47,17 @@ export default function OnboardingFlow() {
     {
       title: 'createTokens',
       excerpt: 'createTokensText',
-      read_more_link: 'https://docs.tokens.studio/tokens/creating-tokens',
+      read_more_link: 'https://docs.tokens.studio/manage-tokens/token-types/',
     },
     {
       title: 'reference',
       excerpt: 'referenceText',
-      read_more_link: 'https://docs.tokens.studio/tokens/aliases',
+      read_more_link: 'https://docs.tokens.studio/manage-tokens/token-values/references',
     },
     {
       title: 'apply',
       excerpt: 'applyText',
-      read_more_link: 'https://docs.tokens.studio/tokens/applying-tokens',
+      read_more_link: 'https://docs.tokens.studio/figma/variables-overview',
     },
     {
       title: 'knowMore',

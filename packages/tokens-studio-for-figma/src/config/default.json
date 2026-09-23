@@ -50,7 +50,7 @@
       "multi-value": {
         "$value": "{dimension.sm} {dimension.xl}",
         "$type": "spacing",
-        "$description": "You can have multiple values in a single spacing token. Read more on these: https://docs.tokens.studio/available-tokens/spacing-tokens#multi-value-spacing-tokens"
+        "$description": "You can have multiple values in a single spacing token. Read more on these: https://docs.tokens.studio/manage-tokens/token-types/dimension/spacing#multiple-values"
       }
     },
     "borderRadius": {
@@ -69,7 +69,7 @@
       "multi-value": {
         "$value": "{borderRadius.sm} {borderRadius.lg}",
         "$type": "borderRadius",
-        "$description": "You can have multiple values in a single radius token. Read more on these: https://docs.tokens.studio/available-tokens/border-radius-tokens#single--multiple-values"
+        "$description": "You can have multiple values in a single radius token. Read more on these: https://docs.tokens.studio/manage-tokens/token-types/dimension/border-radius#multiple-values"
       }
     },
     "colors": {
