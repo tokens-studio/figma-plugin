@@ -1,6 +1,10 @@
 // @ts-ignore This is due to weird @types/node issues based on hoistng
 require('dotenv').config();
 
+// CI gets TOKEN_FLOW_APP_URL from a secret. Default it so the token flow tests also run locally and on fork PRs.
+// @ts-ignore Same @types/node issue as above
+process.env.TOKEN_FLOW_APP_URL = process.env.TOKEN_FLOW_APP_URL || 'https://token-flow.test';
+
 /*
  * For a detailed explanation regarding each configuration property and type check, visit:
  * https://jestjs.io/docs/en/configuration.html

@@ -1,11 +1,11 @@
 import React from 'react';
 import { Provider } from 'react-redux';
-import { mockFetch } from '../../../../tests/__mocks__/fetchMock';
 import {
   createMockStore, fireEvent, render, resetStore, screen, waitFor,
 } from '../../../../tests/config/setupTest';
 import AuthModal from '.';
 import { AuthContextProvider } from '@/context/AuthContext';
+import supabase from '@/supabase';
 
 // Hide log calls unless they are expected. This is mainly related to react-modal
 jest.spyOn(console, 'error').mockImplementation(() => {});
@@ -102,9 +102,11 @@ describe('Add license key', () => {
     const pass = 'pass';
     const loginError = 'Invalid login credentials';
 
-    mockFetch.mockImplementationOnce(() => Promise.resolve({
-      json: () => Promise.resolve({ error: 'invalid_grant', error_description: loginError }),
-    }));
+    // setupTest's msw server intercepts fetch before a fetch mock, so mock what the client returns for this error body.
+    jest.spyOn(supabase, 'signIn').mockResolvedValueOnce({
+      data: null,
+      error: { error: 'invalid_grant', error_description: loginError },
+    });
 
     const mockStore = createMockStore({
       uiState: {
@@ -136,7 +138,7 @@ describe('Add license key', () => {
 
     expect(emailInput).toHaveValue(email);
     loginButton.click();
-    waitFor(async () => {
+    await waitFor(async () => {
       const errorMsg = await screen.findByText(new RegExp(loginError, 'i'));
       expect(errorMsg).toBeInTheDocument();
     });
@@ -148,9 +150,11 @@ it('Displays signup error', async () => {
   const pass = 'pass';
   const signupError = 'Error signing up';
 
-  mockFetch.mockImplementationOnce(() => Promise.resolve({
-    json: () => Promise.resolve({ code: 422, msg: signupError }),
-  }));
+  // setupTest's msw server intercepts fetch before a fetch mock, so mock what the client returns for this error body.
+  jest.spyOn(supabase, 'signUp').mockResolvedValueOnce({
+    data: null,
+    error: { code: 422, msg: signupError },
+  });
 
   const mockStore = createMockStore({
     uiState: {
@@ -190,7 +194,7 @@ it('Displays signup error', async () => {
 
   expect(emailInput).toHaveValue(email);
   signupButton.click();
-  waitFor(async () => {
+  await waitFor(async () => {
     const errorMsg = await screen.findByText(new RegExp(signupError, 'i'));
     expect(errorMsg).toBeInTheDocument();
   });
