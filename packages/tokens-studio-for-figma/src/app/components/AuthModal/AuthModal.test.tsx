@@ -1,11 +1,12 @@
 import React from 'react';
 import { Provider } from 'react-redux';
+import { rest } from 'msw';
 import {
   createMockStore, fireEvent, render, resetStore, screen, waitFor,
 } from '../../../../tests/config/setupTest';
 import AuthModal from '.';
 import { AuthContextProvider } from '@/context/AuthContext';
-import supabase from '@/supabase';
+import { server } from '@/mocks/server';
 
 // Hide log calls unless they are expected. This is mainly related to react-modal
 jest.spyOn(console, 'error').mockImplementation(() => {});
@@ -102,11 +103,10 @@ describe('Add license key', () => {
     const pass = 'pass';
     const loginError = 'Invalid login credentials';
 
-    // setupTest's msw server intercepts fetch before a fetch mock, so mock what the client returns for this error body.
-    jest.spyOn(supabase, 'signIn').mockResolvedValueOnce({
-      data: null,
-      error: { error: 'invalid_grant', error_description: loginError },
-    });
+    server.use(rest.post(`${process.env.SUPABASE_URL}/auth/v1/token`, (req, res, ctx) => res(
+      ctx.status(400),
+      ctx.json({ error: 'invalid_grant', error_description: loginError }),
+    )));
 
     const mockStore = createMockStore({
       uiState: {
@@ -150,11 +150,10 @@ it('Displays signup error', async () => {
   const pass = 'pass';
   const signupError = 'Error signing up';
 
-  // setupTest's msw server intercepts fetch before a fetch mock, so mock what the client returns for this error body.
-  jest.spyOn(supabase, 'signUp').mockResolvedValueOnce({
-    data: null,
-    error: { code: 422, msg: signupError },
-  });
+  server.use(rest.post(`${process.env.SUPABASE_URL}/auth/v1/signup`, (req, res, ctx) => res(
+    ctx.status(422),
+    ctx.json({ code: 422, msg: signupError }),
+  )));
 
   const mockStore = createMockStore({
     uiState: {
