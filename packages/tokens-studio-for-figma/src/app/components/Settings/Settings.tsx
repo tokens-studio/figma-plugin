@@ -17,6 +17,7 @@ import { replay } from '@/app/sentry';
 import { sessionRecordingSelector } from '@/selectors/sessionRecordingSelector';
 import { ExplainerModal } from '../ExplainerModal';
 import { Tabs } from '@/constants/Tabs';
+import { getReplaySessionIdWithRetry } from './getReplaySessionIdWithRetry';
 
 // TODO: expose types from @tokens-studio/ui/checkbox
 type CheckedState = boolean | 'indeterminate';
@@ -42,15 +43,9 @@ function Settings() {
 
     dispatch.settings.setSessionRecording(!!checked);
     if (checked) {
-      // Display the info to the user
       try {
-        let id = await replay.getReplayId();
-        if (!id) {
-          // Force start the replay functionality
-          replay.start();
-          id = await replay.getReplayId();
-        }
-        setDebugSession(id || '');
+        const replaySessionId = await getReplaySessionIdWithRetry(replay);
+        setDebugSession(replaySessionId);
       } catch (err) {
         console.warn('Replay is likely in progress already', err);
       }
@@ -65,16 +60,16 @@ function Settings() {
 
   // Load once on mount.
   useEffect(() => {
-    async function getSessionId() {
+    async function loadSessionId() {
       try {
-        const id = replay.getReplayId();
-        setDebugSession(id || '');
+        const replaySessionId = await getReplaySessionIdWithRetry(replay, { startIfMissing: false });
+        setDebugSession(replaySessionId);
       } catch (err) {
         // Silently fail
       }
     }
-    getSessionId();
-  });
+    loadSessionId();
+  }, []);
 
   const closeOnboarding = React.useCallback(() => {
     dispatch.uiState.setOnboardingExplainerSyncProviders(false);
