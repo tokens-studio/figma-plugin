@@ -2,7 +2,7 @@
 /* eslint-disable no-console */
 
 import React, { useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector, useStore } from 'react-redux';
 import { ChevronRightIcon } from '@radix-ui/react-icons';
 import copy from 'copy-to-clipboard';
 
@@ -17,7 +17,7 @@ import { DocumentationProperties } from '@/constants/DocumentationProperties';
 import { SingleToken } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
 import useSetNodeData from '@/hooks/useSetNodeData';
-import { Dispatch } from '@/app/store';
+import { Dispatch, RootState } from '@/app/store';
 import { TokensContext } from '@/context';
 import { SelectionValue, ShowFormOptions } from '@/types';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
@@ -53,10 +53,10 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
   const tokensContext = React.useContext(TokensContext);
   const setNodeData = useSetNodeData();
   const dispatch = useDispatch<Dispatch>();
+  const store = useStore<RootState>();
   const editProhibited = useSelector(editProhibitedSelector);
   const activeTokenSetReadOnly = useSelector(activeTokenSetReadOnlySelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
-  const mainNodeSelectionValues = useSelector(mainNodeSelectionValuesSelector);
   const { deleteSingleToken } = useManageTokens();
 
   const canEdit = !editProhibited && !activeTokenSetReadOnly;
@@ -135,6 +135,8 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
       if (canEdit && ((isMacBrowser && event.metaKey) || (!isMacBrowser && event.ctrlKey))) {
         handleEditClick();
       } else {
+        // Read the selection at click time: subscribing to it would re-render every token on each selection change
+        const mainNodeSelectionValues = mainNodeSelectionValuesSelector(store.getState());
         // Find the property that currently has this token
         const activeProperty = activeStateProperties.find(
           (prop) => mainNodeSelectionValues[prop.name] === token.name,
@@ -149,7 +151,7 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
         }
       }
     },
-    [canEdit, handleEditClick, handleClick, properties, activeStateProperties, mainNodeSelectionValues, token.name],
+    [canEdit, handleEditClick, handleClick, properties, activeStateProperties, store, token.name],
   );
 
   return (

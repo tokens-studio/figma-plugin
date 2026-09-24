@@ -1,7 +1,9 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import { TokenTypes } from '@/constants/TokenTypes';
-import { createMockStore, fireEvent, render } from '../../../../tests/config/setupTest';
+import {
+  act, createMockStore, fireEvent, render,
+} from '../../../../tests/config/setupTest';
 import { MoreButton } from './MoreButton';
 import { SingleToken } from '@/types/tokens';
 import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
@@ -250,6 +252,49 @@ describe('MoreButton', () => {
     expect(mockSetNodeData).toHaveBeenCalledWith({
       paddingLeft: 'delete',
     }, []);
+  });
+
+  it('should deselect the property from the latest selection', async () => {
+    const mockStore = createMockStore({});
+
+    const result = render(
+      <Provider store={mockStore}>
+        <MoreButton
+          type={TokenTypes.SPACING}
+          showForm={mockShowForm}
+          token={token}
+        />
+      </Provider>,
+    );
+    act(() => {
+      mockStore.dispatch.uiState.setMainNodeSelectionValues({ paddingLeft: token.name });
+    });
+    await fireEvent.click(result.getByText(token.name));
+    expect(mockSetNodeData).toHaveBeenCalledWith({
+      paddingLeft: 'delete',
+    }, []);
+  });
+
+  it('should not re-render when the selection changes without involving the token', () => {
+    const mockStore = createMockStore({});
+    const onRender = jest.fn();
+
+    render(
+      <Provider store={mockStore}>
+        <React.Profiler id="more-button" onRender={onRender}>
+          <MoreButton
+            type={TokenTypes.SPACING}
+            showForm={mockShowForm}
+            token={token}
+          />
+        </React.Profiler>
+      </Provider>,
+    );
+    onRender.mockClear();
+    act(() => {
+      mockStore.dispatch.uiState.setMainNodeSelectionValues({ itemSpacing: 'another-token' });
+    });
+    expect(onRender).not.toHaveBeenCalled();
   });
 
   it('should deselect correct child property for dimension tokens', async () => {
