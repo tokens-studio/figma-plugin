@@ -180,4 +180,33 @@ describe('stringfyTokens', () => {
       ),
     );
   });
+
+  it('serializes a fontWeights token with a literal numeric string value as a number', () => {
+    const input = {
+      global: [
+        {
+          name: 'fontWeights.bold',
+          value: '700',
+          type: 'fontWeights',
+        },
+      ],
+    };
+
+    setFormat(TokenFormatOptions.DTCG);
+
+    expect(stringifyTokens(input, activeTokenSet)).toEqual(
+      JSON.stringify(
+        {
+          fontWeights: {
+            bold: {
+              $type: 'fontWeights',
+              $value: 700,
+            },
+          },
+        },
+        null,
+        2,
+      ),
+    );
+  });
 });
