@@ -145,14 +145,19 @@ describe('Add license key', () => {
   });
 });
 
-it('Displays signup error', async () => {
+const signupError = 'Error signing up';
+
+// The auth context shows `msg` and falls back to `error_description`, so cover both error shapes.
+it.each([
+  { field: 'msg', status: 422, body: { code: 422, msg: signupError } },
+  { field: 'error_description', status: 400, body: { error: 'invalid_request', error_description: signupError } },
+])('Displays signup error from $field', async ({ status, body }) => {
   const email = 'test@email.com';
   const pass = 'pass';
-  const signupError = 'Error signing up';
 
   server.use(rest.post(`${process.env.SUPABASE_URL}/auth/v1/signup`, (req, res, ctx) => res(
-    ctx.status(422),
-    ctx.json({ code: 422, msg: signupError }),
+    ctx.status(status),
+    ctx.json(body),
   )));
 
   const mockStore = createMockStore({
