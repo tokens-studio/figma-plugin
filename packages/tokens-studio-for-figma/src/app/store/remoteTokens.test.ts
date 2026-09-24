@@ -39,6 +39,7 @@ const mockClosePullDialog = jest.fn();
 const mockShowPullDialogError = jest.fn();
 const mockCreateBranch = jest.fn();
 const mockSave = jest.fn();
+const mockSaveOptimized = jest.fn();
 const mockSetCollapsedTokenSets = jest.fn();
 const mocksetChangedState = jest.fn();
 const mockResetChangedState = jest.fn();
@@ -132,6 +133,7 @@ jest.mock('../../storage/GithubTokenStorage', () => ({
       getCommitSha: mockGetCommitSha,
       fetchBranches: mockFetchBranches,
       save: mockSave,
+      saveOptimized: mockSaveOptimized,
       createBranch: mockCreateBranch,
     }
   )),
@@ -700,6 +702,37 @@ describe('remoteTokens', () => {
     });
   });
 
+  // Regression: PushOverrides used to be forwarded only to pushTokensToGitHub, so a
+  // ConvertToDTCGModal conversion push on GitLab/Bitbucket/ADO landed on the user's current
+  // branch with an empty commit message instead of the dedicated w3c-dtcg-conversion branch.
+  // Verify overrides reach the provider's push dialog for every git provider.
+  Object.values(contextMap).forEach((context) => {
+    if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
+      it(`forwards PushOverrides to ${context.provider} push dialog`, async () => {
+        mockRetrieve.mockImplementation(() => Promise.resolve(null));
+        mockPushDialog.mockImplementation(() => Promise.resolve({
+          customBranch: 'w3c-dtcg-conversion',
+          commitMessage: 'Convert to W3C DTCG format',
+        }));
+        const overrides = {
+          branch: 'w3c-dtcg-conversion',
+          commitMessage: 'Convert to W3C DTCG format',
+        };
+
+        await waitFor(() => {
+          result.current.pushTokens({ context: context as StorageTypeCredentials, overrides });
+        });
+
+        // First call is 'initial' with the overrides; a naive forwarding regression would
+        // pass undefined here for GitLab/Bitbucket/ADO.
+        expect(mockPushDialog).toHaveBeenCalled();
+        expect(mockPushDialog.mock.calls[0][0]).toEqual(
+          expect.objectContaining({ state: 'initial', overrides }),
+        );
+      });
+    }
+  });
+
   Object.values(contextMap).forEach((context) => {
     if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
       it(`push tokens to ${context.provider}, should close push dialog when there is a permission error`, async () => {
@@ -1030,6 +1063,97 @@ describe('remoteTokens', () => {
       } else {
         expect(await result.current.checkRemoteChange(context as StorageTypeCredentials)).toEqual(false);
       }
+    });
+  });
+
+  // Regression: PR #3941 fixed the phantom `tokenSetsData` metadata diff that was making
+  // conversion pushes commit only $metadata.json. But any legitimate metadata-only diff
+  // (initial-sync where remoteData.metadata is undefined vs local {tokenSetOrder}, a set
+  // reorder, or a legacy↔DTCG format flip whose in-memory tokens don't change) would still
+  // route the push through saveOptimized with zero token diffs — dropping every token file
+  // from the commit. Fix: only take saveOptimized when there are real *content* changes
+  // (tokens/themes/tokenSetChanges). Pure metadata diffs fall through to storage.save,
+  // which writes every file correctly.
+  describe('pushTokensToGitHub optimized-path routing', () => {
+    beforeEach(() => {
+      mockSave.mockReset();
+      mockSaveOptimized.mockReset();
+      mockPushDialog.mockClear();
+      mockGetCommitSha.mockResolvedValue('sha');
+      mockFetchBranches.mockResolvedValue(['main']);
+      mockPushDialog.mockImplementation(() => Promise.resolve({
+        customBranch: 'main',
+        commitMessage: 'test',
+      }));
+    });
+
+    it('routes to storage.save (full write) when only metadata differs — e.g. format flip', async () => {
+      // remoteData.metadata is null (fresh sync per the top-of-file mockSelector),
+      // buildMetadata returns {tokenSetOrder} → changedPushState.metadata is truthy but no
+      // token content changed. Pre-fix, this hit saveOptimized with zero token diffs and
+      // committed only $metadata.json. Post-fix, saveOptimized is skipped and storage.save
+      // is called instead, writing every file correctly.
+      const proContext = {
+        ...gitHubContext,
+        filePath: 'tokens', // folder (not .json) → multi-file mode on Pro
+      };
+
+      await waitFor(() => {
+        result.current.pushTokens({ context: proContext as StorageTypeCredentials });
+      });
+
+      expect(mockSaveOptimized).not.toHaveBeenCalled();
+      expect(mockSave).toHaveBeenCalled();
+    });
+  });
+
+  // Regression: pullTokens used to dispatch setLastSyncedState unconditionally right after
+  // retrieve, BEFORE the user confirmed the pull dialog. storage.retrieve mutates the
+  // TokenFormat singleton via detectFormat (no Redux dispatch), so recording lastSyncedState
+  // at that point captured the REMOTE format at index 2 while Redux tokenState.tokenFormat
+  // still held the OLD format. Declining the pull left the two diverged, making the next
+  // push force-rewrite (and silently format-convert) every token file. Fix: only record
+  // lastSyncedState once local state has adopted the remote (setTokenData resyncs Redux
+  // format from the singleton).
+  describe('pullTokens lastSyncedState ordering (declined pull)', () => {
+    beforeEach(() => {
+      mockSetLastSyncedState.mockClear();
+      mockShowPullDialog.mockClear();
+    });
+
+    it('does not record lastSyncedState when the user declines the pull dialog', async () => {
+      mockRetrieve.mockImplementation(() => Promise.resolve({
+        status: 'success',
+        tokens: {
+          global: [{ name: 'primary', type: 'color', value: '#ffffff' }],
+        },
+        themes: [],
+        metadata: { tokenSetOrder: ['global'] },
+      }));
+      // User is presented with the pull dialog and cancels — declines the pull.
+      mockShowPullDialog.mockImplementation(() => Promise.resolve(false));
+
+      await result.current.pullTokens({ context: gitHubContext as StorageTypeCredentials });
+
+      expect(mockShowPullDialog).toHaveBeenCalled();
+      // Prior to the fix, this fired unconditionally at retrieve() time.
+      expect(mockSetLastSyncedState).not.toHaveBeenCalled();
+    });
+
+    it('records lastSyncedState when the user confirms the pull', async () => {
+      mockRetrieve.mockImplementation(() => Promise.resolve({
+        status: 'success',
+        tokens: {
+          global: [{ name: 'primary', type: 'color', value: '#ffffff' }],
+        },
+        themes: [],
+        metadata: { tokenSetOrder: ['global'] },
+      }));
+      mockShowPullDialog.mockImplementation(() => Promise.resolve(true));
+
+      await result.current.pullTokens({ context: gitHubContext as StorageTypeCredentials });
+
+      expect(mockSetLastSyncedState).toHaveBeenCalled();
     });
   });
 });
