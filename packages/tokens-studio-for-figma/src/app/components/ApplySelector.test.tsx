@@ -27,24 +27,24 @@ describe('ApplySelector', () => {
     const result = renderStore();
 
     const trigger = await result.getByTestId('apply-selector');
-    waitFor(async () => {
-      await userEvent.click(trigger);
-      const applyToDocument = result.getByTestId('apply-to-document');
-      await userEvent.click(applyToDocument, { pointerEventsCheck: 0 });
-      await userEvent.click(trigger);
-      const applyToPage = result.getByTestId('apply-to-page');
-      await userEvent.click(applyToPage, { pointerEventsCheck: 0 });
-      await userEvent.click(trigger);
-      const applyToSelection = result.getByTestId('apply-to-selection');
-      await userEvent.click(applyToSelection, { pointerEventsCheck: 0 });
+    await userEvent.click(trigger);
+    const applyToDocument = await result.findByTestId('apply-to-document');
+    await userEvent.click(applyToDocument, { pointerEventsCheck: 0 });
+    await userEvent.click(trigger);
+    const applyToPage = await result.findByTestId('apply-to-page');
+    await userEvent.click(applyToPage, { pointerEventsCheck: 0 });
+    await userEvent.click(trigger);
+    const applyToSelection = await result.findByTestId('apply-to-selection');
+    await userEvent.click(applyToSelection, { pointerEventsCheck: 0 });
+    await waitFor(() => {
       expect(updateModeSpy).toBeCalledTimes(3);
     });
   });
   it('should trigger an update', async () => {
     const result = renderStore();
     const updateButton = await result.findByTestId('update-button');
-    waitFor(() => {
-      updateButton.click();
+    updateButton.click();
+    await waitFor(() => {
       expect(mockHandleUpdate).toBeCalledTimes(1);
     });
   });
