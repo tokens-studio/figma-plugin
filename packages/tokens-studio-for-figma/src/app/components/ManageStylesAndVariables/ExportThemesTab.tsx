@@ -112,7 +112,7 @@ export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: {
               <>
                 <Heading size="medium">{t('exportThemesTab.headingPro')}</Heading>
                 <p>{t('exportThemesTab.introPro')}</p>
-                {/* Commenting out until we have docs <Link target="_blank" href={docsLinks.themes}>
+                {/* Commenting out until we have docs <Link target="_blank" href={docUrls.exportThemes}>
                   {' '}
                   {t('generic.learnMore')}
                   {' – '}
@@ -123,7 +123,7 @@ export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: {
               <>
                 <Heading size="medium">{t('exportThemesTab.headingBasic')}</Heading>
                 <p>{t('exportThemesTab.introBasic')}</p>
-                {/* Commenting out until we have docs <Link target="_blank" href={docsLinks.themes}>
+                {/* Commenting out until we have docs <Link target="_blank" href={docUrls.exportThemes}>
                   {t('generic.learnMore')}
                   {' – '}
                   {t('generic.themes')}

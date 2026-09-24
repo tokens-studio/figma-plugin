@@ -6,6 +6,9 @@ import {
 } from '@tokens-studio/ui';
 import { EyeClosedIcon, EyeOpenIcon } from '@radix-ui/react-icons';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import { docUrls } from '@/constants/docUrls';
+import { DocsRef } from '@/constants/DocsRef';
+import { withDocsRef } from '@/utils/withDocsRef';
 import { StorageTypeFormValues } from '@/types/StorageType';
 import { generateId } from '@/utils/generateId';
 import { ErrorMessage } from '../ErrorMessage';
@@ -69,7 +72,7 @@ export default function SupernovaForm({
       <Stack direction="column" gap={5}>
         <Text muted>{t('providers.supernova.description')}</Text>
         <Text muted css={{ marginTop: '$2' }}>
-          <Link href="https://docs.tokens.studio/token-storage/remote/sync-cloud-supernova?ref=addprovider" target="_blank" rel="noreferrer">
+          <Link href={withDocsRef(docUrls.syncProviders[StorageProviderType.SUPERNOVA], DocsRef.ADD_PROVIDER)} target="_blank" rel="noreferrer">
             {t('providers.supernova.readMore')}
           </Link>
         </Text>

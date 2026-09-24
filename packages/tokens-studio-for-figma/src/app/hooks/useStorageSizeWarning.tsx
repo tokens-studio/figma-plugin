@@ -4,6 +4,7 @@ import { useTranslation, Trans } from 'react-i18next';
 import useConfirm from '@/app/hooks/useConfirm';
 import { Dispatch } from '@/app/store';
 import { Tabs } from '@/constants/Tabs';
+import { docUrls } from '@/constants/docUrls';
 
 export function useStorageSizeWarning() {
   const { confirm } = useConfirm();
@@ -19,7 +20,7 @@ export function useStorageSizeWarning() {
           br: <br />,
           // text coming from i18n
           // eslint-disable-next-line jsx-a11y/control-has-associated-label, jsx-a11y/anchor-has-content
-          firstLink: <a style={{ textDecoration: 'underline', color: 'var(--colors-fgAccent)' }} href="https://docs.tokens.studio/token-storage/local/figma-data-limit" target="_blank" rel="noreferrer" />,
+          firstLink: <a style={{ textDecoration: 'underline', color: 'var(--colors-fgAccent)' }} href={docUrls.figmaDataLimit} target="_blank" rel="noreferrer" />,
         }}
       />
     );
