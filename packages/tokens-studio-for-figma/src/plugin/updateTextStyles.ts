@@ -16,7 +16,7 @@ export default async function updateTextStyles(textTokens: SingleTypographyToken
   await processBatches(textTokens, 50, async (token) => {
     if (textStylesToIdMap.has(token.styleId)) {
       const textStyle = textStylesToIdMap.get(token.styleId)!;
-      if (shouldRename) {
+      if (shouldRename && textStyle.name !== token.path) {
         textStyle.name = token.path;
       }
       tokenToStyleMap[token.name] = textStyle.id;
