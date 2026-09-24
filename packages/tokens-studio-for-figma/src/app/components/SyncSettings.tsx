@@ -10,13 +10,19 @@ import StorageItem from './StorageItem';
 import EditStorageItemModal from './modals/EditStorageItemModal';
 import CreateStorageItemModal from './modals/CreateStorageItemModal';
 import { Dispatch } from '../store';
-import { apiProvidersSelector, localApiStateSelector, triggerMigrationEditSelector } from '@/selectors';
+import {
+  apiProvidersSelector, localApiStateSelector, storageTypeSelector, triggerMigrationEditSelector,
+} from '@/selectors';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import useRemoteTokens from '../store/remoteTokens';
 import { StorageTypeCredentials } from '@/types/StorageType';
 import LocalStorageItem from './LocalStorageItem';
 import { getProviderIcon } from '@/utils/getProviderIcon';
 import { useAuthStore } from '@/app/store/useAuthStore';
+import { isVariablesPlan } from '@/utils/tokensStudio/organizationAccess';
+import { isTokensStudioOAuthType } from '@/utils/is';
+import type { Organization } from '@/types/oauth';
+import { StyledStorageItem } from './StyledStorageItem';
 
 const SyncSettings = () => {
   const localApiState = useSelector(localApiStateSelector);
@@ -63,19 +69,34 @@ const SyncSettings = () => {
   const dispatch = useDispatch<Dispatch>();
 
   const { isAuthenticated, organizations } = useAuthStore();
+  const storageType = useSelector(storageTypeSelector);
+  const connectedOrgId = isTokensStudioOAuthType(storageType) ? storageType.orgId : undefined;
 
-  const studioProviders = React.useMemo(() => {
-    if (isAuthenticated && organizations?.length) {
-      return organizations.map((org) => ({
-        provider: StorageProviderType.TOKENS_STUDIO_OAUTH,
-        internalId: `tokens-studio-${org.id}`,
-        name: org.name,
-        orgId: org.id,
-        id: org.projects?.data?.[0]?.id || '',
-      } as StorageTypeCredentials));
-    }
-    return [];
-  }, [isAuthenticated, organizations]);
+  const studioOrganizations = React.useMemo(() => (
+    isAuthenticated && organizations?.length ? organizations : []
+  ), [isAuthenticated, organizations]);
+
+  // A Variables-plan org gets a notice instead of a provider row, unless this file is already connected to it:
+  // then it keeps its (active) row so the connection stays visible.
+  const isPlanNotice = React.useCallback(
+    (org: Organization) => isVariablesPlan(org) && org.id !== connectedOrgId,
+    [connectedOrgId],
+  );
+
+  const studioProviders = React.useMemo(() => studioOrganizations
+    .filter((org) => !isPlanNotice(org))
+    .map((org) => ({
+      provider: StorageProviderType.TOKENS_STUDIO_OAUTH,
+      internalId: `tokens-studio-${org.id}`,
+      name: org.name,
+      orgId: org.id,
+      id: org.projects?.data?.[0]?.id || '',
+    } as StorageTypeCredentials)), [studioOrganizations, isPlanNotice]);
+
+  const variablesPlanOrganizations = React.useMemo(
+    () => studioOrganizations.filter(isPlanNotice),
+    [studioOrganizations, isPlanNotice],
+  );
 
   const [open, setOpen] = React.useState(false);
 
@@ -220,6 +241,17 @@ const SyncSettings = () => {
                 onMigrate={handleEditClick(item, true)}
                 item={item}
               />
+            ))}
+            {variablesPlanOrganizations.map((org) => (
+              <StyledStorageItem key={`tokens-studio-${org.id}`} active={false} data-testid={`studio-plan-notice-${org.id}`}>
+                <Stack direction="row" gap={3} align="center">
+                  <Box css={{ color: '$fgMuted' }}>{getProviderIcon(StorageProviderType.TOKENS_STUDIO_OAUTH)}</Box>
+                  <Stack direction="column" gap={0}>
+                    <Box css={{ fontSize: '$small', fontWeight: '$sansBold' }}>{org.name}</Box>
+                    <Box css={{ color: '$fgMuted', fontSize: '$xsmall' }}>{t('variablesPlanCantSync')}</Box>
+                  </Stack>
+                </Stack>
+              </StyledStorageItem>
             ))}
             <LocalStorageItem />
             {apiProviders.length > 0 && (

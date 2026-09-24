@@ -25,6 +25,7 @@ import { OAuthService } from '../../../services/OAuthService';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { TOKENS_STUDIO_APP_URL } from '@/constants/TokensStudio';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
+import { canSyncWithStudio } from '@/utils/tokensStudio/organizationAccess';
 import {
   createTokenRest,
   updateTokenRest,
@@ -231,7 +232,7 @@ export function useTokensStudioOAuth() {
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
-  const { t } = useTranslation(['sync', 'branch', 'general']);
+  const { t } = useTranslation(['sync', 'branch', 'general', 'storage']);
   const { hasChanges } = useChangedState();
   const editProhibited = useSelector(editProhibitedSelector);
   const localApiState = useSelector(localApiStateSelector);
@@ -381,10 +382,18 @@ export function useTokensStudioOAuth() {
     [confirm, dispatch, activeTheme, tokens, themes, usedTokenSet, pullTokensFromTokensStudioOAuth, t],
   );
 
+  // Starts or switches sync to a project. `orgId` is the org that owns the project (defaults to the active org).
   const loadProjectTokens = useCallback(
-    async (projectId: string, branch?: string) => {
-      const { oauthTokens, activeOrganization } = useAuthStore.getState();
+    async (projectId: string, branch?: string, orgId?: string) => {
+      const { oauthTokens, activeOrganization, organizations } = useAuthStore.getState();
       if (!oauthTokens || !activeOrganization) return;
+
+      const org = orgId ? organizations.find((o) => o.id === orgId) : activeOrganization;
+      if (!canSyncWithStudio(org)) {
+        const message = t('planCantSync', { ns: 'storage' });
+        notifyToUI(message, { error: true });
+        throw new Error(message);
+      }
 
       if (hasChanges && !editProhibited && localApiState?.provider !== StorageProviderType.LOCAL) {
         const confirmResult = await confirm({
@@ -470,7 +479,7 @@ export function useTokensStudioOAuth() {
         useAuthStore.setState({ isLoading: false });
       }
     },
-    [dispatch],
+    [dispatch, hasChanges, editProhibited, localApiState, confirm, t],
   );
 
   return useMemo(

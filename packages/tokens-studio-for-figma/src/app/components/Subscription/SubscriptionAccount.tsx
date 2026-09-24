@@ -11,6 +11,7 @@ import { TOKENS_STUDIO_APP_URL } from '@/constants/TokensStudio';
 import { OAuthLogin } from '../Login/OAuthLogin';
 import { useAuthStore } from '@/app/store/useAuthStore';
 import { Divider } from '../Divider';
+import { getPlanDisplayName } from '@/utils/tokensStudio/organizationAccess';
 
 // ─── Styled ──────────────────────────────────────────────────────────
 
@@ -151,26 +152,6 @@ const StyledDropdownItem = styled(DropdownMenu.Item, {
 });
 
 // ─── Component ───────────────────────────────────────────────────────
-
-const getPlanName = (sub: any) => {
-  if (!sub) return 'Starter';
-  const name = (typeof sub.plan === 'string' ? sub.plan : undefined)
-    || sub.plan?.name
-    || sub.plan_name
-    || sub.current_plan;
-
-  if (!name) return 'Starter';
-  return name;
-};
-
-const getPlanDisplayName = (sub: any) => {
-  const planName = getPlanName(sub);
-  if (planName.toLowerCase().includes('partner')) return planName;
-  const status = sub?.subscription_status;
-  if (status === 'trial_expired') return 'Trial expired';
-  if (status === 'expired' || status === 'canceled') return 'Expired';
-  return planName;
-};
 
 export default function SubscriptionAccount() {
   // OAuth Auth store
