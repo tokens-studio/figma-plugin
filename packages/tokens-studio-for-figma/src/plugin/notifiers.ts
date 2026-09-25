@@ -66,6 +66,7 @@ export type SavedSettings = {
   width: number;
   height: number;
   showEmptyGroups: boolean
+  hideDeprecatedTokens: boolean;
   updateMode: UpdateMode;
   updateRemote: boolean;
   updateOnChange: boolean;
@@ -75,6 +76,7 @@ export type SavedSettings = {
   variablesNumber: boolean;
   variablesString: boolean;
   variablesBoolean: boolean;
+  variablesMotion: boolean;
   stylesColor: boolean;
   stylesTypography: boolean;
   stylesEffect: boolean;
@@ -108,10 +110,12 @@ export function notifyUISettings(
     applyVariablesStylesOrRawValue,
     shouldUpdateStyles,
     showEmptyGroups,
+    hideDeprecatedTokens,
     variablesColor,
     variablesNumber,
     variablesString,
     variablesBoolean,
+    variablesMotion,
     stylesColor,
     stylesTypography,
     stylesEffect,
@@ -153,6 +157,7 @@ export function notifyUISettings(
       variablesBoolean,
       variablesNumber,
       variablesString,
+      variablesMotion,
       stylesColor,
       stylesEffect,
       stylesTypography,
@@ -177,6 +182,10 @@ export function notifyUISettings(
   postToUI({
     type: MessageFromPluginTypes.SHOW_EMPTY_GROUPS,
     showEmptyGroups,
+  });
+  postToUI({
+    type: MessageFromPluginTypes.HIDE_DEPRECATED_TOKENS,
+    hideDeprecatedTokens,
   });
 }
 

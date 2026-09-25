@@ -97,8 +97,8 @@ describe('fetchServerResolvedTokens', () => {
 
     await fetchServerResolvedTokens(BASE_OPTIONS);
 
-    const expectedParams = new URLSearchParams({ 
-      change_set_id: 'cs-456', 
+    const expectedParams = new URLSearchParams({
+      change_set_id: 'cs-456',
       t: '1777406477644',
       Mode: 'Dark',
     });
