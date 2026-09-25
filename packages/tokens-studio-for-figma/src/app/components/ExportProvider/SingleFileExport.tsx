@@ -67,7 +67,18 @@ export default function SingleFileExport({ onClose }: Props) {
   const exportData = React.useMemo(() => {
     const returnValue = JSON.parse(formattedTokens);
     if (includeAllTokens) {
-      set(returnValue, SystemFilenames.THEMES, themes);
+      // Filter out internal metadata from themes before export
+      const cleanedThemes = themes.map((theme) => {
+        const {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          $figmaParentCollectionId,
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          $figmaIsExtension,
+          ...rest
+        } = theme;
+        return rest;
+      });
+      set(returnValue, SystemFilenames.THEMES, cleanedThemes);
       set(returnValue, SystemFilenames.METADATA, {
         tokenSetOrder: Object.keys(tokens),
       });

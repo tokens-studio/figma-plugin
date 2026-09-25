@@ -3,7 +3,23 @@ import { TreeItem } from '../themeListToTree';
 
 export function findOrderableTargetIndexesInThemeList<T extends TreeItem>(velocity: number, value: T, order: ItemData<T>[]) {
   if (value.isLeaf) {
-    return Array.from({ length: order.length - 1 }, (_, index) => index + 1);
+    // Filter out extended themes (themes with $figmaParentThemeId) from reorder targets
+    const validTargets = order.filter((item, index) => {
+      // Always allow index 0 as a boundary
+      if (index === 0) return true;
+
+      // If the item is a leaf (theme), check if it's an extended theme
+      if (item.value.isLeaf && typeof item.value.value === 'object') {
+        // Exclude extended themes from being valid targets
+        return !item.value.value.$figmaParentThemeId;
+      }
+
+      // Group headers are always valid targets
+      return true;
+    });
+
+    // Return indexes of valid targets in the original order array
+    return validTargets.map(item => order.indexOf(item)).filter(idx => idx > 0);
   }
   const siblings = order.filter((item) => (
     item.value !== value

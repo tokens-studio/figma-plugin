@@ -112,6 +112,7 @@ global.figma = {
     }),
   },
   variables: {
+    getLocalVariableCollectionsAsync: jest.fn().mockResolvedValue([]),
     // New async version returns a promise that resolves with the expected collection
     getVariableCollectionByIdAsync: jest.fn().mockResolvedValue({
       id: 'VariableID:1:0',

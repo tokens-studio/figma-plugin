@@ -1,6 +1,8 @@
 import { isVariableWithAliasReference } from '@/utils/isAliasReference';
+import { resolveCollectionContext } from './extendedCollections/collectionContext';
+import { applyChildModeValue } from './extendedCollections/applyChildModeValue';
 
-export default function setStringValuesOnVariable(variable: Variable, mode: string, value: string, forceUpdate = false) {
+export default function setStringValuesOnVariable(variable: Variable, mode: string, value: string, collection?: VariableCollection, forceUpdate = false) {
   try {
     const existingVariableValue = variable.valuesByMode[mode];
     if (
@@ -8,8 +10,14 @@ export default function setStringValuesOnVariable(variable: Variable, mode: stri
       && !(typeof existingVariableValue === 'string' || isVariableWithAliasReference(existingVariableValue))
     ) return;
 
+    // Extended collections: inherit-vs-override decided in one shared place
+    const { parentModeId } = resolveCollectionContext(collection, mode);
+    if (parentModeId) {
+      applyChildModeValue(variable, mode, parentModeId, value);
+      return;
+    }
+
     if (forceUpdate || existingVariableValue !== value) {
-      console.log('Setting string value on variable', variable.name, existingVariableValue, value, existingVariableValue === value ? 'match' : 'no match');
       variable.setValueForMode(mode, value);
     }
   } catch (e) {
