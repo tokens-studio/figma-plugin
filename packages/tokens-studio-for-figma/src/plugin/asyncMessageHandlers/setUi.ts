@@ -26,6 +26,7 @@ export const setUi: AsyncMessageChannelHandlers[AsyncMessageTypes.SET_UI] = asyn
     variablesColor: msg.variablesColor,
     variablesNumber: msg.variablesNumber,
     variablesString: msg.variablesString,
+    variablesMotion: msg.variablesMotion,
     stylesColor: msg.stylesColor,
     stylesEffect: msg.stylesEffect,
     stylesTypography: msg.stylesTypography,

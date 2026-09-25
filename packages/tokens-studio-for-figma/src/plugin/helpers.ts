@@ -10,6 +10,7 @@ import { UserIdProperty, FileKeyProperty } from '@/figmaStorage';
 import { generateId } from '@/utils/generateId';
 import { Properties } from '@/constants/Properties';
 import { convertFontFamilyToFigma } from './figmaTransforms/convertFontFamilyToFigma';
+import { convertDurationToMs } from './figmaTransforms/duration';
 
 export async function getUserId() {
   let userId = generateId(24);
@@ -88,6 +89,8 @@ export function transformValue(value: string, type: string, baseFontSize: string
     case 'dimension':
     case 'number':
       return convertTypographyNumberToFigma(value, baseFontSize);
+    case 'duration':
+      return convertDurationToMs(value);
     case 'fontWeights':
     case 'fontWeight':
       return convertFontWeightToFigma(value, shouldOutputForVariables);
