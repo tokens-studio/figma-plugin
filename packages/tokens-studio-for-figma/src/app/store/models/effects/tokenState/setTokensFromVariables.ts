@@ -3,6 +3,12 @@ import type { RootModel } from '@/types/RootModel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { pushToTokensStudioOAuth } from '../../../providers/tokens-studio/tokensStudioOAuth';
 import { pushThemeToTokensStudioOAuth } from './utils/pushThemeToTokensStudioOAuth';
+import {
+  resolveSanitizedKey,
+  sanitizeNewTokensForStudio,
+  sanitizeThemeForStudio,
+  sanitizeTokenSetName,
+} from './utils/sanitizeForStudio';
 import { store } from '@/app/store';
 import type { SetTokensFromVariablesPayload } from '@/types/payloads';
 
@@ -14,7 +20,10 @@ export function setTokensFromVariables(dispatch: RematchDispatch<RootModel>) {
     const context = currentState.uiState.api;
     const hasChangeSetId = !!(context as any)?.changeSetId;
     const { importedTokens } = currentState.tokenState;
-    const newTokens = (importedTokens?.newTokens || []).filter((t) => t.parent != null);
+    // Sanitize at the studio boundary: strip characters that would corrupt the
+    // ledger's reference or token-set parsing. Plugin-only flows still receive
+    // the raw names because this effect only runs for TOKENS_STUDIO_OAUTH.
+    const newTokens = sanitizeNewTokensForStudio(importedTokens?.newTokens || []);
 
     // Only create token sets and tokens if changeSetId is present — the REST API requires it.
     // changeSetId is populated after pulling from the REST API for a specific branch.
@@ -33,7 +42,12 @@ export function setTokensFromVariables(dispatch: RematchDispatch<RootModel>) {
       const allTokensToCreate: Array<{ name: string; value: any; type: string; description?: string; token_set_id: string }> = [];
 
       for (const [setName, tokens] of Object.entries(tokensBySet)) {
-        const existingMeta = store.getState().tokenState.tokenSetMetadata[setName] as any;
+        // `setName` is sanitized but the metadata map is still keyed by the raw
+        // Figma name, so an exact lookup would miss and create a duplicate set.
+        // Write back under the resolved key for the same reason.
+        const metadata = store.getState().tokenState.tokenSetMetadata as Record<string, any>;
+        const metaKey = resolveSanitizedKey(metadata, setName, sanitizeTokenSetName) ?? setName;
+        const existingMeta = metadata[metaKey];
         let tokenSetId = existingMeta?.id;
 
         if (tokenSetId) {
@@ -42,7 +56,7 @@ export function setTokensFromVariables(dispatch: RematchDispatch<RootModel>) {
           if (!existingMeta?.fromVariableImport) {
             dispatch.tokenState.setTokenSetMetadata({
               ...store.getState().tokenState.tokenSetMetadata,
-              [setName]: { ...existingMeta, fromVariableImport: true } as any,
+              [metaKey]: { ...existingMeta, fromVariableImport: true } as any,
             });
           }
         } else {
@@ -98,8 +112,8 @@ export function setTokensFromVariables(dispatch: RematchDispatch<RootModel>) {
     const stateAfterSets = store.getState();
     const { importedThemes } = stateAfterSets.tokenState;
     if (hasChangeSetId && importedThemes) {
-      const newThemesToPush = (importedThemes.newThemes || []).map((t: any) => ({ ...t, id: undefined }));
-      const updatedThemesToPush = importedThemes.updatedThemes || [];
+      const newThemesToPush = (importedThemes.newThemes || []).map((t: any) => sanitizeThemeForStudio({ ...t, id: undefined }));
+      const updatedThemesToPush = (importedThemes.updatedThemes || []).map((t: any) => sanitizeThemeForStudio(t));
       // Push themes sequentially so that a shared theme group (e.g. "appearances") is only created
       // once — concurrent pushes would both see groupId=null and create duplicate groups.
       for (const theme of [...newThemesToPush, ...updatedThemesToPush]) {
