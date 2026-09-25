@@ -6,6 +6,7 @@ import { transformTypographyKeyToFigmaVariable } from './transformTypographyKeyT
 import { normalizeTypographyPropertyValue } from './normalizeTypographyPropertyValue';
 import { SingleTypographyToken } from '@/types/tokens';
 import { ApplyVariablesStylesOrRawValues } from '@/constants/ApplyVariablesStyleOrder';
+import { listAvailableFonts } from './listAvailableFonts';
 
 // Cache to track font loading promises to prevent race conditions in Promise.all
 const fontLoadingPromises = new Map<string, Promise<void>>();
@@ -49,7 +50,7 @@ export async function tryApplyTypographyCompositeVariable({
             if (!loadingPromise) {
               // Create and cache the loading promise
               loadingPromise = (async () => {
-                const fontsMatching = (await figma.listAvailableFontsAsync() || []).filter((font) => font.fontName.family === firstVariableValue);
+                const fontsMatching = (await listAvailableFonts()).filter((font) => font.fontName.family === firstVariableValue);
                 for (const font of fontsMatching) {
                   await figma.loadFontAsync(font.fontName);
                 }
