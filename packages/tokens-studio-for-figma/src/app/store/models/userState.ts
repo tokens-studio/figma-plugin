@@ -25,6 +25,8 @@ export interface UserState {
   userName: string;
   licenseDetails: LicenseDetails;
   usedEmail: string | undefined;
+  tokensStudioPAT: string | null;
+  isFigmaEnterprise: boolean;
 }
 
 interface LicenseDetails {
@@ -47,6 +49,8 @@ export const userState = createModel<RootModel>()({
       clientEmail: undefined,
       entitlements: [],
     },
+    tokensStudioPAT: null,
+    isFigmaEnterprise: false,
   } as UserState,
   reducers: {
     setUserId(state, payload: string | null) {
@@ -89,6 +93,12 @@ export const userState = createModel<RootModel>()({
       return {
         ...state,
         initialLoad: payload,
+      };
+    },
+    setIsFigmaEnterprise(state, payload: boolean) {
+      return {
+        ...state,
+        isFigmaEnterprise: payload,
       };
     },
     ...userStateReducers,

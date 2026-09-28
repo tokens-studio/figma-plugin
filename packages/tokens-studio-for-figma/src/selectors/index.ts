@@ -75,6 +75,8 @@ export * from './stylesTypographySelector';
 export * from './stylesEffectSelector';
 export * from './stylesGradientSelector';
 export * from './createStylesWithVariableReferencesSelector';
+export * from './exportExtendedCollectionsSelector';
+export * from './isFigmaEnterpriseSelector';
 export * from './autoApplyThemeOnDropSelector';
 export * from './shouldSwapFigmaModesSelector';
 export * from './importedThemesSelector';
