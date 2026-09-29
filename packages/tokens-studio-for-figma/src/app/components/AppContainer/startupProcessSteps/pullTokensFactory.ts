@@ -26,11 +26,15 @@ export function pullTokensFactory(
   const activeTheme = typeof params.activeTheme === 'string' ? { [INTERNAL_THEMES_NO_GROUP]: params.activeTheme } : params.activeTheme;
 
   const askUserIfRecoverLocalChanges = async () => {
-    const shouldRecoverLocalChanges = await useConfirmResult.confirm({
+    const shouldUseRemote = await useConfirmResult.confirm({
       text: 'Recover local changes?',
       description: 'You have local changes unsaved to the remote storage.',
+      confirmAction: 'Use remote',
+      cancelAction: 'Recover changes',
+      variant: 'danger',
     });
-    return shouldRecoverLocalChanges;
+    // Return the opposite: if user confirms "Use remote", we should NOT recover local changes
+    return !shouldUseRemote;
   };
 
   const getApiCredentials = async (shouldPull: boolean, isRemoteStorage: boolean) => {
