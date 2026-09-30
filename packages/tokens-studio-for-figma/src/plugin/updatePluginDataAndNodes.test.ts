@@ -1,8 +1,10 @@
 import { TokenTypes } from '@/constants/TokenTypes';
-import { mockGetNodeById } from '../../tests/__mocks__/figmaMock';
+import { mockGetNodeById, mockUiPostMessage } from '../../tests/__mocks__/figmaMock';
 import * as setValuesOnNode from './setValuesOnNode';
 import { updatePluginDataAndNodes } from './updatePluginDataAndNodes';
 import { SingleToken } from '@/types/tokens';
+import { BackgroundJobs } from '@/constants/BackgroundJobs';
+import { MessageFromPluginTypes } from '@/types/messages';
 
 describe('updatePluginDataAndNodes', () => {
   const mockSetSharedPluginData = jest.fn();
@@ -54,5 +56,35 @@ describe('updatePluginDataAndNodes', () => {
         },
       },
     );
+  });
+
+  it('waits for node application before reporting completion', async () => {
+    let finishApply: () => void = () => {};
+    const applying = new Promise<void>((resolve) => { finishApply = resolve; });
+    let signalStarted: () => void = () => {};
+    const started = new Promise<void>((resolve) => { signalStarted = resolve; });
+    setValuesOnNodeSpy.mockImplementationOnce(async () => {
+      signalStarted();
+      await applying;
+    });
+    const node = { id: '1:1', setSharedPluginData: jest.fn() } as unknown as BaseNode;
+
+    const updating = updatePluginDataAndNodes({
+      entries: [node],
+      values: {},
+      tokensMap: new Map(),
+    });
+    await started;
+    expect(mockUiPostMessage).not.toHaveBeenCalledWith({
+      type: MessageFromPluginTypes.COMPLETE_JOB,
+      name: BackgroundJobs.PLUGIN_UPDATEPLUGINDATA,
+    });
+
+    finishApply();
+    await updating;
+    expect(mockUiPostMessage).toHaveBeenCalledWith({
+      type: MessageFromPluginTypes.COMPLETE_JOB,
+      name: BackgroundJobs.PLUGIN_UPDATEPLUGINDATA,
+    });
   });
 });

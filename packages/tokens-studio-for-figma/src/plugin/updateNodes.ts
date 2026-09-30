@@ -35,7 +35,7 @@ export async function updateNodes(
         try {
           const rawTokenMap = destructureTokenForAlias(tokens, appliedTokens);
           const tokenValues = mapValuesToTokens(tokens, appliedTokens);
-          setValuesOnNode(
+          await setValuesOnNode(
             {
               node,
               values: tokenValues,

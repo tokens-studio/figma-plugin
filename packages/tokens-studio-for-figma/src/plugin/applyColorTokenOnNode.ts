@@ -40,7 +40,7 @@ export async function applyColorTokenOnNode(node: BaseNode, data: NodeTokenRefMa
     }
 
     if (!matchingStyleId || (matchingStyleId && !(await trySetStyleId(node, 'fill', matchingStyleId)))) {
-      setColorValuesOnTarget({
+      await setColorValuesOnTarget({
         target: node, token: tokenName, key: 'fills', givenValue: tokenValue,
       });
     }

@@ -307,4 +307,21 @@ describe('setEffectValuesOnTarget', () => {
       ],
     });
   });
+
+  it('reports and rejects a failed Figma effect write', async () => {
+    const error = new Error('Cannot set effects');
+    const originalEffects = rectangleNodeMock.effects;
+    Object.defineProperty(rectangleNodeMock, 'effects', {
+      get: () => originalEffects,
+      set: () => { throw error; },
+    });
+    const logError = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+    try {
+      await expect(setEffectValuesOnTarget(rectangleNodeMock, singleShadowToken.name, defaultBaseFontSize)).rejects.toThrow(error);
+      expect(logError).toHaveBeenCalledWith('Error setting shadow', error);
+    } finally {
+      logError.mockRestore();
+    }
+  });
 });

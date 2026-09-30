@@ -41,7 +41,7 @@ export async function applyShadowValuesOnNode(
 
     if (!matchingStyleId || (matchingStyleId && !(await trySetStyleId(node, 'effect', matchingStyleId)))) {
       if (isSingleBoxShadowValue(values.boxShadow)) {
-        setEffectValuesOnTarget(node, data.boxShadow, baseFontSize);
+        await setEffectValuesOnTarget(node, data.boxShadow, baseFontSize);
       }
     }
   }

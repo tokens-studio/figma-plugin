@@ -1,19 +1,20 @@
-import EventEmitter from 'eventemitter3';
 import { CanceledError } from './CanceledError';
 
 type PoolFn = {
-  id: number
-  fn: () => Promise<any>
+  run: () => Promise<void>;
+  cancel: () => void;
 };
 
 export class Worker {
-  private schedulerId = 0;
-
   private pool: Set<PoolFn> = new Set();
 
-  private emitter = new EventEmitter();
+  private active: Set<PoolFn> = new Set();
+
+  private flushResolvers: Set<() => void> = new Set();
 
   private timeoutId: ReturnType<typeof setTimeout> | null = null;
+
+  private running = false;
 
   private batchSize: number;
 
@@ -23,71 +24,83 @@ export class Worker {
 
   public setBatchSize(size: number) {
     this.batchSize = size;
+    this.scheduleTick();
   }
 
-  private tick = async () => {
-    let numberOfJobs = 0;
-
-    const promises: Set<Promise<void>> = new Set();
-
-    // eslint-disable-next-line
-    for (const item of this.pool) {
-      this.pool.delete(item);
-      promises.add(new Promise((resolve) => {
-        item.fn().then((result) => {
-          this.emitter.emit(`completed/${item.id}`, result);
-          resolve();
-        });
-      }));
-
-      numberOfJobs += 1;
-      if (numberOfJobs >= this.batchSize) {
-        break;
-      }
-    }
-
-    if (this.timeoutId !== null) {
+  private scheduleTick = () => {
+    if (this.running && this.pool.size > 0 && this.active.size < this.batchSize && this.timeoutId === null) {
       this.timeoutId = setTimeout(this.tick, 0);
     }
-
-    await Promise.all(promises);
   };
 
-  public schedule = <R extends any>(fn: () => Promise<R>) => {
-    this.schedulerId += 1;
-    const id = this.schedulerId;
-    const promise = new Promise<R>((res, rej) => {
-      this.emitter.once('canceled', () => {
-        rej(new CanceledError());
+  private resolveFlushes() {
+    if (this.pool.size === 0 && this.active.size === 0) {
+      this.flushResolvers.forEach((resolve) => resolve());
+      this.flushResolvers.clear();
+    }
+  }
+
+  private tick = () => {
+    this.timeoutId = null;
+    while (this.running && this.pool.size > 0 && this.active.size < this.batchSize) {
+      const item = this.pool.values().next().value;
+      if (!item) break;
+
+      this.pool.delete(item);
+      this.active.add(item);
+      item.run().finally(() => {
+        this.active.delete(item);
+        this.scheduleTick();
+        this.resolveFlushes();
       });
-      this.emitter.once(`completed/${id}`, res);
-    });
-    this.pool.add({ id, fn });
-    return promise;
+    }
   };
+
+  public schedule = <R>(fn: () => Promise<R>): Promise<R> => new Promise<R>((resolve, reject) => {
+    const item: PoolFn = {
+      run: async () => {
+        try {
+          resolve(await fn());
+        } catch (error) {
+          reject(error);
+        }
+      },
+      cancel: () => reject(new CanceledError()),
+    };
+    this.pool.add(item);
+    this.scheduleTick();
+  });
 
   public cancel = () => {
+    this.pool.forEach((item) => item.cancel());
     this.pool.clear();
-    this.emitter.emit('canceled', Date.now());
-    this.emitter.removeAllListeners();
+    this.active.forEach((item) => item.cancel());
+    if (this.timeoutId !== null) {
+      clearTimeout(this.timeoutId);
+      this.timeoutId = null;
+    }
+    this.resolveFlushes();
   };
 
   public start = () => {
-    this.timeoutId = setTimeout(this.tick, 0);
+    this.running = true;
+    this.scheduleTick();
   };
 
   public stop = () => {
-    if (this.timeoutId) {
+    this.running = false;
+    if (this.timeoutId !== null) {
       clearTimeout(this.timeoutId);
       this.timeoutId = null;
     }
   };
 
   public async flush(): Promise<void> {
-    // Process all remaining jobs until queue is empty
-    while (this.pool.size > 0) {
-      await this.tick();
-    }
+    if (this.pool.size === 0 && this.active.size === 0) return;
+    this.start();
+    await new Promise<void>((resolve) => {
+      this.flushResolvers.add(resolve);
+    });
   }
 }
 
