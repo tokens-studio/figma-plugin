@@ -42,11 +42,9 @@ export async function swapStyles(activeTheme: Record<string, string>, themes: Th
     });
     return acc;
   }, {} as StyleIdMap);
-  if (activeThemes.length < 1 || !mappedStyleReferences || !allStyleIds) {
+  if (activeThemes.length < 1 || Object.keys(allStyleIds).length === 0) {
     return;
   }
 
-  getRootNode(updateMode).forEach((layer) => {
-    applySiblingStyleId(layer, allStyleIds, mappedStyleReferences, activeThemes);
-  });
+  await Promise.all(getRootNode(updateMode).map((layer) => applySiblingStyleId(layer, allStyleIds, mappedStyleReferences, activeThemes)));
 }

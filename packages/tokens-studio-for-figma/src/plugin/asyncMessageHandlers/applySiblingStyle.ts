@@ -25,13 +25,13 @@ export async function applySiblingStyleId(node: BaseNode, styleIds: StyleIdMap, 
               node.textStyleId = newTextStyleId;
             }
           } else {
-            node.getStyledTextSegments(['textStyleId']).forEach(async (segment) => {
+            await Promise.all(node.getStyledTextSegments(['textStyleId']).map(async (segment) => {
               const newTextStyleId = await getNewStyleId(segment.textStyleId, styleIds, styleMap, activeThemes);
 
               if (newTextStyleId) {
                 node.setRangeTextStyleId(segment.start, segment.end, newTextStyleId);
               }
-            });
+            }));
           }
 
           if (node.fillStyleId !== figma.mixed) {
@@ -40,13 +40,13 @@ export async function applySiblingStyleId(node: BaseNode, styleIds: StyleIdMap, 
               node.fillStyleId = newFillStyleId;
             }
           } else {
-            node.getStyledTextSegments(['fillStyleId']).forEach(async (segment) => {
+            await Promise.all(node.getStyledTextSegments(['fillStyleId']).map(async (segment) => {
               const newFillStyleId = await getNewStyleId(segment.fillStyleId, styleIds, styleMap, activeThemes);
 
               if (newFillStyleId) {
                 node.setRangeFillStyleId(segment.start, segment.end, newFillStyleId);
               }
-            });
+            }));
           }
         }
         break;

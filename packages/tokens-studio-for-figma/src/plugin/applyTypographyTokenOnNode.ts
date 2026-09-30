@@ -90,7 +90,7 @@ export async function applyTypographyTokenOnNode(
   if (matchingStyleId && (await trySetStyleId(node, 'text', matchingStyleId))) return;
   // Apply typography token directly if no other properties exist
   if (data.typography && resolvedToken && isSingleTypographyValue(resolvedToken.value) && !Object.keys(values).length) {
-    setTextValuesOnTarget(node, data.typography, baseFontSize);
+    await setTextValuesOnTarget(node, data.typography, baseFontSize);
     return;
   }
 

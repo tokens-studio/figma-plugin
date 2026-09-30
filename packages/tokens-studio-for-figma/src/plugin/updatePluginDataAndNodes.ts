@@ -52,7 +52,7 @@ export async function updatePluginDataAndNodes({
         const rawTokenMap = destructureTokenForAlias(tokensMap, tokenValues);
         const mappedValues = mapValuesToTokens(tokensMap, tokenValues);
 
-        setValuesOnNode(
+        await setValuesOnNode(
           {
             node,
             values: mappedValues,

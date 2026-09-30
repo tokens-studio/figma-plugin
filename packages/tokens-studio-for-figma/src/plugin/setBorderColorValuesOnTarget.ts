@@ -38,7 +38,7 @@ export async function setBorderColorValuesOnTarget({
       }
 
       if (!matchingStyleId || (matchingStyleId && !(await trySetStyleId(node, 'stroke', matchingStyleId)))) {
-        setColorValuesOnTarget({
+        await setColorValuesOnTarget({
           target: node, token: data, key: 'strokes', givenValue: value,
         });
       }

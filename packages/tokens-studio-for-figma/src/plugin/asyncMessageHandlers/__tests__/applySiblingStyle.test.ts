@@ -127,4 +127,38 @@ describe('applySiblingStyleId', () => {
     const node = { type: 'UNKNOWN_TYPE' } as unknown as BaseNode;
     await expect(applySiblingStyleId(node, styleIds, styleMap, activeThemes)).resolves.not.toThrow();
   });
+
+  it('waits for mixed-text style segments to finish swapping', async () => {
+    let finishSegment: (style: string) => void = () => {};
+    const swappedStyle = new Promise<string>((resolve) => { finishSegment = resolve; });
+    let signalStarted: () => void = () => {};
+    const started = new Promise<void>((resolve) => { signalStarted = resolve; });
+    mockedGetNewStyleId.mockImplementation(async (styleId) => {
+      if (styleId === 'S:abc,') {
+        signalStarted();
+        return swappedStyle;
+      }
+      return null;
+    });
+    const node = {
+      type: 'TEXT',
+      textStyleId: figma.mixed,
+      fillStyleId: '',
+      strokeStyleId: '',
+      effectStyleId: '',
+      getStyledTextSegments: jest.fn(() => [{ start: 0, end: 4, textStyleId: 'S:abc,' }]),
+      setRangeTextStyleId: jest.fn(),
+    } as unknown as TextNode;
+
+    const applying = applySiblingStyleId(node, styleIds, styleMap, activeThemes);
+    await started;
+    let completed = false;
+    applying.then(() => { completed = true; });
+    await Promise.resolve();
+    expect(completed).toBe(false);
+
+    finishSegment('S:def,');
+    await applying;
+    expect(node.setRangeTextStyleId).toHaveBeenCalledWith(0, 4, 'S:def,');
+  });
 });

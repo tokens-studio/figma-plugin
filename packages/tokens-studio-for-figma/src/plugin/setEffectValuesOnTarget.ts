@@ -119,7 +119,6 @@ export default async function setEffectValuesOnTarget(
         target.effects = [
           newEffect,
         ];
-        Promise.resolve();
       }
     }
 
@@ -128,6 +127,6 @@ export default async function setEffectValuesOnTarget(
     }
   } catch (e) {
     console.error('Error setting shadow', e);
-    Promise.reject();
+    throw e;
   }
 }
