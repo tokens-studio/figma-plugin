@@ -13,6 +13,7 @@ import { FIGMA_PLATFORMS, normalizeVariableScopes, getCodeSyntaxValue } from '@/
 import { checkCanReferenceVariable } from '@/utils/alias/checkCanReferenceVariable';
 import { resolveCollectionContext } from './extendedCollections/collectionContext';
 import { applyChildModeValue } from './extendedCollections/applyChildModeValue';
+import { buildComposedColorValue, parseComposedColorReference } from './composedColor';
 
 export default async function updateVariablesFromPlugin(payload: UpdateTokenVariablePayload) {
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
@@ -82,7 +83,24 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
             ? await figma.variables.getVariableCollectionByIdAsync(theme.$figmaCollectionId)
             : null;
 
-          if (checkCanReferenceVariable(payload)) {
+          const composed = payload.type === TokenTypes.COLOR && !payload.$extensions?.['studio.tokens']?.modify
+            ? parseComposedColorReference(payload.rawValue)
+            : null;
+          const composedValue = composed && buildComposedColorValue({
+            composed,
+            resolvedValue: payload.value,
+            colorVariable: composed.colorReference ? nameToVariableMap[composed.colorReference.split('.').join('/')] : undefined,
+            opacityVariable: composed.opacityReference ? nameToVariableMap[composed.opacityReference.split('.').join('/')] : undefined,
+          });
+
+          if (composedValue) {
+            const { parentModeId } = resolveCollectionContext(collection, theme.$figmaModeId!, theme);
+            if (parentModeId) {
+              applyChildModeValue(variable, theme.$figmaModeId!, parentModeId, composedValue);
+            } else {
+              variable.setValueForMode(theme.$figmaModeId!, composedValue);
+            }
+          } else if (!composed && checkCanReferenceVariable(payload)) {
             let referenceTokenName: string = '';
             if (payload.rawValue && payload.rawValue?.toString().startsWith('{')) {
               referenceTokenName = payload.rawValue?.toString().slice(1, payload.rawValue.toString().length - 1);
