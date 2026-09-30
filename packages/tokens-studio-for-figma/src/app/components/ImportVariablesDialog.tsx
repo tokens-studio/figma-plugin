@@ -2,6 +2,7 @@ import React, {
   useState, useCallback, useEffect, useMemo,
 } from 'react';
 import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import {
   Button, Checkbox, Label, Stack, Heading,
 } from '@tokens-studio/ui';
@@ -24,6 +25,7 @@ export default function ImportVariablesDialog({
   const [useDimensions, setUseDimensions] = useState(false);
   const [useRem, setUseRem] = useState(false);
 
+  const { t } = useTranslation(['tokens']);
   const isTokensStudioSync = useSelector(isTokensStudioSyncSelector);
 
   // Filter out multi-level extensions (depth > 1). Tokens Studio sync doesn't
@@ -127,11 +129,11 @@ export default function ImportVariablesDialog({
     [handleModeToggle],
   );
 
-  let emptyMessage = 'There are no collections present in this file';
+  let emptyMessage = t('importVariablesNoCollections');
   if (filteredCollections.length > 0) {
     emptyMessage = isTokensStudioSync
-      ? 'All collections in this file are extended collections, which are not supported with Tokens Studio sync'
-      : 'All collections in this file have more than one level of extension';
+      ? t('importVariablesAllExtendedStudioSync')
+      : t('importVariablesAllMultiLevelExtensions');
   }
 
   const hasSelections = Object.keys(selectedCollections).length > 0;
@@ -172,7 +174,7 @@ export default function ImportVariablesDialog({
         </Box>
         {isTokensStudioSync && filteredCollections.length > 0 && (
           <Box css={{ fontSize: '$small', color: '$fgMuted' }}>
-            Extended collections are not supported with Tokens Studio sync and have been skipped.
+            {t('importVariablesExtendedSkippedStudioSync')}
           </Box>
         )}
 

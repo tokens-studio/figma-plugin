@@ -20,7 +20,7 @@ import {
   updateModeSelector,
   themesListSelector,
   storageTypeSelector,
-  exportExtendedCollectionsSelector,
+  isTokensStudioSyncSelector,
 } from '@/selectors';
 import { useAuthStore } from '@/app/store/useAuthStore';
 import { fetchServerResolvedTokensPerTheme } from '@/utils/tokensStudio/fetchServerResolvedTokensPerTheme';
@@ -71,14 +71,14 @@ export default function useTokens() {
   const themes = useSelector(themesListSelector);
   const storageType = useSelector(storageTypeSelector);
   const rawSettings = useSelector(settingsStateSelector, isEqual);
-  const exportExtendedCollections = useSelector(exportExtendedCollectionsSelector);
-  // Tokens Studio sync doesn't support extended collections, so the effective
-  // value (not the persisted one) is what gets sent to the plugin.
+  const isTokensStudioSync = useSelector(isTokensStudioSyncSelector);
+  // Tokens Studio sync doesn't support extended collections, so the persisted
+  // setting is overridden while Studio is active. Other providers get it as-is.
   const settings = useMemo(
-    () => (rawSettings.exportExtendedCollections === exportExtendedCollections
-      ? rawSettings
-      : { ...rawSettings, exportExtendedCollections }),
-    [rawSettings, exportExtendedCollections],
+    () => (isTokensStudioSync && rawSettings.exportExtendedCollections
+      ? { ...rawSettings, exportExtendedCollections: false }
+      : rawSettings),
+    [rawSettings, isTokensStudioSync],
   );
   const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
   const { confirm } = useConfirm<ConfirmResult>();
