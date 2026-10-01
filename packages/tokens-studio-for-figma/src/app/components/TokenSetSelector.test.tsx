@@ -14,12 +14,12 @@ describe('TokenSetSelector Component', () => {
     store.dispatch.tokenState.setCollapsedTokenSets([]);
   });
 
-  it('show onboarding explainer sets', () => {
+  it('show onboarding explainer sets', async () => {
     store.dispatch.uiState.setOnboardingExplainerSets('true');
 
     const result = render(<TokenSetSelector saveScrollPositionSet={mockSaveScrollPositionSet} />);
-    waitFor(async () => {
-      expect(await result.findByText('sets')).not.toBeUndefined();
+    await waitFor(async () => {
+      expect(await result.findByText('sets.title')).not.toBeUndefined();
     }, { timeout: 10000 });
   });
 
@@ -29,7 +29,7 @@ describe('TokenSetSelector Component', () => {
 
     fireEvent.click(result.getByTestId('closeButton'));
 
-    expect(result.queryByText('Sets')).toBeNull();
+    expect(result.queryByText('sets.title')).toBeNull();
   });
 
   it('should collapse individual folder on regular click', async () => {
@@ -120,7 +120,7 @@ describe('TokenSetSelector Component', () => {
     });
 
     fireEvent.click(createButton);
-    waitFor(() => {
+    await waitFor(() => {
       expect(store.getState().tokenState.tokens).toEqual({
         'Folder/newSetCreated': [],
         global: [],
@@ -138,7 +138,7 @@ describe('TokenSetSelector Component', () => {
       name: /change/i,
     });
     fireEvent.click(changeButton);
-    waitFor(() => {
+    await waitFor(() => {
       expect(store.getState().tokenState.tokens).toEqual({
         'Folder/renameSet': [],
         global: [],
@@ -156,7 +156,7 @@ describe('TokenSetSelector Component', () => {
       name: /change/i,
     });
     fireEvent.click(changeButton);
-    waitFor(() => {
+    await waitFor(() => {
       expect(store.getState().tokenState.tokens).toEqual({
         'renameFolder/renameSet': [],
         global: [],
@@ -172,7 +172,7 @@ describe('TokenSetSelector Component', () => {
       name: /Save/i,
     });
     fireEvent.click(saveButton);
-    waitFor(() => {
+    await waitFor(() => {
       expect(store.getState().tokenState.tokens).toEqual({
         'renameFolder/renameSet': [],
         'renameFolder/renameSet_sets.duplicateSetSuffix': [],
