@@ -73,5 +73,14 @@ module.exports = {
         'import/no-extraneous-dependencies': 0,
       },
     },
+    {
+      // An un-awaited waitFor or findBy never enforces its assertion, and its rejection fails a later test.
+      files: ['**/*.test.ts', '**/*.test.tsx'],
+      plugins: ['testing-library'],
+      rules: {
+        'testing-library/await-async-utils': 'error',
+        'testing-library/await-async-queries': 'error',
+      },
+    },
   ],
 };
