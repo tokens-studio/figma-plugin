@@ -236,10 +236,10 @@ describe('AppContainer (integration)', () => {
             <AppContainer {...params} />
           </Provider>,
         );
-        waitFor(async () => {
-          expect(await result.findByText('Getting started')).not.toBeUndefined();
-          result.unmount();
+        await waitFor(async () => {
+          expect(await result.findByText('gettingStarted')).not.toBeUndefined();
         }, { timeout: 10000 });
+        result.unmount();
       })
     ),
   );
@@ -257,10 +257,10 @@ describe('AppContainer (integration)', () => {
             <AppContainer {...params} />
           </Provider>,
         );
-        waitFor(async () => {
-          expect(await result.findByText('Getting started')).not.toBeUndefined();
-          result.unmount();
+        await waitFor(async () => {
+          expect(await result.findByText('gettingStarted')).not.toBeUndefined();
         }, { timeout: 10000 });
+        result.unmount();
       })
     ),
   );
@@ -282,10 +282,10 @@ describe('AppContainer (integration)', () => {
             <AppContainer {...params} />
           </Provider>,
         );
-        waitFor(async () => {
+        await waitFor(async () => {
           expect(await result.findAllByText('global')).toHaveLength(1);
-          result.unmount();
         }, { timeout: 10000 });
+        result.unmount();
       })
     ),
   );
@@ -308,10 +308,10 @@ describe('AppContainer (integration)', () => {
       </Provider>,
     );
 
-    waitFor(async () => {
+    await waitFor(async () => {
       expect(screen.queryByText(/Recover local changes\?/i)).not.toBeNull();
-      result.unmount();
     });
+    result.unmount();
   }));
 
   it('skips start page if there are no local changes and the Github provider can sync', withOrWithoutLicense({
@@ -336,10 +336,10 @@ describe('AppContainer (integration)', () => {
       </Provider>,
     );
 
-    waitFor(async () => {
+    await waitFor(async () => {
       expect(await result.findAllByText('global')).toHaveLength(1);
-      result.unmount();
     }, { timeout: 10000 });
+    result.unmount();
   }));
 
   it('can switch to a different tokenset', withOrWithoutLicense({
@@ -359,12 +359,12 @@ describe('AppContainer (integration)', () => {
       </Provider>,
     );
 
-    waitFor(async () => {
-      const set = await result.findByTestId('tokensetitem-playground');
-      set.click();
+    const set = await result.findByTestId('tokensetitem-playground');
+    set.click();
+    await waitFor(() => {
       expect(mockStore.getState().tokenState.activeTokenSet).toEqual('playground');
-      result.unmount();
     });
+    result.unmount();
   }));
 
   it('can toggle a tokenset', withOrWithoutLicense({
@@ -383,10 +383,10 @@ describe('AppContainer (integration)', () => {
       </Provider>,
     );
 
-    waitFor(async () => {
-      const checkbox = await result.findByTestId('tokensetitem-playground-checkbox');
-      fireEvent.click(checkbox);
+    const checkbox = await result.findByTestId('tokensetitem-playground-checkbox');
+    fireEvent.click(checkbox);
 
+    await waitFor(() => {
       expect(mockStore.getState().tokenState.usedTokenSet).toEqual({
         global: TokenSetStatus.DISABLED,
         playground: TokenSetStatus.ENABLED,
@@ -418,9 +418,10 @@ describe('AppContainer (integration)', () => {
         <AppContainer {...params} />
       </Provider>,
     );
-    waitFor(async () => {
-      await result.findByText("Couldn't load tokens stored on GitHub");
-      expect(result.queryByText("Couldn't load tokens stored on GitHub")).toBeInTheDocument();
+    await waitFor(async () => {
+      await result.findByText('Could not load tokens from GitHub');
+      expect(result.queryByText('Could not load tokens from GitHub')).toBeInTheDocument();
     });
+    result.unmount();
   }));
 });
