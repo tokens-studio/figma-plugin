@@ -20,7 +20,7 @@ import { allTokenSetsSelector, themesListSelector, tokensSelector } from '@/sele
 import { ExportTokenSet } from '@/types/ExportTokenSet';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { Dispatch } from '@/app/store';
-import { TokenTypes } from '@/constants/TokenTypes';
+import { findGradientTokensWithStaleVariables } from '@/utils/findGradientTokensWithStaleVariables';
 
 export default function ManageStylesAndVariables({ showModal, setShowModal }: { showModal: boolean, setShowModal: (show: boolean) => void }) {
   const { t } = useTranslation(['manageStylesAndVariables']);
@@ -55,7 +55,7 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
 
   const {
     createVariablesFromSets, createVariablesFromThemes, createStylesFromSelectedTokenSets, createStylesFromSelectedThemes,
-    removeVariablesFromToken,
+    removeVariablesByKeys,
   } = useTokens();
   const { confirm } = useConfirm<string[]>();
   const allTokens = useSelector(tokensSelector);
@@ -77,56 +77,43 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
     setShowOptions(false);
   }, []);
 
-  // Color tokens that now hold a gradient value but still have a Figma variable
-  // bound from an earlier export. Figma variables can't store gradients, so a
-  // stale variable will keep overriding the new gradient style on any bound
-  // layer. Offer to delete these variables before we push.
-  const gradientTokensWithStaleVariable = React.useMemo(() => {
-    const isGradient = (v: unknown): v is string => typeof v === 'string'
-      && (v.startsWith('linear-gradient') || v.startsWith('radial-gradient') || v.startsWith('conic-gradient'));
-    // Flatten variable-reference keys across all themes once so the token scan
-    // stays O(tokens + refs) rather than O(tokens × themes).
-    const referencedTokenNames = new Set<string>();
-    themes.forEach((theme) => {
-      Object.keys(theme.$figmaVariableReferences ?? {}).forEach((name) => referencedTokenNames.add(name));
-    });
-    const seen = new Set<string>();
-    const collected: string[] = [];
-    Object.values(allTokens).forEach((tokenList) => {
-      tokenList.forEach((token) => {
-        if (token.type !== TokenTypes.COLOR || !isGradient(token.value) || seen.has(token.name)) return;
-        if (referencedTokenNames.has(token.name)) {
-          seen.add(token.name);
-          collected.push(token.name);
-        }
-      });
-    });
-    return collected;
-  }, [allTokens, themes]);
-
   const handleExportToFigma = React.useCallback(async () => {
-    if (gradientTokensWithStaleVariable.length > 0) {
+    // Figma variables can't store gradients, so a stale variable from an earlier
+    // export keeps overriding the new gradient style on bound layers. Offer to
+    // delete those before we push. Computed on click as it resolves every theme.
+    const staleGradientTokens = findGradientTokensWithStaleVariables(allTokens, themes);
+    if (staleGradientTokens.length > 0) {
       const gradientConfirm = await confirm({
         text: t('confirmDeleteGradientVariables.text', { defaultValue: 'Delete Figma variables for gradient tokens?' }),
         description: t('confirmDeleteGradientVariables.description', { defaultValue: "Figma variables can't store gradients. These color tokens are now gradients but still have variables from a previous export — bound layers will keep showing the old color until the variable is removed. Uncheck any you'd rather keep." }),
         confirmAction: t('confirmDeleteGradientVariables.confirmAction', { defaultValue: 'Delete selected & export' }),
         cancelAction: t('confirmDeleteGradientVariables.cancelAction', { defaultValue: 'Cancel' }),
+        secondaryAction: t('confirmDeleteGradientVariables.secondaryAction', { defaultValue: 'Skip & export' }),
         variant: 'danger',
-        choices: gradientTokensWithStaleVariable.map((name) => ({
+        choices: staleGradientTokens.map(({ name }) => ({
           key: name,
           label: name,
           enabled: true,
         })),
       });
       if (!gradientConfirm) return; // user cancelled — abort export entirely
-      const toDelete = gradientConfirm.data ?? [];
-      // Sequential rather than Promise.all — each call posts a REMOVE_VARIABLES
-      // message and the plugin side processes them serially anyway, so this
-      // keeps behavior predictable without a burst of parallel requests.
-      // eslint-disable-next-line no-restricted-syntax
-      for (const name of toDelete) {
-        // eslint-disable-next-line no-await-in-loop
-        await removeVariablesFromToken(name);
+      // Skip keeps every variable and exports as-is
+      const selectedNames = new Set(gradientConfirm.secondary ? [] : gradientConfirm.data ?? []);
+      const keysToDelete = new Set(staleGradientTokens
+        .filter(({ name }) => selectedNames.has(name))
+        .flatMap(({ variableKeys }) => variableKeys));
+      if (keysToDelete.size > 0) {
+        await removeVariablesByKeys(Array.from(keysToDelete));
+        // Drop the references too, otherwise themes that aren't part of this export
+        // keep pointing at the deleted variable and the prompt shows up again.
+        themes.forEach((theme) => {
+          const staleNames = Object.entries(theme.$figmaVariableReferences ?? {})
+            .filter(([, key]) => keysToDelete.has(key))
+            .map(([name]) => name);
+          if (staleNames.length > 0) {
+            dispatch.tokenState.disconnectVariableFromTheme({ id: theme.id, key: staleNames });
+          }
+        });
       }
     }
 
@@ -142,7 +129,7 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
     setShowModal, activeTab, selectedThemes, selectedSets,
     createVariablesFromSets, createStylesFromSelectedTokenSets,
     createVariablesFromThemes, createStylesFromSelectedThemes,
-    gradientTokensWithStaleVariable, confirm, removeVariablesFromToken, t,
+    allTokens, themes, confirm, removeVariablesByKeys, dispatch, t,
   ]);
   const canExportToFigma = activeTab === 'useSets' ? selectedSets.length > 0 : selectedThemes.length > 0;
 

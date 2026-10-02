@@ -32,7 +32,7 @@ function ConfirmDialog() {
   const confirmButton = React.useRef<HTMLButtonElement | null>(null);
   const firstInput = React.useRef<HTMLInputElement | null>(null);
   const {
-    onConfirm, onCancel, confirmState,
+    onConfirm, onCancel, onSecondary, confirmState,
   } = useConfirm();
   const [chosen, setChosen] = React.useState<string[]>([]);
   const [inputValue, setInputValue] = React.useState('');
@@ -74,6 +74,10 @@ function ConfirmDialog() {
       onConfirm(chosen);
     }
   }, [chosen, inputValue, confirmState, onConfirm]);
+
+  const handleSecondary = React.useCallback(() => {
+    onSecondary(confirmState.input ? inputValue : chosen);
+  }, [chosen, inputValue, confirmState, onSecondary]);
 
   React.useEffect(() => {
     if (confirmState.choices) setChosen(confirmState.choices.filter((c) => c.enabled).map((c) => c.key));
@@ -128,9 +132,16 @@ function ConfirmDialog() {
             <Button variant="secondary" onClick={onCancel}>
               {confirmState?.cancelAction}
             </Button>
-            <Button type="submit" variant={isDangerVariant ? 'danger' : 'primary'} ref={confirmButton}>
-              {confirmState?.confirmAction}
-            </Button>
+            <Stack direction="row" gap={3}>
+              {confirmState?.secondaryAction ? (
+                <Button variant="secondary" onClick={handleSecondary}>
+                  {confirmState.secondaryAction}
+                </Button>
+              ) : null}
+              <Button type="submit" variant={isDangerVariant ? 'danger' : 'primary'} ref={confirmButton}>
+                {confirmState?.confirmAction}
+              </Button>
+            </Stack>
           </Stack>
         </Stack>
       </form>
