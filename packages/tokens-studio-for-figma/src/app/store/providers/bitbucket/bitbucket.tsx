@@ -22,6 +22,7 @@ import { useIsProUser } from '@/app/hooks/useIsProUser';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 import { categorizeError } from '@/utils/error/categorizeError';
 import removeIdPropertyFromTokens from '@/utils/removeIdPropertyFromTokens';
+import { buildGitMetadata } from '@/utils/buildGitMetadata';
 
 type BitbucketCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.BITBUCKET }>;
 type BitbucketFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.BITBUCKET }>;
@@ -78,9 +79,7 @@ export function useBitbucket() {
       const { commitMessage, customBranch } = pushSettings;
       try {
         if (customBranch) storage.selectBranch(customBranch);
-        const metadata = {
-          tokenSetOrder: Object.keys(tokens),
-        };
+        const metadata = buildGitMetadata(tokens);
         await storage.save({
           themes,
           tokens,
