@@ -11,6 +11,18 @@ function isSceneNode(node: BaseNode): node is SceneNode {
   return node.type !== 'DOCUMENT' && node.type !== 'PAGE';
 }
 
+// Ensures a node inside an auto-layout parent has FIXED sizing so resize() persists.
+function ensureFixedLayoutSizing(node: BaseNode, dimension: 'width' | 'height' | 'both') {
+  if (!node.parent || !isSceneNode(node.parent) || !isAutoLayout(node.parent)) return;
+
+  if ((dimension === 'width' || dimension === 'both') && 'layoutSizingHorizontal' in node) {
+    (node as SceneNode & { layoutSizingHorizontal: string }).layoutSizingHorizontal = 'FIXED';
+  }
+  if ((dimension === 'height' || dimension === 'both') && 'layoutSizingVertical' in node) {
+    (node as SceneNode & { layoutSizingVertical: string }).layoutSizingVertical = 'FIXED';
+  }
+}
+
 // Helper function to handle full size (100%) values
 function handleFullSizeValue(
   node: BaseNode,
@@ -86,6 +98,7 @@ export async function applySizingValuesOnNode(
     // Try to handle as 100% value first
     if (!handleFullSizeValue(node, 'both', sizingValue, baseFontSize)) {
       // Regular sizing handling for non-100% values
+      ensureFixedLayoutSizing(node, 'both');
       const transformedSize = transformValue(sizingValue, 'sizing', baseFontSize);
       node.resize(transformedSize, transformedSize);
     }
@@ -103,6 +116,7 @@ export async function applySizingValuesOnNode(
     // Try to handle as 100% value first
     if (!handleFullSizeValue(node, 'width', widthValue, baseFontSize)) {
       // Regular width handling for non-100% values
+      ensureFixedLayoutSizing(node, 'width');
       const transformedWidth = transformValue(widthValue, 'sizing', baseFontSize);
       node.resize(transformedWidth, node.height);
     }
@@ -120,6 +134,7 @@ export async function applySizingValuesOnNode(
     // Try to handle as 100% value first
     if (!handleFullSizeValue(node, 'height', heightValue, baseFontSize)) {
       // Regular height handling for non-100% values
+      ensureFixedLayoutSizing(node, 'height');
       const transformedHeight = transformValue(heightValue, 'sizing', baseFontSize);
       node.resize(node.width, transformedHeight);
     }
