@@ -6,6 +6,8 @@ import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { processBatches } from '@/utils/processBatches';
 import { resolveCollectionContext } from './extendedCollections/collectionContext';
 import { applyChildModeValue } from './extendedCollections/applyChildModeValue';
+import { valuesEquivalent } from './extendedCollections/valuesEquivalent';
+import { buildComposedColorValue } from './composedColor';
 
 export default async function updateVariablesToReference(figmaVariables: Map<string, string>, referenceVariableCandidates: ReferenceVariableType[]): Promise<Variable[]> {
   const updatedVariables: Variable[] = [];
@@ -38,9 +40,9 @@ export default async function updateVariablesToReference(figmaVariables: Map<str
   // Process references in batches to avoid overwhelming Figma's API and provide progress updates
   let lastReported = 0;
   let progressOffset = 0;
-  const processCandidate = async (aliasVariable: ReferenceVariableType) => {
+  const findReferenceVariable = async (referenceName: string, aliasVariable: ReferenceVariableType): Promise<Variable | undefined> => {
     // Normalize reference name to dot notation for consistent lookup
-    const normalizedRefName = aliasVariable.referenceVariable.split('/').join('.');
+    const normalizedRefName = referenceName.split('/').join('.');
 
     // O(1) lookup instead of O(n) find
     const candidateVariables = normalizedVariableMap.get(normalizedRefName) || [];
@@ -62,11 +64,11 @@ export default async function updateVariablesToReference(figmaVariables: Map<str
       // Fall back to the global map lookup if no same-collection variable found
       // Try both dot and slash notation to handle mixed formats
       referenceVariableKey = figmaVariables.get(normalizedRefName)
-          ?? figmaVariables.get(aliasVariable.referenceVariable);
+          ?? figmaVariables.get(referenceName);
     }
 
     if (!referenceVariableKey) {
-      return;
+      return undefined;
     }
 
     // Check cache first before calling importVariableByKeyAsync
@@ -91,7 +93,25 @@ export default async function updateVariablesToReference(figmaVariables: Map<str
       }
     }
 
-    if (!variable) {
+    return variable;
+  };
+
+  const processCandidate = async (aliasVariable: ReferenceVariableType) => {
+    let newValue: VariableValue | null;
+    if (aliasVariable.composed) {
+      const { colorReference, opacityReference } = aliasVariable.composed;
+      newValue = buildComposedColorValue({
+        composed: aliasVariable.composed,
+        resolvedValue: aliasVariable.resolvedValue,
+        colorVariable: colorReference ? await findReferenceVariable(colorReference, aliasVariable) : undefined,
+        opacityVariable: opacityReference ? await findReferenceVariable(opacityReference, aliasVariable) : undefined,
+      });
+    } else {
+      const variable = await findReferenceVariable(aliasVariable.referenceVariable, aliasVariable);
+      newValue = variable ? { type: 'VARIABLE_ALIAS', id: variable.id } : null;
+    }
+
+    if (!newValue) {
       return;
     }
 
@@ -103,11 +123,6 @@ export default async function updateVariablesToReference(figmaVariables: Map<str
     const effectiveModeId = aliasVariable.modeId;
 
     try {
-      const newValue: VariableAlias = {
-        type: 'VARIABLE_ALIAS',
-        id: variable.id,
-      };
-
       // Extended collections: one shared inherit-vs-override decision. Runs
       // before any existing-value early-return so stale explicit overrides
       // from previous exports self-heal back to inherited.
@@ -121,19 +136,14 @@ export default async function updateVariablesToReference(figmaVariables: Map<str
       }
 
       const existingValue = aliasVariable.variable.valuesByMode?.[effectiveModeId];
-      if (
-        typeof existingValue === 'object'
-          && existingValue !== null
-          && (existingValue as any).type === 'VARIABLE_ALIAS'
-          && (existingValue as any).id === variable.id
-      ) {
+      if (valuesEquivalent(existingValue, newValue)) {
         return;
       }
 
       await aliasVariable.variable.setValueForMode(effectiveModeId, newValue);
       updatedVariables.push(aliasVariable.variable);
     } catch (e) {
-      console.log('error setting value for mode', e, aliasVariable, variable);
+      console.log('error setting value for mode', e, aliasVariable, newValue);
     }
   };
 

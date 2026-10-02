@@ -10,6 +10,7 @@ export const VARIABLE_SCOPE_OPTIONS: { value: VariableScope; label: string }[] =
   { value: 'GAP', label: 'Gap' },
   { value: 'STROKE_FLOAT', label: 'Stroke' },
   { value: 'OPACITY', label: 'Layer opacity' },
+  { value: 'COLOR_OPACITY', label: 'Color opacity' },
   { value: 'EFFECT_FLOAT', label: 'Effects' },
   { value: 'FONT_WEIGHT', label: 'Font weight' },
   { value: 'FONT_SIZE', label: 'Font size' },
@@ -47,7 +48,7 @@ export const TOKEN_TYPE_TO_SCOPES_MAP: Record<string, VariableScope[]> = {
     'NONE', 'ALL_SCOPES', 'STROKE_FLOAT',
   ],
   [TokenTypes.OPACITY]: [
-    'NONE', 'ALL_SCOPES', 'OPACITY',
+    'NONE', 'ALL_SCOPES', 'OPACITY', 'COLOR_OPACITY',
   ],
   [TokenTypes.FONT_FAMILIES]: [
     'NONE', 'ALL_SCOPES', 'FONT_FAMILY',
@@ -75,7 +76,7 @@ export const TOKEN_TYPE_TO_SCOPES_MAP: Record<string, VariableScope[]> = {
   ],
   [TokenTypes.BOOLEAN]: ['NONE'],
   [TokenTypes.NUMBER]: [
-    'NONE', 'ALL_SCOPES', 'TEXT_CONTENT', 'WIDTH_HEIGHT', 'GAP', 'CORNER_RADIUS', 'STROKE_FLOAT', 'EFFECT_FLOAT', 'OPACITY', 'FONT_WEIGHT', 'FONT_SIZE', 'LINE_HEIGHT', 'LETTER_SPACING', 'PARAGRAPH_SPACING', 'PARAGRAPH_INDENT',
+    'NONE', 'ALL_SCOPES', 'TEXT_CONTENT', 'WIDTH_HEIGHT', 'GAP', 'CORNER_RADIUS', 'STROKE_FLOAT', 'EFFECT_FLOAT', 'OPACITY', 'COLOR_OPACITY', 'FONT_WEIGHT', 'FONT_SIZE', 'LINE_HEIGHT', 'LETTER_SPACING', 'PARAGRAPH_SPACING', 'PARAGRAPH_INDENT',
   ],
   [TokenTypes.GRADIENT]: [
     'NONE', 'ALL_SCOPES', 'ALL_FILLS', 'FRAME_FILL', 'SHAPE_FILL', 'TEXT_FILL', 'STROKE_COLOR', 'EFFECT_COLOR',

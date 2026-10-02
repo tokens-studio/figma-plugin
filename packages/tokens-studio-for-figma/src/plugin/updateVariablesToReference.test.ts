@@ -275,4 +275,66 @@ describe('updateVariablesToReference', () => {
     expect(result).toHaveLength(1);
     expect(result[0]).toBe(mockAliasVariable);
   });
+  describe('composed colors', () => {
+    const colorVariable = {
+      id: 'VariableID:color', name: 'colors/red', key: 'K:color', variableCollectionId: 'coll1', resolvedType: 'COLOR',
+    };
+    const opacityVariable = {
+      id: 'VariableID:opacity', name: 'opacity/50', key: 'K:opacity', variableCollectionId: 'coll1', resolvedType: 'FLOAT',
+    };
+
+    beforeEach(() => {
+      mockGetVariablesWithoutZombies.mockResolvedValue([colorVariable as any, opacityVariable as any]);
+      (figma.variables.importVariableByKeyAsync as jest.Mock).mockImplementation((key: string) => (
+        Promise.resolve(key === 'K:color' ? colorVariable : opacityVariable)
+      ));
+    });
+
+    it('links rgba({color}, 0.5) as a composed color with literal opacity', async () => {
+      const target = { variableCollectionId: 'coll1', valuesByMode: {}, setValueForMode: jest.fn() };
+      await updateVariablesToReference(new Map(), [{
+        variable: target as any,
+        modeId: 'mode1',
+        referenceVariable: 'colors.red',
+        composed: { colorReference: 'colors.red', opacityLiteral: '0.5' },
+        resolvedValue: '#ff000080',
+      }]);
+      expect(target.setValueForMode).toHaveBeenCalledWith('mode1', {
+        color: { type: 'VARIABLE_ALIAS', id: 'VariableID:color' },
+        opacity: 50,
+      });
+    });
+
+    it('links rgba({color}, {opacity}) with both parts aliased', async () => {
+      const target = { variableCollectionId: 'coll1', valuesByMode: {}, setValueForMode: jest.fn() };
+      await updateVariablesToReference(new Map(), [{
+        variable: target as any,
+        modeId: 'mode1',
+        referenceVariable: 'colors.red',
+        composed: { colorReference: 'colors.red', opacityReference: 'opacity.50' },
+        resolvedValue: '#ff000080',
+      }]);
+      expect(target.setValueForMode).toHaveBeenCalledWith('mode1', {
+        color: { type: 'VARIABLE_ALIAS', id: 'VariableID:color' },
+        opacity: { type: 'VARIABLE_ALIAS', id: 'VariableID:opacity' },
+      });
+    });
+
+    it('skips the write when the existing composed value is equivalent', async () => {
+      const target = {
+        variableCollectionId: 'coll1',
+        valuesByMode: { mode1: { color: { type: 'VARIABLE_ALIAS', id: 'VariableID:color' }, opacity: 50 } },
+        setValueForMode: jest.fn(),
+      };
+      const result = await updateVariablesToReference(new Map(), [{
+        variable: target as any,
+        modeId: 'mode1',
+        referenceVariable: 'colors.red',
+        composed: { colorReference: 'colors.red', opacityLiteral: '50%' },
+        resolvedValue: '#ff000080',
+      }]);
+      expect(target.setValueForMode).not.toHaveBeenCalled();
+      expect(result).toHaveLength(0);
+    });
+  });
 });
