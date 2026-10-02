@@ -20,6 +20,7 @@ import { isUsingAppPassword } from '@/utils/bitbucketMigration';
 import { StudioProjectSelector } from './Subscription/StudioProjectSelector';
 import { useAuthStore } from '@/app/store/useAuthStore';
 import { useTokensStudioOAuth } from '../store/providers/tokens-studio/tokensStudioOAuth';
+import { canSyncWithStudio, getPlanDisplayName } from '@/utils/tokensStudio/organizationAccess';
 
 type Props = {
   item: StorageTypeCredentials;
@@ -54,21 +55,8 @@ const StorageItem = ({
     ? organizations.find((o) => o.id === oauthItem.orgId)
     : null), [oauthItem, organizations]);
 
-  const hasAccess = org?.subscription?.access?.includes('figma_plugin') ?? true;
-  const isAccessDisabled = oauthItem ? !hasAccess : false;
-
-  const planName = React.useMemo(() => {
-    if (!org?.subscription) return '';
-    const sub = org.subscription as any;
-    if (typeof sub.plan === 'string') return sub.plan;
-    if (sub.plan?.name) return sub.plan.name;
-    if (sub.plan_name) return sub.plan_name;
-    if (sub.current_plan) return sub.current_plan;
-    if (sub.current_plan === null) return 'Starter';
-    return '';
-  }, [org]);
-
-  const subscriptionStatus = org?.subscription?.subscription_status || '';
+  const isSyncBlocked = oauthItem ? !canSyncWithStudio(org) : false;
+  const planName = getPlanDisplayName(org?.subscription);
   const isActive = React.useCallback(() => isSameCredentials(item, storageType), [item, storageType]);
 
   const [selectedProjectId, setSelectedProjectId] = React.useState<string | undefined>(
@@ -99,6 +87,7 @@ const StorageItem = ({
   }, [deleteProvider, item, askUserIfDelete, setStorageType, dispatch.uiState, dispatch.tokenState]);
 
   const handleRestore = React.useCallback(async () => {
+    if (isSyncBlocked) return;
     if (oauthItem) {
       let fallbackId = oauthItem.id;
       const isCurrentlyActiveOrg = !oauthItem.orgId || oauthItem.orgId === useAuthStore.getState().activeOrganizationId;
@@ -110,10 +99,11 @@ const StorageItem = ({
       if (idToLoad) {
         try {
           if (oauthItem.orgId) {
-            setActiveOrganization(oauthItem.orgId);
+            // Only for this file: other files keep the org saved for them.
+            setActiveOrganization(oauthItem.orgId, { persist: false });
           }
           setActiveProject(idToLoad);
-          await loadProjectTokens(idToLoad);
+          await loadProjectTokens(idToLoad, undefined, oauthItem.orgId);
           setHasErrored(false);
           const newItem = { ...oauthItem, id: idToLoad };
           dispatch.uiState.setLocalApiState(newItem);
@@ -143,10 +133,10 @@ const StorageItem = ({
       setHasErrored(true);
       setErrorMessage(response?.errorMessage);
     }
-  }, [item, restoreStoredProvider, fetchBranches, isOAuthApp, activeProject, loadProjectTokens, dispatch.uiState, dispatch.branchState, setStorageType, selectedProjectId, isOAuth, setActiveOrganization, setActiveProject]);
+  }, [item, restoreStoredProvider, fetchBranches, isOAuthApp, activeProject, loadProjectTokens, dispatch.uiState, dispatch.branchState, setStorageType, selectedProjectId, isOAuth, setActiveOrganization, setActiveProject, isSyncBlocked]);
 
   return (
-    <StyledStorageItem data-testid={`storageitem-${provider}-${id}`} key={`${provider}-${item.internalId || id}`} active={isActive()} hasError={isBitbucketWithAppPassword} css={isAccessDisabled ? { opacity: 0.6, pointerEvents: 'none' } : {}}>
+    <StyledStorageItem data-testid={`storageitem-${provider}-${id}`} key={`${provider}-${item.internalId || id}`} active={isActive()} hasError={isBitbucketWithAppPassword} css={isSyncBlocked && !isActive() ? { opacity: 0.6 } : {}}>
       <div style={{
         display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-between', alignItems: 'center',
       }}
@@ -193,7 +183,7 @@ const StorageItem = ({
               >
                 {(() => {
                   if (isOAuth) {
-                    return subscriptionStatus === 'trial_expired' ? 'Trial expired' : planName;
+                    return planName;
                   }
                   return (
                     <>
@@ -204,6 +194,11 @@ const StorageItem = ({
                   );
                 })()}
               </Box>
+              {isSyncBlocked && (
+                <Box css={{ color: '$fgMuted', fontSize: '$xsmall' }} data-testid="storage-item-sync-blocked">
+                  {t(isActive() ? 'planCantSyncConnected' : 'planCantSync')}
+                </Box>
+              )}
             </Stack>
           </Stack>
           {hasErrored && isActive() && (
@@ -240,7 +235,7 @@ const StorageItem = ({
           ) : (
             <Stack gap={2} align="center">
               {isOAuth && <StudioProjectSelector orgId={oauthItem?.orgId} value={selectedProjectId} onChange={setSelectedProjectId} />}
-              <Button data-testid="button-storage-item-apply" variant="secondary" size="small" onClick={handleRestore}>
+              <Button data-testid="button-storage-item-apply" variant="secondary" size="small" onClick={handleRestore} disabled={isSyncBlocked}>
                 {t('apply')}
               </Button>
             </Stack>

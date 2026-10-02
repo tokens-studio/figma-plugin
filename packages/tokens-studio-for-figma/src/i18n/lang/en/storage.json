@@ -119,5 +119,8 @@
   "converttow3c": "Convert to W3C DTCG format",
   "converttolegacy": "Convert to legacy format",
   "pushfirsterror": "Push your unsaved changes before converting",
-  "readmoreformat": "Read more"
+  "readmoreformat": "Read more",
+  "variablesPlanCantSync": "The Variables plan can't sync with Tokens Studio for Figma.",
+  "planCantSync": "This plan can't sync with Tokens Studio for Figma.",
+  "planCantSyncConnected": "This plan can't connect new files or switch projects."
 }
