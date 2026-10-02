@@ -7,7 +7,7 @@ import debounce from 'lodash.debounce';
 import { Button, EmptyState } from '@tokens-studio/ui';
 import { styled } from '@stitches/react';
 import { useTranslation } from 'react-i18next';
-import { activeThemeSelector, themesListSelector } from '@/selectors';
+import { activeThemeSelector, isTokensStudioSyncSelector, themesListSelector } from '@/selectors';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { notifyToUI } from '@/plugin/notifiers';
@@ -52,6 +52,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
   const dispatch = useDispatch<Dispatch>();
   const themes = useSelector(themesListSelector);
   const activeTheme = useSelector(activeThemeSelector);
+  const isTokensStudioSync = useSelector(isTokensStudioSyncSelector);
   const { confirm } = useConfirm();
   const [themeEditorOpen, setThemeEditorOpen] = useState<boolean | string>(false);
   const [isExtendMode, setIsExtendMode] = useState(false);
@@ -396,10 +397,12 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
   const debouncedHandleThemeListScroll = useMemo(() => debounce(handleThemeListScroll, 200), [handleThemeListScroll]);
 
   const handleExtendThemeGroup = useCallback((groupName: string) => {
+    // Tokens Studio sync doesn't support extended collections yet
+    if (isTokensStudioSync) return;
     setSelectedParentGroup(groupName);
     setIsExtendMode(true);
     setThemeEditorOpen(true);
-  }, [setSelectedParentGroup, setIsExtendMode, setThemeEditorOpen]);
+  }, [isTokensStudioSync, setSelectedParentGroup, setIsExtendMode, setThemeEditorOpen]);
 
   const isEditingNonExtendedTheme = typeof themeEditorOpen === 'string'
     && !themes.find((t) => t.id === themeEditorOpen)?.$figmaIsExtension;
