@@ -162,7 +162,9 @@ describe('pushThemeToTokensStudioOAuth', () => {
     mockGetState.mockReturnValue({
       tokenState: {
         remoteData: { metadata: { themeGroupsData: { Colors: { id: 'group-1' } }, tokenSetsData: {} } },
-        themes: [localTheme, { id: 'child-theme', name: 'Dark', group: 'Extended', $figmaParentThemeId: 'local-hash-id' }],
+        themes: [localTheme, {
+          id: 'child-theme', name: 'Dark', group: 'Extended', $figmaParentThemeId: 'local-hash-id',
+        }],
       },
     } as any);
     mockPush.mockRejectedValueOnce(new RestApiError(422, 'Your plan includes 2 options per theme group. Upgrade to add more.', 'theme_option_limit_reached'));
