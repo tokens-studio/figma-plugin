@@ -40,6 +40,7 @@ import {
   updateThemeOptionRest,
   deleteThemeOptionRest,
   batchCreateTokensRest,
+  isNameConflictError,
 } from '../../../../utils/tokensStudio/restApi';
 
 type TokensStudioOAuthCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.TOKENS_STUDIO_OAUTH }>;
@@ -49,6 +50,9 @@ interface PushToTokensStudioOAuth {
   action: string;
   data: any;
   successCallback?: (result: any) => void;
+  // Throw API failures instead of notifying and returning null, so the caller can report them in its
+  // own terms and undo whatever it applied locally.
+  rethrowErrors?: boolean;
 }
 
 const ACTION_LABELS: Record<string, string> = {
@@ -68,7 +72,7 @@ const ACTION_LABELS: Record<string, string> = {
 };
 
 export const pushToTokensStudioOAuth = async ({
-  context, action, data, successCallback,
+  context, action, data, successCallback, rethrowErrors,
 }: PushToTokensStudioOAuth) => {
   const { oauthTokens } = useAuthStore.getState();
   if (!oauthTokens?.accessToken) return null;
@@ -115,10 +119,10 @@ export const pushToTokensStudioOAuth = async ({
         try {
           result = await createThemeGroupRest(oauthTokens.accessToken, apiBaseUrl, projectId, data, branch, changeSetId);
         } catch (err) {
-          // 422 "already exists" is expected when the group was created in a previous session.
-          // Return null so the caller can fall back to fetching the existing group id.
-          const msg = err instanceof Error ? err.message : String(err);
-          if (msg.includes('422')) return null;
+          // A name clash means the group was already created (e.g. in a previous session). Return null so
+          // the caller can fall back to fetching the existing group's id. Every other refusal — a plan's
+          // theme group limit, for one — has to surface rather than read as "already there".
+          if (isNameConflictError(err)) return null;
           throw err;
         }
         break;
@@ -160,6 +164,7 @@ export const pushToTokensStudioOAuth = async ({
     return result;
   } catch (error) {
     console.error('Failed to push to Tokens Studio OAuth via REST:', error);
+    if (rethrowErrors) throw error;
     notifyToUI(`Failed to sync: ${error instanceof Error ? error.message : 'Unknown error'}`, { error: true });
     return null;
   }

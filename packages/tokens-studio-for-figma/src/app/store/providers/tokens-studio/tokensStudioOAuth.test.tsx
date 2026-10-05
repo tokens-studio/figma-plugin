@@ -1,6 +1,7 @@
 import { renderHook } from '@testing-library/react';
+import { pushToTokensStudioOAuth, useTokensStudioOAuth } from './tokensStudioOAuth';
+import { createThemeGroupRest, RestApiError } from '@/utils/tokensStudio/restApi';
 import { AllTheProviders } from '../../../../../tests/config/setupTest';
-import { useTokensStudioOAuth } from './tokensStudioOAuth';
 import { useAuthStore } from '../../useAuthStore';
 import { fetchProjectDataRest } from '@/utils/tokensStudio/fetchProjectDataRest';
 import { notifyToUI } from '@/plugin/notifiers';
@@ -12,6 +13,11 @@ jest.mock('@/utils/tokensStudio/fetchProjectDataRest', () => ({
 
 jest.mock('@/plugin/notifiers', () => ({
   notifyToUI: jest.fn(),
+}));
+
+jest.mock('@/utils/tokensStudio/restApi', () => ({
+  ...jest.requireActual('@/utils/tokensStudio/restApi'),
+  createThemeGroupRest: jest.fn(),
 }));
 
 const makeOrg = (id: string, subscription: Partial<NonNullable<Organization['subscription']>>): Organization => ({
@@ -62,5 +68,50 @@ describe('useTokensStudioOAuth loadProjectTokens', () => {
     useAuthStore.setState({ activeOrganization: variablesOrg, activeOrganizationId: 'variables' });
     await expect(loadProjectTokens()('project-1')).rejects.toThrow('planCantSync');
     expect(fetchProjectDataRest).not.toHaveBeenCalled();
+  });
+});
+
+describe('pushToTokensStudioOAuth CREATE_THEME_GROUP', () => {
+  const context = { id: 'project-1', branch: 'main', changeSetId: 'change-set-1' } as any;
+  const limitRefusal = () => new RestApiError(422, 'Your plan includes 1 theme group. Upgrade to add more.', 'theme_group_limit_reached');
+
+  beforeEach(() => {
+    jest.mocked(createThemeGroupRest).mockReset();
+    jest.mocked(notifyToUI).mockReset();
+    useAuthStore.setState({
+      oauthTokens: {
+        accessToken: 'token', refreshToken: 'refresh', tokenType: 'Bearer', expiresAt: Date.now() + 60 * 60 * 1000,
+      },
+    });
+  });
+
+  it('reads a name clash as "already there" and returns null', async () => {
+    jest.mocked(createThemeGroupRest).mockRejectedValue(
+      new RestApiError(422, "A theme group with the name 'Colors' already exists in this branch"),
+    );
+
+    await expect(pushToTokensStudioOAuth({
+      context, action: 'CREATE_THEME_GROUP', data: { name: 'Colors' }, rethrowErrors: true,
+    })).resolves.toBeNull();
+  });
+
+  it('surfaces a plan limit refusal instead of swallowing it as a name clash', async () => {
+    jest.mocked(createThemeGroupRest).mockRejectedValue(limitRefusal());
+
+    await expect(pushToTokensStudioOAuth({
+      context, action: 'CREATE_THEME_GROUP', data: { name: 'Colors' }, rethrowErrors: true,
+    })).rejects.toThrow('Your plan includes 1 theme group');
+  });
+
+  it('notifies and returns null for a plan limit refusal when the caller does not want errors', async () => {
+    jest.mocked(createThemeGroupRest).mockRejectedValue(limitRefusal());
+
+    await expect(pushToTokensStudioOAuth({
+      context, action: 'CREATE_THEME_GROUP', data: { name: 'Colors' },
+    })).resolves.toBeNull();
+    expect(notifyToUI).toHaveBeenCalledWith(
+      expect.stringContaining('Your plan includes 1 theme group'),
+      { error: true },
+    );
   });
 });

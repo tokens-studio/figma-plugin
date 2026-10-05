@@ -1,3 +1,37 @@
+/**
+ * An error response from the Studio REST API, with the error object's fields kept so callers can tell
+ * refusals apart: a plan limit carries a `code` (e.g. `theme_group_limit_reached`) and a human-readable
+ * `detail`, while a name clash carries only a `detail`.
+ */
+export class RestApiError extends Error {
+  status: number;
+
+  code?: string;
+
+  detail?: string;
+
+  constructor(status: number, detail?: string, code?: string) {
+    super(`API error: ${status} ${detail || ''}`);
+    this.name = 'RestApiError';
+    this.status = status;
+    this.detail = detail;
+    this.code = code;
+  }
+}
+
+/** True when the API refused because the org's plan has no room left for the entity. */
+export function isPlanLimitError(error: unknown): error is RestApiError {
+  return error instanceof RestApiError && !!error.code?.endsWith('_limit_reached');
+}
+
+/** True when the API refused because an entity of that name already exists. */
+export function isNameConflictError(error: unknown): boolean {
+  if (error instanceof RestApiError) {
+    return error.status === 422 && !error.code && /already exists|already been taken/i.test(error.detail || '');
+  }
+  return false;
+}
+
 interface RestOptions {
   method?: 'GET' | 'POST' | 'PATCH' | 'DELETE';
   body?: any;
@@ -33,7 +67,8 @@ async function restRequest(
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       console.error(`REST API Request failed [${method} ${url.toString()}]:`, response.status, errorData);
-      throw new Error(`API error: ${response.status} ${errorData.errors?.[0]?.detail || ''}`);
+      const apiError = errorData.errors?.[0];
+      throw new RestApiError(response.status, apiError?.detail, apiError?.code);
     }
 
     const result = await response.json().catch(() => ({}));
