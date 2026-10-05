@@ -1,6 +1,7 @@
 import updateVariablesToReference from './updateVariablesToReference';
 import { ReferenceVariableType } from './setValuesOnVariable';
 import * as getVariablesWithoutZombiesModule from './getVariablesWithoutZombies';
+import { parseComposedColorReference } from './composedColor';
 
 // Mock the getVariablesWithoutZombies function
 jest.mock('./getVariablesWithoutZombies');
@@ -296,8 +297,9 @@ describe('updateVariablesToReference', () => {
         variable: target as any,
         modeId: 'mode1',
         referenceVariable: 'colors.red',
-        composed: { colorReference: 'colors.red', opacityLiteral: '0.5' },
+        composed: parseComposedColorReference('rgba({colors.red}, 0.5)')!,
         resolvedValue: '#ff000080',
+        colorCandidates: [{ reference: 'colors.red', value: '#ff0000' }],
       }]);
       expect(target.setValueForMode).toHaveBeenCalledWith('mode1', {
         color: { type: 'VARIABLE_ALIAS', id: 'VariableID:color' },
@@ -305,14 +307,17 @@ describe('updateVariablesToReference', () => {
       });
     });
 
-    it('links rgba({color}, {opacity}) with both parts aliased', async () => {
+    it('links combine_alpha({color}, {opacity}, "source") with both parts aliased', async () => {
       const target = { variableCollectionId: 'coll1', valuesByMode: {}, setValueForMode: jest.fn() };
       await updateVariablesToReference(new Map(), [{
         variable: target as any,
         modeId: 'mode1',
         referenceVariable: 'colors.red',
-        composed: { colorReference: 'colors.red', opacityReference: 'opacity.50' },
+        composed: parseComposedColorReference('combine_alpha({colors.red}, {opacity.50}, "source")')!,
         resolvedValue: '#ff000080',
+        colorCandidates: [{ reference: 'colors.red', value: '#ff0000' }],
+        opacityReferenceValue: '50%',
+        opacityLinkable: true,
       }]);
       expect(target.setValueForMode).toHaveBeenCalledWith('mode1', {
         color: { type: 'VARIABLE_ALIAS', id: 'VariableID:color' },
@@ -330,11 +335,31 @@ describe('updateVariablesToReference', () => {
         variable: target as any,
         modeId: 'mode1',
         referenceVariable: 'colors.red',
-        composed: { colorReference: 'colors.red', opacityLiteral: '50%' },
+        composed: parseComposedColorReference('rgba({colors.red}, 50%)')!,
         resolvedValue: '#ff000080',
+        colorCandidates: [{ reference: 'colors.red', value: '#ff0000' }],
       }]);
       expect(target.setValueForMode).not.toHaveBeenCalled();
       expect(result).toHaveLength(0);
+    });
+
+    it('writes the flat color when no color or opacity variable can be linked', async () => {
+      const target = {
+        variableCollectionId: 'coll1',
+        valuesByMode: { mode1: { color: { type: 'VARIABLE_ALIAS', id: 'VariableID:color' }, opacity: 40 } },
+        setValueForMode: jest.fn(),
+      };
+      await updateVariablesToReference(new Map(), [{
+        variable: target as any,
+        modeId: 'mode1',
+        referenceVariable: 'colors.red',
+        composed: parseComposedColorReference('set_alpha({colors.red}, 0.4)')!,
+        resolvedValue: '#ff000066',
+        colorCandidates: [],
+      }]);
+      expect(target.setValueForMode).toHaveBeenCalledWith('mode1', expect.objectContaining({
+        r: 1, g: 0, b: 0, a: 0.4,
+      }));
     });
   });
 });

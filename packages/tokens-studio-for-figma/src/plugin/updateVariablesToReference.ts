@@ -7,7 +7,7 @@ import { processBatches } from '@/utils/processBatches';
 import { resolveCollectionContext } from './extendedCollections/collectionContext';
 import { applyChildModeValue } from './extendedCollections/applyChildModeValue';
 import { valuesEquivalent } from './extendedCollections/valuesEquivalent';
-import { buildComposedColorValue } from './composedColor';
+import { buildComposedColorValue, flatColorValue } from './composedColor';
 
 export default async function updateVariablesToReference(figmaVariables: Map<string, string>, referenceVariableCandidates: ReferenceVariableType[]): Promise<Variable[]> {
   const updatedVariables: Variable[] = [];
@@ -99,13 +99,22 @@ export default async function updateVariablesToReference(figmaVariables: Map<str
   const processCandidate = async (aliasVariable: ReferenceVariableType) => {
     let newValue: VariableValue | null;
     if (aliasVariable.composed) {
-      const { colorReference, opacityReference } = aliasVariable.composed;
+      const { opacityReference } = aliasVariable.composed;
+      const colorCandidates = await Promise.all((aliasVariable.colorCandidates ?? []).map(async ({ reference, value }) => ({
+        variable: await findReferenceVariable(reference, aliasVariable),
+        value,
+      })));
       newValue = buildComposedColorValue({
         composed: aliasVariable.composed,
         resolvedValue: aliasVariable.resolvedValue,
-        colorVariable: colorReference ? await findReferenceVariable(colorReference, aliasVariable) : undefined,
-        opacityVariable: opacityReference ? await findReferenceVariable(opacityReference, aliasVariable) : undefined,
-      });
+        colorCandidates,
+        opacityVariable: opacityReference && aliasVariable.opacityLinkable
+          ? await findReferenceVariable(opacityReference, aliasVariable)
+          : undefined,
+        opacityReferenceValue: aliasVariable.opacityReferenceValue,
+      })
+        // Not linkable: write the flat color so a stale composed value from an earlier export doesn't survive
+        ?? flatColorValue(aliasVariable.resolvedValue);
     } else {
       const variable = await findReferenceVariable(aliasVariable.referenceVariable, aliasVariable);
       newValue = variable ? { type: 'VARIABLE_ALIAS', id: variable.id } : null;

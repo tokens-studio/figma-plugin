@@ -13,7 +13,9 @@ import { FIGMA_PLATFORMS, normalizeVariableScopes, getCodeSyntaxValue } from '@/
 import { checkCanReferenceVariable } from '@/utils/alias/checkCanReferenceVariable';
 import { resolveCollectionContext } from './extendedCollections/collectionContext';
 import { applyChildModeValue } from './extendedCollections/applyChildModeValue';
-import { buildComposedColorValue, parseComposedColorReference } from './composedColor';
+import {
+  buildComposedColorValue, getComposedColorCandidates, parseComposedColorReference, readVariableValue,
+} from './composedColor';
 
 export default async function updateVariablesFromPlugin(payload: UpdateTokenVariablePayload) {
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
@@ -86,11 +88,22 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
           const composed = payload.type === TokenTypes.COLOR && !payload.$extensions?.['studio.tokens']?.modify
             ? parseComposedColorReference(payload.rawValue)
             : null;
+          // No resolved token list here: read the referenced variables' current Figma values
+          const variableForToken = (name: string) => nameToVariableMap[name.split('.').join('/')];
+          const lookup = (name: string) => {
+            const value = readVariableValue(variableForToken(name), theme.$figmaModeId!);
+            return value === undefined ? undefined : { value };
+          };
+          const composedOpacityVariable = composed?.opacityReference ? variableForToken(composed.opacityReference) : undefined;
+          const composedOpacityValue = readVariableValue(composedOpacityVariable, theme.$figmaModeId!);
           const composedValue = composed && buildComposedColorValue({
             composed,
             resolvedValue: payload.value,
-            colorVariable: composed.colorReference ? nameToVariableMap[composed.colorReference.split('.').join('/')] : undefined,
-            opacityVariable: composed.opacityReference ? nameToVariableMap[composed.opacityReference.split('.').join('/')] : undefined,
+            colorCandidates: getComposedColorCandidates(composed, lookup)
+              .map(({ reference, value }) => ({ variable: variableForToken(reference), value })),
+            opacityVariable: composedOpacityVariable,
+            // Figma stores opacity variables as 0-100
+            opacityReferenceValue: typeof composedOpacityValue === 'number' ? `${composedOpacityValue}%` : undefined,
           });
 
           if (composedValue) {
