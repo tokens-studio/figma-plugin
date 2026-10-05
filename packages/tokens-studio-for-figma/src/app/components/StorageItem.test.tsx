@@ -144,6 +144,48 @@ describe('StorageItem', () => {
       expect(mockLoadProjectTokens).toHaveBeenCalledWith('project-free', undefined, 'free');
     });
 
+    it('loads the projects of an org that is not active yet, then opens its first one', async () => {
+      const unloaded = { ...freeOrg, id: 'unloaded', projects: { data: [] } };
+      const mockFetchProjects = jest.fn(async (orgId: string) => {
+        useAuthStore.setState((state) => ({
+          organizations: state.organizations.map((o) => (o.id === orgId
+            ? { ...o, projects: { data: [{ id: 'project-loaded', name: 'Loaded' }] } }
+            : o)),
+        }));
+      });
+      useAuthStore.setState({ organizations: [unloaded], fetchProjects: mockFetchProjects });
+      const result = render(<StorageItem
+        item={{
+          ...studioItem(freeOrg), orgId: 'unloaded', internalId: 'tokens-studio-unloaded', id: '',
+        } as StorageTypeCredentials}
+        onEdit={onEdit}
+      />);
+
+      await act(async () => {
+        await userEvent.click(result.getByTestId('button-storage-item-apply'));
+      });
+
+      expect(mockFetchProjects).toHaveBeenCalledWith('unloaded');
+      expect(mockLoadProjectTokens).toHaveBeenCalledWith('project-loaded', undefined, 'unloaded');
+    });
+
+    it('says so when an org has no projects to open', async () => {
+      const empty = { ...freeOrg, id: 'empty', projects: { data: [] } };
+      useAuthStore.setState({ organizations: [empty], fetchProjects: jest.fn(async () => {}) });
+      const result = render(<StorageItem
+        item={{
+          ...studioItem(freeOrg), orgId: 'empty', internalId: 'tokens-studio-empty', id: '',
+        } as StorageTypeCredentials}
+        onEdit={onEdit}
+      />);
+
+      await act(async () => {
+        await userEvent.click(result.getByTestId('button-storage-item-apply'));
+      });
+
+      expect(mockLoadProjectTokens).not.toHaveBeenCalled();
+    });
+
     it('keeps letting an org with figma_plugin access but no studio_platform be applied', () => {
       const result = render(<StorageItem item={studioItem(pluginOnlyOrg)} onEdit={onEdit} />);
       expect(result.getByTestId('button-storage-item-apply')).toBeEnabled();

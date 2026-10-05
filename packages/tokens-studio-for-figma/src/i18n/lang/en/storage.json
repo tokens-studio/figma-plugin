@@ -122,5 +122,6 @@
   "readmoreformat": "Read more",
   "variablesPlanCantSync": "The Variables plan can't sync with Tokens Studio for Figma.",
   "planCantSync": "This plan can't sync with Tokens Studio for Figma.",
-  "planCantSyncConnected": "This plan can't connect new files or switch projects."
+  "planCantSyncConnected": "This plan can't connect new files or switch projects.",
+  "orgHasNoProjects": "This organisation has no projects to sync yet."
 }

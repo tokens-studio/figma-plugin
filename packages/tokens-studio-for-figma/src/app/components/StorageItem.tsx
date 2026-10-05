@@ -21,6 +21,7 @@ import { StudioProjectSelector } from './Subscription/StudioProjectSelector';
 import { useAuthStore } from '@/app/store/useAuthStore';
 import { useTokensStudioOAuth } from '../store/providers/tokens-studio/tokensStudioOAuth';
 import { canSyncWithStudio, getPlanDisplayName } from '@/utils/tokensStudio/organizationAccess';
+import { notifyToUI } from '@/plugin/notifiers';
 
 type Props = {
   item: StorageTypeCredentials;
@@ -44,7 +45,7 @@ const StorageItem = ({
 
   const { t } = useTranslation(['storage']);
   const {
-    activeProject, setActiveOrganization, setActiveProject, organizations,
+    activeProject, setActiveOrganization, setActiveProject, organizations, fetchProjects,
   } = useAuthStore();
   const { loadProjectTokens } = useTokensStudioOAuth();
   const isOAuth = React.useMemo(() => isTokensStudioOAuthType(item), [item]);
@@ -95,7 +96,17 @@ const StorageItem = ({
         fallbackId = activeProject.id;
       }
 
-      const idToLoad = selectedProjectId || fallbackId;
+      let idToLoad = selectedProjectId || fallbackId;
+      if (!idToLoad && oauthItem.orgId) {
+        // Projects are only fetched up front for the active org. Load this org's now so Apply has one to open.
+        await fetchProjects(oauthItem.orgId);
+        idToLoad = useAuthStore.getState().organizations
+          .find((o) => o.id === oauthItem.orgId)?.projects?.data?.[0]?.id || '';
+        if (!idToLoad) {
+          notifyToUI(t('orgHasNoProjects'), { error: true });
+          return;
+        }
+      }
       if (idToLoad) {
         try {
           if (oauthItem.orgId) {
@@ -133,7 +144,7 @@ const StorageItem = ({
       setHasErrored(true);
       setErrorMessage(response?.errorMessage);
     }
-  }, [item, restoreStoredProvider, fetchBranches, isOAuthApp, activeProject, loadProjectTokens, dispatch.uiState, dispatch.branchState, setStorageType, selectedProjectId, isOAuth, setActiveOrganization, setActiveProject, isSyncBlocked]);
+  }, [item, restoreStoredProvider, fetchBranches, isOAuthApp, activeProject, loadProjectTokens, dispatch.uiState, dispatch.branchState, setStorageType, selectedProjectId, isOAuth, setActiveOrganization, setActiveProject, isSyncBlocked, fetchProjects, t]);
 
   return (
     <StyledStorageItem data-testid={`storageitem-${provider}-${id}`} key={`${provider}-${item.internalId || id}`} active={isActive()} hasError={isBitbucketWithAppPassword} css={isSyncBlocked && !isActive() ? { opacity: 0.6 } : {}}>
