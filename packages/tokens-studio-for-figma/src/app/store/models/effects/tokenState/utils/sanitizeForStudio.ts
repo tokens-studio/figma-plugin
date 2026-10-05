@@ -152,6 +152,50 @@ export function sanitizeReferencesInValue(value: unknown): unknown {
   return sanitizeValue(value).value;
 }
 
+// Legacy plugin syntax rgba({color}, alpha) → Studio's set_alpha({color}, alpha), which keeps
+// the color's RGB and replaces its alpha. Studio's resolver only accepts numeric rgba(), so the
+// legacy form fails to resolve there. Only the whole-value two-argument form with a reference
+// or hex color is rewritten; numeric rgba(255, 0, 0, 0.5) is already valid in Studio.
+const LEGACY_RGBA_REGEX = /^\s*rgba?\(\s*(\{[^{}]+\}|\$[^\s,{}()]+|#[0-9a-fA-F]{3,8})\s*,\s*([^,()]+?)\s*\)\s*$/;
+const ALPHA_REFERENCE_REGEX = /^(?:\{[^{}]+\}|\$[^\s,{}()]+)$/;
+const ALPHA_NUMBER_REGEX = /^[+-]?\d+(?:\.\d+)?$/;
+const ALPHA_PERCENT_REGEX = /^([+-]?\d+(?:\.\d+)?)%$/;
+
+// $ref → {ref}; Studio expressions use the braced form
+function toBracedReference(ref: string): string {
+  return ref.startsWith('$') ? `{${ref.slice(1)}}` : ref;
+}
+
+// Same alpha the plugin resolved: "50%" → 0.5, numbers clamp to 0-1 (rgba(…, 50) was opaque)
+function normalizeAlpha(alpha: string): string | null {
+  if (ALPHA_REFERENCE_REGEX.test(alpha)) return toBracedReference(alpha);
+  const percent = alpha.match(ALPHA_PERCENT_REGEX);
+  let numeric: number;
+  if (percent) numeric = Number(percent[1]) / 100;
+  else if (ALPHA_NUMBER_REGEX.test(alpha)) numeric = Number(alpha);
+  else return null;
+  if (!Number.isFinite(numeric)) return null;
+  return String(Number(Math.min(Math.max(numeric, 0), 1).toFixed(4)));
+}
+
+export function convertLegacyRgbaForStudio(value: unknown): unknown {
+  if (typeof value !== 'string') return value;
+  const match = value.match(LEGACY_RGBA_REGEX);
+  if (!match) return value;
+  const [, color, rawAlpha] = match;
+  const alpha = normalizeAlpha(rawAlpha);
+  if (!alpha) return value;
+  return `set_alpha(${toBracedReference(color)}, ${alpha})`;
+}
+
+// Applied to every token written to Studio (see pushToTokensStudioOAuth).
+export function convertTokenValueForStudio<T>(token: T): T {
+  if (!token || typeof token !== 'object' || !('value' in token)) return token;
+  const { value } = token as unknown as { value: unknown };
+  const converted = convertLegacyRgbaForStudio(value);
+  return converted === value ? token : { ...token, value: converted };
+}
+
 // Tokens missing a parent, or whose name/parent normalize to empty, or whose
 // value carries a reference that sanitizes to nothing, are dropped with a warning.
 export function sanitizeNewTokensForStudio<T extends { name: string; parent?: string | null; value: unknown }>(

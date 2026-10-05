@@ -7,6 +7,8 @@ import {
   sanitizeThemeForStudio,
   sanitizeTokenName,
   sanitizeTokenSetName,
+  convertLegacyRgbaForStudio,
+  convertTokenValueForStudio,
 } from './sanitizeForStudio';
 
 describe('sanitizeTokenName', () => {
@@ -314,5 +316,55 @@ describe('sanitizeThemeForStudio', () => {
       $figmaStyleReferences: { 'color.{brand}.primary': 'S:1', '{}': 'S:2' },
     });
     expect(out.$figmaStyleReferences).toEqual({ 'color.brand.primary': 'S:1' });
+  });
+});
+
+describe('convertLegacyRgbaForStudio', () => {
+  it.each([
+    ['rgba({colors.red}, 0.5)', 'set_alpha({colors.red}, 0.5)'],
+    ['rgb({colors.red}, 0.5)', 'set_alpha({colors.red}, 0.5)'],
+    ['rgba( {colors.red.100} , 0.5)', 'set_alpha({colors.red.100}, 0.5)'],
+    ['rgba({colors.red}, 50%)', 'set_alpha({colors.red}, 0.5)'],
+    ['rgba({colors.red}, 50)', 'set_alpha({colors.red}, 1)'],
+    ['rgba({colors.red}, {opacity.half})', 'set_alpha({colors.red}, {opacity.half})'],
+    ['rgba($colors.red, $opacity.half)', 'set_alpha({colors.red}, {opacity.half})'],
+    ['rgba(#ff0000, {opacity.half})', 'set_alpha(#ff0000, {opacity.half})'],
+    ['rgba(#ff0000, 0.5)', 'set_alpha(#ff0000, 0.5)'],
+  ])('converts %s', (input, expected) => {
+    expect(convertLegacyRgbaForStudio(input)).toBe(expected);
+  });
+
+  it.each([
+    'rgba(255, 0, 0, 0.5)',
+    'rgba(255, 0, 0, {opacity.half})',
+    '{colors.red}',
+    '#ff000080',
+    'set_alpha({colors.red}, 0.5)',
+    'combine_alpha({colors.red}, {opacity.half}, "source")',
+    'rgba({colors.red}, {opacity.half} * 2)',
+    'linear-gradient(90deg, rgba({colors.red}, 0.5) 0%, #fff 100%)',
+  ])('leaves %s unchanged', (input) => {
+    expect(convertLegacyRgbaForStudio(input)).toBe(input);
+  });
+
+  it('leaves non-string values unchanged', () => {
+    const value = { color: 'rgba({colors.red}, 0.5)' };
+    expect(convertLegacyRgbaForStudio(value)).toBe(value);
+    expect(convertLegacyRgbaForStudio(undefined)).toBeUndefined();
+  });
+});
+
+describe('convertTokenValueForStudio', () => {
+  it('converts the value and keeps the rest of the token', () => {
+    expect(convertTokenValueForStudio({
+      id: '1', name: 'overlay', type: 'color', value: 'rgba({colors.red}, 0.5)',
+    })).toEqual({
+      id: '1', name: 'overlay', type: 'color', value: 'set_alpha({colors.red}, 0.5)',
+    });
+  });
+
+  it('returns the same token when nothing changes', () => {
+    const token = { name: 'red', type: 'color', value: '#ff0000' };
+    expect(convertTokenValueForStudio(token)).toBe(token);
   });
 });
