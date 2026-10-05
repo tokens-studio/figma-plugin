@@ -95,6 +95,22 @@ describe('useAuthStore Pro and plan labels', () => {
     expect(useAuthStore.getState().isPro).toBe(expected);
   });
 
+  it('prefers an org that grants Pro when nothing has been picked', async () => {
+    const freeFirst = { data: [...organizationsResponse.data].sort((a) => (a.id === 'free' ? -1 : 1)) };
+    expect(freeFirst.data[0].id).toBe('free');
+    global.fetch = jest.fn(async (url: RequestInfo | URL) => {
+      const href = String(url);
+      if (href.endsWith('/api/v1/auth/me')) return jsonResponse({ data: { id: 'user-1', attributes: { email: 'a@b.c' } } });
+      if (href.endsWith('/api/v1/organizations')) return jsonResponse(freeFirst);
+      return jsonResponse({ data: [] });
+    }) as unknown as typeof fetch;
+
+    await loadOrganizations();
+
+    expect(useAuthStore.getState().activeOrganizationId).toBe('paid');
+    expect(useAuthStore.getState().isPro).toBe(true);
+  });
+
   it('saves the active org for other files unless persist is false', async () => {
     await loadOrganizations();
     const messageSpy = jest.mocked(AsyncMessageChannel.ReactInstance.message);

@@ -1,6 +1,6 @@
 import type { Organization } from '@/types/oauth';
 import {
-  canSyncWithStudio, getPlanDisplayName, isActivePlanStatus, isProOrganization, isVariablesPlan,
+  canSyncWithStudio, canUseFreePlanThemes, getPlanDisplayName, isActivePlanStatus, isFreePlan, isProOrganization, isVariablesPlan,
 } from './organizationAccess';
 
 const makeOrg = (
@@ -126,5 +126,30 @@ describe('getPlanDisplayName', () => {
   it('is empty without a subscription or plan name', () => {
     expect(getPlanDisplayName(undefined)).toBe('');
     expect(getPlanDisplayName({ ...paidOrg.subscription!, plan: { id: '', name: '' } })).toBe('');
+  });
+});
+
+describe('canUseFreePlanThemes', () => {
+  it('lets an editor of a Free org use themes', () => {
+    expect(isFreePlan(freeOrg)).toBe(true);
+    expect(canUseFreePlanThemes(freeOrg)).toBe(true);
+  });
+
+  it('counts a lapsed org that reads as Free before its plan is stored as Free', () => {
+    const lapsed = makeOrg({ access: ['studio_platform'], plan_type: 'regular', plan_status: 'free' });
+    expect(canUseFreePlanThemes(lapsed)).toBe(true);
+  });
+
+  it('does not let a viewer of a Free org use themes', () => {
+    expect(canUseFreePlanThemes(makeOrg(freeOrg.subscription, 'VIEWER'))).toBe(false);
+  });
+
+  it('is false for paid and Variables orgs, which Pro covers or which cannot sync', () => {
+    expect(canUseFreePlanThemes(paidOrg)).toBe(false);
+    expect(canUseFreePlanThemes(variablesOrg)).toBe(false);
+  });
+
+  it('is false without an org', () => {
+    expect(canUseFreePlanThemes(undefined)).toBe(false);
   });
 });

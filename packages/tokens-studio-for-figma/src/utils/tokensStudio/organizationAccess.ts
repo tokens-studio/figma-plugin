@@ -23,6 +23,16 @@ export function canSyncWithStudio(org?: Organization | null): boolean {
   return !isVariablesPlan(org);
 }
 
+export function isFreePlan(org?: Organization | null): boolean {
+  return org?.subscription?.plan_status === 'free' || org?.subscription?.plan_type === 'free';
+}
+
+// Free orgs don't get Pro, but in a file synced with their Studio project an editor can manage themes and export
+// them to Figma. Studio's plan limits cap how many (1 theme group, 2 options on Free).
+export function canUseFreePlanThemes(org?: Organization | null): boolean {
+  return isFreePlan(org) && canSyncWithStudio(org) && org?.current_user_seat_type === 'EDITOR';
+}
+
 export function isProOrganization(org?: Organization | null): boolean {
   if (!org) return false;
   return !!org.subscription?.access?.includes('figma_plugin')

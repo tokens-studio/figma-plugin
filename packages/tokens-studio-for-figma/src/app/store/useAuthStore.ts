@@ -346,7 +346,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       }
 
       const storedId = get().activeOrganizationId;
-      const activeOrganization = organizations.find((o) => o.id === storedId) || (organizations.length > 0 ? organizations[0] : null);
+      // Without a saved pick (or when it's gone), prefer an org that grants Pro: someone in both a paid and a Free
+      // org then gets Pro in local and Git files without picking it in Settings first.
+      const activeOrganization = organizations.find((o) => o.id === storedId)
+        || organizations.find(isProOrganization)
+        || organizations[0]
+        || null;
 
       const defaultProject = activeOrganization?.projects?.data?.find((p) => p.id === persistedProjectId) || activeOrganization?.projects?.data?.[0] || null;
 
