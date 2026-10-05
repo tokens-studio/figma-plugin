@@ -15,6 +15,7 @@ export async function updateUISettings(uiSettings: Partial<SavedSettings>) {
       language: uiSettings.language ?? data?.language,
       height: uiSettings.height ?? data?.height,
       showEmptyGroups: uiSettings.showEmptyGroups ?? data?.showEmptyGroups,
+      hideDeprecatedTokens: uiSettings.hideDeprecatedTokens ?? data?.hideDeprecatedTokens,
       updateMode: uiSettings.updateMode ?? data?.updateMode,
       updateRemote: uiSettings.updateRemote ?? data?.updateRemote,
       updateOnChange: uiSettings.updateOnChange ?? data?.updateOnChange,
@@ -25,10 +26,12 @@ export async function updateUISettings(uiSettings: Partial<SavedSettings>) {
       prefixStylesWithThemeName: uiSettings.prefixStylesWithThemeName ?? data?.prefixStylesWithThemeName,
       renameExistingStylesAndVariables: uiSettings.renameExistingStylesAndVariables ?? data?.renameExistingStylesAndVariables,
       removeStylesAndVariablesWithoutConnection: uiSettings.removeStylesAndVariablesWithoutConnection ?? data?.removeStylesAndVariablesWithoutConnection,
+      exportExtendedCollections: uiSettings.exportExtendedCollections ?? data?.exportExtendedCollections,
       variablesBoolean: uiSettings.variablesBoolean ?? data?.variablesBoolean,
       variablesColor: uiSettings.variablesColor ?? data?.variablesColor,
       variablesNumber: uiSettings.variablesNumber ?? data?.variablesNumber,
       variablesString: uiSettings.variablesString ?? data?.variablesString,
+      variablesMotion: uiSettings.variablesMotion ?? data?.variablesMotion,
       stylesColor: uiSettings.stylesColor ?? data?.stylesColor,
       stylesEffect: uiSettings.stylesEffect ?? data?.stylesEffect,
       stylesTypography: uiSettings.stylesTypography ?? data?.stylesTypography,
@@ -59,6 +62,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
     let width: number;
     let height: number;
     let showEmptyGroups: boolean;
+    let hideDeprecatedTokens: boolean;
     let updateMode: UpdateMode;
     let updateRemote: boolean;
     let updateOnChange: boolean;
@@ -68,6 +72,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
     let variablesBoolean: boolean;
     let variablesNumber: boolean;
     let variablesString: boolean;
+    let variablesMotion: boolean;
     let stylesColor: boolean;
     let stylesEffect: boolean;
     let stylesTypography: boolean;
@@ -77,6 +82,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
     let prefixStylesWithThemeName: boolean;
     let renameExistingStylesAndVariables: boolean;
     let removeStylesAndVariablesWithoutConnection: boolean;
+    let exportExtendedCollections: boolean;
     let inspectDeep: boolean;
     let shouldSwapStyles: boolean;
     let shouldSwapFigmaModes: boolean;
@@ -96,6 +102,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
       height = data.height || 600;
       language = data.language || 'en';
       showEmptyGroups = typeof data.showEmptyGroups === 'undefined' ? true : data.showEmptyGroups;
+      hideDeprecatedTokens = typeof data.hideDeprecatedTokens === 'undefined' ? false : data.hideDeprecatedTokens;
       updateMode = data.updateMode || UpdateMode.PAGE;
       updateRemote = typeof data.updateRemote === 'undefined' ? true : data.updateRemote;
       updateOnChange = typeof data.updateOnChange === 'undefined' ? true : data.updateOnChange;
@@ -105,6 +112,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
       variablesBoolean = typeof data.variablesBoolean === 'undefined' ? true : data.variablesBoolean;
       variablesNumber = typeof data.variablesNumber === 'undefined' ? true : data.variablesNumber;
       variablesString = typeof data.variablesString === 'undefined' ? true : data.variablesString;
+      variablesMotion = typeof data.variablesMotion === 'undefined' ? true : data.variablesMotion;
       stylesColor = typeof data.stylesColor === 'undefined' ? false : data.stylesColor;
       stylesTypography = typeof data.stylesTypography === 'undefined' ? true : data.stylesTypography;
       stylesEffect = typeof data.stylesEffect === 'undefined' ? true : data.stylesEffect;
@@ -114,6 +122,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
       prefixStylesWithThemeName = typeof data.prefixStylesWithThemeName === 'undefined' ? false : data.prefixStylesWithThemeName;
       renameExistingStylesAndVariables = typeof data.renameExistingStylesAndVariables === 'undefined' ? false : data.renameExistingStylesAndVariables;
       removeStylesAndVariablesWithoutConnection = typeof data.removeStylesAndVariablesWithoutConnection === 'undefined' ? false : data.removeStylesAndVariablesWithoutConnection;
+      exportExtendedCollections = typeof data.exportExtendedCollections === 'undefined' ? false : data.exportExtendedCollections;
       baseFontSize = typeof data.baseFontSize === 'undefined' ? defaultBaseFontSize : data.baseFontSize;
       aliasBaseFontSize = typeof data.aliasBaseFontSize === 'undefined' ? defaultBaseFontSize : data.aliasBaseFontSize;
       inspectDeep = typeof data.inspectDeep === 'undefined' ? false : data.inspectDeep;
@@ -132,6 +141,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
         height: Math.max(200, height),
         sessionRecording,
         showEmptyGroups,
+        hideDeprecatedTokens,
         updateMode,
         updateOnChange,
         applyVariablesStylesOrRawValue,
@@ -141,6 +151,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
         variablesColor,
         variablesNumber,
         variablesString,
+        variablesMotion,
         stylesColor,
         stylesEffect,
         stylesTypography,
@@ -150,6 +161,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
         prefixStylesWithThemeName,
         renameExistingStylesAndVariables,
         removeStylesAndVariablesWithoutConnection,
+        exportExtendedCollections,
         inspectDeep,
         shouldSwapStyles,
         shouldSwapFigmaModes,

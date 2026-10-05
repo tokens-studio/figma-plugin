@@ -7,7 +7,9 @@ import useTokens from './useTokens';
 import { AnyTokenList, SingleToken } from '@/types/tokens';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes, GetThemeInfoMessageResult } from '@/types/AsyncMessages';
-import { createStyles, renameStyles, removeStyles, removeVariables } from '@/plugin/asyncMessageHandlers';
+import {
+  createStyles, renameStyles, removeStyles, removeVariables,
+} from '@/plugin/asyncMessageHandlers';
 import { AllTheProviders, createMockStore, resetStore } from '../../../tests/config/setupTest';
 import { store } from '../store';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';

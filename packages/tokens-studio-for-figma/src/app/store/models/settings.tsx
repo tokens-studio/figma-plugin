@@ -46,6 +46,7 @@ export interface SettingsState {
   variablesString: boolean;
   variablesNumber: boolean;
   variablesBoolean: boolean;
+  variablesMotion: boolean;
   stylesColor: boolean;
   stylesTypography: boolean;
   stylesEffect: boolean;
@@ -55,6 +56,7 @@ export interface SettingsState {
   createStylesWithVariableReferences?: boolean;
   renameExistingStylesAndVariables?: boolean;
   removeStylesAndVariablesWithoutConnection?: boolean;
+  exportExtendedCollections?: boolean;
   autoApplyThemeOnDrop?: boolean;
   seenGenericVersionedHeaderMigrationDialog?: boolean;
   seenTermsUpdate2026?: boolean;
@@ -90,6 +92,7 @@ export const settings = createModel<RootModel>()({
     renameExistingStylesAndVariables: false,
     removeStylesAndVariablesWithoutConnection: false,
     createStylesWithVariableReferences: false,
+    exportExtendedCollections: false,
     autoApplyThemeOnDrop: false,
     inspectDeep: false,
     shouldSwapStyles: false,
@@ -102,6 +105,7 @@ export const settings = createModel<RootModel>()({
     variablesString: true,
     variablesNumber: true,
     variablesBoolean: true,
+    variablesMotion: true,
     stylesColor: true,
     stylesTypography: true,
     stylesEffect: true,

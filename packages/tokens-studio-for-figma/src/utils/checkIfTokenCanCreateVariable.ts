@@ -1,4 +1,4 @@
-import { ExportNumberVariablesTokenTypes, TokenTypes } from '@/constants/TokenTypes';
+import { ExportMotionVariablesTokenTypes, ExportNumberVariablesTokenTypes, TokenTypes } from '@/constants/TokenTypes';
 import { ResolveTokenValuesResult } from './tokenHelpers';
 import { numberMatchesPercentage } from '@/plugin/figmaTransforms/numberMatchesPercentage';
 import { SettingsState } from '@/app/store/models/settings';
@@ -7,6 +7,7 @@ export default function checkIfTokenCanCreateVariable(token: ResolveTokenValuesR
   if (
     (token.type === TokenTypes.COLOR && settings.variablesColor)
     || (ExportNumberVariablesTokenTypes.includes(token.type) && settings.variablesNumber)
+    || (ExportMotionVariablesTokenTypes.includes(token.type) && settings.variablesMotion)
     || ([TokenTypes.TEXT, TokenTypes.FONT_FAMILIES].includes(token.type) && settings.variablesString)
     || (token.type === TokenTypes.BOOLEAN && settings.variablesBoolean)
     || (token.type === TokenTypes.FONT_WEIGHTS && Boolean(parseFloat(token.value)) && settings.variablesNumber)

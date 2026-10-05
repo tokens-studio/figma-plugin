@@ -11,6 +11,7 @@ import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
 import { ShowFormOptions, ShowNewFormOptions } from '@/types';
 import Box from './Box';
 import TokenListingHeading from './TokenListingHeading';
+import { DEFAULT_GRADIENT_VALUE } from './GradientTokenForm';
 
 type Props = {
   tokenKey: string;
@@ -32,6 +33,11 @@ const TokenListing: React.FC<React.PropsWithChildren<React.PropsWithChildren<Pro
     ({ token, name, status }: ShowFormOptions) => {
       dispatch.uiState.setShowEditForm(true);
       const type = token?.type || schema.type;
+      let value = token?.value;
+      if (!value) {
+        if (type === TokenTypes.COLOR) value = '#';
+        if (type === TokenTypes.GRADIENT) value = DEFAULT_GRADIENT_VALUE;
+      }
       dispatch.uiState.setEditToken({
         ...token,
         type,
@@ -39,7 +45,7 @@ const TokenListing: React.FC<React.PropsWithChildren<React.PropsWithChildren<Pro
         status,
         initialName: name,
         name,
-        value: type === TokenTypes.COLOR && !token?.value ? '#' : token?.value,
+        value,
       } as EditTokenObject);
     },
     [schema, dispatch],

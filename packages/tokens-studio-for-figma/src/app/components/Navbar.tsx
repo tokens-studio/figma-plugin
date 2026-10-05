@@ -69,7 +69,7 @@ const Navbar: React.FC<React.PropsWithChildren<React.PropsWithChildren<unknown>>
         <NavbarUndoButton />
       </Stack>
       <Stack direction="row" align="center" justify="end" gap={1} css={{ paddingRight: '$2', flexBasis: 'min-content' }}>
-        {isProUser && <IconButton size="small" variant="invisible" icon={secondScreenIcon} tooltip="Second Screen" onClick={switchToSecondScreen} />}
+        {isProUser && <IconButton size="small" variant="invisible" icon={secondScreenIcon} tooltip="Second Screen" aria-label="Second Screen" onClick={switchToSecondScreen} />}
         <TokenFlowButton />
         <IconButton size="small" variant="invisible" tooltip={t('minimize') as string} onClick={handleResize} icon={<Minimize />} />
       </Stack>

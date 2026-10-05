@@ -1,5 +1,14 @@
 # @tokens-studio/figma-plugin
 
+## 2.12.1
+
+### Patch Changes
+
+- 8ad16a0e3: Add deprecated token state with visual indicators and bidirectional sync to Tokens Studio, including metadata for severity, replacement tokens, and removal timelines.
+- 5c7fe785f: Add gradient token type support (Tokens Studio users only): create, inspect, and export gradient tokens as Figma paint styles.
+- bbb69632d: Add Prompt to delete stale Figma variables when exporting color tokens that have been converted to gradients. Figma variables can't hold gradient values, so a bound variable from a previous export keeps overriding the new gradient style on any layer that uses it. The export flow now scans for these mismatches and shows a checkbox confirm so you can clean them up in one step.
+- 09b51eff2: Added support for motion, duration, and cubicBezier token types. Duration and cubicBezier tokens can now be exported as native Figma motion variables (Number/Time and Easing) — a new "Motion" checkbox in the variable export options controls the export.
+
 ## 2.12.0
 
 ### Minor Changes

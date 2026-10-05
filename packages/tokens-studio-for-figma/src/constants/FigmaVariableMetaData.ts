@@ -77,6 +77,9 @@ export const TOKEN_TYPE_TO_SCOPES_MAP: Record<string, VariableScope[]> = {
   [TokenTypes.NUMBER]: [
     'NONE', 'ALL_SCOPES', 'TEXT_CONTENT', 'WIDTH_HEIGHT', 'GAP', 'CORNER_RADIUS', 'STROKE_FLOAT', 'EFFECT_FLOAT', 'OPACITY', 'FONT_WEIGHT', 'FONT_SIZE', 'LINE_HEIGHT', 'LETTER_SPACING', 'PARAGRAPH_SPACING', 'PARAGRAPH_INDENT',
   ],
+  [TokenTypes.GRADIENT]: [
+    'NONE', 'ALL_SCOPES', 'ALL_FILLS', 'FRAME_FILL', 'SHAPE_FILL', 'TEXT_FILL', 'STROKE_COLOR', 'EFFECT_COLOR',
+  ],
 };
 
 export const CODE_SYNTAX_PLATFORM_OPTIONS: { value: CodeSyntaxPlatform; label: string }[] = [

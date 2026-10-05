@@ -1,4 +1,4 @@
-import { pushThemeToTokensStudioOAuth } from './pushThemeToTokensStudioOAuth';
+import { notifyThemePushFailures, pushThemeToTokensStudioOAuth } from './pushThemeToTokensStudioOAuth';
 import { pushToTokensStudioOAuth } from '@/app/store/providers/tokens-studio/tokensStudioOAuth';
 import { notifyToUI } from '@/plugin/notifiers';
 import { store } from '@/app/store';
@@ -118,7 +118,7 @@ describe('pushThemeToTokensStudioOAuth', () => {
     await pushThemeToTokensStudioOAuth(newThemePayload, rootState, dispatch);
 
     expect(notifyToUI).toHaveBeenCalledWith(
-      'Couldn\'t find or create theme group "Colors" in Tokens Studio.',
+      'Couldn\'t create theme group "Colors": the theme group could not be found or created.',
       { error: true },
     );
     expect(pushCalls('CREATE_THEME')).toHaveLength(0);
@@ -157,5 +157,82 @@ describe('pushThemeToTokensStudioOAuth', () => {
     await pushThemeToTokensStudioOAuth(newThemePayload, { uiState: { api: { provider: StorageProviderType.GITHUB } } }, dispatch);
 
     expect(mockPush).not.toHaveBeenCalled();
+  });
+  it('also removes themes mirrored into extension groups', async () => {
+    mockGetState.mockReturnValue({
+      tokenState: {
+        remoteData: { metadata: { themeGroupsData: { Colors: { id: 'group-1' } }, tokenSetsData: {} } },
+        themes: [localTheme, { id: 'child-theme', name: 'Dark', group: 'Extended', $figmaParentThemeId: 'local-hash-id' }],
+      },
+    } as any);
+    mockPush.mockRejectedValueOnce(new RestApiError(422, 'Your plan includes 2 options per theme group. Upgrade to add more.', 'theme_option_limit_reached'));
+
+    await pushThemeToTokensStudioOAuth(newThemePayload, rootState, dispatch);
+
+    expect(dispatch.tokenState.removeTheme).toHaveBeenCalledWith('child-theme');
+    expect(dispatch.tokenState.removeTheme).toHaveBeenCalledWith('local-hash-id');
+  });
+
+  it('hands the failure back without a message when the caller reports them together', async () => {
+    setStoreState({ Colors: { id: 'group-1' } });
+    mockPush.mockRejectedValueOnce(new RestApiError(422, 'Your plan includes 2 options per theme group. Upgrade to add more.', 'theme_option_limit_reached'));
+
+    const result = await pushThemeToTokensStudioOAuth(newThemePayload, rootState, dispatch, { notifyOnFailure: false });
+
+    expect(result).toEqual({
+      ok: false,
+      failure: {
+        themeName: 'Dark',
+        action: 'create',
+        reason: 'Your plan includes 2 options per theme group. Upgrade to add more.',
+      },
+    });
+    expect(notifyToUI).not.toHaveBeenCalled();
+    // The theme is still taken back out locally — only the message waits for the others.
+    expect(dispatch.tokenState.removeTheme).toHaveBeenCalledWith('local-hash-id');
+  });
+});
+
+describe('notifyThemePushFailures', () => {
+  const failure = (themeName: string, reason: string) => ({ themeName, action: 'create' as const, reason });
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('says nothing when every theme was saved', () => {
+    notifyThemePushFailures([]);
+    expect(notifyToUI).not.toHaveBeenCalled();
+  });
+
+  it('names the theme when only one failed', () => {
+    notifyThemePushFailures([failure('Dark', 'Your plan includes 2 options per theme group. Upgrade to add more.')]);
+
+    expect(notifyToUI).toHaveBeenCalledTimes(1);
+    expect(notifyToUI).toHaveBeenCalledWith(
+      'Couldn\'t create theme "Dark": Your plan includes 2 options per theme group. Upgrade to add more.',
+      { error: true },
+    );
+  });
+
+  it('sums up an import where several themes hit the same limit', () => {
+    const reason = 'Your plan includes 2 options per theme group. Upgrade to add more.';
+    notifyThemePushFailures([failure('Dark', reason), failure('Light', reason), failure('Dim', reason)]);
+
+    expect(notifyToUI).toHaveBeenCalledTimes(1);
+    expect(notifyToUI).toHaveBeenCalledWith(
+      `Couldn't save 3 themes in Tokens Studio: ${reason}`,
+      { error: true },
+    );
+  });
+
+  it('leads with the first reason when they differ', () => {
+    notifyThemePushFailures([failure('Dark', 'Limit reached.'), failure('Light', 'Theme name is required')]);
+
+    expect(notifyToUI).toHaveBeenCalledTimes(1);
+    expect(notifyToUI).toHaveBeenCalledWith(
+      'Couldn\'t save 2 themes in Tokens Studio. First problem: Limit reached.',
+      { error: true },
+    );
   });
 });

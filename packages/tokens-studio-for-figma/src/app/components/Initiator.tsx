@@ -144,6 +144,10 @@ export function Initiator() {
             dispatch.uiState.toggleShowEmptyGroups(pluginMessage.showEmptyGroups);
             break;
           }
+          case MessageFromPluginTypes.HIDE_DEPRECATED_TOKENS: {
+            dispatch.uiState.toggleHideDeprecatedTokens(pluginMessage.hideDeprecatedTokens);
+            break;
+          }
           case MessageFromPluginTypes.START_JOB: {
             dispatch.uiState.startJob(pluginMessage.job);
             break;

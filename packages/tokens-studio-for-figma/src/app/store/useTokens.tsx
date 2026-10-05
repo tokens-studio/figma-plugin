@@ -398,7 +398,7 @@ export default function useTokens() {
       );
 
       const tokensToCreate = withoutSourceTokens.reduce((acc: SingleToken[], curr) => {
-        const isGradient = curr.type === TokenTypes.COLOR && isGradientValue(curr.value);
+        const isGradient = curr.type === TokenTypes.GRADIENT || (curr.type === TokenTypes.COLOR && isGradientValue(curr.value));
 
         const shouldCreate = [
           settings.stylesTypography && curr.type === TokenTypes.TYPOGRAPHY,
@@ -484,7 +484,7 @@ export default function useTokens() {
             );
 
             const tokensToCreate = tokensFromEnabledSets.reduce((acc: SingleToken[], curr) => {
-              const isGradient = curr.type === TokenTypes.COLOR && isGradientValue(curr.value);
+              const isGradient = curr.type === TokenTypes.GRADIENT || (curr.type === TokenTypes.COLOR && isGradientValue(curr.value));
 
               const shouldCreate = [
                 settings.stylesTypography && curr.type === TokenTypes.TYPOGRAPHY,
@@ -662,7 +662,8 @@ export default function useTokens() {
       const shouldCreateVariables = (settings.variablesBoolean
         || settings.variablesColor
         || settings.variablesNumber
-        || settings.variablesString)
+        || settings.variablesString
+        || settings.variablesMotion)
         && selectedSets.length > 0;
       if (!shouldCreateVariables) return;
 
@@ -715,7 +716,8 @@ export default function useTokens() {
       const shouldCreateVariables = (settings.variablesBoolean
         || settings.variablesColor
         || settings.variablesNumber
-        || settings.variablesString)
+        || settings.variablesString
+        || settings.variablesMotion)
         && selectedThemes.length > 0;
       if (!shouldCreateVariables) return;
 

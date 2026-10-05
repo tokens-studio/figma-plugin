@@ -364,7 +364,7 @@ export const tokenState = createModel<RootModel>()({
               if (originalTokenIndex > -1) {
                 const existingTokens = [...state.tokens[tokenSet]];
                 existingTokens.splice(originalTokenIndex + 1, 0, {
-                  ...omit(state.tokens[tokenSet][originalTokenIndex], 'description', '$extensions'),
+                  ...omit(state.tokens[tokenSet][originalTokenIndex], 'description', '$extensions', '$deprecated'),
                   ...updateTokenPayloadToSingleToken(
                     {
                       parent: data.parent,
@@ -373,6 +373,7 @@ export const tokenState = createModel<RootModel>()({
                       value: data.value,
                       description: data.description,
                       oldName: data.oldName,
+                      $deprecated: data.$deprecated,
                       $extensions: data.$extensions,
                     } as UpdateTokenPayload,
                     uuidv4(),
@@ -388,6 +389,7 @@ export const tokenState = createModel<RootModel>()({
                   type: data.type,
                   value: data.value,
                   description: data.description,
+                  $deprecated: data.$deprecated,
                   $extensions: data.$extensions,
                 } as UpdateTokenPayload,
                 uuidv4(),
@@ -509,7 +511,7 @@ export const tokenState = createModel<RootModel>()({
       const index = state.tokens[data.parent].findIndex((token) => token.name === nameToFind);
       const newArray = [...state.tokens[data.parent]];
       newArray[index] = {
-        ...omit(newArray[index], 'description'),
+        ...omit(newArray[index], 'description', '$deprecated'),
         ...updateTokenPayloadToSingleToken(data),
       } as SingleToken;
       return {
@@ -813,6 +815,7 @@ export const tokenState = createModel<RootModel>()({
               type: token.type,
               description: token.description,
               token_set_id: (rootState.tokenState.tokenSetMetadata[payload.parent] as any)?.id,
+              $deprecated: token.$deprecated || null,
             },
           });
         }

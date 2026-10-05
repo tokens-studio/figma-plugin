@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Stack, Label, Box, Button, Switch, Text,
@@ -8,6 +8,8 @@ import {
   ChevronLeftIcon,
 } from '@primer/octicons-react';
 import { useDispatch, useSelector } from 'react-redux';
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { Modal } from '../Modal/Modal';
 import { LabelledCheckbox } from './LabelledCheckbox';
 import { ExplainerModal } from '../ExplainerModal';
@@ -21,10 +23,13 @@ import {
   variablesNumberSelector,
   variablesBooleanSelector,
   variablesStringSelector,
+  variablesMotionSelector,
   stylesColorSelector,
   stylesEffectSelector,
   stylesTypographySelector,
+  exportExtendedCollectionsSelector,
   stylesGradientSelector,
+  isFigmaEnterpriseSelector,
 } from '@/selectors';
 import ignoreFirstPartImage from '@/app/assets/hints/ignoreFirstPartForStyles.png';
 import prefixStylesImage from '@/app/assets/hints/prefixStyles.png';
@@ -49,12 +54,29 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
   const variablesNumber = useSelector(variablesNumberSelector);
   const variablesBoolean = useSelector(variablesBooleanSelector);
   const variablesString = useSelector(variablesStringSelector);
+  const variablesMotion = useSelector(variablesMotionSelector);
   const stylesColor = useSelector(stylesColorSelector);
   const stylesTypography = useSelector(stylesTypographySelector);
   const stylesEffect = useSelector(stylesEffectSelector);
+  const exportExtendedCollections = useSelector(exportExtendedCollectionsSelector);
   const stylesGradient = useSelector(stylesGradientSelector);
+  const isFigmaEnterprise = useSelector(isFigmaEnterpriseSelector);
 
   const dispatch = useDispatch<Dispatch>();
+
+  useEffect(() => {
+    AsyncMessageChannel.ReactInstance.message({ type: AsyncMessageTypes.CHECK_FIGMA_ENTERPRISE })
+      .then((result) => {
+        dispatch.userState.setIsFigmaEnterprise(result.isFigmaEnterprise);
+        // Auto-reset the setting when the file isn't Enterprise. Otherwise a file
+        // that was Enterprise (setting persisted as true) but no longer is would
+        // leave the toggle checked AND disabled — the user could never turn it off.
+        if (!result.isFigmaEnterprise) {
+          dispatch.settings.setExportExtendedCollections(false);
+        }
+      })
+      .catch(() => { dispatch.userState.setIsFigmaEnterprise(false); });
+  }, [dispatch.userState, dispatch.settings]);
 
   const handleIgnoreChange = React.useCallback(
     (state: CheckedState) => {
@@ -91,6 +113,13 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
     [dispatch.settings],
   );
 
+  const handleExportExtendedCollectionsChange = React.useCallback(
+    (state: CheckedState) => {
+      dispatch.settings.setExportExtendedCollections(!!state);
+    },
+    [dispatch.settings],
+  );
+
   const handleExportVariablesColor = React.useCallback(
     (state: CheckedState) => {
       dispatch.settings.setVariablesColor(!!state);
@@ -115,6 +144,12 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
   const handleExportVariablesString = React.useCallback(
     (state: CheckedState) => {
       dispatch.settings.setVariablesString(!!state);
+    },
+    [dispatch.settings],
+  );
+  const handleExportVariablesMotion = React.useCallback(
+    (state: CheckedState) => {
+      dispatch.settings.setVariablesMotion(!!state);
     },
     [dispatch.settings],
   );
@@ -175,7 +210,7 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
           </Button>
 
         </Stack>
-)}
+      )}
       stickyFooter
     >
       <Stack direction="column" align="start" gap={4}>
@@ -197,6 +232,7 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
                   <LabelledCheckbox id="variablesString" onChange={handleExportVariablesString} checked={!!variablesString} label={t('variables.string')} />
                   <LabelledCheckbox id="variablesNumber" onChange={handleExportVariablesNumber} checked={!!variablesNumber} label={t('variables.number')} />
                   <LabelledCheckbox id="variablesBoolean" onChange={handleExportVariablesBoolean} checked={!!variablesBoolean} label={t('variables.boolean')} />
+                  <LabelledCheckbox id="variablesMotion" onChange={handleExportVariablesMotion} checked={!!variablesMotion} label={t('variables.motion')} />
                 </Stack>
                 <Box css={{ alignSelf: 'stretch', width: '1px', border: '1px solid $colors$borderSubtle' }} />
                 <Stack direction="column" gap={3}>
@@ -268,6 +304,21 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
               <Label css={{ fontWeight: '$sansRegular', fontSize: '$xsmall' }} htmlFor="removeWithoutConnection">{t('options.removeWithoutConnection')}</Label>
               <ExplainerModal title={t('options.removeWithoutConnection')}>
                 <Box>{t('options.removeWithoutConnectionExplanation')}</Box>
+              </ExplainerModal>
+              <Switch
+                data-testid="exportExtendedCollections"
+                id="exportExtendedCollections"
+                checked={!!exportExtendedCollections}
+                defaultChecked={exportExtendedCollections}
+                onCheckedChange={handleExportExtendedCollectionsChange}
+                disabled={!isFigmaEnterprise}
+              />
+              <Label css={{ fontWeight: '$sansRegular', fontSize: '$xsmall', ...(!isFigmaEnterprise ? { color: '$fgDisabled', opacity: 0.5 } : {}) }} htmlFor="exportExtendedCollections">
+                {t('options.exportExtendedCollections')}
+                {!isFigmaEnterprise && t('options.exportExtendedCollectionsEnterpriseSuffix')}
+              </Label>
+              <ExplainerModal title={t('options.exportExtendedCollections')}>
+                <Box>{t('options.exportExtendedCollectionsExplanation')}</Box>
               </ExplainerModal>
             </StyledCheckboxGrid>
           </Stack>
