@@ -4,6 +4,8 @@ import { Provider } from 'react-redux';
 import { act, createMockStore, render } from '../../../../tests/config/setupTest';
 import { ThemeSelector } from './ThemeSelector';
 import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
+import { useAuthStore } from '@/app/store/useAuthStore';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 
 describe('ThemeSelector', () => {
   it('should show none if no active theme is selected', () => {
@@ -81,5 +83,45 @@ describe('ThemeSelector', () => {
     });
 
     expect(mockStore.getState().tokenState.activeTheme).toEqual({ [INTERNAL_THEMES_NO_GROUP]: 'light' });
+  });
+
+  describe('Manage themes on the Free plan', () => {
+    const freeOrg = {
+      id: 'free',
+      name: 'Free org',
+      current_user_seat_type: 'EDITOR',
+      subscription: {
+        id: 'sub-free', plan: { id: '', name: 'Free' }, access: ['studio_platform'], plan_type: 'free', plan_status: 'free',
+      },
+      projects: { data: [{ id: 'project-free', name: 'Project' }] },
+    };
+
+    const openManageThemesItem = async (storageType: Record<string, unknown>) => {
+      useAuthStore.setState({ organizations: [freeOrg], isPro: false });
+      const mockStore = createMockStore({ uiState: { storageType } as any });
+      const component = render(
+        <Provider store={mockStore}>
+          <ThemeSelector />
+        </Provider>,
+      );
+      await act(async () => {
+        const trigger = await component.findByTestId('themeselector-dropdown');
+        trigger.focus();
+        await userEvent.keyboard('[Enter]');
+      });
+      return component.findByTestId('themeselector-managethemes');
+    };
+
+    it('is available in a file synced with the Free org', async () => {
+      const item = await openManageThemesItem({
+        provider: StorageProviderType.TOKENS_STUDIO_OAUTH, internalId: 'tokens-studio-free', orgId: 'free', id: 'project-free', name: 'Free org',
+      });
+      expect(item).not.toHaveAttribute('data-disabled');
+    });
+
+    it('stays a Pro feature in a local file', async () => {
+      const item = await openManageThemesItem({ provider: StorageProviderType.LOCAL });
+      expect(item).toHaveAttribute('data-disabled');
+    });
   });
 });
