@@ -410,10 +410,12 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
   const debouncedHandleThemeListScroll = useMemo(() => debounce(handleThemeListScroll, 200), [handleThemeListScroll]);
 
   const handleExtendThemeGroup = useCallback((groupName: string) => {
+    // Tokens Studio sync doesn't support extended collections yet
+    if (isTokensStudioSync) return;
     setSelectedParentGroup(groupName);
     setIsExtendMode(true);
     setThemeEditorOpen(true);
-  }, [setSelectedParentGroup, setIsExtendMode, setThemeEditorOpen]);
+  }, [isTokensStudioSync, setSelectedParentGroup, setIsExtendMode, setThemeEditorOpen]);
 
   const isEditingNonExtendedTheme = typeof themeEditorOpen === 'string'
     && !themes.find((t) => t.id === themeEditorOpen)?.$figmaIsExtension;
