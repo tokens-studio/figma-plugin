@@ -4,6 +4,11 @@ import createVariableMode from './createVariableMode';
 import { notifyUI } from './notifiers';
 import { truncateCollectionName, truncateModeName } from '@/utils/truncateName';
 
+function isExtensionOf(collection: VariableCollection, parentId: string): boolean {
+  return 'parentVariableCollectionId' in collection
+    && (collection as unknown as ExtendedVariableCollection).parentVariableCollectionId === parentId;
+}
+
 async function processTheme(
   currentTheme: ThemeObject,
   themes: ThemeObjectsList,
@@ -26,15 +31,15 @@ async function processTheme(
         : rawChildName;
       const truncatedChildName = truncateCollectionName(childCollectionName);
 
-      // The stored $figmaCollectionId can be missing or stale (themes replaced by a
-      // pull, a duplicated Figma file). Fall back to the child's name under this parent
-      // so we reuse the collection instead of calling extend() again on every sync.
-      const existingExtendedCollection = acc.find((c) => c.name === truncatedChildName)
-        || acc.find((c) => c.id === currentTheme.$figmaCollectionId)
-        || allCollections.find((c) => c.id === currentTheme.$figmaCollectionId)
-        || allCollections.find((c) => c.name === truncatedChildName
-          && (c as any).isExtension
-          && (c as any).parentVariableCollectionId === parentCollection.id);
+      // Only reuse an extension of THIS parent: names repeat across parents (several
+      // "Brand" children) and a stale $figmaCollectionId from another file can point
+      // at an unrelated collection. Prefer the stored id, then fall back to the name so
+      // a missing/stale id doesn't make us call extend() again on every sync.
+      const childrenOfParent = [...acc, ...allCollections].filter(
+        (c) => isExtensionOf(c, parentCollection.id),
+      );
+      const existingExtendedCollection = childrenOfParent.find((c) => c.id === currentTheme.$figmaCollectionId)
+        || childrenOfParent.find((c) => c.name === truncatedChildName);
 
       if (existingExtendedCollection) {
         currentTheme.$figmaIsExtension = true;

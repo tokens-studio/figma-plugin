@@ -79,6 +79,8 @@ export default async function setValuesOnVariable(
   isExtendedCollection = false,
   // All resolved tokens in the theme, used to check composed colors render correctly
   resolvedTokensByName?: Map<string, ComposedColorTokenInfo>,
+  // Names of all live local variables, across collections
+  localVariableNames?: Iterable<string>,
 ) {
   const variableKeyMap: Record<string, string> = {};
   const referenceVariableCandidates: ReferenceVariableType[] = [];
@@ -104,17 +106,11 @@ export default async function setValuesOnVariable(
     variablesById.add(v.id);
   });
 
-  // Every local variable name, across all collections. Alias targets often live in a
-  // different collection (e.g. primitives), so the extended-collection "will this be
-  // aliased?" check must not be limited to the variables passed in for this collection.
-  const allVariableNames = new Set<string>(variablesInFigma.map((v) => v.name));
-  if (isExtendedCollection) {
-    try {
-      (await figma.variables.getLocalVariablesAsync()).forEach((v) => allVariableNames.add(v.name));
-    } catch (e) {
-      // Fall back to the variables passed in
-    }
-  }
+  // Names an alias can resolve to. Targets often live in another collection (e.g.
+  // primitives), so extended collections get every live local variable name from the
+  // caller, which must exclude zombies to match what the reference pass can link.
+  const allVariableNames = new Set<string>(localVariableNames);
+  variablesInFigma.forEach((v) => allVariableNames.add(v.name));
 
   const indexVariable = (v: Variable) => {
     allVariableNames.add(v.name);

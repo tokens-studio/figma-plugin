@@ -22,10 +22,10 @@ function makeVariable(name: string, valuesByMode: Record<string, VariableValue>)
     setValueForMode: jest.fn(function set(this: any, modeId: string, value: VariableValue) {
       this.valuesByMode[modeId] = value;
     }),
-    clearValueForMode: jest.fn(function clear(this: any, modeId: string) {
+    removeOverrideForMode: jest.fn(function clear(this: any, modeId: string) {
       delete this.valuesByMode[modeId];
     }),
-  } as unknown as Variable & { setValueForMode: jest.Mock; clearValueForMode: jest.Mock };
+  } as unknown as Variable & { setValueForMode: jest.Mock; removeOverrideForMode: jest.Mock };
 }
 
 describe('updateVariablesToReference — extended collection phases', () => {
@@ -88,7 +88,7 @@ describe('updateVariablesToReference — extended collection phases', () => {
       },
     ] as any);
 
-    expect(variable.clearValueForMode).toHaveBeenCalledWith(CHILD_MODE);
+    expect(variable.removeOverrideForMode).toHaveBeenCalledWith(CHILD_MODE);
     expect(variable.setValueForMode).not.toHaveBeenCalled();
   });
 
@@ -106,7 +106,7 @@ describe('updateVariablesToReference — extended collection phases', () => {
     ] as any);
 
     expect(variable.setValueForMode).toHaveBeenCalledWith(CHILD_MODE, { type: 'VARIABLE_ALIAS', id: 'id-ref-key' });
-    expect(variable.clearValueForMode).not.toHaveBeenCalled();
+    expect(variable.removeOverrideForMode).not.toHaveBeenCalled();
   });
 
   it('leaves regular collection candidates on the plain set path', async () => {
@@ -118,6 +118,6 @@ describe('updateVariablesToReference — extended collection phases', () => {
     ] as any);
 
     expect(variable.setValueForMode).toHaveBeenCalledWith('plain-mode', { type: 'VARIABLE_ALIAS', id: 'id-ref-key' });
-    expect(variable.clearValueForMode).not.toHaveBeenCalled();
+    expect(variable.removeOverrideForMode).not.toHaveBeenCalled();
   });
 });

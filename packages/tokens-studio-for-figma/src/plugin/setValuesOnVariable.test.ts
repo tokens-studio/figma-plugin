@@ -1,4 +1,4 @@
-import { mockCreateVariable, mockGetLocalVariablesAsync } from '../../tests/__mocks__/figmaMock';
+import { mockCreateVariable } from '../../tests/__mocks__/figmaMock';
 import { SingleToken } from '@/types/tokens';
 import setValuesOnVariable from './setValuesOnVariable';
 import { TokenTypes } from '@/constants/TokenTypes';
@@ -799,7 +799,6 @@ describe('SetValuesOnVariable', () => {
     it('skips raw write when the reference target lives in another collection', async () => {
       const fgDefault = makeVariable('fg/default', 'fg-key');
       const primitive = { ...makeVariable('colors/red/500', 'red-key'), variableCollectionId: 'primitives-coll' };
-      mockGetLocalVariablesAsync.mockResolvedValueOnce([fgDefault, primitive]);
 
       const tokens = [{
         name: 'fg.default',
@@ -821,6 +820,8 @@ describe('SetValuesOnVariable', () => {
         undefined,
         undefined,
         true,
+        undefined,
+        [fgDefault.name, primitive.name],
       );
 
       expect(mockSetValue).not.toHaveBeenCalled();

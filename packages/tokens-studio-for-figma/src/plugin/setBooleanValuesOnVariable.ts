@@ -1,8 +1,8 @@
 import { isVariableWithAliasReference } from '@/utils/isAliasReference';
 import { resolveCollectionContext } from './extendedCollections/collectionContext';
-import { applyChildModeValue } from './extendedCollections/applyChildModeValue';
+import { applyChildModeValue, InheritBehavior } from './extendedCollections/applyChildModeValue';
 
-export default function setBooleanValuesOnVariable(variable: Variable, mode: string, value: string, collection?: VariableCollection, forceUpdate = false) {
+export default function setBooleanValuesOnVariable(variable: Variable, mode: string, value: string, collection?: VariableCollection, forceUpdate = false, inheritBehavior: InheritBehavior = 'overwrite') {
   try {
     const existingVariableValue = variable.valuesByMode[mode];
     if (
@@ -15,7 +15,7 @@ export default function setBooleanValuesOnVariable(variable: Variable, mode: str
     // Extended collections: inherit-vs-override decided in one shared place
     const { parentModeId } = resolveCollectionContext(collection, mode);
     if (parentModeId) {
-      applyChildModeValue(variable, mode, parentModeId, newValue, collection);
+      applyChildModeValue(variable, mode, parentModeId, newValue, collection, inheritBehavior);
       return;
     }
 

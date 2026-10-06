@@ -109,7 +109,7 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
           if (composedValue) {
             const { parentModeId } = resolveCollectionContext(collection, theme.$figmaModeId!, theme);
             if (parentModeId) {
-              applyChildModeValue(variable, theme.$figmaModeId!, parentModeId, composedValue, collection);
+              applyChildModeValue(variable, theme.$figmaModeId!, parentModeId, composedValue, collection, 'keep');
             } else {
               variable.setValueForMode(theme.$figmaModeId!, composedValue);
             }
@@ -130,7 +130,7 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
               // Extended collections: one shared inherit-vs-override decision
               const { parentModeId } = resolveCollectionContext(collection, theme.$figmaModeId!, theme);
               if (parentModeId) {
-                applyChildModeValue(variable, theme.$figmaModeId!, parentModeId, newValue, collection);
+                applyChildModeValue(variable, theme.$figmaModeId!, parentModeId, newValue, collection, 'keep');
               } else {
                 variable.setValueForMode(theme.$figmaModeId!, newValue);
               }
@@ -140,19 +140,19 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
             switch (payload.type) {
               case TokenTypes.COLOR:
                 if (typeof payload.value === 'string') {
-                  if (collection) setColorValuesOnVariable(variable, modeId, payload.value, collection);
+                  if (collection) setColorValuesOnVariable(variable, modeId, payload.value, collection, false, 'keep');
                   else setColorValuesOnVariable(variable, modeId, payload.value);
                 }
                 break;
               case TokenTypes.BOOLEAN:
                 if (typeof payload.value === 'string') {
-                  if (collection) setBooleanValuesOnVariable(variable, modeId, payload.value, collection);
+                  if (collection) setBooleanValuesOnVariable(variable, modeId, payload.value, collection, false, 'keep');
                   else setBooleanValuesOnVariable(variable, modeId, payload.value);
                 }
                 break;
               case TokenTypes.TEXT:
                 if (typeof payload.value === 'string') {
-                  if (collection) setStringValuesOnVariable(variable, modeId, payload.value, collection);
+                  if (collection) setStringValuesOnVariable(variable, modeId, payload.value, collection, false, 'keep');
                   else setStringValuesOnVariable(variable, modeId, payload.value);
                 }
                 break;
@@ -162,7 +162,7 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
               case TokenTypes.BORDER_WIDTH:
               case TokenTypes.SPACING:
               case TokenTypes.NUMBER:
-                if (collection) setNumberValuesOnVariable(variable, modeId, Number(payload.value), collection);
+                if (collection) setNumberValuesOnVariable(variable, modeId, Number(payload.value), collection, false, 'keep');
                 else setNumberValuesOnVariable(variable, modeId, Number(payload.value));
                 break;
               default:
