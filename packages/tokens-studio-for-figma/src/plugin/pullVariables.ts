@@ -13,6 +13,7 @@ import { normalizeVariableName } from '@/utils/normalizeVariableName';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { processExtendedCollectionImport } from './extendedCollections';
+import { composedColorToTokenValue, isVariableComposedColor } from './composedColor';
 
 type CollectionEntry = {
   id: string,
@@ -207,6 +208,12 @@ export default async function pullVariables(options: PullVariablesOptions, theme
               if (typeof actualValue === 'object' && 'type' in actualValue && actualValue.type === 'VARIABLE_ALIAS') {
                 const alias = figma.variables.getVariableById(actualValue.id);
                 tokenValue = `{${alias?.name.replace(/\//g, '.')}}`;
+              } else if (isVariableComposedColor(actualValue)) {
+                tokenValue = composedColorToTokenValue(
+                  actualValue,
+                  (aliasRef) => figma.variables.getVariableById(aliasRef.id)?.name.replace(/\//g, '.'),
+                  figmaRGBToHex,
+                );
               } else {
                 tokenValue = figmaRGBToHex(actualValue as RGBA);
               }

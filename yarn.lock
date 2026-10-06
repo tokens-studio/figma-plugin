@@ -2459,10 +2459,10 @@
     lodash "^4.17.15"
     matrix-inverse "^1.0.1"
 
-"@figma/plugin-typings@^1.135.0":
-  version "1.138.0"
-  resolved "https://registry.yarnpkg.com/@figma/plugin-typings/-/plugin-typings-1.138.0.tgz#883d0a9fa51dda933305255067c1c7e9d944ecd0"
-  integrity sha512-bLP9wRf8c0e4z5GbXpDUXd7YNPXEDpgyeMmTe8Lm4EWMU8JEO1DFRfj1NaucIeRSurbde8y7xS1jas60LTTDaw==
+"@figma/plugin-typings@^1.140.0":
+  version "1.140.0"
+  resolved "https://registry.yarnpkg.com/@figma/plugin-typings/-/plugin-typings-1.140.0.tgz#0acbce83b78b040300266e55830505e7f81d9993"
+  integrity sha512-xo2yz7QqaK0uHCowOmoqmT2SRKSIgSW00T1DxRTtB8/JSWzr8f800LSxFyp0LuSGd9OiiDC3TCI2payahrKP7g==
 
 "@floating-ui/core@^1.4.2":
   version "1.5.1"
