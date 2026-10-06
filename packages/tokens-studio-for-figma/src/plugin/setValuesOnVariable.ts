@@ -79,6 +79,8 @@ export default async function setValuesOnVariable(
   isExtendedCollection = false,
   // All resolved tokens in the theme, used to check composed colors render correctly
   resolvedTokensByName?: Map<string, ComposedColorTokenInfo>,
+  // Names of all live local variables, across collections
+  localVariableNames?: Iterable<string>,
 ) {
   const variableKeyMap: Record<string, string> = {};
   const referenceVariableCandidates: ReferenceVariableType[] = [];
@@ -104,7 +106,14 @@ export default async function setValuesOnVariable(
     variablesById.add(v.id);
   });
 
+  // Names an alias can resolve to. Targets often live in another collection (e.g.
+  // primitives), so extended collections get every live local variable name from the
+  // caller, which must exclude zombies to match what the reference pass can link.
+  const allVariableNames = new Set<string>(localVariableNames);
+  variablesInFigma.forEach((v) => allVariableNames.add(v.name));
+
   const indexVariable = (v: Variable) => {
+    allVariableNames.add(v.name);
     if (!v.remote && !variablesByKey.has(v.key)) variablesByKey.set(v.key, v);
     if (v.variableCollectionId === collection.id && !variablesByName.has(v.name)) {
       variablesByName.set(v.name, v);
@@ -367,7 +376,7 @@ export default async function setValuesOnVariable(
               // existing target is enough. Outside extended collections only skip the raw
               // write when the variable is already composed, to avoid rewriting it each run.
               const refPaths = getComposedColorReferenceNames(composed).map((name) => name.split('.').join('/'));
-              const anyTargetExists = variablesInFigma.some((v) => refPaths.includes(v.name));
+              const anyTargetExists = refPaths.some((refPath) => allVariableNames.has(refPath));
               willBeAliased = anyTargetExists && (isExtendedCollection || isVariableComposedColor(existingVariableValue));
             } else if (willBeAliased) {
               let refName = '';
@@ -377,8 +386,7 @@ export default async function setValuesOnVariable(
                 refName = token.rawValue.toString().substring(1);
               }
               const refPath = refName.split('.').join('/');
-              const targetExists = variablesInFigma.some((v) => v.name === refPath);
-              if (!targetExists) {
+              if (!allVariableNames.has(refPath)) {
                 willBeAliased = false;
               }
             }

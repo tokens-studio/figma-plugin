@@ -677,7 +677,11 @@ describe('SetValuesOnVariable', () => {
       resolvedType: 'COLOR',
       description: '',
       variableCollectionId: PARENT_COLL_ID,
-      valuesByMode: { [PARENT_MODE]: { r: 0, g: 0, b: 0, a: 1 } } as Record<string, unknown>,
+      valuesByMode: {
+        [PARENT_MODE]: {
+          r: 0, g: 0, b: 0, a: 1,
+        },
+      } as Record<string, unknown>,
       scopes: [] as VariableScope[],
       setValueForMode: mockSetValue,
       setVariableCodeSyntax: jest.fn(),
@@ -716,7 +720,9 @@ describe('SetValuesOnVariable', () => {
       );
 
       // Raw color should be written since reference target doesn't exist
-      expect(mockSetValue).toHaveBeenCalledWith(CHILD_MODE, { r: 1, g: 0, b: 0, a: 1 });
+      expect(mockSetValue).toHaveBeenCalledWith(CHILD_MODE, {
+        r: 1, g: 0, b: 0, a: 1,
+      });
     });
 
     it('skips raw write and queues reference candidate when target variable exists (willBeAliased=true)', async () => {
@@ -735,8 +741,16 @@ describe('SetValuesOnVariable', () => {
       }] as SingleToken<true, { path: string; variableId: string }>[];
 
       const result = await setValuesOnVariable(
-        variables, tokens, childCollection, CHILD_MODE, baseFontSize,
-        false, null, undefined, undefined, true,
+        variables,
+        tokens,
+        childCollection,
+        CHILD_MODE,
+        baseFontSize,
+        false,
+        null,
+        undefined,
+        undefined,
+        true,
       );
 
       // Raw value should NOT be written — deferred to reference pass
@@ -767,11 +781,54 @@ describe('SetValuesOnVariable', () => {
       }] as SingleToken<true, { path: string; variableId: string }>[];
 
       await setValuesOnVariable(
-        [spacing], tokens, childCollection, CHILD_MODE, baseFontSize,
-        false, null, undefined, undefined, true,
+        [spacing],
+        tokens,
+        childCollection,
+        CHILD_MODE,
+        baseFontSize,
+        false,
+        null,
+        undefined,
+        undefined,
+        true,
       );
 
       expect(mockSetValue).toHaveBeenCalledWith(CHILD_MODE, 24);
+    });
+
+    it('skips raw write when the reference target lives in another collection', async () => {
+      const fgDefault = makeVariable('fg/default', 'fg-key');
+      const primitive = { ...makeVariable('colors/red/500', 'red-key'), variableCollectionId: 'primitives-coll' };
+
+      const tokens = [{
+        name: 'fg.default',
+        path: 'fg/default',
+        rawValue: '{colors.red.500}',
+        value: '#ff0000',
+        type: TokenTypes.COLOR,
+        variableId: 'fg-key',
+      }] as SingleToken<true, { path: string; variableId: string }>[];
+
+      const result = await setValuesOnVariable(
+        [fgDefault],
+        tokens,
+        childCollection,
+        CHILD_MODE,
+        baseFontSize,
+        false,
+        null,
+        undefined,
+        undefined,
+        true,
+        undefined,
+        [fgDefault.name, primitive.name],
+      );
+
+      expect(mockSetValue).not.toHaveBeenCalled();
+      expect(result.referenceVariableCandidates[0]).toEqual(expect.objectContaining({
+        referenceVariable: 'colors.red.500',
+        collection: childCollection,
+      }));
     });
   });
 });
