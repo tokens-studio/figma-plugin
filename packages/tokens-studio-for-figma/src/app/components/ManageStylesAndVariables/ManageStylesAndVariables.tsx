@@ -9,7 +9,7 @@ import {
 import { useSelector, useDispatch } from 'react-redux';
 import { StyledProBadge } from '../ProBadge';
 import Modal from '../Modal';
-import { useIsProUser } from '@/app/hooks/useIsProUser';
+import { useCanUseThemes } from '@/app/hooks/useCanUseThemes';
 
 import OptionsModal from './OptionsModal';
 import useTokens from '@/app/store/useTokens';
@@ -25,10 +25,10 @@ import { TokenTypes } from '@/constants/TokenTypes';
 export default function ManageStylesAndVariables({ showModal, setShowModal }: { showModal: boolean, setShowModal: (show: boolean) => void }) {
   const { t } = useTranslation(['manageStylesAndVariables']);
 
-  const isProUser = useIsProUser();
+  const canUseThemes = useCanUseThemes();
 
   const [showOptions, setShowOptions] = React.useState(true);
-  const [activeTab, setActiveTab] = React.useState<'useThemes' | 'useSets'>(isProUser ? 'useThemes' : 'useSets');
+  const [activeTab, setActiveTab] = React.useState<'useThemes' | 'useSets'>(canUseThemes ? 'useThemes' : 'useSets');
 
   const allSets = useSelector(allTokenSetsSelector);
   const themes = useSelector(themesListSelector);
@@ -193,7 +193,7 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
             {/* eslint-disable-next-line react/jsx-no-bind */}
             <Tabs.Trigger value="useThemes" onClick={() => handleTabChange('useThemes')}>
               {t('tabs.exportThemes')}
-              <StyledProBadge css={{ marginInlineStart: '$2' }}>{isProUser ? 'PRO' : 'Get PRO'}</StyledProBadge>
+              <StyledProBadge css={{ marginInlineStart: '$2' }}>{canUseThemes ? 'PRO' : 'Get PRO'}</StyledProBadge>
             </Tabs.Trigger>
             {/* eslint-disable-next-line react/jsx-no-bind */}
             <Tabs.Trigger value="useSets" onClick={() => handleTabChange('useSets')}>{t('tabs.exportSets')}</Tabs.Trigger>
