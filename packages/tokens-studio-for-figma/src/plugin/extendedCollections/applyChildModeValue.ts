@@ -2,25 +2,56 @@ import { valuesEquivalent } from './valuesEquivalent';
 
 export type ChildModeWriteResult = 'cleared' | 'set' | 'unchanged';
 
+type ExtendedCollectionLike = {
+  variableOverrides?: Record<string, Record<string, VariableValue>>;
+  removeOverridesForVariable?: (variable: Variable) => void;
+};
+
+function getCollectionOverrides(
+  collection: VariableCollection | null | undefined,
+  variable: Variable,
+): Record<string, VariableValue> | undefined {
+  return (collection as unknown as ExtendedCollectionLike | null | undefined)?.variableOverrides?.[variable.id];
+}
+
 /**
  * Remove an explicit child-mode override so the mode inherits from its parent.
  *
- * Figma's public Variable API has NO method to clear a single mode value — only
- * setValueForMode. Some enterprise runtimes expose clearValueForMode at runtime;
- * where they do we use it, otherwise we cannot remove an existing override and
- * report that. A variable that never had an explicit child-mode entry is already
- * inherited, so the common case needs no API at all.
+ * Figma's documented way to clear overrides is
+ * ExtendedVariableCollection.removeOverridesForVariable, which drops the overrides
+ * for EVERY mode of the child collection. Overrides held by the other modes are
+ * snapshotted first and written back. Some runtimes also expose
+ * Variable.clearValueForMode, which we prefer when present.
  */
-function clearChildModeOverride(variable: Variable, childModeId: string): boolean {
+function clearChildModeOverride(
+  variable: Variable,
+  childModeId: string,
+  collection?: VariableCollection | null,
+): boolean {
   const anyVar = variable as any;
   if (typeof anyVar.clearValueForMode === 'function') {
     anyVar.clearValueForMode(childModeId);
     return true;
   }
+
+  const extended = collection as unknown as ExtendedCollectionLike | null | undefined;
+  if (typeof extended?.removeOverridesForVariable === 'function') {
+    const overrides = getCollectionOverrides(collection, variable) ?? {};
+    const keep = Object.entries(overrides).filter(([modeId]) => modeId !== childModeId);
+    extended.removeOverridesForVariable(variable);
+    keep.forEach(([modeId, value]) => variable.setValueForMode(modeId, value));
+    return true;
+  }
   return false;
 }
 
-function hasExplicitChildValue(variable: Variable, childModeId: string): boolean {
+function hasExplicitChildValue(
+  variable: Variable,
+  childModeId: string,
+  collection?: VariableCollection | null,
+): boolean {
+  const overrides = getCollectionOverrides(collection, variable);
+  if (overrides && Object.prototype.hasOwnProperty.call(overrides, childModeId)) return true;
   return Object.prototype.hasOwnProperty.call(variable.valuesByMode, childModeId);
 }
 
@@ -43,19 +74,21 @@ export function applyChildModeValue(
   childModeId: string,
   parentModeId: string,
   desiredValue: VariableValue,
+  collection?: VariableCollection | null,
 ): ChildModeWriteResult {
   const parentValue = variable.valuesByMode[parentModeId];
-  const childValue = variable.valuesByMode[childModeId];
+  const childValue = getCollectionOverrides(collection, variable)?.[childModeId]
+    ?? variable.valuesByMode[childModeId];
 
   if (valuesEquivalent(desiredValue, parentValue)) {
     // The child should inherit. If it holds no explicit value for this mode it
     // already inherits — do nothing (the common case, and the only correct move
     // when no clear API exists).
-    if (!hasExplicitChildValue(variable, childModeId)) {
+    if (!hasExplicitChildValue(variable, childModeId, collection)) {
       return 'unchanged';
     }
     // An explicit override exists. Prefer to remove it so the mode inherits.
-    if (clearChildModeOverride(variable, childModeId)) {
+    if (clearChildModeOverride(variable, childModeId, collection)) {
       return 'cleared';
     }
     // No clear API in this runtime. We cannot restore true inheritance, but a

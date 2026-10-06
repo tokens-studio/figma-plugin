@@ -410,6 +410,110 @@ describe('Extended Collections', () => {
 
       expect(result[0].name).toBe('New Name');
     });
+
+    it('reuses an existing extended collection by name when the stored id is stale', async () => {
+      const existingChild = {
+        id: 'extended-id',
+        name: 'Brand',
+        isExtension: true,
+        parentVariableCollectionId: 'parent-id',
+        modes: [{ name: 'Light', modeId: 'ext-light-mode', parentModeId: 'light-mode' }],
+        renameMode: jest.fn(),
+      };
+      const parentCollection = {
+        id: 'parent-id',
+        name: 'Colors',
+        modes: [{ name: 'Light', modeId: 'light-mode' }],
+        extend: jest.fn(),
+      };
+      (global.figma.variables.getLocalVariableCollectionsAsync as jest.Mock).mockResolvedValue([
+        parentCollection,
+        existingChild,
+      ]);
+
+      const themes: ThemeObject[] = [
+        {
+          id: 'parent-theme-id',
+          name: 'Light',
+          group: 'Colors',
+          selectedTokenSets: {},
+          $figmaStyleReferences: {},
+          $figmaVariableReferences: {},
+          $figmaModeId: 'light-mode',
+          $figmaCollectionId: 'parent-id',
+        },
+        {
+          id: 'extended-theme-id',
+          name: 'Light',
+          group: 'Brand',
+          selectedTokenSets: {},
+          $figmaStyleReferences: {},
+          $figmaVariableReferences: {},
+          $figmaModeId: 'stale-mode',
+          $figmaCollectionId: 'stale-collection-id',
+          $figmaIsExtension: true,
+          $figmaParentCollectionId: 'parent-id',
+          $figmaParentThemeId: 'parent-theme-id',
+        },
+      ];
+
+      const result = await createNecessaryVariableCollections(themes, ['parent-theme-id', 'extended-theme-id'], createMockSettings());
+
+      expect(parentCollection.extend).not.toHaveBeenCalled();
+      expect(result).toContain(existingChild);
+      expect(themes[1].$figmaCollectionId).toBe('extended-id');
+    });
+
+    it('does not reuse a same-named extended collection belonging to another parent', async () => {
+      const otherParentsChild = {
+        id: 'other-child-id',
+        name: 'Brand',
+        isExtension: true,
+        parentVariableCollectionId: 'some-other-parent',
+        modes: [{ name: 'Light', modeId: 'x', parentModeId: 'y' }],
+        renameMode: jest.fn(),
+      };
+      const parentCollection = {
+        id: 'parent-id',
+        name: 'Colors',
+        modes: [{ name: 'Light', modeId: 'light-mode' }],
+        extend: jest.fn().mockReturnValue({
+          id: 'new-child-id', name: 'Brand', modes: [{ name: 'Light', modeId: 'n' }], renameMode: jest.fn(),
+        }),
+      };
+      (global.figma.variables.getLocalVariableCollectionsAsync as jest.Mock).mockResolvedValue([
+        parentCollection,
+        otherParentsChild,
+      ]);
+
+      const themes: ThemeObject[] = [
+        {
+          id: 'parent-theme-id',
+          name: 'Light',
+          group: 'Colors',
+          selectedTokenSets: {},
+          $figmaStyleReferences: {},
+          $figmaVariableReferences: {},
+          $figmaModeId: 'light-mode',
+          $figmaCollectionId: 'parent-id',
+        },
+        {
+          id: 'extended-theme-id',
+          name: 'Light',
+          group: 'Brand',
+          selectedTokenSets: {},
+          $figmaStyleReferences: {},
+          $figmaVariableReferences: {},
+          $figmaIsExtension: true,
+          $figmaParentCollectionId: 'parent-id',
+          $figmaParentThemeId: 'parent-theme-id',
+        },
+      ];
+
+      await createNecessaryVariableCollections(themes, ['parent-theme-id', 'extended-theme-id'], createMockSettings());
+
+      expect(parentCollection.extend).toHaveBeenCalledWith('Brand');
+    });
   });
 
   describe('Backwards Compatibility', () => {

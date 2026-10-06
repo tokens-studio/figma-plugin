@@ -109,7 +109,7 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
           if (composedValue) {
             const { parentModeId } = resolveCollectionContext(collection, theme.$figmaModeId!, theme);
             if (parentModeId) {
-              applyChildModeValue(variable, theme.$figmaModeId!, parentModeId, composedValue);
+              applyChildModeValue(variable, theme.$figmaModeId!, parentModeId, composedValue, collection);
             } else {
               variable.setValueForMode(theme.$figmaModeId!, composedValue);
             }
@@ -130,7 +130,7 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
               // Extended collections: one shared inherit-vs-override decision
               const { parentModeId } = resolveCollectionContext(collection, theme.$figmaModeId!, theme);
               if (parentModeId) {
-                applyChildModeValue(variable, theme.$figmaModeId!, parentModeId, newValue);
+                applyChildModeValue(variable, theme.$figmaModeId!, parentModeId, newValue, collection);
               } else {
                 variable.setValueForMode(theme.$figmaModeId!, newValue);
               }

@@ -137,7 +137,7 @@ export default async function updateVariablesToReference(figmaVariables: Map<str
       // from previous exports self-heal back to inherited.
       const { parentModeId } = resolveCollectionContext(aliasVariable.collection, effectiveModeId);
       if (parentModeId) {
-        const result = applyChildModeValue(aliasVariable.variable, effectiveModeId, parentModeId, newValue);
+        const result = applyChildModeValue(aliasVariable.variable, effectiveModeId, parentModeId, newValue, aliasVariable.collection);
         if (result !== 'unchanged') {
           updatedVariables.push(aliasVariable.variable);
         }

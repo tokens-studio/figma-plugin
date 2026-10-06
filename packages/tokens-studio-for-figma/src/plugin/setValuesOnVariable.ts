@@ -104,7 +104,20 @@ export default async function setValuesOnVariable(
     variablesById.add(v.id);
   });
 
+  // Every local variable name, across all collections. Alias targets often live in a
+  // different collection (e.g. primitives), so the extended-collection "will this be
+  // aliased?" check must not be limited to the variables passed in for this collection.
+  const allVariableNames = new Set<string>(variablesInFigma.map((v) => v.name));
+  if (isExtendedCollection) {
+    try {
+      (await figma.variables.getLocalVariablesAsync()).forEach((v) => allVariableNames.add(v.name));
+    } catch (e) {
+      // Fall back to the variables passed in
+    }
+  }
+
   const indexVariable = (v: Variable) => {
+    allVariableNames.add(v.name);
     if (!v.remote && !variablesByKey.has(v.key)) variablesByKey.set(v.key, v);
     if (v.variableCollectionId === collection.id && !variablesByName.has(v.name)) {
       variablesByName.set(v.name, v);
@@ -367,7 +380,7 @@ export default async function setValuesOnVariable(
               // existing target is enough. Outside extended collections only skip the raw
               // write when the variable is already composed, to avoid rewriting it each run.
               const refPaths = getComposedColorReferenceNames(composed).map((name) => name.split('.').join('/'));
-              const anyTargetExists = variablesInFigma.some((v) => refPaths.includes(v.name));
+              const anyTargetExists = refPaths.some((refPath) => allVariableNames.has(refPath));
               willBeAliased = anyTargetExists && (isExtendedCollection || isVariableComposedColor(existingVariableValue));
             } else if (willBeAliased) {
               let refName = '';
@@ -377,8 +390,7 @@ export default async function setValuesOnVariable(
                 refName = token.rawValue.toString().substring(1);
               }
               const refPath = refName.split('.').join('/');
-              const targetExists = variablesInFigma.some((v) => v.name === refPath);
-              if (!targetExists) {
+              if (!allVariableNames.has(refPath)) {
                 willBeAliased = false;
               }
             }

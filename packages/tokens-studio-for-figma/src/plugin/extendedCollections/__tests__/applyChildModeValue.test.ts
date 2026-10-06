@@ -55,7 +55,12 @@ describe('applyChildModeValue', () => {
     // value. We cannot clear to inherit, so at least make it show the right value.
     const desiredAlias = { type: 'VARIABLE_ALIAS', id: 'v-target' } as VariableAlias;
     const variable = makeVariable(
-      { [PARENT_MODE]: desiredAlias, [CHILD_MODE]: { r: 0.5, g: 0.5, b: 0.5, a: 1 } },
+      {
+        [PARENT_MODE]: desiredAlias,
+        [CHILD_MODE]: {
+          r: 0.5, g: 0.5, b: 0.5, a: 1,
+        },
+      },
       { withClearApi: false },
     );
 
@@ -199,6 +204,53 @@ describe('applyChildModeValue', () => {
       });
 
       expect(result).toBe('set');
+    });
+  });
+
+  describe('with Figma extended collection overrides API', () => {
+    const OTHER_CHILD_MODE = 'other-child-mode';
+
+    function makeCollection(overrides: Record<string, Record<string, VariableValue>>) {
+      return {
+        variableOverrides: overrides,
+        removeOverridesForVariable: jest.fn(),
+      } as unknown as VariableCollection & { removeOverridesForVariable: jest.Mock };
+    }
+
+    it('clears a stale override via removeOverridesForVariable and restores other modes', () => {
+      const variable = makeVariable({ [PARENT_MODE]: 16 }, { withClearApi: false });
+      (variable as any).id = 'var-1';
+      const collection = makeCollection({ 'var-1': { [CHILD_MODE]: 99, [OTHER_CHILD_MODE]: 42 } });
+
+      const result = applyChildModeValue(variable, CHILD_MODE, PARENT_MODE, 16, collection);
+
+      expect(result).toBe('cleared');
+      expect(collection.removeOverridesForVariable).toHaveBeenCalledWith(variable);
+      expect(variable.setValueForMode).toHaveBeenCalledTimes(1);
+      expect(variable.setValueForMode).toHaveBeenCalledWith(OTHER_CHILD_MODE, 42);
+    });
+
+    it('does nothing when the variable has no override for the child mode', () => {
+      const variable = makeVariable({ [PARENT_MODE]: 16 }, { withClearApi: false });
+      (variable as any).id = 'var-1';
+      const collection = makeCollection({});
+
+      const result = applyChildModeValue(variable, CHILD_MODE, PARENT_MODE, 16, collection);
+
+      expect(result).toBe('unchanged');
+      expect(collection.removeOverridesForVariable).not.toHaveBeenCalled();
+      expect(variable.setValueForMode).not.toHaveBeenCalled();
+    });
+
+    it('skips the write when the override already holds the desired value', () => {
+      const variable = makeVariable({ [PARENT_MODE]: 16 }, { withClearApi: false });
+      (variable as any).id = 'var-1';
+      const collection = makeCollection({ 'var-1': { [CHILD_MODE]: 24 } });
+
+      const result = applyChildModeValue(variable, CHILD_MODE, PARENT_MODE, 24, collection);
+
+      expect(result).toBe('unchanged');
+      expect(variable.setValueForMode).not.toHaveBeenCalled();
     });
   });
 });

@@ -26,11 +26,20 @@ async function processTheme(
         : rawChildName;
       const truncatedChildName = truncateCollectionName(childCollectionName);
 
+      // The stored $figmaCollectionId can be missing or stale (themes replaced by a
+      // pull, a duplicated Figma file). Fall back to the child's name under this parent
+      // so we reuse the collection instead of calling extend() again on every sync.
       const existingExtendedCollection = acc.find((c) => c.name === truncatedChildName)
         || acc.find((c) => c.id === currentTheme.$figmaCollectionId)
-        || allCollections.find((c) => c.id === currentTheme.$figmaCollectionId);
+        || allCollections.find((c) => c.id === currentTheme.$figmaCollectionId)
+        || allCollections.find((c) => c.name === truncatedChildName
+          && (c as any).isExtension
+          && (c as any).parentVariableCollectionId === parentCollection.id);
 
       if (existingExtendedCollection) {
+        currentTheme.$figmaIsExtension = true;
+        currentTheme.$figmaParentCollectionId = parentCollection.id;
+        currentTheme.$figmaCollectionId = existingExtendedCollection.id;
         if (existingExtendedCollection.name !== truncatedChildName) {
           existingExtendedCollection.name = truncatedChildName;
         }

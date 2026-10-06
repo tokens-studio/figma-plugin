@@ -26,7 +26,7 @@ export default function setNumberValuesOnVariable(variable: Variable, mode: stri
     // Extended collections: inherit-vs-override decided in one shared place
     const { parentModeId } = resolveCollectionContext(collection, mode);
     if (parentModeId) {
-      applyChildModeValue(variable, mode, parentModeId, value);
+      applyChildModeValue(variable, mode, parentModeId, value, collection);
       return;
     }
 

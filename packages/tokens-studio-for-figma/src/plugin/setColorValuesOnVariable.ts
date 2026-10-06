@@ -39,7 +39,7 @@ export default function setColorValuesOnVariable(variable: Variable, mode: strin
     // Extended collections: inherit-vs-override decided in one shared place
     const { parentModeId } = resolveCollectionContext(collection, mode);
     if (parentModeId) {
-      applyChildModeValue(variable, mode, parentModeId, newValue);
+      applyChildModeValue(variable, mode, parentModeId, newValue, collection);
       return;
     }
 
