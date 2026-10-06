@@ -1,11 +1,14 @@
 import { renderHook } from '@testing-library/react';
 import { pushToTokensStudioOAuth, useTokensStudioOAuth } from './tokensStudioOAuth';
-import { createThemeGroupRest, RestApiError } from '@/utils/tokensStudio/restApi';
+import {
+  createThemeGroupRest, deleteThemeGroupRest, listThemeOptionsRest, RestApiError,
+} from '@/utils/tokensStudio/restApi';
 import { AllTheProviders } from '../../../../../tests/config/setupTest';
 import { useAuthStore } from '../../useAuthStore';
 import { fetchProjectDataRest } from '@/utils/tokensStudio/fetchProjectDataRest';
 import { notifyToUI } from '@/plugin/notifiers';
 import type { Organization } from '@/types/oauth';
+import { store } from '@/app/store';
 
 jest.mock('@/utils/tokensStudio/fetchProjectDataRest', () => ({
   fetchProjectDataRest: jest.fn(),
@@ -18,6 +21,8 @@ jest.mock('@/plugin/notifiers', () => ({
 jest.mock('@/utils/tokensStudio/restApi', () => ({
   ...jest.requireActual('@/utils/tokensStudio/restApi'),
   createThemeGroupRest: jest.fn(),
+  listThemeOptionsRest: jest.fn(),
+  deleteThemeGroupRest: jest.fn(),
 }));
 
 const makeOrg = (id: string, subscription: Partial<NonNullable<Organization['subscription']>>): Organization => ({
@@ -62,6 +67,25 @@ describe('useTokensStudioOAuth loadProjectTokens', () => {
     await expect(loadProjectTokens()('project-1', 'main', orgId)).rejects.toThrow('planCantSync');
     expect(fetchProjectDataRest).not.toHaveBeenCalled();
     expect(notifyToUI).toHaveBeenCalledWith('planCantSync', { error: true });
+  });
+
+  it('keeps the theme group and token set lookups, so theme pushes find existing groups', async () => {
+    jest.mocked(fetchProjectDataRest).mockResolvedValue({
+      tokens: {},
+      themes: [],
+      tokenSetOrder: ['global'],
+      tokenSets: { global: { id: 'set-1', isDynamic: false } },
+      themeGroups: { Mode: { id: 'group-1' } },
+      changeSetId: 'change-set',
+    } as any);
+
+    await loadProjectTokens()('project-1', 'main', 'free');
+
+    expect(store.getState().tokenState.remoteData.metadata).toEqual(expect.objectContaining({
+      tokenSetOrder: ['global'],
+      tokenSetsData: { global: { id: 'set-1', isDynamic: false } },
+      themeGroupsData: { Mode: { id: 'group-1' } },
+    }));
   });
 
   it('checks the active org when no org is passed', async () => {
@@ -113,5 +137,41 @@ describe('pushToTokensStudioOAuth CREATE_THEME_GROUP', () => {
       expect.stringContaining('Your plan includes 1 theme group'),
       { error: true },
     );
+  });
+});
+
+describe('pushToTokensStudioOAuth DELETE_THEME_GROUP_IF_EMPTY', () => {
+  const context = { id: 'project-1', branch: 'main', changeSetId: 'change-set-1' } as any;
+  const deleteGroupIfEmpty = () => pushToTokensStudioOAuth({
+    context, action: 'DELETE_THEME_GROUP_IF_EMPTY', data: { id: 'group-1' },
+  });
+
+  beforeEach(() => {
+    jest.mocked(listThemeOptionsRest).mockReset();
+    jest.mocked(deleteThemeGroupRest).mockReset().mockResolvedValue({});
+    jest.mocked(notifyToUI).mockReset();
+    useAuthStore.setState({
+      oauthTokens: {
+        accessToken: 'token', refreshToken: 'refresh', tokenType: 'Bearer', expiresAt: Date.now() + 60 * 60 * 1000,
+      },
+    });
+  });
+
+  it('deletes a group with no themes left, without a message of its own', async () => {
+    jest.mocked(listThemeOptionsRest).mockResolvedValue([]);
+
+    await deleteGroupIfEmpty();
+
+    expect(listThemeOptionsRest).toHaveBeenCalledWith('token', expect.any(String), 'project-1', 'group-1', 'change-set-1');
+    expect(deleteThemeGroupRest).toHaveBeenCalledWith('token', expect.any(String), 'project-1', 'group-1', 'main', 'change-set-1');
+    expect(notifyToUI).not.toHaveBeenCalled();
+  });
+
+  it('keeps a group that still has themes in Tokens Studio, since deleting it would delete them too', async () => {
+    jest.mocked(listThemeOptionsRest).mockResolvedValue([{ id: 'option-1' }]);
+
+    await deleteGroupIfEmpty();
+
+    expect(deleteThemeGroupRest).not.toHaveBeenCalled();
   });
 });

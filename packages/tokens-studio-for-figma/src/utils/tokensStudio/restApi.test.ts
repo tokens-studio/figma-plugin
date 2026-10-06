@@ -1,5 +1,5 @@
 import {
-  RestApiError, createThemeGroupRest, isNameConflictError, isPlanLimitError,
+  RestApiError, createThemeGroupRest, isNameConflictError, isPlanLimitError, listThemeOptionsRest,
 } from './restApi';
 
 const errorResponse = (status: number, error: Record<string, unknown>) => ({
@@ -70,5 +70,31 @@ describe('restApi errors', () => {
     expect(error.status).toBe(500);
     expect(error.detail).toBeUndefined();
     expect(isNameConflictError(error)).toBe(false);
+  });
+});
+
+describe('listThemeOptionsRest', () => {
+  const originalFetch = global.fetch;
+
+  afterEach(() => {
+    global.fetch = originalFetch;
+  });
+
+  it("asks for one group's theme options in the change set", async () => {
+    global.fetch = jest.fn().mockResolvedValue({ ok: true, json: async () => ({ data: [{ id: 'option-1' }] }) }) as any;
+
+    const options = await listThemeOptionsRest('token', 'https://api.example.com', 'project-1', 'group-1', 'change-set-1');
+
+    const url = new URL(jest.mocked(global.fetch).mock.calls[0][0] as string);
+    expect(url.pathname).toBe('/api/v1/projects/project-1/theme_options');
+    expect(url.searchParams.get('theme_group_id')).toBe('group-1');
+    expect(url.searchParams.get('change_set_id')).toBe('change-set-1');
+    expect(options).toEqual([{ id: 'option-1' }]);
+  });
+
+  it('reads a response without data as no options', async () => {
+    global.fetch = jest.fn().mockResolvedValue({ ok: true, json: async () => ({}) }) as any;
+
+    await expect(listThemeOptionsRest('token', 'https://api.example.com', 'project-1', 'group-1')).resolves.toEqual([]);
   });
 });

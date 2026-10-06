@@ -1,6 +1,8 @@
 import { useAuthStore } from './useAuthStore';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
+import { store } from '@/app/store';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 import { getPlanDisplayName } from '@/utils/tokensStudio/organizationAccess';
 
 // Shape of GET /api/v1/organizations (studio-on-rails OrganizationsController#index).
@@ -135,6 +137,20 @@ describe('useAuthStore Pro and plan labels', () => {
 
     expect(useAuthStore.getState().activeOrganizationId).toBe('free');
     expect(savedOrgMessages()).toHaveLength(0);
+  });
+
+  it("uses the open file's org on login, read from the file's sync settings", async () => {
+    store.dispatch.uiState.setStorage({
+      provider: StorageProviderType.TOKENS_STUDIO_OAUTH, id: 'project-1', name: 'Org', internalId: 'tokens-studio-free', orgId: 'free',
+    } as any);
+
+    // Logging in: nothing picked yet, and no org passed in.
+    await useAuthStore.getState().fetchUserData(tokens);
+
+    expect(useAuthStore.getState().activeOrganizationId).toBe('free');
+    expect(useAuthStore.getState().isPro).toBe(false);
+    expect(savedOrgMessages()).toHaveLength(0);
+    store.dispatch.uiState.setStorage({ provider: StorageProviderType.LOCAL } as any);
   });
 
   it('saves the active org for other files unless persist is false', async () => {

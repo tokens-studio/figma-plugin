@@ -265,6 +265,22 @@ describe('pushThemeToTokensStudioOAuth', () => {
     expect(dispatch.tokenState.removeTheme).not.toHaveBeenCalledWith('server-dark');
   });
 
+  it('rolls back a theme whose raw name changes when sanitized', async () => {
+    const rawTheme = { ...localTheme, name: 'Dark ', group: '{Colors}' };
+    mockGetState.mockReturnValue({
+      tokenState: {
+        remoteData: { metadata: { themeGroupsData: { Colors: { id: 'group-1' } }, tokenSetsData: {} } },
+        themes: [rawTheme],
+      },
+    } as any);
+    mockPush.mockRejectedValueOnce(new RestApiError(422, 'Your plan includes 2 options per theme group. Upgrade to add more.', 'theme_option_limit_reached'));
+
+    // The theme form passes names as typed.
+    await pushThemeToTokensStudioOAuth({ ...newThemePayload, name: 'Dark ', group: '{Colors}' }, rootState, dispatch);
+
+    expect(dispatch.tokenState.removeTheme).toHaveBeenCalledWith('local-hash-id');
+  });
+
   it('removes a group it created when the theme for it is refused', async () => {
     mockPush
       .mockResolvedValueOnce({ data: { id: 'new-group' } })
