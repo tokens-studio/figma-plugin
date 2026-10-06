@@ -18,7 +18,7 @@ export async function setTextValuesOnTarget(
       await tryApplyTypographyCompositeVariable({
         target, baseFontSize, value, resolvedValue, // maybe this needs to be value
       });
-      if ('description' in target && description) target.description = description;
+      if ('description' in target && description && target.description !== description) target.description = description;
     }
   } catch (e) {
     console.log('Error setting font on target', target, token, e);

@@ -142,4 +142,42 @@ describe('updateColorStyles', () => {
 
     expect(existingStyles[0].name).toEqual('colors/redRENAMED');
   });
+
+  it('does not rewrite the name when it already matches, even with rename enabled', async () => {
+    let nameSetCount = 0;
+    let storedName = 'colors/red';
+    const existingStyle = {
+      type: 'PAINT',
+      id: '1234',
+      paints: [{
+        type: 'SOLID',
+        color: { r: 1, g: 0, b: 0 },
+        opacity: 1,
+      }],
+    };
+    Object.defineProperty(existingStyle, 'name', {
+      get: () => storedName,
+      set: (v: string) => {
+        storedName = v;
+        nameSetCount += 1;
+      },
+    });
+    mockGetLocalPaintStyles.mockImplementation(() => [existingStyle]);
+
+    await updateColorStyles(
+      [{
+        name: 'colors.red',
+        value: '#ff0000',
+        type: TokenTypes.COLOR,
+        path: 'colors/red',
+        styleId: '1234',
+      }],
+      true,
+      true,
+    );
+
+    // Re-exporting with an already-correct name must not touch it, otherwise
+    // Figma marks the style as modified even though nothing changed.
+    expect(nameSetCount).toBe(0);
+  });
 });

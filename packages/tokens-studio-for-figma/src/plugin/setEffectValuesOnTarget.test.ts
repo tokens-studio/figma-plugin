@@ -122,6 +122,42 @@ describe('setEffectValuesOnTarget', () => {
     } as unknown as RectangleNode;
   });
 
+  it('sets the description on a style target when it differs, and does not rewrite it again', async () => {
+    let descriptionSetCount = 0;
+    let storedDescription = '';
+    const effectStyleMock = {
+      type: 'EFFECT',
+      effects: [],
+    } as unknown as EffectStyle;
+    Object.defineProperty(effectStyleMock, 'description', {
+      get: () => storedDescription,
+      set: (v: string) => {
+        storedDescription = v;
+        descriptionSetCount += 1;
+      },
+    });
+
+    await setEffectValuesOnTarget(effectStyleMock, singleShadowToken.name, defaultBaseFontSize);
+    expect(effectStyleMock.description).toEqual(singleShadowToken.description);
+    expect(descriptionSetCount).toBe(1);
+
+    // Re-exporting the identical description must not write it again, otherwise
+    // Figma marks the style as modified even though nothing changed.
+    await setEffectValuesOnTarget(effectStyleMock, singleShadowToken.name, defaultBaseFontSize);
+    expect(descriptionSetCount).toBe(1);
+  });
+
+  it('does not rewrite effects on a second export with the same token', async () => {
+    await setEffectValuesOnTarget(rectangleNodeMock, singleShadowToken.name, defaultBaseFontSize);
+    const effectsAfterFirstExport = rectangleNodeMock.effects;
+
+    await setEffectValuesOnTarget(rectangleNodeMock, singleShadowToken.name, defaultBaseFontSize);
+
+    // Same array reference — re-exporting an unchanged token must not touch the style,
+    // otherwise Figma marks it as modified and it shows up as "ready to publish" again.
+    expect(rectangleNodeMock.effects).toBe(effectsAfterFirstExport);
+  });
+
   it('sets single shadow token', async () => {
     await setEffectValuesOnTarget(rectangleNodeMock, singleShadowToken.name, defaultBaseFontSize);
     expect(rectangleNodeMock).toEqual({

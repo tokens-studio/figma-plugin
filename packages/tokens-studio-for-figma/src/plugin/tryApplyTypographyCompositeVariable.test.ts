@@ -199,4 +199,81 @@ describe('tryApplyTypographyCompositeVariable', () => {
 
     expect(target.letterSpacing).toEqual({ unit: 'PIXELS', value: 8 });
   });
+
+  it('does not rewrite fontName when the family and style already match', async () => {
+    const fontName = { family: 'Inter', style: 'Bold' };
+    target = { fontName } as TextNode | TextStyle;
+    value = {
+      fontFamily: 'Inter',
+      fontWeight: 'Bold',
+    };
+    resolvedValue = {};
+
+    await tryApplyTypographyCompositeVariable({
+      target, value, resolvedValue, baseFontSize,
+    });
+
+    // Same object reference — proves setFontStyleOnTarget did not reassign it.
+    expect(target.fontName).toBe(fontName);
+  });
+
+  it('does not write an object-shaped property (letterSpacing) again when it already matches', async () => {
+    let letterSpacingSetCount = 0;
+    let storedLetterSpacing: { unit: string; value?: number } = { unit: 'PIXELS', value: 8 };
+    target = {
+      fontName: { family: 'Arial', style: 'Regular' },
+    } as TextNode | TextStyle;
+    Object.defineProperty(target, 'letterSpacing', {
+      get: () => storedLetterSpacing,
+      set: (v: { unit: string; value?: number }) => {
+        storedLetterSpacing = v;
+        letterSpacingSetCount += 1;
+      },
+    });
+    value = {
+      letterSpacing: '0.5em',
+    };
+    resolvedValue = {
+      letterSpacing: '0.5em',
+    };
+    defaultTokenValueRetriever.getVariableReference = jest.fn().mockResolvedValue(undefined);
+
+    await tryApplyTypographyCompositeVariable({
+      target, value, resolvedValue, baseFontSize,
+    });
+
+    // target.letterSpacing already equals the transformed value ({ unit: 'PIXELS', value: 8 }),
+    // so it must not be reassigned.
+    expect(letterSpacingSetCount).toBe(0);
+  });
+
+  it('does not write a property again on a second call with the same resolved value', async () => {
+    let fontSizeSetCount = 0;
+    let storedFontSize: number | undefined;
+    target = {
+      fontName: { family: 'Arial', style: 'Regular' },
+    } as TextNode | TextStyle;
+    Object.defineProperty(target, 'fontSize', {
+      get: () => storedFontSize,
+      set: (v: number) => {
+        storedFontSize = v;
+        fontSizeSetCount += 1;
+      },
+    });
+    value = { fontSize: '24px' };
+    resolvedValue = { fontSize: '24px' };
+    defaultTokenValueRetriever.getVariableReference = jest.fn().mockResolvedValue(undefined);
+
+    await tryApplyTypographyCompositeVariable({
+      target, value, resolvedValue, baseFontSize,
+    });
+    expect(fontSizeSetCount).toBe(1);
+
+    // Re-exporting the identical resolved value must not write the property again,
+    // otherwise Figma marks the style as modified even though nothing changed.
+    await tryApplyTypographyCompositeVariable({
+      target, value, resolvedValue, baseFontSize,
+    });
+    expect(fontSizeSetCount).toBe(1);
+  });
 });
