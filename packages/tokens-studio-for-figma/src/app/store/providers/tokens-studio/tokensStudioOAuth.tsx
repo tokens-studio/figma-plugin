@@ -25,6 +25,7 @@ import { OAuthService } from '../../../services/OAuthService';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { TOKENS_STUDIO_APP_URL } from '@/constants/TokensStudio';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
+import { convertTokenValueForStudio } from '../../models/effects/tokenState/utils/sanitizeForStudio';
 import {
   createTokenRest,
   updateTokenRest,
@@ -105,14 +106,14 @@ export const pushToTokensStudioOAuth = async ({
   try {
     switch (action) {
       case 'BATCH_CREATE_TOKENS':
-        result = await batchCreateTokensRest(oauthTokens.accessToken, apiBaseUrl, projectId, data, changeSetId);
+        result = await batchCreateTokensRest(oauthTokens.accessToken, apiBaseUrl, projectId, data.map(convertTokenValueForStudio), changeSetId);
         break;
       case 'CREATE_TOKEN':
-        result = await createTokenRest(oauthTokens.accessToken, apiBaseUrl, projectId, data, branch, changeSetId);
+        result = await createTokenRest(oauthTokens.accessToken, apiBaseUrl, projectId, convertTokenValueForStudio(data), branch, changeSetId);
         break;
       case 'EDIT_TOKEN': {
         if (!data?.id) break;
-        result = await updateTokenRest(oauthTokens.accessToken, apiBaseUrl, projectId, data.id, data, branch, changeSetId);
+        result = await updateTokenRest(oauthTokens.accessToken, apiBaseUrl, projectId, data.id, convertTokenValueForStudio(data), branch, changeSetId);
         break;
       }
       case 'DELETE_TOKEN': {

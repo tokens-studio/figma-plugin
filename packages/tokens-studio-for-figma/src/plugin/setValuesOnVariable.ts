@@ -13,12 +13,29 @@ import { transformValue } from './helpers';
 import { variableWorker } from './Worker';
 import { ProgressTracker } from './ProgressTracker';
 import { checkVariableAliasEquality } from '@/utils/checkVariableAliasEquality';
+import {
+  canLinkOpacity,
+  ComposedColorCandidate,
+  ComposedColorReference,
+  ComposedColorTokenInfo,
+  getComposedColorCandidates,
+  getComposedColorReferenceNames,
+  isVariableComposedColor,
+  parseComposedColorReference,
+} from './composedColor';
 
 export type ReferenceVariableType = {
   variable: Variable;
   modeId: string;
   referenceVariable: string;
   collection?: VariableCollection;
+  // Set for rgba({color}, 0.5) / rgba({color}, {opacity}) style values
+  composed?: ComposedColorReference;
+  resolvedValue?: SingleToken['value'];
+  // Colors the composed value may link, in order (see getComposedColorCandidates)
+  colorCandidates?: ComposedColorCandidate[];
+  opacityReferenceValue?: unknown;
+  opacityLinkable?: boolean;
 };
 
 // Figma gates plugin creation of EASING/TIMING variables behind a feature
@@ -60,6 +77,8 @@ export default async function setValuesOnVariable(
   metadataUpdateTracker?: Record<string, boolean>,
   providedPlatformsByVariable?: Record<string, Set<string>>,
   isExtendedCollection = false,
+  // All resolved tokens in the theme, used to check composed colors render correctly
+  resolvedTokensByName?: Map<string, ComposedColorTokenInfo>,
 ) {
   const variableKeyMap: Record<string, string> = {};
   const referenceVariableCandidates: ReferenceVariableType[] = [];
@@ -339,8 +358,18 @@ export default async function setValuesOnVariable(
             // skipping the raw write. If the target doesn't exist (e.g. a primitive
             // token like "colors.black" that isn't exported as a variable), the
             // reference pass will silently do nothing and we'd lose the value.
+            const composed = variableType === 'COLOR' && !token.$extensions?.['studio.tokens']?.modify
+              ? parseComposedColorReference(token.rawValue)
+              : null;
             let willBeAliased = isExtendedCollection && checkCanReferenceVariable(token);
-            if (willBeAliased) {
+            if (composed) {
+              // Composed colors fall back to resolved values for missing parts, so one
+              // existing target is enough. Outside extended collections only skip the raw
+              // write when the variable is already composed, to avoid rewriting it each run.
+              const refPaths = getComposedColorReferenceNames(composed).map((name) => name.split('.').join('/'));
+              const anyTargetExists = variablesInFigma.some((v) => refPaths.includes(v.name));
+              willBeAliased = anyTargetExists && (isExtendedCollection || isVariableComposedColor(existingVariableValue));
+            } else if (willBeAliased) {
               let refName = '';
               if (token.rawValue?.toString().startsWith('{')) {
                 refName = token.rawValue.toString().slice(1, -1);
@@ -540,7 +569,20 @@ export default async function setValuesOnVariable(
               referenceTokenName = token.rawValue!.toString().substring(1);
             }
 
-            if (token && checkCanReferenceVariable(token)) {
+            if (composed) {
+              const lookup = (name: string) => resolvedTokensByName?.get(name);
+              referenceVariableCandidates.push({
+                variable,
+                modeId: mode,
+                referenceVariable: getComposedColorReferenceNames(composed)[0],
+                composed,
+                resolvedValue: token.value,
+                colorCandidates: getComposedColorCandidates(composed, lookup),
+                opacityReferenceValue: composed.opacityReference ? lookup(composed.opacityReference)?.value : undefined,
+                opacityLinkable: canLinkOpacity(composed, lookup),
+                ...(isExtendedCollection ? { collection } : {}),
+              });
+            } else if (token && checkCanReferenceVariable(token)) {
               referenceVariableCandidates.push({
                 variable,
                 modeId: mode,
