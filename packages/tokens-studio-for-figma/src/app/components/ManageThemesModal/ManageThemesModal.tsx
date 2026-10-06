@@ -7,7 +7,9 @@ import debounce from 'lodash.debounce';
 import { Button, EmptyState } from '@tokens-studio/ui';
 import { styled } from '@stitches/react';
 import { useTranslation } from 'react-i18next';
-import { activeThemeSelector, themesListSelector } from '@/selectors';
+import { activeThemeSelector, storageTypeSelector, themesListSelector } from '@/selectors';
+import { isTokensStudioOAuthType } from '@/utils/is';
+import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { notifyToUI } from '@/plugin/notifiers';
@@ -52,6 +54,8 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
   const dispatch = useDispatch<Dispatch>();
   const themes = useSelector(themesListSelector);
   const activeTheme = useSelector(activeThemeSelector);
+  const storageType = useSelector(storageTypeSelector);
+  const isSyncedWithStudio = isTokensStudioOAuthType(storageType);
   const { confirm } = useConfirm();
   const [themeEditorOpen, setThemeEditorOpen] = useState<boolean | string>(false);
   const [isExtendMode, setIsExtendMode] = useState(false);
@@ -261,6 +265,16 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
       });
     } else {
       // REGULAR THEME: Create single theme
+      // Tokens Studio refuses a theme without a group or without a set in use. Say so here, keeping the form open,
+      // rather than creating the theme and taking it back out when the push is refused.
+      if (isSyncedWithStudio && !values.group?.trim()) {
+        notifyToUI(t('studioThemeNeedsGroup'), { error: true });
+        return;
+      }
+      if (isSyncedWithStudio && !Object.values(values.tokenSets || {}).some((status) => status !== TokenSetStatus.DISABLED)) {
+        notifyToUI(t('studioThemeNeedsTokenSet'), { error: true });
+        return;
+      }
       const themeData: any = {
         name: values.name,
         selectedTokenSets: values.tokenSets,
@@ -271,7 +285,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
     }
 
     closeThemeEditor();
-  }, [themeEditorOpen, dispatch.tokenState, themeEditorDefaultValues, themes, isExtendMode, closeThemeEditor, t]);
+  }, [themeEditorOpen, dispatch.tokenState, themeEditorDefaultValues, themes, isExtendMode, closeThemeEditor, t, isSyncedWithStudio]);
 
   const handleReorder = React.useCallback((reorderedItems: TreeItem[]) => {
     let currentGroup = '';

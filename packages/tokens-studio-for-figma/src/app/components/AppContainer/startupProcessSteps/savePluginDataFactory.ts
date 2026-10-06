@@ -44,16 +44,13 @@ export function savePluginDataFactory(dispatch: Dispatch, params: StartupMessage
 
       // Restore OAuth tokens
       if (params.oauthTokens) {
-        // A file synced with Studio uses the org it syncs with (so Pro and plan come from that org); other files use
-        // the org last picked in Settings, which is shared across files.
-        const fileOrgId = isTokensStudioOAuthType(params.storageType) ? params.storageType.orgId : undefined;
-        const activeOrganizationId = fileOrgId || params.activeOrganizationId;
-        if (activeOrganizationId) {
-          useAuthStore.setState({ activeOrganizationId });
+        if (params.activeOrganizationId) {
+          useAuthStore.setState({ activeOrganizationId: params.activeOrganizationId });
         }
         useAuthStore.getState().setOAuthTokens(params.oauthTokens);
-        const activeProjectId = params.storageType && isTokensStudioOAuthType(params.storageType) ? params.storageType.id : undefined;
-        useAuthStore.getState().fetchUserData(params.oauthTokens, activeProjectId);
+        // A file synced with Studio uses the org it syncs with; fetchUserData falls back to the org picked in Settings.
+        const fileSync = isTokensStudioOAuthType(params.storageType) ? params.storageType : undefined;
+        useAuthStore.getState().fetchUserData(params.oauthTokens, fileSync?.id, fileSync?.orgId);
       }
     } else {
       throw new Error('User not found');

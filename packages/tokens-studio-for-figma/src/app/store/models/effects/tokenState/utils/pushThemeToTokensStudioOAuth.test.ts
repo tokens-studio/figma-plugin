@@ -193,6 +193,88 @@ describe('pushThemeToTokensStudioOAuth', () => {
     // The theme is still taken back out locally — only the message waits for the others.
     expect(dispatch.tokenState.removeTheme).toHaveBeenCalledWith('local-hash-id');
   });
+
+  it('creates a theme with token set names, which is what Studio maps to ids on create', async () => {
+    mockGetState.mockReturnValue({
+      tokenState: {
+        remoteData: {
+          metadata: { themeGroupsData: { Colors: { id: 'group-1' } }, tokenSetsData: { global: { id: 'set-uuid' } } },
+        },
+        themes: [localTheme],
+      },
+    } as any);
+    mockPush.mockResolvedValueOnce({ data: { id: 'server-theme-id' } });
+
+    await pushThemeToTokensStudioOAuth(newThemePayload, rootState, dispatch);
+
+    expect(pushCalls('CREATE_THEME')[0][0].data.selected_token_sets).toEqual({ global: 'enabled' });
+  });
+
+  it('updates a theme with token set ids', async () => {
+    mockGetState.mockReturnValue({
+      tokenState: {
+        remoteData: {
+          metadata: { themeGroupsData: { Colors: { id: 'group-1' } }, tokenSetsData: { global: { id: 'set-uuid' } } },
+        },
+        themes: [localTheme],
+      },
+    } as any);
+    mockPush.mockResolvedValueOnce({ data: {} });
+
+    await pushThemeToTokensStudioOAuth({ ...newThemePayload, id: 'server-theme-id' }, rootState, dispatch);
+
+    expect(pushCalls('UPDATE_THEME')[0][0].data.selected_token_sets).toEqual({ 'set-uuid': 'enabled' });
+  });
+
+  it('finds the existing group when the plan limit refuses re-creating it, and saves the edit', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ data: [{ id: 'existing-group', attributes: { name: 'Colors' } }] }),
+    }) as any;
+    mockPush
+      .mockRejectedValueOnce(new RestApiError(422, 'Your plan includes 1 theme group. Upgrade to add more.', 'theme_group_limit_reached'))
+      .mockResolvedValueOnce({ data: {} });
+
+    const result = await pushThemeToTokensStudioOAuth({ ...newThemePayload, id: 'server-theme-id' }, rootState, dispatch);
+
+    expect(result).toEqual({ ok: true });
+    expect(pushCalls('UPDATE_THEME')[0][0].data.theme_group_id).toBe('existing-group');
+    expect(notifyToUI).not.toHaveBeenCalled();
+  });
+
+  it('refuses an ungrouped theme up front instead of sending it', async () => {
+    const result = await pushThemeToTokensStudioOAuth({ name: 'Dark', selectedTokenSets: {} }, rootState, dispatch);
+
+    expect(result.ok).toBe(false);
+    expect(mockPush).not.toHaveBeenCalled();
+  });
+
+  it('rolls back the new theme, not an earlier synced theme with the same name', async () => {
+    const syncedTheme = { ...localTheme, id: 'server-dark' };
+    mockGetState.mockReturnValue({
+      tokenState: {
+        remoteData: { metadata: { themeGroupsData: { Colors: { id: 'group-1' } }, tokenSetsData: {} }, themes: [syncedTheme] },
+        themes: [syncedTheme, localTheme],
+      },
+    } as any);
+    mockPush.mockRejectedValueOnce(new RestApiError(422, "A theme option with the name 'Dark' already exists in this theme group"));
+
+    await pushThemeToTokensStudioOAuth(newThemePayload, rootState, dispatch);
+
+    expect(dispatch.tokenState.removeTheme).toHaveBeenCalledWith('local-hash-id');
+    expect(dispatch.tokenState.removeTheme).not.toHaveBeenCalledWith('server-dark');
+  });
+
+  it('removes a group it created when the theme for it is refused', async () => {
+    mockPush
+      .mockResolvedValueOnce({ data: { id: 'new-group' } })
+      .mockRejectedValueOnce(new RestApiError(422, 'At least one token set must be enabled'));
+
+    await pushThemeToTokensStudioOAuth(newThemePayload, rootState, dispatch);
+
+    expect(pushCalls('DELETE_THEME_GROUP_IF_EMPTY')[0][0].data).toEqual({ id: 'new-group' });
+    expect(dispatch.tokenState.removeTheme).toHaveBeenCalledWith('local-hash-id');
+  });
 });
 
 describe('notifyThemePushFailures', () => {

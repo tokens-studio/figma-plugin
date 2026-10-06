@@ -15,6 +15,7 @@ import { notifyToUI } from '@/plugin/notifiers';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 import { TOKENS_STUDIO_APP_URL } from '@/constants/TokensStudio';
 import { isProOrganization } from '@/utils/tokensStudio/organizationAccess';
+import { isTokensStudioOAuthType } from '@/utils/is';
 
 interface DeviceCodeState {
   userCode: string;
@@ -42,7 +43,9 @@ interface AuthState {
   setActiveOrganization: (orgId: string, options?: { persist?: boolean }) => void;
   setActiveProject: (projectId: string) => void;
   setOAuthTokens: (tokens: OAuthTokens | null) => Promise<void>;
-  fetchUserData: (tokens: OAuthTokens, persistedProjectId?: string) => Promise<void>;
+  // `fileOrganizationId`: the org the open file syncs with. Startup passes it, since the file's storage isn't in the
+  // store yet; otherwise it's read from the store.
+  fetchUserData: (tokens: OAuthTokens, persistedProjectId?: string, fileOrganizationId?: string) => Promise<void>;
   fetchProjects: (orgId: string, persistedProjectId?: string) => Promise<void>;
   loadProjectTokens: (projectId: string) => Promise<void>;
   refreshTokens: () => Promise<void>;
@@ -207,7 +210,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     });
   },
 
-  fetchUserData: async (tokens: OAuthTokens, persistedProjectId?: string) => {
+  fetchUserData: async (tokens: OAuthTokens, persistedProjectId?: string, fileOrganizationId?: string) => {
     let currentTokens = tokens;
     if (OAuthService.needsRefresh(currentTokens)) {
       try {
@@ -345,10 +348,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         console.warn('Could not fetch organizations via new backend, fallback missing depending on API.', err);
       }
 
-      const storedId = get().activeOrganizationId;
-      // Without a saved pick (or when it's gone), prefer an org that grants Pro: someone in both a paid and a Free
-      // org then gets Pro in local and Git files without picking it in Settings first.
-      const activeOrganization = organizations.find((o) => o.id === storedId)
+      // A file synced with Studio uses the org it syncs with, so Pro and plan come from that org. Other files use the
+      // org picked in Settings, which is shared across files. Without a usable pick, prefer an org that grants Pro:
+      // someone in both a paid and a Free org then gets Pro in local and Git files without picking it first.
+      const { storageType } = store.getState().uiState;
+      const fileOrgId = fileOrganizationId ?? (isTokensStudioOAuthType(storageType) ? storageType.orgId : undefined);
+      const savedId = get().activeOrganizationId;
+      const fileOrganization = organizations.find((o) => o.id === fileOrgId);
+      const savedOrganization = organizations.find((o) => o.id === savedId);
+      const activeOrganization = fileOrganization
+        || savedOrganization
         || organizations.find(isProOrganization)
         || organizations[0]
         || null;
@@ -369,7 +378,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       if (activeOrganization) {
         await get().fetchProjects(activeOrganization.id, persistedProjectId);
 
-        if (activeOrganization.id !== storedId) {
+        // Remember a pick only when none of the user's is usable, and never the file's org: that one is per file.
+        if (!savedOrganization && activeOrganization !== fileOrganization) {
           AsyncMessageChannel.ReactInstance.message({
             type: AsyncMessageTypes.SET_ACTIVE_ORGANIZATION_ID,
             activeOrganizationId: activeOrganization.id,

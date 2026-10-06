@@ -40,6 +40,7 @@ import {
   createThemeOptionRest,
   updateThemeOptionRest,
   deleteThemeOptionRest,
+  listThemeOptionsRest,
   batchCreateTokensRest,
   isNameConflictError,
 } from '../../../../utils/tokensStudio/restApi';
@@ -163,6 +164,15 @@ export const pushToTokensStudioOAuth = async ({
           result = await deleteThemeGroupRest(oauthTokens.accessToken, apiBaseUrl, projectId, data.id, branch, changeSetId);
         }
         break;
+      case 'DELETE_THEME_GROUP_IF_EMPTY': {
+        // Studio deletes a group's options along with it, so only remove a group that has none left.
+        if (!data.id) break;
+        const options = await listThemeOptionsRest(oauthTokens.accessToken, apiBaseUrl, projectId, data.id, changeSetId);
+        if (options.length === 0) {
+          result = await deleteThemeGroupRest(oauthTokens.accessToken, apiBaseUrl, projectId, data.id, branch, changeSetId);
+        }
+        break;
+      }
       case 'CREATE_THEME':
         result = await createThemeOptionRest(oauthTokens.accessToken, apiBaseUrl, projectId, data, branch, changeSetId);
         break;
@@ -181,7 +191,8 @@ export const pushToTokensStudioOAuth = async ({
       default:
         console.warn('Unknown REST action', action);
     }
-    if (result) {
+    // Removing an empty group is housekeeping after another change; it gets no message of its own.
+    if (result && action !== 'DELETE_THEME_GROUP_IF_EMPTY') {
       const actionLabel = ACTION_LABELS[action] || 'Synced change';
       notifyToUI(`${actionLabel} to Tokens Studio`);
     }
@@ -448,7 +459,13 @@ export function useTokensStudioOAuth() {
           dispatch.tokenState.setRemoteData({
             tokens: (newTokens || {}) as any,
             themes: alignedNewThemes,
-            metadata: { tokenSetOrder },
+            // Theme pushes look groups and sets up here; without them every grouped push re-creates its group.
+            metadata: {
+              tokenSetOrder,
+              tokenSetsData: projectData.tokenSets as any,
+              themeGroupsData: projectData.themeGroups as any,
+              changeSetId: projectData.changeSetId,
+            },
           });
 
           const stringifiedRemoteTokens = JSON.stringify(compact([newTokens, alignedNewThemes, TokenFormat.format]), null, 2);

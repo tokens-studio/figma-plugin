@@ -8,6 +8,7 @@ import { notifyToUI } from '@/plugin/notifiers';
 import { RestApiError } from '@/utils/tokensStudio/restApi';
 import {
   lookupBySanitized,
+  resolveSanitizedKey,
   sanitizeDisplayName,
   sanitizeTokenSetName,
 } from './sanitizeForStudio';
@@ -46,7 +47,7 @@ async function fetchThemeGroupId(projectId: string, groupName: string, changeSet
     const groups = json.data || [];
     // Server names are raw; `groupName` is sanitized. Compare sanitized forms so
     // an existing group is matched instead of being re-created.
-    const match = groups.find((g: any) => sanitizeDisplayName(String(g.attributes?.name || g.name || '')) === groupName);
+    const match = groups.find((g: any) => sanitizeDisplayName(String(g.attributes?.name || g.name || '')) === sanitizeDisplayName(groupName));
     return match?.id || null;
   } catch {
     return null;
@@ -101,12 +102,18 @@ export async function pushThemeToTokensStudioOAuth(
   const { metadata } = liveState.tokenState?.remoteData || {};
   const { themeGroupsData, tokenSetsData } = metadata || {};
   const isNewTheme = !payload?.id;
+  // Callers pass raw names (the theme form) or sanitized ones (variables imports); compare sanitized forms.
+  const themeName = sanitizeDisplayName(payload?.name ?? '');
+  const groupName = sanitizeDisplayName(payload?.group ?? '');
+  // Themes that came from Tokens Studio. A rollback must never take one of these out.
+  const remoteThemeIds = new Set<string>((liveState.tokenState?.remoteData?.themes || []).map((t: any) => t.id));
 
-  // Local themes keep their raw Figma names while `payload` carries sanitized ones, so compare
-  // sanitized forms — an exact match would fail.
-  const findLocalTheme = () => store.getState().tokenState.themes.find(
-    (t: any) => sanitizeDisplayName(t.name ?? '') === payload?.name
-      && sanitizeDisplayName(t.group ?? '') === (payload?.group || ''),
+  // The theme this push created locally. The reducer appends new themes, so take the last match, and skip any
+  // theme Tokens Studio already has: a same-named theme earlier in the list is someone else's, not this one.
+  const findLocalTheme = () => [...store.getState().tokenState.themes].reverse().find(
+    (t: any) => !remoteThemeIds.has(t.id)
+      && sanitizeDisplayName(t.name ?? '') === themeName
+      && sanitizeDisplayName(t.group ?? '') === groupName,
   );
 
   // The reducer already added the theme locally. When the API refuses the create, take it back out
@@ -129,44 +136,52 @@ export async function pushThemeToTokensStudioOAuth(
     return { ok: false, failure };
   };
 
-  // `payload.group` is sanitized; themeGroupsData is keyed by the raw server
-  // name, so an exact lookup would miss and create a duplicate group.
-  let themeGroupId = payload.group
-    ? (lookupBySanitized(themeGroupsData, payload.group, sanitizeDisplayName) as any)?.id
-    : null;
+  // Tokens Studio keeps every theme in a group and refuses one without; say so instead of sending it.
+  if (isNewTheme && !groupName) {
+    return fail({
+      themeName: payload?.name,
+      action: 'create',
+      reason: 'themes synced with Tokens Studio need a group.',
+    });
+  }
 
-  if (payload.group && !themeGroupId) {
+  // themeGroupsData is keyed by the raw server name, so an exact lookup would miss and create a duplicate group.
+  let themeGroupId = groupName
+    ? (lookupBySanitized(themeGroupsData, groupName, sanitizeDisplayName) as any)?.id
+    : null;
+  // Set when this push created the group, so a refused theme doesn't leave it behind empty.
+  let createdGroupId: string | null = null;
+
+  if (groupName && !themeGroupId) {
+    const { id: projectId, changeSetId } = rootState.uiState.api;
     let createResult: any;
+    let createError: unknown = null;
     try {
-      // Try to create the theme group
       createResult = await pushToTokensStudioOAuth({
         context: rootState.uiState.api,
         action: 'CREATE_THEME_GROUP',
-        data: { name: payload.group },
+        data: { name: groupName },
         rethrowErrors: true,
       });
     } catch (error) {
-      return fail({
-        themeName: payload?.name, action: 'create', groupName: payload.group, reason: failureDetail(error),
-      });
+      createError = error;
     }
 
     if (createResult?.data?.id) {
       themeGroupId = createResult.data.id;
+      createdGroupId = themeGroupId;
     } else {
-      // Creation returned null (the group already exists).
-      // Fetch from the server to get the existing group's ID.
-      const { id: projectId, changeSetId } = rootState.uiState.api;
-      themeGroupId = await fetchThemeGroupId(projectId, payload.group, changeSetId);
+      // The group may already exist: Studio reports a plan's group limit or a name it would no longer accept
+      // before it checks for a name clash, so look the group up before treating the refusal as final.
+      themeGroupId = await fetchThemeGroupId(projectId, groupName, changeSetId);
     }
 
     if (!themeGroupId) {
-      // Without the group's id the theme would be pushed ungrouped, which the API refuses anyway.
       return fail({
         themeName: payload?.name,
         action: 'create',
-        groupName: payload.group,
-        reason: 'the theme group could not be found or created.',
+        groupName,
+        reason: createError ? failureDetail(createError) : 'the theme group could not be found or created.',
       });
     }
 
@@ -175,18 +190,20 @@ export async function pushThemeToTokensStudioOAuth(
       ...metadata,
       themeGroupsData: {
         ...themeGroupsData,
-        [payload.group]: { id: themeGroupId },
+        [groupName]: { id: themeGroupId },
       },
     });
   }
 
-  // Map set names to IDs. If no metadata mapping is available, send the name directly —
-  // the Rails API accepts both UUIDs and names in selected_token_sets.
+  // Creating a theme option takes token set names (Studio maps them to ids); updating one takes ids.
   const selectedTokenSets: Record<string, string> = {};
   Object.entries(payload?.selectedTokenSets || {}).forEach(([setName, status]) => {
-    // Set names arrive sanitized; tokenSetsData is keyed by the raw server name.
-    const setId = (lookupBySanitized(tokenSetsData, setName, sanitizeTokenSetName) as any)?.id;
-    selectedTokenSets[setId || setName] = (status as string).toLowerCase();
+    // tokenSetsData is keyed by the raw server name.
+    const sanitizedSetName = sanitizeTokenSetName(setName);
+    const key = isNewTheme
+      ? resolveSanitizedKey(tokenSetsData, sanitizedSetName, sanitizeTokenSetName) || sanitizedSetName
+      : (lookupBySanitized(tokenSetsData, sanitizedSetName, sanitizeTokenSetName) as any)?.id || setName;
+    selectedTokenSets[key] = (status as string).toLowerCase();
   });
 
   const themeData = {
@@ -212,6 +229,18 @@ export async function pushThemeToTokensStudioOAuth(
       rethrowErrors: true,
     });
   } catch (error) {
+    if (createdGroupId) {
+      // The group was made for this theme only; don't leave it empty, where it still counts toward a plan's limit.
+      await pushToTokensStudioOAuth({
+        context: rootState.uiState.api,
+        action: 'DELETE_THEME_GROUP_IF_EMPTY',
+        data: { id: createdGroupId },
+      });
+      const { metadata: currentMetadata } = store.getState().tokenState.remoteData || {};
+      const remainingGroups = { ...(currentMetadata?.themeGroupsData || {}) };
+      delete remainingGroups[resolveSanitizedKey(remainingGroups, groupName, sanitizeDisplayName) ?? groupName];
+      dispatch.tokenState.setRemoteMetadata({ ...currentMetadata, themeGroupsData: remainingGroups });
+    }
     // An edit that failed keeps the local change; only a create is undone, since the theme it added
     // never reached Tokens Studio.
     return fail({
@@ -223,7 +252,7 @@ export async function pushThemeToTokensStudioOAuth(
 
   if (isNewTheme && result?.data?.id) {
     // Re-read after the async create — the reducer has run by now and stored the theme with a local
-    // hash id. Find it by name + group so we can swap it for the server-assigned id.
+    // hash id. Find it so we can swap it for the server-assigned id.
     const localTheme = findLocalTheme();
     if (localTheme) {
       dispatch.tokenState.updateTheme({

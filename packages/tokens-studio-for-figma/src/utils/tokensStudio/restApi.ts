@@ -329,6 +329,22 @@ export async function deleteThemeGroupRest(
 }
 
 // Theme Option Operations
+export async function listThemeOptionsRest(
+  authToken: string,
+  apiBaseUrl: string,
+  projectId: string,
+  themeGroupId: string,
+  changeSetId?: string,
+): Promise<unknown[]> {
+  const result = await restRequest(authToken, apiBaseUrl, `/api/v1/projects/${projectId}/theme_options`, {
+    query: {
+      theme_group_id: themeGroupId,
+      ...(changeSetId ? { change_set_id: changeSetId } : {}),
+    },
+  });
+  return Array.isArray(result?.data) ? result.data : [];
+}
+
 export async function createThemeOptionRest(
   authToken: string,
   apiBaseUrl: string,

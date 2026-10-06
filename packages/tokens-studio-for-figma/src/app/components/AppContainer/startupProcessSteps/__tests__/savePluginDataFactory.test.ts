@@ -76,7 +76,7 @@ describe('savePluginDataFactory', () => {
       });
     });
 
-    it('uses the org a Studio-synced file syncs with, not the org saved for other files', async () => {
+    it('hands fetchUserData the org a Studio-synced file syncs with, keeping the saved org as the fallback', async () => {
       const params = {
         ...baseParams,
         storageType: {
@@ -86,8 +86,8 @@ describe('savePluginDataFactory', () => {
 
       await savePluginDataFactory(createMockStore({}).dispatch, params)();
 
-      expect(useAuthStore.getState().activeOrganizationId).toBe('file-org');
-      expect(mockFetchUserData).toHaveBeenCalledWith(params.oauthTokens, 'project-1');
+      expect(useAuthStore.getState().activeOrganizationId).toBe('saved-org');
+      expect(mockFetchUserData).toHaveBeenCalledWith(params.oauthTokens, 'project-1', 'file-org');
     });
 
     it('uses the saved org for a file that does not sync with Studio', async () => {

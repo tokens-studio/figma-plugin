@@ -60,6 +60,15 @@ describe('canSyncWithStudio', () => {
     expect(canSyncWithStudio(production)).toBe(false);
   });
 
+  it('lets a lapsed Variables org sync as Free, which is how Studio already treats it', () => {
+    // What Studio sends before Free is stored: the old slug, Free's rules.
+    const lapsed = makeOrg({
+      access: ['studio_platform'], current_plan: 'variables', plan_type: 'free', plan_status: 'expired',
+    });
+    expect(isVariablesPlan(lapsed)).toBe(false);
+    expect(canSyncWithStudio(lapsed)).toBe(true);
+  });
+
   it('keeps allowing an org with figma_plugin access but no studio_platform', () => {
     expect(canSyncWithStudio(makeOrg({ access: ['figma_plugin'], plan_status: 'paid' }))).toBe(true);
   });

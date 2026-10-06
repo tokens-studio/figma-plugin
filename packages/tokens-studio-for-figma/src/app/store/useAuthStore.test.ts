@@ -1,5 +1,6 @@
 import { useAuthStore } from './useAuthStore';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { getPlanDisplayName } from '@/utils/tokensStudio/organizationAccess';
 
 // Shape of GET /api/v1/organizations (studio-on-rails OrganizationsController#index).
@@ -109,6 +110,31 @@ describe('useAuthStore Pro and plan labels', () => {
 
     expect(useAuthStore.getState().activeOrganizationId).toBe('paid');
     expect(useAuthStore.getState().isPro).toBe(true);
+  });
+
+  const tokens = {
+    accessToken: 'token', refreshToken: 'refresh', tokenType: 'Bearer', expiresAt: Date.now() + 60 * 60 * 1000,
+  };
+  const savedOrgMessages = () => jest.mocked(AsyncMessageChannel.ReactInstance.message).mock.calls
+    .filter(([message]) => (message as any).type === AsyncMessageTypes.SET_ACTIVE_ORGANIZATION_ID);
+
+  it('uses the org a Studio-synced file syncs with, without saving it for other files', async () => {
+    useAuthStore.setState({ activeOrganizationId: 'paid' });
+
+    await useAuthStore.getState().fetchUserData(tokens, undefined, 'free');
+
+    expect(useAuthStore.getState().activeOrganizationId).toBe('free');
+    expect(useAuthStore.getState().isPro).toBe(false);
+    expect(savedOrgMessages()).toHaveLength(0);
+  });
+
+  it("keeps the saved org when the file's org isn't one of the user's", async () => {
+    useAuthStore.setState({ activeOrganizationId: 'free' });
+
+    await useAuthStore.getState().fetchUserData(tokens, undefined, 'someone-elses-org');
+
+    expect(useAuthStore.getState().activeOrganizationId).toBe('free');
+    expect(savedOrgMessages()).toHaveLength(0);
   });
 
   it('saves the active org for other files unless persist is false', async () => {
