@@ -1,10 +1,15 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, {
+  useState, useCallback, useEffect, useMemo,
+} from 'react';
+import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import {
   Button, Checkbox, Label, Stack, Heading,
 } from '@tokens-studio/ui';
 import Modal from './Modal';
 import Box from './Box';
 import { VariableCollectionInfo, SelectedCollections } from '@/types/VariableCollectionSelection';
+import { isTokensStudioSyncSelector } from '@/selectors';
 
 type Props = {
   isOpen: boolean;
@@ -20,11 +25,32 @@ export default function ImportVariablesDialog({
   const [useDimensions, setUseDimensions] = useState(false);
   const [useRem, setUseRem] = useState(false);
 
-  // Initialize all collections as selected with all modes selected by default
+  const { t } = useTranslation(['tokens']);
+  const isTokensStudioSync = useSelector(isTokensStudioSyncSelector);
+
+  // Filter out multi-level extensions (depth > 1). Tokens Studio sync doesn't
+  // support extended collections at all, so every extension is filtered there.
+  const { allowedCollections, filteredCollections } = useMemo(() => {
+    const allowed: VariableCollectionInfo[] = [];
+    const filtered: VariableCollectionInfo[] = [];
+    const maxExtensionDepth = isTokensStudioSync ? 0 : 1;
+
+    collections.forEach((collection) => {
+      if ((collection.extensionDepth ?? (collection.isExtension ? 1 : 0)) <= maxExtensionDepth) {
+        allowed.push(collection);
+      } else {
+        filtered.push(collection);
+      }
+    });
+
+    return { allowedCollections: allowed, filteredCollections: filtered };
+  }, [collections, isTokensStudioSync]);
+
+  // Initialize all allowed collections as selected with all modes selected by default
   useEffect(() => {
-    if (collections.length > 0) {
+    if (allowedCollections.length > 0) {
       const initialSelection: SelectedCollections = {};
-      collections.forEach((collection) => {
+      allowedCollections.forEach((collection) => {
         initialSelection[collection.id] = {
           name: collection.name,
           selectedModes: collection.modes.map((mode) => mode.modeId),
@@ -32,7 +58,7 @@ export default function ImportVariablesDialog({
       });
       setSelectedCollections(initialSelection);
     }
-  }, [collections]);
+  }, [allowedCollections]);
 
   const handleCollectionToggle = useCallback((collectionId: string, collectionName: string, modes: { modeId: string; name: string }[]) => {
     setSelectedCollections((prev) => {
@@ -103,20 +129,27 @@ export default function ImportVariablesDialog({
     [handleModeToggle],
   );
 
+  let emptyMessage = t('importVariablesNoCollections');
+  if (filteredCollections.length > 0) {
+    emptyMessage = isTokensStudioSync
+      ? t('importVariablesAllExtendedStudioSync')
+      : t('importVariablesAllMultiLevelExtensions');
+  }
+
   const hasSelections = Object.keys(selectedCollections).length > 0;
-  const allCollectionsSelected = collections.every((collection) => selectedCollections[collection.id]);
+  const allCollectionsSelected = allowedCollections.every((collection) => selectedCollections[collection.id]);
 
   const handleToggleAllCollections = useCallback(() => {
     // If all collections are selected, deselect all; otherwise, select all
     if (allCollectionsSelected) {
       setSelectedCollections({});
     } else {
-      setSelectedCollections(collections.reduce((acc, collection) => ({
+      setSelectedCollections(allowedCollections.reduce((acc, collection) => ({
         ...acc,
         [collection.id]: { name: collection.name, selectedModes: collection.modes.map((mode) => mode.modeId) },
       }), {}));
     }
-  }, [collections, allCollectionsSelected]);
+  }, [allowedCollections, allCollectionsSelected]);
 
   return (
     <Modal
@@ -139,6 +172,11 @@ export default function ImportVariablesDialog({
         <Box css={{ fontSize: '$small', color: '$fgMuted' }}>
           Select which variable collections and modes to import. Sets will be created for each selected mode.
         </Box>
+        {isTokensStudioSync && filteredCollections.length > 0 && (
+          <Box css={{ fontSize: '$small', color: '$fgMuted' }}>
+            {t('importVariablesExtendedSkippedStudioSync')}
+          </Box>
+        )}
 
         {/* Options */}
         <Stack direction="column" gap={2}>
@@ -183,16 +221,16 @@ export default function ImportVariablesDialog({
               </Label>
             </Stack>
           </Stack>
-          {collections.length === 0 ? (
+          {allowedCollections.length === 0 ? (
             <Box css={{
               padding: '$3', backgroundColor: '$bgMuted', borderRadius: '$small', textAlign: 'center',
             }}
             >
-              There are no collections present in this file
+              {emptyMessage}
             </Box>
           ) : (
             <Stack direction="column" gap={3} css={{ borderLeft: '2px solid $borderMuted' }}>
-              {collections.map((collection) => {
+              {allowedCollections.map((collection) => {
                 const isCollectionSelected = !!selectedCollections[collection.id];
                 const selectedModes = selectedCollections[collection.id]?.selectedModes || [];
 
@@ -233,6 +271,19 @@ export default function ImportVariablesDialog({
             </Stack>
           )}
         </Stack>
+
+        {filteredCollections.length > 0 && (
+          <Box css={{
+            padding: '$3', backgroundColor: '$warningBg', color: '$warningFg', borderRadius: '$small',
+          }}
+          >
+            ⚠️
+            {' '}
+            {filteredCollections.length}
+            {' '}
+            collection(s) skipped: We only support one level of extension at the moment.
+          </Box>
+        )}
 
         {!hasSelections && (
           <Box css={{
