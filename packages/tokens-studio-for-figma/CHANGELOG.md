@@ -1,5 +1,15 @@
 # @tokens-studio/figma-plugin
 
+## 2.13.0
+
+### Minor Changes
+
+- 30408a5dc: Add support for exporting extended (child) variable collections for Figma Enterprise users. Extended collections inherit variables from a parent collection and can override specific values per brand or theme, enabling scalable multi-brand design token systems directly in Figma.
+
+### Patch Changes
+
+- 295866cf6: Color tokens using `rgba`, `combine_alpha` or `set_alpha` with references now export as Figma variables linked to their color and opacity variables.
+
 ## 2.12.1
 
 ### Patch Changes
