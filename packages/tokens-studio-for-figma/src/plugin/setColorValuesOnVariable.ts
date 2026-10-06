@@ -3,6 +3,7 @@ import { convertToFigmaColor } from './figmaTransforms/colors';
 import { isColorApproximatelyEqual } from '@/utils/isColorApproximatelyEqual';
 import { resolveCollectionContext } from './extendedCollections/collectionContext';
 import { applyChildModeValue } from './extendedCollections/applyChildModeValue';
+import { isVariableComposedColor } from './composedColor';
 
 type RGB = { r: number; g: number; b: number };
 type RGBOrRGBA = RGB | RGBA;
@@ -26,7 +27,11 @@ export default function setColorValuesOnVariable(variable: Variable, mode: strin
     const existingVariableValue = variable.valuesByMode[mode];
     if (
       existingVariableValue
-      && !(isFigmaColorObject(existingVariableValue) || isVariableWithAliasReference(existingVariableValue))
+      && !(
+        isFigmaColorObject(existingVariableValue)
+        || isVariableWithAliasReference(existingVariableValue)
+        || isVariableComposedColor(existingVariableValue)
+      )
     ) return;
 
     const newValue = { ...color, a: opacity };

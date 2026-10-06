@@ -83,9 +83,9 @@ describe('ManageThemesModal', () => {
         <ManageThemesModal />
       </Provider>,
     );
-    waitFor(() => {
-      result.getByTestId('singlethemeentry-light').click();
-      result.getByText('delete').click();
+    (await result.findByTestId('singlethemeentry-light')).click();
+    (await result.findByText('delete')).click();
+    await waitFor(() => {
       expect(result.getByText('delete')).toBeInTheDocument();
     });
   });

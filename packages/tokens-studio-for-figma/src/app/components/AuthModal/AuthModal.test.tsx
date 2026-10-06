@@ -1,11 +1,12 @@
 import React from 'react';
 import { Provider } from 'react-redux';
-import { mockFetch } from '../../../../tests/__mocks__/fetchMock';
+import { rest } from 'msw';
 import {
   createMockStore, fireEvent, render, resetStore, screen, waitFor,
 } from '../../../../tests/config/setupTest';
 import AuthModal from '.';
 import { AuthContextProvider } from '@/context/AuthContext';
+import { server } from '@/mocks/server';
 
 // Hide log calls unless they are expected. This is mainly related to react-modal
 jest.spyOn(console, 'error').mockImplementation(() => {});
@@ -102,9 +103,10 @@ describe('Add license key', () => {
     const pass = 'pass';
     const loginError = 'Invalid login credentials';
 
-    mockFetch.mockImplementationOnce(() => Promise.resolve({
-      json: () => Promise.resolve({ error: 'invalid_grant', error_description: loginError }),
-    }));
+    server.use(rest.post(`${process.env.SUPABASE_URL}/auth/v1/token`, (req, res, ctx) => res(
+      ctx.status(400),
+      ctx.json({ error: 'invalid_grant', error_description: loginError }),
+    )));
 
     const mockStore = createMockStore({
       uiState: {
@@ -136,21 +138,27 @@ describe('Add license key', () => {
 
     expect(emailInput).toHaveValue(email);
     loginButton.click();
-    waitFor(async () => {
+    await waitFor(async () => {
       const errorMsg = await screen.findByText(new RegExp(loginError, 'i'));
       expect(errorMsg).toBeInTheDocument();
     });
   });
 });
 
-it('Displays signup error', async () => {
+const signupError = 'Error signing up';
+
+// The auth context shows `msg` and falls back to `error_description`, so cover both error shapes.
+it.each([
+  { field: 'msg', status: 422, body: { code: 422, msg: signupError } },
+  { field: 'error_description', status: 400, body: { error: 'invalid_request', error_description: signupError } },
+])('Displays signup error from $field', async ({ status, body }) => {
   const email = 'test@email.com';
   const pass = 'pass';
-  const signupError = 'Error signing up';
 
-  mockFetch.mockImplementationOnce(() => Promise.resolve({
-    json: () => Promise.resolve({ code: 422, msg: signupError }),
-  }));
+  server.use(rest.post(`${process.env.SUPABASE_URL}/auth/v1/signup`, (req, res, ctx) => res(
+    ctx.status(status),
+    ctx.json(body),
+  )));
 
   const mockStore = createMockStore({
     uiState: {
@@ -190,7 +198,7 @@ it('Displays signup error', async () => {
 
   expect(emailInput).toHaveValue(email);
   signupButton.click();
-  waitFor(async () => {
+  await waitFor(async () => {
     const errorMsg = await screen.findByText(new RegExp(signupError, 'i'));
     expect(errorMsg).toBeInTheDocument();
   });

@@ -125,6 +125,7 @@ export default async function updateVariables({
     metadataUpdateTracker,
     providedPlatformsByVariable,
     isExtendedCollection,
+    new Map(resolvedTokens.map((token) => [token.name, { value: token.value, rawValue: token.rawValue, type: token.type }])),
   );
 
   const removedVariables: string[] = [];
