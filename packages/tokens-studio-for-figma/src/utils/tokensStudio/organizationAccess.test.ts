@@ -52,6 +52,14 @@ describe('canSyncWithStudio', () => {
     expect(canSyncWithStudio(variablesOrg)).toBe(false);
   });
 
+  it('recognises the Variables plan by its slug when plan_type is wrong, as on production', () => {
+    const production = makeOrg({
+      access: ['companion', 'studio_platform'], current_plan: 'variables', plan_type: 'regular', plan_status: 'paid',
+    });
+    expect(isVariablesPlan(production)).toBe(true);
+    expect(canSyncWithStudio(production)).toBe(false);
+  });
+
   it('keeps allowing an org with figma_plugin access but no studio_platform', () => {
     expect(canSyncWithStudio(makeOrg({ access: ['figma_plugin'], plan_status: 'paid' }))).toBe(true);
   });

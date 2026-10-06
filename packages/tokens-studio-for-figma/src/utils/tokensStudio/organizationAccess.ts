@@ -10,9 +10,10 @@ export function isActivePlanStatus(planStatus?: string | null): boolean {
   return !!planStatus && ACTIVE_PLAN_STATUSES.includes(planStatus);
 }
 
-// Variables plans are for Companion; they can't sync in Tokens Studio for Figma.
+// Variables plans are for Companion; they can't sync in Tokens Studio for Figma. Checks the plan's slug too:
+// production's Variables plan group reports `plan_type: "regular"`.
 export function isVariablesPlan(org?: Organization | null): boolean {
-  return org?.subscription?.plan_type === 'variables';
+  return org?.subscription?.plan_type === 'variables' || org?.subscription?.current_plan === 'variables';
 }
 
 // Whether a file can start or switch Studio sync with this org. Free orgs can (`studio_platform`); Pro is a
