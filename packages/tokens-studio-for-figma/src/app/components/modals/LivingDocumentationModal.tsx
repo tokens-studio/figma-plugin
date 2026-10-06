@@ -21,6 +21,7 @@ import { mergeTokenGroups, getOverallConfig, mergeServerResolvedTokens } from '@
 import { defaultTokenResolver } from '@/utils/TokenResolver';
 import { RootState } from '../../store';
 import { track } from '@/utils/analytics';
+import { docUrls } from '@/constants/docUrls';
 
 const StyledCode = styled('code', {
   backgroundColor: '$bgSubtle',
@@ -125,7 +126,7 @@ export default function LivingDocumentationModal({
             Generate living documentation to showcase your design tokens in Figma.
             {' '}
             <a
-              href="https://docs.tokens.studio/figma/generate-documentation"
+              href={docUrls.generateDocumentation}
               target="_blank"
               rel="noopener noreferrer"
               style={{ color: '$accent', textDecoration: 'underline' }}

@@ -6,6 +6,9 @@ import {
 import { EyeClosedIcon, EyeOpenIcon, ExclamationTriangleIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import { docUrls } from '@/constants/docUrls';
+import { DocsRef } from '@/constants/DocsRef';
+import { withDocsRef } from '@/utils/withDocsRef';
 import { StorageTypeFormValues } from '@/types/StorageType';
 import { generateId } from '@/utils/generateId';
 import { ChangeEventHandler } from './types';
@@ -96,7 +99,7 @@ export default function BitbucketForm({
         <Text muted>{t('bitBucketExplained')}</Text>
         <Text muted css={{ marginTop: '$2' }}>
           <Link
-            href="https://docs.tokens.studio/token-storage/remote/sync-git-bitbucket?ref=addprovider"
+            href={withDocsRef(docUrls.syncProviders[StorageProviderType.BITBUCKET], DocsRef.ADD_PROVIDER)}
             target="_blank"
             rel="noreferrer"
           >
@@ -106,7 +109,7 @@ export default function BitbucketForm({
         {isMigrating && (
           <Text muted css={{ marginTop: '$2' }}>
             <Link
-              href="https://docs.tokens.studio/token-storage/remote/sync-git-bitbucket/migration-from-app-passwords-to-api-tokens"
+              href={docUrls.bitbucketAppPasswordMigration}
               target="_blank"
               rel="noreferrer"
             >
