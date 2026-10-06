@@ -14,6 +14,8 @@ import { store } from '@/app/store';
 import { notifyToUI } from '@/plugin/notifiers';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 import { TOKENS_STUDIO_APP_URL } from '@/constants/TokensStudio';
+import { isProOrganization } from '@/utils/tokensStudio/organizationAccess';
+import { isTokensStudioOAuthType } from '@/utils/is';
 
 interface DeviceCodeState {
   userCode: string;
@@ -37,10 +39,13 @@ interface AuthState {
   loginWithOAuth: () => Promise<void>;
   logout: () => Promise<void>;
   setError: (error: string | null) => void;
-  setActiveOrganization: (orgId: string) => void;
+  // `persist: false` keeps the change to this session, without replacing the org saved for other files.
+  setActiveOrganization: (orgId: string, options?: { persist?: boolean }) => void;
   setActiveProject: (projectId: string) => void;
   setOAuthTokens: (tokens: OAuthTokens | null) => Promise<void>;
-  fetchUserData: (tokens: OAuthTokens, persistedProjectId?: string) => Promise<void>;
+  // `fileOrganizationId`: the org the open file syncs with. Startup passes it, since the file's storage isn't in the
+  // store yet; otherwise it's read from the store.
+  fetchUserData: (tokens: OAuthTokens, persistedProjectId?: string, fileOrganizationId?: string) => Promise<void>;
   fetchProjects: (orgId: string, persistedProjectId?: string) => Promise<void>;
   loadProjectTokens: (projectId: string) => Promise<void>;
   refreshTokens: () => Promise<void>;
@@ -168,16 +173,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
-  setActiveOrganization: (orgId: string) => {
+  setActiveOrganization: (orgId: string, { persist = true } = {}) => {
     set((state) => {
       const org = state.organizations.find((o) => o.id === orgId) || null;
-      const accessArr = org?.subscription?.access || [];
-      const planName = org?.subscription?.plan?.name || '';
-      const isPartner = planName.toLowerCase().includes('partner');
-      const isTrialExpired = !isPartner && (org?.subscription?.plan_status === 'trial_expired' || org?.subscription?.plan_status === 'expired');
-      const isPro = accessArr.includes('figma_plugin') && org?.current_user_seat_type === 'EDITOR' && !isTrialExpired;
 
-      if (org) {
+      if (org && persist) {
         AsyncMessageChannel.ReactInstance.message({
           type: AsyncMessageTypes.SET_ACTIVE_ORGANIZATION_ID,
           activeOrganizationId: org.id,
@@ -188,7 +188,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         activeOrganization: org,
         activeOrganizationId: org?.id || null,
         activeProject: org?.projects?.data?.[0] || null,
-        isPro,
+        isPro: isProOrganization(org),
       };
     });
     // Fetch projects if needed
@@ -210,7 +210,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     });
   },
 
-  fetchUserData: async (tokens: OAuthTokens, persistedProjectId?: string) => {
+  fetchUserData: async (tokens: OAuthTokens, persistedProjectId?: string, fileOrganizationId?: string) => {
     let currentTokens = tokens;
     if (OAuthService.needsRefresh(currentTokens)) {
       try {
@@ -285,17 +285,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             const sub = (org.type && org.attributes ? org.attributes.subscription : org.subscription) || {};
 
             // Plan name mapping
-            const rawPlanName = sub.current_plan || sub.plan?.name || 'Starter';
+            const rawPlanName = sub.current_plan || sub.plan?.name || 'No plan';
             // Capitalize first letter
             let planName = rawPlanName.charAt(0).toUpperCase() + rawPlanName.slice(1);
-            const isPartner = rawPlanName.toLowerCase().includes('partner');
-
-            if (!isPartner) {
-              if (sub.plan_status === 'trial_expired' || sub.plan_status === 'expired') {
-                planName = `${planName} Trial Expired`;
-              } else if (sub.plan_status === 'trialing') {
-                planName = `${planName} Trial`;
-              }
+            if (sub.plan_status === 'trialing') {
+              planName = `${planName} Trial`;
             }
 
             // Billing date mapping
@@ -354,17 +348,19 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         console.warn('Could not fetch organizations via new backend, fallback missing depending on API.', err);
       }
 
-      const storedId = get().activeOrganizationId;
-      const activeOrganization = organizations.find((o) => o.id === storedId) || (organizations.length > 0 ? organizations[0] : null);
-
-      let isPro = false;
-      if (activeOrganization) {
-        const accessArr = activeOrganization.subscription?.access || [];
-        const planName = activeOrganization.subscription?.plan?.name || '';
-        const isPartner = planName.toLowerCase().includes('partner');
-        const isTrialExpired = !isPartner && (activeOrganization.subscription?.plan_status === 'trial_expired' || activeOrganization.subscription?.plan_status === 'expired');
-        isPro = accessArr.includes('figma_plugin') && activeOrganization.current_user_seat_type === 'EDITOR' && !isTrialExpired;
-      }
+      // A file synced with Studio uses the org it syncs with, so Pro and plan come from that org. Other files use the
+      // org picked in Settings, which is shared across files. Without a usable pick, prefer an org that grants Pro:
+      // someone in both a paid and a Free org then gets Pro in local and Git files without picking it first.
+      const { storageType } = store.getState().uiState;
+      const fileOrgId = fileOrganizationId ?? (isTokensStudioOAuthType(storageType) ? storageType.orgId : undefined);
+      const savedId = get().activeOrganizationId;
+      const fileOrganization = organizations.find((o) => o.id === fileOrgId);
+      const savedOrganization = organizations.find((o) => o.id === savedId);
+      const activeOrganization = fileOrganization
+        || savedOrganization
+        || organizations.find(isProOrganization)
+        || organizations[0]
+        || null;
 
       const defaultProject = activeOrganization?.projects?.data?.find((p) => p.id === persistedProjectId) || activeOrganization?.projects?.data?.[0] || null;
 
@@ -374,7 +370,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         activeOrganization,
         activeOrganizationId: activeOrganization?.id || null,
         activeProject: defaultProject,
-        isPro,
+        isPro: isProOrganization(activeOrganization),
         isLoading: false,
         isAuthenticated: true,
       });
@@ -382,7 +378,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       if (activeOrganization) {
         await get().fetchProjects(activeOrganization.id, persistedProjectId);
 
-        if (activeOrganization.id !== storedId) {
+        // Remember a pick only when none of the user's is usable, and never the file's org: that one is per file.
+        if (!savedOrganization && activeOrganization !== fileOrganization) {
           AsyncMessageChannel.ReactInstance.message({
             type: AsyncMessageTypes.SET_ACTIVE_ORGANIZATION_ID,
             activeOrganizationId: activeOrganization.id,

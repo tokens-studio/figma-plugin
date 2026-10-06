@@ -2,7 +2,7 @@ import type { RematchDispatch } from '@rematch/core';
 import type { RootModel } from '@/types/RootModel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { pushToTokensStudioOAuth } from '../../../providers/tokens-studio/tokensStudioOAuth';
-import { pushThemeToTokensStudioOAuth } from './utils/pushThemeToTokensStudioOAuth';
+import { notifyThemePushFailures, pushThemeToTokensStudioOAuth, type ThemePushFailure } from './utils/pushThemeToTokensStudioOAuth';
 import {
   resolveSanitizedKey,
   sanitizeNewTokensForStudio,
@@ -116,10 +116,14 @@ export function setTokensFromVariables(dispatch: RematchDispatch<RootModel>) {
       const updatedThemesToPush = (importedThemes.updatedThemes || []).map((t: any) => sanitizeThemeForStudio(t));
       // Push themes sequentially so that a shared theme group (e.g. "appearances") is only created
       // once — concurrent pushes would both see groupId=null and create duplicate groups.
+      const failures: ThemePushFailure[] = [];
       for (const theme of [...newThemesToPush, ...updatedThemesToPush]) {
         // eslint-disable-next-line no-await-in-loop
-        await pushThemeToTokensStudioOAuth(theme, stateAfterSets, dispatch);
+        const result = await pushThemeToTokensStudioOAuth(theme, stateAfterSets, dispatch, { notifyOnFailure: false });
+        if (!result.ok) failures.push(result.failure);
       }
+      // One message for the whole import rather than one per refused theme.
+      notifyThemePushFailures(failures);
     }
   };
 }
