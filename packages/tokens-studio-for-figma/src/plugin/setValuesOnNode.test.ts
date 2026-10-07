@@ -187,4 +187,30 @@ describe('setValuesOnNode', () => {
       paddingTop: 3,
     });
   });
+
+  it('should still remove styling values when a token resolves to none', async () => {
+    await setValuesOnNode({ node: textNodeMock, values: { borderRadius: 'none' }, data });
+    expect(textNodeMock.cornerRadius).toEqual(0);
+  });
+
+  describe('documentation properties with a none value', () => {
+    let documentationTextNodeMock: TextNode;
+    beforeEach(() => {
+      documentationTextNodeMock = {
+        id: '123:458',
+        type: 'TEXT',
+        characters: 'placeholder',
+        fontName: { family: 'Inter', style: 'Regular' },
+      } as TextNode;
+    });
+
+    it.each(['tokenValue', 'value', 'tokenName', 'description'])('should write none as text for %s', async (property) => {
+      await setValuesOnNode({
+        node: documentationTextNodeMock,
+        values: { [property]: 'none' },
+        data: { [property]: 'shadow.none' },
+      });
+      expect(documentationTextNodeMock.characters).toEqual('none');
+    });
+  });
 });
