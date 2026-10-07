@@ -26,6 +26,8 @@ export type ConfirmProps = {
   choices?: { key: string; label: string; enabled?: boolean, unique?: boolean }[];
   confirmAction?: string;
   cancelAction?: string;
+  // Optional third button, resolves the confirm with `secondary: true`
+  secondaryAction?: string;
   variant?: 'danger';
   input?: {
     type: 'text';
@@ -188,6 +190,7 @@ export const uiState = createModel<RootModel>()({
         choices: { key: string; label: string; enabled?: boolean; unique?: boolean }[];
         confirmAction?: string;
         cancelAction?: string;
+        secondaryAction?: string;
         variant?: 'danger';
         input?: {
           type: 'text';
@@ -204,6 +207,7 @@ export const uiState = createModel<RootModel>()({
         choices: data.choices,
         confirmAction: data.confirmAction || defaultConfirmState.confirmAction,
         cancelAction: data.cancelAction || defaultConfirmState.cancelAction,
+        secondaryAction: data.secondaryAction,
         input: data.input,
         variant: data.variant,
         formId: data.formId,
