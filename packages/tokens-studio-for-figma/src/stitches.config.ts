@@ -2,6 +2,16 @@
 import { createStitches } from '@stitches/react';
 import { lightFigmaTheme as lightTheme, darkFigmaTheme as darkTheme, core } from '@tokens-studio/tokens';
 
+// The launch screens are always dark, regardless of the Figma theme.
+const launchScreenColors = {
+  loadingScreenBg: '#0B0A0F',
+  loadingScreenFg: '#FCFCFC',
+  loadingScreenFgSubtle: 'rgba(252, 252, 252, 0.8)',
+  loadingScreenFgMuted: 'rgba(252, 252, 252, 0.6)',
+  loadingScreenBorder: 'rgba(252, 252, 252, 0.24)',
+  loadingScreenSeparator: 'rgba(255, 255, 255, 0.4)',
+};
+
 export const stitchesInstance = createStitches({
   theme: {
     colors: {
@@ -10,6 +20,7 @@ export const stitchesInstance = createStitches({
       proBg: '#e1d8ec',
       proBorder: '#c2b2d8',
       proFg: '#694993',
+      ...launchScreenColors,
     },
     shadows: lightTheme.shadows,
     ...core,
@@ -52,6 +63,7 @@ const lightThemeMode = createTheme('figma-light', {
     proBg: '#e1d8ec',
     proBorder: '#c2b2d8',
     proFg: '#694993',
+    ...launchScreenColors,
   },
   shadows: lightTheme.shadows,
 });
@@ -63,6 +75,7 @@ const darkThemeMode = createTheme('figma-dark', {
     proBg: '#402d5a',
     proBorder: '#694993',
     proFg: '#c2b2d8',
+    ...launchScreenColors,
   },
   shadows: darkTheme.shadows,
 });
