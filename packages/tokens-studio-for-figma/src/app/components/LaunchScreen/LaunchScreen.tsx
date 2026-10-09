@@ -3,10 +3,23 @@ import { useTranslation } from 'react-i18next';
 import { Stack } from '@tokens-studio/ui';
 import { styled } from '@/stitches.config';
 import { LaunchScreenLayout } from './LaunchScreenLayout';
+import launchAnimation from '@/app/assets/launch-screen.webm';
 
 const SLACK_URL = 'https://tokens.studio/slack';
 const DOCS_URL = 'https://docs.tokens.studio/?ref=launchscreen';
 const REPORT_ISSUE_URL = 'https://github.com/tokens-studio/figma-plugin/issues';
+
+// Fills the screen behind the buttons. 'contain' keeps the whole animation visible at any
+// plugin size; the video's dark background blends into the layout around it.
+const LaunchAnimation = styled('video', {
+  position: 'absolute',
+  inset: 0,
+  width: '100%',
+  height: '100%',
+  objectFit: 'contain',
+  objectPosition: 'top center',
+  pointerEvents: 'none',
+});
 
 const PillButton = styled('button', {
   display: 'flex',
@@ -97,7 +110,8 @@ export default function LaunchScreen({
 
   return (
     <LaunchScreenLayout data-testid="launch-screen">
-      <Stack direction="column" gap={6} align="center">
+      <LaunchAnimation src={launchAnimation} autoPlay loop muted playsInline aria-hidden data-testid="launch-screen-animation" />
+      <Stack direction="column" gap={6} align="center" css={{ position: 'relative' }}>
         <Stack direction="column" align="center" css={{ width: '180px', gap: '10px' }}>
           <PillButton type="button" variant="primary" onClick={onCreateAccount} data-testid="launch-screen-create-account">
             {t('createAccount')}
