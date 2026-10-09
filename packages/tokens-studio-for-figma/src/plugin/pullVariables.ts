@@ -14,6 +14,7 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { processExtendedCollectionImport } from './extendedCollections';
 import { composedColorToTokenValue, isVariableComposedColor } from './composedColor';
+import { fromFigmaEasing, secondsToDurationValue } from './figmaTransforms/motion';
 
 type CollectionEntry = {
   id: string,
@@ -31,6 +32,8 @@ export default async function pullVariables(options: PullVariablesOptions, theme
   const strings: VariableToCreateToken[] = [];
   const numbers: VariableToCreateToken[] = [];
   const dimensions: VariableToCreateToken[] = [];
+  const durations: VariableToCreateToken[] = [];
+  const cubicBeziers: VariableToCreateToken[] = [];
 
   let baseRem = 16;
   if (options.useRem) {
@@ -393,6 +396,63 @@ export default async function pullVariables(options: PullVariablesOptions, theme
               }
             });
             break;
+
+          case 'TIMING':
+          case 'EASING': {
+            const isTiming = variable.resolvedType === 'TIMING';
+            Object.entries(variable.valuesByMode).forEach(([parentModeId, value]) => {
+              let actualModeId = parentModeId;
+              if (collectionToProcess?.isExtension) {
+                const childMode = collectionToProcess.modes.find((m) => m.parentModeId === parentModeId);
+                if (!childMode) {
+                  return;
+                }
+                actualModeId = childMode.modeId;
+              }
+
+              if (options.selectedCollections && collectionToProcess) {
+                const selectedCollection = options.selectedCollections[collectionToProcess.id];
+                if (selectedCollection && !selectedCollection.selectedModes.includes(actualModeId)) {
+                  return;
+                }
+              }
+
+              let actualValue = value;
+              if (collectionToProcess?.isExtension && collectionToProcess.variableOverrides) {
+                const override = collectionToProcess.variableOverrides[variable.id]?.[actualModeId];
+                if (override !== undefined) {
+                  actualValue = override;
+                }
+              }
+
+              let tokenValue: string | null;
+              if (typeof actualValue === 'object' && 'type' in actualValue && actualValue.type === 'VARIABLE_ALIAS') {
+                const alias = figma.variables.getVariableById(actualValue.id);
+                tokenValue = `{${alias?.name.replace(/\//g, '.')}}`;
+              } else if (isTiming) {
+                tokenValue = typeof actualValue === 'number' ? secondsToDurationValue(actualValue) : null;
+              } else {
+                tokenValue = fromFigmaEasing(actualValue);
+              }
+
+              if (!tokenValue) {
+                console.warn(`Skipping ${variable.resolvedType} variable ${variable.name}: unsupported value`, actualValue);
+                return;
+              }
+
+              const modeName = collectionToProcess?.modes.find((m) => m.modeId === actualModeId)?.name;
+              const figmaExtensions = createFigmaExtensions(variable);
+              (isTiming ? durations : cubicBeziers).push({
+                name: variableName,
+                value: tokenValue,
+                type: isTiming ? TokenTypes.DURATION : TokenTypes.CUBIC_BEZIER,
+                parent: `${collectionToProcess?.name}/${modeName}`,
+                ...(variable.description ? { description: variable.description } : {}),
+                ...(figmaExtensions ? { $extensions: figmaExtensions } : {}),
+              });
+            });
+            break;
+          }
           default:
             break;
         }
@@ -408,6 +468,8 @@ export default async function pullVariables(options: PullVariablesOptions, theme
     strings,
     numbers,
     dimensions,
+    durations,
+    cubicBeziers,
   };
 
   type ResultObject = Record<string, VariableToCreateToken[]>;
