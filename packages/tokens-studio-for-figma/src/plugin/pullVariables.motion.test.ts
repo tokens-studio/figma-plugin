@@ -121,4 +121,22 @@ describe('pullVariables motion variables', () => {
       ],
     }, []);
   });
+
+  it('normalizes alias names the same way as variable names', async () => {
+    (figma.variables.getVariableById as jest.Mock).mockReturnValue({ name: 'motion / duration / base', id: 'aliasId' });
+    await pullVariables({ useDimensions: false, useRem: false }, [], false);
+
+    const { durations } = notifyVariableValuesSpy.mock.calls[0][0];
+    expect(durations).toContainEqual(expect.objectContaining({ name: 'motion.duration.alias', value: '{motion.duration.base}' }));
+  });
+
+  it('skips aliases whose target variable cannot be resolved', async () => {
+    (figma.variables.getVariableById as jest.Mock).mockReturnValue(null);
+    await pullVariables({ useDimensions: false, useRem: false }, [], false);
+
+    const { durations } = notifyVariableValuesSpy.mock.calls[0][0];
+    expect(durations.filter((t) => t.name === 'motion.duration.alias')).toEqual([
+      expect.objectContaining({ value: '300ms', parent: 'Motion/Reduced' }),
+    ]);
+  });
 });
