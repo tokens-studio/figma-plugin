@@ -93,3 +93,39 @@ export function defaultFigmaEasing(): MotionEasing {
     },
   };
 }
+
+// Import direction: Figma TIMING seconds -> duration token value ("200ms").
+// Figma stores float32, so 0.3s reads back as 0.30000001…; round to µs.
+export function secondsToDurationValue(seconds: number): string | null {
+  if (!Number.isFinite(seconds)) return null;
+  return `${Number((seconds * 1000).toFixed(3))}ms`;
+}
+
+// Cubic-bezier equivalents of Figma's preset easings, so a preset EASING
+// variable still imports as a cubicBezier token. Spring and HOLD easings
+// have no cubic-bezier form.
+const PRESET_EASING_BEZIERS: Partial<Record<MotionEasing['type'], [number, number, number, number]>> = {
+  LINEAR: [0, 0, 1, 1],
+  EASE_IN: [0.42, 0, 1, 1],
+  EASE_OUT: [0, 0, 0.58, 1],
+  EASE_IN_AND_OUT: [0.42, 0, 0.58, 1],
+  EASE_IN_BACK: [0.3, -0.05, 0.7, -0.5],
+  EASE_OUT_BACK: [0.45, 1.45, 0.8, 1],
+  EASE_IN_AND_OUT_BACK: [0.7, -0.4, 0.4, 1.4],
+};
+
+// Import direction: Figma MotionEasing -> cubicBezier token value ("x1, y1, x2, y2"),
+// the same canonical string the STRING export fallback writes.
+// Returns null for easings that can't be expressed as a cubic bezier.
+export function fromFigmaEasing(easing: unknown): string | null {
+  if (!easing || typeof easing !== 'object') return null;
+  const { type, easingFunctionCubicBezier: bezier } = easing as MotionEasing;
+  let pts: number[] | undefined;
+  if (bezier && [bezier.x1, bezier.y1, bezier.x2, bezier.y2].every(isNumber)) {
+    pts = [bezier.x1, bezier.y1, bezier.x2, bezier.y2];
+  } else if (type) {
+    pts = PRESET_EASING_BEZIERS[type];
+  }
+  if (!pts) return null;
+  return pts.map(roundTo6).join(', ');
+}

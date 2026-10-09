@@ -14,6 +14,23 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { processExtendedCollectionImport } from './extendedCollections';
 import { composedColorToTokenValue, isVariableComposedColor } from './composedColor';
+import { fromFigmaEasing, secondsToDurationValue } from './figmaTransforms/motion';
+
+const isVariableAlias = (value: unknown): value is VariableAlias => (
+  typeof value === 'object' && value !== null && 'type' in value && (value as VariableAlias).type === 'VARIABLE_ALIAS'
+);
+
+// Alias target's token name, normalized the same way as imported variable names
+// so references resolve. Undefined when the target variable can't be found.
+const aliasName = (alias: VariableAlias): string | undefined => {
+  const name = figma.variables.getVariableById(alias.id)?.name;
+  return name ? normalizeVariableName(name) : undefined;
+};
+
+const aliasReference = (alias: VariableAlias): string | null => {
+  const name = aliasName(alias);
+  return name ? `{${name}}` : null;
+};
 
 type CollectionEntry = {
   id: string,
@@ -31,6 +48,8 @@ export default async function pullVariables(options: PullVariablesOptions, theme
   const strings: VariableToCreateToken[] = [];
   const numbers: VariableToCreateToken[] = [];
   const dimensions: VariableToCreateToken[] = [];
+  const durations: VariableToCreateToken[] = [];
+  const cubicBeziers: VariableToCreateToken[] = [];
 
   let baseRem = 16;
   if (options.useRem) {
@@ -116,6 +135,45 @@ export default async function pullVariables(options: PullVariablesOptions, theme
     return Object.keys(extensions).length > 0 ? extensions : undefined;
   };
 
+  // Calls `callback` once per mode of `variable` as seen from `collection`:
+  // parent modes are mapped to extended child modes, child overrides are
+  // applied, and modes excluded by `options.selectedCollections` are skipped.
+  // `parent` is the token set name ("Collection/Mode").
+  const forEachModeValue = (
+    variable: Variable,
+    collection: CollectionEntry,
+    callback: (value: VariableValue, parent: string) => void,
+  ) => {
+    Object.entries(variable.valuesByMode).forEach(([parentModeId, value]) => {
+      let actualModeId = parentModeId;
+      if (collection.isExtension) {
+        const childMode = collection.modes.find((m) => m.parentModeId === parentModeId);
+        if (!childMode) {
+          return;
+        }
+        actualModeId = childMode.modeId;
+      }
+
+      if (options.selectedCollections) {
+        const selectedCollection = options.selectedCollections[collection.id];
+        if (selectedCollection && !selectedCollection.selectedModes.includes(actualModeId)) {
+          return;
+        }
+      }
+
+      let actualValue = value;
+      if (collection.isExtension && collection.variableOverrides) {
+        const override = collection.variableOverrides[variable.id]?.[actualModeId];
+        if (override !== undefined) {
+          actualValue = override;
+        }
+      }
+
+      const modeName = collection.modes.find((m) => m.modeId === actualModeId)?.name;
+      callback(actualValue, `${collection.name}/${modeName}`);
+    });
+  };
+
   // Collections that at least one variable contributes to (directly, or via
   // inheritance for extended child collections). Used to skip empty collections
   // in the theme pass.
@@ -174,225 +232,107 @@ export default async function pullVariables(options: PullVariablesOptions, theme
 
     const variableName = normalizeVariableName(variable.name);
 
+    const pushToken = (target: VariableToCreateToken[], type: TokenTypes, value: VariableToCreateToken['value'], parent: string) => {
+      const figmaExtensions = createFigmaExtensions(variable);
+      target.push({
+        name: variableName,
+        value,
+        type,
+        parent,
+        ...(variable.description ? { description: variable.description } : {}),
+        ...(figmaExtensions ? { $extensions: figmaExtensions } : {}),
+      });
+    };
+
     // Process the variable for each collection (parent + extended collections)
     for (const collectionToProcess of collectionsToProcess) {
       try {
         switch (variable.resolvedType) {
           case 'COLOR':
-            Object.entries(variable.valuesByMode).forEach(([parentModeId, value]) => {
-              let actualModeId = parentModeId;
-              if (collectionToProcess?.isExtension) {
-                const childMode = collectionToProcess.modes.find((m) => m.parentModeId === parentModeId);
-                if (!childMode) {
-                  return;
-                }
-                actualModeId = childMode.modeId;
-              }
-
-              if (options.selectedCollections && collectionToProcess) {
-                const selectedCollection = options.selectedCollections[collectionToProcess.id];
-                if (selectedCollection && !selectedCollection.selectedModes.includes(actualModeId)) {
-                  return;
-                }
-              }
-
-              let actualValue = value;
-              if (collectionToProcess?.isExtension && collectionToProcess.variableOverrides) {
-                const override = collectionToProcess.variableOverrides[variable.id]?.[actualModeId];
-                if (override !== undefined) {
-                  actualValue = override;
-                }
-              }
-
+            forEachModeValue(variable, collectionToProcess, (value, parent) => {
               let tokenValue;
-              if (typeof actualValue === 'object' && 'type' in actualValue && actualValue.type === 'VARIABLE_ALIAS') {
-                const alias = figma.variables.getVariableById(actualValue.id);
-                tokenValue = `{${alias?.name.replace(/\//g, '.')}}`;
-              } else if (isVariableComposedColor(actualValue)) {
-                tokenValue = composedColorToTokenValue(
-                  actualValue,
-                  (aliasRef) => figma.variables.getVariableById(aliasRef.id)?.name.replace(/\//g, '.'),
-                  figmaRGBToHex,
-                );
+              if (isVariableAlias(value)) {
+                tokenValue = aliasReference(value);
+              } else if (isVariableComposedColor(value)) {
+                tokenValue = composedColorToTokenValue(value, aliasName, figmaRGBToHex);
               } else {
-                tokenValue = figmaRGBToHex(actualValue as RGBA);
+                tokenValue = figmaRGBToHex(value as RGBA);
               }
 
-              const modeName = collectionToProcess?.modes.find((m) => m.modeId === actualModeId)?.name;
               if (tokenValue) {
-                const figmaExtensions = createFigmaExtensions(variable);
-                const parent = `${collectionToProcess?.name}/${modeName}`;
-
-                colors.push({
-                  name: variableName,
-                  value: tokenValue as string,
-                  type: TokenTypes.COLOR,
-                  parent,
-                  ...(variable.description ? { description: variable.description } : {}),
-                  ...(figmaExtensions ? { $extensions: figmaExtensions } : {}),
-                });
+                pushToken(colors, TokenTypes.COLOR, tokenValue, parent);
               }
             });
             break;
 
           case 'BOOLEAN':
-            Object.entries(variable.valuesByMode).forEach(([parentModeId, value]) => {
-              let actualModeId = parentModeId;
-              if (collectionToProcess?.isExtension) {
-                const childMode = collectionToProcess.modes.find((m) => m.parentModeId === parentModeId);
-                if (!childMode) {
-                  return;
-                }
-                actualModeId = childMode.modeId;
+            forEachModeValue(variable, collectionToProcess, (value, parent) => {
+              const tokenValue = isVariableAlias(value) ? aliasReference(value) : JSON.stringify(value);
+              if (tokenValue) {
+                pushToken(booleans, TokenTypes.BOOLEAN, tokenValue, parent);
               }
-
-              if (options.selectedCollections && collectionToProcess) {
-                const selectedCollection = options.selectedCollections[collectionToProcess.id];
-                if (selectedCollection && !selectedCollection.selectedModes.includes(actualModeId)) {
-                  return;
-                }
-              }
-
-              let actualValue = value;
-              if (collectionToProcess?.isExtension && collectionToProcess.variableOverrides) {
-                const override = collectionToProcess.variableOverrides[variable.id]?.[actualModeId];
-                if (override !== undefined) {
-                  actualValue = override;
-                }
-              }
-
-              const modeName = collectionToProcess?.modes.find((m) => m.modeId === actualModeId)?.name;
-              let tokenValue;
-              if (typeof actualValue === 'object' && 'type' in actualValue && actualValue.type === 'VARIABLE_ALIAS') {
-                const alias = figma.variables.getVariableById(actualValue.id);
-                tokenValue = `{${alias?.name.replace(/\//g, '.')}}`;
-              } else {
-                tokenValue = JSON.stringify(actualValue);
-              }
-
-              const figmaExtensions = createFigmaExtensions(variable);
-              booleans.push({
-                name: variableName,
-                value: tokenValue,
-                type: TokenTypes.BOOLEAN,
-                parent: `${collectionToProcess?.name}/${modeName}`,
-                ...(variable.description ? { description: variable.description } : {}),
-                ...(figmaExtensions ? { $extensions: figmaExtensions } : {}),
-              });
             });
             break;
 
           case 'STRING':
-            Object.entries(variable.valuesByMode).forEach(([parentModeId, value]) => {
-              let actualModeId = parentModeId;
-              if (collectionToProcess?.isExtension) {
-                const childMode = collectionToProcess.modes.find((m) => m.parentModeId === parentModeId);
-                if (!childMode) {
-                  return;
-                }
-                actualModeId = childMode.modeId;
+            forEachModeValue(variable, collectionToProcess, (value, parent) => {
+              const tokenValue = isVariableAlias(value) ? aliasReference(value) : String(value);
+              if (tokenValue !== null) {
+                pushToken(strings, TokenTypes.TEXT, tokenValue, parent);
               }
-
-              if (options.selectedCollections && collectionToProcess) {
-                const selectedCollection = options.selectedCollections[collectionToProcess.id];
-                if (selectedCollection && !selectedCollection.selectedModes.includes(actualModeId)) {
-                  return;
-                }
-              }
-
-              let actualValue = value;
-              if (collectionToProcess?.isExtension && collectionToProcess.variableOverrides) {
-                const override = collectionToProcess.variableOverrides[variable.id]?.[actualModeId];
-                if (override !== undefined) {
-                  actualValue = override;
-                }
-              }
-
-              const modeName = collectionToProcess?.modes.find((m) => m.modeId === actualModeId)?.name;
-              let tokenValue;
-              if (typeof actualValue === 'object' && 'type' in actualValue && actualValue.type === 'VARIABLE_ALIAS') {
-                const alias = figma.variables.getVariableById(actualValue.id);
-                tokenValue = `{${alias?.name.replace(/\//g, '.')}}`;
-              } else {
-                tokenValue = String(actualValue);
-              }
-
-              const figmaExtensions = createFigmaExtensions(variable);
-              strings.push({
-                name: variableName,
-                value: tokenValue as string,
-                type: TokenTypes.TEXT,
-                parent: `${collectionToProcess?.name}/${modeName}`,
-                ...(variable.description ? { description: variable.description } : {}),
-                ...(figmaExtensions ? { $extensions: figmaExtensions } : {}),
-              });
             });
             break;
 
           case 'FLOAT':
-            Object.entries(variable.valuesByMode).forEach(([parentModeId, value]) => {
-              let actualModeId = parentModeId;
-              if (collectionToProcess?.isExtension) {
-                const childMode = collectionToProcess.modes.find((m) => m.parentModeId === parentModeId);
-                if (!childMode) {
-                  return;
-                }
-                actualModeId = childMode.modeId;
-              }
-
-              if (options.selectedCollections && collectionToProcess) {
-                const selectedCollection = options.selectedCollections[collectionToProcess.id];
-                if (selectedCollection && !selectedCollection.selectedModes.includes(actualModeId)) {
-                  return;
-                }
-              }
-
-              let actualValue = value;
-              if (collectionToProcess?.isExtension && collectionToProcess.variableOverrides) {
-                const override = collectionToProcess.variableOverrides[variable.id]?.[actualModeId];
-                if (override !== undefined) {
-                  actualValue = override;
-                }
-              }
-
-              let tokenValue: string | number = actualValue as number;
-              if (typeof actualValue === 'object' && 'type' in actualValue && actualValue.type === 'VARIABLE_ALIAS') {
-                const alias = figma.variables.getVariableById(actualValue.id);
-                tokenValue = `{${alias?.name.replace(/\//g, '.')}}`;
-              } else if (typeof actualValue === 'number') {
+            forEachModeValue(variable, collectionToProcess, (value, parent) => {
+              let tokenValue: string | number | null = value as number;
+              if (isVariableAlias(value)) {
+                tokenValue = aliasReference(value);
+              } else if (typeof value === 'number') {
                 if (options.useRem) {
-                  tokenValue = `${Number((Number(tokenValue) / parseFloat(String(baseRem))).toFixed(3))}rem`;
+                  tokenValue = `${Number((value / parseFloat(String(baseRem))).toFixed(3))}rem`;
                 } else if (options.useDimensions) {
-                  tokenValue = `${Number(tokenValue.toFixed(3))}px`;
+                  tokenValue = `${Number(value.toFixed(3))}px`;
                 } else {
-                  tokenValue = Number(tokenValue.toFixed(3));
+                  tokenValue = Number(value.toFixed(3));
                 }
               }
 
-              const modeName = collectionToProcess?.modes.find((m) => m.modeId === actualModeId)?.name;
-              const figmaExtensions = createFigmaExtensions(variable);
-
+              if (tokenValue === null) return;
               if (options.useDimensions || options.useRem) {
-                dimensions.push({
-                  name: variableName,
-                  value: tokenValue as string,
-                  type: TokenTypes.DIMENSION,
-                  parent: `${collectionToProcess?.name}/${modeName}`,
-                  ...(variable.description ? { description: variable.description } : {}),
-                  ...(figmaExtensions ? { $extensions: figmaExtensions } : {}),
-                });
+                pushToken(dimensions, TokenTypes.DIMENSION, tokenValue as string, parent);
               } else {
-                numbers.push({
-                  name: variableName,
-                  value: tokenValue as string,
-                  type: TokenTypes.NUMBER,
-                  parent: `${collectionToProcess?.name}/${modeName}`,
-                  ...(variable.description ? { description: variable.description } : {}),
-                  ...(figmaExtensions ? { $extensions: figmaExtensions } : {}),
-                });
+                pushToken(numbers, TokenTypes.NUMBER, tokenValue as string, parent);
               }
             });
             break;
+
+          case 'TIMING':
+          case 'EASING': {
+            const isTiming = variable.resolvedType === 'TIMING';
+            forEachModeValue(variable, collectionToProcess, (value, parent) => {
+              let tokenValue: string | null;
+              if (isVariableAlias(value)) {
+                tokenValue = aliasReference(value);
+              } else if (isTiming) {
+                tokenValue = typeof value === 'number' ? secondsToDurationValue(value) : null;
+              } else {
+                tokenValue = fromFigmaEasing(value);
+              }
+
+              if (!tokenValue) {
+                console.warn(`Skipping ${variable.resolvedType} variable ${variable.name}: unsupported value`, value);
+                return;
+              }
+
+              if (isTiming) {
+                pushToken(durations, TokenTypes.DURATION, tokenValue, parent);
+              } else {
+                pushToken(cubicBeziers, TokenTypes.CUBIC_BEZIER, tokenValue, parent);
+              }
+            });
+            break;
+          }
           default:
             break;
         }
@@ -408,6 +348,8 @@ export default async function pullVariables(options: PullVariablesOptions, theme
     strings,
     numbers,
     dimensions,
+    durations,
+    cubicBeziers,
   };
 
   type ResultObject = Record<string, VariableToCreateToken[]>;
