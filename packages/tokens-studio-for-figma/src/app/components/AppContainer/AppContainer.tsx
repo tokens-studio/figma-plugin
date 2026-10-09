@@ -7,6 +7,7 @@ import LaunchScreen from '../LaunchScreen/LaunchScreen';
 import ConsentDialog, { ConsentChoices } from '../LaunchScreen/ConsentDialog';
 import { OAuthDeviceCodeModal } from '../Login/OAuthDeviceCodeModal';
 import { useAuthStore } from '@/app/store/useAuthStore';
+import { TOKENS_STUDIO_APP_URL } from '@/constants/TokensStudio';
 import { AsyncMessageTypes, StartupMessage } from '@/types/AsyncMessages';
 import type { Dispatch, RootState } from '@/app/store';
 import { Tabs } from '@/constants/Tabs';
@@ -54,6 +55,10 @@ export const AppContainer = (params: Props) => {
   // Shown after every startup until the user logs in or continues without an account.
   const [showLaunchScreen, setShowLaunchScreen] = useState(!isAutomatedTest);
   const hasConsented = useSelector((state: RootState) => state.settings.acceptedStudioConsent);
+
+  const handleCreateAccount = useCallback(() => {
+    window.open(`https://${TOKENS_STUDIO_APP_URL}/register`, '_blank');
+  }, []);
 
   const handleContinueWithoutAccount = useCallback(() => {
     setShowLaunchScreen(false);
@@ -139,6 +144,7 @@ export const AppContainer = (params: Props) => {
         {showLaunchScreen ? (
           <>
             <LaunchScreen
+              onCreateAccount={handleCreateAccount}
               onLogIn={handleLogIn}
               onContinueWithoutAccount={handleContinueWithoutAccount}
               isLoggingIn={isLoggingIn}
