@@ -48,6 +48,8 @@ export async function updateUISettings(uiSettings: Partial<SavedSettings>) {
       seenTermsUpdate2026: uiSettings.seenTermsUpdate2026 ?? data?.seenTermsUpdate2026,
       seenTermsUpdate2026Subprocessors:
         uiSettings.seenTermsUpdate2026Subprocessors ?? data?.seenTermsUpdate2026Subprocessors,
+      acceptedStudioConsent: uiSettings.acceptedStudioConsent ?? data?.acceptedStudioConsent,
+      performanceAnalyticsConsent: uiSettings.performanceAnalyticsConsent ?? data?.performanceAnalyticsConsent,
     });
   } catch (err) {
     notifyUI('There was an issue saving your credentials. Please try again.');
@@ -96,6 +98,8 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
     let seenGenericVersionedHeaderMigrationDialog: boolean;
     let seenTermsUpdate2026: boolean;
     let seenTermsUpdate2026Subprocessors: boolean;
+    let acceptedStudioConsent: boolean;
+    let performanceAnalyticsConsent: boolean;
 
     if (data) {
       width = data.width || 400;
@@ -135,6 +139,8 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
       seenGenericVersionedHeaderMigrationDialog = typeof data.seenGenericVersionedHeaderMigrationDialog === 'undefined' ? false : data.seenGenericVersionedHeaderMigrationDialog;
       seenTermsUpdate2026 = typeof data.seenTermsUpdate2026 === 'undefined' ? false : data.seenTermsUpdate2026;
       seenTermsUpdate2026Subprocessors = typeof data.seenTermsUpdate2026Subprocessors === 'undefined' ? false : data.seenTermsUpdate2026Subprocessors;
+      acceptedStudioConsent = data.acceptedStudioConsent ?? false;
+      performanceAnalyticsConsent = data.performanceAnalyticsConsent ?? false;
       settings = {
         language,
         width: Math.max(300, width),
@@ -173,6 +179,8 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
         seenGenericVersionedHeaderMigrationDialog,
         seenTermsUpdate2026,
         seenTermsUpdate2026Subprocessors,
+        acceptedStudioConsent,
+        performanceAnalyticsConsent,
       };
 
       if (notify) {

@@ -122,6 +122,8 @@ module.exports = wrapper((env, argv) => {
           },
         },
         { test: /\.(png|jpg|gif|webp)$/, use: [{ loader: 'url-loader' }] },
+        // Inlines videos as data URLs, since the plugin UI ships as a single HTML file
+        { test: /\.webm$/, type: 'asset/inline' },
         {
           test: /\.svg$/,
           use: [

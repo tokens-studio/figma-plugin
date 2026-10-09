@@ -19,5 +19,17 @@
   "loadFromProvider": "Load from sync provider",
   "selectProvider": "Select a provider",
   "chooseProvider": "Choose a provider...",
-  "loadingTokens": "Loading tokens from sync provider..."
+  "loadingTokens": "Loading tokens from sync provider...",
+  "createAccount": "Create an Account",
+  "logIn": "Log In",
+  "continueWithoutAccount": "Continue without Account",
+  "joinSlackShort": "Join Slack",
+  "docs": "Docs",
+  "reportIssue": "Report issue",
+  "termsAndConditions": "Terms & Conditions",
+  "consentDescription": "Please give the consent by checking the boxes to continue using Tokens Studio Plugin for Figma. Some of the consents are required and revocable.",
+  "termsOfService": "Terms of service",
+  "performanceAnalytics": "Performance analytics",
+  "optional": "(optional)",
+  "agreeAndContinue": "Agree & Continue"
 }
