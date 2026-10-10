@@ -51,11 +51,12 @@ describe('DuplicateTokenGroupModal', () => {
     );
   });
 
-  it('should disable duplication when there are duplicates', () => {
-    const newName = 'foo.bar';
+  it('should disable duplication when there are duplicates', async () => {
+    // A token with this name already exists. An existing group name alone is allowed.
+    const newName = 'otherfoo.something';
     const oldName = 'otherfoo-copy';
 
-    const { getByText } = render(
+    const { getByRole } = render(
       <Provider store={store}>
         <DuplicateTokenGroupModal
           isOpen
@@ -66,16 +67,16 @@ describe('DuplicateTokenGroupModal', () => {
       </Provider>,
     );
 
-    waitFor(async () => {
-      expect(getByText('duplicate')).toBeDisabled();
+    await waitFor(async () => {
+      expect(getByRole('button', { name: 'duplicate' })).toBeDisabled();
     });
   });
 
-  it('should not disable duplication when there are no duplicates', () => {
+  it('should not disable duplication when there are no duplicates', async () => {
     const newName = 'foo.bar.ss';
     const oldName = 'otherfoo-copy';
 
-    const { getByText } = render(
+    const { getByRole } = render(
       <Provider store={store}>
         <DuplicateTokenGroupModal
           isOpen
@@ -86,8 +87,8 @@ describe('DuplicateTokenGroupModal', () => {
       </Provider>,
     );
 
-    waitFor(async () => {
-      expect(getByText('duplicate')).not.toBeDisabled();
+    await waitFor(async () => {
+      expect(getByRole('button', { name: 'duplicate' })).not.toBeDisabled();
     });
   });
 

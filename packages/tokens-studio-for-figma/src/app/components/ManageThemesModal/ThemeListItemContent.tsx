@@ -15,6 +15,8 @@ type Props = React.PropsWithChildren<{
   isActive: boolean
   groupName: string
   onOpen: (theme?: ThemeObject) => void;
+  indentationDepth?: number
+  isUnderExtendedGroup?: boolean // NEW: indicates if this theme belongs to an extended group
 }>;
 
 const StyledDragGrabber = styled(DragGrabber, {
@@ -26,9 +28,15 @@ export function ThemeListItemContent({
   isActive,
   groupName,
   onOpen,
+  indentationDepth = 0,
+  isUnderExtendedGroup = false,
 }: Props) {
   const dragContext = useContext(DragControlsContext);
   const editProhibited = useSelector(editProhibitedSelector);
+
+  // Disable reordering for extended themes (they should follow parent theme order)
+  const isExtendedTheme = !!item.$figmaParentThemeId;
+  const canReorder = !editProhibited && !isExtendedTheme;
 
   const handleDragStart = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
     dragContext.controls?.start(event);
@@ -37,14 +45,44 @@ export function ThemeListItemContent({
   return (
     <StyledDragButton
       type="button"
-      canReorder={!editProhibited}
+      canReorder={canReorder}
       css={{
-        padding: 0, width: '100%', display: 'inherit', cursor: 'inherit',
+        padding: 0,
+        width: '100%',
+        display: 'inherit',
+        cursor: 'inherit',
+        position: 'relative',
+        '&:not(:first-of-type)': { marginTop: '$4' },
+        // Root-level themes get no indentation (the grabber aligns with the group
+        // label); each extension level indents by one unit.
+        paddingLeft: `calc(${indentationDepth} * var(--space-6))`,
+        // Visual hierarchy line for extended groups, drawn in the gutter created
+        // by this row's own indentation step
+        ...(isUnderExtendedGroup ? {
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            left: `calc(${Math.max(indentationDepth - 1, 0)} * var(--space-6) + 24px)`,
+            top: 0,
+            bottom: 0,
+            width: '1px',
+            backgroundColor: '$borderMuted',
+          },
+          '&:last-of-type::before': {
+            bottom: '50%',
+            borderBottomLeftRadius: '$medium',
+            borderBottom: '1px solid $borderMuted',
+            borderLeft: '1px solid $borderMuted',
+            width: '4px',
+            left: `calc(${Math.max(indentationDepth - 1, 0)} * var(--space-6) + 24px)`,
+            backgroundColor: 'transparent',
+          },
+        } : {}),
       }}
     >
       <StyledDragGrabber<ThemeObject>
         item={item}
-        canReorder={!editProhibited}
+        canReorder={canReorder}
         onDragStart={handleDragStart}
       />
       <SingleThemeEntry

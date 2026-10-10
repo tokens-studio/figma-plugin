@@ -48,8 +48,9 @@ export function savePluginDataFactory(dispatch: Dispatch, params: StartupMessage
           useAuthStore.setState({ activeOrganizationId: params.activeOrganizationId });
         }
         useAuthStore.getState().setOAuthTokens(params.oauthTokens);
-        const activeProjectId = params.storageType && isTokensStudioOAuthType(params.storageType) ? params.storageType.id : undefined;
-        useAuthStore.getState().fetchUserData(params.oauthTokens, activeProjectId);
+        // A file synced with Studio uses the org it syncs with; fetchUserData falls back to the org picked in Settings.
+        const fileSync = isTokensStudioOAuthType(params.storageType) ? params.storageType : undefined;
+        useAuthStore.getState().fetchUserData(params.oauthTokens, fileSync?.id, fileSync?.orgId);
       }
     } else {
       throw new Error('User not found');

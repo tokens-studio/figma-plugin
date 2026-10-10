@@ -18,12 +18,12 @@ describe('Settings Component', () => {
     render(<Settings />);
   });
 
-  it('show onboarding explainer syncproviders', () => {
+  it('show onboarding explainer syncproviders', async () => {
     store.dispatch.uiState.setOnboardingExplainerSyncProviders(true);
 
     const result = render(<Settings />);
 
-    expect(result.findByText('Set up where tokens should be stored')).not.toBeUndefined();
+    expect(await result.findByText('whereTokensStored')).not.toBeUndefined();
   });
 
   it('hide onboarding explainer syncproviders', async () => {
@@ -32,15 +32,15 @@ describe('Settings Component', () => {
 
     fireEvent.click(result.getByTestId('closeButton'));
 
-    expect(result.queryByText('Set up where tokens should be stored')).toBeNull();
+    expect(result.queryByText('whereTokensStored')).toBeNull();
   });
 
   it('reset onboarding explainers', async () => {
     const result = render(<Settings />);
 
     fireEvent.click(result.getByTestId('reset-onboarding'));
-    waitFor(() => {
-      expect(result.queryByText('Set up where tokens should be stored')).not.toBeNull();
+    await waitFor(() => {
+      expect(result.queryByText('whereTokensStored')).not.toBeNull();
     });
   });
 });

@@ -81,7 +81,7 @@ const getDefaultStore = () => ({
 });
 
 describe('ImportedTokensDialog', () => {
-  it('shows dialog with newTokenlist and updateTokenlist', () => {
+  it('shows dialog with newTokenlist and updateTokenlist', async () => {
     const mockStore = createMockStore(getDefaultStore());
     const result = render(
       <Provider store={mockStore}>
@@ -89,7 +89,7 @@ describe('ImportedTokensDialog', () => {
       </Provider>,
     );
 
-    waitFor(async () => {
+    await waitFor(async () => {
       expect(result.queryByText('newTokens')).toBeInTheDocument();
       expect(result.queryByText('createAll')).toBeInTheDocument();
       expect(result.queryByText('existingTokens')).toBeInTheDocument();
@@ -120,7 +120,7 @@ describe('ImportedTokensDialog', () => {
       const updateButton = result.getAllByTestId('imported-tokens-dialog-update-button')[0] as HTMLButtonElement;
       updateButton.click();
     });
-    waitFor(async () => {
+    await waitFor(async () => {
       expect(mockStore.getState().tokenState.tokens.global).toEqual(
         [
           {
@@ -192,6 +192,9 @@ describe('ImportedTokensDialog', () => {
             description: 'regular color token',
           },
           {
+            $extensions: {
+              'studio.tokens': { id: 'mock-uuid' },
+            },
             name: 'headline',
             type: 'boxShadow',
             value: {
@@ -277,10 +280,11 @@ describe('ImportedTokensDialog', () => {
       updateButton.click();
     });
 
-    waitFor(async () => {
+    await waitFor(async () => {
       expect(mockStore.getState().tokenState.tokens.global).toEqual(
         [
           {
+            $extensions: { 'studio.tokens': {} },
             name: 'light',
             type: 'typography',
             value: {
@@ -357,10 +361,11 @@ describe('ImportedTokensDialog', () => {
       updateButton.click();
     });
 
-    waitFor(async () => {
+    await waitFor(async () => {
       expect(mockStore.getState().tokenState.tokens.global).toEqual(
         [
           {
+            $extensions: { 'studio.tokens': { id: 'mock-uuid' } },
             name: 'light',
             type: 'typography',
             value: {
@@ -370,6 +375,7 @@ describe('ImportedTokensDialog', () => {
             },
           },
           {
+            $extensions: { 'studio.tokens': { id: 'mock-uuid' } },
             name: 'opacity.50',
             type: 'opacity',
             value: '30%',

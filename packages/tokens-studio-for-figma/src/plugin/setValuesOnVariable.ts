@@ -13,11 +13,29 @@ import { transformValue } from './helpers';
 import { variableWorker } from './Worker';
 import { ProgressTracker } from './ProgressTracker';
 import { checkVariableAliasEquality } from '@/utils/checkVariableAliasEquality';
+import {
+  canLinkOpacity,
+  ComposedColorCandidate,
+  ComposedColorReference,
+  ComposedColorTokenInfo,
+  getComposedColorCandidates,
+  getComposedColorReferenceNames,
+  isVariableComposedColor,
+  parseComposedColorReference,
+} from './composedColor';
 
 export type ReferenceVariableType = {
   variable: Variable;
   modeId: string;
   referenceVariable: string;
+  collection?: VariableCollection;
+  // Set for rgba({color}, 0.5) / rgba({color}, {opacity}) style values
+  composed?: ComposedColorReference;
+  resolvedValue?: SingleToken['value'];
+  // Colors the composed value may link, in order (see getComposedColorCandidates)
+  colorCandidates?: ComposedColorCandidate[];
+  opacityReferenceValue?: unknown;
+  opacityLinkable?: boolean;
 };
 
 // Figma gates plugin creation of EASING/TIMING variables behind a feature
@@ -58,6 +76,11 @@ export default async function setValuesOnVariable(
   progressTracker?: ProgressTracker | null,
   metadataUpdateTracker?: Record<string, boolean>,
   providedPlatformsByVariable?: Record<string, Set<string>>,
+  isExtendedCollection = false,
+  // All resolved tokens in the theme, used to check composed colors render correctly
+  resolvedTokensByName?: Map<string, ComposedColorTokenInfo>,
+  // Names of all live local variables, across collections
+  localVariableNames?: Iterable<string>,
 ) {
   const variableKeyMap: Record<string, string> = {};
   const referenceVariableCandidates: ReferenceVariableType[] = [];
@@ -83,7 +106,14 @@ export default async function setValuesOnVariable(
     variablesById.add(v.id);
   });
 
+  // Names an alias can resolve to. Targets often live in another collection (e.g.
+  // primitives), so extended collections get every live local variable name from the
+  // caller, which must exclude zombies to match what the reference pass can link.
+  const allVariableNames = new Set<string>(localVariableNames);
+  variablesInFigma.forEach((v) => allVariableNames.add(v.name));
+
   const indexVariable = (v: Variable) => {
+    allVariableNames.add(v.name);
     if (!v.remote && !variablesByKey.has(v.key)) variablesByKey.set(v.key, v);
     if (v.variableCollectionId === collection.id && !variablesByName.has(v.name)) {
       variablesByName.set(v.name, v);
@@ -110,9 +140,16 @@ export default async function setValuesOnVariable(
     Array.from(variableIdsToFetch).map(async (variableId) => {
       try {
         const variable = await figma.variables.getVariableByIdAsync(variableId);
-        if (variable && variable.variableCollectionId === collection.id) {
-          variableIdCache.set(variableId, variable);
-          indexVariable(variable);
+        if (variable) {
+          // For extended collections, skip collection ID check since inherited variables belong to parent
+          const belongsToCollection = isExtendedCollection || variable.variableCollectionId === collection.id;
+          if (belongsToCollection) {
+            variableIdCache.set(variableId, variable);
+            // Add to local cache if not already present
+            if (!variablesInFigma.some((v) => v.id === variable.id)) {
+              variablesInFigma.push(variable);
+            }
+          }
         }
       } catch (e) {
         // Variable doesn't exist or can't be accessed - skip it
@@ -146,10 +183,24 @@ export default async function setValuesOnVariable(
           // If still no variable, try one more time to find by name in case it was just created
           // (variablesByName is already collection-scoped, so no extra check needed).
           if (!variable) {
-            variable = variablesByName.get(token.path);
+            // For extended collections, don't check collection ID since variables belong to parent
+            variable = isExtendedCollection
+              ? variablesInFigma.find((v) => v.name === token.path)
+              : variablesInFigma.find((v) => v.name === token.path && v.variableCollectionId === collection.id);
           }
 
           if (!variable) {
+            // For extended collections, variables should have been found from parent
+            if (isExtendedCollection) {
+              console.warn(
+                `⚠️  Variable "${token.path}" not found in extended collection "${collection.name}". `
+                + 'Extended collections can only update inherited variables from their parent collection. '
+                + 'Skipping this token.',
+              );
+              return; // Skip this token entirely
+            }
+
+            // Regular collection - create new variable
             try {
               variable = figma.variables.createVariable(token.path, collection, variableType);
               indexVariable(variable);
@@ -301,19 +352,54 @@ export default async function setValuesOnVariable(
 
             // Check if the variable already has the correct alias reference before updating
             if (!hasMetadataChanged && checkVariableAliasEquality(existingVariableValue, rawValue)) {
-              // The alias already points to the correct variable, no update needed
               return;
+            }
+
+            // For extended (child) collections a token that will be linked as an
+            // alias in the reference pass must NOT be written as a resolved raw
+            // value here. token.value is often the resolved value (no braces) even
+            // when token.rawValue is a reference, so the brace guards below don't
+            // catch it. Writing raw would create an explicit child override that
+            // the reference pass can no longer convert to inherited — Figma has no
+            // per-mode clear API — leaving a stale raw "blue" override. Skip the
+            // raw write and let the reference pass set the alias (or inherit).
+            // Check if the reference target actually exists as a variable before
+            // skipping the raw write. If the target doesn't exist (e.g. a primitive
+            // token like "colors.black" that isn't exported as a variable), the
+            // reference pass will silently do nothing and we'd lose the value.
+            const composed = variableType === 'COLOR' && !token.$extensions?.['studio.tokens']?.modify
+              ? parseComposedColorReference(token.rawValue)
+              : null;
+            let willBeAliased = isExtendedCollection && checkCanReferenceVariable(token);
+            if (composed) {
+              // Composed colors fall back to resolved values for missing parts, so one
+              // existing target is enough. Outside extended collections only skip the raw
+              // write when the variable is already composed, to avoid rewriting it each run.
+              const refPaths = getComposedColorReferenceNames(composed).map((name) => name.split('.').join('/'));
+              const anyTargetExists = refPaths.some((refPath) => allVariableNames.has(refPath));
+              willBeAliased = anyTargetExists && (isExtendedCollection || isVariableComposedColor(existingVariableValue));
+            } else if (willBeAliased) {
+              let refName = '';
+              if (token.rawValue?.toString().startsWith('{')) {
+                refName = token.rawValue.toString().slice(1, -1);
+              } else if (token.rawValue?.toString().startsWith('$')) {
+                refName = token.rawValue.toString().substring(1);
+              }
+              const refPath = refName.split('.').join('/');
+              if (!allVariableNames.has(refPath)) {
+                willBeAliased = false;
+              }
             }
 
             switch (variableType) {
               case 'BOOLEAN':
-                if (typeof token.value === 'string' && !token.value.includes('{')) {
-                  setBooleanValuesOnVariable(variable, mode, token.value, hasMetadataChanged);
+                if (!willBeAliased && typeof token.value === 'string' && !token.value.includes('{')) {
+                  setBooleanValuesOnVariable(variable, mode, token.value, collection, hasMetadataChanged);
                 }
                 break;
               case 'COLOR':
-                if (typeof token.value === 'string' && !token.value.includes('{')) {
-                  setColorValuesOnVariable(variable, mode, token.value, hasMetadataChanged);
+                if (!willBeAliased && typeof token.value === 'string' && !token.value.includes('{')) {
+                  setColorValuesOnVariable(variable, mode, token.value, collection, hasMetadataChanged);
                 }
                 break;
               case 'FLOAT': {
@@ -328,9 +414,9 @@ export default async function setValuesOnVariable(
                 } else {
                   value = String(token.value);
                 }
-                if (typeof value === 'string' && !value.includes('{')) {
+                if (!willBeAliased && typeof value === 'string' && !value.includes('{')) {
                   const transformedValue = transformValue(value, token.type, baseFontSize, true);
-                  setNumberValuesOnVariable(variable, mode, Number(transformedValue), hasMetadataChanged);
+                  setNumberValuesOnVariable(variable, mode, Number(transformedValue), collection, hasMetadataChanged);
                 }
                 break;
               }
@@ -359,14 +445,14 @@ export default async function setValuesOnVariable(
                   const easing = toFigmaEasing(token.value);
                   const b = easing?.easingFunctionCubicBezier;
                   if (b) {
-                    setStringValuesOnVariable(variable, mode, `${b.x1}, ${b.y1}, ${b.x2}, ${b.y2}`, hasMetadataChanged);
+                    setStringValuesOnVariable(variable, mode, `${b.x1}, ${b.y1}, ${b.x2}, ${b.y2}`, collection, hasMetadataChanged);
                   }
                 } else if (typeof token.value === 'string' && !token.value.includes('{')) {
-                  setStringValuesOnVariable(variable, mode, token.value, hasMetadataChanged);
+                  setStringValuesOnVariable(variable, mode, token.value, collection, hasMetadataChanged);
                   // Given we cannot determine the combined family of a variable, we cannot use fallback weights from our estimates.
                   // This is not an issue because users can set numerical font weights with variables, so we opt-out of the guesswork and just apply the numerical weight.
-                } else if (token.type === TokenTypes.FONT_WEIGHTS && Array.isArray(token.value)) {
-                  setStringValuesOnVariable(variable, mode, token.value[0], hasMetadataChanged);
+                } else if (!willBeAliased && token.type === TokenTypes.FONT_WEIGHTS && Array.isArray(token.value)) {
+                  setStringValuesOnVariable(variable, mode, token.value[0], collection, hasMetadataChanged);
                 }
                 break;
               default:
@@ -491,11 +577,25 @@ export default async function setValuesOnVariable(
               referenceTokenName = token.rawValue!.toString().substring(1);
             }
 
-            if (token && checkCanReferenceVariable(token)) {
+            if (composed) {
+              const lookup = (name: string) => resolvedTokensByName?.get(name);
+              referenceVariableCandidates.push({
+                variable,
+                modeId: mode,
+                referenceVariable: getComposedColorReferenceNames(composed)[0],
+                composed,
+                resolvedValue: token.value,
+                colorCandidates: getComposedColorCandidates(composed, lookup),
+                opacityReferenceValue: composed.opacityReference ? lookup(composed.opacityReference)?.value : undefined,
+                opacityLinkable: canLinkOpacity(composed, lookup),
+                ...(isExtendedCollection ? { collection } : {}),
+              });
+            } else if (token && checkCanReferenceVariable(token)) {
               referenceVariableCandidates.push({
                 variable,
                 modeId: mode,
                 referenceVariable: referenceTokenName,
+                ...(isExtendedCollection ? { collection } : {}),
               });
             }
           }

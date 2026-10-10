@@ -29,8 +29,59 @@ describe('getAvailableVariableCollections', () => {
     const result = await getAvailableVariableCollections();
 
     expect(result).toEqual({
-      collections: mockCollections,
+      collections: [
+        {
+          ...mockCollections[0],
+          isExtension: false,
+          extensionDepth: 0,
+          parentCollectionId: undefined,
+          modes: mockCollections[0].modes.map((mode) => ({
+            ...mode,
+            parentModeId: undefined,
+          })),
+        },
+        {
+          ...mockCollections[1],
+          isExtension: false,
+          extensionDepth: 0,
+          parentCollectionId: undefined,
+          modes: mockCollections[1].modes.map((mode) => ({
+            ...mode,
+            parentModeId: undefined,
+          })),
+        },
+      ],
     });
+  });
+
+  it('detects extended collections via parent-linked modes when isExtension is absent', async () => {
+    global.figma = {
+      variables: {
+        getLocalVariableCollectionsAsync: jest.fn().mockResolvedValue([
+          { id: 'parent', name: 'Parent', modes: [{ modeId: 'parent-mode', name: 'Light' }] },
+          {
+            id: 'child',
+            name: 'Child',
+            parentVariableCollectionId: 'parent',
+            modes: [{ modeId: 'child-mode', name: 'Light', parentModeId: 'parent-mode' }],
+          },
+          {
+            id: 'orphan',
+            name: 'Orphan',
+            modes: [{ modeId: 'orphan-mode', name: 'Light', parentModeId: 'missing-mode' }],
+          },
+        ]),
+      },
+    } as any;
+
+    const { collections } = await getAvailableVariableCollections();
+
+    expect(collections.map(({ id, isExtension, extensionDepth }) => ({ id, isExtension, extensionDepth }))).toEqual([
+      { id: 'parent', isExtension: false, extensionDepth: 0 },
+      { id: 'child', isExtension: true, extensionDepth: 1 },
+      { id: 'orphan', isExtension: true, extensionDepth: 1 },
+    ]);
+    expect(collections[1].parentCollectionId).toBe('parent');
   });
 
   it('should return empty array if error occurs', async () => {

@@ -20,6 +20,7 @@ import {
   updateModeSelector,
   themesListSelector,
   storageTypeSelector,
+  isTokensStudioSyncSelector,
 } from '@/selectors';
 import { useAuthStore } from '@/app/store/useAuthStore';
 import { fetchServerResolvedTokensPerTheme } from '@/utils/tokensStudio/fetchServerResolvedTokensPerTheme';
@@ -69,7 +70,16 @@ export default function useTokens() {
   const tokens = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
   const storageType = useSelector(storageTypeSelector);
-  const settings = useSelector(settingsStateSelector, isEqual);
+  const rawSettings = useSelector(settingsStateSelector, isEqual);
+  const isTokensStudioSync = useSelector(isTokensStudioSyncSelector);
+  // Tokens Studio sync doesn't support extended collections, so the persisted
+  // setting is overridden while Studio is active. Other providers get it as-is.
+  const settings = useMemo(
+    () => (isTokensStudioSync && rawSettings.exportExtendedCollections
+      ? { ...rawSettings, exportExtendedCollections: false }
+      : rawSettings),
+    [rawSettings, isTokensStudioSync],
+  );
   const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
   const { confirm } = useConfirm<ConfirmResult>();
   const store = useStore<RootState>();
