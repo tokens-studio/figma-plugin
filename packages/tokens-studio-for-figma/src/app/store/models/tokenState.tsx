@@ -112,6 +112,25 @@ function keepFontWeightType(existingToken: SingleToken, token: VariableToCreateT
   return { ...token, type: TokenTypes.FONT_WEIGHTS, value: typeof existingToken.value === 'number' ? Number(fontWeight) : fontWeight };
 }
 
+// Figma reports these defaults for every variable. Only import them when the token already has the key,
+// so a token that had specific scopes or was hidden still gets the change saved.
+const FIGMA_EXTENSION_DEFAULTS: Record<string, unknown> = {
+  'com.figma.scopes': ['ALL_SCOPES'],
+  'com.figma.hiddenFromPublishing': false,
+};
+
+function withoutDefaultFigmaExtensions(token: VariableToCreateToken, existingToken?: SingleToken): VariableToCreateToken {
+  if (!token.$extensions) return token;
+  const $extensions: Record<string, unknown> = { ...token.$extensions };
+  Object.entries(FIGMA_EXTENSION_DEFAULTS).forEach(([key, defaultValue]) => {
+    if (isEqual($extensions[key], defaultValue) && !(key in (existingToken?.$extensions ?? {}))) {
+      delete $extensions[key];
+    }
+  });
+  if (Object.keys($extensions).length === 0) return omit(token, '$extensions');
+  return { ...token, $extensions };
+}
+
 export const tokenState = createModel<RootModel>()({
   state: {
     tokens: {
@@ -487,11 +506,11 @@ export const tokenState = createModel<RootModel>()({
             const oldValue = state.tokens[token.parent].find((t) => t.name === token.name);
             // If the token already exists
             if (oldValue) {
-              const importedToken = keepFontWeightType(oldValue, token);
+              const importedToken = keepFontWeightType(oldValue, withoutDefaultFigmaExtensions(token, oldValue));
               const normalizedOldValueDescription = oldValue.description ?? '';
               const normalizedTokenDescription = token.description ?? '';
               const normalizedOldValueExtensions = oldValue.$extensions ?? {};
-              const normalizedTokenExtensions = token.$extensions ?? {};
+              const normalizedTokenExtensions = importedToken.$extensions ?? {};
               if (
                 isEqual(oldValue.value, importedToken.value)
                 && isEqual(normalizedOldValueDescription, normalizedTokenDescription)
@@ -504,10 +523,10 @@ export const tokenState = createModel<RootModel>()({
                 updatedTokens.push(updatedToken);
               }
             } else {
-              newTokens.push(token);
+              newTokens.push(withoutDefaultFigmaExtensions(token));
             }
           } else {
-            newTokens.push(token);
+            newTokens.push(withoutDefaultFigmaExtensions(token));
           }
         });
       });
