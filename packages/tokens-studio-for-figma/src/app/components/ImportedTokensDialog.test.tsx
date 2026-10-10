@@ -192,9 +192,6 @@ describe('ImportedTokensDialog', () => {
             description: 'regular color token',
           },
           {
-            $extensions: {
-              'studio.tokens': { id: 'mock-uuid' },
-            },
             name: 'headline',
             type: 'boxShadow',
             value: {
@@ -284,7 +281,6 @@ describe('ImportedTokensDialog', () => {
       expect(mockStore.getState().tokenState.tokens.global).toEqual(
         [
           {
-            $extensions: { 'studio.tokens': {} },
             name: 'light',
             type: 'typography',
             value: {
@@ -365,7 +361,6 @@ describe('ImportedTokensDialog', () => {
       expect(mockStore.getState().tokenState.tokens.global).toEqual(
         [
           {
-            $extensions: { 'studio.tokens': { id: 'mock-uuid' } },
             name: 'light',
             type: 'typography',
             value: {
@@ -375,7 +370,6 @@ describe('ImportedTokensDialog', () => {
             },
           },
           {
-            $extensions: { 'studio.tokens': { id: 'mock-uuid' } },
             name: 'opacity.50',
             type: 'opacity',
             value: '30%',
