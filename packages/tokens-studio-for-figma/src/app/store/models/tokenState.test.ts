@@ -2113,3 +2113,59 @@ describe('editToken', () => {
     });
   });
 });
+
+describe('setTokensFromVariables', () => {
+  it('only updates the number of existing tokens and keeps their type, unit and extensions', () => {
+    const store: Store = init<RootModel>({
+      redux: {
+        initialState: {
+          tokenState: {
+            tokens: {
+              'core/default': [
+                {
+                  name: 'fontWeight.regular',
+                  value: '400',
+                  type: TokenTypes.FONT_WEIGHTS,
+                  $extensions: { 'studio.tokens': { id: 'regular-id' } },
+                },
+                { name: 'fontWeight.bold', value: '700', type: TokenTypes.FONT_WEIGHTS },
+                { name: 'spacing.sm', value: '8px', type: TokenTypes.DIMENSION },
+              ],
+            },
+            importedTokens: { newTokens: [], updatedTokens: [] },
+          },
+        },
+      },
+      models,
+    });
+    const figmaDefaults = { 'com.figma.scopes': ['ALL_SCOPES'], 'com.figma.hiddenFromPublishing': false };
+    const variable = (name: string, value: string) => ({
+      name, value, type: TokenTypes.DIMENSION, parent: 'core/default', $extensions: figmaDefaults,
+    });
+
+    // What pullVariables sends with "Convert numbers to dimensions" checked, after fontWeight.bold changed in Figma
+    store.dispatch.tokenState.setTokensFromVariables({
+      dimensions: [
+        variable('fontWeight.regular', '400px'),
+        variable('fontWeight.bold', '600px'),
+        variable('spacing.sm', '8px'),
+        variable('spacing.md', '16px'),
+      ],
+    });
+
+    const { importedTokens } = store.getState().tokenState;
+    expect(importedTokens.newTokens.map((t) => t.name)).toEqual(['spacing.md']);
+    expect(importedTokens.updatedTokens).toEqual([
+      {
+        name: 'fontWeight.bold', value: '600', oldValue: '700', type: TokenTypes.FONT_WEIGHTS, parent: 'core/default',
+      },
+    ]);
+
+    store.dispatch.tokenState.editMultipleTokens(importedTokens.updatedTokens);
+    expect(store.getState().tokenState.tokens['core/default']).toEqual([
+      expect.objectContaining({ name: 'fontWeight.regular', value: '400', type: TokenTypes.FONT_WEIGHTS }),
+      expect.objectContaining({ name: 'fontWeight.bold', value: '600', type: TokenTypes.FONT_WEIGHTS }),
+      expect.objectContaining({ name: 'spacing.sm', value: '8px', type: TokenTypes.DIMENSION }),
+    ]);
+  });
+});

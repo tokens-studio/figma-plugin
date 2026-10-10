@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/react';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { MessageFromPluginTypes, PostToUIMessage } from '@/types/messages';
 import useRemoteTokens from '../store/remoteTokens';
@@ -13,7 +13,7 @@ import { hasTokenValues } from '@/utils/hasTokenValues';
 import { track } from '@/utils/analytics';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageChannelPreview } from '@/AsyncMessageChannelPreview';
-import { autoApplyThemeOnDropSelector } from '@/selectors';
+import { autoApplyThemeOnDropSelector, baseFontSizeSelector } from '@/selectors';
 
 // @README this component is not the "Initiator" anymore - as it is named
 // but solely acts as the interface between the plugin and the UI
@@ -37,6 +37,9 @@ export function Initiator() {
   const { pullTokens, fetchBranches } = useRemoteTokens();
   const { setStorageType } = useStorage();
   const autoApplyThemeOnDrop = useSelector(autoApplyThemeOnDropSelector);
+  // Read through a ref so the message listener below sees the current value without re-subscribing
+  const baseFontSizeRef = useRef<string>();
+  baseFontSizeRef.current = useSelector(baseFontSizeSelector);
 
   useEffect(() => {
     const onMessageEvent = async (event: {
@@ -123,7 +126,8 @@ export function Initiator() {
           case MessageFromPluginTypes.VARIABLES: {
             const { values, themes } = pluginMessage;
             if (values) {
-              dispatch.tokenState.setTokensFromVariables(values);
+              const baseFontSize = parseFloat(String(baseFontSizeRef.current));
+              dispatch.tokenState.setTokensFromVariables(values, { baseFontSize: Number.isNaN(baseFontSize) ? undefined : baseFontSize });
               dispatch.uiState.setActiveTab(Tabs.TOKENS);
             }
             if (themes) {

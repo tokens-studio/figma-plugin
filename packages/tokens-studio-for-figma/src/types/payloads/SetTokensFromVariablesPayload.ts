@@ -10,6 +10,7 @@ export type VariableToCreateToken = {
   description?: string
   oldDescription?: string
   $extensions?: SingleToken['$extensions']
+  $deprecated?: SingleToken['$deprecated']
 };
 
 export type SetTokensFromVariablesPayload = Record<string, VariableToCreateToken[]>;

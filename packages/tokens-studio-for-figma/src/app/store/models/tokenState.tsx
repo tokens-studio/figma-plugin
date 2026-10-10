@@ -34,6 +34,7 @@ import { RootModel } from '@/types/RootModel';
 import { ThemeObject, ThemeObjectsList, UsedTokenSetsMap } from '@/types';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { isEqual } from '@/utils/isEqual';
+import { reconcileImportedVariableToken } from '@/utils/reconcileImportedVariableToken';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { updateTokenSetsInState } from '@/utils/tokenset/updateTokenSetsInState';
 import { TokenTypes } from '@/constants/TokenTypes';
@@ -462,39 +463,21 @@ export const tokenState = createModel<RootModel>()({
       } as TokenState;
     },
     // Imports received variables as tokens, if needed
-    setTokensFromVariables: (state, receivedVariables: SetTokensFromVariablesPayload): TokenState => {
+    setTokensFromVariables: (state, receivedVariables: SetTokensFromVariablesPayload, options?: { baseFontSize?: number }): TokenState => {
       const newTokens: VariableToCreateToken[] = [];
-      const existingTokens: VariableToCreateToken[] = [];
       const updatedTokens: VariableToCreateToken[] = [];
 
-      // Iterate over received styles and check if they existed before or need updating
+      // Iterate over received variables and check if they existed before or need updating
       Object.values(receivedVariables).forEach((values) => {
         values.forEach((token) => {
-          // If a set exists for the token
-          if (state.tokens[token.parent]) {
-            const oldValue = state.tokens[token.parent].find((t) => t.name === token.name);
-            // If the token already exists
-            if (oldValue) {
-              const normalizedOldValueDescription = oldValue.description ?? '';
-              const normalizedTokenDescription = token.description ?? '';
-              const normalizedOldValueExtensions = oldValue.$extensions ?? {};
-              const normalizedTokenExtensions = token.$extensions ?? {};
-              if (
-                isEqual(oldValue.value, token.value)
-                && isEqual(normalizedOldValueDescription, normalizedTokenDescription)
-                && isEqual(normalizedOldValueExtensions, normalizedTokenExtensions)
-              ) {
-                existingTokens.push(token);
-              } else {
-                const updatedToken = { ...token };
-                updatedToken.oldValue = oldValue.value;
-                updatedTokens.push(updatedToken);
-              }
-            } else {
-              newTokens.push(token);
-            }
-          } else {
+          const oldValue = state.tokens[token.parent]?.find((t) => t.name === token.name);
+          if (!oldValue) {
             newTokens.push(token);
+            return;
+          }
+          const { token: reconciledToken, hasChanges } = reconcileImportedVariableToken(oldValue, token, options?.baseFontSize);
+          if (hasChanges) {
+            updatedTokens.push({ ...reconciledToken, oldValue: oldValue.value });
           }
         });
       });
