@@ -2,6 +2,8 @@ import { init, RematchStore } from '@rematch/core';
 import { RootModel } from '@/types/RootModel';
 import { models } from './index';
 import { TokenTypes } from '@/constants/TokenTypes';
+import { AnyTokenList } from '@/types/tokens';
+import { UpdateTokenPayload } from '@/types/payloads';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import * as notifiers from '@/plugin/notifiers';
 import updateTokensOnSources from '../updateSources';
@@ -2111,5 +2113,231 @@ describe('editToken', () => {
       metadata: null,
 
     });
+  });
+});
+
+describe('setTokensFromVariables', () => {
+  const variable = (name: string, value: string | number, type = TokenTypes.DIMENSION) => ({
+    name, value, type, parent: 'core/default',
+  });
+  const initStore = (tokens: AnyTokenList): Store => init<RootModel>({
+    redux: {
+      initialState: {
+        tokenState: {
+          tokens: { 'core/default': tokens },
+          importedTokens: { newTokens: [], updatedTokens: [] },
+        },
+      },
+    },
+    models,
+  });
+
+  it('keeps font weights as unitless fontWeights tokens', () => {
+    const store = initStore([
+      { name: 'fontWeight.regular', value: '400', type: TokenTypes.FONT_WEIGHTS },
+      { name: 'fontWeight.bold', value: '700', type: TokenTypes.FONT_WEIGHTS },
+      { name: 'spacing.sm', value: '8px', type: TokenTypes.DIMENSION },
+    ]);
+
+    // What pullVariables sends with "Convert numbers to dimensions" checked, after fontWeight.bold changed in Figma
+    store.dispatch.tokenState.setTokensFromVariables({
+      dimensions: [
+        variable('fontWeight.regular', '400px'),
+        variable('fontWeight.bold', '600px'),
+        variable('spacing.sm', '12px'),
+      ],
+    });
+
+    const { updatedTokens } = store.getState().tokenState.importedTokens;
+    expect(updatedTokens).toEqual([
+      {
+        name: 'fontWeight.bold', value: '600', oldValue: '700', type: TokenTypes.FONT_WEIGHTS, parent: 'core/default',
+      },
+      {
+        name: 'spacing.sm', value: '12px', oldValue: '8px', type: TokenTypes.DIMENSION, parent: 'core/default',
+      },
+    ]);
+
+    store.dispatch.tokenState.editMultipleTokens(updatedTokens);
+    expect(store.getState().tokenState.tokens['core/default']).toEqual([
+      expect.objectContaining({ name: 'fontWeight.regular', value: '400', type: TokenTypes.FONT_WEIGHTS }),
+      expect.objectContaining({ name: 'fontWeight.bold', value: '600', type: TokenTypes.FONT_WEIGHTS }),
+      expect.objectContaining({ name: 'spacing.sm', value: '12px', type: TokenTypes.DIMENSION }),
+    ]);
+  });
+
+  describe('Figma metadata', () => {
+    const figmaDefaults = { 'com.figma.scopes': ['ALL_SCOPES'], 'com.figma.hiddenFromPublishing': false };
+    const withFigma = (name: string, value: string, $extensions: Record<string, unknown>) => ({ ...variable(name, value), $extensions });
+
+    it('leaves out default scopes and publishing so unchanged tokens are not listed', () => {
+      const store = initStore([
+        { name: 'fontWeight.regular', value: '400', type: TokenTypes.FONT_WEIGHTS },
+        { name: 'spacing.sm', value: '8px', type: TokenTypes.DIMENSION },
+      ]);
+
+      store.dispatch.tokenState.setTokensFromVariables({
+        dimensions: [
+          withFigma('fontWeight.regular', '400px', figmaDefaults),
+          withFigma('spacing.sm', '8px', figmaDefaults),
+          withFigma('spacing.md', '16px', figmaDefaults),
+        ],
+      });
+
+      expect(store.getState().tokenState.importedTokens).toEqual({
+        newTokens: [variable('spacing.md', '16px')],
+        updatedTokens: [],
+      });
+    });
+
+    it('imports scopes and publishing that differ from the defaults', () => {
+      const store = initStore([{ name: 'spacing.sm', value: '8px', type: TokenTypes.DIMENSION }]);
+      const custom = { 'com.figma.scopes': ['GAP'], 'com.figma.hiddenFromPublishing': true };
+
+      store.dispatch.tokenState.setTokensFromVariables({
+        dimensions: [withFigma('spacing.sm', '8px', custom), withFigma('spacing.md', '16px', custom)],
+      });
+
+      expect(store.getState().tokenState.importedTokens).toEqual({
+        newTokens: [withFigma('spacing.md', '16px', custom)],
+        updatedTokens: [{ ...withFigma('spacing.sm', '8px', custom), oldValue: '8px' }],
+      });
+    });
+
+    it('saves a reset to the defaults when the token had other values', () => {
+      const store = initStore([
+        {
+          name: 'spacing.sm',
+          value: '8px',
+          type: TokenTypes.DIMENSION,
+          $extensions: { 'com.figma.scopes': ['GAP'], 'com.figma.hiddenFromPublishing': true },
+        },
+        {
+          name: 'spacing.md',
+          value: '16px',
+          type: TokenTypes.DIMENSION,
+          $extensions: figmaDefaults,
+        },
+      ]);
+
+      store.dispatch.tokenState.setTokensFromVariables({
+        dimensions: [withFigma('spacing.sm', '8px', figmaDefaults), withFigma('spacing.md', '16px', figmaDefaults)],
+      });
+
+      // spacing.md already had the defaults, so it is unchanged
+      const { updatedTokens } = store.getState().tokenState.importedTokens;
+      expect(updatedTokens).toEqual([{ ...withFigma('spacing.sm', '8px', figmaDefaults), oldValue: '8px' }]);
+
+      store.dispatch.tokenState.editMultipleTokens(updatedTokens);
+      expect(store.getState().tokenState.tokens['core/default'][0]).toEqual({
+        name: 'spacing.sm', value: '8px', type: TokenTypes.DIMENSION, $extensions: figmaDefaults,
+      });
+    });
+
+    it('does not list tokens as updated again after they were imported', () => {
+      const store = initStore([{ name: 'spacing.sm', value: '8px', type: TokenTypes.DIMENSION }]);
+      const payload = { dimensions: [withFigma('spacing.sm', '12px', { ...figmaDefaults, 'com.figma.scopes': ['GAP'] })] };
+
+      store.dispatch.tokenState.setTokensFromVariables(payload);
+      store.dispatch.tokenState.editMultipleTokens(store.getState().tokenState.importedTokens.updatedTokens);
+      expect(store.getState().tokenState.tokens['core/default']).toEqual([
+        {
+          name: 'spacing.sm', value: '12px', type: TokenTypes.DIMENSION, $extensions: { 'com.figma.scopes': ['GAP'] },
+        },
+      ]);
+
+      store.dispatch.tokenState.setTokensFromVariables(payload);
+      expect(store.getState().tokenState.importedTokens.updatedTokens).toEqual([]);
+    });
+  });
+
+  it('keeps font weights imported as plain numbers, numeric values and aliases as fontWeights', () => {
+    const store = initStore([
+      { name: 'fontWeight.regular', value: '400', type: TokenTypes.FONT_WEIGHTS },
+      { name: 'fontWeight.bold', value: 700, type: TokenTypes.FONT_WEIGHTS },
+      { name: 'fontWeight.body', value: '{fontWeight.light}', type: TokenTypes.FONT_WEIGHTS },
+    ]);
+
+    store.dispatch.tokenState.setTokensFromVariables({
+      numbers: [
+        variable('fontWeight.regular', 500, TokenTypes.NUMBER),
+        variable('fontWeight.bold', 700, TokenTypes.NUMBER),
+        variable('fontWeight.body', '{fontWeight.regular}', TokenTypes.NUMBER),
+      ],
+    });
+
+    expect(store.getState().tokenState.importedTokens.updatedTokens).toEqual([
+      {
+        name: 'fontWeight.regular', value: '500', oldValue: '400', type: TokenTypes.FONT_WEIGHTS, parent: 'core/default',
+      },
+      {
+        name: 'fontWeight.body', value: '{fontWeight.regular}', oldValue: '{fontWeight.light}', type: TokenTypes.FONT_WEIGHTS, parent: 'core/default',
+      },
+    ]);
+  });
+
+  it('leaves other values and other token types as imported', () => {
+    const store = initStore([
+      { name: 'fontWeight.regular', value: '400', type: TokenTypes.FONT_WEIGHTS },
+      { name: 'fontWeight.name', value: 'Bold', type: TokenTypes.FONT_WEIGHTS },
+      { name: 'size.sm', value: '8', type: TokenTypes.SIZING },
+    ]);
+
+    store.dispatch.tokenState.setTokensFromVariables({
+      dimensions: [variable('fontWeight.regular', '25rem'), variable('size.sm', '12px')],
+      strings: [variable('fontWeight.name', 'Medium', TokenTypes.TEXT)],
+    });
+
+    expect(store.getState().tokenState.importedTokens.updatedTokens).toEqual([
+      {
+        name: 'fontWeight.regular', value: '25rem', oldValue: '400', type: TokenTypes.DIMENSION, parent: 'core/default',
+      },
+      {
+        name: 'size.sm', value: '12px', oldValue: '8', type: TokenTypes.DIMENSION, parent: 'core/default',
+      },
+      {
+        name: 'fontWeight.name', value: 'Medium', oldValue: 'Bold', type: TokenTypes.TEXT, parent: 'core/default',
+      },
+    ]);
+  });
+});
+
+describe('editToken extensions', () => {
+  it('removes extensions the edit no longer has', () => {
+    const store: Store = init<RootModel>({
+      redux: {
+        initialState: {
+          tokenState: {
+            tokens: {
+              global: [
+                {
+                  name: 'red',
+                  value: '#ff0000',
+                  type: TokenTypes.COLOR,
+                  $extensions: { 'studio.tokens': { modify: { type: 'lighten', value: '0.2', space: 'lch' } } },
+                },
+                {
+                  name: 'gap', value: '8px', type: TokenTypes.DIMENSION, $extensions: { 'com.figma.scopes': ['GAP'] },
+                },
+              ],
+            },
+          },
+        },
+      },
+      models,
+    });
+
+    // What EditTokenForm sends after removing the color modifier and the variable scopes
+    store.dispatch.tokenState.editToken({
+      parent: 'global', name: 'red', value: '#ff0000', type: TokenTypes.COLOR, $extensions: { 'studio.tokens': undefined },
+    } as UpdateTokenPayload);
+    store.dispatch.tokenState.editToken({
+      parent: 'global', name: 'gap', value: '8px', type: TokenTypes.DIMENSION, $extensions: {},
+    } as UpdateTokenPayload);
+
+    expect(store.getState().tokenState.tokens.global).toEqual([
+      { name: 'red', value: '#ff0000', type: TokenTypes.COLOR },
+      { name: 'gap', value: '8px', type: TokenTypes.DIMENSION },
+    ]);
   });
 });

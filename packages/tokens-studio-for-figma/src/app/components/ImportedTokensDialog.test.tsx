@@ -180,27 +180,18 @@ describe('ImportedTokensDialog', () => {
             value: '50%',
           },
           {
-            $extensions: {
-              'studio.tokens': { id: 'mock-uuid' },
-            },
             name: 'small',
             type: 'sizing',
             value: '12',
             description: 'regular sizing token',
           },
           {
-            $extensions: {
-              'studio.tokens': { id: 'mock-uuid' },
-            },
             name: 'black',
             type: 'color',
             value: '#ffffff',
             description: 'regular color token',
           },
           {
-            $extensions: {
-              'studio.tokens': { id: 'mock-uuid' },
-            },
             name: 'headline',
             type: 'boxShadow',
             value: {
@@ -251,18 +242,12 @@ describe('ImportedTokensDialog', () => {
             value: '50%',
           },
           {
-            $extensions: {
-              'studio.tokens': { id: 'mock-uuid' },
-            },
             name: 'black',
             type: 'color',
             value: '#ffffff',
             description: 'regular color token',
           },
           {
-            $extensions: {
-              'studio.tokens': { id: 'mock-uuid' },
-            },
             name: 'headline',
             type: 'boxShadow',
             value: {
@@ -296,7 +281,6 @@ describe('ImportedTokensDialog', () => {
       expect(mockStore.getState().tokenState.tokens.global).toEqual(
         [
           {
-            $extensions: { 'studio.tokens': {} },
             name: 'light',
             type: 'typography',
             value: {
@@ -312,6 +296,51 @@ describe('ImportedTokensDialog', () => {
           },
         ],
       );
+    });
+  });
+
+  it('should save the imported Figma metadata when updating a single token', async () => {
+    const mockStore = createMockStore({
+      tokenState: {
+        activeTokenSet: 'global',
+        tokens: {
+          global: [
+            {
+              name: 'gap', type: 'dimension', value: '8px', $extensions: { 'com.figma.scopes': ['GAP'] },
+            },
+          ],
+        },
+        importedTokens: {
+          newTokens: [],
+          updatedTokens: [
+            {
+              name: 'gap',
+              type: 'dimension',
+              value: '8px',
+              oldValue: '8px',
+              parent: 'global',
+              $extensions: { 'com.figma.scopes': ['ALL_SCOPES'] },
+            },
+          ],
+        },
+      },
+    });
+    const result = render(
+      <Provider store={mockStore}>
+        <ImportedTokensDialog />
+      </Provider>,
+    );
+
+    await act(async () => {
+      result.getAllByTestId('imported-tokens-dialog-update-button')[0].click();
+    });
+
+    await waitFor(() => {
+      expect(mockStore.getState().tokenState.tokens.global).toEqual([
+        {
+          name: 'gap', type: 'dimension', value: '8px', $extensions: { 'com.figma.scopes': ['ALL_SCOPES'] },
+        },
+      ]);
     });
   });
 
@@ -332,7 +361,6 @@ describe('ImportedTokensDialog', () => {
       expect(mockStore.getState().tokenState.tokens.global).toEqual(
         [
           {
-            $extensions: { 'studio.tokens': { id: 'mock-uuid' } },
             name: 'light',
             type: 'typography',
             value: {
@@ -342,7 +370,6 @@ describe('ImportedTokensDialog', () => {
             },
           },
           {
-            $extensions: { 'studio.tokens': { id: 'mock-uuid' } },
             name: 'opacity.50',
             type: 'opacity',
             value: '30%',
@@ -382,7 +409,6 @@ describe('ImportedTokensDialog', () => {
             },
           },
           {
-            $extensions: { 'studio.tokens': { id: 'mock-uuid' } },
             name: 'opacity.50',
             type: 'opacity',
             value: '30%',
@@ -407,7 +433,6 @@ describe('ImportedTokensDialog', () => {
       expect(mockStore.getState().tokenState.tokens.global).toEqual(
         [
           {
-            $extensions: { 'studio.tokens': { id: 'mock-uuid' } },
             name: 'light',
             type: 'typography',
             value: {
@@ -417,27 +442,23 @@ describe('ImportedTokensDialog', () => {
             },
           },
           {
-            $extensions: { 'studio.tokens': { id: 'mock-uuid' } },
             name: 'opacity.50',
             type: 'opacity',
             value: '30%',
           },
           {
-            $extensions: { 'studio.tokens': { id: 'mock-uuid' } },
             name: 'small',
             type: 'sizing',
             value: '12',
             description: 'regular sizing token',
           },
           {
-            $extensions: { 'studio.tokens': { id: 'mock-uuid' } },
             name: 'black',
             type: 'color',
             value: '#ffffff',
             description: 'regular color token',
           },
           {
-            $extensions: { 'studio.tokens': { id: 'mock-uuid' } },
             name: 'headline',
             type: 'boxShadow',
             value: {
