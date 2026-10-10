@@ -3,6 +3,7 @@ import { RootModel } from '@/types/RootModel';
 import { models } from './index';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { AnyTokenList } from '@/types/tokens';
+import { UpdateTokenPayload } from '@/types/payloads';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import * as notifiers from '@/plugin/notifiers';
 import updateTokensOnSources from '../updateSources';
@@ -2297,6 +2298,46 @@ describe('setTokensFromVariables', () => {
       {
         name: 'fontWeight.name', value: 'Medium', oldValue: 'Bold', type: TokenTypes.TEXT, parent: 'core/default',
       },
+    ]);
+  });
+});
+
+describe('editToken extensions', () => {
+  it('removes extensions the edit no longer has', () => {
+    const store: Store = init<RootModel>({
+      redux: {
+        initialState: {
+          tokenState: {
+            tokens: {
+              global: [
+                {
+                  name: 'red',
+                  value: '#ff0000',
+                  type: TokenTypes.COLOR,
+                  $extensions: { 'studio.tokens': { modify: { type: 'lighten', value: '0.2', space: 'lch' } } },
+                },
+                {
+                  name: 'gap', value: '8px', type: TokenTypes.DIMENSION, $extensions: { 'com.figma.scopes': ['GAP'] },
+                },
+              ],
+            },
+          },
+        },
+      },
+      models,
+    });
+
+    // What EditTokenForm sends after removing the color modifier and the variable scopes
+    store.dispatch.tokenState.editToken({
+      parent: 'global', name: 'red', value: '#ff0000', type: TokenTypes.COLOR, $extensions: { 'studio.tokens': undefined },
+    } as UpdateTokenPayload);
+    store.dispatch.tokenState.editToken({
+      parent: 'global', name: 'gap', value: '8px', type: TokenTypes.DIMENSION, $extensions: {},
+    } as UpdateTokenPayload);
+
+    expect(store.getState().tokenState.tokens.global).toEqual([
+      { name: 'red', value: '#ff0000', type: TokenTypes.COLOR },
+      { name: 'gap', value: '8px', type: TokenTypes.DIMENSION },
     ]);
   });
 });

@@ -299,6 +299,51 @@ describe('ImportedTokensDialog', () => {
     });
   });
 
+  it('should save the imported Figma metadata when updating a single token', async () => {
+    const mockStore = createMockStore({
+      tokenState: {
+        activeTokenSet: 'global',
+        tokens: {
+          global: [
+            {
+              name: 'gap', type: 'dimension', value: '8px', $extensions: { 'com.figma.scopes': ['GAP'] },
+            },
+          ],
+        },
+        importedTokens: {
+          newTokens: [],
+          updatedTokens: [
+            {
+              name: 'gap',
+              type: 'dimension',
+              value: '8px',
+              oldValue: '8px',
+              parent: 'global',
+              $extensions: { 'com.figma.scopes': ['ALL_SCOPES'] },
+            },
+          ],
+        },
+      },
+    });
+    const result = render(
+      <Provider store={mockStore}>
+        <ImportedTokensDialog />
+      </Provider>,
+    );
+
+    await act(async () => {
+      result.getAllByTestId('imported-tokens-dialog-update-button')[0].click();
+    });
+
+    await waitFor(() => {
+      expect(mockStore.getState().tokenState.tokens.global).toEqual([
+        {
+          name: 'gap', type: 'dimension', value: '8px', $extensions: { 'com.figma.scopes': ['ALL_SCOPES'] },
+        },
+      ]);
+    });
+  });
+
   it('should update all tokens', async () => {
     const mockStore = createMockStore(getDefaultStore());
     const result = render(
