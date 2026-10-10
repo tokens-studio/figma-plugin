@@ -311,6 +311,62 @@ describe('ImportedTokensDialog', () => {
     });
   });
 
+  it('should update a single token in its own set, keeping its extensions and deprecation', async () => {
+    const mockStore = createMockStore({
+      tokenState: {
+        activeTokenSet: 'global',
+        tokens: {
+          global: [],
+          'core/default': [
+            {
+              name: 'fontWeight.bold',
+              type: 'fontWeights',
+              value: '700',
+              $deprecated: true,
+              $extensions: { 'studio.tokens': { id: 'bold-id' } },
+            },
+          ],
+        },
+        importedTokens: {
+          newTokens: [],
+          updatedTokens: [
+            {
+              name: 'fontWeight.bold',
+              type: 'fontWeights',
+              value: '600',
+              oldValue: '700',
+              parent: 'core/default',
+              $deprecated: true,
+              $extensions: { 'studio.tokens': { id: 'bold-id' } },
+            },
+          ],
+        },
+      },
+    });
+    const result = render(
+      <Provider store={mockStore}>
+        <ImportedTokensDialog />
+      </Provider>,
+    );
+
+    await act(async () => {
+      result.getAllByTestId('imported-tokens-dialog-update-button')[0].click();
+    });
+
+    await waitFor(() => {
+      expect(mockStore.getState().tokenState.tokens['core/default']).toEqual([
+        {
+          name: 'fontWeight.bold',
+          type: 'fontWeights',
+          value: '600',
+          $deprecated: true,
+          $extensions: { 'studio.tokens': { id: 'bold-id' } },
+        },
+      ]);
+    });
+    expect(mockStore.getState().tokenState.tokens.global).toEqual([]);
+  });
+
   it('should update all tokens', async () => {
     const mockStore = createMockStore(getDefaultStore());
     const result = render(

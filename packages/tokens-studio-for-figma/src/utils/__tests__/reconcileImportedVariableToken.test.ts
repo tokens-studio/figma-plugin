@@ -95,6 +95,15 @@ describe('reconcileImportedVariableToken', () => {
     expect(result.token).toMatchObject({ value: '16px', type: TokenTypes.DIMENSION });
   });
 
+  it('takes the imported value when the existing value is not a string or number', () => {
+    const result = reconcileImportedVariableToken(
+      existing({ value: { fontSize: '16' } as any, type: TokenTypes.TYPOGRAPHY }),
+      imported({ value: '16px' }),
+    );
+    expect(result.hasChanges).toBe(true);
+    expect(result.token.value).toBe('16px');
+  });
+
   it('keeps the type of string tokens such as font families', () => {
     const result = reconcileImportedVariableToken(
       existing({ value: 'Inter', type: TokenTypes.FONT_FAMILIES }),
