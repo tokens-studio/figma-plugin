@@ -9,7 +9,6 @@ import { Initiator } from './Initiator';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { Tabs } from '@/constants/Tabs';
-import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { UpdateMode } from '@/constants/UpdateMode';
 import { ApplyVariablesStylesOrRawValues } from '@/constants/ApplyVariablesStyleOrder';
 
@@ -424,113 +423,6 @@ describe('Initiator', () => {
       ],
       updatedTokens: [],
     });
-  });
-
-  it('should import variables, keeping the type and unit of existing tokens', () => {
-    const variableTheme = {
-      id: 'core-default',
-      name: 'default',
-      group: 'core',
-      selectedTokenSets: { 'core/default': TokenSetStatus.ENABLED },
-      $figmaCollectionId: 'VariableCollectionId:1:0',
-      $figmaModeId: '1:0',
-    };
-    const mockStore = createMockStore({
-      settings: { baseFontSize: '20' },
-      tokenState: {
-        tokens: {
-          'core/default': [
-            { name: 'fontWeight.regular', type: TokenTypes.FONT_WEIGHTS, value: '400' },
-            { name: 'spacing.md', type: TokenTypes.SPACING, value: '1rem' },
-          ],
-        },
-      },
-    });
-    render(
-      <Provider store={mockStore}>
-        <Initiator />
-      </Provider>,
-    );
-
-    fireEvent(
-      window,
-      new MessageEvent('message', {
-        data: {
-          pluginMessage: {
-            type: 'variables',
-            values: {
-              dimensions: [
-                {
-                  name: 'fontWeight.regular', type: TokenTypes.DIMENSION, value: '500px', parent: 'core/default',
-                },
-                // 1rem at the 20px base font size from settings, so unchanged
-                {
-                  name: 'spacing.md', type: TokenTypes.DIMENSION, value: '20px', parent: 'core/default',
-                },
-                {
-                  name: 'spacing.lg', type: TokenTypes.DIMENSION, value: '32px', parent: 'core/default',
-                },
-              ],
-            },
-            themes: [variableTheme],
-          },
-        },
-      }),
-    );
-
-    const state = mockStore.getState();
-    expect(state.tokenState.importedThemes).toEqual({ newThemes: [variableTheme], updatedThemes: [] });
-    expect(state.tokenState.importedTokens).toEqual({
-      newTokens: [
-        {
-          name: 'spacing.lg', type: TokenTypes.DIMENSION, value: '32px', parent: 'core/default',
-        },
-      ],
-      updatedTokens: [
-        {
-          name: 'fontWeight.regular', type: TokenTypes.FONT_WEIGHTS, value: '500', oldValue: '400', parent: 'core/default',
-        },
-      ],
-    });
-    expect(state.uiState.activeTab).toEqual(Tabs.TOKENS);
-  });
-
-  it('should fall back to the default base font size when importing variables with an invalid one', () => {
-    const mockStore = createMockStore({
-      settings: { baseFontSize: '{fontSize.base}' },
-      tokenState: {
-        tokens: {
-          'core/default': [
-            { name: 'spacing.md', type: TokenTypes.SPACING, value: '1rem' },
-          ],
-        },
-      },
-    });
-    render(
-      <Provider store={mockStore}>
-        <Initiator />
-      </Provider>,
-    );
-
-    fireEvent(
-      window,
-      new MessageEvent('message', {
-        data: {
-          pluginMessage: {
-            type: 'variables',
-            values: {
-              dimensions: [
-                {
-                  name: 'spacing.md', type: TokenTypes.DIMENSION, value: '16px', parent: 'core/default',
-                },
-              ],
-            },
-          },
-        },
-      }),
-    );
-
-    expect(mockStore.getState().tokenState.importedTokens).toEqual({ newTokens: [], updatedTokens: [] });
   });
 
   it('should be able to start a background job', () => {

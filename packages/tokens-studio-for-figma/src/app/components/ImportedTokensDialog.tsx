@@ -253,13 +253,11 @@ export default function ImportedTokensDialog() {
   const handleUpdateSingleClick = React.useCallback((token: any) => {
     // Go through each token that needs to be updated
     editSingleToken({
-      parent: token.parent || activeTokenSet,
+      parent: activeTokenSet,
       name: token.name,
       value: token.value,
       type: token.type,
       description: token.description,
-      $extensions: token.$extensions,
-      $deprecated: token.$deprecated,
       shouldUpdateDocument: true,
     });
     track('Update single variable', { type: token.type });

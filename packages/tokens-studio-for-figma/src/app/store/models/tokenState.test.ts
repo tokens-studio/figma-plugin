@@ -2,6 +2,7 @@ import { init, RematchStore } from '@rematch/core';
 import { RootModel } from '@/types/RootModel';
 import { models } from './index';
 import { TokenTypes } from '@/constants/TokenTypes';
+import { AnyTokenList } from '@/types/tokens';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import * as notifiers from '@/plugin/notifiers';
 import updateTokensOnSources from '../updateSources';
@@ -2115,57 +2116,102 @@ describe('editToken', () => {
 });
 
 describe('setTokensFromVariables', () => {
-  it('only updates the number of existing tokens and keeps their type, unit and extensions', () => {
-    const store: Store = init<RootModel>({
-      redux: {
-        initialState: {
-          tokenState: {
-            tokens: {
-              'core/default': [
-                {
-                  name: 'fontWeight.regular',
-                  value: '400',
-                  type: TokenTypes.FONT_WEIGHTS,
-                  $extensions: { 'studio.tokens': { id: 'regular-id' } },
-                },
-                { name: 'fontWeight.bold', value: '700', type: TokenTypes.FONT_WEIGHTS },
-                { name: 'spacing.sm', value: '8px', type: TokenTypes.DIMENSION },
-              ],
-            },
-            importedTokens: { newTokens: [], updatedTokens: [] },
-          },
+  const variable = (name: string, value: string | number, type = TokenTypes.DIMENSION) => ({
+    name, value, type, parent: 'core/default',
+  });
+  const initStore = (tokens: AnyTokenList): Store => init<RootModel>({
+    redux: {
+      initialState: {
+        tokenState: {
+          tokens: { 'core/default': tokens },
+          importedTokens: { newTokens: [], updatedTokens: [] },
         },
       },
-      models,
-    });
-    const figmaDefaults = { 'com.figma.scopes': ['ALL_SCOPES'], 'com.figma.hiddenFromPublishing': false };
-    const variable = (name: string, value: string) => ({
-      name, value, type: TokenTypes.DIMENSION, parent: 'core/default', $extensions: figmaDefaults,
-    });
+    },
+    models,
+  });
+
+  it('keeps font weights as unitless fontWeights tokens', () => {
+    const store = initStore([
+      { name: 'fontWeight.regular', value: '400', type: TokenTypes.FONT_WEIGHTS },
+      { name: 'fontWeight.bold', value: '700', type: TokenTypes.FONT_WEIGHTS },
+      { name: 'spacing.sm', value: '8px', type: TokenTypes.DIMENSION },
+    ]);
 
     // What pullVariables sends with "Convert numbers to dimensions" checked, after fontWeight.bold changed in Figma
     store.dispatch.tokenState.setTokensFromVariables({
       dimensions: [
         variable('fontWeight.regular', '400px'),
         variable('fontWeight.bold', '600px'),
-        variable('spacing.sm', '8px'),
-        variable('spacing.md', '16px'),
+        variable('spacing.sm', '12px'),
       ],
     });
 
-    const { importedTokens } = store.getState().tokenState;
-    expect(importedTokens.newTokens.map((t) => t.name)).toEqual(['spacing.md']);
-    expect(importedTokens.updatedTokens).toEqual([
+    const { updatedTokens } = store.getState().tokenState.importedTokens;
+    expect(updatedTokens).toEqual([
       {
         name: 'fontWeight.bold', value: '600', oldValue: '700', type: TokenTypes.FONT_WEIGHTS, parent: 'core/default',
       },
+      {
+        name: 'spacing.sm', value: '12px', oldValue: '8px', type: TokenTypes.DIMENSION, parent: 'core/default',
+      },
     ]);
 
-    store.dispatch.tokenState.editMultipleTokens(importedTokens.updatedTokens);
+    store.dispatch.tokenState.editMultipleTokens(updatedTokens);
     expect(store.getState().tokenState.tokens['core/default']).toEqual([
       expect.objectContaining({ name: 'fontWeight.regular', value: '400', type: TokenTypes.FONT_WEIGHTS }),
       expect.objectContaining({ name: 'fontWeight.bold', value: '600', type: TokenTypes.FONT_WEIGHTS }),
-      expect.objectContaining({ name: 'spacing.sm', value: '8px', type: TokenTypes.DIMENSION }),
+      expect.objectContaining({ name: 'spacing.sm', value: '12px', type: TokenTypes.DIMENSION }),
+    ]);
+  });
+
+  it('keeps font weights imported as plain numbers, numeric values and aliases as fontWeights', () => {
+    const store = initStore([
+      { name: 'fontWeight.regular', value: '400', type: TokenTypes.FONT_WEIGHTS },
+      { name: 'fontWeight.bold', value: 700, type: TokenTypes.FONT_WEIGHTS },
+      { name: 'fontWeight.body', value: '{fontWeight.light}', type: TokenTypes.FONT_WEIGHTS },
+    ]);
+
+    store.dispatch.tokenState.setTokensFromVariables({
+      numbers: [
+        variable('fontWeight.regular', 500, TokenTypes.NUMBER),
+        variable('fontWeight.bold', 700, TokenTypes.NUMBER),
+        variable('fontWeight.body', '{fontWeight.regular}', TokenTypes.NUMBER),
+      ],
+    });
+
+    expect(store.getState().tokenState.importedTokens.updatedTokens).toEqual([
+      {
+        name: 'fontWeight.regular', value: '500', oldValue: '400', type: TokenTypes.FONT_WEIGHTS, parent: 'core/default',
+      },
+      {
+        name: 'fontWeight.body', value: '{fontWeight.regular}', oldValue: '{fontWeight.light}', type: TokenTypes.FONT_WEIGHTS, parent: 'core/default',
+      },
+    ]);
+  });
+
+  it('leaves other values and other token types as imported', () => {
+    const store = initStore([
+      { name: 'fontWeight.regular', value: '400', type: TokenTypes.FONT_WEIGHTS },
+      { name: 'fontWeight.name', value: 'Bold', type: TokenTypes.FONT_WEIGHTS },
+      { name: 'size.sm', value: '8', type: TokenTypes.SIZING },
+    ]);
+
+    store.dispatch.tokenState.setTokensFromVariables({
+      dimensions: [variable('fontWeight.regular', '25rem'), variable('size.sm', '12px')],
+      strings: [variable('fontWeight.name', 'Medium', TokenTypes.TEXT)],
+    });
+
+    expect(store.getState().tokenState.importedTokens.updatedTokens).toEqual([
+      {
+        name: 'fontWeight.regular', value: '25rem', oldValue: '400', type: TokenTypes.DIMENSION, parent: 'core/default',
+      },
+      {
+        name: 'size.sm', value: '12px', oldValue: '8', type: TokenTypes.DIMENSION, parent: 'core/default',
+      },
+      {
+        name: 'fontWeight.name', value: 'Medium', oldValue: 'Bold', type: TokenTypes.TEXT, parent: 'core/default',
+      },
     ]);
   });
 });

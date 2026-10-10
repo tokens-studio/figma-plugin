@@ -34,7 +34,6 @@ import { RootModel } from '@/types/RootModel';
 import { ThemeObject, ThemeObjectsList, UsedTokenSetsMap } from '@/types';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { isEqual } from '@/utils/isEqual';
-import { reconcileImportedVariableToken } from '@/utils/reconcileImportedVariableToken';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { updateTokenSetsInState } from '@/utils/tokenset/updateTokenSetsInState';
 import { TokenTypes } from '@/constants/TokenTypes';
@@ -99,6 +98,18 @@ export interface TokenState {
    * null = server hasn't responded yet or is unavailable → use local resolver only.
    */
   serverResolvedTokens: Record<string, string> | null;
+}
+
+// Figma has no font weight variable type, so a numeric font weight comes back from the import as a number
+// or px dimension. Keep existing font weight tokens as unitless fontWeights instead of e.g. "400px" dimensions.
+function keepFontWeightType(existingToken: SingleToken, token: VariableToCreateToken): VariableToCreateToken {
+  if (existingToken.type !== TokenTypes.FONT_WEIGHTS) return token;
+  if (token.type !== TokenTypes.NUMBER && token.type !== TokenTypes.DIMENSION) return token;
+  const value = String(token.value);
+  if (value.startsWith('{')) return { ...token, type: TokenTypes.FONT_WEIGHTS };
+  const fontWeight = value.match(/^(-?\d*\.?\d+)(px)?$/)?.[1];
+  if (fontWeight === undefined) return token;
+  return { ...token, type: TokenTypes.FONT_WEIGHTS, value: typeof existingToken.value === 'number' ? Number(fontWeight) : fontWeight };
 }
 
 export const tokenState = createModel<RootModel>()({
@@ -463,21 +474,40 @@ export const tokenState = createModel<RootModel>()({
       } as TokenState;
     },
     // Imports received variables as tokens, if needed
-    setTokensFromVariables: (state, receivedVariables: SetTokensFromVariablesPayload, options?: { baseFontSize?: number }): TokenState => {
+    setTokensFromVariables: (state, receivedVariables: SetTokensFromVariablesPayload): TokenState => {
       const newTokens: VariableToCreateToken[] = [];
+      const existingTokens: VariableToCreateToken[] = [];
       const updatedTokens: VariableToCreateToken[] = [];
 
-      // Iterate over received variables and check if they existed before or need updating
+      // Iterate over received styles and check if they existed before or need updating
       Object.values(receivedVariables).forEach((values) => {
         values.forEach((token) => {
-          const oldValue = state.tokens[token.parent]?.find((t) => t.name === token.name);
-          if (!oldValue) {
+          // If a set exists for the token
+          if (state.tokens[token.parent]) {
+            const oldValue = state.tokens[token.parent].find((t) => t.name === token.name);
+            // If the token already exists
+            if (oldValue) {
+              const importedToken = keepFontWeightType(oldValue, token);
+              const normalizedOldValueDescription = oldValue.description ?? '';
+              const normalizedTokenDescription = token.description ?? '';
+              const normalizedOldValueExtensions = oldValue.$extensions ?? {};
+              const normalizedTokenExtensions = token.$extensions ?? {};
+              if (
+                isEqual(oldValue.value, importedToken.value)
+                && isEqual(normalizedOldValueDescription, normalizedTokenDescription)
+                && isEqual(normalizedOldValueExtensions, normalizedTokenExtensions)
+              ) {
+                existingTokens.push(token);
+              } else {
+                const updatedToken = { ...importedToken };
+                updatedToken.oldValue = oldValue.value;
+                updatedTokens.push(updatedToken);
+              }
+            } else {
+              newTokens.push(token);
+            }
+          } else {
             newTokens.push(token);
-            return;
-          }
-          const { token: reconciledToken, hasChanges } = reconcileImportedVariableToken(oldValue, token, options?.baseFontSize);
-          if (hasChanges) {
-            updatedTokens.push({ ...reconciledToken, oldValue: oldValue.value });
           }
         });
       });
