@@ -2165,6 +2165,37 @@ describe('setTokensFromVariables', () => {
     ]);
   });
 
+  it('does not list tokens as updated again after they were imported', () => {
+    const store = initStore([
+      { name: 'fontWeight.regular', value: '400', type: TokenTypes.FONT_WEIGHTS },
+      { name: 'spacing.sm', value: '8px', type: TokenTypes.DIMENSION },
+    ]);
+    const figmaDefaults = { 'com.figma.scopes': ['ALL_SCOPES'], 'com.figma.hiddenFromPublishing': false };
+    const payload = {
+      dimensions: [
+        { ...variable('fontWeight.regular', '400px'), $extensions: figmaDefaults },
+        { ...variable('spacing.sm', '8px'), $extensions: figmaDefaults },
+      ],
+    };
+
+    // The first import adds the Figma metadata the tokens don't have yet
+    store.dispatch.tokenState.setTokensFromVariables(payload);
+    expect(store.getState().tokenState.importedTokens.updatedTokens).toHaveLength(2);
+    store.dispatch.tokenState.editMultipleTokens(store.getState().tokenState.importedTokens.updatedTokens);
+    expect(store.getState().tokenState.tokens['core/default']).toEqual([
+      {
+        name: 'fontWeight.regular', value: '400', type: TokenTypes.FONT_WEIGHTS, $extensions: figmaDefaults,
+      },
+      {
+        name: 'spacing.sm', value: '8px', type: TokenTypes.DIMENSION, $extensions: figmaDefaults,
+      },
+    ]);
+
+    // Importing again without changes in Figma finds nothing to update
+    store.dispatch.tokenState.setTokensFromVariables(payload);
+    expect(store.getState().tokenState.importedTokens.updatedTokens).toEqual([]);
+  });
+
   it('keeps font weights imported as plain numbers, numeric values and aliases as fontWeights', () => {
     const store = initStore([
       { name: 'fontWeight.regular', value: '400', type: TokenTypes.FONT_WEIGHTS },

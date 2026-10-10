@@ -334,7 +334,7 @@ export const tokenState = createModel<RootModel>()({
         }
         const existingTokenIndex = newTokens[token.parent].findIndex((n) => n.name === token.name);
         if (existingTokenIndex === -1) {
-          newTokens[token.parent].push(updateTokenPayloadToSingleToken(token as UpdateTokenPayload, uuidv4()));
+          newTokens[token.parent].push(updateTokenPayloadToSingleToken(token as UpdateTokenPayload));
         }
       });
 
@@ -351,7 +351,7 @@ export const tokenState = createModel<RootModel>()({
         if (existingTokenIndex > -1) {
           newTokens[token.parent] = [
             ...newTokens[token.parent].slice(0, existingTokenIndex),
-            updateTokenPayloadToSingleToken(token as UpdateTokenPayload, uuidv4()),
+            updateTokenPayloadToSingleToken(token as UpdateTokenPayload),
             ...newTokens[token.parent].slice(existingTokenIndex + 1),
           ];
         }
