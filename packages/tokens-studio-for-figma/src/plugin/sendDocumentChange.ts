@@ -7,7 +7,8 @@ import { notifyInstancesCreated } from './notifiers';
 function changesTouchSelection(changedNodeIds: string[]) {
   const selectedIds = new Set(figma.currentPage.selection.map((node) => node.id));
   if (!selectedIds.size) return false;
-  return changedNodeIds.some((id) => {
+  // A change event can list the same node several times
+  return [...new Set(changedNodeIds)].some((id) => {
     let node: BaseNode | null = figma.getNodeById(id);
     while (node) {
       if (selectedIds.has(node.id)) return true;

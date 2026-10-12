@@ -209,17 +209,9 @@ export const uiState = createModel<RootModel>()({
         formId: data.formId,
       },
     }),
-    setSelectedLayers: (state, data: number) => ({
-      ...state,
-      selectedLayers: data,
-    }),
     setHideConfirm: (state) => ({
       ...state,
       confirmState: defaultConfirmState,
-    }),
-    setDisabled: (state, data: boolean) => ({
-      ...state,
-      disabled: data,
     }),
     setEditToken: (state, data: EditTokenObject) => ({
       ...state,
@@ -237,18 +229,6 @@ export const uiState = createModel<RootModel>()({
         displayType: data,
       };
     },
-    setSelectionValues: (state, data: SelectionGroup[]) => ({
-      ...state,
-      selectionValues: data,
-    }),
-    setMainNodeSelectionValues: (state, data: SelectionValue) => ({
-      ...state,
-      mainNodeSelectionValues: data,
-    }),
-    resetSelectionValues: (state) => ({
-      ...state,
-      selectionValues: [] as SelectionGroup[],
-    }),
     // Applies a whole selection update in one dispatch. Every dispatch makes each mounted token
     // re-check its subscriptions, so splitting one update over several dispatches multiplies that cost.
     setSelection: (state, data: {

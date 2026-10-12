@@ -269,7 +269,9 @@ describe('MoreButton', () => {
       </Provider>,
     );
     act(() => {
-      mockStore.dispatch.uiState.setMainNodeSelectionValues({ paddingLeft: token.name });
+      mockStore.dispatch.uiState.setSelection({
+        selectedLayers: 1, disabled: false, mainNodeSelectionValues: { paddingLeft: token.name }, selectionValues: [],
+      });
     });
     await fireEvent.click(result.getByText(token.name));
     expect(mockSetNodeData).toHaveBeenCalledWith({
@@ -294,7 +296,9 @@ describe('MoreButton', () => {
     );
     onRender.mockClear();
     act(() => {
-      mockStore.dispatch.uiState.setMainNodeSelectionValues({ itemSpacing: 'another-token' });
+      mockStore.dispatch.uiState.setSelection({
+        selectedLayers: 1, disabled: false, mainNodeSelectionValues: { itemSpacing: 'another-token' }, selectionValues: [],
+      });
     });
     expect(onRender).not.toHaveBeenCalled();
   });

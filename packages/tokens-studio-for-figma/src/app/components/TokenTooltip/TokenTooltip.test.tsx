@@ -1,6 +1,7 @@
 import React from 'react';
+import { Provider } from 'react-redux';
 import {
-  act, fireEvent, render,
+  act, createMockStore, fireEvent, render,
 } from '../../../../tests/config/setupTest';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { SingleToken } from '@/types/tokens';
@@ -36,5 +37,17 @@ describe('TokenTooltip', () => {
     });
 
     expect(renderCounts.b).toBe(rendersOfB);
+  });
+
+  it('shows no token details while the edit form is open', async () => {
+    const mockStore = createMockStore({ uiState: { showEditForm: true } });
+    const { getByText, findByRole } = render(
+      <Provider store={mockStore}>
+        <TokenTooltip token={tokenA}><CountingTrigger label="a" /></TokenTooltip>
+      </Provider>,
+    );
+
+    fireEvent.pointerMove(getByText('a'));
+    expect((await findByRole('tooltip')).textContent).toBe('');
   });
 });
