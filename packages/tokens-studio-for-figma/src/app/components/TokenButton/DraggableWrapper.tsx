@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
-import { useDispatch, useSelector, useStore } from 'react-redux';
+import { useDispatch, useStore } from 'react-redux';
 import { activeTokenSetSelector, tokensSelector } from '@/selectors';
 import { SingleToken } from '@/types/tokens';
 import { Dispatch, RootState } from '@/app/store';
@@ -17,7 +17,6 @@ export const DraggableWrapper: React.FC<React.PropsWithChildren<React.PropsWithC
 }) => {
   const store = useStore<RootState>();
   const dispatch = useDispatch<Dispatch>();
-  const activeTokenSet = useSelector(activeTokenSetSelector);
 
   const isDraggable = useMemo(() => (
     token.name && isNaN(Number(token.name.split('.')[token.name.split('.').length - 1]))
@@ -46,7 +45,10 @@ export const DraggableWrapper: React.FC<React.PropsWithChildren<React.PropsWithC
   const handleDrop = React.useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.stopPropagation();
 
-    const tokens = tokensSelector(store.getState());
+    // Read at drop time so each token doesn't subscribe to the store
+    const state = store.getState();
+    const tokens = tokensSelector(state);
+    const activeTokenSet = activeTokenSetSelector(state);
 
     let draggedTokenIndex: number | null = null;
     let dropTokenIndex: number | null = null;
@@ -67,7 +69,7 @@ export const DraggableWrapper: React.FC<React.PropsWithChildren<React.PropsWithC
         dispatch.tokenState.setTokens(newTokens);
       }
     }
-  }, [store, token, draggedToken, dispatch, activeTokenSet]);
+  }, [store, token, draggedToken, dispatch]);
 
   const draggerProps = React.useMemo(() => ({
     draggable: !!isDraggable,

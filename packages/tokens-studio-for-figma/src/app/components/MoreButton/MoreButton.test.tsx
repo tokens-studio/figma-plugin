@@ -7,6 +7,8 @@ import {
 import { MoreButton } from './MoreButton';
 import { SingleToken } from '@/types/tokens';
 import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
+import { UpdateMode } from '@/constants/UpdateMode';
+import useManageTokens from '../../store/useManageTokens';
 
 const mockShowForm = jest.fn();
 const mockDeleteToken = jest.fn();
@@ -295,6 +297,51 @@ describe('MoreButton', () => {
       mockStore.dispatch.uiState.setMainNodeSelectionValues({ itemSpacing: 'another-token' });
     });
     expect(onRender).not.toHaveBeenCalled();
+  });
+
+  it('should not re-render or remount on selecting layers, settings changes or opening the edit form', () => {
+    const mockStore = createMockStore({});
+    const onRender = jest.fn();
+
+    const result = render(
+      <Provider store={mockStore}>
+        <React.Profiler id="more-button" onRender={onRender}>
+          <MoreButton
+            type={TokenTypes.SPACING}
+            showForm={mockShowForm}
+            token={token}
+          />
+        </React.Profiler>
+      </Provider>,
+    );
+    const button = result.getByText(token.name).closest('button');
+    onRender.mockClear();
+    act(() => {
+      mockStore.dispatch.uiState.setSelection({
+        selectedLayers: 1, disabled: false, mainNodeSelectionValues: {}, selectionValues: [],
+      });
+      mockStore.dispatch.uiState.setSelection({
+        selectedLayers: 0, disabled: true, mainNodeSelectionValues: {}, selectionValues: [],
+      });
+      mockStore.dispatch.settings.setUpdateMode(UpdateMode.DOCUMENT);
+      mockStore.dispatch.uiState.setShowEditForm(true);
+      mockStore.dispatch.uiState.setShowEditForm(false);
+    });
+    expect(onRender).not.toHaveBeenCalled();
+    expect(result.getByText(token.name).closest('button')).toBe(button);
+  });
+
+  it('should only set up the menu actions once the menu is opened', async () => {
+    const result = render(
+      <MoreButton
+        type={TokenTypes.SPACING}
+        showForm={mockShowForm}
+        token={token}
+      />,
+    );
+    expect(useManageTokens).not.toHaveBeenCalled();
+    await fireEvent.contextMenu(result.getByText(token.name));
+    expect(useManageTokens).toHaveBeenCalled();
   });
 
   it('should deselect correct child property for dimension tokens', async () => {

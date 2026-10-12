@@ -249,6 +249,17 @@ export const uiState = createModel<RootModel>()({
       ...state,
       selectionValues: [] as SelectionGroup[],
     }),
+    // Applies a whole selection update in one dispatch. Every dispatch makes each mounted token
+    // re-check its subscriptions, so splitting one update over several dispatches multiplies that cost.
+    setSelection: (state, data: {
+      selectedLayers: number;
+      disabled: boolean;
+      mainNodeSelectionValues: SelectionValue;
+      selectionValues: SelectionGroup[];
+    }) => ({
+      ...state,
+      ...data,
+    }),
     startJob(state, job: BackgroundJob) {
       return {
         ...state,
