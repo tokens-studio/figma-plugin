@@ -274,22 +274,29 @@ export default async function pullVariables(options: PullVariablesOptions, theme
             });
             break;
 
-          case 'STRING':
+          case 'STRING': {
+            // A variable scoped to font style alone is a named font weight, e.g. "Bold"
+            const isFontWeight = variable.scopes?.length === 1 && variable.scopes[0] === 'FONT_STYLE';
             forEachModeValue(variable, collectionToProcess, (value, parent) => {
               const tokenValue = isVariableAlias(value) ? aliasReference(value) : String(value);
               if (tokenValue !== null) {
-                pushToken(strings, TokenTypes.TEXT, tokenValue, parent);
+                pushToken(strings, isFontWeight ? TokenTypes.FONT_WEIGHTS : TokenTypes.TEXT, tokenValue, parent);
               }
             });
             break;
+          }
 
-          case 'FLOAT':
+          case 'FLOAT': {
+            // A variable scoped to font weight alone is a font weight, not a dimension, so it gets no px or rem
+            const isFontWeight = variable.scopes?.length === 1 && variable.scopes[0] === 'FONT_WEIGHT';
             forEachModeValue(variable, collectionToProcess, (value, parent) => {
               let tokenValue: string | number | null = value as number;
               if (isVariableAlias(value)) {
                 tokenValue = aliasReference(value);
               } else if (typeof value === 'number') {
-                if (options.useRem) {
+                if (isFontWeight) {
+                  tokenValue = String(Number(value.toFixed(3)));
+                } else if (options.useRem) {
                   tokenValue = `${Number((value / parseFloat(String(baseRem))).toFixed(3))}rem`;
                 } else if (options.useDimensions) {
                   tokenValue = `${Number(value.toFixed(3))}px`;
@@ -299,13 +306,16 @@ export default async function pullVariables(options: PullVariablesOptions, theme
               }
 
               if (tokenValue === null) return;
-              if (options.useDimensions || options.useRem) {
+              if (isFontWeight) {
+                pushToken(numbers, TokenTypes.FONT_WEIGHTS, tokenValue as string, parent);
+              } else if (options.useDimensions || options.useRem) {
                 pushToken(dimensions, TokenTypes.DIMENSION, tokenValue as string, parent);
               } else {
                 pushToken(numbers, TokenTypes.NUMBER, tokenValue as string, parent);
               }
             });
             break;
+          }
 
           case 'TIMING':
           case 'EASING': {
