@@ -101,10 +101,11 @@ export interface TokenState {
 }
 
 // Figma has no font weight variable type, so a numeric font weight comes back from the import as a number
-// or px dimension. Keep existing font weight tokens as unitless fontWeights instead of e.g. "400px" dimensions.
+// or px dimension, or as a fontWeights token when the variable is scoped to font weight alone.
+// Keep existing font weight tokens as unitless fontWeights instead of e.g. "400px" dimensions.
 function keepFontWeightType(existingToken: SingleToken, token: VariableToCreateToken): VariableToCreateToken {
   if (existingToken.type !== TokenTypes.FONT_WEIGHTS) return token;
-  if (token.type !== TokenTypes.NUMBER && token.type !== TokenTypes.DIMENSION) return token;
+  if (token.type !== TokenTypes.NUMBER && token.type !== TokenTypes.DIMENSION && token.type !== TokenTypes.FONT_WEIGHTS) return token;
   const value = String(token.value);
   if (value.startsWith('{')) return { ...token, type: TokenTypes.FONT_WEIGHTS };
   const fontWeight = value.match(/^(-?\d*\.?\d+)(px)?$/)?.[1];
@@ -129,6 +130,22 @@ function withoutDefaultFigmaExtensions(token: VariableToCreateToken, existingTok
   });
   if (Object.keys($extensions).length === 0) return omit(token, '$extensions');
   return { ...token, $extensions };
+}
+
+// The import only brings in the com.figma.* keys, so those are the only ones that can have changed in Figma.
+// Sorted, because isEqual also compares the order of keys and array items.
+function sortedFigmaExtensions($extensions: SingleToken['$extensions']): [string, unknown][] {
+  const sortDeep = (value: unknown): unknown => {
+    if (Array.isArray(value)) return [...value].sort();
+    if (value && typeof value === 'object') {
+      return Object.entries(value).sort(([a], [b]) => a.localeCompare(b)).map(([key, nested]) => [key, sortDeep(nested)]);
+    }
+    return value;
+  };
+  return Object.entries($extensions ?? {})
+    .filter(([key]) => key.startsWith('com.figma.'))
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([key, value]) => [key, sortDeep(value)]);
 }
 
 export const tokenState = createModel<RootModel>()({
@@ -509,8 +526,8 @@ export const tokenState = createModel<RootModel>()({
               const importedToken = keepFontWeightType(oldValue, withoutDefaultFigmaExtensions(token, oldValue));
               const normalizedOldValueDescription = oldValue.description ?? '';
               const normalizedTokenDescription = token.description ?? '';
-              const normalizedOldValueExtensions = oldValue.$extensions ?? {};
-              const normalizedTokenExtensions = importedToken.$extensions ?? {};
+              const normalizedOldValueExtensions = sortedFigmaExtensions(oldValue.$extensions);
+              const normalizedTokenExtensions = sortedFigmaExtensions(importedToken.$extensions);
               if (
                 isEqual(oldValue.value, importedToken.value)
                 && isEqual(normalizedOldValueDescription, normalizedTokenDescription)

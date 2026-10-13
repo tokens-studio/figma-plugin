@@ -2276,6 +2276,96 @@ describe('setTokensFromVariables', () => {
     ]);
   });
 
+  it('keeps the value type of a font weight that pullVariables already imported as fontWeights', () => {
+    const store = initStore([
+      { name: 'fontWeight.regular', value: '400', type: TokenTypes.FONT_WEIGHTS },
+      { name: 'fontWeight.numeric', value: 400 as unknown as string, type: TokenTypes.FONT_WEIGHTS },
+      { name: 'fontWeight.bold', value: 700 as unknown as string, type: TokenTypes.FONT_WEIGHTS },
+    ]);
+
+    // What pullVariables sends for variables scoped to font weight alone
+    store.dispatch.tokenState.setTokensFromVariables({
+      numbers: [
+        variable('fontWeight.regular', '400', TokenTypes.FONT_WEIGHTS),
+        variable('fontWeight.numeric', '400', TokenTypes.FONT_WEIGHTS),
+        variable('fontWeight.bold', '600', TokenTypes.FONT_WEIGHTS),
+        variable('fontWeight.new', '500', TokenTypes.FONT_WEIGHTS),
+      ],
+    });
+
+    expect(store.getState().tokenState.importedTokens).toEqual({
+      newTokens: [{
+        name: 'fontWeight.new', value: '500', type: TokenTypes.FONT_WEIGHTS, parent: 'core/default',
+      }],
+      updatedTokens: [{
+        name: 'fontWeight.bold', value: 600, oldValue: 700, type: TokenTypes.FONT_WEIGHTS, parent: 'core/default',
+      }],
+    });
+  });
+
+  describe('comparing extensions', () => {
+    const figmaExtensions = {
+      'com.figma.scopes': ['GAP', 'WIDTH_HEIGHT'],
+      'com.figma.hiddenFromPublishing': true,
+      'com.figma.codeSyntax': { Web: '--gap', Android: 'gap' },
+    };
+    const importGap = (store: Store, $extensions: Record<string, unknown> = figmaExtensions) => {
+      store.dispatch.tokenState.setTokensFromVariables({
+        dimensions: [{ ...variable('gap', '8px'), $extensions }],
+      });
+      return store.getState().tokenState.importedTokens.updatedTokens;
+    };
+
+    it('ignores ids and other keys that Figma does not send', () => {
+      const store = initStore([{
+        name: 'gap',
+        value: '8px',
+        type: TokenTypes.DIMENSION,
+        $extensions: {
+          id: 'server-id',
+          'studio.tokens': { id: 'legacy-id' },
+          'com.figma': { scopes: ['GAP'] },
+          ...figmaExtensions,
+        },
+      } as AnyTokenList[number]]);
+
+      expect(importGap(store)).toEqual([]);
+    });
+
+    it('does not list a token created in the plugin, which has an id', () => {
+      const store = initStore([]);
+      store.dispatch.tokenState.createToken({
+        parent: 'core/default', name: 'gap', value: '8px', type: TokenTypes.DIMENSION,
+      } as UpdateTokenPayload);
+
+      expect(importGap(store, { 'com.figma.scopes': ['ALL_SCOPES'], 'com.figma.hiddenFromPublishing': false })).toEqual([]);
+    });
+
+    it('ignores the order of keys, scopes and code syntax platforms', () => {
+      const store = initStore([{
+        name: 'gap',
+        value: '8px',
+        type: TokenTypes.DIMENSION,
+        $extensions: {
+          'com.figma.codeSyntax': { Android: 'gap', Web: '--gap' },
+          'com.figma.hiddenFromPublishing': true,
+          'com.figma.scopes': ['WIDTH_HEIGHT', 'GAP'],
+        },
+      }]);
+
+      expect(importGap(store)).toEqual([]);
+    });
+
+    it('still lists a token whose scopes or code syntax changed in Figma', () => {
+      const store = initStore([{
+        name: 'gap', value: '8px', type: TokenTypes.DIMENSION, $extensions: { 'studio.tokens': { id: 'legacy-id' }, ...figmaExtensions },
+      }]);
+
+      expect(importGap(store, { ...figmaExtensions, 'com.figma.scopes': ['GAP'] })).toHaveLength(1);
+      expect(importGap(store, { ...figmaExtensions, 'com.figma.codeSyntax': { Web: '--space' } })).toHaveLength(1);
+    });
+  });
+
   it('leaves other values and other token types as imported', () => {
     const store = initStore([
       { name: 'fontWeight.regular', value: '400', type: TokenTypes.FONT_WEIGHTS },
