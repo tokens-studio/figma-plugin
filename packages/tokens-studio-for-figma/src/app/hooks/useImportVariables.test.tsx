@@ -142,4 +142,59 @@ describe('useImportVariables', () => {
     expect(mockStore.getState().uiState.confirmState.show).toBe(false);
     expect(sentTypes()).toContain(AsyncMessageTypes.PULL_VARIABLES);
   });
+
+  it('still asks when the branch and variable counts are unknown', async () => {
+    const { branch, ...studioApiWithoutBranch } = studioApi;
+    messageSpy.mockImplementation((async (message: { type: AsyncMessageTypes }) => (
+      message.type === AsyncMessageTypes.GET_AVAILABLE_VARIABLE_COLLECTIONS
+        ? { collections: collections.map(({ variableCount, ...collection }) => collection) }
+        : {}
+    )) as any);
+    const { result, mockStore } = await setup(studioApiWithoutBranch);
+
+    let importPromise: Promise<void>;
+    act(() => {
+      // Only one of the two collections is selected, by a user who can't create themes.
+      importPromise = result.current.importVariables({ collection1: selectedCollections.collection1 }, options, [], false);
+    });
+
+    await waitFor(() => expect(mockStore.getState().uiState.confirmState.show).toBe(true));
+    expect(mockStore.getState().uiState.confirmState.description).toBe(
+      'importVariablesStudioConfirmDescription importVariablesStudioConfirmCounts',
+    );
+    expect(sentTypes()).not.toContain(AsyncMessageTypes.PULL_VARIABLES);
+
+    await act(async () => {
+      fireEvent.click(screen.getByText('importVariablesStudioConfirmAction'));
+      await importPromise;
+    });
+
+    expect(sentTypes()).toContain(AsyncMessageTypes.PULL_VARIABLES);
+  });
+
+  it('keeps the dialog closed when the collections cannot be fetched', async () => {
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+    messageSpy.mockRejectedValue(new Error('Failed'));
+
+    const { result } = await setup(githubApi);
+
+    expect(result.current.isDialogOpen).toBe(false);
+    expect(result.current.collections).toEqual([]);
+    expect(result.current.isLoading).toBe(false);
+    consoleSpy.mockRestore();
+  });
+
+  it('keeps the dialog open when the import fails', async () => {
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+    const { result } = await setup(githubApi);
+    messageSpy.mockRejectedValue(new Error('Failed'));
+
+    await act(async () => {
+      await result.current.importVariables(selectedCollections, options, [], true);
+    });
+
+    expect(consoleSpy).toHaveBeenCalledWith('Error importing variables:', expect.any(Error));
+    expect(result.current.isDialogOpen).toBe(true);
+    consoleSpy.mockRestore();
+  });
 });
