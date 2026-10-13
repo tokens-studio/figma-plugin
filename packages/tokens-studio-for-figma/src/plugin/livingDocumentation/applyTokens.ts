@@ -13,6 +13,11 @@ export async function applyTokensToDocumentation(
   resolvedTokens: AnyTokenList,
 ): Promise<void> {
   try {
+    // Commit undo point before applying tokens to documentation
+    if (typeof figma !== 'undefined' && figma.commitUndo) {
+      figma.commitUndo();
+    }
+    
     // Get current UI settings for token application
     const uiSettings = await UiSettingsProperty.read(figma.root);
 

@@ -12,6 +12,11 @@ import { defaultWorker } from '../Worker';
 export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK_REMAP_TOKENS] = async (msg) => {
   // Big O(n * m) + Big O(updatePluginData) + Big O(sendSelectionChange): (n = amount of nodes, m = amount of tokens in the node)
   try {
+    // Commit undo point before bulk remapping tokens
+    if (typeof figma !== 'undefined' && figma.commitUndo) {
+      figma.commitUndo();
+    }
+    
     const { oldName, newName, useRegex } = msg;
     const allWithData = await defaultNodeManager.findBaseNodesWithData({ updateMode: msg.updateMode });
     const namespace = SharedPluginDataNamespaces.TOKENS;
