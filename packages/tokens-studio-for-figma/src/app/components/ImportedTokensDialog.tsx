@@ -6,7 +6,7 @@ import Modal from './Modal';
 import { Dispatch } from '../store';
 import useManageTokens from '../store/useManageTokens';
 import {
-  activeTokenSetSelector, importedTokensSelector, importedThemesSelector, themesListSelector, renamedCollectionsSelector, storageTypeSelector,
+  activeTokenSetSelector, importedTokensSelector, importedThemesSelector, themesListSelector, renamedCollectionsSelector, storageTypeSelector, tokensSelector,
 } from '@/selectors';
 import Stack from './Stack';
 import AddIcon from '@/icons/add.svg';
@@ -18,6 +18,7 @@ import Accordion from './Accordion';
 import { Count } from './Count';
 import { track } from '@/utils/analytics';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import { isEqual } from '@/utils/isEqual';
 
 function NewOrExistingToken({
   token,
@@ -101,6 +102,7 @@ export default function ImportedTokensDialog() {
   const dispatch = useDispatch<Dispatch>();
   const { editSingleToken, createSingleToken, importMultipleTokens } = useManageTokens();
   const activeTokenSet = useSelector(activeTokenSetSelector);
+  const tokensBySet = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
   const importedTokens = useSelector(importedTokensSelector);
   const importedThemes = useSelector(importedThemesSelector);
@@ -193,8 +195,21 @@ export default function ImportedTokensDialog() {
       dispatch.tokenState.setRenamedCollections(null);
     }
 
+    // A renamed collection's set doesn't exist under its new name yet, so all of its tokens were classified as new.
+    // After the rename they already exist and creating them is a no-op, so the changed ones have to be sent as updates.
+    const changedTokensInRenamedSets = (renamedCollections ?? []).flatMap(([oldName, newName]) => {
+      const oldTokens = tokensBySet[oldName] ?? [];
+      return multipleNewTokens.filter((token) => token.parent === newName && oldTokens.some((oldToken) => (
+        oldToken.name === token.name
+        && (!isEqual(oldToken.value, token.value) || (oldToken.description ?? '') !== (token.description ?? ''))
+      )));
+    });
+
     // Update all existing tokens, and create new ones
-    importMultipleTokens({ multipleUpdatedTokens, multipleNewTokens });
+    importMultipleTokens({
+      multipleUpdatedTokens: [...multipleUpdatedTokens, ...changedTokensInRenamedSets],
+      multipleNewTokens,
+    });
 
     // Trigger document update if using local storage
     if (newThemes.length > 0 || updatedThemes.length > 0 || multipleUpdatedTokens.length > 0 || multipleNewTokens.length > 0) {
@@ -234,12 +249,12 @@ export default function ImportedTokensDialog() {
     setNewTokens([]);
     setNewThemes([]);
     setUpdatedThemes([]);
-  }, [activeTokenSet, importMultipleTokens, newTokens, updatedTokens, themes, newThemes, updatedThemes, renamedCollections, dispatch]);
+  }, [activeTokenSet, importMultipleTokens, newTokens, updatedTokens, themes, newThemes, updatedThemes, renamedCollections, tokensBySet, dispatch]);
 
   const handleCreateSingleClick = React.useCallback((token: any) => {
     // Create new tokens according to styles
     createSingleToken({
-      parent: activeTokenSet,
+      parent: token.parent || activeTokenSet,
       name: token.name,
       value: token.value,
       type: token.type,
@@ -247,13 +262,13 @@ export default function ImportedTokensDialog() {
       shouldUpdateDocument: true,
     });
     track('Import single variable', { type: token.type });
-    setNewTokens(newTokens.filter((newToken) => newToken.name !== token.name));
+    setNewTokens(newTokens.filter((newToken) => newToken.name !== token.name || newToken.parent !== token.parent));
   }, [newTokens, activeTokenSet, createSingleToken]);
 
   const handleUpdateSingleClick = React.useCallback((token: any) => {
     // Go through each token that needs to be updated
     editSingleToken({
-      parent: activeTokenSet,
+      parent: token.parent || activeTokenSet,
       name: token.name,
       value: token.value,
       type: token.type,
@@ -263,7 +278,7 @@ export default function ImportedTokensDialog() {
     });
     track('Update single variable', { type: token.type });
 
-    setUpdatedTokens(updatedTokens.filter((updatedToken) => updatedToken.name !== token.name));
+    setUpdatedTokens(updatedTokens.filter((updatedToken) => updatedToken.name !== token.name || updatedToken.parent !== token.parent));
   }, [updatedTokens, editSingleToken, activeTokenSet]);
 
   const handleClose = React.useCallback(() => {

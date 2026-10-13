@@ -564,4 +564,174 @@ describe('ImportedTokensDialog', () => {
       expect(mockStore.getState().tokenState.activeTokenSet).toEqual('global');
     });
   });
+
+  describe('tokens that belong to another set than the active one', () => {
+    const getMultiSetStore = () => ({
+      tokenState: {
+        activeTokenSet: 'Colors/Light',
+        tokens: {
+          'Colors/Light': [{ name: 'color.bg', type: 'color', value: '#ffffff' }],
+          'Colors/Dark': [{ name: 'color.bg', type: 'color', value: '#000000' }],
+        },
+        importedTokens: {
+          newTokens: [
+            {
+              name: 'color.fg', type: 'color', value: '#111111', parent: 'Colors/Light',
+            },
+            {
+              name: 'color.fg', type: 'color', value: '#eeeeee', parent: 'Colors/Dark',
+            },
+          ],
+          updatedTokens: [
+            {
+              name: 'color.bg', type: 'color', value: '#fafafa', oldValue: '#ffffff', parent: 'Colors/Light',
+            },
+            {
+              name: 'color.bg', type: 'color', value: '#0a0a0a', oldValue: '#000000', parent: 'Colors/Dark',
+            },
+          ],
+        },
+      },
+    });
+
+    it('should update a single token in its own set and keep the same-named row of the other set', async () => {
+      const mockStore = createMockStore(getMultiSetStore());
+      const result = render(
+        <Provider store={mockStore}>
+          <ImportedTokensDialog />
+        </Provider>,
+      );
+
+      // Rows: 2 new tokens, then Light's color.bg, then Dark's color.bg
+      await act(async () => {
+        result.getAllByTestId('imported-tokens-dialog-update-button')[3].click();
+      });
+
+      await waitFor(() => {
+        expect(mockStore.getState().tokenState.tokens).toEqual({
+          'Colors/Light': [{ name: 'color.bg', type: 'color', value: '#ffffff' }],
+          'Colors/Dark': [{ name: 'color.bg', type: 'color', value: '#0a0a0a' }],
+        });
+      });
+      expect(result.queryByText('#0a0a0a')).not.toBeInTheDocument();
+      expect(result.queryByText('#fafafa')).toBeInTheDocument();
+    });
+
+    it('should create a single token in its own set and keep the same-named row of the other set', async () => {
+      const mockStore = createMockStore(getMultiSetStore());
+      const result = render(
+        <Provider store={mockStore}>
+          <ImportedTokensDialog />
+        </Provider>,
+      );
+
+      await act(async () => {
+        result.getAllByTestId('imported-tokens-dialog-update-button')[1].click();
+      });
+
+      await waitFor(() => {
+        expect(mockStore.getState().tokenState.tokens).toEqual({
+          'Colors/Light': [{ name: 'color.bg', type: 'color', value: '#ffffff' }],
+          'Colors/Dark': [
+            { name: 'color.bg', type: 'color', value: '#000000' },
+            {
+              name: 'color.fg', type: 'color', value: '#eeeeee', $extensions: { 'studio.tokens': { id: 'mock-uuid' } },
+            },
+          ],
+        });
+      });
+      expect(result.queryByText('#eeeeee')).not.toBeInTheDocument();
+      expect(result.queryByText('#111111')).toBeInTheDocument();
+    });
+
+    it('should update a single token whose name does not exist in the active set', async () => {
+      const mockStore = createMockStore({
+        tokenState: {
+          activeTokenSet: 'Colors/Light',
+          tokens: {
+            'Colors/Light': [{ name: 'color.bg', type: 'color', value: '#ffffff' }],
+            'Spacing/Default': [{ name: 'spacing.sm', type: 'dimension', value: '8' }],
+          },
+          importedTokens: {
+            newTokens: [],
+            updatedTokens: [
+              {
+                name: 'spacing.sm', type: 'dimension', value: '12', oldValue: '8', parent: 'Spacing/Default',
+              },
+            ],
+          },
+        },
+      });
+      const result = render(
+        <Provider store={mockStore}>
+          <ImportedTokensDialog />
+        </Provider>,
+      );
+
+      await act(async () => {
+        result.getAllByTestId('imported-tokens-dialog-update-button')[0].click();
+      });
+
+      await waitFor(() => {
+        expect(mockStore.getState().tokenState.tokens).toEqual({
+          'Colors/Light': [{ name: 'color.bg', type: 'color', value: '#ffffff' }],
+          'Spacing/Default': [{ name: 'spacing.sm', type: 'dimension', value: '12' }],
+        });
+      });
+    });
+  });
+
+  it('should apply value changes and create new tokens in a renamed collection when importing all', async () => {
+    // The set doesn't exist under its new name yet, so setTokensFromVariables classifies all of its tokens as new
+    const mockStore = createMockStore({
+      tokenState: {
+        activeTokenSet: 'Old/Default',
+        tokens: {
+          'Old/Default': [
+            { name: 'spacing.sm', type: 'dimension', value: '8' },
+            {
+              name: 'spacing.md', type: 'dimension', value: '16', $extensions: { 'custom.extension': { keep: true } },
+            },
+          ],
+        },
+        renamedCollections: [['Old/Default', 'New/Default']],
+        importedTokens: {
+          newTokens: [
+            {
+              name: 'spacing.sm', type: 'dimension', value: '12', parent: 'New/Default',
+            },
+            {
+              name: 'spacing.md', type: 'dimension', value: '16', parent: 'New/Default',
+            },
+            {
+              name: 'spacing.lg', type: 'dimension', value: '24', parent: 'New/Default',
+            },
+          ],
+          updatedTokens: [],
+        },
+      },
+    });
+    const result = render(
+      <Provider store={mockStore}>
+        <ImportedTokensDialog />
+      </Provider>,
+    );
+
+    await act(async () => {
+      (await result.findByText('importAll')).click();
+    });
+
+    await waitFor(() => {
+      expect(mockStore.getState().tokenState.tokens).toEqual({
+        'New/Default': [
+          { name: 'spacing.sm', type: 'dimension', value: '12' },
+          {
+            name: 'spacing.md', type: 'dimension', value: '16', $extensions: { 'custom.extension': { keep: true }, 'studio.tokens': { id: 'mock-uuid' } },
+          },
+          { name: 'spacing.lg', type: 'dimension', value: '24' },
+        ],
+      });
+    });
+    expect(mockStore.getState().tokenState.renamedCollections).toBeNull();
+  });
 });
