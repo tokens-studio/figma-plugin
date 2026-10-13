@@ -186,9 +186,12 @@ describe('Branch switcher', () => {
     cy.startup(nonProUserParams);
     cy.get('[data-testid=branch-selector-menu-trigger]').click();
 
-    // Should show pro upgrade modal
-    cy.contains('Branching is a feature of the Pro subscription').should('be.visible');
-    cy.contains('You can switch branches, create new ones from current changes or any other branch, easily find branches, and collaborate seamlessly with your team. Branching enables powerful version control and team collaboration workflows.').should('be.visible');
+    // Should show the upgrade dialog for branching
+    cy.get('[data-testid=upgrade-dialog]').should('be.visible');
+    cy.contains('What is Branching?').should('be.visible');
+    cy.get('[data-testid=upgrade-dialog-next]').click();
+    cy.contains('Unlock with «Starter Plus»').should('be.visible');
+    cy.get('[data-testid=upgrade-dialog-start-trial]').should('be.visible');
   });
 
   it('allows searching branches', () => {
