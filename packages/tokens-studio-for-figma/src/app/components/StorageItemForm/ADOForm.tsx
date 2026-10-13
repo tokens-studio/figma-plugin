@@ -10,6 +10,7 @@ import { StorageTypeFormValues } from '@/types/StorageType';
 import { generateId } from '@/utils/generateId';
 import { ChangeEventHandler } from './types';
 import { ErrorMessage } from '../ErrorMessage';
+import MultiFileSyncHint from './MultiFileSyncHint';
 
 type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.ADO }>;
 type Props = {
@@ -122,6 +123,7 @@ export default function ADOForm({
             required
           />
           <Text muted>{t('filePathCaption')}</Text>
+          <MultiFileSyncHint filePath={values.filePath} />
         </FormField>
 
         <Stack direction="row" justify="end" gap={4}>

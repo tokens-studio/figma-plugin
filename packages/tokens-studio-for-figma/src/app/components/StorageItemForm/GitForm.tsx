@@ -11,6 +11,7 @@ import { StorageTypeFormValues } from '@/types/StorageType';
 import { generateId } from '@/utils/generateId';
 import { ChangeEventHandler } from './types';
 import { ErrorMessage } from '../ErrorMessage';
+import MultiFileSyncHint from './MultiFileSyncHint';
 
 type ValidatedFormValues = Extract<
 StorageTypeFormValues<false>,
@@ -133,6 +134,7 @@ export default function GitForm({
           <Text muted size="xsmall">
             {t('filePathCaption')}
           </Text>
+          <MultiFileSyncHint filePath={values.filePath} />
         </FormField>
         <FormField>
           <Label htmlFor="baseUrl">{t('baseUrl')}</Label>

@@ -1,0 +1,117 @@
+{
+  "stepOf": "{{current}} of {{total}}",
+  "next": "Next",
+  "previous": "Previous",
+  "startFreeTrial": "Start Free Trial",
+  "whatDoIGetWithPlus": "What do I get with Plus?",
+  "multiFileSyncHint": "Syncing tokens to a folder needs «Starter Plus». On the Free plan, use a single JSON file (Ex: tokens.json).",
+  "learnMore": "Learn more",
+  "unlock": {
+    "heading": "Unlock with «Starter Plus»",
+    "body": "{{feature}} is part of «Starter Plus». Start a 14-day free trial to unlock it.",
+    "alsoIncluded": "You’ll also get access to all plugin features like:",
+    "alsoIncludedList": "{{features}}, and more.",
+    "closing": "Let’s scale your design system together."
+  },
+  "includedFeatures": {
+    "themes": "Themes",
+    "branching": "Branching",
+    "multiFileSync": "Multi-file Sync",
+    "advancedTokens": "Advanced Tokens",
+    "tokenFlow": "Token Flow",
+    "tokenAutomation": "Token Automation"
+  },
+  "features": {
+    "themes": {
+      "title": "Themes",
+      "slides": {
+        "1": {
+          "heading": "What are Themes?",
+          "body": "Themes let you group tokens into collections – for example, light/dark mode, multiple brands, or platforms – and easily switch between them in Figma."
+        },
+        "2": {
+          "heading": "Combine sets into themes",
+          "body": "Pick which token sets are active, used as a source, or disabled for each theme, so one set of tokens can power many looks."
+        },
+        "3": {
+          "heading": "Group themes together",
+          "body": "Organize themes into groups like Mode and Brand, then mix and match them to cover every combination your design system needs."
+        },
+        "4": {
+          "heading": "Export to Figma Variables",
+          "body": "Turn theme groups into variable collections and themes into modes, so switching a theme in Figma is a single click."
+        }
+      }
+    },
+    "branching": {
+      "title": "Branching",
+      "slides": {
+        "1": {
+          "heading": "What is Branching?",
+          "body": "Switch branches, create new ones from your current changes, and collaborate with your team without stepping on each other’s work."
+        }
+      }
+    },
+    "multiFileSync": {
+      "title": "Multi-file Sync",
+      "slides": {
+        "1": {
+          "heading": "What is Multi-file Sync?",
+          "body": "One file doesn’t scale. With Multi-file Sync, you can split tokens into multiple JSON files and organize them by themes, brands, or platforms. Perfect for growing design systems and teams who need clarity and control."
+        }
+      }
+    },
+    "tokenFlow": {
+      "title": "Visual Flow",
+      "slides": {
+        "1": {
+          "heading": "What is Visual Flow?",
+          "body": "See how your tokens reference each other as an interactive graph, and trace any value back to where it comes from."
+        }
+      }
+    },
+    "compositionTokens": {
+      "title": "Composition Tokens",
+      "slides": {
+        "1": {
+          "heading": "What are Composition Tokens?",
+          "body": "Composition tokens bundle several properties – like fill, spacing, radius, and typography – into one token you can apply in a single step."
+        },
+        "2": {
+          "heading": "Build components faster",
+          "body": "Reference your existing tokens inside a composition and keep every layer that uses it in sync when they change."
+        }
+      }
+    },
+    "colorModifiers": {
+      "title": "Color Modifiers",
+      "slides": {
+        "1": {
+          "heading": "What are Color Modifiers?",
+          "body": "Derive new colors from existing tokens by lightening, darkening, mixing, or changing their alpha – no hard-coded values needed."
+        },
+        "2": {
+          "heading": "Build full color scales",
+          "body": "Generate hover, pressed, and subtle variants from a single base color, and pick the color space that suits your palette."
+        },
+        "3": {
+          "heading": "Fewer tokens to maintain",
+          "body": "Change the base color and every modified color updates with it, across all your themes."
+        }
+      }
+    },
+    "docsGenerator": {
+      "title": "Docs Generator",
+      "slides": {
+        "1": {
+          "heading": "What is the Docs Generator?",
+          "body": "Generate living documentation for your tokens right on the Figma canvas, using your own templates."
+        },
+        "2": {
+          "heading": "Docs that stay up to date",
+          "body": "Regenerate whenever tokens change, so your documentation never drifts from what’s actually in your design system."
+        }
+      }
+    }
+  }
+}
