@@ -6,6 +6,7 @@ import extend from 'just-extend';
 import { v4 as uuidv4 } from 'uuid';
 import * as tokenStateReducers from './reducers/tokenState';
 import * as tokenStateEffects from './effects/tokenState';
+import { applyVariableImport } from './effects/tokenState/applyVariableImport';
 import parseTokenValues from '@/utils/parseTokenValues';
 import { notifyToUI } from '@/plugin/notifiers';
 import parseJson from '@/utils/parseJson';
@@ -146,6 +147,36 @@ function sortedFigmaExtensions($extensions: SingleToken['$extensions']): [string
     .filter(([key]) => key.startsWith('com.figma.'))
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([key, value]) => [key, sortDeep(value)]);
+}
+
+// Deep clones the tokens so that the UI updates even if just a value changes.
+function withCreatedTokens(tokens: TokenStore['values'], data: CreateSingleTokenData[]): TokenStore['values'] {
+  const newTokens: TokenStore['values'] = JSON.parse(JSON.stringify(tokens));
+  data.forEach((token) => {
+    if (!newTokens[token.parent]) {
+      newTokens[token.parent] = [];
+    }
+    const existingTokenIndex = newTokens[token.parent].findIndex((n) => n.name === token.name);
+    if (existingTokenIndex === -1) {
+      newTokens[token.parent].push(updateTokenPayloadToSingleToken(token as UpdateTokenPayload));
+    }
+  });
+  return newTokens;
+}
+
+function withEditedTokens(tokens: TokenStore['values'], data: EditSingleTokenData[]): TokenStore['values'] {
+  const newTokens: TokenStore['values'] = JSON.parse(JSON.stringify(tokens));
+  data.forEach((token) => {
+    const existingTokenIndex = newTokens[token.parent].findIndex((n) => n.name === token.name);
+    if (existingTokenIndex > -1) {
+      newTokens[token.parent] = [
+        ...newTokens[token.parent].slice(0, existingTokenIndex),
+        updateTokenPayloadToSingleToken(token as UpdateTokenPayload),
+        ...newTokens[token.parent].slice(existingTokenIndex + 1),
+      ];
+    }
+  });
+  return newTokens;
 }
 
 export const tokenState = createModel<RootModel>()({
@@ -361,41 +392,25 @@ export const tokenState = createModel<RootModel>()({
         },
       };
     },
-    createMultipleTokens: (state, data: CreateSingleTokenData[]) => {
-      // This is a deep clone of the tokens so that we force an update in the UI even if just the value changes
-      const newTokens: TokenStore['values'] = JSON.parse(JSON.stringify(state.tokens));
-      data.forEach((token) => {
-        if (!newTokens[token.parent]) {
-          newTokens[token.parent] = [];
-        }
-        const existingTokenIndex = newTokens[token.parent].findIndex((n) => n.name === token.name);
-        if (existingTokenIndex === -1) {
-          newTokens[token.parent].push(updateTokenPayloadToSingleToken(token as UpdateTokenPayload));
-        }
-      });
-
+    createMultipleTokens: (state, data: CreateSingleTokenData[]) => ({
+      ...state,
+      tokens: withCreatedTokens(state.tokens, data),
+    }),
+    editMultipleTokens: (state, data: EditSingleTokenData[]) => ({
+      ...state,
+      tokens: withEditedTokens(state.tokens, data),
+    }),
+    // Applies a variables import as accepting everything in ImportedTokensDialog would, without the
+    // createMultipleTokens effect: with Tokens Studio sync, setTokensFromVariables already wrote the tokens.
+    applyImportedVariableTokens: (state): TokenState => {
+      const { newTokens, updatedTokens } = state.importedTokens;
       return {
         ...state,
-        tokens: newTokens,
-      };
-    },
-    editMultipleTokens: (state, data: EditSingleTokenData[]) => {
-      // This is a deep clone of the tokens so that we force an update in the UI even if just the value changes
-      const newTokens: TokenStore['values'] = JSON.parse(JSON.stringify(state.tokens));
-      data.forEach((token) => {
-        const existingTokenIndex = newTokens[token.parent].findIndex((n) => n.name === token.name);
-        if (existingTokenIndex > -1) {
-          newTokens[token.parent] = [
-            ...newTokens[token.parent].slice(0, existingTokenIndex),
-            updateTokenPayloadToSingleToken(token as UpdateTokenPayload),
-            ...newTokens[token.parent].slice(existingTokenIndex + 1),
-          ];
-        }
-      });
-
-      return {
-        ...state,
-        tokens: newTokens,
+        tokens: withCreatedTokens(withEditedTokens(state.tokens, updatedTokens as EditSingleTokenData[]), newTokens as CreateSingleTokenData[]),
+        importedTokens: {
+          newTokens: [],
+          updatedTokens: [],
+        },
       };
     },
     duplicateToken: (state, data: DuplicateTokenPayload) => {
@@ -1182,6 +1197,9 @@ export const tokenState = createModel<RootModel>()({
           });
         }
       }
+    },
+    applyVariableImport(_payload: void, rootState): boolean {
+      return applyVariableImport(dispatch)(_payload, rootState);
     },
     handleRenamedCollections(renamedCollections: [string, string][], rootState) {
       // Create a copy of the current state to accumulate all changes

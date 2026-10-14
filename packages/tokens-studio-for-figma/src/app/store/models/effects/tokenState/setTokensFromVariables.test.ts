@@ -90,6 +90,43 @@ describe('setTokensFromVariables', () => {
     ]);
   });
 
+  it('reuses the set ids from the last Studio pull when tokenSetMetadata was never filled', async () => {
+    // The state of a session whose Studio data came in without replacing the local tokens:
+    // tokenSetMetadata is empty while the sets already exist in Studio.
+    mockGetState.mockReturnValue({
+      uiState: { api: { provider: StorageProviderType.TOKENS_STUDIO_OAUTH, id: 'project-1', changeSetId: 'change-set-1' } },
+      tokenState: {
+        importedTokens: {
+          newTokens: [
+            {
+              name: 'color.new', value: '#ffffff', type: 'color', parent: 'Colors/Light',
+            },
+            {
+              name: 'Foo', value: '#0099ff', type: 'color', parent: 'New/NEWONE',
+            },
+          ],
+        },
+        tokenSetMetadata: {},
+        remoteData: { metadata: { tokenSetsData: { 'Colors/Light': { id: 'set-light', isDynamic: false } } } },
+        importedThemes: { newThemes: [], updatedThemes: [] },
+      },
+    } as any);
+
+    await setTokensFromVariables(dispatch)({} as any, {});
+
+    const createSet = mockPush.mock.calls.filter(([args]: any) => args.action === 'CREATE_TOKEN_SET');
+    // Only the set Studio doesn't have yet; creating 'Colors/Light' again would be refused as a duplicate.
+    expect(createSet.map(([args]: any) => args.data)).toEqual([{ name: 'New/NEWONE' }]);
+    expect(dispatch.tokenState.setTokenSetMetadata).toHaveBeenCalledWith(expect.objectContaining({
+      'Colors/Light': expect.objectContaining({ id: 'set-light', fromVariableImport: true }),
+    }));
+    const batch = mockPush.mock.calls.find(([args]: any) => args.action === 'BATCH_CREATE_TOKENS');
+    expect(batch?.[0].data).toEqual([
+      expect.objectContaining({ name: 'color.new', token_set_id: 'set-light' }),
+      expect.objectContaining({ name: 'Foo', token_set_id: 'set-core' }),
+    ]);
+  });
+
   it('pushes the themes after the token sets, new ones without their local id', async () => {
     setState();
 
