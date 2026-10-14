@@ -46,6 +46,7 @@ export const getAvailableVariableCollections: AsyncMessageChannelHandlers[AsyncM
           ? extendedCollection.parentVariableCollectionId
           : undefined,
         extensionDepth,
+        variableCount: collection.variableIds?.length ?? 0,
         modes: collection.modes.map((mode) => ({
           modeId: mode.modeId,
           name: mode.name || `Mode ${mode.modeId.slice(0, 8)}`,
