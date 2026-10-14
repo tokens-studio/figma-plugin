@@ -349,6 +349,8 @@ export const tokenState = createModel<RootModel>()({
           newTokens: [],
           updatedTokens: [],
         },
+        // Renames belong to the import being closed; a later import must not drop those sets from its themes.
+        renamedCollections: null,
         tokenSetMetadata: cleanedMetadata,
       };
     },
@@ -794,6 +796,8 @@ export const tokenState = createModel<RootModel>()({
     setThemesFromVariables: (state, themes: ThemeObjectsList): TokenState => {
       const newThemes: ThemeObjectsList = [];
       const updatedThemes: ThemeObjectsList = [];
+      // pullVariables sends the renamed collections and modes before the themes.
+      const renamedSets = (state.renamedCollections ?? []).map(([oldName]) => oldName);
 
       themes.forEach((theme) => {
         const existingTheme = state.themes.find((t) => {
@@ -816,11 +820,12 @@ export const tokenState = createModel<RootModel>()({
               // The incoming id is generated from the collection and mode names. Keep the existing one: with
               // Tokens Studio sync it is the theme option's id, and the update is sent to it.
               id: existingTheme.id,
-              // Ensure we preserve the existing selectedTokenSets and add new ones
-              selectedTokenSets: {
+              // Ensure we preserve the existing selectedTokenSets and add new ones, except a set the import
+              // renamed: the theme now uses the set under its new name.
+              selectedTokenSets: omit({
                 ...existingTheme.selectedTokenSets,
                 ...theme.selectedTokenSets,
-              },
+              }, renamedSets),
             });
           }
         } else {

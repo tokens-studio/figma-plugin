@@ -175,6 +175,37 @@ describe('Initiator variables import', () => {
     expect(tokenState.themes).toEqual([expect.objectContaining({ id: 'server-light', name: 'Day' })]);
   });
 
+  it('drops a renamed mode\'s old set from the theme it updates', async () => {
+    const store = createStore(studioApi);
+    renderWithStore(store);
+
+    act(() => {
+      fireEvent(window, new MessageEvent('message', {
+        data: { pluginMessage: { type: MessageFromPluginTypes.RENAME_COLLECTIONS_AND_MODES, renamedCollections: [['Colors/Light', 'Colors/Day']] } },
+      }));
+    });
+    act(() => {
+      fireEvent(window, new MessageEvent('message', {
+        data: {
+          pluginMessage: {
+            type: MessageFromPluginTypes.VARIABLES,
+            values: {
+              colors: [{
+                name: 'color.bg', value: '#d6d6d6', type: 'color', parent: 'Colors/Day',
+              }],
+            },
+            themes: [{
+              ...lightTheme, id: 'colors-day', name: 'Day', selectedTokenSets: { 'Colors/Day': TokenSetStatus.ENABLED },
+            }],
+          },
+        },
+      }));
+    });
+
+    // This is what gets sent to Tokens Studio.
+    expect(store.getState().tokenState.importedThemes.updatedThemes[0].selectedTokenSets).toEqual({ 'Colors/Day': TokenSetStatus.ENABLED });
+  });
+
   it('applies renamed collections with Tokens Studio sync before the imported tokens', async () => {
     const store = createStore(studioApi);
     renderWithStore(store);
