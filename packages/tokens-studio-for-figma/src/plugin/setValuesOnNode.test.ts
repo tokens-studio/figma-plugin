@@ -1,3 +1,4 @@
+import { Properties } from '@/constants/Properties';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { defaultTokenValueRetriever } from './TokenValueRetriever';
 import setValuesOnNode from './setValuesOnNode';
@@ -204,7 +205,7 @@ describe('setValuesOnNode', () => {
       } as TextNode;
     });
 
-    it.each(['tokenValue', 'value', 'tokenName', 'description'])('should write none as text for %s', async (property) => {
+    it.each([Properties.tokenValue, Properties.value, Properties.tokenName, Properties.description])('should write none as text for %s', async (property) => {
       await setValuesOnNode({
         node: documentationTextNodeMock,
         values: { [property]: 'none' },

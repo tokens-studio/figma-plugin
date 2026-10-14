@@ -22,7 +22,7 @@ import { applyShadowValuesOnNode } from './applyShadowValuesOnNode';
 import removeValuesFromNode from './removeValuesFromNode';
 
 // Documentation properties write the token's metadata as text, so a literal 'none' must be displayed rather than treated as a removal
-const documentationProperties = new Set<string>([
+const documentationProperties = new Set<Properties>([
   Properties.tokenValue,
   Properties.value,
   Properties.tokenName,
@@ -49,7 +49,7 @@ export default async function setValuesOnNode({
       && node.type !== 'CODE_BLOCK'
     ) {
       Object.entries(values).forEach(([key, value]) => {
-        if (value === 'none' && !documentationProperties.has(key)) {
+        if (value === 'none' && !documentationProperties.has(key as Properties)) {
           removeValuesFromNode(node, key as Properties);
           delete values[key];
         }
