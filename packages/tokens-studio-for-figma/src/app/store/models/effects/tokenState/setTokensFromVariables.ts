@@ -11,7 +11,10 @@ import {
   sanitizeTokenName,
   sanitizeTokenSetName,
 } from './utils/sanitizeForStudio';
-import { renameThemeGroupsInTokensStudio, renameTokenSetsInTokensStudio } from './utils/renameInTokensStudio';
+import {
+  renamedTokenKey, renameThemeGroupsInTokensStudio, renameTokenSetsInTokensStudio, updateTokensInTokensStudio,
+} from './utils/renameInTokensStudio';
+import { findRenamedVariableTokens } from './utils/findRenamedVariableTokens';
 import { store } from '@/app/store';
 import type { SetTokensFromVariablesPayload } from '@/types/payloads';
 
@@ -32,13 +35,32 @@ export function setTokensFromVariables(dispatch: RematchDispatch<RootModel>) {
     const previousTokens = currentState.tokenState.tokens;
     const previousThemes = currentState.tokenState.themes;
 
+    const updatedTokens = importedTokens?.updatedTokens || [];
+
+    // setThemesFromVariables, dispatched right after this, fills importedThemes; the renamed variables come
+    // from those themes.
+    await Promise.resolve();
+
+    let renamedSets: [string, string][] = [];
     if (hasChangeSetId && renamedCollections.length > 0) {
-      const renamedSets = await renameTokenSetsInTokensStudio(context, renamedCollections, dispatch);
+      renamedSets = await renameTokenSetsInTokensStudio(context, renamedCollections, dispatch);
       // A token that was already in a renamed set moved with it; only the set's new tokens need creating.
       newTokens = newTokens.filter((token) => {
         const rename = renamedSets.find(([, newName]) => sanitizeTokenSetName(newName) === token.parent);
         return !rename || !(previousTokens?.[rename[0]] || []).some((existing) => sanitizeTokenName(existing.name) === token.name);
       });
+    }
+
+    if (hasChangeSetId) {
+      // Renamed variables and changed values update the existing tokens instead of creating new ones.
+      const renamedTokens = await updateTokensInTokensStudio(context, {
+        renames: findRenamedVariableTokens(previousThemes, store.getState().tokenState.importedThemes?.updatedThemes),
+        updatedTokens,
+        newTokens,
+        previousTokens,
+        renamedSets,
+      });
+      newTokens = newTokens.filter((token) => !renamedTokens.has(renamedTokenKey(token.parent!, token.name)));
     }
 
     // Only create token sets and tokens if changeSetId is present — the REST API requires it.

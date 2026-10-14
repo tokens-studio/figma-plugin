@@ -404,11 +404,29 @@ export const tokenState = createModel<RootModel>()({
     }),
     // Applies a variables import as accepting everything in ImportedTokensDialog would, without the
     // createMultipleTokens effect: with Tokens Studio sync, setTokensFromVariables already wrote the tokens.
+    // Renamed Figma variables: rename the token in its set, keeping its Tokens Studio id.
+    renameImportedVariableTokens: (state, renames: { set: string; oldName: string; newName: string }[]): TokenState => {
+      const tokens = { ...state.tokens };
+      renames.forEach(({ set, oldName, newName }) => {
+        const setTokens = tokens[set];
+        if (!setTokens || setTokens.some((token) => token.name === newName)) return;
+        tokens[set] = setTokens.map((token) => (token.name === oldName ? { ...token, name: newName } : token));
+      });
+      return { ...state, tokens };
+    },
     applyImportedVariableTokens: (state): TokenState => {
       const { newTokens, updatedTokens } = state.importedTokens;
+      const existing = (token: { parent?: string; name: string }) => (token.parent ? state.tokens[token.parent]?.find((t) => t.name === token.name) : undefined);
+      // A token can already be there although the import calls it new: it moved with a renamed set, or its
+      // variable was renamed. Its imported value still applies. Keep the Tokens Studio id an edit would drop.
+      const edits = [...updatedTokens, ...newTokens.filter((token) => existing(token))].map((token) => {
+        const id = (existing(token)?.$extensions as { id?: string } | undefined)?.id;
+        return id ? { ...token, $extensions: { ...token.$extensions, id } } : token;
+      });
+      const creates = newTokens.filter((token) => !existing(token));
       return {
         ...state,
-        tokens: withCreatedTokens(withEditedTokens(state.tokens, updatedTokens as EditSingleTokenData[]), newTokens as CreateSingleTokenData[]),
+        tokens: withCreatedTokens(withEditedTokens(state.tokens, edits as EditSingleTokenData[]), creates as CreateSingleTokenData[]),
         importedTokens: {
           newTokens: [],
           updatedTokens: [],
@@ -811,7 +829,9 @@ export const tokenState = createModel<RootModel>()({
           // Check if anything has changed that requires an update
           const needsUpdate = !isEqual(existingTheme.selectedTokenSets, theme.selectedTokenSets)
             || !isEqual(existingTheme.name, theme.name)
-            || !isEqual(existingTheme.group, theme.group);
+            || !isEqual(existingTheme.group, theme.group)
+            // A renamed, added or removed variable changes these; stale ones point styles at the wrong token.
+            || !isEqual(existingTheme.$figmaVariableReferences, theme.$figmaVariableReferences);
 
           if (needsUpdate) {
             updatedThemes.push({

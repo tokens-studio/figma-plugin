@@ -206,6 +206,54 @@ describe('Initiator variables import', () => {
     expect(store.getState().tokenState.importedThemes.updatedThemes[0].selectedTokenSets).toEqual({ 'Colors/Day': TokenSetStatus.ENABLED });
   });
 
+  it('renames the token of a renamed variable with Tokens Studio sync, keeping its Studio id', async () => {
+    const store = createMockStore({
+      uiState: { api: studioApi, storageType: studioApi } as any,
+      tokenState: {
+        activeTokenSet: 'Colors/Light',
+        tokens: {
+          'Colors/Light': [
+            {
+              name: 'color.bg', value: '#d6d6d6', type: 'color', $extensions: { id: 'token-bg' },
+            },
+            {
+              name: 'color.fg', value: '#2f2f2f', type: 'color', $extensions: { id: 'token-fg' },
+            },
+          ],
+        },
+        themes: [{ ...lightTheme, $figmaVariableReferences: { 'color.bg': 'key-bg', 'color.fg': 'key-fg' } }],
+      } as any,
+    });
+    renderWithStore(store);
+
+    act(() => {
+      fireEvent(window, new MessageEvent('message', {
+        data: {
+          pluginMessage: {
+            type: MessageFromPluginTypes.VARIABLES,
+            values: {
+              colors: [
+                {
+                  name: 'color.background', value: '#d6d6d6', type: 'color', parent: 'Colors/Light',
+                },
+                {
+                  name: 'color.fg', value: '#000000', type: 'color', parent: 'Colors/Light',
+                },
+              ],
+            },
+            themes: [{ ...lightTheme, id: 'colors-light', $figmaVariableReferences: { 'color.background': 'key-bg', 'color.fg': 'key-fg' } }],
+          },
+        },
+      }));
+    });
+
+    expect(store.getState().tokenState.tokens['Colors/Light']).toEqual([
+      expect.objectContaining({ name: 'color.background', value: '#d6d6d6', $extensions: { id: 'token-bg' } }),
+      expect.objectContaining({ name: 'color.fg', value: '#000000', $extensions: { id: 'token-fg' } }),
+    ]);
+    expect(store.getState().tokenState.themes[0].$figmaVariableReferences).toEqual({ 'color.background': 'key-bg', 'color.fg': 'key-fg' });
+  });
+
   it('applies renamed collections with Tokens Studio sync before the imported tokens', async () => {
     const store = createStore(studioApi);
     renderWithStore(store);
