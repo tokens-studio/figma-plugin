@@ -75,6 +75,7 @@ export * from './stylesTypographySelector';
 export * from './stylesEffectSelector';
 export * from './stylesGradientSelector';
 export * from './createStylesWithVariableReferencesSelector';
+export * from './isTokensStudioSyncSelector';
 export * from './exportExtendedCollectionsSelector';
 export * from './isFigmaEnterpriseSelector';
 export * from './autoApplyThemeOnDropSelector';

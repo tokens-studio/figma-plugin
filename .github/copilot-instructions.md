@@ -139,7 +139,6 @@ Required environment variables in `.env` files:
 MIXPANEL_ACCESS_TOKEN=
 ENVIRONMENT=development
 LICENSE_API_URL=https://licence.tokens.studio
-LAUNCHDARKLY_SDK_CLIENT=626fb05d52e5c715abd11b5e
 SENTRY_DSN=
 SENTRY_AUTH_TOKEN=
 SENTRY_SAMPLING=0.1
@@ -159,7 +158,6 @@ SENTRY_REPLAY_SAMPLING=0
 - GitHub, GitLab, BitBucket, Azure DevOps - For token storage/sync
 - Sentry - Error tracking
 - Mixpanel - Analytics
-- LaunchDarkly - Feature flags
 
 ## Common Workflows
 

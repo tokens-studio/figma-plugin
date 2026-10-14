@@ -25,6 +25,8 @@ import { OAuthService } from '../../../services/OAuthService';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { TOKENS_STUDIO_APP_URL } from '@/constants/TokensStudio';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
+import { canSyncWithStudio } from '@/utils/tokensStudio/organizationAccess';
+import { convertTokenValueForStudio } from '../../models/effects/tokenState/utils/sanitizeForStudio';
 import {
   createTokenRest,
   updateTokenRest,
@@ -38,7 +40,9 @@ import {
   createThemeOptionRest,
   updateThemeOptionRest,
   deleteThemeOptionRest,
+  listThemeOptionsRest,
   batchCreateTokensRest,
+  isNameConflictError,
 } from '../../../../utils/tokensStudio/restApi';
 
 type TokensStudioOAuthCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.TOKENS_STUDIO_OAUTH }>;
@@ -48,6 +52,9 @@ interface PushToTokensStudioOAuth {
   action: string;
   data: any;
   successCallback?: (result: any) => void;
+  // Throw API failures instead of notifying and returning null, so the caller can report them in its
+  // own terms and undo whatever it applied locally.
+  rethrowErrors?: boolean;
 }
 
 const ACTION_LABELS: Record<string, string> = {
@@ -67,7 +74,7 @@ const ACTION_LABELS: Record<string, string> = {
 };
 
 export const pushToTokensStudioOAuth = async ({
-  context, action, data, successCallback,
+  context, action, data, successCallback, rethrowErrors,
 }: PushToTokensStudioOAuth) => {
   const { oauthTokens } = useAuthStore.getState();
   if (!oauthTokens?.accessToken) return null;
@@ -105,14 +112,14 @@ export const pushToTokensStudioOAuth = async ({
   try {
     switch (action) {
       case 'BATCH_CREATE_TOKENS':
-        result = await batchCreateTokensRest(oauthTokens.accessToken, apiBaseUrl, projectId, data, changeSetId);
+        result = await batchCreateTokensRest(oauthTokens.accessToken, apiBaseUrl, projectId, data.map(convertTokenValueForStudio), changeSetId);
         break;
       case 'CREATE_TOKEN':
-        result = await createTokenRest(oauthTokens.accessToken, apiBaseUrl, projectId, data, branch, changeSetId);
+        result = await createTokenRest(oauthTokens.accessToken, apiBaseUrl, projectId, convertTokenValueForStudio(data), branch, changeSetId);
         break;
       case 'EDIT_TOKEN': {
         if (!data?.id) break;
-        result = await updateTokenRest(oauthTokens.accessToken, apiBaseUrl, projectId, data.id, data, branch, changeSetId);
+        result = await updateTokenRest(oauthTokens.accessToken, apiBaseUrl, projectId, data.id, convertTokenValueForStudio(data), branch, changeSetId);
         break;
       }
       case 'DELETE_TOKEN': {
@@ -138,10 +145,10 @@ export const pushToTokensStudioOAuth = async ({
         try {
           result = await createThemeGroupRest(oauthTokens.accessToken, apiBaseUrl, projectId, data, branch, changeSetId);
         } catch (err) {
-          // 422 "already exists" is expected when the group was created in a previous session.
-          // Return null so the caller can fall back to fetching the existing group id.
-          const msg = err instanceof Error ? err.message : String(err);
-          if (msg.includes('422')) return null;
+          // A name clash means the group was already created (e.g. in a previous session). Return null so
+          // the caller can fall back to fetching the existing group's id. Every other refusal — a plan's
+          // theme group limit, for one — has to surface rather than read as "already there".
+          if (isNameConflictError(err)) return null;
           throw err;
         }
         break;
@@ -157,6 +164,15 @@ export const pushToTokensStudioOAuth = async ({
           result = await deleteThemeGroupRest(oauthTokens.accessToken, apiBaseUrl, projectId, data.id, branch, changeSetId);
         }
         break;
+      case 'DELETE_THEME_GROUP_IF_EMPTY': {
+        // Studio deletes a group's options along with it, so only remove a group that has none left.
+        if (!data.id) break;
+        const options = await listThemeOptionsRest(oauthTokens.accessToken, apiBaseUrl, projectId, data.id, changeSetId);
+        if (options.length === 0) {
+          result = await deleteThemeGroupRest(oauthTokens.accessToken, apiBaseUrl, projectId, data.id, branch, changeSetId);
+        }
+        break;
+      }
       case 'CREATE_THEME':
         result = await createThemeOptionRest(oauthTokens.accessToken, apiBaseUrl, projectId, data, branch, changeSetId);
         break;
@@ -175,7 +191,8 @@ export const pushToTokensStudioOAuth = async ({
       default:
         console.warn('Unknown REST action', action);
     }
-    if (result) {
+    // Removing an empty group is housekeeping after another change; it gets no message of its own.
+    if (result && action !== 'DELETE_THEME_GROUP_IF_EMPTY') {
       const actionLabel = ACTION_LABELS[action] || 'Synced change';
       notifyToUI(`${actionLabel} to Tokens Studio`);
     }
@@ -183,6 +200,7 @@ export const pushToTokensStudioOAuth = async ({
     return result;
   } catch (error) {
     console.error('Failed to push to Tokens Studio OAuth via REST:', error);
+    if (rethrowErrors) throw error;
     notifyToUI(`Failed to sync: ${error instanceof Error ? error.message : 'Unknown error'}`, { error: true });
     return null;
   }
@@ -231,7 +249,7 @@ export function useTokensStudioOAuth() {
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
-  const { t } = useTranslation(['sync', 'branch', 'general']);
+  const { t } = useTranslation(['sync', 'branch', 'general', 'storage']);
   const { hasChanges } = useChangedState();
   const editProhibited = useSelector(editProhibitedSelector);
   const localApiState = useSelector(localApiStateSelector);
@@ -381,10 +399,18 @@ export function useTokensStudioOAuth() {
     [confirm, dispatch, activeTheme, tokens, themes, usedTokenSet, pullTokensFromTokensStudioOAuth, t],
   );
 
+  // Starts or switches sync to a project. `orgId` is the org that owns the project (defaults to the active org).
   const loadProjectTokens = useCallback(
-    async (projectId: string, branch?: string) => {
-      const { oauthTokens, activeOrganization } = useAuthStore.getState();
+    async (projectId: string, branch?: string, orgId?: string) => {
+      const { oauthTokens, activeOrganization, organizations } = useAuthStore.getState();
       if (!oauthTokens || !activeOrganization) return;
+
+      const org = orgId ? organizations.find((o) => o.id === orgId) : activeOrganization;
+      if (!canSyncWithStudio(org)) {
+        const message = t('planCantSync', { ns: 'storage' });
+        notifyToUI(message, { error: true });
+        throw new Error(message);
+      }
 
       if (hasChanges && !editProhibited && localApiState?.provider !== StorageProviderType.LOCAL) {
         const confirmResult = await confirm({
@@ -433,7 +459,13 @@ export function useTokensStudioOAuth() {
           dispatch.tokenState.setRemoteData({
             tokens: (newTokens || {}) as any,
             themes: alignedNewThemes,
-            metadata: { tokenSetOrder },
+            // Theme pushes look groups and sets up here; without them every grouped push re-creates its group.
+            metadata: {
+              tokenSetOrder,
+              tokenSetsData: projectData.tokenSets as any,
+              themeGroupsData: projectData.themeGroups as any,
+              changeSetId: projectData.changeSetId,
+            },
           });
 
           const stringifiedRemoteTokens = JSON.stringify(compact([newTokens, alignedNewThemes, TokenFormat.format]), null, 2);
@@ -470,7 +502,7 @@ export function useTokensStudioOAuth() {
         useAuthStore.setState({ isLoading: false });
       }
     },
-    [dispatch],
+    [dispatch, hasChanges, editProhibited, localApiState, confirm, t],
   );
 
   return useMemo(

@@ -37,7 +37,7 @@ describe('TokenBottomBar', () => {
 
     const closeButton = await result.findByTestId('close-button');
     closeButton.click();
-    waitFor(() => {
+    await waitFor(() => {
       expect(result.queryByText('importFromPreset')).toBeNull();
     });
   });
@@ -139,7 +139,7 @@ describe('TokenBottomBar', () => {
 
     const closeButton = await result.findByTestId('close-button');
     closeButton.click();
-    waitFor(() => {
+    await waitFor(() => {
       expect(result.queryByText('resolveDuplicateTokensModal.title')).toBeNull();
     });
   });

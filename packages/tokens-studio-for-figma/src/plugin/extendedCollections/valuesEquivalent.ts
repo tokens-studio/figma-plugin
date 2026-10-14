@@ -1,4 +1,5 @@
 import { isColorApproximatelyEqual } from '@/utils/isColorApproximatelyEqual';
+import { isVariableComposedColor } from '../composedColor';
 
 const NUMBER_THRESHOLD = 0.000001;
 
@@ -32,6 +33,7 @@ function isAliasObject(obj: unknown): obj is VariableAlias {
  * extended collections. Two values are equivalent when Figma would resolve
  * them identically:
  * - aliases: same target variable id
+ * - composed colors: equivalent color and opacity parts
  * - colors: approximately equal RGBA (missing alpha treated as 1)
  * - numbers: approximately equal
  * - strings / booleans: strict equality
@@ -39,6 +41,12 @@ function isAliasObject(obj: unknown): obj is VariableAlias {
  */
 export function valuesEquivalent(a: VariableValue | undefined, b: VariableValue | undefined): boolean {
   if (a === undefined || b === undefined) return false;
+
+  if (isVariableComposedColor(a) || isVariableComposedColor(b)) {
+    return isVariableComposedColor(a) && isVariableComposedColor(b)
+      && valuesEquivalent(a.color, b.color)
+      && valuesEquivalent(a.opacity, b.opacity);
+  }
 
   if (isAliasObject(a) || isAliasObject(b)) {
     return isAliasObject(a) && isAliasObject(b) && a.id === b.id;

@@ -25,8 +25,8 @@ describe('SettingsDropdown', () => {
     const result = renderStore();
 
     const trigger = await result.getByTestId('bottom-bar-settings');
-    waitFor(async () => {
-      await userEvent.click(trigger);
+    await userEvent.click(trigger);
+    await waitFor(() => {
       const updateChangesOption = result.getByTestId('update-on-change');
       const updateRemoteOption = result.queryByTestId('update-remote');
       const shouldUpdateStylesOption = result.getByTestId('should-update-styles');
@@ -40,8 +40,8 @@ describe('SettingsDropdown', () => {
     const result = renderStore(mockStoreJSONBin);
 
     const trigger = await result.getByTestId('bottom-bar-settings');
-    waitFor(async () => {
-      await userEvent.click(trigger);
+    await userEvent.click(trigger);
+    await waitFor(() => {
       const updateRemote = result.getByTestId('update-remote');
 
       expect(updateRemote).toBeInTheDocument();
@@ -53,10 +53,10 @@ describe('SettingsDropdown', () => {
     const result = renderStore();
 
     const trigger = await result.getByTestId('bottom-bar-settings');
-    waitFor(async () => {
-      await userEvent.click(trigger);
-      const updateChanges = result.getByTestId('update-on-change');
-      await userEvent.click(updateChanges, { pointerEventsCheck: 0 });
+    await userEvent.click(trigger);
+    const updateChanges = await result.findByTestId('update-on-change');
+    await userEvent.click(updateChanges, { pointerEventsCheck: 0 });
+    await waitFor(() => {
       expect(updateOnChangeSpy).toBeCalledTimes(1);
     });
   });
@@ -65,10 +65,10 @@ describe('SettingsDropdown', () => {
     const result = renderStore(mockStoreJSONBin);
 
     const trigger = await result.getByTestId('bottom-bar-settings');
-    waitFor(async () => {
-      await userEvent.click(trigger);
-      const updateChanges = result.getByTestId('update-remote');
-      await userEvent.click(updateChanges, { pointerEventsCheck: 0 });
+    await userEvent.click(trigger);
+    const updateChanges = await result.findByTestId('update-remote');
+    await userEvent.click(updateChanges, { pointerEventsCheck: 0 });
+    await waitFor(() => {
       expect(updateRemoteSpy).toBeCalledTimes(1);
     });
   });
@@ -77,11 +77,11 @@ describe('SettingsDropdown', () => {
     const shouldSwapStylesSpy = jest.spyOn(mockStore.dispatch.settings, 'setShouldSwapStyles');
     const result = renderStore();
 
-    waitFor(async () => {
-      const trigger = await result.getByTestId('bottom-bar-settings');
-      await userEvent.click(trigger);
-      const updateChanges = result.getByTestId('swap-styles');
-      await userEvent.click(updateChanges, { pointerEventsCheck: 0 });
+    const trigger = await result.getByTestId('bottom-bar-settings');
+    await userEvent.click(trigger);
+    const updateChanges = await result.findByTestId('swap-styles');
+    await userEvent.click(updateChanges, { pointerEventsCheck: 0 });
+    await waitFor(() => {
       expect(shouldSwapStylesSpy).toBeCalledTimes(1);
     });
   });

@@ -112,4 +112,25 @@ describe('valuesEquivalent', () => {
       expect(valuesEquivalent(undefined, 16)).toBe(false);
     });
   });
+  describe('composed colors', () => {
+    const colorAlias = { type: 'VARIABLE_ALIAS', id: 'V:1' } as VariableAlias;
+    const opacityAlias = { type: 'VARIABLE_ALIAS', id: 'V:2' } as VariableAlias;
+
+    it('matches equal composed colors', () => {
+      expect(valuesEquivalent({ color: colorAlias, opacity: 50 }, { color: { ...colorAlias }, opacity: 50 })).toBe(true);
+      expect(valuesEquivalent({ color: colorAlias, opacity: opacityAlias }, { color: colorAlias, opacity: { ...opacityAlias } })).toBe(true);
+    });
+
+    it('rejects composed colors with different parts', () => {
+      expect(valuesEquivalent({ color: colorAlias, opacity: 50 }, { color: colorAlias, opacity: 40 })).toBe(false);
+      expect(valuesEquivalent({ color: colorAlias, opacity: 50 }, { color: colorAlias, opacity: opacityAlias })).toBe(false);
+    });
+
+    it('never matches a composed color against a plain alias or color', () => {
+      expect(valuesEquivalent({ color: colorAlias, opacity: 100 }, colorAlias)).toBe(false);
+      expect(valuesEquivalent({ color: colorAlias, opacity: 100 }, {
+        r: 1, g: 0, b: 0, a: 1,
+      })).toBe(false);
+    });
+  });
 });

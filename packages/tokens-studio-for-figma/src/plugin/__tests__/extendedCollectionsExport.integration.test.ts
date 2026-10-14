@@ -1,6 +1,6 @@
 import {
   mockGetLocalVariableCollections,
-  mockGetLocalVariables,
+  mockGetLocalVariables, mockGetLocalVariablesAsync,
 } from '../../../tests/__mocks__/figmaMock';
 import { AsyncMessageTypes, GetThemeInfoMessageResult } from '@/types/AsyncMessages';
 import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
@@ -74,7 +74,7 @@ describe('extended collections export (integration)', () => {
     variableCollectionId: PARENT_COLL_ID,
     valuesByMode: { [PARENT_MODE_ID]: 8 } as Record<string, unknown>,
     setValueForMode: jest.fn(),
-    clearValueForMode: jest.fn(),
+    removeOverrideForMode: jest.fn(),
   });
 
   beforeEach(() => {
@@ -92,6 +92,7 @@ describe('extended collections export (integration)', () => {
     (global.figma.variables.getLocalVariableCollectionsAsync as jest.Mock) = jest.fn()
       .mockResolvedValue([parentCollection]);
     mockGetLocalVariables.mockImplementation(() => [parentVariable]);
+    mockGetLocalVariablesAsync.mockImplementation(() => Promise.resolve([parentVariable]));
 
     // Imported extended theme carries the "Parent/Child" group form
     themesResponse = [
@@ -146,6 +147,7 @@ describe('extended collections export (integration)', () => {
     (global.figma.variables.getLocalVariableCollectionsAsync as jest.Mock) = jest.fn()
       .mockResolvedValue([parentCollection, extendedCollection]);
     mockGetLocalVariables.mockImplementation(() => [parentVariable]);
+    mockGetLocalVariablesAsync.mockImplementation(() => Promise.resolve([parentVariable]));
 
     themesResponse = [
       {
@@ -189,6 +191,7 @@ describe('extended collections export (integration)', () => {
     (global.figma.variables.getLocalVariableCollectionsAsync as jest.Mock) = jest.fn()
       .mockResolvedValue([parentCollection, extendedCollection]);
     mockGetLocalVariables.mockImplementation(() => [parentVariable]);
+    mockGetLocalVariablesAsync.mockImplementation(() => Promise.resolve([parentVariable]));
 
     themesResponse = [
       {

@@ -13,7 +13,7 @@ describe('Extended Collections Overrides', () => {
       name: 'test-var',
       valuesByMode: {},
       setValueForMode: jest.fn(),
-      clearValueForMode: jest.fn(),
+      removeOverrideForMode: jest.fn(),
     };
 
     mockCollection = {
@@ -37,9 +37,9 @@ describe('Extended Collections Overrides', () => {
         }, // Currently blue override
       };
 
-      setColorValuesOnVariable(mockVariable, 'child-mode-id', '#ff0000', mockCollection);
+      setColorValuesOnVariable(mockVariable, 'child-mode-id', '#ff0000', mockCollection, false, 'clear');
 
-      expect(mockVariable.clearValueForMode).toHaveBeenCalledWith('child-mode-id');
+      expect(mockVariable.removeOverrideForMode).toHaveBeenCalledWith('child-mode-id');
       expect(mockVariable.setValueForMode).not.toHaveBeenCalled();
     });
 
@@ -55,7 +55,46 @@ describe('Extended Collections Overrides', () => {
       expect(mockVariable.setValueForMode).toHaveBeenCalledWith('child-mode-id', {
         r: 0, g: 0, b: 1, a: 1,
       });
-      expect(mockVariable.clearValueForMode).not.toHaveBeenCalled();
+      expect(mockVariable.removeOverrideForMode).not.toHaveBeenCalled();
+    });
+
+    it('raw export pass (default) overwrites instead of clearing, since the parent may not be final yet', () => {
+      mockVariable.valuesByMode = {
+        'parent-mode-id': {
+          r: 1, g: 0, b: 0, a: 1,
+        },
+        'child-mode-id': {
+          r: 0, g: 0, b: 1, a: 1,
+        },
+      };
+
+      setColorValuesOnVariable(mockVariable, 'child-mode-id', '#ff0000', mockCollection);
+
+      expect(mockVariable.removeOverrideForMode).not.toHaveBeenCalled();
+      expect(mockVariable.setValueForMode).toHaveBeenCalledWith('child-mode-id', {
+        r: 1, g: 0, b: 0, a: 1,
+      });
+    });
+
+    it("single-token edits ('keep') leave an existing child override alone", () => {
+      mockVariable.id = 'var-1';
+      mockVariable.valuesByMode = {
+        'parent-mode-id': {
+          r: 1, g: 0, b: 0, a: 1,
+        },
+      };
+      mockCollection.variableOverrides = {
+        'var-1': {
+          'child-mode-id': {
+            r: 0, g: 0, b: 1, a: 1,
+          },
+        },
+      };
+
+      setColorValuesOnVariable(mockVariable, 'child-mode-id', '#ff0000', mockCollection, false, 'keep');
+
+      expect(mockVariable.removeOverrideForMode).not.toHaveBeenCalled();
+      expect(mockVariable.setValueForMode).not.toHaveBeenCalled();
     });
   });
 
@@ -66,9 +105,9 @@ describe('Extended Collections Overrides', () => {
         'child-mode-id': 20,
       };
 
-      setNumberValuesOnVariable(mockVariable, 'child-mode-id', 10, mockCollection);
+      setNumberValuesOnVariable(mockVariable, 'child-mode-id', 10, mockCollection, false, 'clear');
 
-      expect(mockVariable.clearValueForMode).toHaveBeenCalledWith('child-mode-id');
+      expect(mockVariable.removeOverrideForMode).toHaveBeenCalledWith('child-mode-id');
       expect(mockVariable.setValueForMode).not.toHaveBeenCalled();
     });
 
@@ -91,9 +130,9 @@ describe('Extended Collections Overrides', () => {
         'child-mode-id': 'child',
       };
 
-      setStringValuesOnVariable(mockVariable, 'child-mode-id', 'parent', mockCollection);
+      setStringValuesOnVariable(mockVariable, 'child-mode-id', 'parent', mockCollection, false, 'clear');
 
-      expect(mockVariable.clearValueForMode).toHaveBeenCalledWith('child-mode-id');
+      expect(mockVariable.removeOverrideForMode).toHaveBeenCalledWith('child-mode-id');
     });
 
     it('should set override even if existing value was undefined (BUGFIX)', () => {
@@ -114,9 +153,9 @@ describe('Extended Collections Overrides', () => {
         'child-mode-id': false,
       };
 
-      setBooleanValuesOnVariable(mockVariable, 'child-mode-id', 'true', mockCollection);
+      setBooleanValuesOnVariable(mockVariable, 'child-mode-id', 'true', mockCollection, false, 'clear');
 
-      expect(mockVariable.clearValueForMode).toHaveBeenCalledWith('child-mode-id');
+      expect(mockVariable.removeOverrideForMode).toHaveBeenCalledWith('child-mode-id');
     });
 
     it('should set override even if existing value was undefined (BUGFIX)', () => {
@@ -159,7 +198,7 @@ describe('Extended Collections Overrides', () => {
       await updateVariablesToReference(figmaVariables, candidates);
 
       // Parent already has the same alias — clear child override so it's inherited (not blue)
-      expect(mockVariable.clearValueForMode).toHaveBeenCalledWith('child-mode-id');
+      expect(mockVariable.removeOverrideForMode).toHaveBeenCalledWith('child-mode-id');
       expect(mockVariable.setValueForMode).not.toHaveBeenCalled();
     });
 
@@ -191,7 +230,7 @@ describe('Extended Collections Overrides', () => {
 
       // Parent has a different alias — set explicit override (shown as blue, it's a real override)
       expect(mockVariable.setValueForMode).toHaveBeenCalledWith('child-mode-id', { type: 'VARIABLE_ALIAS', id: 'target-id' });
-      expect(mockVariable.clearValueForMode).not.toHaveBeenCalled();
+      expect(mockVariable.removeOverrideForMode).not.toHaveBeenCalled();
     });
 
     it('should skip update when alias is already pointing to the correct variable', async () => {
@@ -221,7 +260,7 @@ describe('Extended Collections Overrides', () => {
       await updateVariablesToReference(figmaVariables, candidates);
 
       expect(mockVariable.setValueForMode).not.toHaveBeenCalled();
-      expect(mockVariable.clearValueForMode).not.toHaveBeenCalled();
+      expect(mockVariable.removeOverrideForMode).not.toHaveBeenCalled();
     });
   });
 });

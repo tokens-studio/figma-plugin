@@ -1,5 +1,18 @@
 # @tokens-studio/figma-plugin
 
+## 2.13.0
+
+### Minor Changes
+
+- 30408a5dc: Add support for exporting extended (child) variable collections for Figma Enterprise users. Extended collections inherit variables from a parent collection and can override specific values per brand or theme, enabling scalable multi-brand design token systems directly in Figma.
+
+### Patch Changes
+
+- 0094104ad: Exporting tokens to Figma variables no longer reshuffles your themes file. New variables are added at the end, existing ones keep their place, and references to deleted tokens are cleaned up.
+- 5b6b0207c: Tokens Studio now has a Free plan, and this adds support for it: organisations on the Free plan can sync their projects with the plugin, and manage themes and export them to Figma variables in those files. Other Pro features still need a paid plan, and organisations on a Variables plan can't sync here.
+- 295866cf6: Color tokens using `rgba`, `combine_alpha` or `set_alpha` with references now export as Figma variables linked to their color and opacity variables.
+- 8469855f9: Fixed token value tooltips appearing late or not at all when hovering tokens in large token sets. Hovering a token no longer re-renders every other token in the list, and neither does changing the selection or applying a token.
+
 ## 2.12.1
 
 ### Patch Changes

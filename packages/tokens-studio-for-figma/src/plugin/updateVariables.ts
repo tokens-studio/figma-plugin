@@ -8,6 +8,7 @@ import { mapTokensToVariableInfo } from '@/utils/mapTokensToVariableInfo';
 import { TokenResolver } from '@/utils/TokenResolver';
 import { getAliasValue } from '@/utils/alias';
 import { resolveCollectionContext } from './extendedCollections/collectionContext';
+import { getVariablesWithoutZombies } from './getVariablesWithoutZombies';
 
 import { ProgressTracker } from './ProgressTracker';
 
@@ -73,6 +74,7 @@ export default async function updateVariables({
 
   // For extended collections, variables are inherited from the parent collection
   let variablesInCollection: Variable[];
+  let allLocalVariables: Variable[] | undefined;
 
   if (isExtendedCollection) {
     // Union of the extended collection's own variables and the parent's variables,
@@ -80,7 +82,7 @@ export default async function updateVariables({
     // one source drops inherited-only variables as soon as the child has any own
     // variable of its own.
     const parentCollectionId = (collection as any).parentVariableCollectionId;
-    const allLocalVariables = figma.variables.getLocalVariables();
+    allLocalVariables = await getVariablesWithoutZombies();
     const extendedVars = allLocalVariables.filter((v) => v.variableCollectionId === collection.id);
     const parentVars = parentCollectionId
       ? allLocalVariables.filter((v) => v.variableCollectionId === parentCollectionId)
@@ -125,6 +127,8 @@ export default async function updateVariables({
     metadataUpdateTracker,
     providedPlatformsByVariable,
     isExtendedCollection,
+    new Map(resolvedTokens.map((token) => [token.name, { value: token.value, rawValue: token.rawValue, type: token.type }])),
+    allLocalVariables?.map((v) => v.name),
   );
 
   const removedVariables: string[] = [];

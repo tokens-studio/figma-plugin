@@ -258,6 +258,7 @@ export default function ImportedTokensDialog() {
       value: token.value,
       type: token.type,
       description: token.description,
+      $extensions: token.$extensions,
       shouldUpdateDocument: true,
     });
     track('Update single variable', { type: token.type });

@@ -264,7 +264,7 @@ export const DownshiftInput: React.FunctionComponent<React.PropsWithChildren<Rea
                         value={searchInput}
                         onChange={handleSearchInputChange}
                         getInputProps={getInputProps}
-                        data-testid="downshift-search-input"
+                        dataCy="downshift-search-input"
                       />
                     </Box>
                     {

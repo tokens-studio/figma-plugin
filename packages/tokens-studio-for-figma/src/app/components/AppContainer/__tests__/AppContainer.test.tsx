@@ -2,7 +2,7 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import type { StartupMessage } from '@/types/AsyncMessages';
 import {
-  act, createMockStore, render, waitFor,
+  createMockStore, render, waitFor,
 } from '../../../../../tests/config/setupTest';
 import { AppContainer } from '../AppContainer';
 import * as savePluginDataFactoryModule from '../startupProcessSteps/savePluginDataFactory';
@@ -41,19 +41,18 @@ describe('AppContainer', () => {
   it('should work', async () => {
     const mockStore = createMockStore({});
 
-    await act(async () => {
-      const result = render(
-        <Provider store={mockStore}>
-          <AppContainer {...({} as unknown as StartupMessage)} />
-        </Provider>,
-      );
-      waitFor(() => {
-        expect(result.queryByText('Loading, please wait')).not.toBeNull();
-        expect(savePluginDataFactorySpy).toBeCalledTimes(1);
-        expect(addLicenseFactorySpy).toBeCalledTimes(1);
-        expect(saveStorageInformationFactorySpy).toBeCalledTimes(1);
-        expect(pullTokensFactorySpy).toBeCalledTimes(1);
-      });
+    const result = render(
+      <Provider store={mockStore}>
+        <AppContainer {...({} as unknown as StartupMessage)} />
+      </Provider>,
+    );
+    // The loading screen shows the label of the step that is running.
+    await waitFor(() => {
+      expect(result.queryByText('Receiving local data')).not.toBeNull();
+      expect(savePluginDataFactorySpy).toBeCalledTimes(1);
+      expect(addLicenseFactorySpy).toBeCalledTimes(1);
+      expect(saveStorageInformationFactorySpy).toBeCalledTimes(1);
+      expect(pullTokensFactorySpy).toBeCalledTimes(1);
     });
   });
 });

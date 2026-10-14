@@ -1,6 +1,7 @@
 import updateVariablesToReference from './updateVariablesToReference';
 import { ReferenceVariableType } from './setValuesOnVariable';
 import * as getVariablesWithoutZombiesModule from './getVariablesWithoutZombies';
+import { parseComposedColorReference } from './composedColor';
 
 // Mock the getVariablesWithoutZombies function
 jest.mock('./getVariablesWithoutZombies');
@@ -274,5 +275,91 @@ describe('updateVariablesToReference', () => {
     // Verify the variable was successfully updated
     expect(result).toHaveLength(1);
     expect(result[0]).toBe(mockAliasVariable);
+  });
+  describe('composed colors', () => {
+    const colorVariable = {
+      id: 'VariableID:color', name: 'colors/red', key: 'K:color', variableCollectionId: 'coll1', resolvedType: 'COLOR',
+    };
+    const opacityVariable = {
+      id: 'VariableID:opacity', name: 'opacity/50', key: 'K:opacity', variableCollectionId: 'coll1', resolvedType: 'FLOAT',
+    };
+
+    beforeEach(() => {
+      mockGetVariablesWithoutZombies.mockResolvedValue([colorVariable as any, opacityVariable as any]);
+      (figma.variables.importVariableByKeyAsync as jest.Mock).mockImplementation((key: string) => (
+        Promise.resolve(key === 'K:color' ? colorVariable : opacityVariable)
+      ));
+    });
+
+    it('links rgba({color}, 0.5) as a composed color with literal opacity', async () => {
+      const target = { variableCollectionId: 'coll1', valuesByMode: {}, setValueForMode: jest.fn() };
+      await updateVariablesToReference(new Map(), [{
+        variable: target as any,
+        modeId: 'mode1',
+        referenceVariable: 'colors.red',
+        composed: parseComposedColorReference('rgba({colors.red}, 0.5)')!,
+        resolvedValue: '#ff000080',
+        colorCandidates: [{ reference: 'colors.red', value: '#ff0000' }],
+      }]);
+      expect(target.setValueForMode).toHaveBeenCalledWith('mode1', {
+        color: { type: 'VARIABLE_ALIAS', id: 'VariableID:color' },
+        opacity: 50,
+      });
+    });
+
+    it('links combine_alpha({color}, {opacity}, "source") with both parts aliased', async () => {
+      const target = { variableCollectionId: 'coll1', valuesByMode: {}, setValueForMode: jest.fn() };
+      await updateVariablesToReference(new Map(), [{
+        variable: target as any,
+        modeId: 'mode1',
+        referenceVariable: 'colors.red',
+        composed: parseComposedColorReference('combine_alpha({colors.red}, {opacity.50}, "source")')!,
+        resolvedValue: '#ff000080',
+        colorCandidates: [{ reference: 'colors.red', value: '#ff0000' }],
+        opacityReferenceValue: '50%',
+        opacityLinkable: true,
+      }]);
+      expect(target.setValueForMode).toHaveBeenCalledWith('mode1', {
+        color: { type: 'VARIABLE_ALIAS', id: 'VariableID:color' },
+        opacity: { type: 'VARIABLE_ALIAS', id: 'VariableID:opacity' },
+      });
+    });
+
+    it('skips the write when the existing composed value is equivalent', async () => {
+      const target = {
+        variableCollectionId: 'coll1',
+        valuesByMode: { mode1: { color: { type: 'VARIABLE_ALIAS', id: 'VariableID:color' }, opacity: 50 } },
+        setValueForMode: jest.fn(),
+      };
+      const result = await updateVariablesToReference(new Map(), [{
+        variable: target as any,
+        modeId: 'mode1',
+        referenceVariable: 'colors.red',
+        composed: parseComposedColorReference('rgba({colors.red}, 50%)')!,
+        resolvedValue: '#ff000080',
+        colorCandidates: [{ reference: 'colors.red', value: '#ff0000' }],
+      }]);
+      expect(target.setValueForMode).not.toHaveBeenCalled();
+      expect(result).toHaveLength(0);
+    });
+
+    it('writes the flat color when no color or opacity variable can be linked', async () => {
+      const target = {
+        variableCollectionId: 'coll1',
+        valuesByMode: { mode1: { color: { type: 'VARIABLE_ALIAS', id: 'VariableID:color' }, opacity: 40 } },
+        setValueForMode: jest.fn(),
+      };
+      await updateVariablesToReference(new Map(), [{
+        variable: target as any,
+        modeId: 'mode1',
+        referenceVariable: 'colors.red',
+        composed: parseComposedColorReference('set_alpha({colors.red}, 0.4)')!,
+        resolvedValue: '#ff000066',
+        colorCandidates: [],
+      }]);
+      expect(target.setValueForMode).toHaveBeenCalledWith('mode1', expect.objectContaining({
+        r: 1, g: 0, b: 0, a: 0.4,
+      }));
+    });
   });
 });
