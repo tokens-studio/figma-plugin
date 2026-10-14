@@ -65,5 +65,8 @@ export function findGradientTokensWithStaleVariables(
     });
   });
 
-  return Array.from(keysByName.entries()).map(([name, keys]) => ({ name, variableKeys: Array.from(keys) }));
+  // Alphabetical so the confirm dialog lists tokens in a predictable order
+  return Array.from(keysByName.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([name, keys]) => ({ name, variableKeys: Array.from(keys) }));
 }
