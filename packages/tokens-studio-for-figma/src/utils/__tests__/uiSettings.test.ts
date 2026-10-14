@@ -65,6 +65,8 @@ describe('uiSettings', () => {
       seenGenericVersionedHeaderMigrationDialog: undefined,
       seenTermsUpdate2026: undefined,
       seenTermsUpdate2026Subprocessors: undefined,
+      acceptedStudioConsent: undefined,
+      performanceAnalyticsConsent: undefined,
     }));
   });
 
@@ -111,6 +113,8 @@ describe('uiSettings', () => {
       seenGenericVersionedHeaderMigrationDialog: false,
       seenTermsUpdate2026: false,
       seenTermsUpdate2026Subprocessors: false,
+      acceptedStudioConsent: false,
+      performanceAnalyticsConsent: false,
     });
   });
 
@@ -182,6 +186,8 @@ describe('uiSettings', () => {
       seenGenericVersionedHeaderMigrationDialog: false,
       seenTermsUpdate2026: false,
       seenTermsUpdate2026Subprocessors: false,
+      acceptedStudioConsent: false,
+      performanceAnalyticsConsent: false,
     });
   });
 
