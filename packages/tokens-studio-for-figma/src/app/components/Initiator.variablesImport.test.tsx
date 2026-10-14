@@ -147,6 +147,34 @@ describe('Initiator variables import', () => {
     expect(studio.activeTokenSet).toEqual(reviewed.activeTokenSet);
   });
 
+  it('keeps the Tokens Studio id of a theme the import updates', async () => {
+    const store = createStore(studioApi);
+    renderWithStore(store);
+
+    // The mode was renamed in Figma; pullVariables names the theme's id after the new mode.
+    act(() => {
+      fireEvent(window, new MessageEvent('message', {
+        data: {
+          pluginMessage: {
+            type: MessageFromPluginTypes.VARIABLES,
+            values: {
+              colors: [{
+                name: 'color.bg', value: '#d6d6d6', type: 'color', parent: 'Colors/Day',
+              }],
+            },
+            themes: [{
+              ...lightTheme, id: 'colors-day', name: 'Day', selectedTokenSets: { 'Colors/Day': TokenSetStatus.ENABLED },
+            }],
+          },
+        },
+      }));
+    });
+
+    const { tokenState } = store.getState();
+    expect(tokenState.importedThemes.updatedThemes.map((theme) => theme.id)).toEqual(['server-light']);
+    expect(tokenState.themes).toEqual([expect.objectContaining({ id: 'server-light', name: 'Day' })]);
+  });
+
   it('applies renamed collections with Tokens Studio sync before the imported tokens', async () => {
     const store = createStore(studioApi);
     renderWithStore(store);

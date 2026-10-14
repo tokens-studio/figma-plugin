@@ -813,6 +813,9 @@ export const tokenState = createModel<RootModel>()({
             updatedThemes.push({
               ...existingTheme, // Keep existing properties
               ...theme, // Apply updates
+              // The incoming id is generated from the collection and mode names. Keep the existing one: with
+              // Tokens Studio sync it is the theme option's id, and the update is sent to it.
+              id: existingTheme.id,
               // Ensure we preserve the existing selectedTokenSets and add new ones
               selectedTokenSets: {
                 ...existingTheme.selectedTokenSets,
