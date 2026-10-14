@@ -1,5 +1,5 @@
 import {
-  RestApiError, createThemeGroupRest, isNameConflictError, isPlanLimitError, listThemeOptionsRest,
+  RestApiError, batchUpdateTokensRest, createThemeGroupRest, isNameConflictError, isPlanLimitError, listThemeOptionsRest, listTokensSlimRest,
 } from './restApi';
 
 const errorResponse = (status: number, error: Record<string, unknown>) => ({
@@ -96,5 +96,51 @@ describe('listThemeOptionsRest', () => {
     global.fetch = jest.fn().mockResolvedValue({ ok: true, json: async () => ({}) }) as any;
 
     await expect(listThemeOptionsRest('token', 'https://api.example.com', 'project-1', 'group-1')).resolves.toEqual([]);
+  });
+});
+
+describe('listTokensSlimRest', () => {
+  const originalFetch = global.fetch;
+
+  afterEach(() => {
+    global.fetch = originalFetch;
+  });
+
+  it('asks for the slim token list of the change set', async () => {
+    global.fetch = jest.fn().mockResolvedValue({ ok: true, json: async () => ({ data: [{ id: 'token-1', name: 'color.brand', token_set_id: 'set-1' }] }) }) as any;
+
+    const tokens = await listTokensSlimRest('token', 'https://api.example.com', 'project-1', 'change-set-1');
+
+    const url = new URL(jest.mocked(global.fetch).mock.calls[0][0] as string);
+    expect(url.pathname).toBe('/api/v1/projects/project-1/tokens');
+    expect(url.searchParams.get('fields')).toBe('slim');
+    expect(url.searchParams.get('change_set_id')).toBe('change-set-1');
+    expect(tokens).toEqual([{ id: 'token-1', name: 'color.brand', token_set_id: 'set-1' }]);
+  });
+
+  it('reads a response without data as no tokens', async () => {
+    global.fetch = jest.fn().mockResolvedValue({ ok: true, json: async () => ({}) }) as any;
+
+    await expect(listTokensSlimRest('token', 'https://api.example.com', 'project-1', 'change-set-1')).resolves.toEqual([]);
+  });
+});
+
+describe('batchUpdateTokensRest', () => {
+  const originalFetch = global.fetch;
+
+  afterEach(() => {
+    global.fetch = originalFetch;
+  });
+
+  it('posts the updates by token id with the change set', async () => {
+    global.fetch = jest.fn().mockResolvedValue({ ok: true, json: async () => ({ data: { updated_count: 1 } }) }) as any;
+    const updates = [{ token_id: 'token-1', changes: { name: 'color.brand' } }];
+
+    await batchUpdateTokensRest('token', 'https://api.example.com', 'project-1', updates, 'change-set-1');
+
+    const [url, init] = jest.mocked(global.fetch).mock.calls[0] as [string, RequestInit];
+    expect(new URL(url).pathname).toBe('/api/v1/projects/project-1/tokens/batch_update');
+    expect(init.method).toBe('POST');
+    expect(JSON.parse(init.body as string)).toEqual({ change_set_id: 'change-set-1', updates });
   });
 });
