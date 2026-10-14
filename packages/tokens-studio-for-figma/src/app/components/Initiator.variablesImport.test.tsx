@@ -235,4 +235,79 @@ describe('Initiator variables import', () => {
     expect(tokenState.tokens['Colours/Light'].map((token) => token.name)).toEqual(['color.bg', 'color.fg']);
     expect(tokenState.renamedCollections).toBeNull();
   });
+
+  describe.each([
+    ['GitHub', githubApi],
+    ['a local document', localApi],
+  ])('with %s', (_name, api) => {
+    const sendRenameAndVariables = () => {
+      act(() => {
+        fireEvent(window, new MessageEvent('message', {
+          data: { pluginMessage: { type: MessageFromPluginTypes.RENAME_COLLECTIONS_AND_MODES, renamedCollections: [['Colors/Light', 'Colors/Day']] } },
+        }));
+      });
+      act(() => {
+        fireEvent(window, new MessageEvent('message', {
+          data: {
+            pluginMessage: {
+              type: MessageFromPluginTypes.VARIABLES,
+              values: {
+                colors: [
+                  {
+                    name: 'color.bg', value: '#d6d6d6', type: 'color', parent: 'Colors/Day',
+                  },
+                  {
+                    name: 'color.fg', value: '#2f2f2f', type: 'color', parent: 'Colors/Day',
+                  },
+                ],
+              },
+              themes: [{
+                ...lightTheme, id: 'colors-day', name: 'Day', selectedTokenSets: { 'Colors/Day': TokenSetStatus.ENABLED },
+              }],
+            },
+          },
+        }));
+      });
+    };
+
+    it('applies a renamed mode on "Import all" and keeps the theme\'s id', async () => {
+      const store = createStore(api);
+      const result = renderWithStore(store);
+
+      sendRenameAndVariables();
+      // Nothing changes until the user confirms in the review dialog.
+      expect(store.getState().tokenState.tokens['Colors/Light']).toBeDefined();
+      const importAll = await result.findByTestId('button-import-all');
+      act(() => {
+        importAll.click();
+      });
+
+      await waitFor(() => expect(store.getState().tokenState.tokens['Colors/Day']).toBeDefined());
+      const { tokenState } = store.getState();
+      expect(tokenState.tokens['Colors/Light']).toBeUndefined();
+      expect(tokenState.tokens['Colors/Day'].map((token) => token.name)).toEqual(['color.bg', 'color.fg']);
+      expect(tokenState.themes).toEqual([expect.objectContaining({
+        id: 'server-light', name: 'Day', selectedTokenSets: { 'Colors/Day': TokenSetStatus.ENABLED },
+      })]);
+      expect(tokenState.renamedCollections).toBeNull();
+    });
+
+    it('leaves everything as it was when the review dialog is cancelled', async () => {
+      const store = createStore(api);
+      const result = renderWithStore(store);
+      const before = store.getState().tokenState;
+
+      sendRenameAndVariables();
+      const close = await result.findByTestId('button-import-close');
+      act(() => {
+        close.click();
+      });
+
+      const { tokenState } = store.getState();
+      expect(tokenState.tokens).toEqual(before.tokens);
+      expect(tokenState.themes).toEqual(before.themes);
+      expect(tokenState.renamedCollections).toBeNull();
+      expect(tokenState.importedTokens).toEqual({ newTokens: [], updatedTokens: [] });
+    });
+  });
 });
