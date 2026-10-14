@@ -86,6 +86,18 @@ describe('findGradientTokensWithStaleVariables', () => {
     ]);
   });
 
+  it('returns tokens sorted by name', () => {
+    const tokens: Record<string, AnyTokenList> = {
+      base: [
+        { name: 'z.bg', type: TokenTypes.COLOR, value: gradient },
+        { name: 'a.bg', type: TokenTypes.COLOR, value: gradient },
+      ],
+    };
+    const themes = [theme('light', { base: TokenSetStatus.ENABLED }, { 'z.bg': 'key-z', 'a.bg': 'key-a' })];
+
+    expect(findGradientTokensWithStaleVariables(tokens, themes).map(({ name }) => name)).toEqual(['a.bg', 'z.bg']);
+  });
+
   it('returns nothing when no token holds a gradient', () => {
     const tokens: Record<string, AnyTokenList> = {
       base: [{ name: 'bg', type: TokenTypes.COLOR, value: '#ffffff' }],
