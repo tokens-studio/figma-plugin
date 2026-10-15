@@ -8,8 +8,10 @@ import {
   resolveSanitizedKey,
   sanitizeNewTokensForStudio,
   sanitizeThemeForStudio,
+  sanitizeTokenName,
   sanitizeTokenSetName,
 } from './utils/sanitizeForStudio';
+import { renameThemeGroupsInTokensStudio, renameTokenSetsInTokensStudio } from './utils/renameInTokensStudio';
 import { store } from '@/app/store';
 import type { SetTokensFromVariablesPayload } from '@/types/payloads';
 
@@ -24,7 +26,20 @@ export function setTokensFromVariables(dispatch: RematchDispatch<RootModel>) {
     // Sanitize at the studio boundary: strip characters that would corrupt the
     // ledger's reference or token-set parsing. Plugin-only flows still receive
     // the raw names because this effect only runs for TOKENS_STUDIO_OAUTH.
-    const newTokens = sanitizeNewTokensForStudio(importedTokens?.newTokens || []);
+    let newTokens = sanitizeNewTokensForStudio(importedTokens?.newTokens || []);
+    // Read before the import is applied locally, which happens right after this effect starts.
+    const renamedCollections = currentState.tokenState.renamedCollections ?? [];
+    const previousTokens = currentState.tokenState.tokens;
+    const previousThemes = currentState.tokenState.themes;
+
+    if (hasChangeSetId && renamedCollections.length > 0) {
+      const renamedSets = await renameTokenSetsInTokensStudio(context, renamedCollections, dispatch);
+      // A token that was already in a renamed set moved with it; only the set's new tokens need creating.
+      newTokens = newTokens.filter((token) => {
+        const rename = renamedSets.find(([, newName]) => sanitizeTokenSetName(newName) === token.parent);
+        return !rename || !(previousTokens?.[rename[0]] || []).some((existing) => sanitizeTokenName(existing.name) === token.name);
+      });
+    }
 
     // Only create token sets and tokens if changeSetId is present — the REST API requires it.
     // changeSetId is populated after pulling from the REST API for a specific branch.
@@ -121,6 +136,7 @@ export function setTokensFromVariables(dispatch: RematchDispatch<RootModel>) {
     const stateAfterSets = store.getState();
     const { importedThemes } = stateAfterSets.tokenState;
     if (hasChangeSetId && importedThemes) {
+      await renameThemeGroupsInTokensStudio(context, previousThemes, importedThemes.updatedThemes || [], dispatch);
       const newThemesToPush = (importedThemes.newThemes || []).map((t: any) => sanitizeThemeForStudio({ ...t, id: undefined }));
       const updatedThemesToPush = (importedThemes.updatedThemes || []).map((t: any) => sanitizeThemeForStudio(t));
       // Push themes sequentially so that a shared theme group (e.g. "appearances") is only created
