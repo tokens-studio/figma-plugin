@@ -291,6 +291,10 @@ export const uiState = createModel<RootModel>()({
       return {
         ...state,
         storageType: payload,
+        // The plugin decides whether to write to a sync provider, Tokens Studio among them, by `api`. A document
+        // stored locally has none, so leave nothing behind from the provider that was active before. `api` starts
+        // out null the same way (see the initial state).
+        ...(payload.provider === StorageProviderType.LOCAL ? { api: null as unknown as UIState['api'] } : {}),
       };
     },
     setApiData(state, payload: StorageTypeCredentials) {

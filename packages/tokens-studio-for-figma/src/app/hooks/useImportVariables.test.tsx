@@ -132,6 +132,20 @@ describe('useImportVariables', () => {
     expect(result.current.isDialogOpen).toBe(false);
   });
 
+  it('imports straight away after switching from Tokens Studio sync to local storage', async () => {
+    const { result, mockStore } = await setup(studioApi);
+
+    act(() => {
+      mockStore.dispatch.uiState.setStorage({ provider: StorageProviderType.LOCAL });
+    });
+    await act(async () => {
+      await result.current.importVariables(selectedCollections, options, [], true);
+    });
+
+    expect(mockStore.getState().uiState.confirmState.show).toBe(false);
+    expect(sentTypes()).toContain(AsyncMessageTypes.PULL_VARIABLES);
+  });
+
   it('imports straight away without a confirmation for a local document', async () => {
     const { result, mockStore } = await setup({ provider: StorageProviderType.LOCAL });
 
