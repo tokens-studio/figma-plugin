@@ -14,14 +14,16 @@ import { showConvertTokenFormatModalSelector } from '@/selectors/showConvertToke
 import useRemoteTokens from '../store/remoteTokens';
 import w3cConvertImage from '@/app/assets/hints/w3cformat.png';
 import legacyConvertImage from '@/app/assets/hints/legacyformat.png';
-import { storageTypeSelector } from '@/selectors';
+import { lastSyncedStateSelector, storageTypeSelector } from '@/selectors';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import { getLastSyncedFormat } from '@/utils/compareLastSyncedState';
 
 export function ConvertToDTCGModal() {
   const dispatch = useDispatch<Dispatch>();
   const showConvertTokenFormatModal = useSelector(showConvertTokenFormatModalSelector);
   const tokenFormat = useSelector(tokenFormatSelector);
-  const { hasChanges } = useChangedState();
+  const lastSyncedState = useSelector(lastSyncedStateSelector);
+  const { hasChanges, changedPushState } = useChangedState();
   const { pushTokens } = useRemoteTokens();
   const { t } = useTranslation(['storage']);
   const storageType = useSelector(storageTypeSelector);
@@ -36,6 +38,10 @@ export function ConvertToDTCGModal() {
     dispatch.tokenState.setTokenFormat(isDTCG ? TokenFormatOptions.Legacy : TokenFormatOptions.DTCG);
     dispatch.uiState.setShowConvertTokenFormatModal(false);
     if (storageType.provider === StorageProviderType.LOCAL) return;
+    // No format-flip signal needs to travel with the push: a pure metadata diff (which a
+    // format flip resolves to via compareLastSyncedState) routes to storage.save (full
+    // write) inside pushTokensToGitHub, so every token file gets re-serialized in the new
+    // format.
     pushTokens({
       overrides: isDTCG ? {
         branch: 'w3c-dtcg-conversion-revert',
@@ -47,7 +53,16 @@ export function ConvertToDTCGModal() {
     });
   }, [dispatch, pushTokens, isDTCG, storageType]);
 
-  const hasRemoteChanges = hasChanges && storageType.provider !== StorageProviderType.LOCAL;
+  // A pending format flip is itself a "change" (via compareLastSyncedState), which would
+  // otherwise disable the revert button — trapping the user with no way to undo through this
+  // UI if they cancelled or failed the push dialog. Exempt the format-only case so the
+  // reverse conversion stays reachable; token/theme edits still block as before.
+  const tokenFormatChanged = tokenFormat !== getLastSyncedFormat(lastSyncedState)
+    && getLastSyncedFormat(lastSyncedState) !== undefined;
+  const isFormatOnlyDiff = tokenFormatChanged
+    && Object.keys(changedPushState.tokens).length === 0
+    && changedPushState.themes.length === 0;
+  const hasRemoteChanges = hasChanges && !isFormatOnlyDiff && storageType.provider !== StorageProviderType.LOCAL;
 
   return (
     <Modal title={isDTCG ? t('w3cformatmodaltitle') : t('w3cconverttitle')} isOpen={showConvertTokenFormatModal} close={handleClose} showClose>

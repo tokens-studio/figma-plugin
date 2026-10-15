@@ -186,4 +186,5 @@ describe('GitSyncOptimizer', () => {
 
     expect(result.filesToDelete).toEqual(['test.json']);
   });
+
 });
