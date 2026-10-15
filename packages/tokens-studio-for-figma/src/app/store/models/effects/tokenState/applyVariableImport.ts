@@ -3,6 +3,7 @@ import type { RootModel } from '@/types/RootModel';
 import type { RootState } from '@/app/store';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { track } from '@/utils/analytics';
+import { findRenamedVariableTokens } from './utils/findRenamedVariableTokens';
 
 // With Tokens Studio sync a variables import has already been written to the project by
 // setTokensFromVariables and setThemesFromVariables, so there is nothing left to choose in
@@ -27,6 +28,10 @@ export function applyVariableImport(dispatch: RematchDispatch<RootModel>) {
       dispatch.tokenState.handleRenamedCollections(renamedCollections);
       dispatch.tokenState.setRenamedCollections(null);
     }
+
+    // `themes` is from before setThemes above, so it still has the old variable references.
+    const tokenRenames = findRenamedVariableTokens(themes, importedThemes.updatedThemes);
+    if (tokenRenames.length > 0) dispatch.tokenState.renameImportedVariableTokens(tokenRenames);
 
     dispatch.tokenState.applyImportedVariableTokens();
 

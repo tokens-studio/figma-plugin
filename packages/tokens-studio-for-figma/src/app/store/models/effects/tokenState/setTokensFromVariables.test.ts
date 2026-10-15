@@ -176,6 +176,52 @@ describe('setTokensFromVariables', () => {
     expect(mockPushTheme).toHaveBeenCalledWith(expect.objectContaining({ id: 'theme-dark', group: 'BrandCore' }), expect.anything(), dispatch, expect.anything());
   });
 
+  it('renames the token of a renamed variable and updates changed values instead of creating tokens', async () => {
+    const references = (name: string) => ({ [name]: 'key-primary', 'color.secondary': 'key-secondary' });
+    mockGetState.mockReturnValue({
+      uiState: { api: { provider: StorageProviderType.TOKENS_STUDIO_OAUTH, id: 'project-1', changeSetId: 'change-set-1' } },
+      tokenState: {
+        tokens: {
+          // Pulled from Studio, so it has its id; color.secondary was created by an import and doesn't.
+          'Brand/Light': [
+            { name: 'color.primary', value: '#0066ff', type: 'color', $extensions: { id: 'token-primary' } },
+            { name: 'color.secondary', value: '#ff8000', type: 'color' },
+          ],
+        },
+        themes: [{
+          id: 'theme-light', name: 'Light', group: 'Brand', selectedTokenSets: { 'Brand/Light': 'enabled' }, $figmaVariableReferences: references('color.primary'),
+        }],
+        importedTokens: {
+          newTokens: [{
+            name: 'color.brand', value: '#0066ff', type: 'color', parent: 'Brand/Light',
+          }],
+          updatedTokens: [{
+            name: 'color.secondary', value: '#000000', type: 'color', parent: 'Brand/Light',
+          }],
+        },
+        tokenSetMetadata: { 'Brand/Light': { id: 'set-light' } },
+        importedThemes: {
+          newThemes: [],
+          updatedThemes: [{
+            id: 'theme-light', name: 'Light', group: 'Brand', selectedTokenSets: { 'Brand/Light': 'enabled' }, $figmaVariableReferences: references('color.brand'),
+          }],
+        },
+      },
+    } as any);
+    mockPush.mockImplementation(async ({ action }: any) => (action === 'LIST_TOKENS'
+      ? [{ id: 'token-secondary', name: 'color.secondary', token_set_id: 'set-light' }, { id: 'other', name: 'color.secondary', token_set_id: 'set-dark' }]
+      : { data: {} }));
+
+    await setTokensFromVariables(dispatch)({} as any, {});
+
+    const actions = mockPush.mock.calls.map(([args]: any) => args.action);
+    expect(actions).not.toContain('BATCH_CREATE_TOKENS');
+    expect(mockPush.mock.calls.find(([args]: any) => args.action === 'BATCH_UPDATE_TOKENS')?.[0].data).toEqual([
+      { token_id: 'token-primary', changes: { name: 'color.brand', value: '#0066ff' } },
+      { token_id: 'token-secondary', changes: { value: '#000000' } },
+    ]);
+  });
+
   it('pushes the themes after the token sets, new ones without their local id', async () => {
     setState();
 
