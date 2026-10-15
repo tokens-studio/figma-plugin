@@ -11,6 +11,7 @@ import {
   resolveSanitizedKey,
   sanitizeDisplayName,
   sanitizeTokenSetName,
+  toStudioThemeGroupName,
 } from './sanitizeForStudio';
 
 export type ThemePushFailure = {
@@ -47,7 +48,7 @@ async function fetchThemeGroupId(projectId: string, groupName: string, changeSet
     const groups = json.data || [];
     // Server names are raw; `groupName` is sanitized. Compare sanitized forms so
     // an existing group is matched instead of being re-created.
-    const match = groups.find((g: any) => sanitizeDisplayName(String(g.attributes?.name || g.name || '')) === sanitizeDisplayName(groupName));
+    const match = groups.find((g: any) => toStudioThemeGroupName(String(g.attributes?.name || g.name || '')) === toStudioThemeGroupName(groupName));
     return match?.id || null;
   } catch {
     return null;
@@ -148,8 +149,10 @@ export async function pushThemeToTokensStudioOAuth(
   }
 
   // themeGroupsData is keyed by the raw server name, so an exact lookup would miss and create a duplicate group.
+  // The group as Tokens Studio names it; `groupName` stays the local name for finding the theme here.
+  const studioGroupName = toStudioThemeGroupName(groupName);
   let themeGroupId = groupName
-    ? (lookupBySanitized(themeGroupsData, groupName, sanitizeDisplayName) as any)?.id
+    ? (lookupBySanitized(themeGroupsData, studioGroupName, toStudioThemeGroupName) as any)?.id
     : null;
   // Set when this push created the group, so a refused theme doesn't leave it behind empty.
   let createdGroupId: string | null = null;
@@ -162,7 +165,7 @@ export async function pushThemeToTokensStudioOAuth(
       createResult = await pushToTokensStudioOAuth({
         context: rootState.uiState.api,
         action: 'CREATE_THEME_GROUP',
-        data: { name: groupName },
+        data: { name: studioGroupName },
         rethrowErrors: true,
       });
     } catch (error) {
@@ -175,7 +178,7 @@ export async function pushThemeToTokensStudioOAuth(
     } else {
       // The group may already exist: Studio reports a plan's group limit or a name it would no longer accept
       // before it checks for a name clash, so look the group up before treating the refusal as final.
-      themeGroupId = await fetchThemeGroupId(projectId, groupName, changeSetId);
+      themeGroupId = await fetchThemeGroupId(projectId, studioGroupName, changeSetId);
     }
 
     if (!themeGroupId) {
@@ -192,7 +195,7 @@ export async function pushThemeToTokensStudioOAuth(
       ...metadata,
       themeGroupsData: {
         ...themeGroupsData,
-        [groupName]: { id: themeGroupId },
+        [studioGroupName]: { id: themeGroupId },
       },
     });
   }
@@ -240,7 +243,7 @@ export async function pushThemeToTokensStudioOAuth(
       });
       const { metadata: currentMetadata } = store.getState().tokenState.remoteData || {};
       const remainingGroups = { ...(currentMetadata?.themeGroupsData || {}) };
-      delete remainingGroups[resolveSanitizedKey(remainingGroups, groupName, sanitizeDisplayName) ?? groupName];
+      delete remainingGroups[resolveSanitizedKey(remainingGroups, studioGroupName, toStudioThemeGroupName) ?? studioGroupName];
       dispatch.tokenState.setRemoteMetadata({ ...currentMetadata, themeGroupsData: remainingGroups });
     }
     // An edit that failed keeps the local change; only a create is undone, since the theme it added

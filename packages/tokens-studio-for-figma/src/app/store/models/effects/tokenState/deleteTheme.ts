@@ -3,7 +3,9 @@ import type { RootModel } from '@/types/RootModel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { store } from '@/app/store';
 import { pushToTokensStudioOAuth } from '../../../providers/tokens-studio/tokensStudioOAuth';
-import { lookupBySanitized, resolveSanitizedKey, sanitizeDisplayName } from './utils/sanitizeForStudio';
+import {
+  lookupBySanitized, resolveSanitizedKey, sanitizeDisplayName, toStudioThemeGroupName,
+} from './utils/sanitizeForStudio';
 
 export function deleteTheme(dispatch: RematchDispatch<RootModel>) {
   return async (themeId: string, rootState: any): Promise<void> => {
@@ -30,7 +32,7 @@ export function deleteTheme(dispatch: RematchDispatch<RootModel>) {
       const groupIsEmpty = !store.getState().tokenState.themes
         .some((theme) => sanitizeDisplayName(theme.group ?? '') === groupName);
       const { metadata } = store.getState().tokenState.remoteData || {};
-      const groupId = (lookupBySanitized(metadata?.themeGroupsData, groupName, sanitizeDisplayName) as any)?.id;
+      const groupId = (lookupBySanitized(metadata?.themeGroupsData, toStudioThemeGroupName(groupName), toStudioThemeGroupName) as any)?.id;
       if (!groupIsEmpty || !groupId) return;
 
       await pushToTokensStudioOAuth({
@@ -39,7 +41,7 @@ export function deleteTheme(dispatch: RematchDispatch<RootModel>) {
         data: { id: groupId },
       });
       const remainingGroups = { ...(metadata?.themeGroupsData || {}) };
-      delete remainingGroups[resolveSanitizedKey(remainingGroups, groupName, sanitizeDisplayName) ?? groupName];
+      delete remainingGroups[resolveSanitizedKey(remainingGroups, toStudioThemeGroupName(groupName), toStudioThemeGroupName) ?? groupName];
       dispatch.tokenState.setRemoteMetadata({ ...metadata, themeGroupsData: remainingGroups });
     }
   };
