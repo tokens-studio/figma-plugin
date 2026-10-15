@@ -1,9 +1,7 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 import { useIsProUser } from './useIsProUser';
 import LivingDocumentationModal from '../components/modals/LivingDocumentationModal';
-import UpgradeToProModal from '../components/UpgradeToProModal';
-import generateDocumentationImage from '@/app/assets/hints/generatedocumentation.png';
+import { useUpgradeDialogStore } from '@/app/store/useUpgradeDialogStore';
 import { track } from '@/utils/analytics';
 
 type UseGenerateDocumentationOptions = {
@@ -15,17 +13,12 @@ type UseGenerateDocumentationOptions = {
 export function useGenerateDocumentation(options: UseGenerateDocumentationOptions = {}) {
   const { initialTokenSet, initialStartsWith, source = 'footer' } = options;
   const isProUser = useIsProUser();
-  const { t } = useTranslation(['tokens']);
+  const openUpgradeDialog = useUpgradeDialogStore((state) => state.openUpgradeDialog);
 
   const [docModalVisible, setDocModalVisible] = React.useState(false);
-  const [upgradeModalVisible, setUpgradeModalVisible] = React.useState(false);
 
   const handleCloseDocModal = React.useCallback(() => {
     setDocModalVisible(false);
-  }, []);
-
-  const handleCloseUpgradeModal = React.useCallback(() => {
-    setUpgradeModalVisible(false);
   }, []);
 
   const handleGenerateDocumentation = React.useCallback(() => {
@@ -36,41 +29,26 @@ export function useGenerateDocumentation(options: UseGenerateDocumentationOption
         source,
       });
     } else {
-      setUpgradeModalVisible(true);
+      openUpgradeDialog('docsGenerator', source);
     }
-  }, [isProUser, source]);
+  }, [isProUser, source, openUpgradeDialog]);
 
   const modals = React.useMemo(
     () => (
-      <>
-        {docModalVisible && (
-          <LivingDocumentationModal
-            isOpen
-            onClose={handleCloseDocModal}
-            initialTokenSet={initialTokenSet}
-            initialStartsWith={initialStartsWith}
-          />
-        )}
-        {upgradeModalVisible && (
-          <UpgradeToProModal
-            isOpen
-            onClose={handleCloseUpgradeModal}
-            feature="documentation-feature"
-            title={t('upgradeToPro')}
-            image={generateDocumentationImage}
-            description={t('generateDocumentationDescription')}
-          />
-        )}
-      </>
+      docModalVisible && (
+        <LivingDocumentationModal
+          isOpen
+          onClose={handleCloseDocModal}
+          initialTokenSet={initialTokenSet}
+          initialStartsWith={initialStartsWith}
+        />
+      )
     ),
     [
       docModalVisible,
-      upgradeModalVisible,
       handleCloseDocModal,
-      handleCloseUpgradeModal,
       initialTokenSet,
       initialStartsWith,
-      t,
     ],
   );
 
