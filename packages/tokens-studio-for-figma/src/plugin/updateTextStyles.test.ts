@@ -105,4 +105,36 @@ describe('updateTextStyles', () => {
 
     expect(existingStyles[0].name).toEqual('type/h1-RENAMED');
   });
+
+  it('does not rewrite the name when it already matches, even with rename enabled', async () => {
+    let nameSetCount = 0;
+    let storedName = 'type/h1';
+    const existingStyle = {
+      id: '1234',
+      fontName: { family: 'Inter', style: 'Bold' },
+    };
+    Object.defineProperty(existingStyle, 'name', {
+      get: () => storedName,
+      set: (v: string) => {
+        storedName = v;
+        nameSetCount += 1;
+      },
+    });
+    mockGetLocalTextStyles.mockImplementation(() => [existingStyle]);
+
+    await updateTextStyles(
+      [{
+        name: 'type.h1',
+        value: typographyTokens[0].value,
+        type: TokenTypes.TYPOGRAPHY,
+        path: 'type/h1',
+        styleId: '1234',
+      }],
+      '16',
+      true,
+      true,
+    );
+
+    expect(nameSetCount).toBe(0);
+  });
 });
