@@ -528,14 +528,15 @@ export default async function pullVariables(options: PullVariablesOptions, theme
       }
       return acc;
     }, {});
+    // Renames go first: with Tokens Studio sync the UI applies the import as soon as the values arrive.
+    if (renamedCollections.size > 0) {
+      notifyRenamedCollections(Array.from(renamedCollections.entries()));
+    }
+
     notifyVariableValues(
       processedTokens,
       themesToCreate,
     );
-
-    if (renamedCollections.size > 0) {
-      notifyRenamedCollections(Array.from(renamedCollections.entries()));
-    }
   } catch (error) {
     console.error('Error processing results:', error);
     notifyVariableValues({});

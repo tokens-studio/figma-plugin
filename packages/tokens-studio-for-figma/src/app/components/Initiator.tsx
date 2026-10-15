@@ -122,12 +122,18 @@ export function Initiator() {
 
           case MessageFromPluginTypes.VARIABLES: {
             const { values, themes } = pluginMessage;
+            let studioWrite: Promise<void> | undefined;
             if (values) {
-              dispatch.tokenState.setTokensFromVariables(values);
+              studioWrite = dispatch.tokenState.setTokensFromVariables(values) as unknown as Promise<void>;
               dispatch.uiState.setActiveTab(Tabs.TOKENS);
             }
             if (themes) {
               dispatch.tokenState.setThemesFromVariables(themes);
+            }
+            // With Tokens Studio sync the import is applied right away instead of in ImportedTokensDialog.
+            if (values && dispatch.tokenState.applyVariableImport()) {
+              // Once Studio has the tokens, drop the markers that kept "Import all" from writing them twice.
+              Promise.resolve(studioWrite).finally(() => dispatch.tokenState.resetImportedTokens());
             }
             break;
           }

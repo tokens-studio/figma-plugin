@@ -195,6 +195,23 @@ export default function useRemoteTokens() {
           metadata: remoteData.metadata,
         });
         dispatch.uiState.setHasRemoteChange(false);
+        if (context.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
+          // Store these on every pull, not only when the pull replaces the local tokens: writes to Tokens Studio
+          // need the set ids and the changeSetId even when local already matched Studio (an empty project, say).
+          dispatch.tokenState.setTokenSetMetadata(remoteData.metadata?.tokenSetsData ?? {});
+          if (remoteData.metadata?.changeSetId) {
+            // In-session only: updateCredentials early-returns for OAuth
+            // (see src/utils/credentials.ts), so we can't persist the
+            // changeSetId to Figma pluginData here. After a plugin reload
+            // the credentials come back without it and the first push
+            // trips the "no changeSetId" guard in pushToTokensStudioOAuth.
+            // Re-selecting the branch resolves a fresh changeSetId.
+            dispatch.uiState.setApiData({
+              ...context,
+              changeSetId: remoteData.metadata.changeSetId,
+            });
+          }
+        }
         const stringifiedRemoteTokens = JSON.stringify(
           compact([remoteData.tokens, remoteData.themes, TokenFormat.format]),
           null,
@@ -248,19 +265,7 @@ export default function useRemoteTokens() {
                 break;
               }
               case StorageProviderType.TOKENS_STUDIO_OAUTH: {
-                dispatch.tokenState.setTokenSetMetadata(remoteData.metadata?.tokenSetsData ?? {});
-                if (remoteData.metadata?.changeSetId) {
-                  // In-session only: updateCredentials early-returns for OAuth
-                  // (see src/utils/credentials.ts), so we can't persist the
-                  // changeSetId to Figma pluginData here. After a plugin reload
-                  // the credentials come back without it and the first push
-                  // trips the "no changeSetId" guard in pushToTokensStudioOAuth.
-                  // Re-selecting the branch resolves a fresh changeSetId.
-                  dispatch.uiState.setApiData({
-                    ...context,
-                    changeSetId: remoteData.metadata.changeSetId,
-                  });
-                }
+                // Set ids and changeSetId are stored for every successful pull, above.
                 break;
               }
               default:
