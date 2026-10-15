@@ -528,14 +528,15 @@ export default async function pullVariables(options: PullVariablesOptions, theme
       }
       return acc;
     }, {});
+    // Renames go first, so the import can compare a renamed collection's variables with the set's old tokens.
+    if (renamedCollections.size > 0) {
+      notifyRenamedCollections(Array.from(renamedCollections.entries()));
+    }
+
     notifyVariableValues(
       processedTokens,
       themesToCreate,
     );
-
-    if (renamedCollections.size > 0) {
-      notifyRenamedCollections(Array.from(renamedCollections.entries()));
-    }
   } catch (error) {
     console.error('Error processing results:', error);
     notifyVariableValues({});

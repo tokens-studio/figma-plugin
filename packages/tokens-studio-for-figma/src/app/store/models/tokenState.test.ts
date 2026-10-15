@@ -561,12 +561,15 @@ describe('editToken', () => {
         },
       ],
     });
+    store.dispatch.tokenState.setRenamedCollections([['old/default', 'new/default']]);
     store.dispatch.tokenState.resetImportedTokens();
-    const { importedTokens } = store.getState().tokenState;
+    const { importedTokens, renamedCollections } = store.getState().tokenState;
     expect(importedTokens).toEqual({
       newTokens: [],
       updatedTokens: [],
     });
+    // Renames belong to the import that was closed
+    expect(renamedCollections).toBeNull();
   });
 
   it('can create token', () => {
@@ -2164,6 +2167,91 @@ describe('setTokensFromVariables', () => {
       expect.objectContaining({ name: 'fontWeight.bold', value: '600', type: TokenTypes.FONT_WEIGHTS }),
       expect.objectContaining({ name: 'spacing.sm', value: '12px', type: TokenTypes.DIMENSION }),
     ]);
+  });
+
+  it('keeps the Studio id and custom metadata of a changed token, but not its color modifier', () => {
+    const store = initStore([{
+      name: 'spacing.sm',
+      value: '8px',
+      type: TokenTypes.DIMENSION,
+      $extensions: {
+        'studio.tokens': { id: 'keep-me', urn: 'urn:keep-me', modify: { type: 'lighten', value: '0.2', space: 'srgb' } },
+        'custom.extension': { keep: true },
+        'com.figma.scopes': ['GAP'],
+      },
+    } as any]);
+
+    store.dispatch.tokenState.setTokensFromVariables({
+      dimensions: [{ ...variable('spacing.sm', '12px'), $extensions: { 'com.figma.scopes': ['WIDTH_HEIGHT'] } }],
+    });
+
+    expect(store.getState().tokenState.importedTokens.updatedTokens).toEqual([{
+      ...variable('spacing.sm', '12px'),
+      oldValue: '8px',
+      $extensions: {
+        'studio.tokens': { id: 'keep-me', urn: 'urn:keep-me' },
+        'custom.extension': { keep: true },
+        'com.figma.scopes': ['WIDTH_HEIGHT'],
+      },
+    }]);
+  });
+
+  describe('renamed collections', () => {
+    const initRenamedStore = (tokens: AnyTokenList): Store => init<RootModel>({
+      redux: {
+        initialState: {
+          tokenState: {
+            tokens: { 'old/default': tokens },
+            importedTokens: { newTokens: [], updatedTokens: [] },
+            renamedCollections: [['old/default', 'core/default']],
+          },
+        },
+      },
+      models,
+    });
+
+    it('compares the tokens with the set before the rename', () => {
+      const store = initRenamedStore([
+        { name: 'spacing.sm', value: '8px', type: TokenTypes.DIMENSION },
+        { name: 'spacing.md', value: '16px', type: TokenTypes.DIMENSION },
+        { name: 'fontWeight.bold', value: 700, type: TokenTypes.FONT_WEIGHTS },
+      ]);
+
+      store.dispatch.tokenState.setTokensFromVariables({
+        dimensions: [
+          variable('spacing.sm', '12px'),
+          variable('spacing.md', '16px'),
+          variable('fontWeight.bold', '700px'),
+          variable('spacing.lg', '24px'),
+        ],
+      });
+
+      // Unchanged tokens stay listed as new, so Import all still applies the rename
+      expect(store.getState().tokenState.importedTokens).toEqual({
+        newTokens: [variable('spacing.md', '16px'), variable('fontWeight.bold', '700px'), variable('spacing.lg', '24px')],
+        updatedTokens: [{ ...variable('spacing.sm', '12px'), oldValue: '8px' }],
+      });
+    });
+
+    it('lists a changed font weight as a unitless fontWeights update', () => {
+      const store = initRenamedStore([{ name: 'fontWeight.bold', value: 700, type: TokenTypes.FONT_WEIGHTS }]);
+
+      store.dispatch.tokenState.setTokensFromVariables({ dimensions: [variable('fontWeight.bold', '600px')] });
+
+      expect(store.getState().tokenState.importedTokens.updatedTokens).toEqual([{
+        name: 'fontWeight.bold', value: 600, oldValue: 700, type: TokenTypes.FONT_WEIGHTS, parent: 'core/default',
+      }]);
+    });
+  });
+
+  it('skips updates for a set that no longer exists', () => {
+    const store = initStore([{ name: 'spacing.sm', value: '8px', type: TokenTypes.DIMENSION }]);
+
+    store.dispatch.tokenState.editMultipleTokens([{ ...variable('spacing.sm', '12px'), parent: 'removed/default' }]);
+
+    expect(store.getState().tokenState.tokens).toEqual({
+      'core/default': [{ name: 'spacing.sm', value: '8px', type: TokenTypes.DIMENSION }],
+    });
   });
 
   describe('Figma metadata', () => {

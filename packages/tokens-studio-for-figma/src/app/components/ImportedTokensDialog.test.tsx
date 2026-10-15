@@ -681,22 +681,36 @@ describe('ImportedTokensDialog', () => {
     });
   });
 
-  it('should apply value changes and create new tokens in a renamed collection when importing all', async () => {
-    // The set doesn't exist under its new name yet, so setTokensFromVariables classifies all of its tokens as new
-    const mockStore = createMockStore({
-      tokenState: {
-        activeTokenSet: 'Old/Default',
-        tokens: {
-          'Old/Default': [
-            { name: 'spacing.sm', type: 'dimension', value: '8' },
-            {
-              name: 'spacing.md', type: 'dimension', value: '16', $extensions: { 'custom.extension': { keep: true } },
-            },
-          ],
-        },
-        renamedCollections: [['Old/Default', 'New/Default']],
-        importedTokens: {
-          newTokens: [
+  describe('importing variables from a renamed collection', () => {
+    // Same order as pullVariables: the renames arrive before the variables.
+    const importAll = async (
+      tokens: Record<string, any[]>,
+      renames: [string, string][],
+      values: Record<string, any[]>,
+    ) => {
+      const mockStore = createMockStore({ tokenState: { activeTokenSet: Object.keys(tokens)[0], tokens } });
+      if (renames.length > 0) mockStore.dispatch.tokenState.setRenamedCollections(renames);
+      mockStore.dispatch.tokenState.setTokensFromVariables(values);
+      const result = render(
+        <Provider store={mockStore}>
+          <ImportedTokensDialog />
+        </Provider>,
+      );
+      await act(async () => {
+        (await result.findByText('importAll')).click();
+      });
+      await waitFor(() => {
+        expect(result.queryByText('importAll')).not.toBeInTheDocument();
+      });
+      return mockStore.getState().tokenState;
+    };
+
+    it('applies changed values and creates new tokens', async () => {
+      const state = await importAll(
+        { 'Old/Default': [{ name: 'spacing.sm', type: 'dimension', value: '8' }, { name: 'spacing.md', type: 'dimension', value: '16' }] },
+        [['Old/Default', 'New/Default']],
+        {
+          New: [
             {
               name: 'spacing.sm', type: 'dimension', value: '12', parent: 'New/Default',
             },
@@ -707,9 +721,139 @@ describe('ImportedTokensDialog', () => {
               name: 'spacing.lg', type: 'dimension', value: '24', parent: 'New/Default',
             },
           ],
-          updatedTokens: [],
+        },
+      );
+
+      expect(state.tokens).toEqual({
+        'New/Default': [
+          expect.objectContaining({ name: 'spacing.sm', value: '12' }),
+          expect.objectContaining({ name: 'spacing.md', value: '16' }),
+          expect.objectContaining({ name: 'spacing.lg', value: '24' }),
+        ],
+      });
+      expect(state.renamedCollections).toBeNull();
+    });
+
+    it('keeps the Studio id and custom metadata of a changed token', async () => {
+      const $extensions = { 'studio.tokens': { id: 'keep-me' }, 'custom.extension': { keep: true } };
+      const state = await importAll(
+        {
+          'Old/Default': [{
+            name: 'spacing.sm', type: 'dimension', value: '8', $extensions,
+          }],
+        },
+        [['Old/Default', 'New/Default']],
+        {
+          New: [{
+            name: 'spacing.sm', type: 'dimension', value: '12', parent: 'New/Default',
+          }],
+        },
+      );
+
+      expect(state.tokens['New/Default']).toEqual([{
+        name: 'spacing.sm', type: 'dimension', value: '12', $extensions,
+      }]);
+    });
+
+    it('keeps a font weight that did not change as a number', async () => {
+      const state = await importAll(
+        { 'Old/Default': [{ name: 'fontWeight.regular', type: 'fontWeights', value: 400 }] },
+        [['Old/Default', 'New/Default']],
+        // A float scoped to font weight only comes in as a string
+        {
+          New: [{
+            name: 'fontWeight.regular', type: 'fontWeights', value: '400', parent: 'New/Default',
+          }],
+        },
+      );
+
+      expect(state.tokens['New/Default']).toEqual([
+        expect.objectContaining({ name: 'fontWeight.regular', type: 'fontWeights', value: 400 }),
+      ]);
+    });
+
+    it('keeps a changed font weight that comes in as a px dimension a fontWeights token', async () => {
+      const state = await importAll(
+        { 'Old/Default': [{ name: 'fontWeight.regular', type: 'fontWeights', value: 400 }] },
+        [['Old/Default', 'New/Default']],
+        {
+          New: [{
+            name: 'fontWeight.regular', type: 'dimension', value: '700px', parent: 'New/Default',
+          }],
+        },
+      );
+
+      expect(state.tokens['New/Default']).toEqual([
+        expect.objectContaining({ name: 'fontWeight.regular', type: 'fontWeights', value: 700 }),
+      ]);
+    });
+
+    it('does not crash when a collection is renamed to the old name of another renamed collection', async () => {
+      // A was renamed to B while B was renamed to C
+      const state = await importAll(
+        { 'A/m': [{ name: 'x', type: 'number', value: 1 }], 'B/m': [{ name: 'y', type: 'number', value: 2 }] },
+        [['A/m', 'B/m'], ['B/m', 'C/m']],
+        {
+          A: [{
+            name: 'x', type: 'number', value: 5, parent: 'B/m',
+          }],
+          B: [{
+            name: 'y', type: 'number', value: 2, parent: 'C/m',
+          }],
+        },
+      );
+
+      expect(state.tokens).toEqual({
+        'B/m': [expect.objectContaining({ name: 'x', value: 5 })],
+        'C/m': [expect.objectContaining({ name: 'y', value: 2 })],
+      });
+    });
+
+    it('creates the set under the new name when a single changed token is updated before the rename is applied', async () => {
+      const mockStore = createMockStore({
+        tokenState: { activeTokenSet: 'Old/Default', tokens: { 'Old/Default': [{ name: 'spacing.sm', type: 'dimension', value: '8' }] } },
+      });
+      mockStore.dispatch.tokenState.setRenamedCollections([['Old/Default', 'New/Default']]);
+      mockStore.dispatch.tokenState.setTokensFromVariables({
+        New: [{
+          name: 'spacing.sm', type: 'dimension', value: '12', parent: 'New/Default',
+        }],
+      });
+      const result = render(
+        <Provider store={mockStore}>
+          <ImportedTokensDialog />
+        </Provider>,
+      );
+
+      await act(async () => {
+        (await result.findAllByTestId('imported-tokens-dialog-update-button'))[0].click();
+      });
+
+      await waitFor(() => {
+        expect(mockStore.getState().tokenState.tokens).toEqual({
+          'Old/Default': [{ name: 'spacing.sm', type: 'dimension', value: '8' }],
+          'New/Default': [expect.objectContaining({ name: 'spacing.sm', value: '12' })],
+        });
+      });
+    });
+  });
+
+  it('keeps the Studio id and custom metadata of a changed token when importing all', async () => {
+    const $extensions = { 'studio.tokens': { id: 'keep-me' }, 'custom.extension': { keep: true } };
+    const mockStore = createMockStore({
+      tokenState: {
+        activeTokenSet: 'Spacing/Default',
+        tokens: {
+          'Spacing/Default': [{
+            name: 'spacing.sm', type: 'dimension', value: '8', $extensions,
+          }],
         },
       },
+    });
+    mockStore.dispatch.tokenState.setTokensFromVariables({
+      Spacing: [{
+        name: 'spacing.sm', type: 'dimension', value: '12', parent: 'Spacing/Default',
+      }],
     });
     const result = render(
       <Provider store={mockStore}>
@@ -722,16 +866,9 @@ describe('ImportedTokensDialog', () => {
     });
 
     await waitFor(() => {
-      expect(mockStore.getState().tokenState.tokens).toEqual({
-        'New/Default': [
-          { name: 'spacing.sm', type: 'dimension', value: '12' },
-          {
-            name: 'spacing.md', type: 'dimension', value: '16', $extensions: { 'custom.extension': { keep: true }, 'studio.tokens': { id: 'mock-uuid' } },
-          },
-          { name: 'spacing.lg', type: 'dimension', value: '24' },
-        ],
-      });
+      expect(mockStore.getState().tokenState.tokens['Spacing/Default']).toEqual([{
+        name: 'spacing.sm', type: 'dimension', value: '12', $extensions,
+      }]);
     });
-    expect(mockStore.getState().tokenState.renamedCollections).toBeNull();
   });
 });
