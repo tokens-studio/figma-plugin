@@ -1,6 +1,23 @@
 import { sendSelectionChange } from './sendSelectionChange';
 import { notifyInstancesCreated } from './notifiers';
 
+// Whether any of the changed nodes is a selected node or sits inside one. Remote edits elsewhere in the
+// file don't change what the UI shows for the selection, and every selection update is costly for the
+// UI on large token sets, so those are skipped.
+function changesTouchSelection(changedNodeIds: string[]) {
+  const selectedIds = new Set(figma.currentPage.selection.map((node) => node.id));
+  if (!selectedIds.size) return false;
+  // A change event can list the same node several times
+  return [...new Set(changedNodeIds)].some((id) => {
+    let node: BaseNode | null = figma.getNodeById(id);
+    while (node) {
+      if (selectedIds.has(node.id)) return true;
+      node = node.parent;
+    }
+    return false;
+  });
+}
+
 export async function sendDocumentChange(event: DocumentChangeEvent) {
   // Check if event has documentChanges before processing
   if (!event.documentChanges) {
@@ -25,7 +42,7 @@ export async function sendDocumentChange(event: DocumentChangeEvent) {
       && (change.properties.includes('componentProperties') || change.properties.includes('variant')),
   );
 
-  if (selfChangedNodeIds.length > 0) {
+  if (selfChangedNodeIds.length > 0 && changesTouchSelection(selfChangedNodeIds)) {
     await sendSelectionChange();
   }
 

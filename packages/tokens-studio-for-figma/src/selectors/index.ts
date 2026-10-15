@@ -34,7 +34,6 @@ export * from './hideDeprecatedTokensSelector';
 export * from './updateModeSelector';
 export * from './displayTypeSelector';
 export * from './collapsedSelector';
-export * from './uiDisabledSelector';
 export * from './themeOptionsSelector';
 export * from './activeThemeSelector';
 export * from './themesListSelector';
