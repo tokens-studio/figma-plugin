@@ -16,7 +16,9 @@ import useTokens from '@/app/store/useTokens';
 import useConfirm from '@/app/hooks/useConfirm';
 import ExportSetsTab from './ExportSetsTab';
 import ExportThemesTab from './ExportThemesTab';
-import { allTokenSetsSelector, themesListSelector, tokensSelector } from '@/selectors';
+import {
+  allTokenSetsSelector, removeStylesAndVariablesWithoutConnectionSelector, themesListSelector, tokensSelector,
+} from '@/selectors';
 import { ExportTokenSet } from '@/types/ExportTokenSet';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { Dispatch } from '@/app/store';
@@ -59,6 +61,7 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
   } = useTokens();
   const { confirm } = useConfirm<string[]>();
   const allTokens = useSelector(tokensSelector);
+  const removeWithoutConnection = useSelector(removeStylesAndVariablesWithoutConnectionSelector);
 
   // Save selected themes when they change and update redux state
   React.useEffect(() => {
@@ -78,10 +81,28 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
   }, []);
 
   const handleExportToFigma = React.useCallback(async () => {
+    // theme id -> { token name -> variable key } for the references whose key matches
+    const collectReferences = (keys: Set<string>) => Object.fromEntries(themes
+      .map((theme) => [theme.id, Object.fromEntries(Object.entries(theme.$figmaVariableReferences ?? {})
+        .filter(([, key]) => keys.has(key)))] as const)
+      .filter(([, references]) => Object.keys(references).length > 0));
+
+    // With "remove without connection" on, a themes export already deletes variables in the
+    // exported collections that no token created. Only ask about variables that cleanup
+    // won't reach: ones also used by themes outside this export, or extended collections.
+    const removedByExport = (key: string) => removeWithoutConnection && activeTab === 'useThemes'
+      && themes
+        .filter((theme) => Object.values(theme.$figmaVariableReferences ?? {}).includes(key))
+        .every((theme) => selectedThemes.includes(theme.id) && !theme.$figmaIsExtension);
+
     // Figma variables can't store gradients, so a stale variable from an earlier
     // export keeps overriding the new gradient style on bound layers. Offer to
     // delete those before we push. Computed on click as it resolves every theme.
-    const staleGradientTokens = findGradientTokensWithStaleVariables(allTokens, themes);
+    const staleGradientTokens = findGradientTokensWithStaleVariables(allTokens, themes)
+      .map((token) => ({ ...token, variableKeys: token.variableKeys.filter((key) => !removedByExport(key)) }))
+      .filter(({ variableKeys }) => variableKeys.length > 0);
+
+    let referencesToRestore: Record<string, Record<string, string>> = {};
     if (staleGradientTokens.length > 0) {
       const gradientConfirm = await confirm({
         text: t('confirmDeleteGradientVariables.text', { defaultValue: 'Delete Figma variables for gradient tokens?' }),
@@ -102,18 +123,18 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
       const keysToDelete = new Set(staleGradientTokens
         .filter(({ name }) => selectedNames.has(name))
         .flatMap(({ variableKeys }) => variableKeys));
+      // Kept variables lose their references when the export rewrites them (gradients don't
+      // create variables), which would hide them from this prompt for good. Put them back after.
+      referencesToRestore = collectReferences(new Set(staleGradientTokens
+        .filter(({ name }) => !selectedNames.has(name))
+        .flatMap(({ variableKeys }) => variableKeys)));
       if (keysToDelete.size > 0) {
         await removeVariablesByKeys(Array.from(keysToDelete));
         // Drop the references too, otherwise themes that aren't part of this export
         // keep pointing at the deleted variable and the prompt shows up again.
-        themes.forEach((theme) => {
-          const staleNames = Object.entries(theme.$figmaVariableReferences ?? {})
-            .filter(([, key]) => keysToDelete.has(key))
-            .map(([name]) => name);
-          if (staleNames.length > 0) {
-            dispatch.tokenState.disconnectVariableFromTheme({ id: theme.id, key: staleNames });
-          }
-        });
+        const referencesToRemove = collectReferences(keysToDelete);
+        dispatch.tokenState.disconnectVariablesFromThemes(Object.fromEntries(Object.entries(referencesToRemove)
+          .map(([themeId, references]) => [themeId, Object.keys(references)])));
       }
     }
 
@@ -124,12 +145,15 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
     } else if (activeTab === 'useThemes') {
       await createVariablesFromThemes(selectedThemes);
       await createStylesFromSelectedThemes(selectedThemes);
+      if (Object.keys(referencesToRestore).length > 0) {
+        dispatch.tokenState.restoreVariableReferencesToThemes(referencesToRestore);
+      }
     }
   }, [
     setShowModal, activeTab, selectedThemes, selectedSets,
     createVariablesFromSets, createStylesFromSelectedTokenSets,
     createVariablesFromThemes, createStylesFromSelectedThemes,
-    allTokens, themes, confirm, removeVariablesByKeys, dispatch, t,
+    allTokens, themes, removeWithoutConnection, confirm, removeVariablesByKeys, dispatch, t,
   ]);
   const canExportToFigma = activeTab === 'useSets' ? selectedSets.length > 0 : selectedThemes.length > 0;
 
