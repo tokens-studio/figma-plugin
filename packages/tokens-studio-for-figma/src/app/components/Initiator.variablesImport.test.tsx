@@ -109,6 +109,19 @@ describe('Initiator variables import', () => {
     expect(result.queryByTestId('button-import-all')).not.toBeInTheDocument();
   });
 
+  it('asks which tokens to import again after switching from Tokens Studio sync to local storage', async () => {
+    const store = createStore(studioApi);
+    const result = renderWithStore(store);
+    act(() => {
+      store.dispatch.uiState.setStorage({ provider: StorageProviderType.LOCAL });
+    });
+
+    sendVariables();
+
+    expect(store.getState().tokenState.tokens['New/NEWONE']).toBeUndefined();
+    expect(await result.findByTestId('button-import-all')).toBeInTheDocument();
+  });
+
   it.each([
     ['GitHub', githubApi],
     ['a local document', localApi],
