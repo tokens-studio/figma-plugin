@@ -21,12 +21,14 @@ export async function tryApplyColorVariableId(target: BaseNode | PaintStyle, tok
   try {
     const defaultPaint: SolidPaint = { type: 'SOLID', color: { r: 0, g: 0, b: 0 } };
     if (type === 'fills' && 'fills' in target) {
+      if (target.boundVariables?.fills?.[0]?.id === variable.id) return true;
       const fillsCopy = clone(target.fills);
       fillsCopy[0] = figma.variables.setBoundVariableForPaint(fillsCopy[0] ?? defaultPaint, 'color', variable);
       target.fills = fillsCopy;
       return target.boundVariables?.fills?.[0]?.id === variable.id;
     }
     if (type === 'strokes' && 'strokes' in target) {
+      if (target.boundVariables?.strokes?.[0]?.id === variable.id) return true;
       const stokesCopy = clone(target.strokes);
       stokesCopy[0] = figma.variables.setBoundVariableForPaint(stokesCopy[0] ?? defaultPaint, 'color', variable);
       target.strokes = stokesCopy;
@@ -34,6 +36,7 @@ export async function tryApplyColorVariableId(target: BaseNode | PaintStyle, tok
     }
     // For styles we're looking for paints
     if (type === 'paints' && 'paints' in target) {
+      if (target.boundVariables?.paints?.[0]?.id === variable.id) return true;
       const fillsCopy = clone(target.paints);
       fillsCopy[0] = figma.variables.setBoundVariableForPaint(fillsCopy[0] ?? defaultPaint, 'color', variable);
       target.paints = fillsCopy;

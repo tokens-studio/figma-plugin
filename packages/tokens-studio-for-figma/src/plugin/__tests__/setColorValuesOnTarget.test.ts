@@ -6,81 +6,91 @@ import { mockImportVariableByKeyAsync, mockSetBoundVariableForPaint } from '../.
 describe('setColorValuesOnTarget', () => {
   beforeEach(() => {
     defaultTokenValueRetriever.initiate({
-      tokens: [{
-        name: 'red',
-        type: TokenTypes.COLOR,
-        value: '#ff0000',
-        rawValue: '#ff0000',
-        description: 'Red',
-      }, {
-        name: 'black',
-        type: TokenTypes.COLOR,
-        value: '#000000',
-        rawValue: '#000000',
-        description: 'Black',
-      }, {
-        name: 'gradient',
-        type: TokenTypes.COLOR,
-        value: 'linear-gradient(90deg, #000000 0%, #ffffff 100%)',
-        rawValue: 'linear-gradient(90deg, #000000 0%, #ffffff 100%)',
-      }, {
-        name: 'ref-red',
-        type: TokenTypes.COLOR,
-        value: '#ff0000',
-        rawValue: '{red}',
-        description: 'Referenced Red',
-      }, {
-        name: 'gradient1',
-        type: TokenTypes.COLOR,
-        value: 'linear-gradient(90deg, #ff0000 0%, #000000 100%)',
-        rawValue: 'linear-gradient(90deg, {red} 0%, {black} 100%)',
-      }, {
-        name: 'border',
-        type: TokenTypes.BORDER,
-        value: {
-          color: '#ff0000',
-          width: '12px',
-          style: 'solid',
+      tokens: [
+        {
+          name: 'red',
+          type: TokenTypes.COLOR,
+          value: '#ff0000',
+          rawValue: '#ff0000',
+          description: 'Red',
         },
-        rawValue: '#ff0000' as any, // FIXME: Figure out why this is a string in the plugin, are the types incorrect, or should this be resolved as an object instead?
-        description: 'Border',
-      }, {
-        // gradient token with a properly structured rawValue but a server-resolved
-        // value that is a non-standard object notation string (not a CSS gradient).
-        // Reproduces the bug: token.value = "{angle: 180, kind: linear, ...}".
-        name: 'gradient-token-server-string',
-        type: TokenTypes.GRADIENT,
-        value: '{angle: 180, kind: linear, stops: [{color: #000000, position: 0},{color: #ffffff, position: 1}]}' as any,
-        rawValue: {
-          kind: 'linear',
-          angle: 180,
-          stops: [
-            { color: '#000000', position: 0 },
-            { color: '#ffffff', position: 1 },
-          ],
-        } as any,
-      }, {
-        // gradient token where both value and rawValue are the structured object
-        // (no server resolution applied).
-        name: 'gradient-token-structured',
-        type: TokenTypes.GRADIENT,
-        value: {
-          kind: 'linear',
-          angle: 90,
-          stops: [
-            { color: '#ff0000', position: 0 },
-            { color: '#0000ff', position: 1 },
-          ],
-        } as any,
-        rawValue: {
-          kind: 'linear',
-          angle: 90,
-          stops: [
-            { color: '#ff0000', position: 0 },
-            { color: '#0000ff', position: 1 },
-          ],
-        } as any,
-      }],
+        {
+          name: 'black',
+          type: TokenTypes.COLOR,
+          value: '#000000',
+          rawValue: '#000000',
+          description: 'Black',
+        },
+        {
+          name: 'gradient',
+          type: TokenTypes.COLOR,
+          value: 'linear-gradient(90deg, #000000 0%, #ffffff 100%)',
+          rawValue: 'linear-gradient(90deg, #000000 0%, #ffffff 100%)',
+        },
+        {
+          name: 'ref-red',
+          type: TokenTypes.COLOR,
+          value: '#ff0000',
+          rawValue: '{red}',
+          description: 'Referenced Red',
+        },
+        {
+          name: 'gradient1',
+          type: TokenTypes.COLOR,
+          value: 'linear-gradient(90deg, #ff0000 0%, #000000 100%)',
+          rawValue: 'linear-gradient(90deg, {red} 0%, {black} 100%)',
+        },
+        {
+          name: 'border',
+          type: TokenTypes.BORDER,
+          value: {
+            color: '#ff0000',
+            width: '12px',
+            style: 'solid',
+          },
+          rawValue: '#ff0000' as any, // FIXME: Figure out why this is a string in the plugin, are the types incorrect, or should this be resolved as an object instead?
+          description: 'Border',
+        },
+        {
+          // gradient token with a properly structured rawValue but a server-resolved
+          // value that is a non-standard object notation string (not a CSS gradient).
+          // Reproduces the bug: token.value = "{angle: 180, kind: linear, ...}".
+          name: 'gradient-token-server-string',
+          type: TokenTypes.GRADIENT,
+          value:
+            '{angle: 180, kind: linear, stops: [{color: #000000, position: 0},{color: #ffffff, position: 1}]}' as any,
+          rawValue: {
+            kind: 'linear',
+            angle: 180,
+            stops: [
+              { color: '#000000', position: 0 },
+              { color: '#ffffff', position: 1 },
+            ],
+          } as any,
+        },
+        {
+          // gradient token where both value and rawValue are the structured object
+          // (no server resolution applied).
+          name: 'gradient-token-structured',
+          type: TokenTypes.GRADIENT,
+          value: {
+            kind: 'linear',
+            angle: 90,
+            stops: [
+              { color: '#ff0000', position: 0 },
+              { color: '#0000ff', position: 1 },
+            ],
+          } as any,
+          rawValue: {
+            kind: 'linear',
+            angle: 90,
+            stops: [
+              { color: '#ff0000', position: 0 },
+              { color: '#0000ff', position: 1 },
+            ],
+          } as any,
+        },
+      ],
       variableReferences: new Map([['red', '123']]),
       createStylesWithVariableReferences: true,
     });
@@ -97,11 +107,13 @@ describe('setColorValuesOnTarget', () => {
 
     expect(mockStyle.description).toEqual('Red');
 
-    expect(mockStyle.paints).toEqual([{
-      type: 'SOLID',
-      opacity: 1,
-      color: { r: 1, g: 0, b: 0 },
-    }]);
+    expect(mockStyle.paints).toEqual([
+      {
+        type: 'SOLID',
+        opacity: 1,
+        color: { r: 1, g: 0, b: 0 },
+      },
+    ]);
   });
 
   it('should be able to update the fills on a node', async () => {
@@ -112,11 +124,60 @@ describe('setColorValuesOnTarget', () => {
 
     await setColorValuesOnTarget({ target: mockNode, token: 'red', key: 'fills' });
 
-    expect(mockNode.fills).toEqual([{
+    expect(mockNode.fills).toEqual([
+      {
+        type: 'SOLID',
+        opacity: 1,
+        color: { r: 1, g: 0, b: 0 },
+      },
+    ]);
+  });
+
+  it('does not reassign an unchanged unbound fill', async () => {
+    const paint: SolidPaint = { type: 'SOLID', color: { r: 1, g: 0, b: 0 }, opacity: 1 };
+    const setFills = jest.fn();
+    const node = {
+      get fills() {
+        return [paint];
+      },
+      set fills(value: readonly Paint[]) {
+        setFills(value);
+      },
+    } as unknown as RectangleNode;
+
+    await setColorValuesOnTarget({ target: node, token: 'red', key: 'fills' });
+
+    expect(setFills).not.toHaveBeenCalled();
+    expect(mockSetBoundVariableForPaint).not.toHaveBeenCalled();
+  });
+
+  it('still removes a bound color even when its current value matches', async () => {
+    const paint: SolidPaint = {
       type: 'SOLID',
-      opacity: 1,
       color: { r: 1, g: 0, b: 0 },
-    }]);
+      opacity: 1,
+      boundVariables: { color: { type: 'VARIABLE_ALIAS', id: 'VariableID:1' } },
+    };
+    mockSetBoundVariableForPaint.mockImplementationOnce((currentPaint) => ({
+      ...currentPaint,
+      boundVariables: undefined,
+    }));
+    const node = { fills: [paint] } as unknown as RectangleNode;
+
+    await setColorValuesOnTarget({ target: node, token: 'red', key: 'fills' });
+
+    expect(mockSetBoundVariableForPaint).toHaveBeenCalledWith(expect.anything(), 'color', null);
+    expect(node.fills[0].boundVariables).toBeUndefined();
+  });
+
+  it('updates a changed unbound fill without an unnecessary unbind', async () => {
+    const paint: SolidPaint = { type: 'SOLID', color: { r: 0, g: 0, b: 0 }, opacity: 1 };
+    const node = { fills: [paint] } as unknown as RectangleNode;
+
+    await setColorValuesOnTarget({ target: node, token: 'red', key: 'fills' });
+
+    expect((node.fills[0] as SolidPaint).color).toEqual({ r: 1, g: 0, b: 0 });
+    expect(mockSetBoundVariableForPaint).not.toHaveBeenCalled();
   });
 
   it('should be able to update the strokes on a node', async () => {
@@ -127,11 +188,13 @@ describe('setColorValuesOnTarget', () => {
 
     await setColorValuesOnTarget({ target: mockNode, token: 'red', key: 'strokes' });
 
-    expect(mockNode.strokes).toEqual([{
-      type: 'SOLID',
-      opacity: 1,
-      color: { r: 1, g: 0, b: 0 },
-    }]);
+    expect(mockNode.strokes).toEqual([
+      {
+        type: 'SOLID',
+        opacity: 1,
+        color: { r: 1, g: 0, b: 0 },
+      },
+    ]);
   });
 
   it('should be able to update the strokes on a node from a border style', async () => {
@@ -142,11 +205,13 @@ describe('setColorValuesOnTarget', () => {
 
     await setColorValuesOnTarget({ target: mockNode, token: 'border', key: 'strokes' });
 
-    expect(mockNode.strokes).toEqual([{
-      type: 'SOLID',
-      opacity: 1,
-      color: { r: 1, g: 0, b: 0 },
-    }]);
+    expect(mockNode.strokes).toEqual([
+      {
+        type: 'SOLID',
+        opacity: 1,
+        color: { r: 1, g: 0, b: 0 },
+      },
+    ]);
   });
 
   it('should be able to handle a linear gradient', async () => {
@@ -189,12 +254,19 @@ describe('setColorValuesOnTarget', () => {
     await setColorValuesOnTarget({ target: mockStyle, token: 'ref-red', key: 'paints' });
 
     // Assert that fills have been updated to the referenced token's color
-    expect(mockSetBoundVariableForPaint).toHaveBeenCalledWith({
-      color: { r: 0, g: 0, b: 0 },
-      type: 'SOLID',
-    }, 'color', {
-      id: 'VariableID:3456', key: '34567', name: 'fg/subtle', variableCollectionId: 'VariableCollectionId:23:23456',
-    });
+    expect(mockSetBoundVariableForPaint).toHaveBeenCalledWith(
+      {
+        color: { r: 0, g: 0, b: 0 },
+        type: 'SOLID',
+      },
+      'color',
+      {
+        id: 'VariableID:3456',
+        key: '34567',
+        name: 'fg/subtle',
+        variableCollectionId: 'VariableCollectionId:23:23456',
+      },
+    );
   });
 
   // Test a linear gradient token with references
@@ -205,29 +277,35 @@ describe('setColorValuesOnTarget', () => {
 
     await setColorValuesOnTarget({ target: mockStyle, token: 'gradient1', key: 'paints' });
 
-    expect(mockStyle.paints).toEqual([{
-      type: 'GRADIENT_LINEAR',
-      gradientStops: [
-        {
-          color: {
-            r: 1,
-            g: 0,
-            b: 0,
-            a: 1,
+    expect(mockStyle.paints).toEqual([
+      {
+        type: 'GRADIENT_LINEAR',
+        gradientStops: [
+          {
+            color: {
+              r: 1,
+              g: 0,
+              b: 0,
+              a: 1,
+            },
+            position: 0,
           },
-          position: 0,
-        }, {
-          color: {
-            r: 0,
-            g: 0,
-            b: 0,
-            a: 1,
+          {
+            color: {
+              r: 0,
+              g: 0,
+              b: 0,
+              a: 1,
+            },
+            position: 1,
           },
-          position: 1,
-        },
-      ],
-      gradientTransform: [[1, 0, 0], [0, 1, 0]],
-    }]);
+        ],
+        gradientTransform: [
+          [1, 0, 0],
+          [0, 1, 0],
+        ],
+      },
+    ]);
   });
 
   // Test when token reference is not found
@@ -240,16 +318,21 @@ describe('setColorValuesOnTarget', () => {
     mockImportVariableByKeyAsync.mockImplementationOnce(() => null);
 
     await setColorValuesOnTarget({
-      target: mockStyle, token: 'ref-red', key: 'paints', givenValue: '#ff0000',
+      target: mockStyle,
+      token: 'ref-red',
+      key: 'paints',
+      givenValue: '#ff0000',
     });
 
     // Assert that fills have been updated to the hex value of the token
     expect(mockSetBoundVariableForPaint).not.toHaveBeenCalledWith();
-    expect(mockStyle.paints).toEqual([{
-      type: 'SOLID',
-      opacity: 1,
-      color: { r: 1, g: 0, b: 0 },
-    }]);
+    expect(mockStyle.paints).toEqual([
+      {
+        type: 'SOLID',
+        opacity: 1,
+        color: { r: 1, g: 0, b: 0 },
+      },
+    ]);
   });
 
   // Regression test: server-resolved token.value may be a non-standard object
@@ -266,10 +349,16 @@ describe('setColorValuesOnTarget', () => {
     expect(mockStyle.paints[0].type).toBe('GRADIENT_LINEAR');
     expect((mockStyle.paints[0] as GradientPaint).gradientStops).toHaveLength(2);
     expect((mockStyle.paints[0] as GradientPaint).gradientStops[0].color).toEqual({
-      r: 0, g: 0, b: 0, a: 1,
+      r: 0,
+      g: 0,
+      b: 0,
+      a: 1,
     });
     expect((mockStyle.paints[0] as GradientPaint).gradientStops[1].color).toEqual({
-      r: 1, g: 1, b: 1, a: 1,
+      r: 1,
+      g: 1,
+      b: 1,
+      a: 1,
     });
   });
 
@@ -284,10 +373,16 @@ describe('setColorValuesOnTarget', () => {
     expect(mockStyle.paints[0].type).toBe('GRADIENT_LINEAR');
     expect((mockStyle.paints[0] as GradientPaint).gradientStops).toHaveLength(2);
     expect((mockStyle.paints[0] as GradientPaint).gradientStops[0].color).toEqual({
-      r: 1, g: 0, b: 0, a: 1,
+      r: 1,
+      g: 0,
+      b: 0,
+      a: 1,
     });
     expect((mockStyle.paints[0] as GradientPaint).gradientStops[1].color).toEqual({
-      r: 0, g: 0, b: 1, a: 1,
+      r: 0,
+      g: 0,
+      b: 1,
+      a: 1,
     });
   });
 
@@ -301,14 +396,19 @@ describe('setColorValuesOnTarget', () => {
     const givenValue = '#00ff00'; // Mock a givenValue
 
     await setColorValuesOnTarget({
-      target: mockStyle, token, key, givenValue,
+      target: mockStyle,
+      token,
+      key,
+      givenValue,
     });
 
     expect(mockSetBoundVariableForPaint).not.toHaveBeenCalledWith();
-    expect(mockStyle.paints).toEqual([{
-      type: 'SOLID',
-      opacity: 1,
-      color: { r: 0, g: 1, b: 0 },
-    }]);
+    expect(mockStyle.paints).toEqual([
+      {
+        type: 'SOLID',
+        opacity: 1,
+        color: { r: 0, g: 1, b: 0 },
+      },
+    ]);
   });
 });
