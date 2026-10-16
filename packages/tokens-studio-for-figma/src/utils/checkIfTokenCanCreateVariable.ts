@@ -13,17 +13,18 @@ export default function checkIfTokenCanCreateVariable(token: ResolveTokenValuesR
     || (token.type === TokenTypes.FONT_WEIGHTS && Boolean(parseFloat(token.value)) && settings.variablesNumber)
     || (token.type === TokenTypes.FONT_WEIGHTS && !parseFloat(token.value) && settings.variablesString)
   ) {
-  // Ignore multi value spacing and multi value borderRadius tokens
+    // Ignore AUTO values (e.g. on lineHeight or spacing): number variables cannot represent AUTO,
+    // so creating one would leave a variable with Figma's default value of 0
+    if (ExportNumberVariablesTokenTypes.includes(token.type) && typeof token.value === 'string' && token.value.trim().toUpperCase() === 'AUTO') {
+      return false;
+    }
+    // Ignore multi value spacing and multi value borderRadius tokens
     if ((token.type === TokenTypes.BORDER_RADIUS || token.type === TokenTypes.SPACING) && typeof token.value === 'string') {
       return token.value.split(' ').length === 1;
     }
     // Ignore gradient colors (all types: linear, radial, conic)
     if (token.type === TokenTypes.COLOR && typeof token.value === 'string'
         && (token.value.startsWith('linear-gradient') || token.value.startsWith('radial-gradient') || token.value.startsWith('conic-gradient'))) {
-      return false;
-    }
-    // Ignore AUTO values on lineHeight
-    if (token.type === TokenTypes.LINE_HEIGHTS && typeof token.value === 'string' && token.value === 'AUTO') {
       return false;
     }
     // Ignore percentage values, except on text type tokens and opacity tokens
