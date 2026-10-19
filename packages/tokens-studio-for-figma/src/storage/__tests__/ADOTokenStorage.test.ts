@@ -3,6 +3,7 @@ import { mockFetch } from '../../../tests/__mocks__/fetchMock';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { ErrorMessages } from '@/constants/ErrorMessages';
+import { MAX_CONCURRENT_FILE_REQUESTS } from '../GitTokenStorage';
 
 describe('ADOTokenStorage', () => {
   const baseUrl = 'https://brandcode.azure.com';
@@ -622,5 +623,35 @@ describe('ADOTokenStorage', () => {
         }),
       },
     );
+  });
+
+  it('never has more than MAX_CONCURRENT_FILE_REQUESTS file downloads in flight when reading a large multi file repository', async () => {
+    const filePaths = Array.from({ length: 60 }, (_, i) => `multifile/set-${String(i).padStart(2, '0')}.json`);
+    let inFlight = 0;
+    let maxInFlight = 0;
+    const fetchGitSpy = jest.spyOn(storageProvider, 'fetchGit').mockImplementation(async ({ params }) => {
+      if (params?.scopePath !== undefined) {
+        return {
+          ok: true,
+          json: () => Promise.resolve({ count: filePaths.length, value: filePaths.map((path) => ({ path })) }),
+        } as unknown as Response;
+      }
+      inFlight += 1;
+      maxInFlight = Math.max(maxInFlight, inFlight);
+      await new Promise((resolve) => { setTimeout(resolve, 1); });
+      inFlight -= 1;
+      return {
+        ok: true,
+        json: () => Promise.resolve({ red: { type: TokenTypes.COLOR, value: '#ff0000' } }),
+      } as unknown as Response;
+    });
+
+    storageProvider.enableMultiFile();
+    storageProvider.changePath('multifile');
+    const result = await storageProvider.read();
+    fetchGitSpy.mockRestore();
+
+    expect(result).toHaveLength(filePaths.length);
+    expect(maxInFlight).toBe(MAX_CONCURRENT_FILE_REQUESTS);
   });
 });

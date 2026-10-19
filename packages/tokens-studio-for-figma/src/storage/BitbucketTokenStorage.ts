@@ -5,12 +5,15 @@ import {
   RemoteTokenStorageMetadata,
   RemoteTokenstorageErrorMessage,
 } from './RemoteTokenStorage';
-import { GitMultiFileObject, GitSingleFileObject, GitTokenStorage } from './GitTokenStorage';
+import {
+  GitMultiFileObject, GitSingleFileObject, GitTokenStorage, MAX_CONCURRENT_FILE_REQUESTS,
+} from './GitTokenStorage';
 import { AnyTokenSet } from '@/types/tokens';
 import { ThemeObjectsList } from '@/types';
 import { SystemFilenames } from '@/constants/SystemFilenames';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { retryHttpRequest } from '@/utils/retryWithBackoff';
+import { mapWithConcurrency } from '@/utils/mapWithConcurrency';
 import { isMissingFileError } from './utils/handleMissingFileError';
 
 type CreatedOrUpdatedFileType = {
@@ -344,8 +347,11 @@ export class BitbucketTokenStorage extends GitTokenStorage {
         const jsonFiles = await this.fetchJsonFilesFromDirectory(url);
 
         const authString = `${this.username || this.owner}:${this.apiToken}`;
-        const jsonFileContents = await Promise.allSettled(
-          jsonFiles.map((file: any) => {
+        // Settle each file on its own so one unreadable file doesn't fail the whole read
+        const jsonFileContents = await mapWithConcurrency<any, PromiseSettledResult<string>>(
+          jsonFiles as any[],
+          MAX_CONCURRENT_FILE_REQUESTS,
+          (file: any) => {
             const fileUrl = `https://api.bitbucket.org/2.0/repositories/${this.owner}/${this.repository}/src/${branchRef}/${file.path}`;
             return retryHttpRequest<Response>(
               () => fetch(fileUrl, {
@@ -359,8 +365,11 @@ export class BitbucketTokenStorage extends GitTokenStorage {
                 throw new Error(`Failed to read file ${file.path}: ${rsp.status} ${rsp.statusText}`);
               }
               return rsp.text();
-            });
-          }),
+            }).then(
+              (value): PromiseSettledResult<string> => ({ status: 'fulfilled', value }),
+              (reason): PromiseSettledResult<string> => ({ status: 'rejected', reason }),
+            );
+          },
         );
         return jsonFileContents.map((result, index) => {
           const { path } = jsonFiles[index];

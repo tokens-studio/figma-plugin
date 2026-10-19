@@ -1,6 +1,7 @@
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { getTreeMode, GithubTokenStorage } from '../GithubTokenStorage';
+import { MAX_CONCURRENT_FILE_REQUESTS } from '../GitTokenStorage';
 import {
   mockCreateOrUpdateFiles,
   mockCreateRef,
@@ -595,6 +596,72 @@ describe('GithubTokenStorage', () => {
     ]);
 
     mockGetContent.mockClear();
+  });
+
+  describe('reading a large multi file repository', () => {
+    const fileCount = 60;
+    const filePaths = Array.from({ length: fileCount }, (_, i) => `data/set-${String(i).padStart(2, '0')}.json`);
+
+    const mockDirectory = (getFile: (path: string) => Promise<unknown>) => {
+      mockGetContent.mockImplementation((opts: { path: string }) => {
+        if (opts.path === '') {
+          return Promise.resolve({ data: [{ path: 'data', sha: 'sha(data)', type: 'dir' }] });
+        }
+        if (opts.path === 'data') {
+          return Promise.resolve({
+            data: filePaths.map((path) => ({ path, sha: `sha(${path})`, type: 'file' })),
+          });
+        }
+        return getFile(opts.path);
+      });
+      mockGetTree.mockImplementationOnce(() => Promise.resolve({
+        data: {
+          sha: 'sha(data)',
+          tree: filePaths.map((path) => ({ path, type: 'blob', sha: `sha(${path})` })),
+        },
+      }));
+      storageProvider.enableMultiFile();
+      storageProvider.changePath('data');
+    };
+
+    const fileBody = (path: string) => JSON.stringify({ [path]: { type: 'color', value: '#ff0000' } });
+
+    it('never has more than MAX_CONCURRENT_FILE_REQUESTS file downloads in flight', async () => {
+      let inFlight = 0;
+      let maxInFlight = 0;
+      mockDirectory(async (path) => {
+        inFlight += 1;
+        maxInFlight = Math.max(maxInFlight, inFlight);
+        await new Promise((resolve) => { setTimeout(resolve, 1); });
+        inFlight -= 1;
+        return { data: fileBody(path) };
+      });
+
+      const result = await storageProvider.read();
+
+      expect(Array.isArray(result)).toBe(true);
+      expect(result).toHaveLength(fileCount);
+      expect(maxInFlight).toBe(MAX_CONCURRENT_FILE_REQUESTS);
+    });
+
+    it('retries a file download that fails at the network level instead of failing the whole read', async () => {
+      const attempts: Record<string, number> = {};
+      jest.spyOn(console, 'log').mockImplementation(() => {});
+      mockDirectory(async (path) => {
+        attempts[path] = (attempts[path] ?? 0) + 1;
+        if (path === filePaths[7] && attempts[path] === 1) {
+          // What octokit throws when the browser reports net::ERR_FAILED
+          throw Object.assign(new Error('Failed to fetch'), { name: 'HttpError', status: 500 });
+        }
+        return { data: fileBody(path) };
+      });
+
+      const result = await storageProvider.read();
+
+      expect(result).toHaveLength(fileCount);
+      expect(attempts[filePaths[7]]).toBe(2);
+      (console.log as jest.Mock).mockRestore();
+    });
   });
 
   it('should return an error message when reading results in an error', async () => {

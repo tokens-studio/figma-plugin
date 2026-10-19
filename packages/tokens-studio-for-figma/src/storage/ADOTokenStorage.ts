@@ -2,7 +2,7 @@ import * as GitInterfaces from 'azure-devops-node-api/interfaces/GitInterfaces';
 import compact from 'just-compact';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeCredentials } from '@/types/StorageType';
-import { GitTokenStorage } from './GitTokenStorage';
+import { GitTokenStorage, MAX_CONCURRENT_FILE_REQUESTS } from './GitTokenStorage';
 import {
   RemoteTokenstorageErrorMessage,
   RemoteTokenStorageFile, RemoteTokenStorageMetadataFile, RemoteTokenStorageSingleTokenSetFile, RemoteTokenStorageThemesFile,
@@ -12,6 +12,7 @@ import { SystemFilenames } from '@/constants/SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { AnyTokenSet } from '@/types/tokens';
 import { retryHttpRequest } from '@/utils/retryWithBackoff';
+import { mapWithConcurrency } from '@/utils/mapWithConcurrency';
 import { isMissingFileError } from './utils/handleMissingFileError';
 
 const apiVersion = 'api-version=7.0';
@@ -295,16 +296,14 @@ export class ADOTokenStorage extends GitTokenStorage {
 
         if (!jsonFiles.length) return [];
 
-        const jsonFileContents = await Promise.all(
-          jsonFiles.map(async ({ path }) => {
-            const res = await this.getItem(path);
-            const validationResult = await multiFileSchema.safeParseAsync(res);
-            if (validationResult.success) {
-              return validationResult.data;
-            }
-            return null;
-          }),
-        );
+        const jsonFileContents = await mapWithConcurrency(jsonFiles, MAX_CONCURRENT_FILE_REQUESTS, async ({ path }) => {
+          const res = await this.getItem(path);
+          const validationResult = await multiFileSchema.safeParseAsync(res);
+          if (validationResult.success) {
+            return validationResult.data;
+          }
+          return null;
+        });
         return compact(jsonFileContents.map<RemoteTokenStorageFile | null>((fileContent, index) => {
           const { path } = jsonFiles[index];
           if (fileContent) {

@@ -7,13 +7,14 @@ import IsJSONString from '@/utils/isJSONString';
 import { AnyTokenSet } from '@/types/tokens';
 import { ThemeObjectsList } from '@/types';
 import {
-  GitMultiFileObject, GitSingleFileObject, GitTokenStorage, GitStorageSaveOption, GitStorageSaveOptions,
+  GitMultiFileObject, GitSingleFileObject, GitTokenStorage, GitStorageSaveOption, GitStorageSaveOptions, MAX_CONCURRENT_FILE_REQUESTS,
 } from './GitTokenStorage';
 import { SystemFilenames } from '@/constants/SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { GitSyncOptimizer, ChangedState } from './GitSyncOptimizer';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { retryWithBackoff } from '@/utils/retryWithBackoff';
+import { mapWithConcurrency } from '@/utils/mapWithConcurrency';
 import { isMissingFileError } from './utils/handleMissingFileError';
 
 type ExtendedOctokitClient = Omit<Octokit, 'repos'> & {
@@ -221,7 +222,7 @@ export class GithubTokenStorage extends GitTokenStorage {
           )).sort((a, b) => (
             (a.path && b.path) ? a.path.localeCompare(b.path) : 0
           ));
-          const jsonFileContents = await Promise.all(jsonFiles.map((treeItem) => {
+          const jsonFileContents = await mapWithConcurrency(jsonFiles, MAX_CONCURRENT_FILE_REQUESTS, (treeItem) => {
             if (!treeItem.path) return Promise.resolve(null);
 
             const itemPath = treeItem.path;
@@ -239,10 +240,10 @@ export class GithubTokenStorage extends GitTokenStorage {
               }),
               {
                 maxRetries: 3,
-                initialDelayMs: 100,
+                initialDelayMs: 500,
               },
             );
-          }));
+          });
           return compact(jsonFileContents.map<RemoteTokenStorageFile | null>((fileContent, index) => {
             const { path } = jsonFiles[index];
             if (
