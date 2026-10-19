@@ -14,6 +14,7 @@ import { ErrorMessages } from '@/constants/ErrorMessages';
 import { GitSyncOptimizer, ChangedState } from './GitSyncOptimizer';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { retryWithBackoff } from '@/utils/retryWithBackoff';
+import { mapWithConcurrency } from '@/utils/mapWithConcurrency';
 import { isMissingFileError } from './utils/handleMissingFileError';
 
 type ExtendedOctokitClient = Omit<Octokit, 'repos'> & {
@@ -32,6 +33,18 @@ type ExtendedOctokitClient = Omit<Octokit, 'repos'> & {
     }) => ReturnType<Octokit['repos']['createOrUpdateFileContents']>
   }
 };
+
+// GitHub rejects bursts of concurrent requests and corporate proxies tend to drop them,
+// so large multi-file repos must not fetch every file at once
+export const MAX_CONCURRENT_FILE_REQUESTS = 10;
+
+// Multi-file reads fetch file contents through GraphQL in batches, turning ~1,000 REST calls into ~11.
+// Token files are small, so 100 per query stays well inside GitHub's query timeout and response limits.
+export const GRAPHQL_FILES_PER_QUERY = 100;
+export const MAX_CONCURRENT_GRAPHQL_QUERIES = 3;
+
+type GraphqlBlob = { text: string | null; isTruncated: boolean; isBinary: boolean | null } | null;
+type GraphqlFilesResponse = { repository: Record<string, GraphqlBlob> | null };
 
 export function getTreeMode(type: 'dir' | 'file' | string) {
   switch (type) {
@@ -178,6 +191,95 @@ export class GithubTokenStorage extends GitTokenStorage {
     }
   }
 
+  /**
+   * Fetches the raw contents of many files on the current branch, in the same order as `paths`.
+   * Files are fetched through GraphQL in batches; any file GraphQL can't return (truncated, binary,
+   * missing, or the whole query failed) falls back to one REST call per file.
+   */
+  private async fetchFileContents(paths: string[]): Promise<(string | null)[]> {
+    const contents = new Map<string, string>();
+    let graphqlAvailable = true;
+
+    const batches: string[][] = [];
+    for (let i = 0; i < paths.length; i += GRAPHQL_FILES_PER_QUERY) {
+      batches.push(paths.slice(i, i + GRAPHQL_FILES_PER_QUERY));
+    }
+
+    await mapWithConcurrency(batches, MAX_CONCURRENT_GRAPHQL_QUERIES, async (batch) => {
+      if (!graphqlAvailable) return;
+      try {
+        const files = await this.fetchFileContentsViaGraphql(batch);
+        files.forEach((text, path) => contents.set(path, text));
+      } catch (e) {
+        // e.g. GraphQL disabled on an older GitHub Enterprise Server, or a token GraphQL rejects
+        console.warn('GitHub GraphQL read failed, falling back to REST for the remaining files', e);
+        graphqlAvailable = false;
+      }
+    });
+
+    const missing = paths.filter((path) => !contents.has(path));
+    await mapWithConcurrency(missing, MAX_CONCURRENT_FILE_REQUESTS, async (path) => {
+      const response = await retryWithBackoff(
+        () => this.octokitClient.rest.repos.getContent({
+          owner: this.owner,
+          repo: this.repository,
+          path,
+          ref: this.branch,
+          headers: {
+            ...octokitClientDefaultHeaders,
+            // Setting this makes github return the raw file instead of a json object.
+            Accept: 'application/vnd.github.raw',
+          },
+        }),
+        {
+          maxRetries: 3,
+          initialDelayMs: 500,
+        },
+      );
+      if (typeof response?.data === 'string') {
+        contents.set(path, response.data);
+      }
+    });
+
+    return paths.map((path) => contents.get(path) ?? null);
+  }
+
+  private async fetchFileContentsViaGraphql(paths: string[]): Promise<Map<string, string>> {
+    // Branch and paths go in as variables so names with quotes or other special characters are safe
+    const variables: Record<string, string> = { owner: this.owner, name: this.repository };
+    const declarations = ['$owner: String!', '$name: String!'];
+    const fields = paths.map((path, index) => {
+      variables[`e${index}`] = `${this.branch}:${path}`;
+      declarations.push(`$e${index}: String!`);
+      return `f${index}: object(expression: $e${index}) { ... on Blob { text isTruncated isBinary } }`;
+    });
+    const query = `query (${declarations.join(', ')}) { repository(owner: $owner, name: $name) { ${fields.join(' ')} } }`;
+
+    let response: GraphqlFilesResponse | undefined;
+    try {
+      response = await retryWithBackoff(
+        () => this.octokitClient.graphql<GraphqlFilesResponse>(query, variables),
+        {
+          maxRetries: 3,
+          initialDelayMs: 500,
+        },
+      );
+    } catch (e: any) {
+      // Octokit throws when any field has an error, but still hands us the fields that resolved
+      if (e?.name !== 'GraphqlResponseError' || !e.data?.repository) throw e;
+      response = e.data as GraphqlFilesResponse;
+    }
+
+    const files = new Map<string, string>();
+    paths.forEach((path, index) => {
+      const blob = response?.repository?.[`f${index}`];
+      if (blob && typeof blob.text === 'string' && !blob.isTruncated && !blob.isBinary) {
+        files.set(path, blob.text);
+      }
+    });
+    return files;
+  }
+
   public async read(): Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage> {
     try {
       const normalizedPath = compact(this.path.split('/')).join('/');
@@ -221,40 +323,18 @@ export class GithubTokenStorage extends GitTokenStorage {
           )).sort((a, b) => (
             (a.path && b.path) ? a.path.localeCompare(b.path) : 0
           ));
-          const jsonFileContents = await Promise.all(jsonFiles.map((treeItem) => {
-            if (!treeItem.path) return Promise.resolve(null);
-
-            const itemPath = treeItem.path;
-            return retryWithBackoff(
-              () => this.octokitClient.rest.repos.getContent({
-                owner: this.owner,
-                repo: this.repository,
-                path: itemPath.startsWith(normalizedPath) ? itemPath : `${normalizedPath}/${itemPath}`,
-                ref: this.branch,
-                headers: {
-                  ...octokitClientDefaultHeaders,
-                  // Setting this makes github return the raw file instead of a json object.
-                  Accept: 'application/vnd.github.raw',
-                },
-              }),
-              {
-                maxRetries: 3,
-                initialDelayMs: 100,
-              },
-            );
-          }));
+          const filePaths = jsonFiles.map((treeItem) => (
+            treeItem.path?.startsWith(normalizedPath) ? treeItem.path : `${normalizedPath}/${treeItem.path}`
+          ));
+          const jsonFileContents = await this.fetchFileContents(filePaths);
           return compact(jsonFileContents.map<RemoteTokenStorageFile | null>((fileContent, index) => {
             const { path } = jsonFiles[index];
-            if (
-              path
-              && fileContent?.data
-              && !Array.isArray(fileContent?.data)
-            ) {
-              const filePath = path.startsWith(normalizedPath) ? path : `${normalizedPath}/${path}`;
+            if (path && fileContent) {
+              const filePath = filePaths[index];
               let name = filePath.substring(this.path.length).replace(/^\/+/, '');
               name = name.replace('.json', '');
 
-              const parsed = JSON.parse(fileContent.data as unknown as string) as GitMultiFileObject;
+              const parsed = JSON.parse(fileContent) as GitMultiFileObject;
               // @README we will need to ensure these reserved names
 
               if (name === SystemFilenames.THEMES) {

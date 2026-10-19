@@ -3,6 +3,28 @@ import { transformProviderName } from '@/utils/transformProviderName';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { ErrorCategory } from '@/types/ErrorCategory';
 
+const getHeader = (error: any, name: string): string | undefined => {
+  // REST errors carry headers on the response, GraphQL errors on the error itself
+  const headers = error?.response?.headers ?? error?.headers;
+  const value = headers?.[name];
+  return value == null ? undefined : String(value);
+};
+
+/**
+ * When the server says when a rate limit lifts (`retry-after` or `x-ratelimit-reset`), returns that time
+ */
+export function getRateLimitResetTime(error: any, now = Date.now()): Date | undefined {
+  const retryAfter = Number(getHeader(error, 'retry-after'));
+  if (getHeader(error, 'retry-after') !== undefined && !Number.isNaN(retryAfter)) {
+    return new Date(now + retryAfter * 1000);
+  }
+  const reset = Number(getHeader(error, 'x-ratelimit-reset'));
+  if (getHeader(error, 'x-ratelimit-remaining') === '0' && reset > 0) {
+    return new Date(reset * 1000);
+  }
+  return undefined;
+}
+
 /**
  * Categorizes an error to determine if it's a JSON parsing error, credential error, connectivity error, or other
  * @param error - The error object or string
@@ -87,6 +109,31 @@ export function categorizeError(error: any, context?: {
     return {
       type: 'parsing',
       message: baseMessage,
+      header,
+    };
+  }
+
+  // Check for rate limiting before connectivity and credentials: GitHub reports rate limits as a 403,
+  // which would otherwise read as a credential error
+  // Match the status rather than "429" in the text, which also matches file paths like set-429.json
+  const status = error?.status ?? error?.response?.status;
+  const isRateLimited = status === 429 || /rate limit|too many requests/i.test(errorMessage);
+
+  if (isRateLimited) {
+    const isGithub = context?.provider === StorageProviderType.GITHUB;
+    const resetTime = getRateLimitResetTime(error);
+    let message: string = isGithub ? ErrorMessages.GITHUB_RATE_LIMIT_ERROR : ErrorMessages.RATE_LIMIT_ERROR;
+    if (resetTime) {
+      const untilMessage = isGithub ? ErrorMessages.GITHUB_RATE_LIMIT_UNTIL_ERROR : ErrorMessages.RATE_LIMIT_UNTIL_ERROR;
+      message = untilMessage.replace('{time}', resetTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+    }
+    const header = context?.provider
+      ? `Could not load tokens from ${transformProviderName(context.provider)}`
+      : 'Rate Limit Exceeded';
+
+    return {
+      type: 'connectivity',
+      message,
       header,
     };
   }

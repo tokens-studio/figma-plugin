@@ -1,6 +1,8 @@
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { TokenTypes } from '@/constants/TokenTypes';
-import { getTreeMode, GithubTokenStorage } from '../GithubTokenStorage';
+import {
+  getTreeMode, GithubTokenStorage, GRAPHQL_FILES_PER_QUERY, MAX_CONCURRENT_FILE_REQUESTS, MAX_CONCURRENT_GRAPHQL_QUERIES,
+} from '../GithubTokenStorage';
 import {
   mockCreateOrUpdateFiles,
   mockCreateRef,
@@ -10,6 +12,7 @@ import {
   mockGetContent,
   mockGetRef,
   mockGetTree,
+  mockGraphql,
   mockPaginate,
 } from '../../../tests/__mocks__/octokitRestMock';
 import { ErrorMessages } from '@/constants/ErrorMessages';
@@ -595,6 +598,227 @@ describe('GithubTokenStorage', () => {
     ]);
 
     mockGetContent.mockClear();
+  });
+
+  describe('reading a large multi file repository when GraphQL is unavailable', () => {
+    const fileCount = 60;
+    let warnSpy: jest.SpyInstance;
+
+    beforeEach(() => {
+      warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+      warnSpy.mockRestore();
+    });
+    const filePaths = Array.from({ length: fileCount }, (_, i) => `data/set-${String(i).padStart(2, '0')}.json`);
+
+    const mockDirectory = (getFile: (path: string) => Promise<unknown>) => {
+      mockGetContent.mockImplementation((opts: { path: string }) => {
+        if (opts.path === '') {
+          return Promise.resolve({ data: [{ path: 'data', sha: 'sha(data)', type: 'dir' }] });
+        }
+        if (opts.path === 'data') {
+          return Promise.resolve({
+            data: filePaths.map((path) => ({ path, sha: `sha(${path})`, type: 'file' })),
+          });
+        }
+        return getFile(opts.path);
+      });
+      mockGetTree.mockImplementationOnce(() => Promise.resolve({
+        data: {
+          sha: 'sha(data)',
+          tree: filePaths.map((path) => ({ path, type: 'blob', sha: `sha(${path})` })),
+        },
+      }));
+      storageProvider.enableMultiFile();
+      storageProvider.changePath('data');
+    };
+
+    const fileBody = (path: string) => JSON.stringify({ [path]: { type: 'color', value: '#ff0000' } });
+
+    it('falls back to REST with never more than MAX_CONCURRENT_FILE_REQUESTS downloads in flight', async () => {
+      let inFlight = 0;
+      let maxInFlight = 0;
+      mockDirectory(async (path) => {
+        inFlight += 1;
+        maxInFlight = Math.max(maxInFlight, inFlight);
+        await new Promise((resolve) => { setTimeout(resolve, 1); });
+        inFlight -= 1;
+        return { data: fileBody(path) };
+      });
+
+      const result = await storageProvider.read();
+
+      expect(Array.isArray(result)).toBe(true);
+      expect(result).toHaveLength(fileCount);
+      expect(maxInFlight).toBe(MAX_CONCURRENT_FILE_REQUESTS);
+    });
+
+    it('retries a file download that fails at the network level instead of failing the whole read', async () => {
+      const attempts: Record<string, number> = {};
+      jest.spyOn(console, 'log').mockImplementation(() => {});
+      mockDirectory(async (path) => {
+        attempts[path] = (attempts[path] ?? 0) + 1;
+        if (path === filePaths[7] && attempts[path] === 1) {
+          // What octokit throws when the browser reports net::ERR_FAILED
+          throw Object.assign(new Error('Failed to fetch'), { name: 'HttpError', status: 500 });
+        }
+        return { data: fileBody(path) };
+      });
+
+      const result = await storageProvider.read();
+
+      expect(result).toHaveLength(fileCount);
+      expect(attempts[filePaths[7]]).toBe(2);
+      (console.log as jest.Mock).mockRestore();
+    });
+  });
+
+  describe('reading a multi file repository through GraphQL', () => {
+    const filePaths = Array.from({ length: 1062 }, (_, i) => `data/set-${String(i).padStart(4, '0')}.json`);
+    const fileBody = (path: string) => JSON.stringify({ [path]: { type: 'color', value: '#ff0000' } });
+    let warnSpy: jest.SpyInstance;
+
+    const mockDirectory = (paths: string[]) => {
+      mockGetContent.mockImplementation((opts: { path: string }) => {
+        if (opts.path === '') {
+          return Promise.resolve({ data: [{ path: 'data', sha: 'sha(data)', type: 'dir' }] });
+        }
+        if (opts.path === 'data') {
+          return Promise.resolve({ data: paths.map((path) => ({ path, sha: `sha(${path})`, type: 'file' })) });
+        }
+        return Promise.resolve({ data: fileBody(opts.path) });
+      });
+      mockGetTree.mockImplementationOnce(() => Promise.resolve({
+        data: { sha: 'sha(data)', tree: paths.map((path) => ({ path, type: 'blob', sha: `sha(${path})` })) },
+      }));
+      storageProvider.enableMultiFile();
+      storageProvider.changePath('data');
+    };
+
+    // Answers each aliased `object(expression: $eN)` field the way GitHub does
+    const graphqlResponder = (blobFor: (path: string) => unknown = (path) => ({
+      text: fileBody(path), isTruncated: false, isBinary: false,
+    })) => async (_query: string, variables: Record<string, string>) => {
+      const repository: Record<string, unknown> = {};
+      Object.entries(variables).forEach(([key, expression]) => {
+        if (!key.startsWith('e')) return;
+        const path = expression.substring(expression.indexOf(':') + 1);
+        repository[`f${key.substring(1)}`] = blobFor(path);
+      });
+      return { repository };
+    };
+
+    const fileDownloads = () => mockGetContent.mock.calls.filter(([opts]) => opts.path.endsWith('.json'));
+
+    beforeEach(() => {
+      mockGraphql.mockReset();
+      warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+      warnSpy.mockRestore();
+    });
+
+    it('fetches 1,062 files in batched queries without any per-file REST calls', async () => {
+      mockDirectory(filePaths);
+      mockGraphql.mockImplementation(graphqlResponder());
+
+      const result = await storageProvider.read();
+
+      expect(result).toHaveLength(filePaths.length);
+      expect(mockGraphql).toHaveBeenCalledTimes(Math.ceil(filePaths.length / GRAPHQL_FILES_PER_QUERY));
+      expect(fileDownloads()).toHaveLength(0);
+      expect((result as any[])[5]).toEqual({
+        path: filePaths[5],
+        name: 'set-0005',
+        type: 'tokenSet',
+        data: { [filePaths[5]]: { type: 'color', value: '#ff0000' } },
+      });
+    });
+
+    it('never has more than MAX_CONCURRENT_GRAPHQL_QUERIES queries in flight', async () => {
+      mockDirectory(filePaths);
+      const respond = graphqlResponder();
+      let inFlight = 0;
+      let maxInFlight = 0;
+      mockGraphql.mockImplementation(async (query: string, variables: Record<string, string>) => {
+        inFlight += 1;
+        maxInFlight = Math.max(maxInFlight, inFlight);
+        await new Promise((resolve) => { setTimeout(resolve, 1); });
+        inFlight -= 1;
+        return respond(query, variables);
+      });
+
+      await storageProvider.read();
+
+      expect(maxInFlight).toBe(MAX_CONCURRENT_GRAPHQL_QUERIES);
+    });
+
+    it('falls back to REST only for files GraphQL returns truncated, binary or missing', async () => {
+      const paths = filePaths.slice(0, 10);
+      mockDirectory(paths);
+      mockGraphql.mockImplementation(graphqlResponder((path) => {
+        if (path === paths[2]) return { text: '{"cut', isTruncated: true, isBinary: false };
+        if (path === paths[4]) return { text: null, isTruncated: false, isBinary: true };
+        if (path === paths[6]) return null;
+        return { text: fileBody(path), isTruncated: false, isBinary: false };
+      }));
+
+      const result = await storageProvider.read();
+
+      expect(result).toHaveLength(paths.length);
+      expect(fileDownloads().map(([opts]) => opts.path)).toEqual([paths[2], paths[4], paths[6]]);
+    });
+
+    it('uses the fields that resolved when GraphQL reports errors for others', async () => {
+      const paths = filePaths.slice(0, 10);
+      mockDirectory(paths);
+      const respond = graphqlResponder();
+      mockGraphql.mockImplementation(async (query: string, variables: Record<string, string>) => {
+        const { repository } = await respond(query, variables);
+        repository.f3 = null;
+        throw Object.assign(new Error('Something went wrong while executing your query'), {
+          name: 'GraphqlResponseError',
+          data: { repository },
+        });
+      });
+
+      const result = await storageProvider.read();
+
+      expect(result).toHaveLength(paths.length);
+      expect(fileDownloads().map(([opts]) => opts.path)).toEqual([paths[3]]);
+    });
+
+    it('falls back to REST for every file when GraphQL fails entirely', async () => {
+      const paths = filePaths.slice(0, 120);
+      mockDirectory(paths);
+      mockGraphql.mockRejectedValue(Object.assign(new Error('Not Found'), { name: 'HttpError', status: 404, response: { status: 404 } }));
+
+      const result = await storageProvider.read();
+
+      expect(result).toHaveLength(paths.length);
+      expect(fileDownloads()).toHaveLength(paths.length);
+      // After the first failure the remaining batches go straight to REST instead of retrying GraphQL
+      expect(mockGraphql.mock.calls.length).toBeLessThanOrEqual(MAX_CONCURRENT_GRAPHQL_QUERIES);
+    });
+
+    it('passes the branch and paths as variables, so special characters cannot break the query', async () => {
+      const paths = ['data/it\'s "quoted" } {.json', 'data/plain.json'];
+      mockDirectory(paths);
+      mockGraphql.mockImplementation(graphqlResponder());
+
+      const result = await storageProvider.read();
+
+      expect(result).toHaveLength(2);
+      const [query, variables] = mockGraphql.mock.calls[0];
+      expect(query).not.toContain('quoted');
+      expect(variables).toEqual(expect.objectContaining({
+        owner: 'six7', name: 'figma-tokens', e0: `main:${paths[0]}`, e1: `main:${paths[1]}`,
+      }));
+      expect(fileDownloads()).toHaveLength(0);
+    });
   });
 
   it('should return an error message when reading results in an error', async () => {
