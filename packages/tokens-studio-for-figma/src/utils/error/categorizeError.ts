@@ -93,14 +93,11 @@ export function categorizeError(error: any, context?: {
 
   // Check for rate limiting before connectivity and credentials: GitHub reports rate limits as a 403,
   // which would otherwise read as a credential error
-  const rateLimitKeywords = [
-    'rate limit',
-    'Rate limit',
-    'Too Many Requests',
-    '429',
-  ];
+  // Match the status rather than "429" in the text, which also matches file paths like set-429.json
+  const status = error?.status ?? error?.response?.status;
+  const isRateLimited = status === 429 || /rate limit|too many requests/i.test(errorMessage);
 
-  if (rateLimitKeywords.some((keyword) => errorMessage.includes(keyword))) {
+  if (isRateLimited) {
     const message = context?.provider === StorageProviderType.GITHUB
       ? ErrorMessages.GITHUB_RATE_LIMIT_ERROR
       : ErrorMessages.RATE_LIMIT_ERROR;

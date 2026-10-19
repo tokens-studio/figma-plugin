@@ -143,6 +143,19 @@ describe('categorizeError', () => {
       expect(result.header).toBe('Rate Limit Exceeded');
     });
 
+    it('detects a 429 from the status even when the message does not say so', () => {
+      const error = Object.assign(new Error('Request failed'), { status: 429 });
+      expect(categorizeError(error, { provider: StorageProviderType.GITHUB }).message)
+        .toBe(ErrorMessages.GITHUB_RATE_LIMIT_ERROR);
+    });
+
+    it('does not treat a 429 inside a file path as a rate limit', () => {
+      const error = new Error('Failed to read file tokens/set-429.json: 404 Not Found');
+      const result = categorizeError(error, { provider: StorageProviderType.GITHUB });
+
+      expect(result.message).not.toBe(ErrorMessages.GITHUB_RATE_LIMIT_ERROR);
+    });
+
     it('still treats a plain 403 as a credential error', () => {
       expect(categorizeError(new Error('403 Forbidden')).type).toBe('credential');
     });

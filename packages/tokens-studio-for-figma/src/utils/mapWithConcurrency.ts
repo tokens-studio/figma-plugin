@@ -1,10 +1,14 @@
 // Like Promise.all(items.map(mapper)), but with at most `concurrency` mappers in flight at once.
-// Results keep the input order. The first rejection rejects the whole call and stops new work from starting.
+// Results keep the input order. The first rejection rejects the whole call; once a failure is observed,
+// workers stop starting new work, but any mapper already in flight may continue to completion.
 export async function mapWithConcurrency<T, R>(
   items: T[],
   concurrency: number,
   mapper: (item: T, index: number) => Promise<R>,
 ): Promise<R[]> {
+  if (items.length === 0) {
+    return [];
+  }
   const results: R[] = new Array(items.length);
   const workerCount = Math.max(1, Math.min(Math.floor(concurrency) || 1, items.length));
   let nextIndex = 0;
