@@ -1,7 +1,6 @@
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { TokenTypes } from '@/constants/TokenTypes';
-import { getTreeMode, GithubTokenStorage } from '../GithubTokenStorage';
-import { MAX_CONCURRENT_FILE_REQUESTS } from '../GitTokenStorage';
+import { getTreeMode, GithubTokenStorage, MAX_CONCURRENT_FILE_REQUESTS } from '../GithubTokenStorage';
 import {
   mockCreateOrUpdateFiles,
   mockCreateRef,

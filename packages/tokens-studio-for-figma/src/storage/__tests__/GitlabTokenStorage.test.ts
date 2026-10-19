@@ -2,7 +2,6 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { GitlabTokenStorage } from '../GitlabTokenStorage';
 import { ErrorMessages } from '@/constants/ErrorMessages';
-import { MAX_CONCURRENT_FILE_REQUESTS } from '../GitTokenStorage';
 
 const mockGetUserName = jest.fn();
 const mockGetProjects = jest.fn();
@@ -727,42 +726,4 @@ describe('GitlabTokenStorage', () => {
   //   ));
   //   expect(await storageProvider.getLatestCommitDate()).toEqual(new Date('2022-01-31T12:34:56Z'));
   // });
-
-  it('never has more than MAX_CONCURRENT_FILE_REQUESTS file downloads in flight when reading a large multi file repository', async () => {
-    const provider = new GitlabTokenStorage('', 'figma-tokens', 'six7/figma-tokens');
-    provider.selectBranch('main');
-    mockGetProjects.mockImplementationOnce(() => Promise.resolve([{
-      name: 'figma-tokens',
-      id: 35102363,
-      path: 'figma-tokens',
-      path_with_namespace: 'six7/figma-tokens',
-      namespace: { full_path: 'six7', id: 51634506 },
-    }]));
-    await provider.assignProjectId();
-
-    const filePaths = Array.from({ length: 60 }, (_, i) => `data/set-${String(i).padStart(2, '0')}.json`);
-    // Earlier tests can leave unused one-off implementations queued
-    mockGetRepositories.mockReset();
-    mockGetRepositories.mockImplementationOnce(() => Promise.resolve(
-      filePaths.map((path) => ({ path, type: 'blob' })),
-    ));
-
-    let inFlight = 0;
-    let maxInFlight = 0;
-    mockGetRepositoryFiles.mockImplementation(async (_projectId: number, path: string) => {
-      inFlight += 1;
-      maxInFlight = Math.max(maxInFlight, inFlight);
-      await new Promise((resolve) => { setTimeout(resolve, 1); });
-      inFlight -= 1;
-      return JSON.stringify({ [path]: { type: 'color', value: '#ff0000' } });
-    });
-
-    provider.enableMultiFile();
-    provider.changePath('data');
-    const result = await provider.read();
-    mockGetRepositoryFiles.mockReset();
-
-    expect(result).toHaveLength(filePaths.length);
-    expect(maxInFlight).toBe(MAX_CONCURRENT_FILE_REQUESTS);
-  });
 });

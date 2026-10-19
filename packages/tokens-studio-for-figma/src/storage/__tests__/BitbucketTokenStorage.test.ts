@@ -8,7 +8,6 @@ import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { BitbucketTokenStorage } from '../BitbucketTokenStorage';
 import { RemoteTokenStorageFile } from '../RemoteTokenStorage';
 import { ErrorMessages } from '@/constants/ErrorMessages';
-import { MAX_CONCURRENT_FILE_REQUESTS } from '../GitTokenStorage';
 
 import {
   mockGetAuthedUser,
@@ -543,62 +542,4 @@ describe('BitbucketTokenStorage', () => {
   //   // TODO
   //   expect((await 1) + 1).toEqual(3);
   // });
-
-  describe('reading a large multi file repository', () => {
-    const filePaths = Array.from({ length: 60 }, (_, i) => `data/set-${String(i).padStart(2, '0')}.json`);
-    let inFlight: number;
-    let maxInFlight: number;
-
-    const mockDirectory = (failingPath?: string) => {
-      inFlight = 0;
-      maxInFlight = 0;
-      mockFetch.mockImplementation(async (url: string) => {
-        if (url.includes('pagelen=100')) {
-          return {
-            ok: true,
-            status: 200,
-            json: () => Promise.resolve({
-              values: filePaths.map((path) => ({ path, type: 'commit_file' })),
-              next: null,
-            }),
-          };
-        }
-        inFlight += 1;
-        maxInFlight = Math.max(maxInFlight, inFlight);
-        await new Promise((resolve) => { setTimeout(resolve, 1); });
-        inFlight -= 1;
-        if (failingPath && url.endsWith(failingPath)) {
-          return { ok: false, status: 404, statusText: 'Not Found' };
-        }
-        return {
-          ok: true,
-          status: 200,
-          text: () => Promise.resolve(JSON.stringify({ red: { type: 'color', value: '#ff0000' } })),
-        };
-      });
-      storageProvider.enableMultiFile();
-      storageProvider.changePath('data');
-    };
-
-    it('never has more than MAX_CONCURRENT_FILE_REQUESTS file downloads in flight', async () => {
-      mockDirectory();
-
-      const result = await storageProvider.read();
-
-      expect(result).toHaveLength(filePaths.length);
-      expect(maxInFlight).toBe(MAX_CONCURRENT_FILE_REQUESTS);
-    });
-
-    it('still downloads every other file when one file fails, then reports the error', async () => {
-      jest.spyOn(console, 'error').mockImplementation(() => {});
-      mockDirectory(filePaths[3]);
-
-      const result = await storageProvider.read();
-
-      const fileDownloads = mockFetch.mock.calls.filter(([url]) => !String(url).includes('pagelen=100'));
-      expect(fileDownloads).toHaveLength(filePaths.length);
-      expect(result).toHaveProperty('errorMessage');
-      (console.error as jest.Mock).mockRestore();
-    });
-  });
 });

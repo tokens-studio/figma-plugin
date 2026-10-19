@@ -7,7 +7,7 @@ import IsJSONString from '@/utils/isJSONString';
 import { AnyTokenSet } from '@/types/tokens';
 import { ThemeObjectsList } from '@/types';
 import {
-  GitMultiFileObject, GitSingleFileObject, GitTokenStorage, GitStorageSaveOption, GitStorageSaveOptions, MAX_CONCURRENT_FILE_REQUESTS,
+  GitMultiFileObject, GitSingleFileObject, GitTokenStorage, GitStorageSaveOption, GitStorageSaveOptions,
 } from './GitTokenStorage';
 import { SystemFilenames } from '@/constants/SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
@@ -33,6 +33,10 @@ type ExtendedOctokitClient = Omit<Octokit, 'repos'> & {
     }) => ReturnType<Octokit['repos']['createOrUpdateFileContents']>
   }
 };
+
+// GitHub rejects bursts of concurrent requests and corporate proxies tend to drop them,
+// so large multi-file repos must not fetch every file at once
+export const MAX_CONCURRENT_FILE_REQUESTS = 10;
 
 export function getTreeMode(type: 'dir' | 'file' | string) {
   switch (type) {

@@ -3,7 +3,7 @@ import compact from 'just-compact';
 import type { CommitAction } from '@gitbeaker/rest';
 import IsJSONString from '@/utils/isJSONString';
 import {
-  GitMultiFileObject, GitSingleFileObject, GitTokenStorage, MAX_CONCURRENT_FILE_REQUESTS,
+  GitMultiFileObject, GitSingleFileObject, GitTokenStorage,
 } from './GitTokenStorage';
 import { RemoteTokenstorageErrorMessage, RemoteTokenStorageFile, RemoteTokenStorageMetadata } from './RemoteTokenStorage';
 import { AnyTokenSet } from '@/types/tokens';
@@ -12,7 +12,6 @@ import { SystemFilenames } from '@/constants/SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { retryWithBackoff } from '@/utils/retryWithBackoff';
-import { mapWithConcurrency } from '@/utils/mapWithConcurrency';
 import { isMissingFileError } from './utils/handleMissingFileError';
 
 enum GitLabAccessLevel {
@@ -183,15 +182,15 @@ export class GitlabTokenStorage extends GitTokenStorage {
           (a.path && b.path) ? a.path.localeCompare(b.path) : 0
         ));
 
-        const jsonFileContents = await mapWithConcurrency(jsonFiles, MAX_CONCURRENT_FILE_REQUESTS, (treeItem) => (
+        const jsonFileContents = await Promise.all(jsonFiles.map((treeItem) => (
           retryWithBackoff(
             () => this.gitlabClient.RepositoryFiles.showRaw(this.projectId!, treeItem.path, this.branch),
             {
               maxRetries: 3,
-              initialDelayMs: 500,
+              initialDelayMs: 100,
             },
           )
-        ));
+        )));
 
         return compact(jsonFileContents.map<RemoteTokenStorageFile | null>((fileContent, index) => {
           const { path } = jsonFiles[index];

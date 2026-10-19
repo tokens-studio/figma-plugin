@@ -9,10 +9,6 @@ type StorageFlags = {
   multiFileEnabled: boolean
 };
 
-// Git hosts reject bursts of concurrent requests (rate limits), and corporate proxies tend to drop
-// them, so multi-file reads of large repos must not fetch every file at once
-export const MAX_CONCURRENT_FILE_REQUESTS = 10;
-
 export type GitStorageSaveOptions = {
   commitMessage?: string,
 };
