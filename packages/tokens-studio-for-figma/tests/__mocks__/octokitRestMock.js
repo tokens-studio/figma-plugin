@@ -14,6 +14,8 @@ export const mockGetContent = jest.fn();
 export const mockCreateOrUpdateFiles = jest.fn();
 export const mockCreateTree = jest.fn();
 export const mockGetTree = jest.fn();
+// Rejects by default so reads fall back to per-file REST calls unless a test mocks GraphQL
+export const mockGraphql = jest.fn(() => Promise.reject(new Error('GraphQL is not mocked in this test')));
 export const mockPaginate = jest.fn(() => Promise.resolve([
     { name: 'main' },
     { name: 'development' },
@@ -44,7 +46,8 @@ jest.mock('@octokit/rest', () => ({
           listBranches: mockListBranches,
           createOrUpdateFiles: mockCreateOrUpdateFiles,
         },
-        paginate: mockPaginate
+        paginate: mockPaginate,
+        graphql: mockGraphql,
       }))
     )),
   },
