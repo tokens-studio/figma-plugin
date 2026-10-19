@@ -14,6 +14,7 @@ import { ErrorMessages } from '@/constants/ErrorMessages';
 import { GitSyncOptimizer, ChangedState } from './GitSyncOptimizer';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { retryWithBackoff } from '@/utils/retryWithBackoff';
+import { mapWithConcurrency } from '@/utils/mapWithConcurrency';
 import { isMissingFileError } from './utils/handleMissingFileError';
 
 type ExtendedOctokitClient = Omit<Octokit, 'repos'> & {
@@ -32,6 +33,10 @@ type ExtendedOctokitClient = Omit<Octokit, 'repos'> & {
     }) => ReturnType<Octokit['repos']['createOrUpdateFileContents']>
   }
 };
+
+// GitHub rejects bursts of concurrent requests and corporate proxies tend to drop them,
+// so large multi-file repos must not fetch every file at once
+export const MAX_CONCURRENT_FILE_REQUESTS = 10;
 
 export function getTreeMode(type: 'dir' | 'file' | string) {
   switch (type) {
@@ -221,7 +226,7 @@ export class GithubTokenStorage extends GitTokenStorage {
           )).sort((a, b) => (
             (a.path && b.path) ? a.path.localeCompare(b.path) : 0
           ));
-          const jsonFileContents = await Promise.all(jsonFiles.map((treeItem) => {
+          const jsonFileContents = await mapWithConcurrency(jsonFiles, MAX_CONCURRENT_FILE_REQUESTS, (treeItem) => {
             if (!treeItem.path) return Promise.resolve(null);
 
             const itemPath = treeItem.path;
@@ -239,10 +244,10 @@ export class GithubTokenStorage extends GitTokenStorage {
               }),
               {
                 maxRetries: 3,
-                initialDelayMs: 100,
+                initialDelayMs: 500,
               },
             );
-          }));
+          });
           return compact(jsonFileContents.map<RemoteTokenStorageFile | null>((fileContent, index) => {
             const { path } = jsonFiles[index];
             if (

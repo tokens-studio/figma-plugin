@@ -26,4 +26,6 @@ export enum ErrorMessages {
   TOKENSSTUDIO_OAUTH_CREDENTIAL_ERROR = 'Error syncing with Tokens Studio. Please login again.',
   TOKENSSTUDIO_OAUTH_CONNECTIVITY_ERROR = 'Unable to connect to Tokens Studio. Please check your internet connection or try again later.',
   JSONBIN_CONNECTIVITY_ERROR = 'Unable to connect to JSONbin. Please check your internet connection or try again later.',
+  RATE_LIMIT_ERROR = 'The service is rate limiting requests. Please wait a few minutes and try again.',
+  GITHUB_RATE_LIMIT_ERROR = 'GitHub is rate limiting requests for this token. Please wait a few minutes and try again, or use a personal access token that is not shared with others.',
 }
