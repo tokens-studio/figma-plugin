@@ -621,11 +621,14 @@ describe('GithubTokenStorage', () => {
     storageProvider.enableMultiFile();
     storageProvider.changePath('data');
 
-    const result = await storageProvider.read();
+    try {
+      const result = await storageProvider.read();
 
-    expect(result).toHaveLength(filePaths.length);
-    expect(attempts[filePaths[7]]).toBe(2);
-    logSpy.mockRestore();
+      expect(result).toHaveLength(filePaths.length);
+      expect(attempts[filePaths[7]]).toBe(2);
+    } finally {
+      logSpy.mockRestore();
+    }
   });
 
   it('should return an error message when reading results in an error', async () => {

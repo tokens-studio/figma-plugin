@@ -25,6 +25,12 @@ describe('retryWithBackoff', () => {
     expect(fn).toHaveBeenCalledTimes(2);
   });
 
+  it('does not retry other HttpErrors that have no response', async () => {
+    const fn = jest.fn().mockRejectedValue(Object.assign(new Error('Bad credentials'), { name: 'HttpError', status: 401 }));
+    await expect(retryWithBackoff(fn, quiet)).rejects.toThrow('Bad credentials');
+    expect(fn).toHaveBeenCalledTimes(1);
+  });
+
   it('retries server errors and 429s', async () => {
     const fn = jest.fn()
       .mockRejectedValueOnce(httpError(502, 'Bad Gateway'))
