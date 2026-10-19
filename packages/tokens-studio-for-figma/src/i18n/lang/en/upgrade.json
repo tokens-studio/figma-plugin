@@ -6,6 +6,10 @@
   "whatDoIGetWithPlus": "What do I get with Plus?",
   "multiFileSyncHint": "Syncing tokens to a folder needs «Starter Plus». On the Free plan, use a single JSON file (Ex: tokens.json).",
   "learnMore": "Learn more",
+  "plusBanner": {
+    "line1": "Try Pro features free",
+    "line2": "for 14 days with «Starter Plus»"
+  },
   "unlock": {
     "heading": "Unlock with «Starter Plus»",
     "body": "{{feature}} is part of «Starter Plus». Start a 14-day free trial to unlock it.",

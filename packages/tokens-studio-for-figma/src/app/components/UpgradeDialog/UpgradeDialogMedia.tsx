@@ -2,24 +2,48 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { styled } from '@/stitches.config';
 import type { UpgradeMediaId } from './upgradeFeatures';
-
-// Animated SVGs exported from the design file, keyed by slide. Slides without an entry fall back to a placeholder.
-const animations: Partial<Record<UpgradeMediaId, React.ComponentType<React.SVGProps<SVGSVGElement>>>> = {};
+import FrameSequence from './animations/FrameSequence';
+import { storyboards } from './animations/storyboards';
+import background from './animations/background.png';
 
 // The illustrations are designed on a fixed pink canvas, so these don't follow the light/dark theme.
+const canvas = '#FF709C';
+const ink = '#2F0210';
+
+// Frames are exported without their background; this draws the shared one with the same crop as the Figma frames.
 const StyledMedia = styled('div', {
   position: 'relative',
   width: '100%',
-  aspectRatio: '16 / 9',
+  aspectRatio: '418 / 235',
   borderRadius: '$medium',
   overflow: 'hidden',
-  backgroundColor: '#ff7aa5',
-  color: '#2b0012',
-  '& > svg': {
-    display: 'block',
-    width: '100%',
-    height: '100%',
+  backgroundColor: canvas,
+  backgroundImage: `url(${background})`,
+  backgroundRepeat: 'no-repeat',
+  color: ink,
+  variants: {
+    background: {
+      default: {
+        backgroundSize: '238.94% 100%',
+        backgroundPosition: '50% 0',
+      },
+      zoomed: {
+        backgroundSize: '693.42% 290.21%',
+        backgroundPosition: '50% 72.71%',
+      },
+    },
   },
+  defaultVariants: {
+    background: 'default',
+  },
+});
+
+// Sits over the frames in the same 418×235 space they were designed in.
+const StyledOverlay = styled('svg', {
+  position: 'absolute',
+  inset: 0,
+  width: '100%',
+  height: '100%',
 });
 
 const StyledPlaceholder = styled('div', {
@@ -48,7 +72,7 @@ const StyledDot = styled('span', {
   backgroundColor: 'rgba(43, 0, 18, 0.25)',
   variants: {
     active: {
-      true: { backgroundColor: '#2b0012' },
+      true: { backgroundColor: ink },
     },
   },
 });
@@ -64,25 +88,23 @@ export default function UpgradeDialogMedia({
   media, title, step, total,
 }: Props) {
   const { t } = useTranslation(['upgrade']);
-  const Animation = animations[media];
+  const storyboard = storyboards[media];
 
   return (
-    <StyledMedia data-testid={`upgrade-dialog-media-${media}`}>
-      {Animation ? <Animation aria-hidden /> : (
+    <StyledMedia data-testid={`upgrade-dialog-media-${media}`} background={storyboard?.background}>
+      {storyboard ? <FrameSequence frames={storyboard.frames} /> : (
         <StyledPlaceholder aria-hidden>
-          {media === 'plus' ? (
-            <>
-              <span style={{ fontSize: '32px', fontWeight: 900, lineHeight: 0.95 }}>
-                GET MORE
-                <br />
-                WITH PLUS
-              </span>
-              <span style={{ fontSize: '12px' }}>{t('unlock.heading')}</span>
-            </>
-          ) : (
-            <span style={{ fontSize: '24px', fontWeight: 900, textTransform: 'uppercase' }}>{title}</span>
-          )}
+          <span style={{ fontSize: '24px', fontWeight: 900, textTransform: 'uppercase' }}>{title}</span>
         </StyledPlaceholder>
+      )}
+      {media === 'plus' && (
+        // The design's subtitle is left out of the export so the trial length comes from the translations.
+        <StyledOverlay viewBox="0 0 418 235" aria-hidden>
+          <text x="24" fill={ink} fontFamily="Inter, sans-serif" fontSize="11">
+            <tspan x="24" y="159">{t('plusBanner.line1')}</tspan>
+            <tspan x="24" y="176">{t('plusBanner.line2')}</tspan>
+          </text>
+        </StyledOverlay>
       )}
       {total > 1 && (
         <StyledDots aria-hidden>
