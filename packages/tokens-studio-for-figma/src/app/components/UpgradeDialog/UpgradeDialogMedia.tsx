@@ -2,15 +2,14 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { styled } from '@/stitches.config';
 import type { UpgradeMediaId } from './upgradeFeatures';
-import FrameSequence from './animations/FrameSequence';
-import { storyboards } from './animations/storyboards';
-import background from './animations/background.png';
+import { slideImages, zoomedBackgroundSlides } from './slideImages';
+import background from './images/background.png';
 
 // The illustrations are designed on a fixed pink canvas, so these don't follow the light/dark theme.
 const canvas = '#FF709C';
 const ink = '#2F0210';
 
-// Frames are exported without their background; this draws the shared one with the same crop as the Figma frames.
+// Slide images are exported without their background; this draws the shared one with the same crop as the Figma frames.
 const StyledMedia = styled('div', {
   position: 'relative',
   width: '100%',
@@ -38,22 +37,19 @@ const StyledMedia = styled('div', {
   },
 });
 
-// Sits over the frames in the same 418×235 space they were designed in.
-const StyledOverlay = styled('svg', {
+const StyledImage = styled('img', {
   position: 'absolute',
   inset: 0,
   width: '100%',
   height: '100%',
 });
 
-const StyledPlaceholder = styled('div', {
+// Sits over the image in the same 418×235 space it was designed in.
+const StyledOverlay = styled('svg', {
   position: 'absolute',
   inset: 0,
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'center',
-  padding: '$6',
-  gap: '$3',
+  width: '100%',
+  height: '100%',
 });
 
 const StyledDots = styled('div', {
@@ -79,24 +75,21 @@ const StyledDot = styled('span', {
 
 type Props = {
   media: UpgradeMediaId;
-  title: string;
   step: number;
   total: number;
 };
 
 export default function UpgradeDialogMedia({
-  media, title, step, total,
+  media, step, total,
 }: Props) {
   const { t } = useTranslation(['upgrade']);
-  const storyboard = storyboards[media];
 
   return (
-    <StyledMedia data-testid={`upgrade-dialog-media-${media}`} background={storyboard?.background}>
-      {storyboard ? <FrameSequence frames={storyboard.frames} /> : (
-        <StyledPlaceholder aria-hidden>
-          <span style={{ fontSize: '24px', fontWeight: 900, textTransform: 'uppercase' }}>{title}</span>
-        </StyledPlaceholder>
-      )}
+    <StyledMedia
+      data-testid={`upgrade-dialog-media-${media}`}
+      background={zoomedBackgroundSlides.includes(media) ? 'zoomed' : 'default'}
+    >
+      <StyledImage src={slideImages[media]} alt="" aria-hidden />
       {media === 'plus' && (
         // The design's subtitle is left out of the export so the trial length comes from the translations.
         <StyledOverlay viewBox="0 0 418 235" aria-hidden>

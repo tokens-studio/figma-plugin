@@ -67,7 +67,7 @@ function UpgradeDialogContent({ feature, source, onClose }: { feature: UpgradeFe
   return (
     <Modal id="upgrade-dialog" title={title} isOpen close={onClose} size="large" showClose footer={footer}>
       <Stack direction="column" gap={4}>
-        <UpgradeDialogMedia media={slide.media} title={title} step={step} total={slides.length} />
+        <UpgradeDialogMedia media={slide.media} step={step} total={slides.length} />
         <Heading size="medium">{t(slide.headingKey)}</Heading>
         {isLastStep ? (
           <Stack direction="column" gap={4}>

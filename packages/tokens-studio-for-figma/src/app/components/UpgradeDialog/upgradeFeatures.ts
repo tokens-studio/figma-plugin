@@ -7,7 +7,7 @@ export type UpgradeFeature =
   | 'colorModifiers'
   | 'docsGenerator';
 
-// Identifies the animation shown above a slide. 'plus' is the shared "Get more with Plus" slide.
+// Identifies the image shown above a slide. 'plus' is the shared "Get more with Plus" slide.
 export type UpgradeMediaId =
   | 'plus'
   | 'themes-1' | 'themes-2' | 'themes-3' | 'themes-4'
