@@ -122,8 +122,18 @@ module.exports = wrapper((env, argv) => {
           },
         },
         { test: /\.(png|jpg|gif|webp)$/, use: [{ loader: 'url-loader' }] },
+        // `import url from './file.svg?url'` inlines the SVG as a data URL instead of a React component.
         {
           test: /\.svg$/,
+          resourceQuery: /url/,
+          type: 'asset/inline',
+          generator: {
+            dataUrl: (content) => `data:image/svg+xml,${encodeURIComponent(content.toString())}`,
+          },
+        },
+        {
+          test: /\.svg$/,
+          resourceQuery: { not: [/url/] },
           use: [
             {
               loader: '@svgr/webpack',

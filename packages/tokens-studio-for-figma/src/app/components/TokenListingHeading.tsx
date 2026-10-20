@@ -17,6 +17,7 @@ import Box from './Box';
 import Stack from './Stack';
 import { StyledTokenGroupHeadingButton } from './TokenGroup/StyledTokenGroupHeading';
 import { useIsProUser } from '../hooks/useIsProUser';
+import { useUpgradeDialogStore } from '@/app/store/useUpgradeDialogStore';
 
 type Props = {
   isCollapsed: boolean;
@@ -45,7 +46,16 @@ export default function TokenListingHeading({
 
   const displayType = useSelector(displayTypeSelector);
 
-  const handleShowNewForm = React.useCallback(() => showNewForm({}), [showNewForm]);
+  const openUpgradeDialog = useUpgradeDialogStore((state) => state.openUpgradeDialog);
+  const isLocked = isPro && !isProUser;
+
+  const handleShowNewForm = React.useCallback(() => {
+    if (isLocked) {
+      openUpgradeDialog('compositionTokens', `${tokenKey}-listing`);
+      return;
+    }
+    showNewForm({});
+  }, [showNewForm, isLocked, openUpgradeDialog, tokenKey]);
 
   const handleToggleDisplayType = React.useCallback(() => {
     dispatch.uiState.setDisplayType(displayType === 'GRID' ? 'LIST' : 'GRID');
@@ -80,7 +90,7 @@ export default function TokenListingHeading({
 
         <IconButton
           data-testid="button-add-new-token"
-          disabled={editProhibited || activeTokenSetReadOnly || (isPro && !isProUser)}
+          disabled={editProhibited || activeTokenSetReadOnly}
           icon={<IconAdd />}
           tooltip={t('addNew')}
           onClick={handleShowNewForm}

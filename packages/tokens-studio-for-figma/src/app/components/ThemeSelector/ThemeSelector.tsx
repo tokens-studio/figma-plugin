@@ -6,11 +6,13 @@ import { DropdownMenu, Button } from '@tokens-studio/ui';
 import { activeThemeSelector, themeOptionsSelector, themesListSelector } from '@/selectors';
 import Text from '../Text';
 import { Dispatch } from '@/app/store';
-import ProBadge from '../ProBadge';
+import { StyledProBadge } from '../ProBadge';
 import { track } from '@/utils/analytics';
 import { INTERNAL_THEMES_NO_GROUP, INTERNAL_THEMES_NO_GROUP_LABEL } from '@/constants/InternalTokenGroup';
 import Box from '../Box';
 import { useCanUseThemes } from '@/app/hooks/useCanUseThemes';
+import { useIsProUser } from '@/app/hooks/useIsProUser';
+import { useUpgradeDialogStore } from '@/app/store/useUpgradeDialogStore';
 import {
   buildChildrenMap, buildParentMap, collectAncestors, collectDescendants,
 } from '@/utils/themeHierarchy';
@@ -23,8 +25,10 @@ type AvailableTheme = {
 
 export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChildren<unknown>>> = () => {
   const canUseThemes = useCanUseThemes();
+  const isProUser = useIsProUser();
+  const openUpgradeDialog = useUpgradeDialogStore((state) => state.openUpgradeDialog);
   const dispatch = useDispatch<Dispatch>();
-  const { t } = useTranslation(['tokens']);
+  const { t } = useTranslation(['tokens', 'licence', 'upgrade']);
   const activeTheme = useSelector(activeThemeSelector);
   const availableThemes = useSelector(themeOptionsSelector);
   const allThemes = useSelector(themesListSelector);
@@ -73,8 +77,17 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
   }, [dispatch, activeTheme, availableThemes, allThemes]);
 
   const handleManageThemes = useCallback(() => {
-    dispatch.uiState.setManageThemesModalOpen(true);
-  }, [dispatch]);
+    if (canUseThemes) {
+      dispatch.uiState.setManageThemesModalOpen(true);
+    } else {
+      openUpgradeDialog('themes', 'manage-themes');
+    }
+  }, [dispatch, canUseThemes, openUpgradeDialog]);
+
+  // Free-plan orgs get a limited set of themes; let them see what the paid plan adds.
+  const handleShowPlusThemes = useCallback(() => {
+    openUpgradeDialog('themes', 'themes-free-plan');
+  }, [openUpgradeDialog]);
 
   const activeThemeLabel = useMemo(() => {
     if (activeTheme) {
@@ -154,15 +167,20 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
           <DropdownMenu.Item
             data-testid="themeselector-managethemes"
             css={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
-            disabled={!canUseThemes}
+            data-locked={!canUseThemes || undefined}
             onSelect={handleManageThemes}
           >
             <span>{t('manageThemes')}</span>
-            {!canUseThemes && <ProBadge campaign="manage-themes" compact />}
+            {!canUseThemes && <StyledProBadge as="span">{t('pro', { ns: 'licence' })}</StyledProBadge>}
             <DropdownMenu.TrailingVisual>
               <NavArrowRight />
             </DropdownMenu.TrailingVisual>
           </DropdownMenu.Item>
+          {canUseThemes && !isProUser && (
+            <DropdownMenu.Item data-testid="themeselector-plus-themes" onSelect={handleShowPlusThemes}>
+              {t('whatDoIGetWithPlus', { ns: 'upgrade' })}
+            </DropdownMenu.Item>
+          )}
           <DropdownMenu.Separator />
           {availableThemes.length === 0 && (
             <DropdownMenu.RadioItem css={{ paddingLeft: '$6' }} value="" disabled={!activeTheme} onSelect={handleClearTheme}>

@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useUIDSeed } from 'react-uid';
 import {
   Box, Text, Button,
@@ -13,8 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { useDebouncedCallback } from 'use-debounce';
 import { useIsProUser } from '../hooks/useIsProUser';
 import { useChangedState } from '@/hooks/useChangedState';
-import UpgradeToProModal from './UpgradeToProModal';
-import branchingImage from '@/app/assets/hints/branchselector.png';
+import { useUpgradeDialogStore } from '@/app/store/useUpgradeDialogStore';
 import { track } from '@/utils/analytics';
 
 type PopoverMode = 'switch' | 'create';
@@ -44,7 +43,7 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [mode, setMode] = React.useState<PopoverMode>('switch');
   const [searchValue, setSearchValue] = React.useState('');
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const openUpgradeDialog = useUpgradeDialogStore((state) => state.openUpgradeDialog);
   const isProUser = useIsProUser();
   const { hasChanges } = useChangedState();
   const { t } = useTranslation(['branch']);
@@ -107,12 +106,8 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
   }, [handleSetMode]);
 
   const handleNonProUserClick = React.useCallback(() => {
-    setShowUpgradeModal(true);
-  }, []);
-
-  const handleCloseUpgradeModal = React.useCallback(() => {
-    setShowUpgradeModal(false);
-  }, []);
+    openUpgradeDialog('branching', 'branch-selector');
+  }, [openUpgradeDialog]);
 
   const getTitle = () => ((mode === 'switch') ? 'Switch branch' : 'Create branch from');
 
@@ -171,31 +166,20 @@ export const BranchSelectorPopover: React.FC<BranchSelectorPopoverProps> = ({
     <>
       {/* For non-pro users, show a simple button that opens a dialog */}
       {!isProUser ? (
-        <>
-          <Button
-            size="small"
-            variant="invisible"
-            icon={<GitBranchIcon />}
-            onClick={handleNonProUserClick}
-            data-testid="branch-selector-menu-trigger"
-            style={{
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              flexShrink: 1,
-            }}
-          >
-            {currentBranch}
-          </Button>
-
-          <UpgradeToProModal
-            isOpen={showUpgradeModal}
-            onClose={handleCloseUpgradeModal}
-            feature="branching-feature"
-            image={branchingImage}
-            title={t('branchingProFeature')}
-            description="You can switch branches, create new ones from current changes or any other branch, easily find branches, and collaborate seamlessly with your team. Branching enables powerful version control and team collaboration workflows."
-          />
-        </>
+        <Button
+          size="small"
+          variant="invisible"
+          icon={<GitBranchIcon />}
+          onClick={handleNonProUserClick}
+          data-testid="branch-selector-menu-trigger"
+          style={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            flexShrink: 1,
+          }}
+        >
+          {currentBranch}
+        </Button>
       ) : (
         /* For pro users, show the full popover functionality */
         <Downshift
