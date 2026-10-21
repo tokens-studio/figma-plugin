@@ -19,7 +19,7 @@ type Props = {
   setDragOverToken: (token: SingleToken | null) => void;
 };
 
-export const TokenButton: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
+const TokenButtonComponent: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
   type,
   token,
   showForm,
@@ -48,3 +48,7 @@ export const TokenButton: React.FC<React.PropsWithChildren<React.PropsWithChildr
     />
   </DraggableWrapper>
 );
+
+// Memoized: every TokenGroup re-renders on group-level state (collapse, display type, drag), and
+// re-rendering thousands of token buttons with them blocks the UI.
+export const TokenButton = React.memo(TokenButtonComponent);

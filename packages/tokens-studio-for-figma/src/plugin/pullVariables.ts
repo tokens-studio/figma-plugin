@@ -528,7 +528,8 @@ export default async function pullVariables(options: PullVariablesOptions, theme
       }
       return acc;
     }, {});
-    // Renames go first: with Tokens Studio sync the UI applies the import as soon as the values arrive.
+    // Renames go first: the import compares a renamed collection's variables with the set's old tokens, and with
+    // Tokens Studio sync the UI applies the import as soon as the values arrive.
     if (renamedCollections.size > 0) {
       notifyRenamedCollections(Array.from(renamedCollections.entries()));
     }
