@@ -3,7 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { Stack } from '@tokens-studio/ui';
 import { styled } from '@/stitches.config';
 import { LaunchScreenLayout } from './LaunchScreenLayout';
-import launchAnimation from '@/app/assets/launch-screen.webm';
+
+// Loaded from jsDelivr instead of bundled, so the 3 MB video doesn't bloat the plugin. Pinned to a commit
+// so the cached file never changes; the source lives in media/launch-screen.webm. If it can't load
+// (e.g. offline), the dark background shows on its own.
+const LAUNCH_ANIMATION_URL = 'https://cdn.jsdelivr.net/gh/tokens-studio/figma-plugin@9c9ec17feee91a868ea0b5ab3b6ae2fdfa2402e9/packages/tokens-studio-for-figma/src/app/assets/launch-screen.webm';
 
 const SLACK_URL = 'https://tokens.studio/slack';
 const DOCS_URL = 'https://docs.tokens.studio/?ref=launchscreen';
@@ -110,7 +114,7 @@ export default function LaunchScreen({
 
   return (
     <LaunchScreenLayout data-testid="launch-screen">
-      <LaunchAnimation src={launchAnimation} autoPlay loop muted playsInline aria-hidden data-testid="launch-screen-animation" />
+      <LaunchAnimation src={LAUNCH_ANIMATION_URL} autoPlay loop muted playsInline aria-hidden data-testid="launch-screen-animation" />
       <Stack direction="column" gap={6} align="center" css={{ position: 'relative' }}>
         <Stack direction="column" align="center" css={{ width: '180px', gap: '10px' }}>
           <PillButton type="button" variant="primary" onClick={onCreateAccount} data-testid="launch-screen-create-account">
