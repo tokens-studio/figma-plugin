@@ -20,11 +20,13 @@ export function setTokensFromVariables(dispatch: RematchDispatch<RootModel>) {
 
     const context = currentState.uiState.api;
     const hasChangeSetId = !!(context as any)?.changeSetId;
-    const { importedTokens } = currentState.tokenState;
+    const { importedTokens, tokens: localTokens = {} } = currentState.tokenState;
+    // Changed tokens of a renamed collection are listed as updates, but their set is new in Studio too.
+    const updatedTokensInNewSets = (importedTokens?.updatedTokens || []).filter((token) => token.parent && !localTokens[token.parent]);
     // Sanitize at the studio boundary: strip characters that would corrupt the
     // ledger's reference or token-set parsing. Plugin-only flows still receive
     // the raw names because this effect only runs for TOKENS_STUDIO_OAUTH.
-    const newTokens = sanitizeNewTokensForStudio(importedTokens?.newTokens || []);
+    const newTokens = sanitizeNewTokensForStudio([...(importedTokens?.newTokens || []), ...updatedTokensInNewSets]);
 
     // Only create token sets and tokens if changeSetId is present — the REST API requires it.
     // changeSetId is populated after pulling from the REST API for a specific branch.
