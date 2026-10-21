@@ -197,6 +197,41 @@ describe('setTokensFromVariables', () => {
     expect(state.tokenState.tokenSetMetadata).toEqual({ 'Brand/Night': { id: 'set-dark', isDynamic: true, fromVariableImport: true } });
   });
 
+  it('also creates the changed tokens of a renamed collection, whose set is new in Studio', async () => {
+    mockGetState.mockReturnValue({
+      uiState: { api: { provider: StorageProviderType.TOKENS_STUDIO_OAUTH, id: 'project-1', changeSetId: 'change-set-1' } },
+      tokenState: {
+        // 'renamed' is the new name of 'old'; the rename is applied when the dialog is confirmed
+        tokens: { old: [], existing: [] },
+        importedTokens: {
+          newTokens: [{
+            name: 'space.md', value: '16', type: 'dimension', parent: 'renamed',
+          }],
+          updatedTokens: [
+            {
+              name: 'space.sm', value: '12', oldValue: '8', type: 'dimension', parent: 'renamed',
+            },
+            // Changes to tokens in sets Studio already has are not written by the import
+            {
+              name: 'space.lg', value: '32', oldValue: '24', type: 'dimension', parent: 'existing',
+            },
+          ],
+        },
+        tokenSetMetadata: { existing: { id: 'set-existing' } },
+        importedThemes: { newThemes: [], updatedThemes: [] },
+      },
+    } as any);
+    mockPush.mockImplementation(async ({ action }: any) => (action === 'CREATE_TOKEN_SET' ? { data: { id: 'set-renamed' } } : {}));
+
+    await setTokensFromVariables(dispatch)({} as any, {});
+
+    const batch = mockPush.mock.calls.find(([args]: any) => args.action === 'BATCH_CREATE_TOKENS');
+    expect(batch?.[0].data).toEqual([
+      expect.objectContaining({ name: 'space.md', value: '16', token_set_id: 'set-renamed' }),
+      expect.objectContaining({ name: 'space.sm', value: '12', token_set_id: 'set-renamed' }),
+    ]);
+  });
+
   it('pushes the themes after the token sets, new ones without their local id', async () => {
     setState();
 

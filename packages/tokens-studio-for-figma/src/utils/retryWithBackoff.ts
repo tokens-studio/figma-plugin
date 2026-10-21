@@ -12,6 +12,12 @@ const defaultShouldRetry = (error: any, _attempt: number): boolean => {
     return true;
   }
 
+  // Octokit turns a failed fetch (CORS failure, dropped connection, proxy reset) into an
+  // HttpError with status 500 and no response
+  if (error?.name === 'HttpError' && error.status === 500 && !error.response) {
+    return true;
+  }
+
   if (error.response) {
     const { status } = error.response;
     return status >= 500 || status === 429 || status === 408 || status === 502 || status === 503 || status === 504;
