@@ -164,24 +164,14 @@ function sortedFigmaExtensions($extensions: SingleToken['$extensions']): [string
     .map(([key, value]) => [key, sortDeep(value)]);
 }
 
-// Deep clones the tokens so that the UI updates even if just a value changes.
-function withCreatedTokens(tokens: TokenStore['values'], data: CreateSingleTokenData[]): TokenStore['values'] {
+// Applies the edits, then the creates. Deep clones the tokens once, so that the UI updates even if just a
+// value changes.
+function withChangedTokens(
+  tokens: TokenStore['values'],
+  { edits = [], creates = [] }: { edits?: EditSingleTokenData[]; creates?: CreateSingleTokenData[] },
+): TokenStore['values'] {
   const newTokens: TokenStore['values'] = JSON.parse(JSON.stringify(tokens));
-  data.forEach((token) => {
-    if (!newTokens[token.parent]) {
-      newTokens[token.parent] = [];
-    }
-    const existingTokenIndex = newTokens[token.parent].findIndex((n) => n.name === token.name);
-    if (existingTokenIndex === -1) {
-      newTokens[token.parent].push(updateTokenPayloadToSingleToken(token as UpdateTokenPayload));
-    }
-  });
-  return newTokens;
-}
-
-function withEditedTokens(tokens: TokenStore['values'], data: EditSingleTokenData[]): TokenStore['values'] {
-  const newTokens: TokenStore['values'] = JSON.parse(JSON.stringify(tokens));
-  data.forEach((token) => {
+  edits.forEach((token) => {
     // A set can be gone after renamed collections are applied
     const existingTokenIndex = newTokens[token.parent]?.findIndex((n) => n.name === token.name) ?? -1;
     if (existingTokenIndex > -1) {
@@ -190,6 +180,15 @@ function withEditedTokens(tokens: TokenStore['values'], data: EditSingleTokenDat
         updateTokenPayloadToSingleToken(token as UpdateTokenPayload),
         ...newTokens[token.parent].slice(existingTokenIndex + 1),
       ];
+    }
+  });
+  creates.forEach((token) => {
+    if (!newTokens[token.parent]) {
+      newTokens[token.parent] = [];
+    }
+    const existingTokenIndex = newTokens[token.parent].findIndex((n) => n.name === token.name);
+    if (existingTokenIndex === -1) {
+      newTokens[token.parent].push(updateTokenPayloadToSingleToken(token as UpdateTokenPayload));
     }
   });
   return newTokens;
@@ -412,11 +411,11 @@ export const tokenState = createModel<RootModel>()({
     },
     createMultipleTokens: (state, data: CreateSingleTokenData[]) => ({
       ...state,
-      tokens: withCreatedTokens(state.tokens, data),
+      tokens: withChangedTokens(state.tokens, { creates: data }),
     }),
     editMultipleTokens: (state, data: EditSingleTokenData[]) => ({
       ...state,
-      tokens: withEditedTokens(state.tokens, data),
+      tokens: withChangedTokens(state.tokens, { edits: data }),
     }),
     // Applies a variables import as accepting everything in ImportedTokensDialog would, without the
     // createMultipleTokens effect: with Tokens Studio sync, setTokensFromVariables already wrote the tokens.
@@ -424,7 +423,10 @@ export const tokenState = createModel<RootModel>()({
       const { newTokens, updatedTokens } = state.importedTokens;
       return {
         ...state,
-        tokens: withCreatedTokens(withEditedTokens(state.tokens, updatedTokens as EditSingleTokenData[]), newTokens as CreateSingleTokenData[]),
+        tokens: withChangedTokens(state.tokens, {
+          edits: updatedTokens as EditSingleTokenData[],
+          creates: newTokens as CreateSingleTokenData[],
+        }),
         importedTokens: {
           newTokens: [],
           updatedTokens: [],
