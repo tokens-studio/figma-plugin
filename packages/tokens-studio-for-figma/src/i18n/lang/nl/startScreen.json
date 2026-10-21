@@ -19,5 +19,17 @@
   "loadFromProvider": "Laden van synchronisatieprovider",
   "selectProvider": "Selecteer een aanbieder",
   "chooseProvider": "Kies een aanbieder...",
-  "loadingTokens": "Tokens laden van synchronisatieprovider..."
+  "loadingTokens": "Tokens laden van synchronisatieprovider...",
+  "createAccount": "Account aanmaken",
+  "logIn": "Inloggen",
+  "continueWithoutAccount": "Doorgaan zonder account",
+  "joinSlackShort": "Word lid van Slack",
+  "docs": "Documentatie",
+  "reportIssue": "Probleem melden",
+  "termsAndConditions": "Algemene voorwaarden",
+  "consentDescription": "Vink de vakjes aan om toestemming te geven en Tokens Studio Plugin voor Figma te blijven gebruiken. Sommige toestemmingen zijn verplicht en kunnen worden ingetrokken.",
+  "termsOfService": "Servicevoorwaarden",
+  "performanceAnalytics": "Prestatieanalyse",
+  "optional": "(optioneel)",
+  "agreeAndContinue": "Akkoord en doorgaan"
 }

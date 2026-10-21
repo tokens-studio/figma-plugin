@@ -61,6 +61,8 @@ export interface SettingsState {
   seenGenericVersionedHeaderMigrationDialog?: boolean;
   seenTermsUpdate2026?: boolean;
   seenTermsUpdate2026Subprocessors?: boolean;
+  acceptedStudioConsent?: boolean;
+  performanceAnalyticsConsent?: boolean;
 }
 
 const setUI = (state: SettingsState) => {
@@ -80,6 +82,8 @@ export const settings = createModel<RootModel>()({
     seenGenericVersionedHeaderMigrationDialog: false,
     seenTermsUpdate2026: false,
     seenTermsUpdate2026Subprocessors: false,
+    acceptedStudioConsent: false,
+    performanceAnalyticsConsent: false,
     language: 'en',
     sessionRecording: false,
     updateMode: UpdateMode.SELECTION,
@@ -259,6 +263,13 @@ export const settings = createModel<RootModel>()({
         seenTermsUpdate2026Subprocessors: payload,
       };
     },
+    setStudioConsent(state, payload: { accepted: boolean; performanceAnalytics: boolean }) {
+      return {
+        ...state,
+        acceptedStudioConsent: payload.accepted,
+        performanceAnalyticsConsent: payload.performanceAnalytics,
+      };
+    },
     setSeenGenericVersionedHeaderMigrationDialog(state, payload: boolean) {
       return {
         ...state,
@@ -334,6 +345,9 @@ export const settings = createModel<RootModel>()({
       setUI(rootState.settings);
     },
     setSeenTermsUpdate2026Subprocessors: (payload: boolean, rootState) => {
+      setUI(rootState.settings);
+    },
+    setStudioConsent: (payload: { accepted: boolean; performanceAnalytics: boolean }, rootState) => {
       setUI(rootState.settings);
     },
     ...Object.fromEntries(
