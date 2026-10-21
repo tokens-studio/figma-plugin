@@ -151,6 +151,15 @@ export async function pushThemeToTokensStudioOAuth(
   // themeGroupsData is keyed by the raw server name, so an exact lookup would miss and create a duplicate group.
   // The group as Tokens Studio names it; `groupName` stays the local name for finding the theme here.
   const studioGroupName = toStudioThemeGroupName(groupName);
+  // A name with no letters, numbers or hyphens ("🎨", "///") has nothing left for Tokens Studio to accept.
+  if (groupName && !studioGroupName) {
+    return fail({
+      themeName: payload?.name,
+      action: isNewTheme ? 'create' : 'update',
+      groupName,
+      reason: 'Tokens Studio needs a theme group name with at least one letter or number.',
+    });
+  }
   let themeGroupId = groupName
     ? (lookupBySanitized(themeGroupsData, studioGroupName, toStudioThemeGroupName) as any)?.id
     : null;
