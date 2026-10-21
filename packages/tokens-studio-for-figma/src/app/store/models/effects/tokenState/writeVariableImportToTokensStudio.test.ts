@@ -222,7 +222,9 @@ describe('writeVariableImportToTokensStudio', () => {
         tokens: {
           // Pulled from Studio, so it has its id; color.secondary was created by an import and doesn't.
           'Brand/Light': [
-            { name: 'color.primary', value: '#0066ff', type: 'color', $extensions: { id: 'token-primary' } },
+            {
+              name: 'color.primary', value: '#0066ff', type: 'color', $extensions: { id: 'token-primary' },
+            },
             { name: 'color.secondary', value: '#ff8000', type: 'color' },
           ],
         },
@@ -258,6 +260,27 @@ describe('writeVariableImportToTokensStudio', () => {
       { token_id: 'token-primary', changes: { name: 'color.brand', value: '#0066ff' } },
       { token_id: 'token-secondary', changes: { value: '#000000' } },
     ]);
+  });
+
+  it('keeps the rest of a renamed set\'s metadata', async () => {
+    const state: any = {
+      uiState: { api: { provider: StorageProviderType.TOKENS_STUDIO_OAUTH, id: 'project-1', changeSetId: 'change-set-1' } },
+      tokenState: {
+        renamedCollections: [['Brand/Dark', 'Brand/Night']],
+        tokens: {},
+        themes: [],
+        importedTokens: { newTokens: [] },
+        tokenSetMetadata: { 'Brand/Dark': { id: 'set-dark', isDynamic: true, fromVariableImport: true } },
+        importedThemes: { newThemes: [], updatedThemes: [] },
+      },
+    };
+    mockGetState.mockImplementation(() => state);
+    dispatch.tokenState.setTokenSetMetadata.mockImplementation((metadata: any) => { state.tokenState.tokenSetMetadata = metadata; });
+    mockPush.mockImplementation(async () => ({ data: {} }));
+
+    await writeVariableImportToTokensStudio(dispatch)({} as any, {});
+
+    expect(state.tokenState.tokenSetMetadata).toEqual({ 'Brand/Night': { id: 'set-dark', isDynamic: true, fromVariableImport: true } });
   });
 
   it('pushes the themes after the token sets, new ones without their local id', async () => {

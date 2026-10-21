@@ -41,10 +41,11 @@ export function writeVariableImportToTokensStudio(dispatch: RematchDispatch<Root
     if (hasChangeSetId && renamedCollections.length > 0) {
       renamedSets = await renameTokenSetsInTokensStudio(context, renamedCollections, dispatch);
       // A token that was already in a renamed set moved with it; only the set's new tokens need creating.
-      newTokens = newTokens.filter((token) => {
-        const rename = renamedSets.find(([, newName]) => sanitizeTokenSetName(newName) === token.parent);
-        return !rename || !(previousTokens[rename[0]] || []).some((existing) => sanitizeTokenName(existing.name) === token.name);
-      });
+      const movedTokenNames = new Map(renamedSets.map(([oldName, newName]) => [
+        sanitizeTokenSetName(newName),
+        new Set((previousTokens[oldName] || []).map((existing) => sanitizeTokenName(existing.name))),
+      ]));
+      newTokens = newTokens.filter((token) => !movedTokenNames.get(token.parent!)?.has(token.name));
     }
 
     // Changed tokens of a renamed collection are listed as updates. Unless their set was renamed in Studio above,
