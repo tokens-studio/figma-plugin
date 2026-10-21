@@ -193,6 +193,46 @@ describe('Initiator', () => {
     expect(state.uiState.mainNodeSelectionValues).toEqual({});
   });
 
+  it('applies each selection message as a single store update', () => {
+    const mockStore = createMockStore({ uiState: { disabled: true } });
+    render(
+      <Provider store={mockStore}>
+        <Initiator />
+      </Provider>,
+    );
+    const listener = jest.fn();
+    mockStore.subscribe(listener);
+
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {
+          pluginMessage: {
+            type: 'selection',
+            selectedNodes: 2,
+            selectionValues: [{ category: 'sizing', type: 'sizing', value: 'sizing.xs' }],
+            mainNodeSelectionValues: [{ sizing: 'sizing.xs' }],
+          },
+        },
+      }),
+    );
+    expect(listener).toHaveBeenCalledTimes(1);
+    expect(mockStore.getState().uiState).toEqual(expect.objectContaining({
+      disabled: false,
+      selectedLayers: 2,
+      mainNodeSelectionValues: { sizing: 'sizing.xs' },
+      selectionValues: [{ category: 'sizing', type: 'sizing', value: 'sizing.xs' }],
+    }));
+
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: { pluginMessage: { type: 'noselection' } },
+      }),
+    );
+    expect(listener).toHaveBeenCalledTimes(2);
+  });
+
   it('should be able to set tokens', () => {
     const mockStore = createMockStore({});
     render(

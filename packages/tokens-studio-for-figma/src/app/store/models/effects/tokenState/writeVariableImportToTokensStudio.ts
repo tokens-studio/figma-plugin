@@ -27,16 +27,15 @@ export function writeVariableImportToTokensStudio(dispatch: RematchDispatch<Root
 
     const context = currentState.uiState.api;
     const hasChangeSetId = !!(context as any)?.changeSetId;
-    const { importedTokens, importedThemes } = currentState.tokenState;
+    const { importedTokens, importedThemes, tokens: previousTokens = {} } = currentState.tokenState;
     // Sanitize at the studio boundary: strip characters that would corrupt the
     // ledger's reference or token-set parsing. Plugin-only flows still receive
     // the raw names because this effect only runs for TOKENS_STUDIO_OAUTH.
     let newTokens = sanitizeNewTokensForStudio(importedTokens?.newTokens || []);
     const renamedCollections = currentState.tokenState.renamedCollections ?? [];
-    const previousTokens = currentState.tokenState.tokens;
     const previousThemes = currentState.tokenState.themes;
 
-    const updatedTokens = importedTokens?.updatedTokens || [];
+    let updatedTokens = importedTokens?.updatedTokens || [];
 
     let renamedSets: [string, string][] = [];
     if (hasChangeSetId && renamedCollections.length > 0) {
@@ -44,9 +43,16 @@ export function writeVariableImportToTokensStudio(dispatch: RematchDispatch<Root
       // A token that was already in a renamed set moved with it; only the set's new tokens need creating.
       newTokens = newTokens.filter((token) => {
         const rename = renamedSets.find(([, newName]) => sanitizeTokenSetName(newName) === token.parent);
-        return !rename || !(previousTokens?.[rename[0]] || []).some((existing) => sanitizeTokenName(existing.name) === token.name);
+        return !rename || !(previousTokens[rename[0]] || []).some((existing) => sanitizeTokenName(existing.name) === token.name);
       });
     }
+
+    // Changed tokens of a renamed collection are listed as updates. Unless their set was renamed in Studio above,
+    // it is new there too, so they are created with it.
+    const isInNewSet = (token: { parent?: string }) => !!token.parent && !previousTokens[token.parent]
+      && !renamedSets.some(([, newName]) => newName === token.parent);
+    newTokens = [...newTokens, ...sanitizeNewTokensForStudio(updatedTokens.filter(isInNewSet))];
+    updatedTokens = updatedTokens.filter((token) => !isInNewSet(token));
 
     if (hasChangeSetId) {
       // Renamed variables and changed values update the existing tokens instead of creating new ones.
