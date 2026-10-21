@@ -153,6 +153,22 @@ describe('updateTokensInTokensStudio', () => {
     expect(renamed.size).toBe(1);
   });
 
+  it('matches sanitized set and token names against the raw local ones, and sanitizes updated values', async () => {
+    setState({ tokenSetMetadata: { 'Brand / Night': { id: 'set-night' } }, remoteData: {} });
+    mockPush.mockResolvedValue({ data: {} });
+
+    await updateTokensInTokensStudio(context, {
+      renames: [],
+      updatedTokens: [{ name: 'color.primary', value: '{ color.{base} }', parent: 'Brand/Night' }],
+      newTokens: [],
+      previousTokens: { 'Brand / Dark': [{ name: 'color. primary', $extensions: { id: 'token-primary' } }] },
+      renamedSets: [['Brand / Dark', 'Brand / Night']],
+    });
+
+    expect(pushed('LIST_TOKENS')).toEqual([]);
+    expect(pushed('BATCH_UPDATE_TOKENS')).toEqual([[{ token_id: 'token-primary', changes: { value: '{color.base}' } }]]);
+  });
+
   it('skips tokens it can\'t find in Studio and tokens without a set', async () => {
     setState({ tokenSetMetadata: { 'Brand/Light': { id: 'set-light' } }, remoteData: {} });
     mockPush.mockImplementation(async ({ action }: any) => (action === 'LIST_TOKENS' ? null : { data: {} }));

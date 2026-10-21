@@ -16,7 +16,6 @@ export * from './renameVariableIdsToTheme';
 export * from './renameVariableNamesToThemes';
 export * from './removeVariableNamesFromThemes';
 export * from './setThemesFromVariables';
-export * from './setTokensFromVariables';
 export * from './setTokensFromStyles';
 export * from './createMultipleTokens';
 export * from './disconnectVariableFromTheme';

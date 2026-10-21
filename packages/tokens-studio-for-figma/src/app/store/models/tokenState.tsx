@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import * as tokenStateReducers from './reducers/tokenState';
 import * as tokenStateEffects from './effects/tokenState';
 import { applyVariableImport } from './effects/tokenState/applyVariableImport';
+import { writeVariableImportToTokensStudio } from './effects/tokenState/writeVariableImportToTokensStudio';
 import parseTokenValues from '@/utils/parseTokenValues';
 import { notifyToUI } from '@/plugin/notifiers';
 import parseJson from '@/utils/parseJson';
@@ -403,7 +404,7 @@ export const tokenState = createModel<RootModel>()({
       tokens: withEditedTokens(state.tokens, data),
     }),
     // Applies a variables import as accepting everything in ImportedTokensDialog would, without the
-    // createMultipleTokens effect: with Tokens Studio sync, setTokensFromVariables already wrote the tokens.
+    // createMultipleTokens effect: with Tokens Studio sync, writeVariableImportToTokensStudio already wrote the tokens.
     // Renamed Figma variables: rename the token in its set, keeping its Tokens Studio id.
     renameImportedVariableTokens: (state, renames: { set: string; oldName: string; newName: string }[]): TokenState => {
       const tokens = { ...state.tokens };
@@ -416,14 +417,21 @@ export const tokenState = createModel<RootModel>()({
     },
     applyImportedVariableTokens: (state): TokenState => {
       const { newTokens, updatedTokens } = state.importedTokens;
-      const existing = (token: { parent?: string; name: string }) => (token.parent ? state.tokens[token.parent]?.find((t) => t.name === token.name) : undefined);
+      const findExisting = (token: { parent?: string; name: string }) => (token.parent ? state.tokens[token.parent]?.find((t) => t.name === token.name) : undefined);
       // A token can already be there although the import calls it new: it moved with a renamed set, or its
       // variable was renamed. Its imported value still applies. Keep the Tokens Studio id an edit would drop.
-      const edits = [...updatedTokens, ...newTokens.filter((token) => existing(token))].map((token) => {
-        const id = (existing(token)?.$extensions as { id?: string } | undefined)?.id;
+      const edits: typeof updatedTokens = [];
+      const creates: typeof newTokens = [];
+      const withExistingId = (token: (typeof updatedTokens)[number], existing: ReturnType<typeof findExisting>) => {
+        const id = (existing?.$extensions as { id?: string } | undefined)?.id;
         return id ? { ...token, $extensions: { ...token.$extensions, id } } : token;
+      };
+      updatedTokens.forEach((token) => edits.push(withExistingId(token, findExisting(token))));
+      newTokens.forEach((token) => {
+        const existing = findExisting(token);
+        if (existing) edits.push(withExistingId(token, existing));
+        else creates.push(token);
       });
-      const creates = newTokens.filter((token) => !existing(token));
       return {
         ...state,
         tokens: withCreatedTokens(withEditedTokens(state.tokens, edits as EditSingleTokenData[]), creates as CreateSingleTokenData[]),
@@ -1225,6 +1233,9 @@ export const tokenState = createModel<RootModel>()({
           });
         }
       }
+    },
+    writeVariableImportToTokensStudio(_payload: void, rootState): Promise<void> {
+      return writeVariableImportToTokensStudio(dispatch)(_payload, rootState);
     },
     applyVariableImport(_payload: void, rootState): boolean {
       return applyVariableImport(dispatch)(_payload, rootState);

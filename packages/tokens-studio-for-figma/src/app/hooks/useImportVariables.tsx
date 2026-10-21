@@ -18,7 +18,7 @@ export function useImportVariables() {
   const api = useSelector(apiSelector);
   const { confirm } = useConfirm();
   const { t } = useTranslation(['tokens']);
-  // setTokensFromVariables and setThemesFromVariables decide on `api.provider` whether to write to Tokens Studio.
+  // writeVariableImportToTokensStudio decides on `api.provider` whether to write to Tokens Studio.
   const writesToTokensStudio = isTokensStudioSync || api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH;
   const branch = (api as { branch?: string } | undefined)?.branch;
 

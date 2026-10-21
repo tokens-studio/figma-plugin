@@ -5,7 +5,7 @@ import type { ThemeObjectsList } from '@/types';
 import { pushToTokensStudioOAuth } from '../../../../providers/tokens-studio/tokensStudioOAuth';
 import { store } from '@/app/store';
 import {
-  lookupBySanitized, resolveSanitizedKey, sanitizeTokenName, sanitizeTokenSetName, toStudioThemeGroupName,
+  lookupBySanitized, resolveSanitizedKey, sanitizeReferencesInValue, sanitizeTokenName, sanitizeTokenSetName, toStudioThemeGroupName,
 } from './sanitizeForStudio';
 import type { TokenRename } from './findRenamedVariableTokens';
 
@@ -109,16 +109,18 @@ export async function updateTokensInTokensStudio(
   if (renames.length === 0 && updatedTokens.length === 0) return renamedTokens;
 
   // The set a token was in before this import: a renamed set still has its old name in previousTokens.
-  const previousSetName = (set: string) => renamedSets.find(([, newName]) => newName === set)?.[0] ?? set;
+  // Set and token names can come raw or sanitized for Studio, so they are compared sanitized.
+  const previousSetName = (set: string) => renamedSets.find(([, newName]) => sanitizeTokenSetName(newName) === sanitizeTokenSetName(set))?.[0] ?? set;
 
   let studioTokens: Array<{ id: string; name: string; token_set_id: string }> | null = null;
   const findTokenId = async (set: string, name: string): Promise<string | undefined> => {
-    const local = (previousTokens?.[previousSetName(set)] || []).find((token) => token.name === name);
+    const sanitized = sanitizeTokenName(name);
+    const previousSet = lookupBySanitized(previousTokens, sanitizeTokenSetName(previousSetName(set)), sanitizeTokenSetName);
+    const local = (previousSet || []).find((token) => sanitizeTokenName(token.name) === sanitized);
     if (local?.$extensions?.id) return local.$extensions.id;
     // Tokens this plugin created through an import don't have their Studio id locally; look it up.
     if (!studioTokens) studioTokens = (await pushToTokensStudioOAuth({ context, action: 'LIST_TOKENS', data: {} })) || [];
     const setId = findStudioSet(set)?.id;
-    const sanitized = sanitizeTokenName(name);
     return studioTokens!.find((token) => token.token_set_id === setId && sanitizeTokenName(token.name) === sanitized)?.id;
   };
 
@@ -136,7 +138,8 @@ export async function updateTokensInTokensStudio(
     if (!token.parent) continue;
     // eslint-disable-next-line no-await-in-loop
     const tokenId = await findTokenId(token.parent, token.name);
-    if (tokenId) updates.push({ token_id: tokenId, changes: { value: token.value } });
+    // Unlike newTokens, updatedTokens aren't sanitized for Studio yet.
+    if (tokenId) updates.push({ token_id: tokenId, changes: { value: sanitizeReferencesInValue(token.value) } });
   }
 
   if (updates.length > 0) {

@@ -6,7 +6,7 @@ import { track } from '@/utils/analytics';
 import { findRenamedVariableTokens } from './utils/findRenamedVariableTokens';
 
 // With Tokens Studio sync a variables import has already been written to the project by
-// setTokensFromVariables and setThemesFromVariables, so there is nothing left to choose in
+// writeVariableImportToTokensStudio, so there is nothing left to choose in
 // ImportedTokensDialog. Apply the import as its "Import all" would instead of showing it.
 // Returns whether it applied the import; other providers keep the dialog.
 export function applyVariableImport(dispatch: RematchDispatch<RootModel>) {
