@@ -41,7 +41,7 @@ export function deleteTheme(dispatch: RematchDispatch<RootModel>) {
         data: { id: groupId },
       });
       const remainingGroups = { ...(metadata?.themeGroupsData || {}) };
-      delete remainingGroups[resolveSanitizedKey(remainingGroups, toStudioThemeGroupName(groupName), toStudioThemeGroupName) ?? groupName];
+      delete remainingGroups[resolveSanitizedKey(remainingGroups, toStudioThemeGroupName(groupName), toStudioThemeGroupName) ?? toStudioThemeGroupName(groupName)];
       dispatch.tokenState.setRemoteMetadata({ ...metadata, themeGroupsData: remainingGroups });
     }
   };
