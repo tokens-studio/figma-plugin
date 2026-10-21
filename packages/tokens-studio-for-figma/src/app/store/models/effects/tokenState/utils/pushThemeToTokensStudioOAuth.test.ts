@@ -343,6 +343,22 @@ describe('pushThemeToTokensStudioOAuth theme group names', () => {
     }));
   });
 
+  it('refuses a group name Tokens Studio has nothing left of, instead of creating an unnamed group', async () => {
+    mockGetState.mockReturnValue({
+      tokenState: { remoteData: { metadata: { themeGroupsData: {}, tokenSetsData: {} } }, themes: [{ ...localTheme, group: '🎨' }] },
+    } as any);
+
+    const result = await pushThemeToTokensStudioOAuth({ ...newThemePayload, group: '🎨' }, rootState, dispatch, { notifyOnFailure: false });
+
+    expect(result).toEqual({
+      ok: false,
+      failure: expect.objectContaining({ action: 'create', groupName: '🎨' }),
+    });
+    expect(mockPush).not.toHaveBeenCalled();
+    expect(dispatch.tokenState.setRemoteMetadata).not.toHaveBeenCalled();
+    expect(dispatch.tokenState.removeTheme).toHaveBeenCalledWith('local-hash-id');
+  });
+
   it('finds the existing group for a collection name with a space', async () => {
     mockGetState.mockReturnValue({
       tokenState: {
