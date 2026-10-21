@@ -35,10 +35,11 @@ export function setTokensFromVariables(dispatch: RematchDispatch<RootModel>) {
     if (hasChangeSetId && renamedCollections.length > 0) {
       const renamedSets = await renameTokenSetsInTokensStudio(context, renamedCollections, dispatch);
       // A token that was already in a renamed set moved with it; only the set's new tokens need creating.
-      newTokens = newTokens.filter((token) => {
-        const rename = renamedSets.find(([, newName]) => sanitizeTokenSetName(newName) === token.parent);
-        return !rename || !(previousTokens?.[rename[0]] || []).some((existing) => sanitizeTokenName(existing.name) === token.name);
-      });
+      const movedTokenNames = new Map(renamedSets.map(([oldName, newName]) => [
+        sanitizeTokenSetName(newName),
+        new Set((previousTokens?.[oldName] || []).map((existing) => sanitizeTokenName(existing.name))),
+      ]));
+      newTokens = newTokens.filter((token) => !movedTokenNames.get(token.parent!)?.has(token.name));
     }
 
     // Only create token sets and tokens if changeSetId is present — the REST API requires it.

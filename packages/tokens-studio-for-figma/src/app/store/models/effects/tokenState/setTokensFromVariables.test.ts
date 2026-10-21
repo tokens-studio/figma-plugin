@@ -176,6 +176,27 @@ describe('setTokensFromVariables', () => {
     expect(mockPushTheme).toHaveBeenCalledWith(expect.objectContaining({ id: 'theme-dark', group: 'BrandCore' }), expect.anything(), dispatch, expect.anything());
   });
 
+  it('keeps the rest of a renamed set\'s metadata', async () => {
+    const state: any = {
+      uiState: { api: { provider: StorageProviderType.TOKENS_STUDIO_OAUTH, id: 'project-1', changeSetId: 'change-set-1' } },
+      tokenState: {
+        renamedCollections: [['Brand/Dark', 'Brand/Night']],
+        tokens: {},
+        themes: [],
+        importedTokens: { newTokens: [] },
+        tokenSetMetadata: { 'Brand/Dark': { id: 'set-dark', isDynamic: true, fromVariableImport: true } },
+        importedThemes: { newThemes: [], updatedThemes: [] },
+      },
+    };
+    mockGetState.mockImplementation(() => state);
+    dispatch.tokenState.setTokenSetMetadata.mockImplementation((metadata: any) => { state.tokenState.tokenSetMetadata = metadata; });
+    mockPush.mockImplementation(async () => ({ data: {} }));
+
+    await setTokensFromVariables(dispatch)({} as any, {});
+
+    expect(state.tokenState.tokenSetMetadata).toEqual({ 'Brand/Night': { id: 'set-dark', isDynamic: true, fromVariableImport: true } });
+  });
+
   it('pushes the themes after the token sets, new ones without their local id', async () => {
     setState();
 
