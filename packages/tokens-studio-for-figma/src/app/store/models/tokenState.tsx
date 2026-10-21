@@ -100,6 +100,69 @@ export interface TokenState {
   serverResolvedTokens: Record<string, string> | null;
 }
 
+// Figma has no font weight variable type, so a numeric font weight comes back from the import as a number
+// or px dimension, or as a fontWeights token when the variable is scoped to font weight alone.
+// Keep existing font weight tokens as unitless fontWeights instead of e.g. "400px" dimensions.
+function keepFontWeightType(existingToken: SingleToken, token: VariableToCreateToken): VariableToCreateToken {
+  if (existingToken.type !== TokenTypes.FONT_WEIGHTS) return token;
+  if (token.type !== TokenTypes.NUMBER && token.type !== TokenTypes.DIMENSION && token.type !== TokenTypes.FONT_WEIGHTS) return token;
+  const value = String(token.value);
+  if (value.startsWith('{')) return { ...token, type: TokenTypes.FONT_WEIGHTS };
+  const fontWeight = value.match(/^(-?\d*\.?\d+)(px)?$/)?.[1];
+  if (fontWeight === undefined) return token;
+  return { ...token, type: TokenTypes.FONT_WEIGHTS, value: typeof existingToken.value === 'number' ? Number(fontWeight) : fontWeight };
+}
+
+// Figma reports these defaults for every variable. Only import them when the token already has the key,
+// so a token that had specific scopes or was hidden still gets the change saved.
+const FIGMA_EXTENSION_DEFAULTS: Record<string, unknown> = {
+  'com.figma.scopes': ['ALL_SCOPES'],
+  'com.figma.hiddenFromPublishing': false,
+};
+
+function withoutDefaultFigmaExtensions(token: VariableToCreateToken, existingToken?: SingleToken): VariableToCreateToken {
+  if (!token.$extensions) return token;
+  const $extensions: Record<string, unknown> = { ...token.$extensions };
+  Object.entries(FIGMA_EXTENSION_DEFAULTS).forEach(([key, defaultValue]) => {
+    if (isEqual($extensions[key], defaultValue) && !(key in (existingToken?.$extensions ?? {}))) {
+      delete $extensions[key];
+    }
+  });
+  if (Object.keys($extensions).length === 0) return omit(token, '$extensions');
+  return { ...token, $extensions };
+}
+
+// Figma only knows the com.figma.* keys, so keep the token's other metadata, such as its Studio id. A color
+// modifier is left out: the value from Figma already is the final color.
+function withExistingExtensions(token: VariableToCreateToken, existingToken: SingleToken): VariableToCreateToken {
+  const existing = Object.entries(existingToken.$extensions ?? {}).filter(([key]) => !key.startsWith('com.figma.'));
+  if (existing.length === 0) return { ...token };
+  const $extensions: NonNullable<SingleToken['$extensions']> = Object.fromEntries(existing);
+  const studioTokens = omit($extensions['studio.tokens'] ?? {}, 'modify');
+  if (Object.keys(studioTokens).length > 0) {
+    $extensions['studio.tokens'] = studioTokens;
+  } else {
+    delete $extensions['studio.tokens'];
+  }
+  return { ...token, $extensions: { ...$extensions, ...token.$extensions } };
+}
+
+// The import only brings in the com.figma.* keys, so those are the only ones that can have changed in Figma.
+// Sorted, because isEqual also compares the order of keys and array items.
+function sortedFigmaExtensions($extensions: SingleToken['$extensions']): [string, unknown][] {
+  const sortDeep = (value: unknown): unknown => {
+    if (Array.isArray(value)) return [...value].sort();
+    if (value && typeof value === 'object') {
+      return Object.entries(value).sort(([a], [b]) => a.localeCompare(b)).map(([key, nested]) => [key, sortDeep(nested)]);
+    }
+    return value;
+  };
+  return Object.entries($extensions ?? {})
+    .filter(([key]) => key.startsWith('com.figma.'))
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([key, value]) => [key, sortDeep(value)]);
+}
+
 export const tokenState = createModel<RootModel>()({
   state: {
     tokens: {
@@ -270,6 +333,8 @@ export const tokenState = createModel<RootModel>()({
           newTokens: [],
           updatedTokens: [],
         },
+        // Renames belong to the import being closed
+        renamedCollections: null,
         tokenSetMetadata: cleanedMetadata,
       };
     },
@@ -322,7 +387,7 @@ export const tokenState = createModel<RootModel>()({
         }
         const existingTokenIndex = newTokens[token.parent].findIndex((n) => n.name === token.name);
         if (existingTokenIndex === -1) {
-          newTokens[token.parent].push(updateTokenPayloadToSingleToken(token as UpdateTokenPayload, uuidv4()));
+          newTokens[token.parent].push(updateTokenPayloadToSingleToken(token as UpdateTokenPayload));
         }
       });
 
@@ -335,11 +400,12 @@ export const tokenState = createModel<RootModel>()({
       // This is a deep clone of the tokens so that we force an update in the UI even if just the value changes
       const newTokens: TokenStore['values'] = JSON.parse(JSON.stringify(state.tokens));
       data.forEach((token) => {
-        const existingTokenIndex = newTokens[token.parent].findIndex((n) => n.name === token.name);
+        // A set can be gone after renamed collections are applied
+        const existingTokenIndex = newTokens[token.parent]?.findIndex((n) => n.name === token.name) ?? -1;
         if (existingTokenIndex > -1) {
           newTokens[token.parent] = [
             ...newTokens[token.parent].slice(0, existingTokenIndex),
-            updateTokenPayloadToSingleToken(token as UpdateTokenPayload, uuidv4()),
+            updateTokenPayloadToSingleToken(token as UpdateTokenPayload),
             ...newTokens[token.parent].slice(existingTokenIndex + 1),
           ];
         }
@@ -466,35 +532,42 @@ export const tokenState = createModel<RootModel>()({
       const newTokens: VariableToCreateToken[] = [];
       const existingTokens: VariableToCreateToken[] = [];
       const updatedTokens: VariableToCreateToken[] = [];
+      // pullVariables sends renamed collections first. A renamed set doesn't exist under its new name until the
+      // import is applied, so compare its variables with the tokens of the set's old name.
+      const renamedFrom = Object.fromEntries((state.renamedCollections ?? []).map(([oldName, newName]) => [newName, oldName]));
 
       // Iterate over received styles and check if they existed before or need updating
       Object.values(receivedVariables).forEach((values) => {
         values.forEach((token) => {
+          const existingSet = state.tokens[token.parent] ?? state.tokens[renamedFrom[token.parent]];
           // If a set exists for the token
-          if (state.tokens[token.parent]) {
-            const oldValue = state.tokens[token.parent].find((t) => t.name === token.name);
+          if (existingSet) {
+            const oldValue = existingSet.find((t) => t.name === token.name);
             // If the token already exists
             if (oldValue) {
+              const importedToken = keepFontWeightType(oldValue, withoutDefaultFigmaExtensions(token, oldValue));
               const normalizedOldValueDescription = oldValue.description ?? '';
               const normalizedTokenDescription = token.description ?? '';
-              const normalizedOldValueExtensions = oldValue.$extensions ?? {};
-              const normalizedTokenExtensions = token.$extensions ?? {};
-              if (
-                isEqual(oldValue.value, token.value)
+              const normalizedOldValueExtensions = sortedFigmaExtensions(oldValue.$extensions);
+              const normalizedTokenExtensions = sortedFigmaExtensions(importedToken.$extensions);
+              const isUnchanged = isEqual(oldValue.value, importedToken.value)
                 && isEqual(normalizedOldValueDescription, normalizedTokenDescription)
-                && isEqual(normalizedOldValueExtensions, normalizedTokenExtensions)
-              ) {
+                && isEqual(normalizedOldValueExtensions, normalizedTokenExtensions);
+              if (isUnchanged && !state.tokens[token.parent]) {
+                // Still listed, so that Import all applies the rename
+                newTokens.push(withoutDefaultFigmaExtensions(token));
+              } else if (isUnchanged) {
                 existingTokens.push(token);
               } else {
-                const updatedToken = { ...token };
+                const updatedToken = withExistingExtensions(importedToken, oldValue);
                 updatedToken.oldValue = oldValue.value;
                 updatedTokens.push(updatedToken);
               }
             } else {
-              newTokens.push(token);
+              newTokens.push(withoutDefaultFigmaExtensions(token));
             }
           } else {
-            newTokens.push(token);
+            newTokens.push(withoutDefaultFigmaExtensions(token));
           }
         });
       });
@@ -511,7 +584,7 @@ export const tokenState = createModel<RootModel>()({
       const index = state.tokens[data.parent].findIndex((token) => token.name === nameToFind);
       const newArray = [...state.tokens[data.parent]];
       newArray[index] = {
-        ...omit(newArray[index], 'description', '$deprecated'),
+        ...omit(newArray[index], 'description', '$deprecated', '$extensions'),
         ...updateTokenPayloadToSingleToken(data),
       } as SingleToken;
       return {

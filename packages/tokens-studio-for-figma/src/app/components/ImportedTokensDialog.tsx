@@ -6,7 +6,7 @@ import Modal from './Modal';
 import { Dispatch } from '../store';
 import useManageTokens from '../store/useManageTokens';
 import {
-  activeTokenSetSelector, importedTokensSelector, importedThemesSelector, themesListSelector, renamedCollectionsSelector, storageTypeSelector,
+  activeTokenSetSelector, importedTokensSelector, importedThemesSelector, themesListSelector, renamedCollectionsSelector, storageTypeSelector, tokensSelector,
 } from '@/selectors';
 import Stack from './Stack';
 import AddIcon from '@/icons/add.svg';
@@ -101,6 +101,7 @@ export default function ImportedTokensDialog() {
   const dispatch = useDispatch<Dispatch>();
   const { editSingleToken, createSingleToken, importMultipleTokens } = useManageTokens();
   const activeTokenSet = useSelector(activeTokenSetSelector);
+  const tokensBySet = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
   const importedTokens = useSelector(importedTokensSelector);
   const importedThemes = useSelector(importedThemesSelector);
@@ -239,7 +240,7 @@ export default function ImportedTokensDialog() {
   const handleCreateSingleClick = React.useCallback((token: any) => {
     // Create new tokens according to styles
     createSingleToken({
-      parent: activeTokenSet,
+      parent: token.parent || activeTokenSet,
       name: token.name,
       value: token.value,
       type: token.type,
@@ -247,23 +248,30 @@ export default function ImportedTokensDialog() {
       shouldUpdateDocument: true,
     });
     track('Import single variable', { type: token.type });
-    setNewTokens(newTokens.filter((newToken) => newToken.name !== token.name));
+    setNewTokens(newTokens.filter((newToken) => newToken.name !== token.name || newToken.parent !== token.parent));
   }, [newTokens, activeTokenSet, createSingleToken]);
 
   const handleUpdateSingleClick = React.useCallback((token: any) => {
-    // Go through each token that needs to be updated
-    editSingleToken({
-      parent: activeTokenSet,
+    const parent = token.parent || activeTokenSet;
+    const singleToken = {
+      parent,
       name: token.name,
       value: token.value,
       type: token.type,
       description: token.description,
+      $extensions: token.$extensions,
       shouldUpdateDocument: true,
-    });
+    };
+    // A token of a renamed collection has no set under the new name until Import all applies the rename
+    if (tokensBySet[parent]) {
+      editSingleToken(singleToken);
+    } else {
+      createSingleToken(singleToken);
+    }
     track('Update single variable', { type: token.type });
 
-    setUpdatedTokens(updatedTokens.filter((updatedToken) => updatedToken.name !== token.name));
-  }, [updatedTokens, editSingleToken, activeTokenSet]);
+    setUpdatedTokens(updatedTokens.filter((updatedToken) => updatedToken.name !== token.name || updatedToken.parent !== token.parent));
+  }, [updatedTokens, editSingleToken, createSingleToken, tokensBySet, activeTokenSet]);
 
   const handleClose = React.useCallback(() => {
     dispatch.tokenState.resetImportedTokens();
