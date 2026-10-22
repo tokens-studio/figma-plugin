@@ -1,5 +1,17 @@
 # @tokens-studio/figma-plugin
 
+## 2.13.1
+
+### Patch Changes
+
+- c271191d2: Importing variables while a file syncs with Tokens Studio now asks for confirmation first. The import creates token sets, tokens and themes in the connected Tokens Studio project straight away, and the confirmation says so, names the branch and shows how many sets, tokens and themes it can add. Cancelling leaves both the plugin and Tokens Studio unchanged. Other sync providers are not affected.
+- ed5c48333: Fixed GitHub sync sometimes failing with "Unable to connect to GitHub" for repositories with many files.
+- 334862f38: Import Figma TIMING and EASING variables as duration and cubicBezier tokens.
+- bbfe20f1c: Importing variables no longer turns existing font weight tokens into `px` dimensions or numbers. They stay unitless `fontWeights` tokens, and only their number is updated. A number variable scoped to font weight alone, or a string variable scoped to font style alone, is always imported as a `fontWeights` token, without `px` or `rem` conversion. The import also skips Figma's default metadata (all scopes, not hidden from publishing) unless a token had other values for it, and tokens no longer show up as updated when nothing changed in Figma.
+- 6b3562288: Fixed documentation layers (value, raw value, name, description) staying empty when the token's value is `none`.
+- 31c2980ae: Fixed the plugin freezing briefly on large token sets whenever the Figma selection changed, after applying a token, when opening or closing the token edit form, or when collaborators edited the file. These freezes made token tooltips show up late or not at all. Each selection update now takes a fraction of the time, and remote edits outside your selection no longer refresh it.
+- 89e49cda6: Fixed several issues when importing variables. Updating or creating a single token in the import dialog now writes to the token's own set instead of the currently active set, and no longer removes same-named rows of other sets from the dialog. Value changes in a collection that was renamed in Figma are now applied on "Import all" instead of being silently dropped. Updated tokens now keep their Tokens Studio id and other plugin metadata instead of losing it on import.
+
 ## 2.13.0
 
 ### Minor Changes
