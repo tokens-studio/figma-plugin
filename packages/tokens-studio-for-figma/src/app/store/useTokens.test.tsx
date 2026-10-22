@@ -805,6 +805,26 @@ describe('useToken test', () => {
         expect.objectContaining({ type: AsyncMessageTypes.REMOVE_VARIABLES }),
       );
     });
+
+    it('removeVariablesByKeys sends REMOVE_VARIABLES with the given keys', async () => {
+      await act(async () => {
+        await result.current.removeVariablesByKeys(['key-abc', 'key-def']);
+      });
+      expect(messageSpy).toBeCalledWith({
+        type: AsyncMessageTypes.REMOVE_VARIABLES,
+        variableKeys: ['key-abc', 'key-def'],
+      });
+    });
+
+    it('removeVariablesByKeys does not send message for an empty list', async () => {
+      messageSpy.mockClear();
+      await act(async () => {
+        await result.current.removeVariablesByKeys([]);
+      });
+      expect(messageSpy).not.toBeCalledWith(
+        expect.objectContaining({ type: AsyncMessageTypes.REMOVE_VARIABLES }),
+      );
+    });
   });
 
   describe('createVariables', () => {
