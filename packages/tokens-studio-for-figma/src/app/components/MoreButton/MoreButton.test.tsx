@@ -68,18 +68,25 @@ describe('MoreButton', () => {
         <input data-testid="edit-form-input" />
       </Provider>,
     );
-    getByText(token.name).closest('button')?.focus();
-    await fireEvent.contextMenu(getByText(token.name));
-    act(() => {
-      fireEvent.click(getByText('Edit Token'));
-    });
-    // The edit form focuses its first field as it opens, before the closed menu restores focus
-    (document.querySelector('[data-testid="edit-form-input"]') as HTMLInputElement).focus();
-    await act(async () => {
-      await new Promise((resolve) => { setTimeout(resolve, 0); });
-    });
-    expect(showForm).toHaveBeenCalled();
-    expect(document.activeElement).toBe(document.querySelector('[data-testid="edit-form-input"]'));
+    jest.useFakeTimers();
+    try {
+      getByText(token.name).closest('button')?.focus();
+      fireEvent.contextMenu(getByText(token.name));
+      act(() => {
+        fireEvent.click(getByText('Edit Token'));
+      });
+      // The edit form focuses its first field as it opens, before the closed menu restores focus
+      (document.querySelector('[data-testid="edit-form-input"]') as HTMLInputElement).focus();
+      // The menu restores focus from a timer once it unmounts. Run it explicitly: waiting for the
+      // expectation instead would pass before that timer fires, with or without the fix.
+      act(() => {
+        jest.runOnlyPendingTimers();
+      });
+      expect(showForm).toHaveBeenCalled();
+      expect(document.activeElement).toBe(document.querySelector('[data-testid="edit-form-input"]'));
+    } finally {
+      jest.useRealTimers();
+    }
   });
 
   it('should show form on duplicate', async () => {

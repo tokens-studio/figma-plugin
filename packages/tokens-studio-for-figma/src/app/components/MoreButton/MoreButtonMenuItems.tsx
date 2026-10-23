@@ -35,7 +35,7 @@ type Props = {
 // useTokens and useConfirm) are not paid by every token in the list on every store update.
 // Renders the items only: ContextMenu.Content has to stay the Portal's direct child, since the Portal
 // passes it the ref that tracks the close animation.
-export const MoreButtonMenu: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
+export const MoreButtonMenuItems: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
   token,
   visibleProperties,
   showForm,

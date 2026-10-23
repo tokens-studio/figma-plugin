@@ -23,7 +23,7 @@ import TokenButtonContent from '../TokenButton/TokenButtonContent';
 import { useGetActiveState } from '@/hooks';
 import { usePropertiesForTokenType } from '../../hooks/usePropertiesForType';
 import { getAliasValue } from '@/utils/alias';
-import { MoreButtonMenu } from './MoreButtonMenu';
+import { MoreButtonMenuItems } from './MoreButtonMenuItems';
 
 // @TODO typing
 
@@ -137,7 +137,7 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
       </ContextMenu.Trigger>
       <ContextMenu.Portal>
         <ContextMenu.Content alignOffset={5} collisionPadding={30} onCloseAutoFocus={handleCloseAutoFocus}>
-          <MoreButtonMenu
+          <MoreButtonMenuItems
             token={token}
             visibleProperties={visibleProperties}
             showForm={showForm}
