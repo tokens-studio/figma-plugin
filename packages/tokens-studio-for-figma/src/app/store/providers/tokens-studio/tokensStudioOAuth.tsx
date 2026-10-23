@@ -42,6 +42,8 @@ import {
   deleteThemeOptionRest,
   listThemeOptionsRest,
   batchCreateTokensRest,
+  batchUpdateTokensRest,
+  listTokensSlimRest,
   isNameConflictError,
 } from '../../../../utils/tokensStudio/restApi';
 
@@ -59,6 +61,7 @@ interface PushToTokensStudioOAuth {
 
 const ACTION_LABELS: Record<string, string> = {
   BATCH_CREATE_TOKENS: 'Created tokens',
+  BATCH_UPDATE_TOKENS: 'Updated tokens',
   CREATE_TOKEN: 'Created token',
   EDIT_TOKEN: 'Updated token',
   DELETE_TOKEN: 'Deleted token',
@@ -114,6 +117,21 @@ export const pushToTokensStudioOAuth = async ({
       case 'BATCH_CREATE_TOKENS':
         result = await batchCreateTokensRest(oauthTokens.accessToken, apiBaseUrl, projectId, data.map(convertTokenValueForStudio), changeSetId);
         break;
+      case 'BATCH_UPDATE_TOKENS':
+        result = await batchUpdateTokensRest(
+          oauthTokens.accessToken,
+          apiBaseUrl,
+          projectId,
+          data.map((update: { token_id: string; changes: { name?: string; value?: unknown } }) => ({
+            ...update,
+            changes: convertTokenValueForStudio(update.changes),
+          })),
+          changeSetId,
+        );
+        break;
+      case 'LIST_TOKENS':
+        // A read, so it gets no success message.
+        return await listTokensSlimRest(oauthTokens.accessToken, apiBaseUrl, projectId, changeSetId);
       case 'CREATE_TOKEN':
         result = await createTokenRest(oauthTokens.accessToken, apiBaseUrl, projectId, convertTokenValueForStudio(data), branch, changeSetId);
         break;

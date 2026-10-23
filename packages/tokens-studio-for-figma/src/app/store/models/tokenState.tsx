@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import * as tokenStateReducers from './reducers/tokenState';
 import * as tokenStateEffects from './effects/tokenState';
 import { applyVariableImport } from './effects/tokenState/applyVariableImport';
+import { writeVariableImportToTokensStudio } from './effects/tokenState/writeVariableImportToTokensStudio';
 import parseTokenValues from '@/utils/parseTokenValues';
 import { notifyToUI } from '@/plugin/notifiers';
 import parseJson from '@/utils/parseJson';
@@ -418,14 +419,39 @@ export const tokenState = createModel<RootModel>()({
       tokens: withChangedTokens(state.tokens, { edits: data }),
     }),
     // Applies a variables import as accepting everything in ImportedTokensDialog would, without the
-    // createMultipleTokens effect: with Tokens Studio sync, setTokensFromVariables already wrote the tokens.
+    // createMultipleTokens effect: with Tokens Studio sync, writeVariableImportToTokensStudio already wrote the tokens.
+    // Renamed Figma variables: rename the token in its set, keeping its Tokens Studio id.
+    renameImportedVariableTokens: (state, renames: { set: string; oldName: string; newName: string }[]): TokenState => {
+      const tokens = { ...state.tokens };
+      renames.forEach(({ set, oldName, newName }) => {
+        const setTokens = tokens[set];
+        if (!setTokens || setTokens.some((token) => token.name === newName)) return;
+        tokens[set] = setTokens.map((token) => (token.name === oldName ? { ...token, name: newName } : token));
+      });
+      return { ...state, tokens };
+    },
     applyImportedVariableTokens: (state): TokenState => {
       const { newTokens, updatedTokens } = state.importedTokens;
+      const findExisting = (token: { parent?: string; name: string }) => (token.parent ? state.tokens[token.parent]?.find((t) => t.name === token.name) : undefined);
+      // A token can already be there although the import calls it new: it moved with a renamed set, or its
+      // variable was renamed. Its imported value still applies. Keep the Tokens Studio id an edit would drop.
+      const edits: typeof updatedTokens = [];
+      const creates: typeof newTokens = [];
+      const withExistingId = (token: (typeof updatedTokens)[number], existing: ReturnType<typeof findExisting>) => {
+        const id = (existing?.$extensions as { id?: string } | undefined)?.id;
+        return id ? { ...token, $extensions: { ...token.$extensions, id } } : token;
+      };
+      updatedTokens.forEach((token) => edits.push(withExistingId(token, findExisting(token))));
+      newTokens.forEach((token) => {
+        const existing = findExisting(token);
+        if (existing) edits.push(withExistingId(token, existing));
+        else creates.push(token);
+      });
       return {
         ...state,
         tokens: withChangedTokens(state.tokens, {
-          edits: updatedTokens as EditSingleTokenData[],
-          creates: newTokens as CreateSingleTokenData[],
+          edits: edits as EditSingleTokenData[],
+          creates: creates as CreateSingleTokenData[],
         }),
         importedTokens: {
           newTokens: [],
@@ -835,7 +861,9 @@ export const tokenState = createModel<RootModel>()({
           // Check if anything has changed that requires an update
           const needsUpdate = !isEqual(existingTheme.selectedTokenSets, theme.selectedTokenSets)
             || !isEqual(existingTheme.name, theme.name)
-            || !isEqual(existingTheme.group, theme.group);
+            || !isEqual(existingTheme.group, theme.group)
+            // A renamed, added or removed variable changes these; stale ones point styles at the wrong token.
+            || !isEqual(existingTheme.$figmaVariableReferences, theme.$figmaVariableReferences);
 
           if (needsUpdate) {
             updatedThemes.push({
@@ -1229,6 +1257,9 @@ export const tokenState = createModel<RootModel>()({
           });
         }
       }
+    },
+    writeVariableImportToTokensStudio(_payload: void, rootState): Promise<void> {
+      return writeVariableImportToTokensStudio(dispatch)(_payload, rootState);
     },
     applyVariableImport(_payload: void, rootState): boolean {
       return applyVariableImport(dispatch)(_payload, rootState);
