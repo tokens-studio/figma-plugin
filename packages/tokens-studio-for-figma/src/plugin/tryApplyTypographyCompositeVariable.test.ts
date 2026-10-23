@@ -3,6 +3,8 @@ import { defaultTokenValueRetriever } from './TokenValueRetriever';
 import { SingleTypographyToken } from '@/types/tokens';
 import { ResolvedTypographyObject } from './ResolvedTypographyObject';
 import { ApplyVariablesStylesOrRawValues } from '@/constants/ApplyVariablesStyleOrder';
+import { mockLoadFontAsync } from '../../tests/__mocks__/figmaMock';
+import { clearFontLoadCache } from './loadFontOnce';
 
 describe('tryApplyTypographyCompositeVariable', () => {
   let target: TextNode | TextStyle;
@@ -11,6 +13,7 @@ describe('tryApplyTypographyCompositeVariable', () => {
   let baseFontSize: string;
 
   beforeEach(() => {
+    clearFontLoadCache();
     target = {} as TextNode | TextStyle;
     value = {};
     resolvedValue = {};
@@ -31,10 +34,34 @@ describe('tryApplyTypographyCompositeVariable', () => {
     resolvedValue = {};
 
     await tryApplyTypographyCompositeVariable({
-      target, value, resolvedValue, baseFontSize,
+      target,
+      value,
+      resolvedValue,
+      baseFontSize,
     });
 
     expect(target.fontName).toEqual({ family: 'Inter', style: 'Bold' });
+    expect(mockLoadFontAsync).toHaveBeenCalledTimes(1);
+  });
+
+  it('loads the existing font only once for multiple typography properties', async () => {
+    target = {
+      fontName: { family: 'Arial', style: 'Regular' },
+    } as TextNode;
+    value = {
+      fontSize: '24px',
+      letterSpacing: '1px',
+      lineHeight: '1.5',
+    };
+
+    await tryApplyTypographyCompositeVariable({
+      target,
+      value,
+      resolvedValue,
+      baseFontSize,
+    });
+
+    expect(mockLoadFontAsync).toHaveBeenCalledTimes(1);
   });
 
   it('should apply variables if available', async () => {
@@ -56,12 +83,16 @@ describe('tryApplyTypographyCompositeVariable', () => {
     const familyVariable = { valuesByMode: { default: ['Roboto'] } };
     const weightVariable = { valuesByMode: { default: ['Bold'] } };
     defaultTokenValueRetriever.getVariableReference = jest.fn().mockResolvedValue(familyVariable);
-    defaultTokenValueRetriever.getVariableReference = jest.fn()
+    defaultTokenValueRetriever.getVariableReference = jest
+      .fn()
       .mockResolvedValueOnce(familyVariable)
       .mockResolvedValueOnce(weightVariable);
 
     await tryApplyTypographyCompositeVariable({
-      target, value, resolvedValue, baseFontSize,
+      target,
+      value,
+      resolvedValue,
+      baseFontSize,
     });
 
     expect(target.setBoundVariable).toHaveBeenCalledTimes(2);
@@ -92,7 +123,10 @@ describe('tryApplyTypographyCompositeVariable', () => {
     defaultTokenValueRetriever.getVariableReference = jest.fn().mockResolvedValue(undefined);
 
     await tryApplyTypographyCompositeVariable({
-      target, value, resolvedValue, baseFontSize,
+      target,
+      value,
+      resolvedValue,
+      baseFontSize,
     });
 
     expect(target.fontName).toEqual({ family: 'Inter', style: 'Ultrabold' });
@@ -118,12 +152,16 @@ describe('tryApplyTypographyCompositeVariable', () => {
     };
     defaultTokenValueRetriever.applyVariablesStylesOrRawValue = ApplyVariablesStylesOrRawValues.RAW_VALUES;
     defaultTokenValueRetriever.getVariableReference = jest.fn().mockResolvedValue('Roboto');
-    defaultTokenValueRetriever.getVariableReference = jest.fn()
+    defaultTokenValueRetriever.getVariableReference = jest
+      .fn()
       .mockResolvedValueOnce('Roboto')
       .mockResolvedValueOnce('Bold');
 
     await tryApplyTypographyCompositeVariable({
-      target, value, resolvedValue, baseFontSize,
+      target,
+      value,
+      resolvedValue,
+      baseFontSize,
     });
 
     expect(target.fontName).toEqual({ family: 'Roboto-raw', style: 'Bold-raw' });
@@ -150,7 +188,10 @@ describe('tryApplyTypographyCompositeVariable', () => {
     };
 
     await tryApplyTypographyCompositeVariable({
-      target, value, resolvedValue, baseFontSize,
+      target,
+      value,
+      resolvedValue,
+      baseFontSize,
     });
 
     expect(target.fontName).toEqual({ family: 'Inter', style: 'Ultrabold' });
@@ -171,10 +212,15 @@ describe('tryApplyTypographyCompositeVariable', () => {
     resolvedValue = {
       fontFamily: '{fontFamilyVariable}',
     };
-    defaultTokenValueRetriever.getVariableReference = jest.fn().mockRejectedValue(new Error('Failed to get variable reference'));
+    defaultTokenValueRetriever.getVariableReference = jest
+      .fn()
+      .mockRejectedValue(new Error('Failed to get variable reference'));
 
     await tryApplyTypographyCompositeVariable({
-      target, value, resolvedValue, baseFontSize,
+      target,
+      value,
+      resolvedValue,
+      baseFontSize,
     });
   });
 
@@ -194,7 +240,10 @@ describe('tryApplyTypographyCompositeVariable', () => {
     defaultTokenValueRetriever.getVariableReference = jest.fn().mockResolvedValue(undefined);
 
     await tryApplyTypographyCompositeVariable({
-      target, value, resolvedValue, baseFontSize,
+      target,
+      value,
+      resolvedValue,
+      baseFontSize,
     });
 
     expect(target.letterSpacing).toEqual({ unit: 'PIXELS', value: 8 });

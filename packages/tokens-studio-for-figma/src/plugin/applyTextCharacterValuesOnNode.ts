@@ -1,6 +1,7 @@
 import { MapValuesToTokensResult } from '@/types';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { tryApplyVariableId } from '@/utils/tryApplyVariableId';
+import { loadFontOnce } from './loadFontOnce';
 
 // Utility function to format objects and arrays nicely for display
 function formatValueForDisplay(value: any): string {
@@ -61,7 +62,7 @@ export async function applyTextCharacterValuesOnNode(
   // Raw value for text layers
   if ('tokenValue' in values) {
     if ('characters' in node && node.fontName !== figma.mixed) {
-      await figma.loadFontAsync(node.fontName);
+      await loadFontOnce(node.fontName);
 
       // Use formatted display for objects and arrays, fallback to string for primitives
       const value = typeof values.tokenValue === 'object' ? formatValueForDisplay(values.tokenValue) : values.tokenValue;
@@ -77,14 +78,14 @@ export async function applyTextCharacterValuesOnNode(
     && typeof data.text !== 'undefined'
   ) {
     if (!(await tryApplyVariableId(node, 'characters', data.text))) {
-      await figma.loadFontAsync(node.fontName);
+      await loadFontOnce(node.fontName);
       node.characters = values.text;
     }
   }
   // Real value for text layers
   if ('value' in values) {
     if ('characters' in node && node.fontName !== figma.mixed) {
-      await figma.loadFontAsync(node.fontName);
+      await loadFontOnce(node.fontName);
       // Use formatted display for objects and arrays, fallback to string for primitives
       const value = typeof values.value === 'object' ? formatValueForDisplay(values.value) : values.value;
       node.characters = String(value);
@@ -94,7 +95,7 @@ export async function applyTextCharacterValuesOnNode(
   // Name value for text layers
   if (values.tokenName) {
     if ('characters' in node && node.fontName !== figma.mixed) {
-      await figma.loadFontAsync(node.fontName);
+      await loadFontOnce(node.fontName);
       node.characters = String(values.tokenName);
     }
   }
@@ -102,7 +103,7 @@ export async function applyTextCharacterValuesOnNode(
   // Name value for text layers
   if (values.description) {
     if ('characters' in node && node.fontName !== figma.mixed) {
-      await figma.loadFontAsync(node.fontName);
+      await loadFontOnce(node.fontName);
       node.characters = String(values.description);
     }
   }
