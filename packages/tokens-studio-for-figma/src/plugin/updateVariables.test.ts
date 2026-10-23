@@ -156,6 +156,38 @@ describe('updateVariables', () => {
     expect(result.removedVariables).toEqual(['VariableID:1:toremove']);
   });
 
+  it('should not create number variables for tokens resolving to AUTO', async () => {
+    const originalCreateVariable = figma.variables.createVariable;
+    const createdVariableNames: string[] = [];
+    figma.variables.createVariable = jest.fn().mockImplementation((name: string) => {
+      createdVariableNames.push(name);
+      return { ...newVariable, name, resolvedType: 'FLOAT' };
+    });
+
+    try {
+      await updateVariables({
+        collection,
+        mode: '1:2',
+        theme,
+        tokens: {
+          core: [
+            { name: 'spacing.auto', value: 'AUTO', type: TokenTypes.SPACING },
+            { name: 'spacing.stack', value: '{spacing.auto}', type: TokenTypes.SPACING },
+            { name: 'spacing.md', value: '16', type: TokenTypes.SPACING },
+            { name: 'lineHeight.auto', value: 'auto', type: TokenTypes.LINE_HEIGHTS },
+            { name: 'lineHeight.body', value: '24', type: TokenTypes.LINE_HEIGHTS },
+          ],
+        },
+        settings,
+        overallConfig: { core: TokenSetStatus.ENABLED },
+      });
+
+      expect(createdVariableNames).toEqual(['spacing/md', 'lineHeight/body']);
+    } finally {
+      figma.variables.createVariable = originalCreateVariable;
+    }
+  });
+
   it('should use theme-specific base font size for rem conversion', async () => {
     // Clear the mock before starting
     mockSetValueForMode.mockClear();
