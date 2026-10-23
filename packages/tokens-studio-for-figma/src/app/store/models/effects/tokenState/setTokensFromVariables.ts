@@ -4,6 +4,7 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { pushToTokensStudioOAuth } from '../../../providers/tokens-studio/tokensStudioOAuth';
 import { notifyThemePushFailures, pushThemeToTokensStudioOAuth, type ThemePushFailure } from './utils/pushThemeToTokensStudioOAuth';
 import {
+  lookupBySanitized,
   resolveSanitizedKey,
   sanitizeNewTokensForStudio,
   sanitizeThemeForStudio,
@@ -48,8 +49,16 @@ export function setTokensFromVariables(dispatch: RematchDispatch<RootModel>) {
         // Figma name, so an exact lookup would miss and create a duplicate set.
         // Write back under the resolved key for the same reason.
         const metadata = store.getState().tokenState.tokenSetMetadata as Record<string, any>;
-        const metaKey = resolveSanitizedKey(metadata, setName, sanitizeTokenSetName) ?? setName;
-        const existingMeta = metadata[metaKey];
+        // tokenSetMetadata is only filled when a pull replaces the local tokens, so it can be empty while
+        // the sets exist in Studio. Fall back to the ids from the last pull: creating a set whose name is
+        // taken is refused, and its tokens would never reach Studio.
+        const remoteSets = store.getState().tokenState.remoteData?.metadata?.tokenSetsData as Record<string, any> | undefined;
+        const metaKey = resolveSanitizedKey(metadata, setName, sanitizeTokenSetName)
+          ?? resolveSanitizedKey(remoteSets, setName, sanitizeTokenSetName)
+          ?? setName;
+        const existingMeta = metadata[metaKey]?.id
+          ? metadata[metaKey]
+          : (lookupBySanitized(remoteSets, setName, sanitizeTokenSetName) ?? metadata[metaKey]);
         let tokenSetId = existingMeta?.id;
 
         if (tokenSetId) {

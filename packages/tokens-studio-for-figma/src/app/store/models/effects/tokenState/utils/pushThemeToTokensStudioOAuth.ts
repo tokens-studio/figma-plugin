@@ -100,7 +100,9 @@ export async function pushThemeToTokensStudioOAuth(
   // may have stale remote metadata / themes that were just written by the reducer.
   const liveState = store.getState();
   const { metadata } = liveState.tokenState?.remoteData || {};
-  const { themeGroupsData, tokenSetsData } = metadata || {};
+  const { themeGroupsData } = metadata || {};
+  // Sets created since the last pull (a variables import creates them) are only recorded in tokenSetMetadata.
+  const tokenSetsData = { ...metadata?.tokenSetsData, ...liveState.tokenState?.tokenSetMetadata };
   const isNewTheme = !payload?.id;
   // Callers pass raw names (the theme form) or sanitized ones (variables imports); compare sanitized forms.
   const themeName = sanitizeDisplayName(payload?.name ?? '');
