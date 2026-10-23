@@ -313,6 +313,68 @@ describe('pushThemeToTokensStudioOAuth', () => {
   });
 });
 
+describe('pushThemeToTokensStudioOAuth theme group names', () => {
+  const dispatch: any = {
+    tokenState: {
+      removeTheme: jest.fn(), updateDocument: jest.fn(), setRemoteMetadata: jest.fn(), updateTheme: jest.fn(),
+    },
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('creates a group named the way Tokens Studio accepts, from a collection name with a space', async () => {
+    mockGetState.mockReturnValue({
+      tokenState: { remoteData: { metadata: { themeGroupsData: {}, tokenSetsData: {} } }, themes: [{ ...localTheme, group: 'Brand Core' }] },
+    } as any);
+    mockPush
+      .mockResolvedValueOnce({ data: { id: 'group-new' } })
+      .mockResolvedValueOnce({ data: { id: 'server-theme-id' } });
+
+    const result = await pushThemeToTokensStudioOAuth({ ...newThemePayload, group: 'Brand Core' }, rootState, dispatch);
+
+    expect(result).toEqual({ ok: true });
+    expect(pushCalls('CREATE_THEME_GROUP')[0][0].data).toEqual({ name: 'Brand-Core' });
+    expect(pushCalls('CREATE_THEME')[0][0].data.theme_group_id).toBe('group-new');
+    // The local theme keeps its Figma name.
+    expect(dispatch.tokenState.updateTheme).toHaveBeenCalledWith(expect.objectContaining({
+      theme: expect.objectContaining({ group: 'Brand Core', id: 'server-theme-id' }),
+    }));
+  });
+
+  it('refuses a group name Tokens Studio has nothing left of, instead of creating an unnamed group', async () => {
+    mockGetState.mockReturnValue({
+      tokenState: { remoteData: { metadata: { themeGroupsData: {}, tokenSetsData: {} } }, themes: [{ ...localTheme, group: '🎨' }] },
+    } as any);
+
+    const result = await pushThemeToTokensStudioOAuth({ ...newThemePayload, group: '🎨' }, rootState, dispatch, { notifyOnFailure: false });
+
+    expect(result).toEqual({
+      ok: false,
+      failure: expect.objectContaining({ action: 'create', groupName: '🎨' }),
+    });
+    expect(mockPush).not.toHaveBeenCalled();
+    expect(dispatch.tokenState.setRemoteMetadata).not.toHaveBeenCalled();
+    expect(dispatch.tokenState.removeTheme).toHaveBeenCalledWith('local-hash-id');
+  });
+
+  it('finds the existing group for a collection name with a space', async () => {
+    mockGetState.mockReturnValue({
+      tokenState: {
+        remoteData: { metadata: { themeGroupsData: { 'Brand-Core': { id: 'group-1' } }, tokenSetsData: {} } },
+        themes: [{ ...localTheme, group: 'Brand Core' }],
+      },
+    } as any);
+    mockPush.mockResolvedValueOnce({ data: { id: 'server-theme-id' } });
+
+    await pushThemeToTokensStudioOAuth({ ...newThemePayload, group: 'Brand Core' }, rootState, dispatch);
+
+    expect(pushCalls('CREATE_THEME_GROUP')).toHaveLength(0);
+    expect(pushCalls('CREATE_THEME')[0][0].data.theme_group_id).toBe('group-1');
+  });
+});
+
 describe('notifyThemePushFailures', () => {
   const failure = (themeName: string, reason: string) => ({ themeName, action: 'create' as const, reason });
 
