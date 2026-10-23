@@ -55,6 +55,33 @@ describe('MoreButton', () => {
     expect(mockShowForm).toHaveBeenCalled();
   });
 
+  it('should not move focus back to the token when edit opens the edit form', async () => {
+    const mockStore = createMockStore({});
+    const showForm = jest.fn(() => mockStore.dispatch.uiState.setShowEditForm(true));
+    const { getByText } = render(
+      <Provider store={mockStore}>
+        <MoreButton
+          type={TokenTypes.SPACING}
+          showForm={showForm}
+          token={token}
+        />
+        <input data-testid="edit-form-input" />
+      </Provider>,
+    );
+    getByText(token.name).closest('button')?.focus();
+    await fireEvent.contextMenu(getByText(token.name));
+    act(() => {
+      fireEvent.click(getByText('Edit Token'));
+    });
+    // The edit form focuses its first field as it opens, before the closed menu restores focus
+    (document.querySelector('[data-testid="edit-form-input"]') as HTMLInputElement).focus();
+    await act(async () => {
+      await new Promise((resolve) => { setTimeout(resolve, 0); });
+    });
+    expect(showForm).toHaveBeenCalled();
+    expect(document.activeElement).toBe(document.querySelector('[data-testid="edit-form-input"]'));
+  });
+
   it('should show form on duplicate', async () => {
     const { getByText } = render(
       <MoreButton

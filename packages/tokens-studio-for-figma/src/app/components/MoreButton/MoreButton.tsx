@@ -6,7 +6,7 @@ import { useDispatch, useStore } from 'react-redux';
 
 import { ContextMenu } from '@tokens-studio/ui';
 import {
-  activeTokenSetReadOnlySelector, editProhibitedSelector, mainNodeSelectionValuesSelector,
+  activeTokenSetReadOnlySelector, editProhibitedSelector, mainNodeSelectionValuesSelector, showEditFormSelector,
 } from '@/selectors';
 import { PropertyObject } from '@/types/properties';
 import { DocumentationProperties } from '@/constants/DocumentationProperties';
@@ -122,18 +122,28 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
     [handleEditClick, handleClick, properties, activeStateProperties, store, token.name],
   );
 
+  // Closing the menu returns focus to the token. When Edit or Duplicate just opened the edit form,
+  // that focus lands outside the (non-modal) form, which closes it again straight away.
+  const handleCloseAutoFocus = React.useCallback((event: Event) => {
+    if (showEditFormSelector(store.getState())) {
+      event.preventDefault();
+    }
+  }, [store]);
+
   return (
     <ContextMenu>
       <ContextMenu.Trigger id={`${token.name}-button}`}>
         <TokenButtonContent type={type} active={active} onClick={handleTokenClick} token={token} />
       </ContextMenu.Trigger>
       <ContextMenu.Portal>
-        <MoreButtonMenu
-          token={token}
-          visibleProperties={visibleProperties}
-          showForm={showForm}
-          onPropertyClick={handleClick}
-        />
+        <ContextMenu.Content alignOffset={5} collisionPadding={30} onCloseAutoFocus={handleCloseAutoFocus}>
+          <MoreButtonMenu
+            token={token}
+            visibleProperties={visibleProperties}
+            showForm={showForm}
+            onPropertyClick={handleClick}
+          />
+        </ContextMenu.Content>
       </ContextMenu.Portal>
     </ContextMenu>
   );
