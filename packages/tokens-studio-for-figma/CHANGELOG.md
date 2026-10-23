@@ -1,5 +1,11 @@
 # @tokens-studio/figma-plugin
 
+## 2.13.2
+
+### Patch Changes
+
+- 83a88ba6a: Fixed the token edit form closing right after it opened when choosing Edit Token or Duplicate Token from a token's right-click menu.
+
 ## 2.13.1
 
 ### Patch Changes
