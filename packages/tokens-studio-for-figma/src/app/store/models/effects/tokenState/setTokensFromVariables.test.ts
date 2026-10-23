@@ -127,6 +127,76 @@ describe('setTokensFromVariables', () => {
     ]);
   });
 
+  it('renames the set and theme group in Studio for a renamed collection and mode', async () => {
+    // A live state, so the ids written by the rename are found by the steps after it.
+    const state: any = {
+      uiState: { api: { provider: StorageProviderType.TOKENS_STUDIO_OAUTH, id: 'project-1', changeSetId: 'change-set-1' } },
+      tokenState: {
+        renamedCollections: [['Brand/Dark', 'BrandCore/Night']],
+        tokens: { 'Brand/Dark': [{ name: 'color.primary', value: '#66b2ff', type: 'color' }] },
+        themes: [{ id: 'theme-dark', name: 'Dark', group: 'Brand' }],
+        importedTokens: {
+          newTokens: [
+            // Moved with the set: Studio has it already.
+            {
+              name: 'color.primary', value: '#66b2ff', type: 'color', parent: 'BrandCore/Night',
+            },
+            {
+              name: 'color.new', value: '#000000', type: 'color', parent: 'BrandCore/Night',
+            },
+          ],
+        },
+        tokenSetMetadata: {},
+        remoteData: {
+          metadata: {
+            tokenSetsData: { 'Brand/Dark': { id: 'set-dark', isDynamic: false } },
+            themeGroupsData: { Brand: { id: 'group-brand' } },
+          },
+        },
+        importedThemes: { newThemes: [], updatedThemes: [{ id: 'theme-dark', name: 'Night', group: 'BrandCore' }] },
+      },
+    };
+    mockGetState.mockImplementation(() => state);
+    dispatch.tokenState.setTokenSetMetadata.mockImplementation((metadata: any) => { state.tokenState.tokenSetMetadata = metadata; });
+    dispatch.tokenState.setRemoteMetadata = jest.fn((metadata: any) => { state.tokenState.remoteData.metadata = metadata; });
+    mockPush.mockImplementation(async () => ({ data: {} }));
+
+    await setTokensFromVariables(dispatch)({} as any, {});
+
+    const actions = mockPush.mock.calls.map(([args]: any) => args.action);
+    expect(actions).not.toContain('CREATE_TOKEN_SET');
+    expect(mockPush.mock.calls.find(([args]: any) => args.action === 'UPDATE_TOKEN_SET')?.[0].data)
+      .toEqual({ id: 'set-dark', name: 'BrandCore/Night' });
+    expect(mockPush.mock.calls.find(([args]: any) => args.action === 'BATCH_CREATE_TOKENS')?.[0].data)
+      .toEqual([expect.objectContaining({ name: 'color.new', token_set_id: 'set-dark' })]);
+    expect(mockPush.mock.calls.find(([args]: any) => args.action === 'UPDATE_THEME_GROUP')?.[0].data)
+      .toEqual({ id: 'group-brand', name: 'BrandCore' });
+    expect(state.tokenState.remoteData.metadata.themeGroupsData).toEqual({ BrandCore: { id: 'group-brand' } });
+    // The theme update that follows goes to the renamed group.
+    expect(mockPushTheme).toHaveBeenCalledWith(expect.objectContaining({ id: 'theme-dark', group: 'BrandCore' }), expect.anything(), dispatch, expect.anything());
+  });
+
+  it('keeps the rest of a renamed set\'s metadata', async () => {
+    const state: any = {
+      uiState: { api: { provider: StorageProviderType.TOKENS_STUDIO_OAUTH, id: 'project-1', changeSetId: 'change-set-1' } },
+      tokenState: {
+        renamedCollections: [['Brand/Dark', 'Brand/Night']],
+        tokens: {},
+        themes: [],
+        importedTokens: { newTokens: [] },
+        tokenSetMetadata: { 'Brand/Dark': { id: 'set-dark', isDynamic: true, fromVariableImport: true } },
+        importedThemes: { newThemes: [], updatedThemes: [] },
+      },
+    };
+    mockGetState.mockImplementation(() => state);
+    dispatch.tokenState.setTokenSetMetadata.mockImplementation((metadata: any) => { state.tokenState.tokenSetMetadata = metadata; });
+    mockPush.mockImplementation(async () => ({ data: {} }));
+
+    await setTokensFromVariables(dispatch)({} as any, {});
+
+    expect(state.tokenState.tokenSetMetadata).toEqual({ 'Brand/Night': { id: 'set-dark', isDynamic: true, fromVariableImport: true } });
+  });
+
   it('also creates the changed tokens of a renamed collection, whose set is new in Studio', async () => {
     mockGetState.mockReturnValue({
       uiState: { api: { provider: StorageProviderType.TOKENS_STUDIO_OAUTH, id: 'project-1', changeSetId: 'change-set-1' } },
