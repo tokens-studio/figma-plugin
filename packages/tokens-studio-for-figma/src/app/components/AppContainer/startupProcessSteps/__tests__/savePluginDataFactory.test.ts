@@ -90,6 +90,16 @@ describe('savePluginDataFactory', () => {
       expect(mockFetchUserData).toHaveBeenCalledWith(params.oauthTokens, 'project-1', 'file-org');
     });
 
+    it('keeps the session restore so later startup steps can wait for the account', async () => {
+      const sessionRestore = Promise.resolve();
+      mockFetchUserData.mockReturnValueOnce(sessionRestore);
+      const params = { ...baseParams, storageType: { provider: StorageProviderType.LOCAL } } as unknown as StartupMessage;
+
+      await savePluginDataFactory(createMockStore({}).dispatch, params)();
+
+      expect(useAuthStore.getState().sessionRestore).toBe(sessionRestore);
+    });
+
     it('uses the saved org for a file that does not sync with Studio', async () => {
       const params = { ...baseParams, storageType: { provider: StorageProviderType.LOCAL } } as unknown as StartupMessage;
 

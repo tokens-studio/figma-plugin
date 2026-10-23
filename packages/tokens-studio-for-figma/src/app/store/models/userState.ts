@@ -113,10 +113,14 @@ export const userState = createModel<RootModel>()({
           notifyToUI('Error removing license, please contact support@tokens.studio', { error: true });
         }
       }
+      dispatch.userState.clearLicenseKey();
+    },
+    // Forgets the license key in this file without releasing it on the license server.
+    clearLicenseKey: async () => {
       // clear license key related state
       AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.SET_LICENSE_KEY,
-        licenseKey: payload,
+        licenseKey: null,
       });
 
       AsyncMessageChannel.ReactInstance.message({
