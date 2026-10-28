@@ -113,21 +113,11 @@ export const userState = createModel<RootModel>()({
           notifyToUI('Error removing license, please contact support@tokens.studio', { error: true });
         }
       }
-      dispatch.userState.clearLicenseKey();
+      await dispatch.userState.clearLicenseKey();
     },
     // Forgets the license key in this file without releasing it on the license server.
     clearLicenseKey: async () => {
       // clear license key related state
-      AsyncMessageChannel.ReactInstance.message({
-        type: AsyncMessageTypes.SET_LICENSE_KEY,
-        licenseKey: null,
-      });
-
-      AsyncMessageChannel.ReactInstance.message({
-        type: AsyncMessageTypes.SET_INITIAL_LOAD,
-        initialLoad: true,
-      });
-
       dispatch.userState.setInitialLoad(true);
       dispatch.userState.setLicenseKey(undefined);
       dispatch.userState.setLicenseError(undefined);
@@ -136,6 +126,18 @@ export const userState = createModel<RootModel>()({
         entitlements: [],
         clientEmail: '',
       });
+
+      // Wait for the plugin to store it, so callers that await this know the key won't come back on the next launch.
+      await Promise.all([
+        AsyncMessageChannel.ReactInstance.message({
+          type: AsyncMessageTypes.SET_LICENSE_KEY,
+          licenseKey: null,
+        }),
+        AsyncMessageChannel.ReactInstance.message({
+          type: AsyncMessageTypes.SET_INITIAL_LOAD,
+          initialLoad: true,
+        }),
+      ]);
     },
   }),
 });
