@@ -162,8 +162,10 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
     // Process themes sequentially
     for (const theme of sortedThemeObjects) {
       const lookup = findCollectionAndModeIdForTheme(theme.group ?? theme.name, theme.name, collections);
-      let { collection } = lookup;
-      let { modeId } = lookup;
+      // eslint-disable-next-line prefer-destructuring
+      let collection: VariableCollection | undefined = lookup.collection;
+      // eslint-disable-next-line prefer-destructuring
+      let modeId: string | undefined = lookup.modeId;
 
       // Extended (child) collections are named WITHOUT the parent-group prefix
       // ("Brand", not "Colors/Brand"), so the name-based lookup misses themes
