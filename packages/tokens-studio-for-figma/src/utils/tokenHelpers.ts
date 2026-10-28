@@ -2,6 +2,7 @@ import { appendTypeToToken } from '@/app/components/createTokenObj';
 import { SingleToken } from '@/types/tokens';
 import { ThemeObject, UsedTokenSetsMap } from '@/types';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
 import { getTokenSetsOrder } from './getTokenSetsOrder';
 import { tryParseJson } from './tryParseJson';
 
@@ -28,6 +29,44 @@ export function getOverallConfig(themes: ThemeObject[], selectedThemes: string[]
     });
     return acc;
   }, {} as Record<string, TokenSetStatus>);
+}
+
+/**
+ * Builds the set pool used to resolve a single theme during export.
+ * Unlike getOverallConfig over all selected themes, every other theme group contributes exactly one option,
+ * so references into a group with several exported options don't depend on the order sets are stored in.
+ * Per group: the active option if it's exported, else the first exported option, else the active option.
+ * Themes without a group are all included, as before.
+ */
+export function getOverallConfigForTheme(
+  themes: ThemeObject[],
+  selectedThemes: string[],
+  theme: ThemeObject,
+  activeTheme: Record<string, string> = {},
+) {
+  const ownGroup = theme.group ?? INTERNAL_THEMES_NO_GROUP;
+  const picked: Record<string, string> = {};
+  const ungrouped: string[] = [];
+  const selectedThemeIds = new Set(selectedThemes);
+
+  themes
+    .filter((t) => selectedThemeIds.has(t.id) && t.id !== theme.id)
+    .forEach((t) => {
+      const group = t.group ?? INTERNAL_THEMES_NO_GROUP;
+      if (group === INTERNAL_THEMES_NO_GROUP) {
+        ungrouped.push(t.id);
+        return;
+      }
+      if (group === ownGroup) return;
+      if (activeTheme[group] === t.id || !(group in picked)) picked[group] = t.id;
+    });
+
+  Object.entries(activeTheme).forEach(([group, themeId]) => {
+    if (group === ownGroup || group === INTERNAL_THEMES_NO_GROUP || group in picked) return;
+    picked[group] = themeId;
+  });
+
+  return getOverallConfig(themes, [...ungrouped, ...Object.values(picked), theme.id]);
 }
 
 export function getEnabledTokenSets(usedSets: UsedTokenSetsMap = {}) {
