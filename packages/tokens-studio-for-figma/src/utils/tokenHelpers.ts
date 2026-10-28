@@ -47,9 +47,10 @@ export function getOverallConfigForTheme(
   const ownGroup = theme.group ?? INTERNAL_THEMES_NO_GROUP;
   const picked: Record<string, string> = {};
   const ungrouped: string[] = [];
+  const selectedThemeIds = new Set(selectedThemes);
 
   themes
-    .filter((t) => selectedThemes.includes(t.id))
+    .filter((t) => selectedThemeIds.has(t.id) && t.id !== theme.id)
     .forEach((t) => {
       const group = t.group ?? INTERNAL_THEMES_NO_GROUP;
       if (group === INTERNAL_THEMES_NO_GROUP) {
