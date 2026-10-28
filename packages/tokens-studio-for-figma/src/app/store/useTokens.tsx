@@ -4,7 +4,7 @@ import { AnyTokenList, SingleToken, TokenToRename } from '@/types/tokens';
 import stringifyTokens from '@/utils/stringifyTokens';
 import formatTokens from '@/utils/formatTokens';
 import {
-  getEnabledTokenSets, getOverallConfig, mergeTokenGroups, mergeServerResolvedTokens,
+  getEnabledTokenSets, getOverallConfigForTheme, mergeTokenGroups, mergeServerResolvedTokens,
 } from '@/utils/tokenHelpers';
 import useConfirm from '../hooks/useConfirm';
 import { Properties } from '@/constants/Properties';
@@ -21,6 +21,7 @@ import {
   themesListSelector,
   storageTypeSelector,
   isTokensStudioSyncSelector,
+  activeThemeSelector,
 } from '@/selectors';
 import { useAuthStore } from '@/app/store/useAuthStore';
 import { fetchServerResolvedTokensPerTheme } from '@/utils/tokensStudio/fetchServerResolvedTokensPerTheme';
@@ -69,6 +70,7 @@ export default function useTokens() {
   const updateMode = useSelector(updateModeSelector);
   const tokens = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
+  const activeTheme = useSelector(activeThemeSelector);
   const storageType = useSelector(storageTypeSelector);
   const rawSettings = useSelector(settingsStateSelector, isEqual);
   const isTokensStudioSync = useSelector(isTokensStudioSyncSelector);
@@ -459,8 +461,6 @@ export default function useTokens() {
       });
 
       let totalTokensToCreate = 0;
-      // Iterate over all given selectedThemes, and combine the selectedTokenSets.
-      const overallConfig = getOverallConfig(themes, selectedThemes);
 
       const allStyleIds: Record<string, string[]> = {};
 
@@ -483,6 +483,8 @@ export default function useTokens() {
           const enabledTokenSets = getEnabledTokenSets(selectedSets);
 
           if (enabledTokenSets.length > 0) {
+            // Resolve against one option per other group, matching the active combination.
+            const overallConfig = getOverallConfigForTheme(themes, selectedThemes, selectedTheme, activeTheme);
             const tokensToResolve = mergeTokenGroups(tokens, selectedSets, overallConfig);
             const allTokens = mergeServerResolvedTokens(
               defaultTokenResolver.setTokens(tokensToResolve),
@@ -558,7 +560,7 @@ export default function useTokens() {
 
       dispatch.uiState.completeJob(BackgroundJobs.UI_CREATE_STYLES);
     },
-    [dispatch.tokenState, tokens, settings, themes, dispatch.uiState, serverResolvedTokens],
+    [dispatch.tokenState, tokens, settings, themes, activeTheme, dispatch.uiState, serverResolvedTokens],
   );
 
   const renameStylesFromTokens = useCallback(

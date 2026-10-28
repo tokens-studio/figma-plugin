@@ -14,10 +14,11 @@ import { createNecessaryVariableCollections } from './createNecessaryVariableCol
 import { truncateModeName } from '@/utils/truncateName';
 import { getVariablesWithoutZombies } from './getVariablesWithoutZombies';
 import { getCodeSyntaxValue } from '@/utils/figma';
-import { getOverallConfig } from '@/utils/tokenHelpers';
+import { getOverallConfigForTheme } from '@/utils/tokenHelpers';
 import { generateTokensToCreate } from './generateTokensToCreate';
 import checkIfTokenCanCreateVariable from '@/utils/checkIfTokenCanCreateVariable';
 import { ProgressTracker } from './ProgressTracker';
+import { ThemeObject, UsedTokenSetsMap } from '@/types';
 
 export type LocalVariableInfo = {
   collectionId: string;
@@ -68,13 +69,21 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
       },
     });
 
-    const overallConfig = getOverallConfig(themeInfo.themes, selectedThemes);
+    // Each theme resolves against one option per other group, so cross-group references
+    // (baked into flat values such as modified colors) match the active combination.
+    const overallConfigs: Record<string, UsedTokenSetsMap> = {};
+    const overallConfigFor = (theme: ThemeObject) => {
+      if (!overallConfigs[theme.id]) {
+        overallConfigs[theme.id] = getOverallConfigForTheme(themeInfo.themes, selectedThemes, theme, themeInfo.activeTheme);
+      }
+      return overallConfigs[theme.id];
+    };
     const collections = await createNecessaryVariableCollections(themeInfo.themes, selectedThemes, settings);
 
     // Calculate total number of variables for progress tracking
     const totalVariableTokens = selectedThemeObjects.reduce((total, theme) => {
       const { tokensToCreate } = generateTokensToCreate({
-        theme, tokens, overallConfig, serverResolvedTokens: deltaFor(serverResolvedTokens, theme.id),
+        theme, tokens, overallConfig: overallConfigFor(theme), serverResolvedTokens: deltaFor(serverResolvedTokens, theme.id),
       });
       const variableTokenCount = tokensToCreate.filter((token) => checkIfTokenCanCreateVariable(token, settings)).length;
       return total + variableTokenCount;
@@ -133,7 +142,7 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
      */
     selectedThemeObjects.forEach((theme) => {
       const { tokensToCreate } = generateTokensToCreate({
-        theme, tokens, overallConfig, serverResolvedTokens: deltaFor(serverResolvedTokens, theme.id),
+        theme, tokens, overallConfig: overallConfigFor(theme), serverResolvedTokens: deltaFor(serverResolvedTokens, theme.id),
       });
       tokensToCreate.forEach((token) => {
         const figmaExtensions = token.$extensions?.['com.figma'] as FigmaExtensions;
@@ -153,8 +162,8 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
     // Process themes sequentially
     for (const theme of sortedThemeObjects) {
       const lookup = findCollectionAndModeIdForTheme(theme.group ?? theme.name, theme.name, collections);
-      let collection: VariableCollection | undefined = lookup.collection;
-      let modeId: string | undefined = lookup.modeId;
+      let { collection } = lookup;
+      let { modeId } = lookup;
 
       // Extended (child) collections are named WITHOUT the parent-group prefix
       // ("Brand", not "Colors/Brand"), so the name-based lookup misses themes
@@ -177,7 +186,7 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
           theme,
           tokens,
           settings,
-          overallConfig,
+          overallConfig: overallConfigFor(theme),
           progressTracker: globalProgressTracker,
           metadataUpdateTracker,
           providedPlatformsByVariable,
