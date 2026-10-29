@@ -18,8 +18,9 @@ import { isEqual } from '@/utils/isEqual';
 import { StorageTypeCredentials } from '@/types/StorageType';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { RemoteResponseData } from '../../../../types/RemoteResponseData';
-import { fetchProjectDataRest } from '../../../../utils/tokensStudio/fetchProjectDataRest';
-import { fetchBranchesListRest, fetchChangeSetIdForBranch } from '../../../../utils/tokensStudio/fetchBranchesListRest';
+import { fetchProjectDataRest, ProjectData } from '../../../../utils/tokensStudio/fetchProjectDataRest';
+import { fetchBranches, fetchChangeSetIdForBranch } from '../../../../utils/tokensStudio/fetchBranchesListRest';
+import { describeStudioSyncError, getStudioAccessToken, withStudioAuth } from './studioAuth';
 import { useAuthStore } from '../../useAuthStore';
 import { OAuthService } from '../../../services/OAuthService';
 import { applyTokenSetOrder } from '@/utils/tokenset';
@@ -78,6 +79,15 @@ export const pushToTokensStudioOAuth = async ({
 }: PushToTokensStudioOAuth) => {
   const { oauthTokens } = useAuthStore.getState();
   if (!oauthTokens?.accessToken) return null;
+  let accessToken: string;
+  try {
+    accessToken = await getStudioAccessToken();
+  } catch (error) {
+    console.error('Failed to refresh Tokens Studio sign-in before push:', error);
+    if (rethrowErrors) throw error;
+    notifyToUI(`Failed to sync: ${describeStudioSyncError(error).message}`, { error: true });
+    return null;
+  }
   const studioUrl = TOKENS_STUDIO_APP_URL;
   const apiBaseUrl = OAuthService.getApiBaseUrl(studioUrl);
   const { id: projectId, branch } = context;
@@ -91,7 +101,7 @@ export const pushToTokensStudioOAuth = async ({
   // the round-trip.
   if (!changeSetId) {
     const resolved = await fetchChangeSetIdForBranch(
-      oauthTokens.accessToken,
+      accessToken,
       apiBaseUrl,
       projectId,
       branch,
@@ -112,38 +122,38 @@ export const pushToTokensStudioOAuth = async ({
   try {
     switch (action) {
       case 'BATCH_CREATE_TOKENS':
-        result = await batchCreateTokensRest(oauthTokens.accessToken, apiBaseUrl, projectId, data.map(convertTokenValueForStudio), changeSetId);
+        result = await batchCreateTokensRest(accessToken, apiBaseUrl, projectId, data.map(convertTokenValueForStudio), changeSetId);
         break;
       case 'CREATE_TOKEN':
-        result = await createTokenRest(oauthTokens.accessToken, apiBaseUrl, projectId, convertTokenValueForStudio(data), branch, changeSetId);
+        result = await createTokenRest(accessToken, apiBaseUrl, projectId, convertTokenValueForStudio(data), branch, changeSetId);
         break;
       case 'EDIT_TOKEN': {
         if (!data?.id) break;
-        result = await updateTokenRest(oauthTokens.accessToken, apiBaseUrl, projectId, data.id, convertTokenValueForStudio(data), branch, changeSetId);
+        result = await updateTokenRest(accessToken, apiBaseUrl, projectId, data.id, convertTokenValueForStudio(data), branch, changeSetId);
         break;
       }
       case 'DELETE_TOKEN': {
         if (!data?.id) break;
-        result = await deleteTokenRest(oauthTokens.accessToken, apiBaseUrl, projectId, data.id, branch, changeSetId);
+        result = await deleteTokenRest(accessToken, apiBaseUrl, projectId, data.id, branch, changeSetId);
         break;
       }
       case 'CREATE_TOKEN_SET':
-        result = await createTokenSetRest(oauthTokens.accessToken, apiBaseUrl, projectId, data, branch, changeSetId);
+        result = await createTokenSetRest(accessToken, apiBaseUrl, projectId, data, branch, changeSetId);
         break;
       case 'UPDATE_TOKEN_SET': {
         if (data.id) {
-          result = await updateTokenSetRest(oauthTokens.accessToken, apiBaseUrl, projectId, data.id, data, branch, changeSetId);
+          result = await updateTokenSetRest(accessToken, apiBaseUrl, projectId, data.id, data, branch, changeSetId);
         }
         break;
       }
       case 'DELETE_TOKEN_SET':
         if (data.id) {
-          result = await deleteTokenSetRest(oauthTokens.accessToken, apiBaseUrl, projectId, data.id, branch, changeSetId);
+          result = await deleteTokenSetRest(accessToken, apiBaseUrl, projectId, data.id, branch, changeSetId);
         }
         break;
       case 'CREATE_THEME_GROUP':
         try {
-          result = await createThemeGroupRest(oauthTokens.accessToken, apiBaseUrl, projectId, data, branch, changeSetId);
+          result = await createThemeGroupRest(accessToken, apiBaseUrl, projectId, data, branch, changeSetId);
         } catch (err) {
           // A name clash means the group was already created (e.g. in a previous session). Return null so
           // the caller can fall back to fetching the existing group's id. Every other refusal — a plan's
@@ -155,37 +165,37 @@ export const pushToTokensStudioOAuth = async ({
       case 'UPDATE_THEME_GROUP': {
         const { id, ...themeGroupData } = data;
         if (id) {
-          result = await updateThemeGroupRest(oauthTokens.accessToken, apiBaseUrl, projectId, id, themeGroupData, branch, changeSetId);
+          result = await updateThemeGroupRest(accessToken, apiBaseUrl, projectId, id, themeGroupData, branch, changeSetId);
         }
         break;
       }
       case 'DELETE_THEME_GROUP':
         if (data.id) {
-          result = await deleteThemeGroupRest(oauthTokens.accessToken, apiBaseUrl, projectId, data.id, branch, changeSetId);
+          result = await deleteThemeGroupRest(accessToken, apiBaseUrl, projectId, data.id, branch, changeSetId);
         }
         break;
       case 'DELETE_THEME_GROUP_IF_EMPTY': {
         // Studio deletes a group's options along with it, so only remove a group that has none left.
         if (!data.id) break;
-        const options = await listThemeOptionsRest(oauthTokens.accessToken, apiBaseUrl, projectId, data.id, changeSetId);
+        const options = await listThemeOptionsRest(accessToken, apiBaseUrl, projectId, data.id, changeSetId);
         if (options.length === 0) {
-          result = await deleteThemeGroupRest(oauthTokens.accessToken, apiBaseUrl, projectId, data.id, branch, changeSetId);
+          result = await deleteThemeGroupRest(accessToken, apiBaseUrl, projectId, data.id, branch, changeSetId);
         }
         break;
       }
       case 'CREATE_THEME':
-        result = await createThemeOptionRest(oauthTokens.accessToken, apiBaseUrl, projectId, data, branch, changeSetId);
+        result = await createThemeOptionRest(accessToken, apiBaseUrl, projectId, data, branch, changeSetId);
         break;
       case 'UPDATE_THEME': {
         const { id, ...themeOptionData } = data;
         if (id) {
-          result = await updateThemeOptionRest(oauthTokens.accessToken, apiBaseUrl, projectId, id, themeOptionData, branch, changeSetId);
+          result = await updateThemeOptionRest(accessToken, apiBaseUrl, projectId, id, themeOptionData, branch, changeSetId);
         }
         break;
       }
       case 'DELETE_THEME':
         if (data.id) {
-          result = await deleteThemeOptionRest(oauthTokens.accessToken, apiBaseUrl, projectId, data.id, branch, changeSetId);
+          result = await deleteThemeOptionRest(accessToken, apiBaseUrl, projectId, data.id, branch, changeSetId);
         }
         break;
       default:
@@ -256,52 +266,53 @@ export function useTokensStudioOAuth() {
 
   const pullTokensFromTokensStudioOAuth = useCallback(
     async (context: TokensStudioOAuthCredentials): Promise<RemoteResponseData | null> => {
-      const { oauthTokens } = useAuthStore.getState();
-
-      if (oauthTokens?.accessToken) {
-        const studioUrl = TOKENS_STUDIO_APP_URL;
-        const apiBaseUrl = OAuthService.getApiBaseUrl(studioUrl);
-        const projectData = await fetchProjectDataRest(oauthTokens.accessToken, apiBaseUrl, context.id, context.branch || 'main');
-        if (projectData) {
-          // OAuth mode intentionally allows editing — write-back is handled via REST actions.
-          dispatch.tokenState.setServerResolverContext({
-            projectId: context.id,
-            changeSetId: projectData.changeSetId,
-            apiBaseUrl,
-          });
-          if (projectData.hasExceededPaginationLimit) {
-            notifyToUI('Maximum limit of 10,000 tokens reached. Some tokens may be missing.', { error: true });
-          }
-          const sortedTokens = applyTokenSetOrder(
-            projectData.tokens as any,
-            projectData.tokenSetOrder,
-          );
-          const { themes } = store.getState().tokenState;
-          const alignedThemes = projectData.themes.map((remoteTheme) => {
-            const localTheme = themes.find((t) => t.id === remoteTheme.id);
-            return localTheme ? alignObjectKeys(remoteTheme, localTheme) : remoteTheme;
-          });
-
-          return {
-            status: 'success',
-            tokens: sortedTokens,
-            themes: alignedThemes,
-            metadata: {
-              tokenSetOrder: projectData.tokenSetOrder,
-              tokenSetsData: projectData.tokenSets as any,
-              themeGroupsData: projectData.themeGroups as any,
-              changeSetId: projectData.changeSetId,
-            },
-          };
-        }
+      const studioUrl = TOKENS_STUDIO_APP_URL;
+      const apiBaseUrl = OAuthService.getApiBaseUrl(studioUrl);
+      let projectData: ProjectData;
+      try {
+        projectData = await withStudioAuth((accessToken) => fetchProjectDataRest(accessToken, apiBaseUrl, context.id, context.branch || 'main'));
+      } catch (error) {
+        console.error('Failed to pull from Tokens Studio:', error);
+        const {
+          type, header, message, code,
+        } = describeStudioSyncError(error);
         return {
           status: 'failure',
-          errorMessage: 'Failed to fetch project data from REST API',
+          errorMessage: message,
+          errorType: type,
+          errorHeader: header,
+          errorCode: code,
         };
       }
+      // OAuth mode intentionally allows editing — write-back is handled via REST actions.
+      dispatch.tokenState.setServerResolverContext({
+        projectId: context.id,
+        changeSetId: projectData.changeSetId,
+        apiBaseUrl,
+      });
+      if (projectData.hasExceededPaginationLimit) {
+        notifyToUI('Maximum limit of 10,000 tokens reached. Some tokens may be missing.', { error: true });
+      }
+      const sortedTokens = applyTokenSetOrder(
+        projectData.tokens as any,
+        projectData.tokenSetOrder,
+      );
+      const { themes } = store.getState().tokenState;
+      const alignedThemes = projectData.themes.map((remoteTheme) => {
+        const localTheme = themes.find((t) => t.id === remoteTheme.id);
+        return localTheme ? alignObjectKeys(remoteTheme, localTheme) : remoteTheme;
+      });
+
       return {
-        status: 'failure',
-        errorMessage: 'OAuth token missing',
+        status: 'success',
+        tokens: sortedTokens,
+        themes: alignedThemes,
+        metadata: {
+          tokenSetOrder: projectData.tokenSetOrder,
+          tokenSetsData: projectData.tokenSets as any,
+          themeGroupsData: projectData.themeGroups as any,
+          changeSetId: projectData.changeSetId,
+        },
       };
     },
     [],
@@ -309,15 +320,15 @@ export function useTokensStudioOAuth() {
 
   const fetchBranchesForTokensStudio = useCallback(
     async (context: TokensStudioOAuthCredentials): Promise<string[] | null> => {
-      const { oauthTokens } = useAuthStore.getState();
-
-      if (oauthTokens?.accessToken) {
-        const studioUrl = TOKENS_STUDIO_APP_URL;
-        const apiBaseUrl = OAuthService.getApiBaseUrl(studioUrl);
-        const branches = await fetchBranchesListRest(oauthTokens.accessToken, apiBaseUrl, context.id);
-        return branches;
+      const studioUrl = TOKENS_STUDIO_APP_URL;
+      const apiBaseUrl = OAuthService.getApiBaseUrl(studioUrl);
+      try {
+        const branches = await withStudioAuth((accessToken) => fetchBranches(accessToken, apiBaseUrl, context.id));
+        return branches.map((b) => b.name);
+      } catch (error) {
+        console.error('Error fetching branches from REST API:', error);
+        return null;
       }
-      return null;
     },
     [],
   );
@@ -430,12 +441,12 @@ export function useTokensStudioOAuth() {
       const apiBaseUrl = OAuthService.getApiBaseUrl(studioUrl);
 
       try {
-        const projectData = await fetchProjectDataRest(
-          oauthTokens.accessToken,
+        const projectData = await withStudioAuth((accessToken) => fetchProjectDataRest(
+          accessToken,
           apiBaseUrl,
           projectId,
           branch || 'main',
-        );
+        ));
 
         if (projectData) {
           if (projectData.hasExceededPaginationLimit) {
@@ -488,15 +499,13 @@ export function useTokensStudioOAuth() {
         }
       } catch (error) {
         console.error('Failed to load project tokens:', error);
-        if ((error as any).code === 'variables_source_of_truth') {
-          const message = 'This feature is not available for projects using variables as source of truth';
-          dispatch.uiState.setLastError({ type: 'other', message });
-          notifyToUI(message, { error: true });
-        } else {
-          const message = error instanceof Error ? error.message : 'Could not load project data.';
-          dispatch.uiState.setLastError({ type: 'other', message });
-          notifyToUI(message, { error: true });
-        }
+        const {
+          type, header, message, code,
+        } = describeStudioSyncError(error);
+        dispatch.uiState.setLastError({
+          type, header, message, code,
+        });
+        notifyToUI(message, { error: true });
         throw error; // Rethrow so caller can catch it and avoid silent failures
       } finally {
         useAuthStore.setState({ isLoading: false });

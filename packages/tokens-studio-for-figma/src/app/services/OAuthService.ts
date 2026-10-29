@@ -632,8 +632,9 @@ export class OAuthService {
     const tokenUrl = config?.oauth?.token_endpoint || `${apiBaseUrl}/oauth/token`;
     const clientId = config?.oauth?.client_id || this.DEFAULT_CLIENT_ID;
 
+    let response: Response;
     try {
-      const response = await fetch(tokenUrl, {
+      response = await fetch(tokenUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -644,25 +645,32 @@ export class OAuthService {
           client_id: clientId,
         }),
       });
-
-      if (!response.ok) {
-        throw new Error(
-          `Token refresh failed: ${response.status} ${response.statusText}`,
-        );
-      }
-
-      const tokenData: TokenResponse = await response.json();
-
-      return {
-        accessToken: tokenData.access_token,
-        refreshToken: tokenData.refresh_token,
-        tokenType: tokenData.token_type,
-        expiresAt: Date.now() + tokenData.expires_in * 1000,
-      };
     } catch (error) {
       console.error('Error refreshing tokens:', error);
-      throw new Error('Failed to refresh access tokens');
+      throw new Error('Failed to refresh access tokens: network error');
     }
+
+    if (!response.ok) {
+      // Keep the OAuth error code (e.g. invalid_grant) in the message: classifyError
+      // reads it to decide whether the sign-in is over or the failure is transient.
+      let errorData: { error?: string; error_description?: string } = {};
+      try {
+        errorData = await response.json();
+      } catch (e) {
+        // ignore parsing error
+      }
+      const reason = [errorData.error, errorData.error_description].filter(Boolean).join(': ');
+      throw new Error(`Token refresh failed: ${response.status}${reason ? ` ${reason}` : ''}`);
+    }
+
+    const tokenData: TokenResponse = await response.json();
+
+    return {
+      accessToken: tokenData.access_token,
+      refreshToken: tokenData.refresh_token,
+      tokenType: tokenData.token_type,
+      expiresAt: Date.now() + tokenData.expires_in * 1000,
+    };
   }
 
   /**

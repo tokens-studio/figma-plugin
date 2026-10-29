@@ -2,6 +2,7 @@ import { normalizeTokenType } from './normalizeTokenType';
 import { AnyTokenSet } from '@/types/tokens';
 import { ThemeObjectsList, ThemeObject } from '@/types';
 import { parseBranchesFromResponse } from './fetchBranchesListRest';
+import { studioApiErrorFromResponse } from './StudioApiError';
 
 // Types derived from REST endpoints
 
@@ -55,15 +56,7 @@ async function fetchAllPages(url: string, headers: HeadersInit, resourceName: st
     const res = await fetch(pageUrl, { headers });
 
     if (!res.ok) {
-      let errorData: { code?: string; error?: string } = {};
-      try {
-        errorData = await res.json();
-      } catch (e) {
-        // ignore parsing error
-      }
-      const error = new Error(errorData.error || `Failed to fetch ${resourceName}: ${res.statusText}`);
-      if (errorData.code) (error as any).code = errorData.code;
-      throw error;
+      throw await studioApiErrorFromResponse(res, `Failed to fetch ${resourceName}`);
     }
 
     const json = await res.json();
@@ -88,7 +81,7 @@ export async function fetchProjectDataRest(
   apiBaseUrl: string,
   projectId: string,
   branchName: string = 'main',
-): Promise<ProjectData | null> {
+): Promise<ProjectData> {
   const headers = {
     Authorization: `Bearer ${authToken}`,
     'Content-Type': 'application/json',
@@ -97,7 +90,7 @@ export async function fetchProjectDataRest(
   try {
     // 1. Fetch branches to find change_set_id for main
     const branchesRes = await fetch(`${apiBaseUrl}/api/v1/projects/${projectId}/branches`, { headers });
-    if (!branchesRes.ok) throw new Error(`Failed to fetch branches: ${branchesRes.statusText}`);
+    if (!branchesRes.ok) throw await studioApiErrorFromResponse(branchesRes, 'Failed to fetch branches');
     const branchesData = await branchesRes.json();
 
     const branches = parseBranchesFromResponse(branchesData);
@@ -118,15 +111,7 @@ export async function fetchProjectDataRest(
 
     const handleFetchResponse = async (res: Response, resourceName: string) => {
       if (!res.ok) {
-        let errorData: { code?: string; error?: string } = {};
-        try {
-          errorData = await res.json();
-        } catch (e) {
-          // ignore parsing error
-        }
-        const error = new Error(errorData.error || `Failed to fetch ${resourceName}: ${res.statusText}`);
-        if (errorData.code) (error as any).code = errorData.code;
-        throw error;
+        throw await studioApiErrorFromResponse(res, `Failed to fetch ${resourceName}`);
       }
       return res.json();
     };
@@ -363,7 +348,8 @@ export async function fetchProjectDataRest(
       hasExceededPaginationLimit,
     };
   } catch (error) {
+    // Rethrow: callers need the status and code to tell a lapsed sign-in from other failures.
     console.error('Error fetching project data from REST API:', error);
-    return null;
+    throw error;
   }
 }
