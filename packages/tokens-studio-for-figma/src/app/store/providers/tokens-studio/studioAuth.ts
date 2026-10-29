@@ -11,6 +11,7 @@ const PLAN_REQUIRED_CODES = ['plan_does_not_include_feature'];
 export class StudioSignInRequiredError extends Error {
   constructor() {
     super('Not signed in to Tokens Studio');
+    Object.setPrototypeOf(this, StudioSignInRequiredError.prototype);
     this.name = 'StudioSignInRequiredError';
   }
 }

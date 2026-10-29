@@ -663,7 +663,13 @@ export class OAuthService {
       throw new Error(`Token refresh failed: ${response.status}${reason ? ` ${reason}` : ''}`);
     }
 
-    const tokenData: TokenResponse = await response.json();
+    let tokenData: TokenResponse;
+    try {
+      tokenData = await response.json();
+    } catch (error) {
+      console.error('Error reading refreshed tokens:', error);
+      throw new Error('Token refresh failed: invalid response body');
+    }
 
     return {
       accessToken: tokenData.access_token,

@@ -448,55 +448,49 @@ export function useTokensStudioOAuth() {
           branch || 'main',
         ));
 
-        if (projectData) {
-          if (projectData.hasExceededPaginationLimit) {
-            notifyToUI('Maximum limit of 10,000 tokens reached. Some tokens may be missing.', { error: true });
-          }
-          const { tokens: newTokens, themes: newThemes, tokenSetOrder } = projectData;
-
-          const { themes } = store.getState().tokenState;
-          const alignedNewThemes = newThemes.map((remoteTheme) => {
-            const localTheme = themes.find((t) => t.id === remoteTheme.id);
-            return localTheme ? alignObjectKeys(remoteTheme, localTheme) : remoteTheme;
-          });
-
-          dispatch.tokenState.setTokenData({
-            values: (newTokens || {}) as any,
-            themes: alignedNewThemes,
-            activeTheme: {},
-            hasChangedRemote: false,
-          });
-
-          dispatch.tokenState.setRemoteData({
-            tokens: (newTokens || {}) as any,
-            themes: alignedNewThemes,
-            // Theme pushes look groups and sets up here; without them every grouped push re-creates its group.
-            metadata: {
-              tokenSetOrder,
-              tokenSetsData: projectData.tokenSets as any,
-              themeGroupsData: projectData.themeGroups as any,
-              changeSetId: projectData.changeSetId,
-            },
-          });
-
-          const stringifiedRemoteTokens = JSON.stringify(compact([newTokens, alignedNewThemes, TokenFormat.format]), null, 2);
-          dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
-          dispatch.tokenState.setServerResolverContext({
-            projectId,
-            changeSetId: projectData.changeSetId,
-            apiBaseUrl,
-          });
-
-          dispatch.uiState.setLastError(null);
-
-          const hasTokens = newTokens && Object.keys(newTokens).length > 0;
-          const message = hasTokens ? 'Successfully loaded project tokens' : 'Successfully loaded tokens, but there are no tokens in the selected project';
-          notifyToUI(message, { error: false });
-        } else {
-          dispatch.uiState.setLastError({ type: 'other', message: 'Could not load project data.' });
-          notifyToUI('Could not load project data.', { error: true });
-          throw new Error('Could not load project data.');
+        if (projectData.hasExceededPaginationLimit) {
+          notifyToUI('Maximum limit of 10,000 tokens reached. Some tokens may be missing.', { error: true });
         }
+        const { tokens: newTokens, themes: newThemes, tokenSetOrder } = projectData;
+
+        const { themes } = store.getState().tokenState;
+        const alignedNewThemes = newThemes.map((remoteTheme) => {
+          const localTheme = themes.find((t) => t.id === remoteTheme.id);
+          return localTheme ? alignObjectKeys(remoteTheme, localTheme) : remoteTheme;
+        });
+
+        dispatch.tokenState.setTokenData({
+          values: (newTokens || {}) as any,
+          themes: alignedNewThemes,
+          activeTheme: {},
+          hasChangedRemote: false,
+        });
+
+        dispatch.tokenState.setRemoteData({
+          tokens: (newTokens || {}) as any,
+          themes: alignedNewThemes,
+          // Theme pushes look groups and sets up here; without them every grouped push re-creates its group.
+          metadata: {
+            tokenSetOrder,
+            tokenSetsData: projectData.tokenSets as any,
+            themeGroupsData: projectData.themeGroups as any,
+            changeSetId: projectData.changeSetId,
+          },
+        });
+
+        const stringifiedRemoteTokens = JSON.stringify(compact([newTokens, alignedNewThemes, TokenFormat.format]), null, 2);
+        dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
+        dispatch.tokenState.setServerResolverContext({
+          projectId,
+          changeSetId: projectData.changeSetId,
+          apiBaseUrl,
+        });
+
+        dispatch.uiState.setLastError(null);
+
+        const hasTokens = newTokens && Object.keys(newTokens).length > 0;
+        const message = hasTokens ? 'Successfully loaded project tokens' : 'Successfully loaded tokens, but there are no tokens in the selected project';
+        notifyToUI(message, { error: false });
       } catch (error) {
         console.error('Failed to load project tokens:', error);
         const {

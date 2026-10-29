@@ -10,6 +10,8 @@ export class StudioApiError extends Error {
 
   constructor(message: string, status: number, code?: string) {
     super(message);
+    // Keep instanceof reliable when the build compiles classes down to ES5.
+    Object.setPrototypeOf(this, StudioApiError.prototype);
     this.name = 'StudioApiError';
     this.status = status;
     this.code = code;
