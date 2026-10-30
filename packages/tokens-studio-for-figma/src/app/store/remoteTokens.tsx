@@ -183,7 +183,10 @@ export default function useRemoteTokens() {
         const type = remoteData.errorType || 'other';
         const message = remoteData.errorMessage;
         const header = remoteData.errorHeader;
-        dispatch.uiState.setLastError({ type, message, header });
+        const code = remoteData.errorCode;
+        dispatch.uiState.setLastError({
+          type, message, header, code,
+        });
         showPullDialogError();
         return remoteData;
       }

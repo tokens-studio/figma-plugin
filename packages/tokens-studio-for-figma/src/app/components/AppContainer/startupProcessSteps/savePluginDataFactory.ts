@@ -3,6 +3,7 @@ import { isTokensStudioOAuthType } from '@/utils/is';
 import type { StartupMessage } from '@/types/AsyncMessages';
 import { identify, track } from '@/utils/analytics';
 import { useAuthStore } from '@/app/store/useAuthStore';
+import { OAuthService } from '@/app/services/OAuthService';
 import pjs from '../../../../../package.json';
 
 export function savePluginDataFactory(dispatch: Dispatch, params: StartupMessage) {
@@ -47,10 +48,22 @@ export function savePluginDataFactory(dispatch: Dispatch, params: StartupMessage
         if (params.activeOrganizationId) {
           useAuthStore.setState({ activeOrganizationId: params.activeOrganizationId });
         }
-        useAuthStore.getState().setOAuthTokens(params.oauthTokens);
-        // A file synced with Studio uses the org it syncs with; fetchUserData falls back to the org picked in Settings.
-        const fileSync = isTokensStudioOAuthType(params.storageType) ? params.storageType : undefined;
-        useAuthStore.getState().fetchUserData(params.oauthTokens, fileSync?.id, fileSync?.orgId);
+        await useAuthStore.getState().setOAuthTokens(params.oauthTokens);
+        // Refresh before the pull step runs, so it does not start with an expired access token.
+        if (OAuthService.needsRefresh(params.oauthTokens)) {
+          try {
+            await useAuthStore.getState().refreshTokens();
+          } catch (error) {
+            // A refused refresh has logged the user out; the pull step then asks them to sign in again.
+            console.error('Failed to refresh Tokens Studio sign-in at startup', error);
+          }
+        }
+        const { oauthTokens } = useAuthStore.getState();
+        if (oauthTokens) {
+          // A file synced with Studio uses the org it syncs with; fetchUserData falls back to the org picked in Settings.
+          const fileSync = isTokensStudioOAuthType(params.storageType) ? params.storageType : undefined;
+          useAuthStore.getState().fetchUserData(oauthTokens, fileSync?.id, fileSync?.orgId);
+        }
       }
     } else {
       throw new Error('User not found');

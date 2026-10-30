@@ -24,6 +24,7 @@ import { track } from '@/utils/analytics';
 import Footer from './Footer';
 import { autoSelectFirstThemesPerGroup } from '@/utils/autoSelectThemes';
 import useRemoteTokens from '../store/remoteTokens';
+import { SIGN_IN_REQUIRED, VARIABLES_SOURCE_OF_TRUTH } from '../store/providers/tokens-studio/studioAuth';
 
 const StyledTokensStudioIcon = styled(TokensStudioLogo, {
   width: '200px',
@@ -231,13 +232,16 @@ function StartScreen() {
                 text: t('retry'),
               } : undefined}
             >
-              {isTokensStudioOAuth && (
+              {isTokensStudioOAuth && lastError?.code !== VARIABLES_SOURCE_OF_TRUTH && (
                 <Button
                   size="small"
                   variant="primary"
                   onClick={onGoToSubscription}
                 >
-                  {t('goToSubscription', { defaultValue: 'Go to Subscription' })}
+                  {/* Sign-in lives on the Subscription tab, so both buttons go there. */}
+                  {lastError?.code === SIGN_IN_REQUIRED
+                    ? t('signInAgain', { defaultValue: 'Sign in to Tokens Studio again' })
+                    : t('goToSubscription', { defaultValue: 'Go to Subscription' })}
                 </Button>
               )}
             </Callout>
