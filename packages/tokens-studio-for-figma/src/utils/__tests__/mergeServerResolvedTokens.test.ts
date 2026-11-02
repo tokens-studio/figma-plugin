@@ -83,11 +83,21 @@ describe('mergeServerResolvedTokens', () => {
       expect(result.value).toEqual({
         fontFamily: 'Inter',
         fontSize: '1.563rem',
+        // Referenced properties take the server's atomic value, which is always a string
         fontWeight: '500',
         textCase: 'uppercase',
         textDecoration: 'none',
       });
       expect(result.failedToResolve).toBe(false);
+    });
+
+    it('restores numbers, booleans and null from unquoted values', () => {
+      const [result] = mergeServerResolvedTokens([localTypography], {
+        'typography.title': '{fontWeight: 600, lineHeight: 1.5, letterSpacing: -0.5, paragraphIndent: null, textCase: true, fontSize: 1rem}',
+      });
+      expect(result.value).toEqual(expect.objectContaining({
+        fontWeight: 600, lineHeight: 1.5, letterSpacing: -0.5, paragraphIndent: null, textCase: true, fontSize: '1rem',
+      }));
     });
 
     it('keeps commas inside unquoted values', () => {

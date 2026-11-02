@@ -90,12 +90,22 @@ export function mergeTokenGroups(
     return mergedTokens;
   }, [] as SingleToken[]);
 }
+// Restores the types JSON would have given: plain numbers, booleans and null. Values with units
+// or other text (`1rem`, `100%`, `Inter`) stay strings.
+function coerceUnquotedPrimitive(value: string): string | number | boolean | null {
+  if (value === 'true') return true;
+  if (value === 'false') return false;
+  if (value === 'null') return null;
+  if (/^-?\d+(\.\d+)?$/.test(value)) return Number(value);
+  return value;
+}
+
 /**
  * Parses a composite value that is not valid JSON, in the unquoted form the Studio server
  * returns: `{fontFamily: Inter, fontSize: 1rem, ...}`. A segment without a `key:` prefix
  * belongs to the previous value, so values containing commas (e.g. font stacks) survive.
  */
-function parseUnquotedObject(value: string): Record<string, string> | null {
+function parseUnquotedObject(value: string): Record<string, string | number | boolean | null> | null {
   if (!value.startsWith('{') || !value.endsWith('}')) return null;
   const result: Record<string, string> = {};
   let lastKey: string | null = null;
@@ -109,13 +119,19 @@ function parseUnquotedObject(value: string): Record<string, string> | null {
       result[lastKey] = `${result[lastKey]},${segment}`.trim();
     }
   });
-  return Object.keys(result).length > 0 ? result : null;
+  if (Object.keys(result).length === 0) return null;
+  return Object.fromEntries(Object.entries(result).map(([key, val]) => [key, coerceUnquotedPrimitive(val)]));
 }
 
 /**
  * Turns a server-resolved composite value back into an object. Never returns the raw string:
  * downstream code reads properties off the value (e.g. `value.fontFamily`), so a string would
- * silently drop the apply. Properties the server omits keep their local values.
+ * silently drop the apply.
+ *
+ * Valid JSON replaces the local value as is: the server is the source of truth, and merging
+ * would stop it from clearing a property by omitting it. The unquoted fallback is merged onto
+ * the local value, because a lenient parse may miss properties and losing one (e.g. fontFamily)
+ * breaks the apply.
  */
 function parseServerCompositeValue(serverValue: string, localValue: Record<string, unknown> | unknown[]): SingleToken['value'] {
   try {
