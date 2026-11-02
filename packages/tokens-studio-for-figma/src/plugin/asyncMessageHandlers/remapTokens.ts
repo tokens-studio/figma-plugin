@@ -11,6 +11,11 @@ import { ProgressTracker } from '../ProgressTracker';
 
 export const remapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.REMAP_TOKENS] = async (msg) => {
   try {
+    // Commit undo point before remapping tokens
+    if (typeof figma !== 'undefined' && figma.commitUndo) {
+      figma.commitUndo();
+    }
+    
     const {
       oldName, newName, updateMode, category,
     } = msg;
