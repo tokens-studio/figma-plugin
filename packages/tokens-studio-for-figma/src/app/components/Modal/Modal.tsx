@@ -113,6 +113,19 @@ export function Modal({
     [close],
   );
 
+  const handleInteractOutside = React.useCallback(
+    (event: Event) => {
+      // A dialog opened on top of this one from elsewhere in the tree (e.g. the upgrade dialog) isn't a nested
+      // layer, so Radix would treat focus moving into it as an outside interaction and close this one.
+      if (event.target instanceof Element && event.target.closest('[role="dialog"]')) {
+        event.preventDefault();
+        return;
+      }
+      onInteractOutside?.(event);
+    },
+    [onInteractOutside],
+  );
+
   return (
     <Dialog open={isOpen} onOpenChange={handleOnOpenChange} modal={modal}>
       <Dialog.Portal>
@@ -124,7 +137,7 @@ export function Modal({
             backgroundColor: '$modalBackdrop',
           }}
         />
-        <StyledDialogContent size={size} onInteractOutside={onInteractOutside} onEscapeKeyDown={onEscapeKeyDown}>
+        <StyledDialogContent size={size} onInteractOutside={handleInteractOutside} onEscapeKeyDown={onEscapeKeyDown}>
           <Box
             css={{
               display: 'flex',

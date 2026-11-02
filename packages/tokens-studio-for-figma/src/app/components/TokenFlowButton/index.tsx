@@ -12,6 +12,7 @@ import {
 } from '@/selectors';
 import { track } from '@/utils/analytics';
 import { useIsProUser } from '@/app/hooks/useIsProUser';
+import { useUpgradeDialogStore } from '@/app/store/useUpgradeDialogStore';
 
 export default function TokenFlowButton() {
   const activeTheme = useSelector(activeThemeSelector);
@@ -20,10 +21,15 @@ export default function TokenFlowButton() {
   const themeObjects = useSelector(themeObjectsSelector);
   const tokens = useSelector(tokensSelector);
   const isProUser = useIsProUser();
+  const openUpgradeDialog = useUpgradeDialogStore((state) => state.openUpgradeDialog);
 
   const [loading, setLoading] = useState(false);
 
   const handleOpenTokenFlowApp = useCallback(async () => {
+    if (!isProUser) {
+      openUpgradeDialog('tokenFlow', 'token-flow-button');
+      return;
+    }
     setLoading(true);
     track('Open visualization');
     const tokenData = JSON.stringify(tokens, null, 2);
@@ -49,20 +55,17 @@ export default function TokenFlowButton() {
       console.error('Error:', error);
     }
     setLoading(false);
-  }, [activeTheme, availableThemes, themeObjects, tokens, usedTokenSet]);
+  }, [activeTheme, availableThemes, themeObjects, tokens, usedTokenSet, isProUser, openUpgradeDialog]);
 
   return (
-    isProUser
-      ? (
-        <IconButton
-          size="small"
-          variant="invisible"
-          tooltip="Open visualization flow"
-          data-testid="token-flow-button"
-          loading={loading}
-          onClick={handleOpenTokenFlowApp}
-          icon={<FlowIcon />}
-        />
-      ) : null
+    <IconButton
+      size="small"
+      variant="invisible"
+      tooltip="Open visualization flow"
+      data-testid="token-flow-button"
+      loading={loading}
+      onClick={handleOpenTokenFlowApp}
+      icon={<FlowIcon />}
+    />
   );
 }

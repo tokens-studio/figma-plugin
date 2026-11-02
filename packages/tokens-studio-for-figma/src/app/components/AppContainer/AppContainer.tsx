@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import TermsUpdateModal from '../TermsUpdateModal';
+import UpgradeDialog from '../UpgradeDialog/UpgradeDialog';
 import App from '../App';
 import FigmaLoading from '../FigmaLoading';
 import { AsyncMessageTypes, StartupMessage } from '@/types/AsyncMessages';
@@ -98,6 +99,7 @@ export const AppContainer = (params: Props) => {
       </FigmaLoading>
       <Initiator />
       <ConfirmDialog />
+      <UpgradeDialog />
       <ImportedTokensDialog />
       <PushDialog />
       {

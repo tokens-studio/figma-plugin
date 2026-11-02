@@ -6,6 +6,7 @@ import {
   act, createMockStore, render, waitFor,
 } from '../../../../tests/config/setupTest';
 import Navbar from '../Navbar';
+import { useUpgradeDialogStore } from '@/app/store/useUpgradeDialogStore';
 
 describe('Navbar', () => {
   it('should work', async () => {
@@ -22,7 +23,8 @@ describe('Navbar', () => {
     expect(mockStore.getState().uiState.activeTab).toEqual(Tabs.SETTINGS);
   });
 
-  it('displays the token flow button if user has access to it via license key', async () => {
+  it('opens the upgrade dialog instead of token flow for users without a license', async () => {
+    global.open = jest.fn();
     const mockStore = createMockStore({});
     const result = render(
       <Provider store={mockStore}>
@@ -30,15 +32,11 @@ describe('Navbar', () => {
       </Provider>,
     );
 
-    expect(() => {
-      result.getByTestId('token-flow-button');
-    }).toThrowError();
+    await userEvent.click(result.getByTestId('token-flow-button'));
 
-    mockStore.dispatch.userState.setLicenseKey('test-key-123');
-    await waitFor(() => {
-      const tokenFlowButton = result.getByTestId('token-flow-button');
-      expect(tokenFlowButton).toBeInTheDocument();
-    });
+    expect(useUpgradeDialogStore.getState().feature).toEqual('tokenFlow');
+    expect(global.open).not.toHaveBeenCalled();
+    act(() => useUpgradeDialogStore.getState().closeUpgradeDialog());
   });
 
   it('should open the token flow page when the button is clicked', async () => {
