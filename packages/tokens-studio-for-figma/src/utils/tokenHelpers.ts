@@ -3,7 +3,6 @@ import { SingleToken } from '@/types/tokens';
 import { ThemeObject, UsedTokenSetsMap } from '@/types';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { getTokenSetsOrder } from './getTokenSetsOrder';
-import { tryParseJson } from './tryParseJson';
 
 export type ResolveTokenValuesResult = SingleToken<
 true,
@@ -92,6 +91,45 @@ export function mergeTokenGroups(
   }, [] as SingleToken[]);
 }
 /**
+ * Parses a composite value that is not valid JSON, in the unquoted form the Studio server
+ * returns: `{fontFamily: Inter, fontSize: 1rem, ...}`. A segment without a `key:` prefix
+ * belongs to the previous value, so values containing commas (e.g. font stacks) survive.
+ */
+function parseUnquotedObject(value: string): Record<string, string> | null {
+  if (!value.startsWith('{') || !value.endsWith('}')) return null;
+  const result: Record<string, string> = {};
+  let lastKey: string | null = null;
+  value.slice(1, -1).split(',').forEach((segment) => {
+    const match = segment.match(/^\s*([A-Za-z_$][\w$-]*)\s*:\s*(.*?)\s*$/);
+    if (match) {
+      const [, key, val] = match;
+      lastKey = key;
+      result[key] = val;
+    } else if (lastKey) {
+      result[lastKey] = `${result[lastKey]},${segment}`.trim();
+    }
+  });
+  return Object.keys(result).length > 0 ? result : null;
+}
+
+/**
+ * Turns a server-resolved composite value back into an object. Never returns the raw string:
+ * downstream code reads properties off the value (e.g. `value.fontFamily`), so a string would
+ * silently drop the apply. Properties the server omits keep their local values.
+ */
+function parseServerCompositeValue(serverValue: string, localValue: Record<string, unknown> | unknown[]): SingleToken['value'] {
+  try {
+    return JSON.parse(serverValue);
+  } catch {
+    const parsed = parseUnquotedObject(serverValue);
+    if (parsed && !Array.isArray(localValue)) {
+      return { ...localValue, ...parsed } as SingleToken['value'];
+    }
+    return localValue as SingleToken['value'];
+  }
+}
+
+/**
  * Merges server-side resolved tokens (gRPC delta) on top of locally-resolved tokens.
  * Only tokens present in the server delta are updated; others retain their local values.
  *
@@ -121,7 +159,7 @@ export function mergeServerResolvedTokens(
         && token.value !== null
         && (serverValue.startsWith('{') || serverValue.startsWith('['))
       ) {
-        nextValue = tryParseJson(serverValue) ?? serverValue;
+        nextValue = parseServerCompositeValue(serverValue, token.value as Record<string, unknown> | unknown[]);
       }
       return {
         ...token,
