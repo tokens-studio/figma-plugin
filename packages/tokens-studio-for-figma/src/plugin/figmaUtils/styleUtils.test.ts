@@ -39,12 +39,12 @@ describe('figmaStyleUtils', () => {
 
   it('should return local styleId', () => {
     getLocalStyle(node, 'effectStyleId_original', 'effects');
-    expect(figma.getStyleById).toBeCalledWith('123');
+    expect(figma.getStyleById).toHaveBeenCalledWith('123');
   });
 
   it('should return undefined', () => {
-    mockGetSharedPluginData.mockReturnValueOnce();
+    mockGetSharedPluginData.mockReturnValueOnce(undefined);
     getLocalStyle(node, 'fillStyleId_original', 'fills');
-    expect(figma.getStyleById).toBeCalledWith(undefined);
+    expect(figma.getStyleById).not.toHaveBeenCalled();
   });
 });
