@@ -7,6 +7,7 @@ import removeIdPropertyFromTokens from '@/utils/removeIdPropertyFromTokens';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 import { TokenStore } from '@/types/tokens';
 import { checkStorageSize } from '@/utils/checkStorageSize';
+import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
 
 export function setTokenData(state: TokenState, payload: SetTokenDataPayload): TokenState {
   if (payload.values.length === 0) {
@@ -28,7 +29,11 @@ export function setTokenData(state: TokenState, payload: SetTokenDataPayload): T
   );
   const newActiveTheme = payload.activeTheme;
   Object.entries(newActiveTheme ?? {}).forEach(([group, activeTheme]) => {
-    if (!payload.themes?.find((t) => t.id === activeTheme) && newActiveTheme) {
+    // Drop themes that no longer exist, and themes listed under a group they're no longer in.
+    // Older versions left an active theme under its previous group after it was moved, so it was
+    // counted twice and couldn't be switched off from the theme menu.
+    const theme = payload.themes?.find((t) => t.id === activeTheme);
+    if (newActiveTheme && (!theme || (theme.group ?? INTERNAL_THEMES_NO_GROUP) !== group)) {
       delete newActiveTheme[group];
     }
   });
