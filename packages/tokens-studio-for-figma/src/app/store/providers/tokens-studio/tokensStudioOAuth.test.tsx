@@ -9,9 +9,18 @@ import { fetchProjectDataRest } from '@/utils/tokensStudio/fetchProjectDataRest'
 import { notifyToUI } from '@/plugin/notifiers';
 import type { Organization } from '@/types/oauth';
 import { store } from '@/app/store';
+import { StudioApiError } from '@/utils/tokensStudio/StudioApiError';
+import { fetchBranches } from '@/utils/tokensStudio/fetchBranchesListRest';
+import { RefreshError } from '@/app/services/RefreshError';
+import { SIGN_IN_REQUIRED, VARIABLES_SOURCE_OF_TRUTH } from './studioAuth';
 
 jest.mock('@/utils/tokensStudio/fetchProjectDataRest', () => ({
   fetchProjectDataRest: jest.fn(),
+}));
+
+jest.mock('@/utils/tokensStudio/fetchBranchesListRest', () => ({
+  ...jest.requireActual('@/utils/tokensStudio/fetchBranchesListRest'),
+  fetchBranches: jest.fn(),
 }));
 
 jest.mock('@/plugin/notifiers', () => ({
@@ -173,5 +182,95 @@ describe('pushToTokensStudioOAuth DELETE_THEME_GROUP_IF_EMPTY', () => {
     await deleteGroupIfEmpty();
 
     expect(deleteThemeGroupRest).not.toHaveBeenCalled();
+  });
+});
+
+describe('useTokensStudioOAuth with a lapsed sign-in', () => {
+  const context = {
+    id: 'project-1', branch: 'main', provider: 'tokensstudio-oauth', name: 'Project',
+  } as any;
+  const refreshTokens = jest.fn();
+  const liveTokens = (accessToken: string) => ({
+    accessToken, refreshToken: `${accessToken}-refresh`, tokenType: 'Bearer', expiresAt: Date.now() + 60 * 60 * 1000,
+  });
+  const hook = () => renderHook(() => useTokensStudioOAuth(), { wrapper: AllTheProviders }).result.current;
+
+  beforeEach(() => {
+    jest.mocked(fetchProjectDataRest).mockReset();
+    jest.mocked(fetchBranches).mockReset();
+    jest.mocked(notifyToUI).mockReset();
+    refreshTokens.mockReset().mockImplementation(async () => useAuthStore.setState({ oauthTokens: liveTokens('fresh') }));
+    useAuthStore.setState({
+      oauthTokens: liveTokens('revoked'),
+      organizations: [freeOrg],
+      activeOrganization: freeOrg,
+      activeOrganizationId: 'free',
+      refreshTokens,
+    });
+  });
+
+  it('pulls with a renewed token after a 401', async () => {
+    jest.mocked(fetchProjectDataRest).mockImplementation(async (accessToken: string) => {
+      if (accessToken === 'revoked') throw new StudioApiError('Unauthorized', 401);
+      return {
+        tokens: { global: [] }, themes: [], tokenSetOrder: ['global'], changeSetId: 'change-set', hasExceededPaginationLimit: true,
+      } as any;
+    });
+
+    const result = await hook().pullTokensFromTokensStudioOAuth(context);
+
+    expect(refreshTokens).toHaveBeenCalledTimes(1);
+    expect(fetchProjectDataRest).toHaveBeenLastCalledWith('fresh', expect.any(String), 'project-1', 'main');
+    expect(result).toMatchObject({ status: 'success', metadata: { changeSetId: 'change-set' } });
+    expect(notifyToUI).toHaveBeenCalledWith(expect.stringContaining('10,000 tokens'), { error: true });
+  });
+
+  it('asks to sign in again when the refresh is refused', async () => {
+    useAuthStore.setState({ oauthTokens: { ...liveTokens('stale'), expiresAt: Date.now() - 1000 } });
+    refreshTokens.mockRejectedValue(new RefreshError('fatal', 'Token refresh failed: 400 invalid_grant'));
+
+    const result = await hook().pullTokensFromTokensStudioOAuth(context);
+
+    expect(fetchProjectDataRest).not.toHaveBeenCalled();
+    expect(result).toMatchObject({ status: 'failure', errorType: 'credential', errorCode: SIGN_IN_REQUIRED });
+  });
+
+  it('lists branches with a renewed token after a 401, and returns null when that fails too', async () => {
+    jest.mocked(fetchBranches).mockImplementation(async (accessToken: string) => {
+      if (accessToken === 'revoked') throw new StudioApiError('Unauthorized', 401);
+      return [{ name: 'main' }, { name: 'feature' }] as any;
+    });
+    await expect(hook().fetchBranchesForTokensStudio(context)).resolves.toEqual(['main', 'feature']);
+
+    useAuthStore.setState({ oauthTokens: liveTokens('revoked') });
+    jest.mocked(fetchBranches).mockRejectedValue(new StudioApiError('Unauthorized', 401));
+    await expect(hook().fetchBranchesForTokensStudio(context)).resolves.toBeNull();
+  });
+
+  it('records why a project could not be loaded', async () => {
+    useAuthStore.setState({ oauthTokens: liveTokens('live') });
+    jest.mocked(fetchProjectDataRest).mockRejectedValue(new StudioApiError('Not available', 403, VARIABLES_SOURCE_OF_TRUTH));
+
+    await expect(hook().loadProjectTokens('project-1', 'main', 'free')).rejects.toBeInstanceOf(StudioApiError);
+
+    expect(store.getState().uiState.lastError).toMatchObject({ code: VARIABLES_SOURCE_OF_TRUTH });
+    expect(notifyToUI).toHaveBeenCalledWith('This project syncs Figma variables, it cannot be pulled as tokens.', { error: true });
+    expect(useAuthStore.getState().isLoading).toBe(false);
+  });
+
+  it('does not push when the sign-in cannot be renewed', async () => {
+    useAuthStore.setState({ oauthTokens: { ...liveTokens('stale'), expiresAt: Date.now() - 1000 } });
+    refreshTokens.mockRejectedValue(new RefreshError('fatal', 'Token refresh failed: 400 invalid_grant'));
+    const pushContext = { id: 'project-1', branch: 'main', changeSetId: 'change-set-1' } as any;
+
+    await expect(pushToTokensStudioOAuth({
+      context: pushContext, action: 'CREATE_THEME_GROUP', data: { name: 'Colors' },
+    })).resolves.toBeNull();
+    expect(createThemeGroupRest).not.toHaveBeenCalled();
+    expect(notifyToUI).toHaveBeenCalledWith('Failed to sync: Sign in to Tokens Studio again to keep syncing this file.', { error: true });
+
+    await expect(pushToTokensStudioOAuth({
+      context: pushContext, action: 'CREATE_THEME_GROUP', data: { name: 'Colors' }, rethrowErrors: true,
+    })).rejects.toBeInstanceOf(RefreshError);
   });
 });

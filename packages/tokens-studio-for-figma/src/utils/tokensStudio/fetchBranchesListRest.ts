@@ -1,3 +1,5 @@
+import { studioApiErrorFromResponse } from './StudioApiError';
+
 export interface RestBranch {
   id: string;
   name: string;
@@ -25,9 +27,9 @@ export function parseBranchesFromResponse(branchesData: any): RestBranch[] {
   return branches;
 }
 
-// Shared internal helper — one place that owns the /branches request
+// Shared helper — one place that owns the /branches request
 // shape, error text, and parsing so callers don't drift.
-async function fetchBranches(
+export async function fetchBranches(
   authToken: string,
   apiBaseUrl: string,
   projectId: string,
@@ -39,26 +41,9 @@ async function fetchBranches(
   const url = `${apiBaseUrl}/api/v1/projects/${projectId}/branches`;
   const res = await fetch(url, { headers });
   if (!res.ok) {
-    // Include the HTTP status code — res.statusText is often empty/opaque
-    // (e.g. HTTP/2 sends no reason phrase), so a bare statusText message
-    // reads as "Failed to fetch branches: " with no diagnosis.
-    throw new Error(`Failed to fetch branches (${res.status}${res.statusText ? ` ${res.statusText}` : ''}) at ${url}`);
+    throw await studioApiErrorFromResponse(res, `Failed to fetch branches at ${url}`);
   }
   return parseBranchesFromResponse(await res.json());
-}
-
-export async function fetchBranchesListRest(
-  authToken: string,
-  apiBaseUrl: string,
-  projectId: string,
-): Promise<string[] | null> {
-  try {
-    const branches = await fetchBranches(authToken, apiBaseUrl, projectId);
-    return branches.map((b) => b.name);
-  } catch (error) {
-    console.error('Error fetching branches from REST API:', error);
-    return null;
-  }
 }
 
 // Resolve the change_set_id for a specific branch. Used by the push path
