@@ -16,7 +16,13 @@ export class StudioSignInRequiredError extends Error {
   }
 }
 
-async function refreshedAccessToken(): Promise<string> {
+// `rejectedToken`: the token the API just refused. When another call has renewed the sign-in
+// since, the current token is used as is instead of renewing again.
+async function refreshedAccessToken(rejectedToken?: string): Promise<string> {
+  const current = useAuthStore.getState().oauthTokens;
+  if (rejectedToken && current?.accessToken && current.accessToken !== rejectedToken) {
+    return current.accessToken;
+  }
   await useAuthStore.getState().refreshTokens();
   const { oauthTokens } = useAuthStore.getState();
   if (!oauthTokens?.accessToken) throw new StudioSignInRequiredError();
@@ -41,7 +47,7 @@ export async function withStudioAuth<T>(request: (accessToken: string) => Promis
     return await request(accessToken);
   } catch (error) {
     if (!(error instanceof StudioApiError) || error.status !== 401) throw error;
-    return request(await refreshedAccessToken());
+    return request(await refreshedAccessToken(accessToken));
   }
 }
 

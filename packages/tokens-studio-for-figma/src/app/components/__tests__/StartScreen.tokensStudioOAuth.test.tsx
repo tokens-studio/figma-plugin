@@ -16,7 +16,7 @@ jest.mock('@/app/store/remoteTokens', () => ({
   }),
 }));
 
-const renderWithError = (lastError: { type: 'credential' | 'other'; header: string; message: string; code?: string }) => {
+const renderWithError = (lastError: { type: 'credential' | 'connectivity' | 'other'; header: string; message: string; code?: string }) => {
   const store = createMockStore({
     uiState: {
       storageType: {
@@ -72,5 +72,15 @@ describe('StartScreen with Tokens Studio OAuth', () => {
 
     expect(screen.getByText('This project syncs Figma variables, it cannot be pulled as tokens.')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /goToSubscription|Go to Subscription|signInAgain|Sign in to Tokens Studio again/ })).not.toBeInTheDocument();
+  });
+
+  it('shows no button for a connection error', () => {
+    renderWithError({
+      type: 'connectivity',
+      header: 'Could not load tokens from Tokens Studio',
+      message: 'Could not renew your Tokens Studio sign-in. Check your connection and try again.',
+    });
+
+    expect(screen.queryByRole('button', { name: /goToSubscription|Go to Subscription/ })).not.toBeInTheDocument();
   });
 });

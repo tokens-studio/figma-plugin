@@ -47,6 +47,20 @@ describe('withStudioAuth', () => {
     expect(request).toHaveBeenCalledTimes(2);
   });
 
+  it('retries with a token another call renewed in the meantime, without renewing again', async () => {
+    useAuthStore.setState({ oauthTokens: makeTokens('revoked', 60 * 60 * 1000) });
+    const request = jest.fn(async (token: string) => {
+      if (token === 'revoked') {
+        useAuthStore.setState({ oauthTokens: makeTokens('renewed-elsewhere', 60 * 60 * 1000) });
+        throw new StudioApiError('Unauthorized', 401);
+      }
+      return token;
+    });
+
+    await expect(withStudioAuth(request)).resolves.toBe('renewed-elsewhere');
+    expect(refreshTokens).not.toHaveBeenCalled();
+  });
+
   it('does not retry other failures', async () => {
     useAuthStore.setState({ oauthTokens: makeTokens('live', 60 * 60 * 1000) });
     const request = jest.fn(async () => {

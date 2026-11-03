@@ -232,7 +232,8 @@ function StartScreen() {
                 text: t('retry'),
               } : undefined}
             >
-              {isTokensStudioOAuth && lastError?.code !== VARIABLES_SOURCE_OF_TRUTH && (
+              {/* The Subscription tab can't help with a variables project or a lost connection. */}
+              {isTokensStudioOAuth && lastError?.code !== VARIABLES_SOURCE_OF_TRUTH && lastError?.type !== 'connectivity' && (
                 <Button
                   size="small"
                   variant="primary"
