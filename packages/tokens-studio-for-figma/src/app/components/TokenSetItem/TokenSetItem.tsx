@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
-import { CheckIcon } from '@radix-ui/react-icons';
+import { Check } from 'iconoir-react';
 import { useTranslation } from 'react-i18next';
 import {
   Checkbox, ContextMenu, Tooltip, Box, Text,
@@ -17,6 +17,7 @@ import { StyledDragButton } from '../StyledDragger/StyledDragButton';
 import { formatCount } from '@/utils/formatCount';
 import { useGenerateDocumentation } from '@/app/hooks/useGenerateDocumentation';
 import ProBadge from '../ProBadge';
+import { contextMenuContentCss } from '../contextMenuContentCss';
 
 export type TokenSetItemProps = {
   item: TreeItem & { tokenCount?: number };
@@ -176,7 +177,7 @@ export function TokenSetItem({
             </ContextMenu.Trigger>
           )}
           <ContextMenu.Portal>
-            <ContextMenu.Content>
+            <ContextMenu.Content css={contextMenuContentCss}>
               <ContextMenu.Item onSelect={handleRename} disabled={!canEdit}>
                 {t('rename')}
               </ContextMenu.Item>
@@ -208,7 +209,7 @@ export function TokenSetItem({
                     onSelect={handleTreatAsSource}
                   >
                     <ContextMenu.ItemIndicator>
-                      <CheckIcon />
+                      <Check />
                     </ContextMenu.ItemIndicator>
                     {t('sets.treatAsSource')}
                   </ContextMenu.CheckboxItem>

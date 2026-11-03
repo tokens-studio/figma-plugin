@@ -15,6 +15,7 @@ import { SingleToken } from '@/types/tokens';
 import { ShowFormOptions } from '@/types';
 import useManageTokens from '@/app/store/useManageTokens';
 import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
+import { contextMenuContentCss } from '../contextMenuContentCss';
 
 const RightSlot = styled('div', {
   marginLeft: 'auto',
@@ -80,7 +81,7 @@ export const MoreButtonMenuItems: React.FC<React.PropsWithChildren<React.PropsWi
             </RightSlot>
           </ContextMenu.SubTrigger>
           <ContextMenu.Portal>
-            <ContextMenu.SubContent alignOffset={-5} collisionPadding={30}>
+            <ContextMenu.SubContent alignOffset={-5} collisionPadding={30} css={contextMenuContentCss}>
               {property.childProperties.map((childProperty) => (
                 <MoreButtonProperty
                   key={childProperty.name}
@@ -109,7 +110,7 @@ export const MoreButtonMenuItems: React.FC<React.PropsWithChildren<React.PropsWi
           </RightSlot>
         </ContextMenu.SubTrigger>
         <ContextMenu.Portal>
-          <ContextMenu.SubContent alignOffset={-5} collisionPadding={30}>
+          <ContextMenu.SubContent alignOffset={-5} collisionPadding={30} css={contextMenuContentCss}>
             {DocumentationProperties.map((property) => (
               <MoreButtonProperty
                 key={property.name}
