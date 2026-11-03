@@ -28,6 +28,7 @@ import { ManageThemesModal } from './ManageThemesModal';
 import { activeTokensTabSelector } from '@/selectors/activeTokensTabSelector';
 import { stringTokensSelector } from '@/selectors/stringTokensSelector';
 import { getAliasValue } from '@/utils/alias';
+import { getBaseFontSizeAlias } from '@/utils/getBaseFontSizeAlias';
 import SidebarIcon from '@/icons/sidebar.svg';
 import { defaultTokenResolver } from '@/utils/TokenResolver';
 import { tokenFormatSelector } from '@/selectors/tokenFormatSelector';
@@ -205,7 +206,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
   }, [dispatch, tokens, stringTokens, activeTokenSet, getStringTokens]);
 
   React.useEffect(() => {
-    const newBaseFontSize = getAliasValue(aliasBaseFontSize, resolvedTokens);
+    const newBaseFontSize = getAliasValue(getBaseFontSizeAlias(aliasBaseFontSize, resolvedTokens), resolvedTokens);
     dispatch.settings.setBaseFontSize(String(newBaseFontSize));
   }, [resolvedTokens, aliasBaseFontSize]);
 
