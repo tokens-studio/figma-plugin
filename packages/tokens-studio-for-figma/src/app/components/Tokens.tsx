@@ -29,6 +29,7 @@ import { activeTokensTabSelector } from '@/selectors/activeTokensTabSelector';
 import { stringTokensSelector } from '@/selectors/stringTokensSelector';
 import { getAliasValue } from '@/utils/alias';
 import { getBaseFontSizeAlias } from '@/utils/getBaseFontSizeAlias';
+import { defaultBaseFontSize } from '@/constants/defaultBaseFontSize';
 import SidebarIcon from '@/icons/sidebar.svg';
 import { defaultTokenResolver } from '@/utils/TokenResolver';
 import { tokenFormatSelector } from '@/selectors/tokenFormatSelector';
@@ -207,7 +208,10 @@ function Tokens({ isActive }: { isActive: boolean }) {
 
   React.useEffect(() => {
     const newBaseFontSize = getAliasValue(getBaseFontSizeAlias(aliasBaseFontSize, resolvedTokens), resolvedTokens);
-    dispatch.settings.setBaseFontSize(String(newBaseFontSize));
+    // Don't store 'null' or '[object Object]' when the alias doesn't resolve to a size
+    const isValidBaseFontSize = typeof newBaseFontSize === 'number'
+      || (typeof newBaseFontSize === 'string' && newBaseFontSize.trim().length > 0);
+    dispatch.settings.setBaseFontSize(isValidBaseFontSize ? String(newBaseFontSize) : defaultBaseFontSize);
   }, [resolvedTokens, aliasBaseFontSize]);
 
   const saveScrollPositionSet = React.useCallback((tokenSet: string) => {
