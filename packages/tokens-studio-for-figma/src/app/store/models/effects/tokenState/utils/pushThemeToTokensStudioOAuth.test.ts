@@ -226,6 +226,26 @@ describe('pushThemeToTokensStudioOAuth', () => {
     expect(pushCalls('UPDATE_THEME')[0][0].data.selected_token_sets).toEqual({ 'set-uuid': 'enabled' });
   });
 
+  it('updates a theme with the id of a set created since the last pull', async () => {
+    mockGetState.mockReturnValue({
+      tokenState: {
+        remoteData: {
+          metadata: { themeGroupsData: { Colors: { id: 'group-1' } }, tokenSetsData: { global: { id: 'set-uuid' } } },
+        },
+        // A variables import created 'New/THIRD' and recorded its id here only.
+        tokenSetMetadata: { 'New/THIRD': { id: 'third-uuid', isDynamic: false } },
+        themes: [localTheme],
+      },
+    } as any);
+    mockPush.mockResolvedValueOnce({ data: {} });
+
+    await pushThemeToTokensStudioOAuth({
+      ...newThemePayload, id: 'server-theme-id', selectedTokenSets: { global: 'enabled', 'New/THIRD': 'enabled' },
+    }, rootState, dispatch);
+
+    expect(pushCalls('UPDATE_THEME')[0][0].data.selected_token_sets).toEqual({ 'set-uuid': 'enabled', 'third-uuid': 'enabled' });
+  });
+
   it('finds the existing group when the plan limit refuses re-creating it, and saves the edit', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,

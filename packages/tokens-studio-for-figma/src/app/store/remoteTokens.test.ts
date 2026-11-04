@@ -48,6 +48,8 @@ const mockSetRemoteData = jest.fn();
 const mockSetHasRemoteChange = jest.fn();
 const mockUpdateCheckForChanges = jest.fn();
 const mockSetLastError = jest.fn();
+const mockSetTokenSetMetadata = jest.fn();
+const mockPullTokensFromTokensStudioOAuth = jest.fn();
 
 // Hide log calls unless they are expected
 jest.spyOn(console, 'log').mockImplementation(() => { });
@@ -114,6 +116,7 @@ jest.mock('react-redux', () => ({
       setRemoteData: mockSetRemoteData,
       setTokenFormat: mockSetTokenFormat,
       updateCheckForChanges: mockUpdateCheckForChanges,
+      setTokenSetMetadata: mockSetTokenSetMetadata,
     },
     branchState: {
       setBranches: mockSetBranches,
@@ -233,6 +236,15 @@ jest.mock('../hooks/usePullDialog', () => ({
     showPullDialogError: mockShowPullDialogError,
   }),
 }));
+jest.mock('./providers/tokens-studio', () => ({
+  useTokensStudioOAuth: () => ({
+    syncTokensWithTokensStudioOAuth: jest.fn(),
+    pullTokensFromTokensStudioOAuth: mockPullTokensFromTokensStudioOAuth,
+    fetchBranchesForTokensStudio: jest.fn(),
+    pushTokensToTokensStudioOAuth: jest.fn(),
+  }),
+}));
+
 jest.mock('../../plugin/notifiers', (() => ({
   notifyToUI: jest.fn(),
 })));
@@ -447,6 +459,25 @@ describe('remoteTokens', () => {
       mockRetrieve.mockImplementation(() => null);
       expect(await result.current.pullTokens({ context: context as StorageTypeCredentials })).toEqual(null);
     });
+  });
+
+  it('stores the Tokens Studio set ids and changeSetId even when the pull matches the local tokens', async () => {
+    const studioContext = {
+      provider: 'tokensstudio-oauth', id: 'project-1', name: 'Project', internalId: 'tokens-studio-1',
+    };
+    mockPullTokensFromTokensStudioOAuth.mockResolvedValueOnce({
+      status: 'success',
+      // The same tokens and themes as the local state, so nothing is replaced.
+      tokens: { global: [{ value: '#ffffff', type: 'color', name: 'white' }] },
+      themes: [{ id: 'light', name: 'Light', selectedTokenSets: { global: 'enabled' } }],
+      metadata: { tokenSetsData: { global: { id: 'set-global', isDynamic: false } }, changeSetId: 'change-set-1' },
+    });
+
+    await result.current.pullTokens({ context: studioContext as unknown as StorageTypeCredentials });
+
+    expect(mocksetChangedState).not.toHaveBeenCalled();
+    expect(mockSetTokenSetMetadata).toHaveBeenCalledWith({ global: { id: 'set-global', isDynamic: false } });
+    expect(mockSetApiData).toHaveBeenCalledWith({ ...studioContext, changeSetId: 'change-set-1' });
   });
 
   it('Pull tokens from JSONbin, should return error message when secret is not defined', async () => {
