@@ -3,6 +3,7 @@ import {
 } from './renameInTokensStudio';
 import { pushToTokensStudioOAuth } from '@/app/store/providers/tokens-studio/tokensStudioOAuth';
 import { store } from '@/app/store';
+import { notifyToUI } from '@/plugin/notifiers';
 
 jest.mock('@/app/store/providers/tokens-studio/tokensStudioOAuth', () => ({
   pushToTokensStudioOAuth: jest.fn(),
@@ -10,6 +11,10 @@ jest.mock('@/app/store/providers/tokens-studio/tokensStudioOAuth', () => ({
 
 jest.mock('@/app/store', () => ({
   store: { getState: jest.fn() },
+}));
+
+jest.mock('@/plugin/notifiers', () => ({
+  notifyToUI: jest.fn(),
 }));
 
 const mockPush = jest.mocked(pushToTokensStudioOAuth);
@@ -137,7 +142,7 @@ describe('updateTokensInTokensStudio', () => {
 
   it('finds a token in a set this import renamed by its old set name', async () => {
     setState({ tokenSetMetadata: { 'Brand/Night': { id: 'set-night' } }, remoteData: {} });
-    mockPush.mockResolvedValue({ data: {} });
+    mockPush.mockResolvedValue({ data: { updated_count: 1, requested_count: 1, skipped_count: 0 } });
 
     const renamed = await updateTokensInTokensStudio(context, {
       renames: [{ set: 'Brand/Night', oldName: 'color.primary', newName: 'color.brand' }],
@@ -185,5 +190,68 @@ describe('updateTokensInTokensStudio', () => {
     // The token list is fetched once, however many tokens it is needed for.
     expect(pushed('LIST_TOKENS')).toHaveLength(1);
     expect(pushed('BATCH_UPDATE_TOKENS')).toEqual([]);
+  });
+
+  describe('when Studio doesn\'t apply every update', () => {
+    const input = () => ({
+      renames: [
+        { set: 'Brand/Light', oldName: 'color.primary', newName: 'color.brand' },
+        { set: 'Brand/Light', oldName: 'color.secondary', newName: 'color.accent' },
+      ],
+      updatedTokens: [],
+      newTokens: [],
+      previousTokens: {
+        'Brand/Light': [
+          { name: 'color.primary', $extensions: { id: 'token-primary' } },
+          { name: 'color.secondary', $extensions: { id: 'token-secondary' } },
+        ],
+      },
+      renamedSets: [] as [string, string][],
+    });
+
+    beforeEach(() => {
+      setState({ tokenSetMetadata: { 'Brand/Light': { id: 'set-light' } }, remoteData: {} });
+    });
+
+    it('counts every rename as done when Studio updated them all', async () => {
+      mockPush.mockResolvedValue({ data: { updated_count: 2, requested_count: 2, skipped_count: 0 } });
+
+      const renamed = await updateTokensInTokensStudio(context, input());
+
+      expect(renamed.size).toBe(2);
+      expect(notifyToUI).not.toHaveBeenCalled();
+    });
+
+    it('creates the tokens instead when the update is refused', async () => {
+      // pushToTokensStudioOAuth has reported the refusal itself.
+      mockPush.mockResolvedValue(null);
+
+      const renamed = await updateTokensInTokensStudio(context, input());
+
+      expect(renamed.size).toBe(0);
+      expect(notifyToUI).not.toHaveBeenCalled();
+    });
+
+    it('creates the tokens instead when Studio skips some without saying which', async () => {
+      mockPush.mockResolvedValue({ data: { updated_count: 1, requested_count: 2, skipped_count: 1 } });
+
+      const renamed = await updateTokensInTokensStudio(context, input());
+
+      expect(renamed.size).toBe(0);
+      expect(notifyToUI).toHaveBeenCalledWith("Tokens Studio didn't apply 2 of 2 token updates", { error: true });
+    });
+
+    it('creates only the token Studio says it skipped', async () => {
+      mockPush.mockResolvedValue({
+        data: {
+          updated_count: 1, requested_count: 2, skipped_count: 1, warnings: [{ token_id: 'token-secondary', detail: 'Token was deleted' }],
+        },
+      });
+
+      const renamed = await updateTokensInTokensStudio(context, input());
+
+      expect([...renamed]).toEqual([expect.stringContaining('color.brand')]);
+      expect(notifyToUI).toHaveBeenCalledWith("Tokens Studio didn't apply 1 of 2 token updates: Token was deleted", { error: true });
+    });
   });
 });

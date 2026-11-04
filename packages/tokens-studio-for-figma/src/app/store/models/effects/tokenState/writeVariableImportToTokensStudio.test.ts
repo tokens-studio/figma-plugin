@@ -250,7 +250,7 @@ describe('writeVariableImportToTokensStudio', () => {
     } as any);
     mockPush.mockImplementation(async ({ action }: any) => (action === 'LIST_TOKENS'
       ? [{ id: 'token-secondary', name: 'color.secondary', token_set_id: 'set-light' }, { id: 'other', name: 'color.secondary', token_set_id: 'set-dark' }]
-      : { data: {} }));
+      : { data: { updated_count: 2, requested_count: 2, skipped_count: 0 } }));
 
     await writeVariableImportToTokensStudio(dispatch)({} as any, {});
 
