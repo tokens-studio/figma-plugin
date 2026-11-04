@@ -195,6 +195,36 @@ export async function batchCreateTokensRest(
   });
 }
 
+// Each token's id, name and set, for finding the Studio id of a token the plugin only knows by name.
+export async function listTokensSlimRest(
+  authToken: string,
+  apiBaseUrl: string,
+  projectId: string,
+  changeSetId: string,
+): Promise<Array<{ id: string; name: string; token_set_id: string }>> {
+  const result = await restRequest(authToken, apiBaseUrl, `/api/v1/projects/${projectId}/tokens`, {
+    query: { change_set_id: changeSetId, fields: 'slim' },
+  });
+  return result?.data ?? [];
+}
+
+// Renames and value changes for existing tokens, by id.
+export async function batchUpdateTokensRest(
+  authToken: string,
+  apiBaseUrl: string,
+  projectId: string,
+  updates: Array<{ token_id: string; changes: { name?: string; value?: unknown } }>,
+  changeSetId: string,
+) {
+  return restRequest(authToken, apiBaseUrl, `/api/v1/projects/${projectId}/tokens/batch_update`, {
+    method: 'POST',
+    body: {
+      change_set_id: changeSetId,
+      updates,
+    },
+  });
+}
+
 export async function createTokenRest(
   authToken: string,
   apiBaseUrl: string,

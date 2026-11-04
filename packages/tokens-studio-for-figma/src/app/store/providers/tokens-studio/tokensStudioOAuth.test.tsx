@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react';
 import { pushToTokensStudioOAuth, useTokensStudioOAuth } from './tokensStudioOAuth';
 import {
-  createThemeGroupRest, deleteThemeGroupRest, listThemeOptionsRest, RestApiError,
+  batchUpdateTokensRest, createThemeGroupRest, deleteThemeGroupRest, listThemeOptionsRest, listTokensSlimRest, RestApiError,
 } from '@/utils/tokensStudio/restApi';
 import { AllTheProviders } from '../../../../../tests/config/setupTest';
 import { useAuthStore } from '../../useAuthStore';
@@ -23,6 +23,8 @@ jest.mock('@/utils/tokensStudio/restApi', () => ({
   createThemeGroupRest: jest.fn(),
   listThemeOptionsRest: jest.fn(),
   deleteThemeGroupRest: jest.fn(),
+  batchUpdateTokensRest: jest.fn(),
+  listTokensSlimRest: jest.fn(),
 }));
 
 const makeOrg = (id: string, subscription: Partial<NonNullable<Organization['subscription']>>): Organization => ({
@@ -173,5 +175,45 @@ describe('pushToTokensStudioOAuth DELETE_THEME_GROUP_IF_EMPTY', () => {
     await deleteGroupIfEmpty();
 
     expect(deleteThemeGroupRest).not.toHaveBeenCalled();
+  });
+});
+
+describe('pushToTokensStudioOAuth token updates', () => {
+  const context = { id: 'project-1', branch: 'main', changeSetId: 'change-set-1' } as any;
+
+  beforeEach(() => {
+    jest.mocked(batchUpdateTokensRest).mockReset().mockResolvedValue({ data: { updated_count: 1 } });
+    jest.mocked(listTokensSlimRest).mockReset();
+    jest.mocked(notifyToUI).mockReset();
+    useAuthStore.setState({
+      oauthTokens: {
+        accessToken: 'token', refreshToken: 'refresh', tokenType: 'Bearer', expiresAt: Date.now() + 60 * 60 * 1000,
+      },
+    });
+  });
+
+  it('sends renames and values, converting legacy color values', async () => {
+    await pushToTokensStudioOAuth({
+      context,
+      action: 'BATCH_UPDATE_TOKENS',
+      data: [
+        { token_id: 'token-1', changes: { name: 'color.brand' } },
+        { token_id: 'token-2', changes: { value: 'rgba(#ff0000, 0.5)' } },
+      ],
+    });
+
+    const [, , , updates, changeSetId] = jest.mocked(batchUpdateTokensRest).mock.calls[0];
+    expect(changeSetId).toBe('change-set-1');
+    expect(updates[0]).toEqual({ token_id: 'token-1', changes: { name: 'color.brand' } });
+    expect(updates[1].changes.value).not.toBe('rgba(#ff0000, 0.5)');
+    expect(notifyToUI).toHaveBeenCalledWith('Updated tokens to Tokens Studio');
+  });
+
+  it('lists the tokens without a success message', async () => {
+    jest.mocked(listTokensSlimRest).mockResolvedValue([{ id: 'token-1', name: 'color.brand', token_set_id: 'set-1' }]);
+
+    await expect(pushToTokensStudioOAuth({ context, action: 'LIST_TOKENS', data: {} }))
+      .resolves.toEqual([{ id: 'token-1', name: 'color.brand', token_set_id: 'set-1' }]);
+    expect(notifyToUI).not.toHaveBeenCalled();
   });
 });

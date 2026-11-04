@@ -3,9 +3,11 @@ import type { RootModel } from '@/types/RootModel';
 import type { ThemeObjectsList } from '@/types';
 import { pushToTokensStudioOAuth } from '../../../../providers/tokens-studio/tokensStudioOAuth';
 import { store } from '@/app/store';
+import { notifyToUI } from '@/plugin/notifiers';
 import {
-  lookupBySanitized, resolveSanitizedKey, sanitizeTokenSetName, toStudioThemeGroupName,
+  lookupBySanitized, resolveSanitizedKey, sanitizeReferencesInValue, sanitizeTokenName, sanitizeTokenSetName, toStudioThemeGroupName,
 } from './sanitizeForStudio';
+import type { TokenRename } from './findRenamedVariableTokens';
 
 type SetEntry = { id?: string; isDynamic?: boolean };
 
@@ -99,4 +101,91 @@ export async function renameThemeGroupsInTokensStudio(
     // eslint-disable-next-line no-await-in-loop
     await renameThemeGroup(context, oldName, newName, dispatch);
   }
+}
+
+export const renamedTokenKey = (set: string, name: string) => `${set}\u0000${name}`;
+
+type ImportedToken = { name: string; value: unknown; parent?: string };
+
+// Renamed variables and changed values, sent as updates to the existing tokens. Returns the renamed tokens'
+// new names per set, so the import doesn't also create them.
+export async function updateTokensInTokensStudio(
+  context: any,
+  {
+    renames, updatedTokens, newTokens, previousTokens, renamedSets,
+  }: {
+    renames: TokenRename[];
+    updatedTokens: ImportedToken[];
+    newTokens: ImportedToken[];
+    previousTokens: Record<string, Array<{ name: string; $extensions?: { id?: string } }>> | undefined;
+    renamedSets: [string, string][];
+  },
+): Promise<Set<string>> {
+  const renamedTokens = new Set<string>();
+  if (renames.length === 0 && updatedTokens.length === 0) return renamedTokens;
+
+  // The set a token was in before this import: a renamed set still has its old name in previousTokens.
+  // Set and token names can come raw or sanitized for Studio, so they are compared sanitized.
+  const previousSetName = (set: string) => renamedSets.find(([, newName]) => sanitizeTokenSetName(newName) === sanitizeTokenSetName(set))?.[0] ?? set;
+
+  let studioTokens: Array<{ id: string; name: string; token_set_id: string }> | null = null;
+  const findTokenId = async (set: string, name: string): Promise<string | undefined> => {
+    const sanitized = sanitizeTokenName(name);
+    const previousSet = lookupBySanitized(previousTokens, sanitizeTokenSetName(previousSetName(set)), sanitizeTokenSetName);
+    const local = (previousSet || []).find((token) => sanitizeTokenName(token.name) === sanitized);
+    if (local?.$extensions?.id) return local.$extensions.id;
+    // Tokens this plugin created through an import don't have their Studio id locally; look it up.
+    if (!studioTokens) studioTokens = (await pushToTokensStudioOAuth({ context, action: 'LIST_TOKENS', data: {} })) || [];
+    const setId = findStudioSet(set)?.id;
+    return studioTokens!.find((token) => token.token_set_id === setId && sanitizeTokenName(token.name) === sanitized)?.id;
+  };
+
+  const updates: Array<{ token_id: string; changes: { name?: string; value?: unknown } }> = [];
+  const renameUpdates: Array<{ tokenId: string; key: string }> = [];
+  for (const { set, oldName, newName } of renames) {
+    // eslint-disable-next-line no-await-in-loop
+    const tokenId = await findTokenId(set, oldName);
+    if (tokenId) {
+      // newTokens are sanitized for Studio; the renames carry the local names.
+      const imported = newTokens.find((token) => token.parent === sanitizeTokenSetName(set) && token.name === sanitizeTokenName(newName));
+      updates.push({ token_id: tokenId, changes: { name: sanitizeTokenName(newName), ...(imported ? { value: imported.value } : {}) } });
+      const key = renamedTokenKey(sanitizeTokenSetName(set), sanitizeTokenName(newName));
+      renamedTokens.add(key);
+      renameUpdates.push({ tokenId, key });
+    }
+  }
+  for (const token of updatedTokens.filter((updated) => updated.parent)) {
+    // eslint-disable-next-line no-await-in-loop
+    const tokenId = await findTokenId(token.parent!, token.name);
+    // Unlike newTokens, updatedTokens aren't sanitized for Studio yet.
+    if (tokenId) updates.push({ token_id: tokenId, changes: { value: sanitizeReferencesInValue(token.value) } });
+  }
+
+  if (updates.length === 0) return renamedTokens;
+
+  // pushToTokensStudioOAuth reports a refused request itself and returns null.
+  const result = await pushToTokensStudioOAuth({ context, action: 'BATCH_UPDATE_TOKENS', data: updates });
+  const response = result?.data as { updated_count?: number; warnings?: Array<{ token_id?: string; detail?: string }> } | undefined;
+  const warnings = response?.warnings ?? [];
+  const refusedIds = new Set(warnings.map((warning) => warning.token_id));
+  // Studio names the tokens it skipped in its warnings. When the counts don't add up and it doesn't say which,
+  // none of the updates count as done.
+  const accountedFor = !!result && (response?.updated_count ?? 0) + refusedIds.size >= updates.length;
+  const confirmed = new Set(accountedFor ? updates.map((update) => update.token_id).filter((id) => !refusedIds.has(id)) : []);
+
+  // A rename Studio didn't confirm goes back to the tokens to create, so Studio still gets the token under its new
+  // name. If the rename did go through after all, Studio skips the create, since the set has that name already.
+  renameUpdates.forEach(({ tokenId, key }) => {
+    if (!confirmed.has(tokenId)) renamedTokens.delete(key);
+  });
+
+  const notApplied = updates.length - confirmed.size;
+  if (result && notApplied > 0) {
+    const reason = warnings.find((warning) => warning.detail)?.detail;
+    notifyToUI(
+      `Tokens Studio didn't apply ${notApplied} of ${updates.length} token updates${reason ? `: ${reason}` : ''}`,
+      { error: true },
+    );
+  }
+  return renamedTokens;
 }
