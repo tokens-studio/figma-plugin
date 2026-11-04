@@ -599,6 +599,46 @@ describe('useToken test', () => {
       });
     });
 
+    it('pushes the selected themes to Tokens Studio once, after the styles of every theme exist', async () => {
+      const selectedThemes = ['a', 'b', 'c'];
+      const themeStore = createMockStore({
+        tokenState: {
+          tokens: { global: [{ name: 'white', value: '#ffffff', type: TokenTypes.COLOR }] },
+          themes: selectedThemes.map((id) => ({
+            id,
+            name: id,
+            selectedTokenSets: { global: TokenSetStatus.ENABLED },
+            $figmaStyleReferences: {},
+          })),
+        },
+        settings: { stylesColor: true },
+      });
+      const { result: themeResult } = renderHook(() => useTokens(), {
+        wrapper: ({ children }) => <Provider store={themeStore}>{children}</Provider>,
+      });
+
+      const calls: string[] = [];
+      const assignSpy = jest.spyOn(themeStore.dispatch.tokenState, 'assignStyleIdsToCurrentTheme')
+        .mockImplementation((() => { calls.push('assign'); }) as any);
+      const pushSpy = jest.spyOn(themeStore.dispatch.tokenState, 'pushThemesToStudio')
+        .mockImplementation((async () => { calls.push('push'); }) as any);
+      selectedThemes.forEach(() => {
+        messageSpy.mockImplementationOnce((async ({ type }: { type: AsyncMessageTypes }) => ({ type, styleIds: {} })) as any);
+      });
+
+      try {
+        await act(async () => {
+          await themeResult.current.createStylesFromSelectedThemes(selectedThemes);
+        });
+
+        expect(calls).toEqual(['assign', 'assign', 'assign', 'push']);
+        expect(pushSpy).toHaveBeenCalledWith(selectedThemes);
+      } finally {
+        assignSpy.mockRestore();
+        pushSpy.mockRestore();
+      }
+    });
+
     it('respects decision to only create text styles', async () => {
       const tokens = [
         {
