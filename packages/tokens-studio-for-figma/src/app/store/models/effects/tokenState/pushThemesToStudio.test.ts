@@ -3,6 +3,7 @@ import { pushThemesToStudio } from './pushThemesToStudio';
 import { notifyThemePushFailures, pushThemeToTokensStudioOAuth } from './utils/pushThemeToTokensStudioOAuth';
 import { store } from '@/app/store';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import { notifyToUI } from '@/plugin/notifiers';
 
 jest.mock('./utils/pushThemeToTokensStudioOAuth', () => ({
   pushThemeToTokensStudioOAuth: jest.fn(),
@@ -13,6 +14,11 @@ jest.mock('@/app/store', () => ({
   store: { getState: jest.fn() },
 }));
 
+jest.mock('@/plugin/notifiers', () => ({
+  notifyToUI: jest.fn(),
+}));
+
+const mockNotify = jest.mocked(notifyToUI);
 const mockPush = jest.mocked(pushThemeToTokensStudioOAuth);
 const mockNotifyFailures = jest.mocked(notifyThemePushFailures);
 const mockGetState = jest.mocked(store.getState);
@@ -155,10 +161,31 @@ describe('pushThemesToStudio', () => {
       expect(pushedIds()).toEqual(['a']);
     });
 
-    it('stops when the change set changes', async () => {
+    it('keeps going when the credentials lose the change set on the same branch, since a push resolves it again', async () => {
+      await pushWhile({ changeSetId: undefined });
+
+      expect(pushedIds()).toEqual(['a', 'b', 'c']);
+      expect(mockNotify).not.toHaveBeenCalled();
+    });
+
+    it('stops when the change set changes, and says that themes stayed unsent', async () => {
       await pushWhile({ changeSetId: 'change-set-2' });
 
       expect(pushedIds()).toEqual(['a']);
+      expect(mockNotify).toHaveBeenCalledTimes(1);
+      expect(mockNotify).toHaveBeenCalledWith(expect.stringContaining('2 themes'), { error: true });
+    });
+
+    it('says nothing when the branch changes after the last push', async () => {
+      mockGetState.mockReturnValue(stateWith() as any);
+      mockPush.mockImplementationOnce(async () => {
+        mockGetState.mockReturnValue(stateWith({ changeSetId: 'change-set-2' }) as any);
+        return { ok: true };
+      });
+
+      await pushThemesToStudio(dispatch)(['a']);
+
+      expect(mockNotify).not.toHaveBeenCalled();
     });
 
     it('stops when the project changes', async () => {

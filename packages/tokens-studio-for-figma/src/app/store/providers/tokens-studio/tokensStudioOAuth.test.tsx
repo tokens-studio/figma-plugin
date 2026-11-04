@@ -9,9 +9,16 @@ import { fetchProjectDataRest } from '@/utils/tokensStudio/fetchProjectDataRest'
 import { notifyToUI } from '@/plugin/notifiers';
 import type { Organization } from '@/types/oauth';
 import { store } from '@/app/store';
+import { StorageProviderType } from '@/constants/StorageProviderType';
+import { fetchChangeSetIdForBranch } from '@/utils/tokensStudio/fetchBranchesListRest';
 
 jest.mock('@/utils/tokensStudio/fetchProjectDataRest', () => ({
   fetchProjectDataRest: jest.fn(),
+}));
+
+jest.mock('@/utils/tokensStudio/fetchBranchesListRest', () => ({
+  ...jest.requireActual('@/utils/tokensStudio/fetchBranchesListRest'),
+  fetchChangeSetIdForBranch: jest.fn(),
 }));
 
 jest.mock('@/plugin/notifiers', () => ({
@@ -92,6 +99,39 @@ describe('useTokensStudioOAuth loadProjectTokens', () => {
     useAuthStore.setState({ activeOrganization: variablesOrg, activeOrganizationId: 'variables' });
     await expect(loadProjectTokens()('project-1')).rejects.toThrow('planCantSync');
     expect(fetchProjectDataRest).not.toHaveBeenCalled();
+  });
+});
+
+describe('pushToTokensStudioOAuth resolving a missing change set', () => {
+  const branchA = { provider: StorageProviderType.TOKENS_STUDIO_OAUTH, id: 'project-1', branch: 'a' } as any;
+  const branchB = { ...branchA, branch: 'b', changeSetId: 'change-set-b' };
+
+  beforeEach(() => {
+    useAuthStore.setState({
+      oauthTokens: {
+        accessToken: 'token', refreshToken: 'refresh', tokenType: 'Bearer', expiresAt: Date.now() + 60 * 60 * 1000,
+      },
+    });
+    store.dispatch.uiState.setApiData(branchA);
+  });
+
+  it('stores the resolved change set for the branch that is still active', async () => {
+    jest.mocked(fetchChangeSetIdForBranch).mockResolvedValue('change-set-a');
+
+    await pushToTokensStudioOAuth({ context: branchA, action: 'DELETE_THEME', data: {} });
+
+    expect(store.getState().uiState.api).toMatchObject({ branch: 'a', changeSetId: 'change-set-a' });
+  });
+
+  it('does not revert a branch switch that happened while it resolved', async () => {
+    jest.mocked(fetchChangeSetIdForBranch).mockImplementation(async () => {
+      store.dispatch.uiState.setApiData(branchB);
+      return 'change-set-a';
+    });
+
+    await pushToTokensStudioOAuth({ context: branchA, action: 'DELETE_THEME', data: {} });
+
+    expect(store.getState().uiState.api).toMatchObject({ branch: 'b', changeSetId: 'change-set-b' });
   });
 });
 
