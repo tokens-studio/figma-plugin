@@ -69,13 +69,13 @@ describe('pushThemesToStudio', () => {
   });
 
   describe('when state changes while an earlier push waits', () => {
-    const pushWhile = async (nextThemes: typeof themes) => {
+    const pushWhile = async (nextThemes: typeof themes, changeSetId = 'change-set-1') => {
       let finishFirst: (value: { ok: true }) => void = () => {};
       mockPush.mockReturnValueOnce(new Promise((resolve) => {
         finishFirst = resolve;
       }));
       const nextState = {
-        uiState: { api: { provider: StorageProviderType.TOKENS_STUDIO_OAUTH, id: 'project-1', changeSetId: 'change-set-1' } },
+        uiState: { api: { provider: StorageProviderType.TOKENS_STUDIO_OAUTH, id: 'project-1', changeSetId } },
         tokenState: { themes: nextThemes },
       };
 
@@ -100,6 +100,12 @@ describe('pushThemesToStudio', () => {
 
     it('skips a theme deleted in the meantime', async () => {
       await pushWhile([themes[0], themes[2]]);
+
+      expect(mockPush.mock.calls.map(([theme]) => theme.id)).toEqual(['a']);
+    });
+
+    it('stops when the user switches branch, because themes of the old branch may still be in state', async () => {
+      await pushWhile(themes, 'change-set-2');
 
       expect(mockPush.mock.calls.map(([theme]) => theme.id)).toEqual(['a']);
     });
