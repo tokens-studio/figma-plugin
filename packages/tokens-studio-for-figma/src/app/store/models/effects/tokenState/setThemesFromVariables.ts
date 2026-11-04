@@ -2,6 +2,7 @@ import type { RematchDispatch } from '@rematch/core';
 import type { RootModel } from '@/types/RootModel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { notifyThemePushFailures, pushThemeToTokensStudioOAuth, type ThemePushFailure } from './utils/pushThemeToTokensStudioOAuth';
+import { renameThemeGroupsInTokensStudio } from './utils/renameInTokensStudio';
 import { store } from '@/app/store';
 import { ThemeObjectsList } from '@/types';
 
@@ -36,6 +37,8 @@ export function setThemesFromVariables(dispatch: RematchDispatch<RootModel>) {
       // Push sequentially so that a shared theme group is only created once.
       // Concurrent pushes would both see groupId=null and create duplicate groups.
       (async () => {
+        // currentState was read before the import is applied locally, so its themes still have the old groups.
+        await renameThemeGroupsInTokensStudio(currentState.uiState.api, currentState.tokenState.themes, updatedThemesToPush, dispatch);
         const failures: ThemePushFailure[] = [];
         for (const theme of [...newThemesToPush, ...updatedThemesToPush]) {
           // eslint-disable-next-line no-await-in-loop
