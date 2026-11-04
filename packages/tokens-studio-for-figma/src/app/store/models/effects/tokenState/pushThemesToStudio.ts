@@ -12,11 +12,12 @@ export function pushThemesToStudio(dispatch: RematchDispatch<RootModel>) {
   return async (themeIds: string[]): Promise<void> => {
     if (!themeIds?.length) return;
 
-    const currentState = store.getState();
-    if (currentState?.uiState?.api?.provider !== StorageProviderType.TOKENS_STUDIO_OAUTH) return;
+    if (store.getState()?.uiState?.api?.provider !== StorageProviderType.TOKENS_STUDIO_OAUTH) return;
 
     const failures: ThemePushFailure[] = [];
     for (const themeId of Array.from(new Set(themeIds))) {
+      // Read per theme: state can change while an earlier push waits, and a stale copy would overwrite a newer save.
+      const currentState = store.getState();
       const theme = currentState.tokenState?.themes?.find((t: any) => t.id === themeId);
       if (theme) {
         // eslint-disable-next-line no-await-in-loop
