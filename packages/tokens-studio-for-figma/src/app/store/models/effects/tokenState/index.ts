@@ -21,4 +21,3 @@ export * from './setTokensFromStyles';
 export * from './createMultipleTokens';
 export * from './disconnectVariableFromTheme';
 export * from './disconnectStyleFromTheme';
-export * from './pushThemesToStudio';
