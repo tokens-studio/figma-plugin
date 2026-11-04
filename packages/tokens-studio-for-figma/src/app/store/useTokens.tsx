@@ -528,6 +528,8 @@ export default function useTokens() {
         }
       }
 
+      await dispatch.tokenState.pushThemesToStudio(selectedThemes);
+
       track('createStyles', {
         type: 'themes',
         textStyles: settings.stylesTypography,
