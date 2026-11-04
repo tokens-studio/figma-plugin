@@ -867,8 +867,10 @@ export const tokenState = createModel<RootModel>()({
   },
   effects: (dispatch) => ({
     // Declared here so that it is typed: it has no reducer of the same name, and the spread below loses types.
-    pushThemesToStudio(themeIds: string[]) {
-      return pushThemesToStudio(dispatch)(themeIds);
+    async pushThemesToStudio(themeIds: string[], rootState) {
+      if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
+        await pushThemesToStudio(dispatch)(themeIds);
+      }
     },
     editToken(payload: UpdateTokenPayload, rootState) {
       if (payload.oldName && payload.oldName !== payload.name) {

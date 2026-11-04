@@ -2,23 +2,25 @@ import type { RematchDispatch } from '@rematch/core';
 import type { RootModel } from '@/types/RootModel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { notifyThemePushFailures, pushThemeToTokensStudioOAuth, type ThemePushFailure } from './utils/pushThemeToTokensStudioOAuth';
-import { store } from '@/app/store';
+import { store, type RootState } from '@/app/store';
 import { notifyToUI } from '@/plugin/notifiers';
 
 const movedFrom = (start?: string | null, current?: string | null) => !!start && !!current && start !== current;
+
+const studioApi = ({ uiState: { api } }: RootState) => (api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH ? api : null);
 
 /**
  * A push resolves a missing change set for the branch in the credentials, so an id that appears or disappears is
  * not a switch. A switch pulls first, which moves the resolver context and the themes, and only then updates the
  * credentials.
  */
-function branchChanged(start: any, current: any): boolean {
-  const startApi = start.uiState?.api;
-  const currentApi = current.uiState?.api;
+function branchChanged(start: RootState, current: RootState): boolean {
+  const startApi = studioApi(start);
+  const currentApi = studioApi(current);
   return currentApi?.id !== startApi?.id
     || currentApi?.branch !== startApi?.branch
     || movedFrom(startApi?.changeSetId, currentApi?.changeSetId)
-    || movedFrom(start.tokenState?.serverResolverContext?.changeSetId, current.tokenState?.serverResolverContext?.changeSetId);
+    || movedFrom(start.tokenState.serverResolverContext?.changeSetId, current.tokenState.serverResolverContext?.changeSetId);
 }
 
 /**
@@ -30,8 +32,6 @@ export function pushThemesToStudio(dispatch: RematchDispatch<RootModel>) {
     if (!themeIds?.length) return;
 
     const startState = store.getState();
-    if (startState?.uiState?.api?.provider !== StorageProviderType.TOKENS_STUDIO_OAUTH) return;
-
     const failures: ThemePushFailure[] = [];
     const uniqueThemeIds = Array.from(new Set(themeIds));
     for (const [index, themeId] of uniqueThemeIds.entries()) {
@@ -44,7 +44,7 @@ export function pushThemesToStudio(dispatch: RematchDispatch<RootModel>) {
         break;
       }
 
-      const theme = currentState.tokenState?.themes?.find((t: any) => t.id === themeId);
+      const theme = currentState.tokenState.themes.find((t) => t.id === themeId);
       if (theme) {
         // eslint-disable-next-line no-await-in-loop
         const result = await pushThemeToTokensStudioOAuth(theme, currentState, dispatch, { notifyOnFailure: false });

@@ -225,13 +225,15 @@ describe('pushThemesToStudio', () => {
     expect(mockNotifyFailures).not.toHaveBeenCalled();
   });
 
-  it('does nothing for another storage provider', async () => {
-    setState(StorageProviderType.GITHUB);
+  it('stops when the provider is no longer Studio, since the theme would go nowhere', async () => {
+    mockPush.mockImplementationOnce(async () => {
+      setState(StorageProviderType.GITHUB);
+      return { ok: true };
+    });
 
-    await pushThemesToStudio(dispatch)(['a']);
+    await pushThemesToStudio(dispatch)(['a', 'b']);
 
-    expect(mockPush).not.toHaveBeenCalled();
-    expect(mockNotifyFailures).not.toHaveBeenCalled();
+    expect(mockPush).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -241,10 +243,7 @@ describe('assignStyleIdsToCurrentTheme', () => {
     setState();
     const dispatch: any = { tokenState: { updateDocument: jest.fn() } };
 
-    assignStyleIdsToCurrentTheme(dispatch)(
-      { selectedThemes: ['a', 'b', 'c'] },
-      { uiState: { api: { provider: StorageProviderType.TOKENS_STUDIO_OAUTH } } },
-    );
+    assignStyleIdsToCurrentTheme(dispatch)();
 
     expect(dispatch.tokenState.updateDocument).toHaveBeenCalledWith({ updateRemote: true, shouldUpdateNodes: false });
     expect(mockPush).not.toHaveBeenCalled();
