@@ -2,6 +2,7 @@ import { appendTypeToToken } from '@/app/components/createTokenObj';
 import { SingleToken } from '@/types/tokens';
 import { ThemeObject, UsedTokenSetsMap } from '@/types';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import { TokenTypes } from '@/constants/TokenTypes';
 import { getTokenSetsOrder } from './getTokenSetsOrder';
 
 export type ResolveTokenValuesResult = SingleToken<
@@ -104,12 +105,15 @@ function coerceUnquotedPrimitive(value: string): string | number | boolean | nul
  * Parses a composite value that is not valid JSON, in the unquoted form the Studio server
  * returns: `{fontFamily: Inter, fontSize: 1rem, ...}`. A segment without a `key:` prefix
  * belongs to the previous value, so values containing commas (e.g. font stacks) survive.
+ * Only flat objects are supported: nested values would be split on their inner commas.
  */
 function parseUnquotedObject(value: string): Record<string, string | number | boolean | null> | null {
   if (!value.startsWith('{') || !value.endsWith('}')) return null;
+  const body = value.slice(1, -1);
+  if (/[{}[\]]/.test(body)) return null;
   const result: Record<string, string> = {};
   let lastKey: string | null = null;
-  value.slice(1, -1).split(',').forEach((segment) => {
+  body.split(',').forEach((segment) => {
     const match = segment.match(/^\s*([A-Za-z_$][\w$-]*)\s*:\s*(.*?)\s*$/);
     if (match) {
       const [, key, val] = match;
@@ -124,24 +128,23 @@ function parseUnquotedObject(value: string): Record<string, string | number | bo
 }
 
 /**
- * Turns a server-resolved composite value back into an object. Never returns the raw string:
- * downstream code reads properties off the value (e.g. `value.fontFamily`), so a string would
- * silently drop the apply.
+ * Turns a server-resolved composite value back into an object.
  *
  * Valid JSON replaces the local value as is: the server is the source of truth, and merging
- * would stop it from clearing a property by omitting it. The unquoted fallback is merged onto
- * the local value, because a lenient parse may miss properties and losing one (e.g. fontFamily)
- * breaks the apply.
+ * would stop it from clearing a property by omitting it.
+ *
+ * The unquoted fallback only applies to typography, whose values are flat and which reads
+ * properties straight off the value (e.g. `value.fontFamily`), so a string would silently drop
+ * the apply. It is merged onto the local value because losing a property breaks the apply.
+ * Other types keep the string: their consumers handle it, e.g. gradients fall back to rawValue.
  */
-function parseServerCompositeValue(serverValue: string, localValue: Record<string, unknown> | unknown[]): SingleToken['value'] {
+function parseServerCompositeValue(serverValue: string, token: ResolveTokenValuesResult): SingleToken['value'] {
   try {
     return JSON.parse(serverValue);
   } catch {
+    if (token.type !== TokenTypes.TYPOGRAPHY) return serverValue;
     const parsed = parseUnquotedObject(serverValue);
-    if (parsed && !Array.isArray(localValue)) {
-      return { ...localValue, ...parsed } as SingleToken['value'];
-    }
-    return localValue as SingleToken['value'];
+    return (parsed ? { ...(token.value as Record<string, unknown>), ...parsed } : token.value) as SingleToken['value'];
   }
 }
 
@@ -175,7 +178,7 @@ export function mergeServerResolvedTokens(
         && token.value !== null
         && (serverValue.startsWith('{') || serverValue.startsWith('['))
       ) {
-        nextValue = parseServerCompositeValue(serverValue, token.value as Record<string, unknown> | unknown[]);
+        nextValue = parseServerCompositeValue(serverValue, token);
       }
       return {
         ...token,

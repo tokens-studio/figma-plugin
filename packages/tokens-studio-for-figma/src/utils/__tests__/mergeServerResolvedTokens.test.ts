@@ -114,7 +114,15 @@ describe('mergeServerResolvedTokens', () => {
       expect(result.value).toEqual(localTypography.value);
     });
 
-    it('never replaces a composite value with a string', () => {
+    it('keeps the local typography value when the server value is nested', () => {
+      const [result] = mergeServerResolvedTokens([localTypography], {
+        'typography.title': '{fontFamily: Inter, fontSize: {value: 1, unit: rem}}',
+      });
+      expect(result.value).toEqual(localTypography.value);
+    });
+
+    it('leaves unparseable values of other composite types as the server sent them', () => {
+      const serverValue = '[{x: 0, y: 1, blur: 2}]';
       const localShadow = {
         name: 'shadow.card',
         type: TokenTypes.BOX_SHADOW,
@@ -122,10 +130,8 @@ describe('mergeServerResolvedTokens', () => {
           x: '0', y: '1', blur: '2', spread: '0', color: '#000', type: 'dropShadow',
         }],
       } as unknown as ResolveTokenValuesResult;
-      const [result] = mergeServerResolvedTokens([localShadow], {
-        'shadow.card': '[{x: 0, y: 1, blur: 2}]',
-      });
-      expect(result.value).toEqual(localShadow.value);
+      const [result] = mergeServerResolvedTokens([localShadow], { 'shadow.card': serverValue });
+      expect(result.value).toBe(serverValue);
     });
   });
 });
