@@ -27,14 +27,26 @@ export function setTokenData(state: TokenState, payload: SetTokenDataPayload): T
   const usedTokenSets = Object.fromEntries(
     allAvailableTokenSets.map((tokenSet) => [tokenSet, payload.usedTokenSet?.[tokenSet] ?? TokenSetStatus.DISABLED]),
   );
-  const newActiveTheme = payload.activeTheme;
-  Object.entries(newActiveTheme ?? {}).forEach(([group, activeTheme]) => {
-    // Drop themes that no longer exist, and themes listed under a group they're no longer in.
-    // Older versions left an active theme under its previous group after it was moved, so it was
-    // counted twice and couldn't be switched off from the theme menu.
-    const theme = payload.themes?.find((t) => t.id === activeTheme);
-    if (newActiveTheme && (!theme || (theme.group ?? INTERNAL_THEMES_NO_GROUP) !== group)) {
-      delete newActiveTheme[group];
+  // Older versions left an active theme listed under its previous group after it was moved, so it
+  // was counted twice in the theme menu. Keep every theme that is listed under its current group,
+  // move one listed under another group to its current group if nothing is active there yet, and
+  // drop the rest (duplicates and themes that no longer exist). The set of active themes stays the
+  // same, so usedTokenSet still matches it.
+  const groupOf = (themeId: string) => {
+    const theme = payload.themes?.find((t) => t.id === themeId);
+    return theme ? theme.group || INTERNAL_THEMES_NO_GROUP : undefined;
+  };
+  const activeThemeEntries = Object.entries(payload.activeTheme ?? {});
+  const newActiveTheme: Record<string, string> = {};
+  activeThemeEntries.forEach(([group, themeId]) => {
+    if (groupOf(themeId) === group) {
+      newActiveTheme[group] = themeId;
+    }
+  });
+  activeThemeEntries.forEach(([group, themeId]) => {
+    const currentGroup = groupOf(themeId);
+    if (currentGroup && currentGroup !== group && !(currentGroup in newActiveTheme)) {
+      newActiveTheme[currentGroup] = themeId;
     }
   });
 
@@ -57,7 +69,7 @@ export function setTokenData(state: TokenState, payload: SetTokenDataPayload): T
         ),
       ),
     })),
-    activeTheme: newActiveTheme ?? {},
+    activeTheme: newActiveTheme,
     ...(Object.keys(payload.values).includes(state.activeTokenSet)
       ? {}
       : {

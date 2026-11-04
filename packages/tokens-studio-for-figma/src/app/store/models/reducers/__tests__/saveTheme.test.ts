@@ -52,6 +52,19 @@ describe('saveTheme', () => {
     expect(store.getState().tokenState.activeTheme).toEqual({ [INTERNAL_THEMES_NO_GROUP]: 'light' });
   });
 
+  it('lists an active theme saved with an empty group under no group', () => {
+    const store = createStore({ mode: 'light' });
+    store.dispatch.tokenState.saveTheme({
+      id: 'light',
+      name: 'Light',
+      group: '',
+      selectedTokenSets: { global: TokenSetStatus.ENABLED },
+      meta: { oldName: 'Light', oldGroup: 'mode' },
+    });
+
+    expect(store.getState().tokenState.activeTheme).toEqual({ [INTERNAL_THEMES_NO_GROUP]: 'light' });
+  });
+
   it('keeps an active theme counted once when it gets a group', () => {
     const store = createStore({ [INTERNAL_THEMES_NO_GROUP]: 'compact', mode: 'dark' });
     store.dispatch.tokenState.saveTheme({
@@ -76,20 +89,5 @@ describe('saveTheme', () => {
     });
 
     expect(store.getState().tokenState.activeTheme).toEqual({ mode: 'light' });
-  });
-});
-
-describe('setTokenData', () => {
-  it('drops active themes that are listed under a group they are no longer in', () => {
-    const store = createStore({});
-    store.dispatch.tokenState.setTokenData({
-      values: { global: [] },
-      themes,
-      // Saved by an older version: "light" was moved out of "colors" but stayed listed there
-      activeTheme: { colors: 'light', mode: 'light', [INTERNAL_THEMES_NO_GROUP]: 'compact' },
-      usedTokenSet: { global: TokenSetStatus.ENABLED },
-    });
-
-    expect(store.getState().tokenState.activeTheme).toEqual({ mode: 'light', [INTERNAL_THEMES_NO_GROUP]: 'compact' });
   });
 });

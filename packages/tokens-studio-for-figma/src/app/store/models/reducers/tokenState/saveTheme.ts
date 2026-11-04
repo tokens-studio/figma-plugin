@@ -120,7 +120,7 @@ export function saveTheme(state: TokenState, data: Payload): TokenState {
     }
   });
   if (isActiveTheme) {
-    newActiveTheme[data?.group ?? INTERNAL_THEMES_NO_GROUP] = themeId;
+    newActiveTheme[data?.group || INTERNAL_THEMES_NO_GROUP] = themeId;
   }
   const nextState: TokenState = {
     ...state,
