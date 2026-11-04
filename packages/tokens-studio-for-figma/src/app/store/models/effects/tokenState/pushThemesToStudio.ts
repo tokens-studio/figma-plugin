@@ -12,12 +12,18 @@ export function pushThemesToStudio(dispatch: RematchDispatch<RootModel>) {
   return async (themeIds: string[]): Promise<void> => {
     if (!themeIds?.length) return;
 
-    if (store.getState()?.uiState?.api?.provider !== StorageProviderType.TOKENS_STUDIO_OAUTH) return;
+    const startApi: any = store.getState()?.uiState?.api;
+    if (startApi?.provider !== StorageProviderType.TOKENS_STUDIO_OAUTH) return;
 
     const failures: ThemePushFailure[] = [];
     for (const themeId of Array.from(new Set(themeIds))) {
       // Read per theme: state can change while an earlier push waits, and a stale copy would overwrite a newer save.
       const currentState = store.getState();
+      const currentApi: any = currentState.uiState?.api;
+      // A branch switch sets the new change set before the pull replaces the themes, so stop: the next theme could
+      // be the old branch's copy, and branches share theme ids.
+      if (currentApi?.id !== startApi.id || currentApi?.changeSetId !== startApi.changeSetId) break;
+
       const theme = currentState.tokenState?.themes?.find((t: any) => t.id === themeId);
       if (theme) {
         // eslint-disable-next-line no-await-in-loop
