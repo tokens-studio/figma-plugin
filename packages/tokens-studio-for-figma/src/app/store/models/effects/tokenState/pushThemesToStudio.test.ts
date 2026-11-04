@@ -69,17 +69,48 @@ describe('pushThemesToStudio', () => {
   });
 
   describe('when state changes while an earlier push waits', () => {
-    const pushWhile = async (nextThemes: typeof themes, changeSetId = 'change-set-1') => {
+    type StateParts = {
+      themes?: typeof themes;
+      id?: string;
+      branch?: string;
+      changeSetId?: string;
+      resolverChangeSetId?: string;
+    };
+
+    const stateWith = (parts: StateParts = {}) => {
+      const merged = {
+        themes,
+        id: 'project-1',
+        branch: 'main',
+        changeSetId: 'change-set-1',
+        resolverChangeSetId: 'change-set-1',
+        ...parts,
+      };
+      return {
+        uiState: {
+          api: {
+            provider: StorageProviderType.TOKENS_STUDIO_OAUTH,
+            id: merged.id,
+            branch: merged.branch,
+            changeSetId: merged.changeSetId,
+          },
+        },
+        tokenState: {
+          themes: merged.themes,
+          serverResolverContext: { changeSetId: merged.resolverChangeSetId },
+        },
+      };
+    };
+
+    const pushWhile = async (next: StateParts, start: StateParts = {}) => {
       let finishFirst: (value: { ok: true }) => void = () => {};
       mockPush.mockReturnValueOnce(new Promise((resolve) => {
         finishFirst = resolve;
       }));
-      const nextState = {
-        uiState: { api: { provider: StorageProviderType.TOKENS_STUDIO_OAUTH, id: 'project-1', changeSetId } },
-        tokenState: { themes: nextThemes },
-      };
+      mockGetState.mockReturnValue(stateWith(start) as any);
+      const nextState = stateWith({ ...start, ...next });
 
-      const pushing = pushThemesToStudio(dispatch)(['a', 'b']);
+      const pushing = pushThemesToStudio(dispatch)(['a', 'b', 'c']);
       await Promise.resolve();
       mockGetState.mockReturnValue(nextState as any);
       finishFirst({ ok: true });
@@ -88,26 +119,58 @@ describe('pushThemesToStudio', () => {
       return nextState;
     };
 
+    const pushedIds = () => mockPush.mock.calls.map(([theme]) => theme.id);
+
     it('sends the newer values of a theme saved in the meantime', async () => {
       const savedB = { ...themes[1], name: 'B saved' };
 
-      const nextState = await pushWhile([themes[0], savedB, themes[2]]);
+      const nextState = await pushWhile({ themes: [themes[0], savedB, themes[2]] });
 
-      expect(mockPush).toHaveBeenCalledTimes(2);
+      expect(pushedIds()).toEqual(['a', 'b', 'c']);
       expect(mockPush.mock.calls[1][0]).toEqual(savedB);
       expect(mockPush.mock.calls[1][1]).toBe(nextState);
     });
 
     it('skips a theme deleted in the meantime', async () => {
-      await pushWhile([themes[0], themes[2]]);
+      await pushWhile({ themes: [themes[0], themes[2]] });
 
-      expect(mockPush.mock.calls.map(([theme]) => theme.id)).toEqual(['a']);
+      expect(pushedIds()).toEqual(['a', 'c']);
     });
 
-    it('stops when the user switches branch, because themes of the old branch may still be in state', async () => {
-      await pushWhile(themes, 'change-set-2');
+    it('keeps going when the first push resolves a change set that was missing after a reload', async () => {
+      await pushWhile(
+        { changeSetId: 'change-set-1' },
+        { changeSetId: undefined, resolverChangeSetId: undefined },
+      );
 
-      expect(mockPush.mock.calls.map(([theme]) => theme.id)).toEqual(['a']);
+      expect(pushedIds()).toEqual(['a', 'b', 'c']);
+    });
+
+    it('stops when the branch name changes, even from a missing change set', async () => {
+      await pushWhile(
+        { branch: 'other', changeSetId: 'change-set-2' },
+        { changeSetId: undefined, resolverChangeSetId: undefined },
+      );
+
+      expect(pushedIds()).toEqual(['a']);
+    });
+
+    it('stops when the change set changes', async () => {
+      await pushWhile({ changeSetId: 'change-set-2' });
+
+      expect(pushedIds()).toEqual(['a']);
+    });
+
+    it('stops when the project changes', async () => {
+      await pushWhile({ id: 'project-2' });
+
+      expect(pushedIds()).toEqual(['a']);
+    });
+
+    it('stops while a pull for another branch runs, before the change set in the credentials moves', async () => {
+      await pushWhile({ resolverChangeSetId: 'change-set-2' });
+
+      expect(pushedIds()).toEqual(['a']);
     });
   });
 
