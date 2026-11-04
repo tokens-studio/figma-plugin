@@ -9,6 +9,7 @@ import {
   sanitizeTokenSetName,
   convertLegacyRgbaForStudio,
   convertTokenValueForStudio,
+  toStudioThemeGroupName,
 } from './sanitizeForStudio';
 
 describe('sanitizeTokenName', () => {
@@ -366,5 +367,18 @@ describe('convertTokenValueForStudio', () => {
   it('returns the same token when nothing changes', () => {
     const token = { name: 'red', type: 'color', value: '#ff0000' };
     expect(convertTokenValueForStudio(token)).toBe(token);
+  });
+});
+
+describe('toStudioThemeGroupName', () => {
+  it('turns a Figma collection name into a name Tokens Studio accepts', () => {
+    expect(toStudioThemeGroupName('Brand Core')).toBe('Brand-Core');
+    expect(toStudioThemeGroupName(' Brand / Core (v2) ')).toBe('Brand-Core-v2');
+    expect(toStudioThemeGroupName('Brand--Core')).toBe('Brand-Core');
+  });
+
+  it('leaves valid names alone', () => {
+    expect(toStudioThemeGroupName('BrandCore')).toBe('BrandCore');
+    expect(toStudioThemeGroupName('color-mode')).toBe('color-mode');
   });
 });

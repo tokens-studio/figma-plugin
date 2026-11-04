@@ -26,6 +26,15 @@ export function sanitizeDisplayName(name: string): string {
   return stripUnsafe(name);
 }
 
+// Tokens Studio only accepts letters, numbers and hyphens in a theme group name, and a group name is often a
+// Figma collection name ("Brand Core"). Replace every other run of characters with one hyphen.
+export function toStudioThemeGroupName(name: string): string {
+  return stripUnsafe(name)
+    .replace(/[^a-zA-Z0-9-]+/g, '-')
+    .replace(/-{2,}/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
 // Returns empty when nothing survives — the caller must decide whether to skip.
 export function sanitizeTokenName(name: string): string {
   return name
