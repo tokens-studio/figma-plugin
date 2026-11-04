@@ -105,7 +105,11 @@ export const pushToTokensStudioOAuth = async ({
       return null;
     }
     changeSetId = resolved;
-    store.dispatch.uiState.setApiData({ ...context, changeSetId });
+    // The user can switch branch during the fetch. Writing `context` back would then undo the switch.
+    const liveApi = store.getState().uiState.api as TokensStudioOAuthCredentials | null;
+    if (liveApi?.id === projectId && liveApi?.branch === branch) {
+      store.dispatch.uiState.setApiData({ ...context, changeSetId });
+    }
   }
   let result: any;
 
