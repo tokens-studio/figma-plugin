@@ -68,6 +68,43 @@ describe('pushThemesToStudio', () => {
     expect(mockPush).toHaveBeenCalledTimes(2);
   });
 
+  describe('when state changes while an earlier push waits', () => {
+    const pushWhile = async (nextThemes: typeof themes) => {
+      let finishFirst: (value: { ok: true }) => void = () => {};
+      mockPush.mockReturnValueOnce(new Promise((resolve) => {
+        finishFirst = resolve;
+      }));
+      const nextState = {
+        uiState: { api: { provider: StorageProviderType.TOKENS_STUDIO_OAUTH, id: 'project-1', changeSetId: 'change-set-1' } },
+        tokenState: { themes: nextThemes },
+      };
+
+      const pushing = pushThemesToStudio(dispatch)(['a', 'b']);
+      await Promise.resolve();
+      mockGetState.mockReturnValue(nextState as any);
+      finishFirst({ ok: true });
+      await pushing;
+
+      return nextState;
+    };
+
+    it('sends the newer values of a theme saved in the meantime', async () => {
+      const savedB = { ...themes[1], name: 'B saved' };
+
+      const nextState = await pushWhile([themes[0], savedB, themes[2]]);
+
+      expect(mockPush).toHaveBeenCalledTimes(2);
+      expect(mockPush.mock.calls[1][0]).toEqual(savedB);
+      expect(mockPush.mock.calls[1][1]).toBe(nextState);
+    });
+
+    it('skips a theme deleted in the meantime', async () => {
+      await pushWhile([themes[0], themes[2]]);
+
+      expect(mockPush.mock.calls.map(([theme]) => theme.id)).toEqual(['a']);
+    });
+  });
+
   it('reports every refused theme in one message and still pushes the rest', async () => {
     const failure = { themeName: 'A', action: 'update' as const, reason: 'Refused' };
     mockPush.mockResolvedValueOnce({ ok: false, failure });
