@@ -267,6 +267,14 @@ describe('pushThemeToTokensStudioOAuth', () => {
     expect(pushCalls('UPDATE_THEME')[0][0].notifyOnSuccess).toBe(false);
   });
 
+  it('passes notifyOnSuccess to a theme group it creates, since a refused theme takes the group back out', async () => {
+    mockPush.mockResolvedValueOnce({ data: { id: 'group-1' } }).mockResolvedValueOnce({ data: {} });
+
+    await pushThemeToTokensStudioOAuth({ ...newThemePayload, id: 'server-theme-id' }, rootState, dispatch, { notifyOnSuccess: false });
+
+    expect(pushCalls('CREATE_THEME_GROUP')[0][0].notifyOnSuccess).toBe(false);
+  });
+
   it('refuses an ungrouped theme up front instead of sending it', async () => {
     const result = await pushThemeToTokensStudioOAuth({ name: 'Dark', selectedTokenSets: {} }, rootState, dispatch);
 

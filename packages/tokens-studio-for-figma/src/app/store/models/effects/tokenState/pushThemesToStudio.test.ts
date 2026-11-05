@@ -178,8 +178,8 @@ describe('pushThemesToStudio', () => {
       ]);
     });
 
-    it('names the main branch when the credentials carry no branch name', async () => {
-      await pushWhile({ changeSetId: 'change-set-2' }, { branch: undefined });
+    it.each([undefined, ''])('names the main branch when the credentials carry the branch name %p', async (branch) => {
+      await pushWhile({ changeSetId: 'change-set-2' }, { branch });
 
       expect(mockNotify).toHaveBeenCalledWith(expect.stringContaining('Switch back to "main"'), { error: true });
     });
