@@ -242,6 +242,31 @@ describe('pushThemeToTokensStudioOAuth', () => {
     expect(notifyToUI).not.toHaveBeenCalled();
   });
 
+  it('marks a theme as skipped when the push sent nothing, so a caller claims no success', async () => {
+    setStoreState({ Colors: { id: 'group-1' } });
+    mockPush.mockResolvedValueOnce(null);
+
+    const result = await pushThemeToTokensStudioOAuth({ ...newThemePayload, id: 'server-theme-id' }, rootState, dispatch);
+
+    expect(result).toEqual({ ok: true, skipped: true });
+  });
+
+  it('marks a theme as skipped for another provider', async () => {
+    const result = await pushThemeToTokensStudioOAuth(newThemePayload, { uiState: { api: { provider: StorageProviderType.GITHUB } } }, dispatch);
+
+    expect(result).toEqual({ ok: true, skipped: true });
+    expect(mockPush).not.toHaveBeenCalled();
+  });
+
+  it('passes notifyOnSuccess to the theme write', async () => {
+    setStoreState({ Colors: { id: 'group-1' } });
+    mockPush.mockResolvedValueOnce({ data: {} });
+
+    await pushThemeToTokensStudioOAuth({ ...newThemePayload, id: 'server-theme-id' }, rootState, dispatch, { notifyOnSuccess: false });
+
+    expect(pushCalls('UPDATE_THEME')[0][0].notifyOnSuccess).toBe(false);
+  });
+
   it('refuses an ungrouped theme up front instead of sending it', async () => {
     const result = await pushThemeToTokensStudioOAuth({ name: 'Dark', selectedTokenSets: {} }, rootState, dispatch);
 

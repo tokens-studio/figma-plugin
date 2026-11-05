@@ -149,6 +149,16 @@ describe('pushToTokensStudioOAuth CREATE_THEME_GROUP', () => {
     });
   });
 
+  it('reports a saved change unless the caller reports it instead', async () => {
+    jest.mocked(createThemeGroupRest).mockResolvedValue({ data: { id: 'group-1' } } as any);
+
+    await pushToTokensStudioOAuth({ context, action: 'CREATE_THEME_GROUP', data: { name: 'Colors' }, notifyOnSuccess: false });
+    expect(notifyToUI).not.toHaveBeenCalled();
+
+    await pushToTokensStudioOAuth({ context, action: 'CREATE_THEME_GROUP', data: { name: 'Colors' } });
+    expect(notifyToUI).toHaveBeenCalledWith('Created theme group to Tokens Studio');
+  });
+
   it('reads a name clash as "already there" and returns null', async () => {
     jest.mocked(createThemeGroupRest).mockRejectedValue(
       new RestApiError(422, "A theme group with the name 'Colors' already exists in this branch"),
