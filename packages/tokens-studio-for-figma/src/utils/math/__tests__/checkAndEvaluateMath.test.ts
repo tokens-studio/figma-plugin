@@ -53,4 +53,19 @@ describe('checkAndEvaluateMath', () => {
     expect(checkAndEvaluateMath('sample(cubicBezier1D(0.45,0.34),0.2)')).toEqual(0.213);
     expect(checkAndEvaluateMath('sample(cubicBezier1D(0.45,0.34),0.2)')).toEqual(0.213);
   });
+
+  it('keeps conditionals and built-in functions working', () => {
+    expect(checkAndEvaluateMath('1 > 0 ? 2 : 3')).toEqual(2);
+    expect(checkAndEvaluateMath('min(1,2) + floor(2.5)')).toEqual(3);
+    expect(checkAndEvaluateMath('roundTo(1.234,2)')).toEqual(1.23);
+  });
+
+  it('does not evaluate property access in expressions', () => {
+    expect(checkAndEvaluateMath('max.name == "max" ? 1 : 0')).toEqual('max.name == "max" ? 1 : 0');
+  });
+
+  it('does not evaluate assignments or function definitions in expressions', () => {
+    expect(checkAndEvaluateMath('x = 5')).toEqual('x = 5');
+    expect(checkAndEvaluateMath('f(x) = x + 1; f(2)')).toEqual('f(x) = x + 1; f(2)');
+  });
 });
