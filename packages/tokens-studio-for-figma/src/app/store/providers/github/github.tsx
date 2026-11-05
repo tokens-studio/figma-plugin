@@ -25,6 +25,7 @@ import { useIsProUser } from '@/app/hooks/useIsProUser';
 import { categorizeError } from '@/utils/error/categorizeError';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 import removeIdPropertyFromTokens from '@/utils/removeIdPropertyFromTokens';
+import { buildGitMetadata } from '@/utils/buildGitMetadata';
 
 type GithubCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITHUB; }>;
 type GithubFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITHUB }>;
@@ -69,18 +70,23 @@ export function useGitHub() {
       const { commitMessage, customBranch } = pushSettings;
       try {
         if (customBranch) storage.selectBranch(customBranch);
-        const metadata = {
-          tokenSetOrder: Object.keys(tokens),
-        };
+        const metadata = buildGitMetadata(tokens);
 
-        // Check if we should use optimized multi-file sync
+        // Take the optimized path only when there are real content changes (tokens, themes,
+        // or set-level additions/removals). A pure metadata-only diff — first-sync where
+        // remoteData.metadata is undefined, a legitimate tokenSetOrder reordering, or a
+        // legacy↔DTCG format flip (which produces no in-memory token diff because format is
+        // a serialization-time concern) — falls through to storage.save. That writes every
+        // file correctly and is what pre-#3941 relied on before the optimized branch became
+        // reachable for these cases. #3941's guarantees still hold: empty commits are gated
+        // by useChangedState.hasChanges (compareLastSyncedState), and empty-set NEW/REMOVE
+        // still routes through tokenSetChanges below.
         const isMultiFileMode = isProUser && context.filePath && !context.filePath.endsWith('.json');
-        const hasChanges = Object.keys(changedPushState.tokens).length > 0
+        const hasContentChanges = Object.keys(changedPushState.tokens).length > 0
           || changedPushState.themes.length > 0
-          || !!changedPushState.metadata
           || !!changedPushState.tokenSetChanges;
 
-        if (isMultiFileMode && hasChanges) {
+        if (isMultiFileMode && hasContentChanges) {
           // Use the optimized save method for multi-file mode
           await (storage as GithubTokenStorage).saveOptimized({
             themes,
