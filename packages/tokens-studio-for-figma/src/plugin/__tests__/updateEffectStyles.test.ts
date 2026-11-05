@@ -244,4 +244,56 @@ describe('updateEffectStyles', () => {
 
     expect(existingStyles[0].name).toEqual('shadows/large-RENAMED');
   });
+
+  it('does not rewrite the name when it already matches, even with rename enabled', async () => {
+    let nameSetCount = 0;
+    let storedName = 'shadows/large';
+    const existingStyle = {
+      id: '1234',
+      effects: [{
+        type: 'DROP_SHADOW',
+        blendMode: 'NORMAL',
+        color: {
+          r: 0, g: 0, b: 0, a: 1,
+        },
+        offset: { x: 0, y: 0 },
+        radius: 10,
+        showShadowBehindNode: false,
+        spread: 0,
+        opacity: 1,
+        visible: true,
+      }],
+    };
+    Object.defineProperty(existingStyle, 'name', {
+      get: () => storedName,
+      set: (v: string) => {
+        storedName = v;
+        nameSetCount += 1;
+      },
+    });
+    mockGetLocalEffectStyles.mockImplementation(() => [existingStyle]);
+
+    await updateEffectStyles(
+      {
+        effectTokens: [{
+          name: 'shadows.large',
+          value: {
+            type: BoxShadowTypes.DROP_SHADOW,
+            x: 0,
+            y: 0,
+            blur: 10,
+            spread: 0,
+            color: '#000000',
+          },
+          type: TokenTypes.BOX_SHADOW,
+          path: 'shadows/large',
+          styleId: '1234',
+        }],
+        baseFontSize: '16',
+        shouldRename: true,
+      },
+    );
+
+    expect(nameSetCount).toBe(0);
+  });
 });

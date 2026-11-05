@@ -14,10 +14,15 @@ export async function setFontStyleOnTarget({ target, value, baseFontSize }: { ta
   try {
     await figma.loadFontAsync({ family, style });
     if (fontFamily || fontWeight) {
-      target.fontName = {
-        family,
-        style,
-      };
+      const isAlreadySet = target.fontName !== figma.mixed
+        && target.fontName.family === family
+        && target.fontName.style === style;
+      if (!isAlreadySet) {
+        target.fontName = {
+          family,
+          style,
+        };
+      }
     }
   } catch (e) {
     const splitFontFamily = family.split(',');

@@ -15,7 +15,7 @@ export default async function updateColorStyles(colorTokens: SingleColorToken<tr
   await processBatches(colorTokens, 50, async (token) => {
     if (paintToIdMap.has(token.styleId)) {
       const paint = paintToIdMap.get(token.styleId)!;
-      if (shouldRename) {
+      if (shouldRename && paint.name !== token.path) {
         paint.name = token.path;
       }
       tokenToStyleMap[token.name] = paint.id;
