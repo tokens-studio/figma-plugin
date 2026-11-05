@@ -163,6 +163,7 @@ export async function pushThemeToTokensStudioOAuth(
         action: 'CREATE_THEME_GROUP',
         data: { name: groupName },
         rethrowErrors: true,
+        notifyOnSuccess,
       });
     } catch (error) {
       createError = error;

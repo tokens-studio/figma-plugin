@@ -57,7 +57,7 @@ export function pushThemesToStudio(dispatch: RematchDispatch<RootModel>) {
     if (saved) notifyToUI(`Saved ${saved} ${saved === 1 ? 'theme' : 'themes'} to Tokens Studio`);
     if (unsent) {
       // The export runs on the active branch, so the unsent themes only reach their own branch from there.
-      const startBranch = studioApi(startState)?.branch ?? 'main';
+      const startBranch = studioApi(startState)?.branch || 'main';
       notifyToUI(`The branch changed, so ${unsent} ${unsent === 1 ? 'theme was' : 'themes were'} not saved in Tokens Studio. Switch back to "${startBranch}" and export styles again to save them.`, { error: true });
     }
     notifyThemePushFailures(failures);
