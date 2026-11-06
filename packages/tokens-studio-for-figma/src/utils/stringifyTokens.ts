@@ -4,8 +4,8 @@ import { AnyTokenList } from '@/types/tokens';
 import removeTokenId from './removeTokenId';
 import { TokenFormat, TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 import { TokenInJSON } from './convertTokens';
+import { isNumericValueToken } from './numericValueTokenTypes';
 import { processNumberValue } from './processNumberValue';
-import { TokenTypes } from '@/constants/TokenTypes';
 
 export function getGroupTypeName(tokenName: string, groupLevel: number): string {
   if (tokenName.includes('.')) {
@@ -16,7 +16,7 @@ export function getGroupTypeName(tokenName: string, groupLevel: number): string 
 }
 
 function processTokenValue(value: any, tokenType: string): any {
-  if (tokenType === TokenTypes.NUMBER || tokenType === TokenTypes.FONT_WEIGHTS) {
+  if (isNumericValueToken(tokenType)) {
     return processNumberValue(value);
   }
   return value;

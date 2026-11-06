@@ -209,4 +209,76 @@ describe('stringfyTokens', () => {
       ),
     );
   });
+
+  it('serializes a numeric fontWeights token as a number in the legacy format', () => {
+    const input = {
+      global: [
+        {
+          name: 'fontWeights.bold',
+          value: '700',
+          type: 'fontWeights',
+        },
+      ],
+    };
+
+    setFormat(TokenFormatOptions.Legacy);
+
+    expect(JSON.parse(stringifyTokens(input, activeTokenSet))).toEqual(
+      {
+        fontWeights: {
+          bold: {
+            value: 700,
+            type: 'fontWeights',
+          },
+        },
+      },
+    );
+  });
+
+  it('keeps alias and named fontWeights tokens as strings', () => {
+    const input = {
+      global: [
+        {
+          name: 'fontWeights.alias',
+          value: '{fontWeights.base}',
+          type: 'fontWeights',
+        },
+        {
+          name: 'fontWeights.named',
+          value: 'Bold',
+          type: 'fontWeights',
+        },
+        {
+          name: 'fontWeights.leadingZero',
+          value: '0700',
+          type: 'fontWeights',
+        },
+      ],
+    };
+
+    setFormat(TokenFormatOptions.DTCG);
+
+    expect(stringifyTokens(input, activeTokenSet)).toEqual(
+      JSON.stringify(
+        {
+          fontWeights: {
+            alias: {
+              $type: 'fontWeights',
+              $value: '{fontWeights.base}',
+            },
+            named: {
+              $type: 'fontWeights',
+              $value: 'Bold',
+            },
+            leadingZero: {
+              $type: 'fontWeights',
+              $value: '0700',
+            },
+          },
+        },
+        null,
+        2,
+      ),
+    );
+  });
 });

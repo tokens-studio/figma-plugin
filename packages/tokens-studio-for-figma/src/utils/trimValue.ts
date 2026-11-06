@@ -1,9 +1,11 @@
 import { SingleToken } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
+import { convertToDefaultProperty } from './convertToDefaultProperty';
+import { isNumericValueToken } from './numericValueTokenTypes';
 import { processNumberValue } from './processNumberValue';
 
 export default function trimValue(value: SingleToken['value'], tokenType?: TokenTypes): SingleToken['value'] {
-  if (tokenType === TokenTypes.NUMBER) {
+  if (isNumericValueToken(tokenType)) {
     return processNumberValue(value) as SingleToken['value'];
   }
 
@@ -32,6 +34,13 @@ export default function trimValue(value: SingleToken['value'], tokenType?: Token
     }) as SingleToken['value'];
   } if (typeof value === 'object') {
     return Object.entries(value).reduce<Record<string, string>>((acc, [key, val]) => {
+      // A numeric font weight inside a composite token (e.g. the fontWeight
+      // of a typography token) is stored as a number, like standalone
+      // number/fontWeights tokens.
+      if (convertToDefaultProperty(key) === TokenTypes.FONT_WEIGHTS) {
+        acc[key] = processNumberValue(val as SingleToken['value']) as string;
+        return acc;
+      }
       acc[key] = val.toString().trim();
       return acc;
     }, {});

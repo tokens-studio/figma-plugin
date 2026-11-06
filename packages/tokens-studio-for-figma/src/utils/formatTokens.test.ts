@@ -100,6 +100,26 @@ describe('formatTokens', () => {
         name: 'shadows.alias',
         value: '{shadows.md}',
       },
+      {
+        name: 'fontWeights.bold',
+        value: '700',
+        type: TokenTypes.FONT_WEIGHTS,
+      },
+      {
+        name: 'fontWeights.alias',
+        value: '{fontWeights.base}',
+        type: TokenTypes.FONT_WEIGHTS,
+      },
+      {
+        name: 'fontWeights.named',
+        value: 'Bold',
+        type: TokenTypes.FONT_WEIGHTS,
+      },
+      {
+        name: 'fontWeights.leadingZero',
+        value: '0700',
+        type: TokenTypes.FONT_WEIGHTS,
+      },
     ],
   } as unknown as Record<string, AnyTokenList>;
 
@@ -185,6 +205,24 @@ describe('formatTokens', () => {
               alias: {
                 $value: '{shadows.md}',
                 $type: TokenTypes.BOX_SHADOW,
+              },
+            },
+            fontWeights: {
+              bold: {
+                $value: 700,
+                $type: TokenTypes.FONT_WEIGHTS,
+              },
+              alias: {
+                $value: '{fontWeights.base}',
+                $type: TokenTypes.FONT_WEIGHTS,
+              },
+              named: {
+                $value: 'Bold',
+                $type: TokenTypes.FONT_WEIGHTS,
+              },
+              leadingZero: {
+                $value: '0700',
+                $type: TokenTypes.FONT_WEIGHTS,
               },
             },
           },
@@ -284,6 +322,24 @@ describe('formatTokens', () => {
                 $type: TokenTypes.BOX_SHADOW,
               },
             },
+            fontWeights: {
+              bold: {
+                $value: 700,
+                $type: TokenTypes.FONT_WEIGHTS,
+              },
+              alias: {
+                $value: '{fontWeights.base}',
+                $type: TokenTypes.FONT_WEIGHTS,
+              },
+              named: {
+                $value: 'Bold',
+                $type: TokenTypes.FONT_WEIGHTS,
+              },
+              leadingZero: {
+                $value: '0700',
+                $type: TokenTypes.FONT_WEIGHTS,
+              },
+            },
           },
         },
         null,
@@ -363,6 +419,24 @@ describe('formatTokens', () => {
               alias: {
                 value: '{shadows.md}',
                 type: TokenTypes.BOX_SHADOW,
+              },
+            },
+            fontWeights: {
+              bold: {
+                value: 700,
+                type: TokenTypes.FONT_WEIGHTS,
+              },
+              alias: {
+                value: '{fontWeights.base}',
+                type: TokenTypes.FONT_WEIGHTS,
+              },
+              named: {
+                value: 'Bold',
+                type: TokenTypes.FONT_WEIGHTS,
+              },
+              leadingZero: {
+                value: '0700',
+                type: TokenTypes.FONT_WEIGHTS,
               },
             },
           },

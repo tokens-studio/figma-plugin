@@ -125,4 +125,66 @@ describe('trimValue', () => {
       expect(trimValue(' hello ', TokenTypes.TEXT)).toBe('hello');
     });
   });
+
+  describe('fontWeights token handling', () => {
+    it('should convert plain numeric font weight strings to numbers', () => {
+      expect(trimValue('700', TokenTypes.FONT_WEIGHTS)).toBe(700);
+      expect(trimValue(' 700 ', TokenTypes.FONT_WEIGHTS)).toBe(700);
+      expect(trimValue('400', TokenTypes.FONT_WEIGHTS)).toBe(400);
+    });
+
+    it('should keep numeric font weight values as numbers', () => {
+      expect(trimValue(700 as any, TokenTypes.FONT_WEIGHTS)).toBe(700);
+      expect(trimValue(400 as any, TokenTypes.FONT_WEIGHTS)).toBe(400);
+    });
+
+    it('should keep alias font weights as strings', () => {
+      expect(trimValue('{fontWeights.base}', TokenTypes.FONT_WEIGHTS)).toBe('{fontWeights.base}');
+      expect(trimValue(' {fontWeights.base} ', TokenTypes.FONT_WEIGHTS)).toBe('{fontWeights.base}');
+    });
+
+    it('should keep named font weights as strings', () => {
+      expect(trimValue('Bold', TokenTypes.FONT_WEIGHTS)).toBe('Bold');
+      expect(trimValue(' bold ', TokenTypes.FONT_WEIGHTS)).toBe('bold');
+    });
+
+    it('should keep font weights with leading zeros as strings', () => {
+      expect(trimValue('0700', TokenTypes.FONT_WEIGHTS)).toBe('0700');
+      expect(trimValue(' 0700 ', TokenTypes.FONT_WEIGHTS)).toBe('0700');
+    });
+  });
+
+  describe('font weight inside composite tokens', () => {
+    it('should convert numeric fontWeight in a typography value to a number', () => {
+      expect(trimValue({
+        fontFamily: ' Inter',
+        fontWeight: ' 700 ',
+        fontSize: '18 ',
+      } as any)).toEqual({
+        fontFamily: 'Inter',
+        fontWeight: 700,
+        fontSize: '18',
+      });
+    });
+
+    it('should keep named fontWeight in a typography value as a string', () => {
+      expect(trimValue({
+        fontFamily: 'Inter',
+        fontWeight: ' Bold ',
+      } as any)).toEqual({
+        fontFamily: 'Inter',
+        fontWeight: 'Bold',
+      });
+    });
+
+    it('should keep alias fontWeight in a typography value as a string', () => {
+      expect(trimValue({
+        fontFamily: 'Inter',
+        fontWeight: '{fontWeights.base}',
+      } as any)).toEqual({
+        fontFamily: 'Inter',
+        fontWeight: '{fontWeights.base}',
+      });
+    });
+  });
 });

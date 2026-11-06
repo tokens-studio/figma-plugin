@@ -38,15 +38,21 @@ describe('processNumberValue', () => {
     expect(processNumberValue('   ')).toBe('');
   });
 
-  it('should handle edge cases with numeric patterns', () => {
-    // These should not be converted to numbers due to the regex check
+  it('should not change values that are not plain numbers', () => {
+    // Leading zeros are not plain numbers and must be kept as-is
+    expect(processNumberValue('0700')).toBe('0700');
+    expect(processNumberValue(' 0700 ')).toBe('0700');
+    expect(processNumberValue('007.5')).toBe('007.5');
+    // These should not be converted to numbers
     expect(processNumberValue('1.2.3')).toBe('1.2.3');
-    expect(processNumberValue('1e5')).toBe('1e5'); // Scientific notation not supported by regex
-    expect(processNumberValue('0x10')).toBe('0x10'); // Hex not supported by regex
+    expect(processNumberValue('1e5')).toBe('1e5'); // Scientific notation
+    expect(processNumberValue('0x10')).toBe('0x10'); // Hex
     expect(processNumberValue('1.')).toBe('1.'); // Trailing dot without digit after
-
-    // This one actually gets converted because .5 is a valid decimal number
-    expect(processNumberValue('.5')).toBe(0.5); // Leading dot with digit - valid decimal
+    // Named font weights are not numbers
+    expect(processNumberValue('Bold')).toBe('Bold');
+    expect(processNumberValue('bold')).toBe('bold');
+    // Aliases are not numbers
+    expect(processNumberValue('{fontWeights.base}')).toBe('{fontWeights.base}');
   });
 
   it('should handle non-string, non-number values', () => {
@@ -60,6 +66,7 @@ describe('processNumberValue', () => {
     expect(processNumberValue('0.5')).toBe(0.5);
     expect(processNumberValue('-0.5')).toBe(-0.5);
     expect(processNumberValue('10.0')).toBe(10.0);
+    expect(processNumberValue('.5')).toBe(0.5);
     expect(processNumberValue('  3.14159  ')).toBe(3.14159);
   });
 

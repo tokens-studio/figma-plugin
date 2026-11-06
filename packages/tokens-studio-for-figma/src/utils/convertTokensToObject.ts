@@ -4,6 +4,8 @@ import { AnyTokenList, AnyTokenSet } from '@/types/tokens';
 import { getGroupTypeName, reorderDeprecatedLast } from './stringifyTokens';
 import removeTokenId from './removeTokenId';
 import { setTokenKey, FormatSensitiveTokenKeys } from './setTokenKey';
+import { isNumericValueToken } from './numericValueTokenTypes';
+import { processNumberValue } from './processNumberValue';
 
 export default function convertTokensToObject(tokens: Record<string, AnyTokenList>, storeTokenIdInJsonEditor: boolean) {
   const tokenObj = Object.entries(tokens).reduce<Record<string, AnyTokenSet<false>>>((acc, [key, val]) => {
@@ -14,6 +16,12 @@ export default function convertTokensToObject(tokens: Record<string, AnyTokenLis
 
       // Remove the name key to not include it in the output
       const { name, ...tokenWithoutName } = tokenWithoutId;
+
+      // Numeric token values (number, fontWeights) are written to the file as
+      // JSON numbers, the same way they are saved in the token store.
+      if (isNumericValueToken(tokenWithoutName.type)) {
+        tokenWithoutName.value = processNumberValue(tokenWithoutName.value);
+      }
 
       // Directly work with tokenWithoutName to preserve order
       if (tokenWithoutName.inheritTypeLevel) {

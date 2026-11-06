@@ -50,6 +50,58 @@ describe('convertTokenToFormat', () => {
       $type: 'string',
     });
   });
+
+  it('should convert numeric fontWeights values to numbers', () => {
+    const token = {
+      type: 'fontWeights',
+      value: '700',
+    };
+
+    const result = convertTokenToFormat(token);
+
+    expect(result).toEqual({
+      $value: 700,
+      $type: 'fontWeights',
+    });
+  });
+
+  it('should keep non-numeric fontWeights values as strings', () => {
+    expect(convertTokenToFormat({ type: 'fontWeights', value: 'Bold' })).toEqual({
+      $value: 'Bold',
+      $type: 'fontWeights',
+    });
+    expect(convertTokenToFormat({ type: 'fontWeights', value: '{fontWeights.base}' })).toEqual({
+      $value: '{fontWeights.base}',
+      $type: 'fontWeights',
+    });
+    expect(convertTokenToFormat({ type: 'fontWeights', value: '0700' })).toEqual({
+      $value: '0700',
+      $type: 'fontWeights',
+    });
+  });
+
+  it('should convert numeric number token values to numbers', () => {
+    const token = {
+      type: 'number',
+      value: '42',
+    };
+
+    const result = convertTokenToFormat(token);
+
+    expect(result).toEqual({
+      $value: 42,
+      $type: 'number',
+    });
+  });
+
+  it('should convert a numeric fontWeight inside an expanded composite token', () => {
+    const result = convertTokenToFormat({ fontFamily: 'Inter', fontWeight: '700' }, true);
+
+    expect(result).toEqual({
+      fontFamily: 'Inter',
+      fontWeight: 700,
+    });
+  });
 });
 
 describe('convertTokenToFormat', () => {

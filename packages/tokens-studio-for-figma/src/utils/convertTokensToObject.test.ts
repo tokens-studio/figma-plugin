@@ -202,4 +202,83 @@ describe('convertTokensToObject', () => {
     TokenFormat.setFormat(TokenFormatOptions.Legacy);
     expect(convertTokensToObject(output as unknown as Record<string, AnyTokenList>, true)).toEqual(input);
   });
+
+  describe('fontWeights tokens', () => {
+    const FONT_WEIGHT_TOKENS = {
+      base: [
+        {
+          name: 'fontWeights.bold',
+          type: 'fontWeights',
+          value: '700',
+        },
+        {
+          name: 'fontWeights.alias',
+          type: 'fontWeights',
+          value: '{fontWeights.base}',
+        },
+        {
+          name: 'fontWeights.named',
+          type: 'fontWeights',
+          value: 'Bold',
+        },
+        {
+          name: 'fontWeights.leadingZero',
+          type: 'fontWeights',
+          value: '0700',
+        },
+      ],
+    } as Record<string, AnyTokenList>;
+
+    it('should write numeric font weights as numbers in the legacy format', () => {
+      TokenFormat.setFormat(TokenFormatOptions.Legacy);
+      expect(convertTokensToObject(FONT_WEIGHT_TOKENS, true)).toEqual({
+        base: {
+          fontWeights: {
+            bold: {
+              type: 'fontWeights',
+              value: 700,
+            },
+            alias: {
+              type: 'fontWeights',
+              value: '{fontWeights.base}',
+            },
+            named: {
+              type: 'fontWeights',
+              value: 'Bold',
+            },
+            leadingZero: {
+              type: 'fontWeights',
+              value: '0700',
+            },
+          },
+        },
+      });
+    });
+
+    it('should write numeric font weights as numbers in the DTCG format', () => {
+      TokenFormat.setFormat(TokenFormatOptions.DTCG);
+      expect(convertTokensToObject(FONT_WEIGHT_TOKENS, true)).toEqual({
+        base: {
+          fontWeights: {
+            bold: {
+              $type: 'fontWeights',
+              $value: 700,
+            },
+            alias: {
+              $type: 'fontWeights',
+              $value: '{fontWeights.base}',
+            },
+            named: {
+              $type: 'fontWeights',
+              $value: 'Bold',
+            },
+            leadingZero: {
+              $type: 'fontWeights',
+              $value: '0700',
+            },
+          },
+        },
+      });
+    });
+  });
 });
