@@ -57,21 +57,23 @@ const getGradientPaint = async (fallbackValue, token) => {
     const referenceTokens = getReferenceTokensFromGradient(rawValue);
 
     if (gradientStops && referenceTokens.length > 0) {
-      gradientStopsWithReferences = await Promise.all(gradientStops.map(async (stop, index) => {
-        const referenceVariableExists = await defaultTokenValueRetriever.getVariableReference(referenceTokens[index]);
-        if (referenceVariableExists) {
-          return {
-            ...stop,
-            boundVariables: {
-              color: {
-                type: 'VARIABLE_ALIAS',
-                id: referenceVariableExists.id,
+      gradientStopsWithReferences = await Promise.all(
+        gradientStops.map(async (stop, index) => {
+          const referenceVariableExists = await defaultTokenValueRetriever.getVariableReference(referenceTokens[index]);
+          if (referenceVariableExists) {
+            return {
+              ...stop,
+              boundVariables: {
+                color: {
+                  type: 'VARIABLE_ALIAS',
+                  id: referenceVariableExists.id,
+                },
               },
-            },
-          };
-        }
-        return stop;
-      }));
+            };
+          }
+          return stop;
+        }),
+      );
     }
   }
   const newPaint: GradientPaint = {
@@ -83,12 +85,15 @@ const getGradientPaint = async (fallbackValue, token) => {
 };
 
 export default async function setColorValuesOnTarget({
-  target, token, key, givenValue,
+  target,
+  token,
+  key,
+  givenValue,
 }: {
-  target: BaseNode | PaintStyle,
-  token: string,
-  key: 'paints' | 'fills' | 'strokes',
-  givenValue?: string
+  target: BaseNode | PaintStyle;
+  token: string;
+  key: 'paints' | 'fills' | 'strokes';
+  givenValue?: string;
 }) {
   // If we're creating styles we need to check the user's setting. If we're applying on a layer, always try to apply variables.
   const shouldCreateStylesWithVariables = defaultTokenValueRetriever.createStylesWithVariableReferences || !('consumers' in target);
@@ -119,9 +124,18 @@ export default async function setColorValuesOnTarget({
       const containsReferenceVariable = resolvedValue.toString().startsWith('{') && resolvedValue.toString().endsWith('}');
       const referenceVariableExists = await defaultTokenValueRetriever.getVariableReference(resolvedValue.slice(1, -1));
 
-      if (containsReferenceVariable && referenceVariableExists && shouldCreateStylesWithVariables && !hasModifier(resolvedToken)) {
+      if (
+        containsReferenceVariable
+        && referenceVariableExists
+        && shouldCreateStylesWithVariables
+        && !hasModifier(resolvedToken)
+      ) {
         try {
-          successfullyAppliedVariable = await tryApplyColorVariableId(target, resolvedValue.slice(1, -1), ColorPaintType.PAINTS);
+          successfullyAppliedVariable = await tryApplyColorVariableId(
+            target,
+            resolvedValue.slice(1, -1),
+            ColorPaintType.PAINTS,
+          );
         } catch (e) {
           console.error('Error setting bound variable for paint', e);
         }
@@ -138,11 +152,15 @@ export default async function setColorValuesOnTarget({
         if (isGradient(valueToApply) || isGradientTokenValue(valueToApply)) {
           newPaint = await getGradientPaint(fallbackValue, token);
         } else {
-          const { color, opacity } = convertToFigmaColor(typeof valueToApply === 'string' ? valueToApply : valueToApply?.color || givenValue || '');
+          const { color, opacity } = convertToFigmaColor(
+            typeof valueToApply === 'string' ? valueToApply : valueToApply?.color || givenValue || '',
+          );
           newPaint = { color, opacity, type: 'SOLID' };
         }
 
-        await unbindVariableFromTarget(target, key, newPaint);
+        if (existingPaint && 'boundVariables' in existingPaint && existingPaint.boundVariables?.color) {
+          await unbindVariableFromTarget(target, key, newPaint);
+        }
         applyPaintIfNotEqual(key, existingPaint, newPaint, target);
       }
     }

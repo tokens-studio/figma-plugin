@@ -1,18 +1,25 @@
 import { transformValue } from './helpers';
 import { notifyUI } from './notifiers';
 import { ResolvedTypographyObject } from './ResolvedTypographyObject';
+import { loadFontOnce } from './loadFontOnce';
 
-export async function setFontStyleOnTarget({ target, value, baseFontSize }: { target: BaseNode | TextStyle; value: Pick<ResolvedTypographyObject, 'fontFamily' | 'fontWeight'>; baseFontSize: string }) {
+export async function setFontStyleOnTarget({
+  target,
+  value,
+  baseFontSize,
+}: {
+  target: BaseNode | TextStyle;
+  value: Pick<ResolvedTypographyObject, 'fontFamily' | 'fontWeight'>;
+  baseFontSize: string;
+}) {
   if (!('fontName' in target)) return;
-  const {
-    fontFamily, fontWeight,
-  } = value;
+  const { fontFamily, fontWeight } = value;
 
   const family = fontFamily?.toString() || (target.fontName !== figma.mixed ? target.fontName.family : '');
   const style = fontWeight?.toString() || (target.fontName !== figma.mixed ? target.fontName.style : '');
 
   try {
-    await figma.loadFontAsync({ family, style });
+    await loadFontOnce({ family, style });
     if (fontFamily || fontWeight) {
       target.fontName = {
         family,
@@ -22,7 +29,7 @@ export async function setFontStyleOnTarget({ target, value, baseFontSize }: { ta
   } catch (e) {
     const splitFontFamily = family.split(',');
     const candidateStyles = transformValue(style, 'fontWeights', baseFontSize);
-    const candidateFonts: { family: string; style: string; }[] = [];
+    const candidateFonts: { family: string; style: string }[] = [];
     splitFontFamily?.forEach((candidateFontFamily) => {
       const normalizedFontFamily = candidateFontFamily?.replace(/['"]/g, '').trim();
       if (candidateStyles.length > 0) {
@@ -44,8 +51,7 @@ export async function setFontStyleOnTarget({ target, value, baseFontSize }: { ta
 
     for (let i = 0; i < candidateFonts.length; i += 1) {
       let isApplied = false; // if font is applied then skip other font families
-      await figma
-        .loadFontAsync({ family: candidateFonts[i].family, style: candidateFonts[i].style })
+      await loadFontOnce({ family: candidateFonts[i].family, style: candidateFonts[i].style })
         .then(() => {
           if (candidateFonts[i]) {
             target.fontName = {
