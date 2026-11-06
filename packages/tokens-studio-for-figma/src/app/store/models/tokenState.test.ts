@@ -8,10 +8,16 @@ import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import * as notifiers from '@/plugin/notifiers';
 import updateTokensOnSources from '../updateSources';
 import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 
 const mockedUpdateTokensOnSources = updateTokensOnSources as jest.MockedFunction<typeof updateTokensOnSources>;
 
 jest.mock('../updateSources', () => jest.fn());
+
+const mockPushThemes = jest.fn();
+jest.mock('./effects/tokenState/pushThemesToStudio', () => ({
+  pushThemesToStudio: jest.fn(() => (themeIds: string[]) => mockPushThemes(themeIds)),
+}));
 
 jest.mock('uuid', () => ({
   v4: jest.fn(() => 'mock-uuid'),
@@ -2517,5 +2523,29 @@ describe('editToken extensions', () => {
       { name: 'red', value: '#ff0000', type: TokenTypes.COLOR },
       { name: 'gap', value: '8px', type: TokenTypes.DIMENSION },
     ]);
+  });
+});
+
+describe('pushThemesToStudio', () => {
+  const dispatchPush = async (provider: StorageProviderType) => {
+    const store: Store = init<RootModel>({ models });
+    store.dispatch.uiState.setApiData({ provider } as any);
+    await store.dispatch.tokenState.pushThemesToStudio(['a', 'b']);
+  };
+
+  beforeEach(() => {
+    mockPushThemes.mockReset();
+  });
+
+  it('pushes the given themes for a Studio sync', async () => {
+    await dispatchPush(StorageProviderType.TOKENS_STUDIO_OAUTH);
+
+    expect(mockPushThemes).toHaveBeenCalledWith(['a', 'b']);
+  });
+
+  it('is never called for another storage provider', async () => {
+    await dispatchPush(StorageProviderType.GITHUB);
+
+    expect(mockPushThemes).not.toHaveBeenCalled();
   });
 });

@@ -6,6 +6,7 @@ import extend from 'just-extend';
 import { v4 as uuidv4 } from 'uuid';
 import * as tokenStateReducers from './reducers/tokenState';
 import * as tokenStateEffects from './effects/tokenState';
+import { pushThemesToStudio } from './effects/tokenState/pushThemesToStudio';
 import parseTokenValues from '@/utils/parseTokenValues';
 import { notifyToUI } from '@/plugin/notifiers';
 import parseJson from '@/utils/parseJson';
@@ -865,6 +866,12 @@ export const tokenState = createModel<RootModel>()({
     ...tokenStateReducers,
   },
   effects: (dispatch) => ({
+    // Declared here so that it is typed: it has no reducer of the same name, and the spread below loses types.
+    async pushThemesToStudio(themeIds: string[], rootState) {
+      if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
+        await pushThemesToStudio(dispatch)(themeIds);
+      }
+    },
     editToken(payload: UpdateTokenPayload, rootState) {
       if (payload.oldName && payload.oldName !== payload.name) {
         dispatch.tokenState.updateAliases({ oldName: payload.oldName, newName: payload.name });

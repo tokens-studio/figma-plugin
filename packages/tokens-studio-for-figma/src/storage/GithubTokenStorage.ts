@@ -239,7 +239,7 @@ export class GithubTokenStorage extends GitTokenStorage {
               }),
               {
                 maxRetries: 3,
-                initialDelayMs: 100,
+                initialDelayMs: 500,
               },
             );
           }));
