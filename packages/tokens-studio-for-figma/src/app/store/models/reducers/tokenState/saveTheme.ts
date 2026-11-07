@@ -110,19 +110,22 @@ export function saveTheme(state: TokenState, data: Payload): TokenState {
     });
   }
 
-  const newActiveTheme = state.activeTheme;
-  if (!isActiveTheme) {
-    Object.keys(newActiveTheme).forEach((group) => {
-      if (newActiveTheme[group] === themeId) {
-        delete newActiveTheme[group];
-      }
-    });
-  } else {
-    newActiveTheme[data?.group ?? INTERNAL_THEMES_NO_GROUP] = themeId;
+  // Remove the theme from every group before adding it back under its current one. Otherwise an
+  // active theme moved to another group (or out of one) stays listed under its old group as well,
+  // and is counted twice.
+  const newActiveTheme = { ...state.activeTheme };
+  Object.keys(newActiveTheme).forEach((group) => {
+    if (newActiveTheme[group] === themeId) {
+      delete newActiveTheme[group];
+    }
+  });
+  if (isActiveTheme) {
+    newActiveTheme[data?.group || INTERNAL_THEMES_NO_GROUP] = themeId;
   }
   const nextState: TokenState = {
     ...state,
     themes: finalThemes,
+    activeTheme: newActiveTheme,
   };
 
   if (isActiveTheme || isNewTheme) {
