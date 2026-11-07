@@ -1,4 +1,12 @@
+import { readFileSync } from 'fs';
+import { join } from 'path';
 import { checkAndEvaluateMath } from '../checkAndEvaluateMath';
+import { TokenResolver } from '../../TokenResolver';
+import { getAliasValue } from '../../alias/getAliasValue';
+import { SingleToken } from '@/types/tokens';
+import {
+  baseTokens, droppedSyntax, mathGolden, referenceGolden,
+} from './mathGolden';
 
 describe('checkAndEvaluateMath', () => {
   it('solves simple unit-less expressions', () => {
@@ -52,5 +60,43 @@ describe('checkAndEvaluateMath', () => {
     expect(checkAndEvaluateMath('sample(cubicBezier1D(0.33, 0.66),0.8)')).toEqual(0.797);
     expect(checkAndEvaluateMath('sample(cubicBezier1D(0.45,0.34),0.2)')).toEqual(0.213);
     expect(checkAndEvaluateMath('sample(cubicBezier1D(0.45,0.34),0.2)')).toEqual(0.213);
+  });
+
+  describe('behaviour frozen from the previous evaluator', () => {
+    it.each(mathGolden)('resolves %j to %j', (input, output) => {
+      expect(checkAndEvaluateMath(input)).toEqual(output);
+    });
+
+    it.each(droppedSyntax)('leaves dropped syntax %j unresolved (was %j)', (input) => {
+      expect(checkAndEvaluateMath(input)).toEqual(input);
+    });
+
+    it.each(referenceGolden)('resolves the reference %j to %j', (value, resolved, failedToResolve, aliasValue) => {
+      const probe = { name: 'probe', value, type: 'number' } as unknown as SingleToken;
+      const tokens = baseTokens as unknown as SingleToken[];
+      const result = new TokenResolver([...tokens, probe]).resolveTokenValues().find((token) => token.name === 'probe');
+
+      expect(result?.value).toEqual(resolved);
+      expect(Boolean(result?.failedToResolve)).toEqual(failedToResolve);
+      expect(getAliasValue(probe, tokens)).toEqual(aliasValue);
+    });
+  });
+
+  it('never exposes the prototype chain through names', () => {
+    ['constructor', '__proto__', 'prototype', 'toString', 'hasOwnProperty', 'valueOf'].forEach((name) => {
+      expect(checkAndEvaluateMath(`${name}(1)`)).toEqual(`${name}(1)`);
+      expect(checkAndEvaluateMath(`${name} + 1`)).toEqual(`${name} + 1`);
+    });
+  });
+
+  it('returns the input for very deep nesting instead of throwing', () => {
+    const deep = `${'('.repeat(50000)}1${')'.repeat(50000)}`;
+    expect(checkAndEvaluateMath(deep)).toEqual(deep);
+  });
+
+  it('does not depend on expr-eval', () => {
+    const manifest = JSON.parse(readFileSync(join(__dirname, '../../../../package.json'), 'utf8'));
+    expect(manifest.dependencies['expr-eval']).toBeUndefined();
+    expect(readFileSync(join(__dirname, '../checkAndEvaluateMath.ts'), 'utf8')).not.toContain('expr-eval');
   });
 });

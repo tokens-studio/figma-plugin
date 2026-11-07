@@ -140,6 +140,9 @@ module.exports = wrapper((env, argv) => {
         '@types': path.resolve(__dirname, 'types'),
         '@': path.resolve(__dirname, 'src'),
         'react-redux': 'react-redux/dist/react-redux.js',
+        // Node-only dependency of the Supernova SDK. It extends http.Agent when loaded, which
+        // crashes in the browser. The SDK only uses it with a proxyUrl, and we never pass one.
+        'https-proxy-agent': false,
       },
       fallback: {
         process: false,
