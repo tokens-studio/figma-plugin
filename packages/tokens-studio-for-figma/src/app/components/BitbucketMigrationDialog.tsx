@@ -9,6 +9,7 @@ import {
 } from '@tokens-studio/ui';
 import Modal from './Modal';
 import { useBitbucketMigration } from '@/app/hooks/useBitbucketMigration';
+import { docUrls } from '@/constants/docUrls';
 
 export default function BitbucketMigrationDialog() {
   const {
@@ -92,7 +93,7 @@ export default function BitbucketMigrationDialog() {
         </Text>
 
         <Link
-          href="https://docs.tokens.studio/token-storage/remote/sync-git-bitbucket/migration-from-app-passwords-to-api-tokens"
+          href={docUrls.bitbucketAppPasswordMigration}
           target="_blank"
           rel="noreferrer"
         >
