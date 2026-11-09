@@ -14,6 +14,7 @@ import branch from './branch.json';
 import manageStylesAndVariables from './manageStylesAndVariables.json';
 import secondScreen from './secondScreen.json';
 import subscription from './subscription.json';
+import upgrade from './upgrade.json';
 
 export default {
   general,
@@ -32,4 +33,5 @@ export default {
   manageStylesAndVariables,
   secondScreen,
   subscription,
+  upgrade,
 };

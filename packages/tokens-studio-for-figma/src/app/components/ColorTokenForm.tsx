@@ -23,6 +23,7 @@ import { convertModifiedColorToHex } from '@/utils/convertModifiedColorToHex';
 import { ColorPickerTrigger } from './ColorPickerTrigger';
 import ProBadge from './ProBadge';
 import { useIsProUser } from '../hooks/useIsProUser';
+import { useUpgradeDialogStore } from '@/app/store/useUpgradeDialogStore';
 import { storageTypeSelector } from '@/selectors/storageTypeSelector';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 
@@ -53,6 +54,7 @@ export default function ColorTokenForm({
   const [inputMixHelperOpen, setInputMixHelperOpen] = React.useState(false);
   const [modifyVisible, setModifyVisible] = React.useState(false);
   const isProUser = useIsProUser();
+  const openUpgradeDialog = useUpgradeDialogStore((state) => state.openUpgradeDialog);
   const storageType = useSelector(storageTypeSelector);
   const modifiersSupported = storageType?.provider !== StorageProviderType.TOKENS_STUDIO_OAUTH;
 
@@ -131,12 +133,16 @@ export default function ColorTokenForm({
   }, [handleColorModifyChange]);
 
   const addModify = useCallback(() => {
+    if (!isProUser) {
+      openUpgradeDialog('colorModifiers', 'color-token-form');
+      return;
+    }
     handleModifyChange({
       type: ColorModifierTypes.LIGHTEN,
       value: defaultValue,
       space: ColorSpaceTypes.LCH,
     });
-  }, [handleModifyChange]);
+  }, [handleModifyChange, isProUser, openUpgradeDialog]);
 
   const removeModify = useCallback(() => {
     setModifyVisible(false);
@@ -232,7 +238,6 @@ export default function ColorTokenForm({
                   tooltip={t('addNewModifier')}
                   data-testid="button-add-new-modify"
                   onClick={addModify}
-                  disabled={!isProUser}
                   icon={<IconPlus />}
                   variant="invisible"
                 />

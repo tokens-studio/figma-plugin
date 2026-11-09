@@ -1,10 +1,13 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { Provider } from 'react-redux';
-import { act, createMockStore, render } from '../../../../tests/config/setupTest';
+import {
+  act, createMockStore, render, screen,
+} from '../../../../tests/config/setupTest';
 import { ThemeSelector } from './ThemeSelector';
 import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
 import { useAuthStore } from '@/app/store/useAuthStore';
+import { useUpgradeDialogStore } from '@/app/store/useUpgradeDialogStore';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 
 describe('ThemeSelector', () => {
@@ -116,12 +119,16 @@ describe('ThemeSelector', () => {
       const item = await openManageThemesItem({
         provider: StorageProviderType.TOKENS_STUDIO_OAUTH, internalId: 'tokens-studio-free', orgId: 'free', id: 'project-free', name: 'Free org',
       });
-      expect(item).not.toHaveAttribute('data-disabled');
+      expect(item).not.toHaveAttribute('data-locked');
+      expect(await screen.findByTestId('themeselector-plus-themes')).toBeInTheDocument();
     });
 
-    it('stays a Pro feature in a local file', async () => {
+    it('opens the upgrade dialog in a local file', async () => {
       const item = await openManageThemesItem({ provider: StorageProviderType.LOCAL });
-      expect(item).toHaveAttribute('data-disabled');
+      expect(item).toHaveAttribute('data-locked');
+      await userEvent.click(item);
+      expect(useUpgradeDialogStore.getState().feature).toEqual('themes');
+      act(() => useUpgradeDialogStore.getState().closeUpgradeDialog());
     });
   });
 });
