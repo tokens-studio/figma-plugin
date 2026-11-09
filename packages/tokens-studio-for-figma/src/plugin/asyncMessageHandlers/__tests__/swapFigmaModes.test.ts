@@ -11,6 +11,7 @@ jest.mock('../../notifiers', () => ({
 // Mock figma API
 const mockSetExplicitVariableModeForCollection = jest.fn();
 const mockGetVariableCollectionByIdAsync = jest.fn();
+const mockImportVariableByKeyAsync = jest.fn();
 
 const mockCurrentPage = {
   name: 'Page 1',
@@ -36,6 +37,7 @@ global.figma = {
   root: mockRoot,
   variables: {
     getVariableCollectionByIdAsync: mockGetVariableCollectionByIdAsync,
+    importVariableByKeyAsync: mockImportVariableByKeyAsync,
   },
 } as any;
 
@@ -196,6 +198,128 @@ describe('swapFigmaModes', () => {
     );
 
     consoleSpy.mockRestore();
+  });
+
+  describe('import-based fallback (stale or cross-file collection ID)', () => {
+    const themeWithVariableRefs = {
+      id: 'dark',
+      name: 'Dark',
+      selectedTokenSets: {},
+      $figmaCollectionId: 'stale-collection-id',
+      $figmaModeId: 'stale-mode-id',
+      $figmaVariableReferences: { 'color.background': 'variable-key-abc' },
+    };
+
+    const fallbackCollection = {
+      id: 'new-collection-id',
+      name: 'My Collection',
+      modes: [
+        { modeId: 'new-mode-id', name: 'Dark' },
+        { modeId: 'new-mode-light-id', name: 'Light' },
+      ],
+    };
+
+    const importedVariable = {
+      variableCollectionId: 'new-collection-id',
+    };
+
+    beforeEach(() => {
+      mockImportVariableByKeyAsync.mockReset();
+    });
+
+    it('should resolve via importVariableByKeyAsync when stored collection ID is stale', async () => {
+      // Primary lookup fails (stale ID), fallback import succeeds
+      mockGetVariableCollectionByIdAsync.mockImplementation(async (id: string) => {
+        if (id === 'new-collection-id') return fallbackCollection;
+        return null;
+      });
+      mockImportVariableByKeyAsync.mockResolvedValue(importedVariable);
+
+      await swapFigmaModes({ 'no-group': 'dark' }, [themeWithVariableRefs], UpdateMode.PAGE);
+
+      expect(mockImportVariableByKeyAsync).toHaveBeenCalledWith('variable-key-abc');
+      expect(mockSetExplicitVariableModeForCollection).toHaveBeenCalledWith(fallbackCollection, 'new-mode-id');
+      expect(notifiers.notifyUI).not.toHaveBeenCalled();
+    });
+
+    it('should report collection-not-found when fallback collection exists but mode name does not match', async () => {
+      const collectionWithoutDarkMode = {
+        ...fallbackCollection,
+        modes: [{ modeId: 'new-mode-light-id', name: 'Light' }],
+      };
+      mockGetVariableCollectionByIdAsync.mockImplementation(async (id: string) => {
+        if (id === 'new-collection-id') return collectionWithoutDarkMode;
+        return null;
+      });
+      mockImportVariableByKeyAsync.mockResolvedValue(importedVariable);
+      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
+
+      await swapFigmaModes({ 'no-group': 'dark' }, [themeWithVariableRefs], UpdateMode.PAGE);
+
+      // Collection was found via fallback, but mode is missing — should report mode-missing error
+      expect(notifiers.notifyUI).toHaveBeenCalledWith(
+        expect.stringContaining('mode'),
+        { error: true },
+      );
+      expect(mockSetExplicitVariableModeForCollection).not.toHaveBeenCalled();
+
+      consoleSpy.mockRestore();
+    });
+
+    it('should report collection-not-found when importVariableByKeyAsync throws', async () => {
+      mockGetVariableCollectionByIdAsync.mockResolvedValue(null);
+      mockImportVariableByKeyAsync.mockRejectedValue(new Error('Key not found in any library'));
+      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
+
+      await swapFigmaModes({ 'no-group': 'dark' }, [themeWithVariableRefs], UpdateMode.PAGE);
+
+      expect(notifiers.notifyUI).toHaveBeenCalledWith(
+        'One of the variable collections linked to this theme no longer exists',
+        { error: true },
+      );
+      expect(mockSetExplicitVariableModeForCollection).not.toHaveBeenCalled();
+
+      consoleSpy.mockRestore();
+    });
+
+    it('should report collection-not-found when $figmaVariableReferences is empty', async () => {
+      const themeWithNoRefs = { ...themeWithVariableRefs, $figmaVariableReferences: {} };
+      mockGetVariableCollectionByIdAsync.mockResolvedValue(null);
+      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
+
+      await swapFigmaModes({ 'no-group': 'dark' }, [themeWithNoRefs], UpdateMode.PAGE);
+
+      expect(mockImportVariableByKeyAsync).not.toHaveBeenCalled();
+      expect(notifiers.notifyUI).toHaveBeenCalledWith(
+        'One of the variable collections linked to this theme no longer exists',
+        { error: true },
+      );
+
+      consoleSpy.mockRestore();
+    });
+
+    it('should match mode name against truncated name for long theme names', async () => {
+      const longName = 'A'.repeat(50); // longer than Figma 40-char limit
+      const truncated = `${'A'.repeat(37)}...`;
+      const themeWithLongName = {
+        ...themeWithVariableRefs,
+        name: longName,
+      };
+      const collectionWithTruncatedMode = {
+        ...fallbackCollection,
+        modes: [{ modeId: 'new-mode-id', name: truncated }],
+      };
+      mockGetVariableCollectionByIdAsync.mockImplementation(async (id: string) => {
+        if (id === 'new-collection-id') return collectionWithTruncatedMode;
+        return null;
+      });
+      mockImportVariableByKeyAsync.mockResolvedValue(importedVariable);
+
+      await swapFigmaModes({ 'no-group': 'dark' }, [themeWithLongName], UpdateMode.PAGE);
+
+      expect(mockSetExplicitVariableModeForCollection).toHaveBeenCalledWith(collectionWithTruncatedMode, 'new-mode-id');
+      expect(notifiers.notifyUI).not.toHaveBeenCalled();
+    });
   });
 
   describe('multi-dimensional themes', () => {
