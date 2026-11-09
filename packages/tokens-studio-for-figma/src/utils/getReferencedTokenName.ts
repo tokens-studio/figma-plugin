@@ -3,5 +3,5 @@
 export function getReferencedTokenName(value: unknown): string | undefined {
   if (typeof value !== 'string') return undefined;
   const match = value.trim().match(/^\{([^{}]+)\}$/);
-  return match ? match[1] : undefined;
+  return match ? match[1].trim() : undefined;
 }

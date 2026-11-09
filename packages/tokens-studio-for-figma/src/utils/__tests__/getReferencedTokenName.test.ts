@@ -4,6 +4,7 @@ describe('getReferencedTokenName', () => {
   it('returns the token name of a pure alias', () => {
     expect(getReferencedTokenName('{border.width.sm}')).toBe('border.width.sm');
     expect(getReferencedTokenName(' {color.red} ')).toBe('color.red');
+    expect(getReferencedTokenName('{ color.red }')).toBe('color.red');
   });
 
   it('returns undefined for anything that is not a pure alias', () => {
