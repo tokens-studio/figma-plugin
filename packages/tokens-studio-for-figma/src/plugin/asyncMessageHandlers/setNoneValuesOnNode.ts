@@ -10,6 +10,11 @@ import { defaultWorker } from '../Worker';
 import { ProgressTracker } from '../ProgressTracker';
 
 export const setNoneValuesOnNode: AsyncMessageChannelHandlers[AsyncMessageTypes.SET_NONE_VALUES_ON_NODE] = async (msg) => {
+  // Commit undo point before setting none values on nodes
+  if (typeof figma !== 'undefined' && figma.commitUndo) {
+    figma.commitUndo();
+  }
+  
   const nodesToRemove: { [key: string]: Properties[] } = {};
 
   msg.tokensToSet.forEach((token) => {
