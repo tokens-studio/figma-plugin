@@ -98,6 +98,8 @@ export type SavedSettings = {
   seenGenericVersionedHeaderMigrationDialog?: boolean;
   seenTermsUpdate2026?: boolean;
   seenTermsUpdate2026Subprocessors?: boolean;
+  acceptedStudioConsent?: boolean;
+  performanceAnalyticsConsent?: boolean;
 };
 
 export function notifyUISettings(
@@ -138,6 +140,8 @@ export function notifyUISettings(
     seenGenericVersionedHeaderMigrationDialog,
     seenTermsUpdate2026,
     seenTermsUpdate2026Subprocessors,
+    acceptedStudioConsent,
+    performanceAnalyticsConsent,
   }: SavedSettings,
 ) {
   postToUI({
@@ -180,6 +184,8 @@ export function notifyUISettings(
       seenGenericVersionedHeaderMigrationDialog,
       seenTermsUpdate2026,
       seenTermsUpdate2026Subprocessors,
+      acceptedStudioConsent,
+      performanceAnalyticsConsent,
     },
   });
   postToUI({

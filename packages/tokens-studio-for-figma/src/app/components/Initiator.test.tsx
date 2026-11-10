@@ -711,6 +711,8 @@ describe('Initiator', () => {
       seenGenericVersionedHeaderMigrationDialog: false,
       seenTermsUpdate2026: false,
       seenTermsUpdate2026Subprocessors: false,
+      acceptedStudioConsent: false,
+      performanceAnalyticsConsent: false,
     });
   });
 
