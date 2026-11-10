@@ -33,7 +33,9 @@ type Props = {
 
 // Only mounted while the context menu is open, so its store subscriptions (useManageTokens pulls in
 // useTokens and useConfirm) are not paid by every token in the list on every store update.
-export const MoreButtonMenu: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
+// Renders the items only: ContextMenu.Content has to stay the Portal's direct child, since the Portal
+// passes it the ref that tracks the close animation.
+export const MoreButtonMenuItems: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
   token,
   visibleProperties,
   showForm,
@@ -68,7 +70,7 @@ export const MoreButtonMenu: React.FC<React.PropsWithChildren<React.PropsWithChi
   }, [activeTokenSet, deleteSingleToken, token.$extensions, token.name, token.type]);
 
   return (
-    <ContextMenu.Content alignOffset={5} collisionPadding={30}>
+    <>
       {visibleProperties.map((property) => (property.childProperties ? (
         <ContextMenu.Sub key={property.label}>
           <ContextMenu.SubTrigger>
@@ -132,6 +134,6 @@ export const MoreButtonMenu: React.FC<React.PropsWithChildren<React.PropsWithChi
       <ContextMenu.Item onSelect={handleDeleteClick} disabled={!canEdit}>
         Delete Token
       </ContextMenu.Item>
-    </ContextMenu.Content>
+    </>
   );
 };
