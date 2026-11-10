@@ -72,4 +72,15 @@ describe('ConsentDialog', () => {
     fireEvent.click(getByText('cancel'));
     expect(onCancel).toHaveBeenCalledTimes(1);
   });
+
+  it('clears the checkboxes when it opens again', () => {
+    const { getByTestId, rerender } = render(<ConsentDialog isOpen />);
+
+    fireEvent.click(getByTestId('consent-terms'));
+    expect(getByTestId('consent-agree')).toHaveProperty('disabled', false);
+
+    rerender(<ConsentDialog isOpen={false} />);
+    rerender(<ConsentDialog isOpen />);
+    expect(getByTestId('consent-agree')).toHaveProperty('disabled', true);
+  });
 });

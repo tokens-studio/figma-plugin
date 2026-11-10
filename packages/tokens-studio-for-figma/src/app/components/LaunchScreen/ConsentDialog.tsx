@@ -1,7 +1,7 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Button, Checkbox, Label, Stack,
+  Button, Checkbox, Stack,
 } from '@tokens-studio/ui';
 import { styled } from '@/stitches.config';
 import { Modal } from '../Modal/Modal';
@@ -14,9 +14,10 @@ const Description = styled('p', {
   lineHeight: 1.46,
 });
 
-const ConsentLabel = styled(Label, {
+// A plain label: the UI library's Label lays its children out in a column, and in the plugin its
+// styles load after ours, so overriding it doesn't stick.
+const ConsentLabel = styled('label', {
   display: 'flex',
-  flexDirection: 'row',
   alignItems: 'center',
   gap: '$1',
   fontSize: '$xsmall',
@@ -44,6 +45,14 @@ export default function ConsentDialog({ isOpen, onAgree, onCancel }: Props) {
   const { t } = useTranslation(['startScreen']);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [performanceAnalytics, setPerformanceAnalytics] = useState(false);
+
+  // The dialog stays mounted, so start from unticked boxes each time it opens (e.g. signing in again after Cancel).
+  useEffect(() => {
+    if (isOpen) {
+      setTermsAccepted(false);
+      setPerformanceAnalytics(false);
+    }
+  }, [isOpen]);
 
   const handleTermsChange = useCallback((checked: boolean | 'indeterminate') => {
     setTermsAccepted(checked === true);
