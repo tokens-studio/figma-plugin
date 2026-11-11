@@ -1,5 +1,15 @@
 # @tokens-studio/figma-plugin
 
+## 2.13.3
+
+### Patch Changes
+
+- 210d82c2e: Gradient styles whose colors reference other color tokens are now created when syncing with Tokens Studio, with each color stop bound to its variable. Previously these gradient styles weren't created at all.
+- 5d0c334bc: Fixed border tokens applied to a single side (top, right, bottom or left) setting raw values instead of binding to variables. The side's stroke weight and the stroke color now use the variables of the width and color tokens the border references, as they already did for borders on all sides.
+- 7e3cc255d: Fixed Tokens Studio platform projects updating layers when the plugin opens or a token changes, without Apply being pressed. Server-resolved values are still loaded, but layers now only change when you apply tokens.
+- e6c68721e: Fixed exporting styles from themes to Tokens Studio sending every selected theme once per theme. Each theme is now sent once, after all styles exist, and refused themes are reported in one message.
+- c3e604e5f: Fixed typography tokens not applying with Tokens Studio sync: font family, text case and text decoration were dropped when the server returned a typography value in an unexpected format, so the text layer stayed unchanged.
+
 ## 2.13.2
 
 ### Patch Changes
