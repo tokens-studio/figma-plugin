@@ -84,6 +84,11 @@ jobs:
     name: Test coverage
     continue-on-error: true
     runs-on: ubuntu-22.04
+    # Jest-Coverage-Diff posts (and updates) its coverage report as a PR comment, which needs write access.
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@v3
