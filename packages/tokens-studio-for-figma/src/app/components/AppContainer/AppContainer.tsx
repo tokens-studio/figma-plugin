@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import TermsUpdateModal from '../TermsUpdateModal';
+import LegacyLicenseSignInNotice from '../LegacyLicenseSignInNotice';
 import App from '../App';
 import FigmaLoading from '../FigmaLoading';
 import { AsyncMessageTypes, StartupMessage } from '@/types/AsyncMessages';
@@ -89,6 +90,7 @@ export const AppContainer = (params: Props) => {
   const appContent = (
     <Box css={{ backgroundColor: '$bgDefault', color: '$fgDefault' }}>
       <TermsUpdateModal />
+      <LegacyLicenseSignInNotice />
       <FigmaLoading
         isLoading={showLoadingScreen}
         label={startupProcess.currentStep ? applicationInitStepLabels[startupProcess.currentStep] : undefined}

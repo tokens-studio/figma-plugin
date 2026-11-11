@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/react';
-import { LICENSE_API_TIMEOUT_MS, fetchLicenseApi } from './licenseApi';
+import { LICENSE_API_TIMEOUT_MS, fetchLicenseApi, getLegacyOnlyLicense } from './licenseApi';
 import { LICENSE_API_HOSTS } from './licenseApiUrl';
 import { track } from './analytics';
 
@@ -173,5 +173,68 @@ describe('fetchLicenseApi', () => {
         expect.objectContaining({ level: 'error' }),
       );
     });
+  });
+});
+
+// Decides whether the plugin tells the user to sign in with their account to keep Pro.
+describe('getLegacyOnlyLicense', () => {
+  const validate = () => fetchLicenseApi('/validate-license', { endpoint: 'validate-license' });
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it.each([
+    ['a 404 for a removed key', json(404, { message: 'No license was found' }), 404],
+    ['a 500 with a message', json(500, { message: 'already_used' }), 500],
+    ['a 403', json(403, { message: 'Forbidden' }), 403],
+  ])('flags a key that Studio rejected with %s and legacy accepted', async (_label, primaryResponse, status) => {
+    mockFetch(primaryResponse, json(200, { plan: 'pro' }));
+
+    const result = await validate();
+
+    expect(getLegacyOnlyLicense(result.attempts)).toEqual({ primaryStatus: status, primaryReason: 'status' });
+  });
+
+  it('does not flag a Studio timeout, even when legacy accepts the key', async () => {
+    jest.useFakeTimers();
+    mockFetch(hangs(), json(200, { plan: 'pro' }));
+
+    const pending = validate();
+    await Promise.resolve();
+    jest.advanceTimersByTime(LICENSE_API_TIMEOUT_MS);
+    const result = await pending;
+    jest.useRealTimers();
+
+    expect(result.attempts[0].reason).toBe('timeout');
+    expect(getLegacyOnlyLicense(result.attempts)).toBeNull();
+  });
+
+  it.each([
+    ['a transport error', () => Promise.reject(new Error('Network request failed'))],
+    ['an unreadable gateway page', raw(502, '<html>bad gateway</html>')],
+    ['an incomplete 200', json(200, {})],
+  ])('does not flag %s from Studio, even when legacy accepts the key', async (_label, primaryResponse) => {
+    mockFetch(primaryResponse, json(200, { plan: 'pro' }));
+
+    const result = await fetchLicenseApi<{ plan?: string }>('/validate-license', {
+      endpoint: 'validate-license',
+      isComplete: (data) => Boolean(data?.plan),
+    });
+
+    expect(result.ok).toBe(true);
+    expect(getLegacyOnlyLicense(result.attempts)).toBeNull();
+  });
+
+  it('does not flag a key Studio validated', async () => {
+    mockFetch(json(200, { plan: 'pro' }));
+
+    expect(getLegacyOnlyLicense((await validate()).attempts)).toBeNull();
+  });
+
+  it('does not flag a key legacy rejected too', async () => {
+    mockFetch(json(404, { message: 'No license was found' }), json(404, { message: 'No license key found' }));
+
+    expect(getLegacyOnlyLicense((await validate()).attempts)).toBeNull();
   });
 });

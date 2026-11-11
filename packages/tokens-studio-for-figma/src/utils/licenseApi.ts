@@ -94,6 +94,36 @@ async function attemptHost<T>(
   }
 }
 
+/**
+ * A key that only validates through the legacy host because Studio turned it
+ * down, as opposed to Studio being unreachable.
+ */
+export type LegacyOnlyLicense = {
+  primaryStatus: number;
+  primaryReason: 'status';
+};
+
+/**
+ * MIGRATION: true when Studio answered with a non-200 HTTP response (e.g. a
+ * 404 for a key removed when its owner took a seat with their account, or a
+ * 500 with a message) and the legacy host then validated the key. These users
+ * keep Pro only until the legacy host is switched off, and signing in with
+ * their Tokens Studio account fixes it.
+ *
+ * Deliberately excludes a Studio timeout or transport error: those users
+ * cannot reach Studio at all, so sending them to a sign-in that also goes to
+ * Studio would not help. Also excludes 'parse' (no readable answer, e.g. a
+ * gateway error page) and 'incomplete' (a 200). Remove with the legacy host.
+ */
+export function getLegacyOnlyLicense(attempts: LicenseApiAttempt[]): LegacyOnlyLicense | null {
+  if (attempts.length < 2) return null;
+  const primary = attempts[0];
+  const resolved = attempts[attempts.length - 1];
+  if (primary.reason !== 'status' || primary.status === null) return null;
+  if (resolved.reason !== null) return null;
+  return { primaryStatus: primary.status, primaryReason: primary.reason };
+}
+
 function reportFallback(endpoint: string, attempts: LicenseApiAttempt[], figmaId?: string | null) {
   const [primary, fallback] = attempts;
   // The cutover signal: the primary could not answer and the legacy host
