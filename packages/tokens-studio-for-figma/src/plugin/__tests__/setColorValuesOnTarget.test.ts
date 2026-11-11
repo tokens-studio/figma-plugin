@@ -60,6 +60,19 @@ describe('setColorValuesOnTarget', () => {
           ],
         } as any,
       }, {
+        // Tokens Studio sync: server string value, raw stops reference color tokens
+        name: 'gradient-token-server-string-refs',
+        type: TokenTypes.GRADIENT,
+        value: '{angle: 90, kind: linear, stops: [{color: #ff0000, position: 0},{color: #000000, position: 1}]}' as any,
+        rawValue: {
+          kind: 'linear',
+          angle: 90,
+          stops: [
+            { color: '{red}', position: 0 },
+            { color: '{black}', position: 1 },
+          ],
+        } as any,
+      }, {
         // gradient token where both value and rawValue are the structured object
         // (no server resolution applied).
         name: 'gradient-token-structured',
@@ -270,6 +283,35 @@ describe('setColorValuesOnTarget', () => {
     });
     expect((mockStyle.paints[0] as GradientPaint).gradientStops[1].color).toEqual({
       r: 1, g: 1, b: 1, a: 1,
+    });
+  });
+
+  it('should resolve and bind referenced stop colors when token.value is a non-CSS server string', async () => {
+    const mockStyle = {
+      paints: [],
+    } as unknown as PaintStyle;
+
+    // Drop once-implementations queued (but not consumed) by earlier tests
+    mockImportVariableByKeyAsync.mockReset();
+    mockImportVariableByKeyAsync.mockImplementationOnce(() => ({ id: 'VariableID:123', key: '123' }));
+
+    await setColorValuesOnTarget({ target: mockStyle, token: 'gradient-token-server-string-refs', key: 'paints' });
+
+    expect(mockStyle.paints).toHaveLength(1);
+    const { gradientStops } = mockStyle.paints[0] as GradientPaint;
+    expect(gradientStops[0]).toEqual({
+      color: {
+        r: 1, g: 0, b: 0, a: 1,
+      },
+      position: 0,
+      boundVariables: { color: { type: 'VARIABLE_ALIAS', id: 'VariableID:123' } },
+    });
+    // black has no variable, so its stop keeps the resolved color unbound
+    expect(gradientStops[1]).toEqual({
+      color: {
+        r: 0, g: 0, b: 0, a: 1,
+      },
+      position: 1,
     });
   });
 
