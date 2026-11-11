@@ -184,16 +184,28 @@ describe('getLegacyOnlyLicense', () => {
     jest.clearAllMocks();
   });
 
+  it('flags a key Studio has no record of (404) that legacy accepted', async () => {
+    mockFetch(json(404, { message: 'No license was found' }), json(200, { plan: 'pro' }));
+
+    const result = await validate();
+
+    expect(getLegacyOnlyLicense(result.attempts)).toEqual({ primaryStatus: 404, primaryReason: 'status' });
+  });
+
+  // Studio answers 500 both for a key it rejects and for its own errors, so none of these can be told from an outage.
   it.each([
-    ['a 404 for a removed key', json(404, { message: 'No license was found' }), 404],
-    ['a 500 with a message', json(500, { message: 'already_used' }), 500],
-    ['a 403', json(403, { message: 'Forbidden' }), 403],
-  ])('flags a key that Studio rejected with %s and legacy accepted', async (_label, primaryResponse, status) => {
+    ['a 500 with a rejection message', json(500, { message: 'License key is already used by someone' })],
+    ['a 500 server error', json(500, { status: 500, error: 'Internal Server Error' })],
+    ['a 503', json(503, { message: 'Service Unavailable' })],
+    ['a 429 throttle', json(429, { message: 'Too many requests' })],
+    ['a 400', json(400, { message: 'Missing or invalid request parameters' })],
+  ])('does not flag %s from Studio, even when legacy accepts the key', async (_label, primaryResponse) => {
     mockFetch(primaryResponse, json(200, { plan: 'pro' }));
 
     const result = await validate();
 
-    expect(getLegacyOnlyLicense(result.attempts)).toEqual({ primaryStatus: status, primaryReason: 'status' });
+    expect(result.attempts[0].reason).toBe('status');
+    expect(getLegacyOnlyLicense(result.attempts)).toBeNull();
   });
 
   it('does not flag a Studio timeout, even when legacy accepts the key', async () => {

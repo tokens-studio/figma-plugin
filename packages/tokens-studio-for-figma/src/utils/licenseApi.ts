@@ -95,33 +95,36 @@ async function attemptHost<T>(
 }
 
 /**
- * A key that only validates through the legacy host because Studio turned it
- * down, as opposed to Studio being unreachable.
+ * A key that only validates through the legacy host because Studio has no
+ * record of it, as opposed to Studio being unreachable or failing.
  */
 export type LegacyOnlyLicense = {
-  primaryStatus: number;
+  primaryStatus: 404;
   primaryReason: 'status';
 };
 
 /**
- * MIGRATION: true when Studio answered with a non-200 HTTP response (e.g. a
- * 404 for a key removed when its owner took a seat with their account, or a
- * 500 with a message) and the legacy host then validated the key. These users
- * keep Pro only until the legacy host is switched off, and signing in with
- * their Tokens Studio account fixes it.
+ * MIGRATION: true when Studio answered 404 ("No license was found") and the
+ * legacy host then validated the key. Studio's /validate-license only uses
+ * 404 for a key it doesn't hold (never imported, or released when its owner
+ * took a seat with their account). Every other rejection there is a 500, the
+ * same status as a server error, so a 500 (or 429, 502, ...) can't be told
+ * apart from an outage and is excluded. The legacy host still validating the
+ * key is the gate. These users keep Pro only until the legacy host is switched
+ * off; signing in with their Tokens Studio account fixes it.
  *
- * Deliberately excludes a Studio timeout or transport error: those users
- * cannot reach Studio at all, so sending them to a sign-in that also goes to
- * Studio would not help. Also excludes 'parse' (no readable answer, e.g. a
- * gateway error page) and 'incomplete' (a 200). Remove with the legacy host.
+ * Also excludes a Studio timeout or transport error (sending users who can't
+ * reach Studio to a sign-in that also goes to Studio wouldn't help), 'parse'
+ * (a 404 without a readable JSON body, e.g. a proxy page) and 'incomplete'
+ * (a 200). Remove with the legacy host.
  */
 export function getLegacyOnlyLicense(attempts: LicenseApiAttempt[]): LegacyOnlyLicense | null {
   if (attempts.length < 2) return null;
   const primary = attempts[0];
   const resolved = attempts[attempts.length - 1];
-  if (primary.reason !== 'status' || primary.status === null) return null;
+  if (primary.reason !== 'status' || primary.status !== 404) return null;
   if (resolved.reason !== null) return null;
-  return { primaryStatus: primary.status, primaryReason: primary.reason };
+  return { primaryStatus: 404, primaryReason: 'status' };
 }
 
 function reportFallback(endpoint: string, attempts: LicenseApiAttempt[], figmaId?: string | null) {

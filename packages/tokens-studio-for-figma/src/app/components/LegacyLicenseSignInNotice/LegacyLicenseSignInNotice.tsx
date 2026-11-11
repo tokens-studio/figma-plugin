@@ -33,26 +33,20 @@ const ModalFooterRight = styled('div', {
 type NoticeConditions = {
   legacyOnlyLicense: LegacyOnlyLicense | null;
   isAuthenticated: boolean;
-  // Account data (user + orgs) has loaded for a restored session. Until then `isPro` isn't known yet.
-  hasAccountData: boolean;
-  isPro: boolean;
   dismissed: boolean;
   // Another startup dialog (the terms update) is still waiting to be seen, or the app is still loading.
   blocked: boolean;
 };
 
 /**
- * MIGRATION: whether to tell the user to sign in to keep Pro. Only for a key that Studio rejected and the legacy
- * host accepted (see getLegacyOnlyLicense), and only while no signed-in account already grants Pro. Remove with the
- * legacy license host.
+ * MIGRATION: whether to tell the user to sign in to keep Pro. Only for a key that Studio doesn't hold and the legacy
+ * host accepted (see getLegacyOnlyLicense), and only while signed out: once signed in, the account decides Pro and
+ * the key isn't what counts, whether or not that account is Pro. Remove with the legacy license host.
  */
 export function shouldShowLegacyLicenseNotice({
-  legacyOnlyLicense, isAuthenticated, hasAccountData, isPro, dismissed, blocked,
+  legacyOnlyLicense, isAuthenticated, dismissed, blocked,
 }: NoticeConditions): boolean {
-  if (!legacyOnlyLicense || dismissed || blocked) return false;
-  // A restored session resolves after license validation; wait for it rather than flash the dialog at a Pro account.
-  if (isAuthenticated && !hasAccountData) return false;
-  return !isPro;
+  return !!legacyOnlyLicense && !isAuthenticated && !dismissed && !blocked;
 }
 
 export default function LegacyLicenseSignInNotice() {
@@ -62,8 +56,6 @@ export default function LegacyLicenseSignInNotice() {
   // These users are Pro by key and get the terms update first; don't stack the two dialogs.
   const termsUpdatePending = useSelector((state: RootState) => state.settings?.[TERMS_UPDATE_MODAL_KEY] === false);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  const hasAccountData = useAuthStore((state) => state.user !== null);
-  const isPro = useAuthStore((state) => state.isPro);
   const loginWithOAuth = useAuthStore((state) => state.loginWithOAuth);
   // Kept in component state on purpose: dismissing only lasts for this session, and the next start asks again.
   const [dismissed, setDismissed] = useState(false);
@@ -72,8 +64,6 @@ export default function LegacyLicenseSignInNotice() {
   const open = shouldShowLegacyLicenseNotice({
     legacyOnlyLicense,
     isAuthenticated,
-    hasAccountData,
-    isPro,
     dismissed,
     blocked: activeTab === Tabs.LOADING || termsUpdatePending,
   });
@@ -99,8 +89,7 @@ export default function LegacyLicenseSignInNotice() {
 
   const handleSignIn = useCallback(async () => {
     track('Legacy license sign-in notice sign in clicked', trackingProps);
-    // Make way for the sign-in flow's own dialog. Pro then comes from the account (useIsProUser reads `isPro`), so
-    // nothing needs to re-validate the key.
+    // Make way for the sign-in flow's own dialog. Once signed in the notice stays hidden: the account decides Pro.
     setDismissed(true);
     try {
       await loginWithOAuth();

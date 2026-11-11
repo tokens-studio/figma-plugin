@@ -24,13 +24,11 @@ describe('shouldShowLegacyLicenseNotice', () => {
   const base = {
     legacyOnlyLicense: REMOVED_KEY,
     isAuthenticated: false,
-    hasAccountData: false,
-    isPro: false,
     dismissed: false,
     blocked: false,
   };
 
-  it('shows for a key Studio rejected and legacy accepted', () => {
+  it('shows for a signed-out user whose key Studio does not hold and legacy accepted', () => {
     expect(shouldShowLegacyLicenseNotice(base)).toBe(true);
   });
 
@@ -39,18 +37,8 @@ describe('shouldShowLegacyLicenseNotice', () => {
     expect(shouldShowLegacyLicenseNotice({ ...base, legacyOnlyLicense: null })).toBe(false);
   });
 
-  it('does not show when a signed-in account already grants Pro', () => {
-    expect(shouldShowLegacyLicenseNotice({
-      ...base, isAuthenticated: true, hasAccountData: true, isPro: true,
-    })).toBe(false);
-  });
-
-  it('shows when the signed-in account does not grant Pro', () => {
-    expect(shouldShowLegacyLicenseNotice({ ...base, isAuthenticated: true, hasAccountData: true })).toBe(true);
-  });
-
-  it('waits for a restored session to load before deciding', () => {
-    expect(shouldShowLegacyLicenseNotice({ ...base, isAuthenticated: true, hasAccountData: false })).toBe(false);
+  it('does not show while signed in: the account decides Pro, not the key', () => {
+    expect(shouldShowLegacyLicenseNotice({ ...base, isAuthenticated: true })).toBe(false);
   });
 
   it('does not show once dismissed, or while another startup dialog is pending', () => {
@@ -108,13 +96,17 @@ describe('LegacyLicenseSignInNotice', () => {
     expect(track).not.toHaveBeenCalled();
   });
 
-  it('stays hidden for a signed-in account with Pro', () => {
+  it.each([
+    ['with Pro', true],
+    ['without Pro', false],
+  ])('stays hidden for a signed-in account %s', (_label, isPro) => {
     act(() => {
-      useAuthStore.setState({ isAuthenticated: true, isPro: true, user: account });
+      useAuthStore.setState({ isAuthenticated: true, isPro, user: account });
     });
     renderNotice();
 
     expect(screen.queryByText('legacySignIn.title')).not.toBeInTheDocument();
+    expect(track).not.toHaveBeenCalled();
   });
 
   it('waits until the terms update and the loading screen are out of the way', () => {
