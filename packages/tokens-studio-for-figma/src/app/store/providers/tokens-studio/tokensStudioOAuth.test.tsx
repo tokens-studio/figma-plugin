@@ -10,11 +10,10 @@ import { notifyToUI } from '@/plugin/notifiers';
 import type { Organization } from '@/types/oauth';
 import { store } from '@/app/store';
 import { StudioApiError } from '@/utils/tokensStudio/StudioApiError';
-import { fetchBranches } from '@/utils/tokensStudio/fetchBranchesListRest';
+import { fetchBranches, fetchChangeSetIdForBranch } from '@/utils/tokensStudio/fetchBranchesListRest';
 import { RefreshError } from '@/app/services/RefreshError';
 import { SIGN_IN_REQUIRED, VARIABLES_SOURCE_OF_TRUTH } from './studioAuth';
 import { StorageProviderType } from '@/constants/StorageProviderType';
-import { fetchChangeSetIdForBranch } from '@/utils/tokensStudio/fetchBranchesListRest';
 
 jest.mock('@/utils/tokensStudio/fetchProjectDataRest', () => ({
   fetchProjectDataRest: jest.fn(),
@@ -22,6 +21,7 @@ jest.mock('@/utils/tokensStudio/fetchProjectDataRest', () => ({
 
 jest.mock('@/utils/tokensStudio/fetchBranchesListRest', () => ({
   ...jest.requireActual('@/utils/tokensStudio/fetchBranchesListRest'),
+  fetchBranches: jest.fn(),
   fetchChangeSetIdForBranch: jest.fn(),
 }));
 
@@ -156,7 +156,9 @@ describe('pushToTokensStudioOAuth CREATE_THEME_GROUP', () => {
   it('reports a saved change unless the caller reports it instead', async () => {
     jest.mocked(createThemeGroupRest).mockResolvedValue({ data: { id: 'group-1' } } as any);
 
-    await pushToTokensStudioOAuth({ context, action: 'CREATE_THEME_GROUP', data: { name: 'Colors' }, notifyOnSuccess: false });
+    await pushToTokensStudioOAuth({
+      context, action: 'CREATE_THEME_GROUP', data: { name: 'Colors' }, notifyOnSuccess: false,
+    });
     expect(notifyToUI).not.toHaveBeenCalled();
 
     await pushToTokensStudioOAuth({ context, action: 'CREATE_THEME_GROUP', data: { name: 'Colors' } });
