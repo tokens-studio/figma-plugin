@@ -6,6 +6,8 @@ export const transformProviderName = (provider: StorageProviderType) => {
       return 'JSONBin.io';
     case StorageProviderType.GITHUB:
       return 'GitHub';
+    case StorageProviderType.GITEA:
+      return 'Gitea';
     case StorageProviderType.GITLAB:
       return 'GitLab';
     case StorageProviderType.BITBUCKET:

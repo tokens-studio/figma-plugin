@@ -61,6 +61,20 @@ StorageProviderType.GITLAB,
 }
 >;
 
+export type GiteaStorageType = GenericStorageType<
+StorageProviderType.GITEA,
+{
+  name: string; // this is only for refrence
+  id: string; // this should be the repository identifier; eg {username}/{repo}
+  branch: string; // this is the base branch
+  filePath: string; // this is the path to the token file or files (depends on multifile support)
+  baseUrl: string; // this is the base API url. This is important for self hosted environments
+  defaultBranch?: string;
+  commitSha?: string; // this is the commit sha of the current file or folder
+  previousSourceBranch?: string; // optional: allows pushing changes to remote based on an existing branch
+}
+>;
+
 export type BitbucketStorageType = GenericStorageType<
 StorageProviderType.BITBUCKET,
 {
@@ -123,6 +137,7 @@ export type StorageType =
   | JSONBinStorageType
   | GitHubStorageType
   | GitLabStorageType
+  | GiteaStorageType
   | GenericVersionedStorageType
   | ADOStorageType
   | BitbucketStorageType
@@ -134,6 +149,7 @@ export type StorageTypeCredentials =
   | StorageTypeCredential<JSONBinStorageType>
   | StorageTypeCredential<GitHubStorageType>
   | StorageTypeCredential<GitLabStorageType>
+  | StorageTypeCredential<GiteaStorageType>
   | StorageTypeCredential<GenericVersionedStorageType, false>
   | StorageTypeCredential<BitbucketStorageType>
   | StorageTypeCredential<ADOStorageType>
@@ -156,6 +172,10 @@ export type StorageTypeFormValues<Incomplete extends boolean = false> =
   | ({ new?: boolean; provider: StorageProviderType.GITLAB } & OptionalPartial<
   Incomplete,
   Omit<StorageTypeCredential<GitLabStorageType>, 'provider'>
+  >)
+  | ({ new?: boolean; provider: StorageProviderType.GITEA } & OptionalPartial<
+  Incomplete,
+  Omit<StorageTypeCredential<GiteaStorageType>, 'provider'>
   >)
   | ({ new?: boolean; migrating?: boolean; provider: StorageProviderType.BITBUCKET } & OptionalPartial<
   Incomplete,

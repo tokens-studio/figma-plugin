@@ -76,7 +76,8 @@ export function pullTokensFactory(
           }
 
           if (
-            matchingSet.provider === StorageProviderType.GITHUB
+            matchingSet.provider === StorageProviderType.GITEA
+              || matchingSet.provider === StorageProviderType.GITHUB
             || matchingSet.provider === StorageProviderType.GITLAB
             || matchingSet.provider === StorageProviderType.ADO
             || matchingSet.provider === StorageProviderType.BITBUCKET
@@ -168,6 +169,7 @@ export function pullTokensFactory(
       StorageProviderType.ADO,
       StorageProviderType.GITHUB,
       StorageProviderType.GITLAB,
+      StorageProviderType.GITEA,
       StorageProviderType.BITBUCKET,
       StorageProviderType.JSONBIN,
       StorageProviderType.GENERIC_VERSIONED_STORAGE,

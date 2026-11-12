@@ -488,3 +488,35 @@ describe('pullTokensFactory', () => {
     expect(result.message).toBe('Network request failed');
   });
 });
+
+describe('Gitea startup credential isolation', () => {
+  const config = {
+    provider: StorageProviderType.GITEA, id: 'owner/repo', name: 'Gitea', internalId: 'same-id', baseUrl: 'https://git.example.com/gitea', branch: 'main', filePath: 'tokens.json',
+  } as const;
+  it.each(['https://evil.example.com/gitea', 'https://git.example.com/other'])('never reuses a PAT after the document installation changes to %s', async (baseUrl) => {
+    const store = createMockStore({ uiState: { storageType: { ...config, baseUrl } } });
+    const pullTokens = jest.fn();
+    const fetchBranches = jest.fn();
+    await pullTokensFactory(store, store.dispatch, {
+      storageType: { ...config, baseUrl },
+      localApiProviders: [{ ...config, secret: 'private-token' }],
+    } as StartupMessage, { confirm: jest.fn() } as unknown as ReturnType<typeof useConfirm>, { pullTokens, fetchBranches } as unknown as ReturnType<typeof useRemoteTokens>)();
+    expect(pullTokens).not.toHaveBeenCalled();
+    expect(fetchBranches).not.toHaveBeenCalled();
+    expect(store.getState().uiState.activeTab).toEqual(Tabs.START);
+  });
+  it('loads branches and pulls using credentials bound to the installation', async () => {
+    const store = createMockStore({ uiState: { storageType: config } });
+    const pullTokens = jest.fn().mockResolvedValue({ status: 'success', tokens: {}, themes: [] });
+    const fetchBranches = jest.fn().mockResolvedValue(['main']);
+    await pullTokensFactory(
+      store,
+      store.dispatch,
+      { storageType: config, localApiProviders: [{ ...config, secret: 'private-token' }] } as StartupMessage,
+      { confirm: jest.fn() } as unknown as ReturnType<typeof useConfirm>,
+      { pullTokens, fetchBranches } as unknown as ReturnType<typeof useRemoteTokens>,
+    )();
+    expect(fetchBranches).toHaveBeenCalledWith(expect.objectContaining({ ...config, secret: 'private-token' }));
+    expect(pullTokens).toHaveBeenCalledWith(expect.objectContaining({ context: expect.objectContaining(config) }));
+  });
+});

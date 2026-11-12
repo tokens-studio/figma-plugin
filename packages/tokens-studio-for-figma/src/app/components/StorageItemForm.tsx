@@ -27,6 +27,7 @@ export default function StorageItemForm({
 }: Props) {
   switch (values.provider) {
     case StorageProviderType.GITHUB:
+    case StorageProviderType.GITEA:
     case StorageProviderType.GITLAB: {
       return (
         <GitForm

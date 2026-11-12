@@ -3,6 +3,7 @@ import { Selector } from 'reselect';
 import useRemoteTokens from './remoteTokens';
 import { StorageTypeCredentials } from '@/types/StorageType';
 import {
+  apiProvidersSelector,
   themesListSelector,
   tokensSelector,
   remoteDataSelector, lastSyncedStateSelector, storageTypeSelector,
@@ -11,6 +12,25 @@ import { notifyToUI } from '@/plugin/notifiers';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { JSONBinTokenStorage } from '@/storage';
 import { tokenFormatSelector } from '@/selectors/tokenFormatSelector';
+
+const mockGiteaPull = jest.fn();
+const mockGiteaPush = jest.fn();
+const mockGiteaSync = jest.fn();
+const mockGiteaAdd = jest.fn();
+const mockGiteaBranches = jest.fn();
+const mockGiteaCreateBranch = jest.fn();
+const mockGiteaRemoteChange = jest.fn();
+jest.mock('./providers/gitea', () => ({
+  useGitea: () => ({
+    pullTokensFromGitea: mockGiteaPull,
+    pushTokensToGitea: mockGiteaPush,
+    syncTokensWithGitea: mockGiteaSync,
+    addNewGiteaCredentials: mockGiteaAdd,
+    fetchGiteaBranches: mockGiteaBranches,
+    createGiteaBranch: mockGiteaCreateBranch,
+    checkRemoteChangeForGitea: mockGiteaRemoteChange,
+  }),
+}));
 
 const mockStartJob = jest.fn();
 const mockRetrieve = jest.fn();
@@ -48,12 +68,15 @@ const mockSetRemoteData = jest.fn();
 const mockSetHasRemoteChange = jest.fn();
 const mockUpdateCheckForChanges = jest.fn();
 const mockSetLastError = jest.fn();
+const mockSetActiveTab = jest.fn();
 
 // Hide log calls unless they are expected
 jest.spyOn(console, 'log').mockImplementation(() => { });
 
 const mockSelector = (selector: Selector) => {
   switch (selector) {
+    case apiProvidersSelector:
+      return [];
     case tokensSelector:
       return {
         global: [
@@ -103,6 +126,7 @@ jest.mock('react-redux', () => ({
       setShowConfirm: mockSetShowConfirm,
       setHasRemoteChange: mockSetHasRemoteChange,
       setLastError: mockSetLastError,
+      setActiveTab: mockSetActiveTab,
     },
     tokenState: {
       setLastSyncedState: mockSetLastSyncedState,
@@ -343,6 +367,134 @@ describe('remoteTokens', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
+  });
+
+  const giteaContext = {
+    provider: 'gitea',
+    name: 'Gitea',
+    id: 'owner/repo',
+    secret: 'fixture',
+    internalId: 'gitea-id',
+    baseUrl: 'https://git.example.com/gitea',
+    branch: 'main',
+    filePath: 'tokens.json',
+    commitSha: 'old-sha',
+  } as StorageTypeCredentials;
+
+  it('preserves the fresh GitHub revision set by its sync hook when restoring', async () => {
+    mockFetchBranches.mockResolvedValueOnce(['main']);
+    mockCanWrite.mockResolvedValueOnce(true);
+    mockRetrieve.mockResolvedValueOnce({ status: 'success', tokens: { remote: [] }, themes: [] });
+    mockConfirm.mockResolvedValueOnce(true);
+    mockGetCommitSha.mockResolvedValueOnce('fresh-github-sha');
+
+    expect(await result.current.restoreStoredProvider(gitHubContext as StorageTypeCredentials)).toEqual({ status: 'success' });
+    expect(mockSetApiData.mock.calls.map(([context]) => context.commitSha)).toEqual(['234', 'fresh-github-sha']);
+    expect(mockSetApiData).toHaveBeenLastCalledWith({ ...gitHubContext, commitSha: 'fresh-github-sha' });
+    expect(mockSetLocalApiState).toHaveBeenCalledTimes(1);
+    expect(mockSetLocalApiState).toHaveBeenCalledWith(gitHubContext);
+    expect(mockSetStorage.mock.invocationCallOrder[0]).toBeLessThan(mockRetrieve.mock.invocationCallOrder[0]);
+  });
+
+  it('preserves the legacy GitHub snapshot and successful read when a pull is declined', async () => {
+    mockRetrieve.mockResolvedValueOnce({ status: 'success', tokens: { remote: [] }, themes: [] });
+    mockGetCommitSha.mockResolvedValueOnce('remote-github-sha');
+    mockShowPullDialog.mockResolvedValueOnce(false);
+
+    expect(await result.current.pullTokens({ context: gitHubContext as StorageTypeCredentials })).toMatchObject({ status: 'success' });
+    expect(mockSetRemoteData).toHaveBeenCalledWith(expect.objectContaining({ tokens: { remote: [] } }));
+    expect(mockSetLastSyncedState).toHaveBeenCalledTimes(1);
+    expect(mockSetRemoteData.mock.invocationCallOrder[0]).toBeLessThan(mockShowPullDialog.mock.invocationCallOrder[0]);
+    expect(mockSetTokenData).not.toHaveBeenCalled();
+    expect(mockSetApiData).not.toHaveBeenCalled();
+    expect(mockSetLocalApiState).not.toHaveBeenCalled();
+  });
+
+  it('does not newly apply GitHub revision metadata when pulled content is unchanged', async () => {
+    mockGetCommitSha.mockResolvedValueOnce('remote-github-sha');
+
+    expect(await result.current.pullTokens({ context: gitHubContext as StorageTypeCredentials })).toMatchObject({ status: 'success' });
+    expect(mockSetApiData).not.toHaveBeenCalled();
+    expect(mockSetLocalApiState).not.toHaveBeenCalled();
+  });
+
+  it('routes Gitea branch operations and push overrides', async () => {
+    mockGiteaBranches.mockResolvedValueOnce(['main']);
+    mockGiteaCreateBranch.mockResolvedValueOnce(true);
+    mockGiteaPush.mockResolvedValueOnce({ status: 'success', tokens: {}, themes: [] });
+    expect(await result.current.fetchBranches(giteaContext)).toEqual(['main']);
+    expect(await result.current.addNewBranch(giteaContext, 'feature/tokens', 'main')).toBe(true);
+    expect(mockGiteaCreateBranch).toHaveBeenCalledWith(giteaContext, 'feature/tokens', 'main');
+    const overrides = { branch: 'feature/tokens', commitMessage: 'save' };
+    await result.current.pushTokens({ context: giteaContext, overrides });
+    expect(mockGiteaPush).toHaveBeenCalledWith(giteaContext, overrides);
+  });
+
+  it('registers the acknowledged branch lifecycle for Gitea only', async () => {
+    expect(result.current.getBranchLifecycle(gitHubContext as StorageTypeCredentials)).toBeUndefined();
+    const lifecycle = result.current.getBranchLifecycle(giteaContext)!;
+    mockGiteaCreateBranch.mockResolvedValueOnce(true);
+    mockGiteaPush.mockResolvedValueOnce({
+      status: 'success', tokens: {}, themes: [], branch: 'feature/new', commitSha: 'confirmed',
+    });
+    mockGiteaBranches.mockResolvedValueOnce(['main']);
+    const response = await lifecycle.createAndSyncBranch('feature/new', 'main', true, {});
+    expect(response.data).toMatchObject({ status: 'success', commitSha: 'confirmed' });
+    expect(response.branches).toEqual(['main', 'feature/new']);
+    expect(mockGiteaPush).toHaveBeenCalledWith({ ...giteaContext, branch: 'feature/new' }, { branch: 'feature/new', commitMessage: '' });
+  });
+
+  it('retains the Gitea baseline when a pull is cancelled', async () => {
+    mockGiteaPull.mockResolvedValueOnce({
+      status: 'success', tokens: { remote: [] }, themes: [], commitSha: 'new-sha', defaultBranch: 'main',
+    });
+    mockShowPullDialog.mockResolvedValueOnce(false);
+    expect(await result.current.pullTokens({ context: giteaContext })).toMatchObject({ status: 'failure' });
+    expect(mockSetRemoteData).not.toHaveBeenCalled();
+    expect(mockSetLastSyncedState).not.toHaveBeenCalled();
+    expect(mockSetApiData).not.toHaveBeenCalled();
+  });
+
+  it('persists Gitea revision and access information when content is unchanged', async () => {
+    mockGiteaPull.mockResolvedValueOnce({
+      status: 'success', tokens: mockSelector(tokensSelector), themes: mockSelector(themesListSelector), commitSha: 'new-sha', defaultBranch: 'trunk', canWrite: false,
+    });
+    await result.current.pullTokens({ context: giteaContext });
+    expect(mockSetApiData).toHaveBeenCalledWith({ ...giteaContext, commitSha: 'new-sha', defaultBranch: 'trunk' });
+    expect(mockSetLocalApiState).toHaveBeenCalledWith({ ...giteaContext, commitSha: 'new-sha', defaultBranch: 'trunk' });
+    expect(mockSetEditProhibited).toHaveBeenCalledWith(true);
+  });
+
+  it('keeps the selected provider when restoring Gitea fails', async () => {
+    mockGiteaSync.mockResolvedValueOnce({ status: 'failure', errorMessage: 'Cannot connect to Gitea' });
+    expect(await result.current.restoreStoredProvider(giteaContext)).toMatchObject({ status: 'failure' });
+    expect(mockSetStorage).not.toHaveBeenCalled();
+    expect(mockSetLocalApiState).not.toHaveBeenCalled();
+    expect(mockSetApiData).not.toHaveBeenCalled();
+  });
+
+  it('rejects a failed Gitea automatic pull without selecting it or navigating away', async () => {
+    mockGiteaPull.mockResolvedValueOnce({ status: 'failure', errorMessage: 'Cannot connect to Gitea' });
+
+    await expect(result.current.restoreProviderWithAutoPull(giteaContext)).rejects.toThrow('Cannot connect to Gitea');
+    expect(mockSetStorage).not.toHaveBeenCalled();
+    expect(mockSetLocalApiState).not.toHaveBeenCalled();
+    expect(mockSetApiData).not.toHaveBeenCalled();
+    expect(mockSetActiveTab).not.toHaveBeenCalled();
+  });
+
+  it('retains the confirmed Gitea revision on connect', async () => {
+    mockGiteaAdd.mockResolvedValueOnce({
+      status: 'success', tokens: {}, themes: [], commitSha: 'new-sha', defaultBranch: 'main',
+    });
+    expect(await result.current.addNewProviderItem(giteaContext)).toMatchObject({ status: 'success' });
+    expect(mockSetApiData).toHaveBeenCalledWith({ ...giteaContext, commitSha: 'new-sha', defaultBranch: 'main' });
+  });
+
+  it('routes Gitea remote revision checks', async () => {
+    mockGiteaRemoteChange.mockResolvedValueOnce(true);
+    expect(await result.current.checkRemoteChange(giteaContext)).toBe(true);
+    expect(mockGiteaRemoteChange).toHaveBeenCalledWith(giteaContext);
   });
 
   Object.values(contextMap).forEach((context) => {

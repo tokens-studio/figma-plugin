@@ -19,11 +19,12 @@ import { styled } from '@/stitches.config';
 import { Tabs } from '@/constants/Tabs';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import Box from './Box';
+import { matchesCredentialById } from '@/utils/credentialIdentity';
 import { transformProviderName } from '@/utils/transformProviderName';
 import { track } from '@/utils/analytics';
 import Footer from './Footer';
 import { autoSelectFirstThemesPerGroup } from '@/utils/autoSelectThemes';
-import useRemoteTokens from '../store/remoteTokens';
+import useRemoteTokens, { ReportedProviderError } from '../store/remoteTokens';
 
 const StyledTokensStudioIcon = styled(TokensStudioLogo, {
   width: '200px',
@@ -74,7 +75,7 @@ function StartScreen() {
     if (storageType.provider === StorageProviderType.LOCAL) {
       return;
     }
-    const matchingProvider = apiProviders.find((i) => i.internalId === storageType?.internalId);
+    const matchingProvider = apiProviders.find((i) => matchesCredentialById(i, storageType));
     const credentialsToSet = matchingProvider
       ? { ...matchingProvider, provider: storageType.provider, new: true }
       : {
@@ -119,6 +120,7 @@ function StartScreen() {
       } catch (error) {
         console.error('Error loading provider:', error);
         setIsLoadingProvider(false);
+        if (error instanceof ReportedProviderError) return;
         dispatch.uiState.setLastError({
           type: 'connectivity',
           header: 'Failed to load provider',
@@ -130,7 +132,7 @@ function StartScreen() {
 
   const matchingProvider = React.useMemo(
     () => (storageType && 'internalId' in storageType
-      ? apiProviders.find((i) => i.internalId === storageType.internalId)
+      ? apiProviders.find((i) => matchesCredentialById(i, storageType))
       : undefined),
     [apiProviders, storageType],
   );

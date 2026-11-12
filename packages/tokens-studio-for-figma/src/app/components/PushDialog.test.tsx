@@ -55,6 +55,27 @@ describe('PushDialog', () => {
     result.unmount();
   });
 
+  it('shows the Gitea compare link after pushing', () => {
+    const mockStore = createMockStore({
+      uiState: {
+        showPushDialog: { state: 'success' },
+        localApiState: {
+          provider: StorageProviderType.GITEA,
+          baseUrl: 'https://git.example.com/gitea',
+          id: 'owner/repo',
+          branch: 'feature/tokens',
+          defaultBranch: 'develop',
+        },
+      },
+    });
+    const result = render(<Provider store={mockStore}><PushDialog /></Provider>);
+    expect(result.getByText('changesPushedTo Gitea')).toBeInTheDocument();
+    expect(result.getByText('createPullRequest').closest('a')).toHaveAttribute(
+      'href',
+      'https://git.example.com/gitea/owner/repo/compare/develop...feature%2Ftokens?expand=1',
+    );
+  });
+
   it('should be able to push by pressing ctrl/cmd + Enter', () => {
     const mockStore = createMockStore({
       uiState: {

@@ -28,6 +28,7 @@ export default function CreateStorageItemModal({
       jsonbin: 'JSONBIN',
       github: 'GitHub',
       gitlab: 'GitLab',
+      gitea: 'Gitea',
       ado: 'Azure DevOps',
       bitbucket: 'Bitbucket',
       supernova: 'Supernova',
