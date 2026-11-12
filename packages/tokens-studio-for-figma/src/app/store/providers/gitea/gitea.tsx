@@ -77,12 +77,14 @@ export function useGitea() {
 
   const pushTokensToGitea = useCallback(
     async (context: GiteaCredentials, overrides?: PushOverrides): Promise<RemoteResponseData> => {
-      const storage = await storageClientFactory(context, isProUser);
-
       const pushSettings = await pushDialog({ state: 'initial', overrides: overrides ?? { branch: context.branch, commitMessage: '' } });
       if (pushSettings) {
         const { commitMessage, customBranch } = pushSettings;
         try {
+          const storage = await storageClientFactory(
+            customBranch ? { ...context, previousSourceBranch: context.branch } : context,
+            isProUser,
+          );
           if (customBranch) storage.selectBranch(customBranch);
           const metadata = {
             tokenSetOrder: Object.keys(tokens),

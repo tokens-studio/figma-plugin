@@ -119,3 +119,24 @@ it('ignores a license access response after the committed provider effect is dis
   await act(async () => { resolveAccess(false); });
   expect(dispatch.tokenState.setEditProhibited).not.toHaveBeenCalled();
 });
+
+it.each([undefined, 'stale/source'])('uses the current non-default branch as the source for a custom push branch (previous source: %s)', async (previousSourceBranch) => {
+  const sourceContext = {
+    ...context, branch: 'feature/source', previousSourceBranch, commitSha: 'source-sha',
+  };
+  mockPushDialog.mockResolvedValueOnce({ commitMessage: 'save', customBranch: 'feature/new' });
+  mockStorage.save.mockResolvedValue(true);
+  const { result } = renderHook(() => useGitea());
+  await act(async () => { await result.current.pushTokensToGitea(sourceContext); });
+  expect(GiteaTokenStorage).toHaveBeenCalledWith(sourceContext.secret, 'owner', 'repo', sourceContext.baseUrl, 'source-sha', 'feature/source');
+  expect(mockStorage.selectBranch).toHaveBeenLastCalledWith('feature/new');
+  expect(dispatch.uiState.setApiData).toHaveBeenCalledWith(expect.objectContaining({ branch: 'feature/new', commitSha: 'new-sha' }));
+});
+
+it('preserves an explicit source when pushing without a custom dialog branch', async () => {
+  const newBranchContext = { ...context, branch: 'feature/new', previousSourceBranch: 'feature/source' };
+  mockStorage.save.mockResolvedValue(true);
+  const { result } = renderHook(() => useGitea());
+  await act(async () => { await result.current.pushTokensToGitea(newBranchContext); });
+  expect(GiteaTokenStorage).toHaveBeenCalledWith(context.secret, 'owner', 'repo', context.baseUrl, context.commitSha, 'feature/source');
+});

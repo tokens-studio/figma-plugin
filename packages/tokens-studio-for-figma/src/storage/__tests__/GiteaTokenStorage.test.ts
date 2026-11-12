@@ -362,3 +362,25 @@ it('does not read token contents through a configured symlink', async () => {
   await expect(client().read()).resolves.toEqual([]);
   expect(mockFetch.mock.calls.some(([url]) => url.includes('/outside/'))).toBe(false);
 });
+
+it.each(['source-sha', 'remote-change'])('uses the non-default source revision for a new push branch (head: %s)', async (sourceHead) => {
+  head = 'main-sha';
+  const previous = mockFetch.getMockImplementation()!;
+  mockFetch.mockImplementation(async (url, init) => (
+    url.endsWith('/branches/feature%2Fsource')
+      ? response({ name: 'feature/source', commit: { id: sourceHead } })
+      : previous(url, init)
+  ));
+  const storage = new GiteaTokenStorage('secret', 'owner', 'repo', baseUrl, 'source-sha', 'feature/source')
+    .changePath('tokens.json').selectBranch('feature/new');
+  const write = storage.writeChangeset({ 'tokens.json': '{}' }, 'message', 'feature/new', true);
+  if (sourceHead !== 'source-sha') {
+    await expect(write).rejects.toMatchObject({ code: 'conflict' });
+    expect(mockFetch.mock.calls.some(([, init]) => init.method === 'POST')).toBe(false);
+    return;
+  }
+  await expect(write).resolves.toBe(true);
+  const post = mockFetch.mock.calls.find(([, init]) => init.method === 'POST');
+  expect(JSON.parse(post[1].body)).toMatchObject({ branch: 'feature/source', new_branch: 'feature/new' });
+  expect(mockFetch.mock.calls.some(([url]) => url.endsWith('/branches/main'))).toBe(false);
+});
