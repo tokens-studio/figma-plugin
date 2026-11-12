@@ -467,11 +467,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       // a refresh token another file has already rotated counts as reuse on the server, which
       // ends the sign-in everywhere, so start from the stored pair.
       const stored = await readStoredOAuthTokens();
+      // The read is async: this file may have signed out or renewed meanwhile.
+      const current = get().oauthTokens;
+      if (!current) return;
+      if (current !== oauthTokens && !OAuthService.needsRefresh(current)) return;
       if (stored === null) {
         throw new RefreshError('fatal', 'Signed out of Tokens Studio in another file');
       }
-      const latest = stored ?? oauthTokens;
-      if (latest.refreshToken !== oauthTokens.refreshToken && !OAuthService.needsRefresh(latest)) {
+      const latest = stored ?? current;
+      if (latest.refreshToken !== current.refreshToken && !OAuthService.needsRefresh(latest)) {
         set({ oauthTokens: latest, isAuthenticated: true });
         return;
       }

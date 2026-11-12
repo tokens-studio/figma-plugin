@@ -1,4 +1,4 @@
-import { OAuthService } from './OAuthService';
+import { OAuthService, REFRESH_TIMEOUT_MS } from './OAuthService';
 import { TokenRefreshManager } from './TokenRefreshManager';
 import { RefreshError } from './RefreshError';
 
@@ -43,6 +43,26 @@ describe('OAuthService.refreshTokens', () => {
 
     expect(err).toBeInstanceOf(RefreshError);
     expect(err.kind).toBe('transient');
+  });
+
+  it('gives up a hung refresh after the timeout as a transient error, keeping the sign-in', async () => {
+    jest.useFakeTimers();
+    try {
+      mockFetch.mockImplementationOnce((_url: string, init: RequestInit) => new Promise((_resolve, reject) => {
+        init.signal?.addEventListener('abort', () => reject(new DOMException('The operation was aborted.', 'AbortError')));
+      }));
+
+      const pending = TokenRefreshManager.refreshTokens({
+        accessToken: 'old', refreshToken: 'live', tokenType: 'Bearer', expiresAt: 0,
+      }, STUDIO_URL).catch((e) => e);
+      jest.advanceTimersByTime(REFRESH_TIMEOUT_MS);
+      const err = await pending;
+
+      expect(err).toBeInstanceOf(RefreshError);
+      expect(err.kind).toBe('transient');
+    } finally {
+      jest.useRealTimers();
+    }
   });
 
   it('returns the rotated tokens', async () => {

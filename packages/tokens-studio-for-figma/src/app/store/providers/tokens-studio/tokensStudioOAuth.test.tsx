@@ -190,6 +190,7 @@ describe('useTokensStudioOAuth with a lapsed sign-in', () => {
     id: 'project-1', branch: 'main', provider: 'tokensstudio-oauth', name: 'Project',
   } as any;
   const refreshTokens = jest.fn();
+  const logout = jest.fn();
   const liveTokens = (accessToken: string) => ({
     accessToken, refreshToken: `${accessToken}-refresh`, tokenType: 'Bearer', expiresAt: Date.now() + 60 * 60 * 1000,
   });
@@ -206,7 +207,9 @@ describe('useTokensStudioOAuth with a lapsed sign-in', () => {
       activeOrganization: freeOrg,
       activeOrganizationId: 'free',
       refreshTokens,
+      logout,
     });
+    logout.mockReset();
   });
 
   it('pulls with a renewed token after a 401', async () => {
@@ -235,7 +238,7 @@ describe('useTokensStudioOAuth with a lapsed sign-in', () => {
     expect(result).toMatchObject({ status: 'failure', errorType: 'credential', errorCode: SIGN_IN_REQUIRED });
   });
 
-  it('lists branches with a renewed token after a 401, and returns null when that fails too', async () => {
+  it('lists branches with a renewed token after a 401, and signs out and returns null when that fails too', async () => {
     jest.mocked(fetchBranches).mockImplementation(async (accessToken: string) => {
       if (accessToken === 'revoked') throw new StudioApiError('Unauthorized', 401);
       return [{ name: 'main' }, { name: 'feature' }] as any;
@@ -245,6 +248,7 @@ describe('useTokensStudioOAuth with a lapsed sign-in', () => {
     useAuthStore.setState({ oauthTokens: liveTokens('revoked') });
     jest.mocked(fetchBranches).mockRejectedValue(new StudioApiError('Unauthorized', 401));
     await expect(hook().fetchBranchesForTokensStudio(context)).resolves.toBeNull();
+    expect(logout).toHaveBeenCalledTimes(1);
   });
 
   it('records why a project could not be loaded', async () => {

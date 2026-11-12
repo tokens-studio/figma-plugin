@@ -11,11 +11,13 @@ const makeTokens = (accessToken: string, expiresInMs: number) => ({
 
 describe('withStudioAuth', () => {
   const refreshTokens = jest.fn();
+  const logout = jest.fn();
 
   beforeEach(() => {
     refreshTokens.mockReset();
     refreshTokens.mockImplementation(async () => useAuthStore.setState({ oauthTokens: makeTokens('fresh', 86400000) }));
-    useAuthStore.setState({ refreshTokens });
+    logout.mockReset();
+    useAuthStore.setState({ refreshTokens, logout });
   });
 
   it('uses a live token as is', async () => {
@@ -59,6 +61,27 @@ describe('withStudioAuth', () => {
 
     await expect(withStudioAuth(request)).resolves.toBe('renewed-elsewhere');
     expect(refreshTokens).not.toHaveBeenCalled();
+  });
+
+  it('signs out when the renewed token is refused too', async () => {
+    useAuthStore.setState({ oauthTokens: makeTokens('revoked', 60 * 60 * 1000) });
+    const request = jest.fn(async () => {
+      throw new StudioApiError('Unauthorized', 401);
+    });
+
+    await expect(withStudioAuth(request)).rejects.toMatchObject({ status: 401 });
+    expect(request).toHaveBeenCalledTimes(2);
+    expect(logout).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps the sign-in when the retry fails for another reason', async () => {
+    useAuthStore.setState({ oauthTokens: makeTokens('revoked', 60 * 60 * 1000) });
+    const request = jest.fn(async (token: string) => {
+      throw new StudioApiError(token === 'revoked' ? 'Unauthorized' : 'Server error', token === 'revoked' ? 401 : 500);
+    });
+
+    await expect(withStudioAuth(request)).rejects.toMatchObject({ status: 500 });
+    expect(logout).not.toHaveBeenCalled();
   });
 
   it('does not retry other failures', async () => {

@@ -8,6 +8,9 @@ import type {
 } from '@/types/oauth';
 import { OAuthError, OAuthErrorType } from '@/types/OAuthError';
 
+/** How long a sign-in refresh may take before it is given up as a network error. */
+export const REFRESH_TIMEOUT_MS = 10_000;
+
 export class OAuthService {
   private static readonly DEFAULT_STUDIO_URL = 'app.tokens.studio';
 
@@ -632,51 +635,60 @@ export class OAuthService {
     const tokenUrl = config?.oauth?.token_endpoint || `${apiBaseUrl}/oauth/token`;
     const clientId = config?.oauth?.client_id || this.DEFAULT_CLIENT_ID;
 
-    let response: Response;
+    // Startup waits on this refresh, so a hung endpoint must not keep the plugin loading forever.
+    // An aborted request reads as a network error, which is transient: the session is kept.
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), REFRESH_TIMEOUT_MS);
     try {
-      response = await fetch(tokenUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          grant_type: 'refresh_token',
-          refresh_token: refreshToken,
-          client_id: clientId,
-        }),
-      });
-    } catch (error) {
-      console.error('Error refreshing tokens:', error);
-      throw new Error('Failed to refresh access tokens: network error');
-    }
-
-    if (!response.ok) {
-      // Keep the OAuth error code (e.g. invalid_grant) in the message: classifyError
-      // reads it to decide whether the sign-in is over or the failure is transient.
-      let errorData: { error?: string; error_description?: string } = {};
+      let response: Response;
       try {
-        errorData = await response.json();
-      } catch (e) {
-        // ignore parsing error
+        response = await fetch(tokenUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({
+            grant_type: 'refresh_token',
+            refresh_token: refreshToken,
+            client_id: clientId,
+          }),
+          signal: controller.signal,
+        });
+      } catch (error) {
+        console.error('Error refreshing tokens:', error);
+        throw new Error('Failed to refresh access tokens: network error');
       }
-      const reason = [errorData.error, errorData.error_description].filter(Boolean).join(': ');
-      throw new Error(`Token refresh failed: ${response.status}${reason ? ` ${reason}` : ''}`);
-    }
 
-    let tokenData: TokenResponse;
-    try {
-      tokenData = await response.json();
-    } catch (error) {
-      console.error('Error reading refreshed tokens:', error);
-      throw new Error('Token refresh failed: invalid response body');
-    }
+      if (!response.ok) {
+        // Keep the OAuth error code (e.g. invalid_grant) in the message: classifyError
+        // reads it to decide whether the sign-in is over or the failure is transient.
+        let errorData: { error?: string; error_description?: string } = {};
+        try {
+          errorData = await response.json();
+        } catch (e) {
+          // ignore parsing error
+        }
+        const reason = [errorData.error, errorData.error_description].filter(Boolean).join(': ');
+        throw new Error(`Token refresh failed: ${response.status}${reason ? ` ${reason}` : ''}`);
+      }
 
-    return {
-      accessToken: tokenData.access_token,
-      refreshToken: tokenData.refresh_token,
-      tokenType: tokenData.token_type,
-      expiresAt: Date.now() + tokenData.expires_in * 1000,
-    };
+      let tokenData: TokenResponse;
+      try {
+        tokenData = await response.json();
+      } catch (error) {
+        console.error('Error reading refreshed tokens:', error);
+        throw new Error('Token refresh failed: invalid response body');
+      }
+
+      return {
+        accessToken: tokenData.access_token,
+        refreshToken: tokenData.refresh_token,
+        tokenType: tokenData.token_type,
+        expiresAt: Date.now() + tokenData.expires_in * 1000,
+      };
+    } finally {
+      clearTimeout(timeout);
+    }
   }
 
   /**

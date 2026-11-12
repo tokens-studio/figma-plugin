@@ -12,7 +12,7 @@ import Text from './Text';
 import Callout from './Callout';
 import { Dispatch } from '../store';
 import {
-  apiProvidersSelector, storageTypeSelector, lastErrorSelector, themeOptionsSelector, activeThemeSelector,
+  apiProvidersSelector, storageTypeSelector, lastErrorSelector, themeOptionsSelector, activeThemeSelector, apiSelector,
 } from '@/selectors';
 import Stack from './Stack';
 import { styled } from '@/stitches.config';
@@ -46,13 +46,14 @@ const HelpfulLink = styled('a', {
 function StartScreen() {
   const dispatch = useDispatch<Dispatch>();
   const { t } = useTranslation(['startScreen']);
-  const { restoreStoredProvider, restoreProviderWithAutoPull } = useRemoteTokens();
+  const { restoreStoredProvider, restoreProviderWithAutoPull, pullTokens } = useRemoteTokens();
 
   const storageType = useSelector(storageTypeSelector);
   const apiProviders = useSelector(apiProvidersSelector);
   const lastError = useSelector(lastErrorSelector);
   const availableThemes = useSelector(themeOptionsSelector);
   const activeTheme = useSelector(activeThemeSelector);
+  const api = useSelector(apiSelector);
 
   // Local loading state for provider selection
   const [isLoadingProvider, setIsLoadingProvider] = React.useState(false);
@@ -92,6 +93,19 @@ function StartScreen() {
     dispatch.uiState.setLastError(null);
     dispatch.uiState.setActiveTab(Tabs.SUBSCRIPTION);
   }, [dispatch.uiState]);
+
+  // Pulls the file's Studio project again. A failed pull stores its own error (with its code), so the
+  // screen updates in place; a successful one opens the tokens.
+  const onRetryTokensStudio = React.useCallback(async () => {
+    dispatch.uiState.setLastError(null);
+    setIsLoadingProvider(true);
+    try {
+      const result = await pullTokens({ context: api, updateLocalTokens: true });
+      if (result?.status === 'success') dispatch.uiState.setActiveTab(Tabs.TOKENS);
+    } finally {
+      setIsLoadingProvider(false);
+    }
+  }, [api, dispatch.uiState, pullTokens]);
 
   const onProviderSelect = React.useCallback(async (providerId: string) => {
     const selectedProvider = apiProviders.find((provider) => provider.internalId === providerId);
@@ -232,7 +246,12 @@ function StartScreen() {
                 text: t('retry'),
               } : undefined}
             >
-              {/* The Subscription tab can't help with a variables project or a lost connection. */}
+              {/* The Subscription tab can't help with a variables project or a lost connection: offer a retry. */}
+              {isTokensStudioOAuth && (lastError?.code === VARIABLES_SOURCE_OF_TRUTH || lastError?.type === 'connectivity') && (
+                <Button size="small" variant="primary" onClick={onRetryTokensStudio}>
+                  {t('retry')}
+                </Button>
+              )}
               {isTokensStudioOAuth && lastError?.code !== VARIABLES_SOURCE_OF_TRUTH && lastError?.type !== 'connectivity' && (
                 <Button
                   size="small"

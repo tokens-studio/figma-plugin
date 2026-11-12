@@ -445,6 +445,45 @@ describe('pullTokensFactory', () => {
     expect(mockUseRemoteTokens.pullTokens).toBeCalledTimes(1);
   });
 
+  it('keeps the error code of a failed Studio OAuth pull, so the start screen can offer a fresh sign-in', async () => {
+    const mockOAuthStorageType = {
+      id: 'my-project',
+      internalId: 'my-project',
+      name: 'Tokens Studio OAuth',
+      provider: StorageProviderType.TOKENS_STUDIO_OAUTH,
+    } as StorageType;
+    const mockStore = createMockStore({
+      uiState: {
+        storageType: mockOAuthStorageType,
+      },
+    });
+    const mockParams = {
+      localTokenData: { checkForChanges: false, values: {} },
+      oauthTokens: {
+        accessToken: 'token', refreshToken: 'refresh', tokenType: 'Bearer', expiresAt: Date.now() + 60 * 60 * 1000,
+      },
+    } as unknown as StartupMessage;
+
+    mockFetchBranches.mockResolvedValueOnce(['main']);
+    mockPullTokens.mockResolvedValueOnce({
+      status: 'failure',
+      errorType: 'credential',
+      errorHeader: 'Your Tokens Studio sign-in has ended',
+      errorMessage: 'Sign in to Tokens Studio again to keep syncing this file.',
+      errorCode: 'signInRequired',
+    });
+
+    await pullTokensFactory(mockStore, mockStore.dispatch, mockParams, mockUseConfirm, mockUseRemoteTokens)();
+
+    expect(mockStore.getState().uiState.lastError).toEqual({
+      type: 'credential',
+      header: 'Your Tokens Studio sign-in has ended',
+      message: 'Sign in to Tokens Studio again to keep syncing this file.',
+      code: 'signInRequired',
+    });
+    expect(mockStore.getState().uiState.activeTab).toBe(Tabs.START);
+  });
+
   it('should categorize JSON parsing errors correctly', () => {
     const jsonError = new SyntaxError('Unexpected token } in JSON at position 10');
 

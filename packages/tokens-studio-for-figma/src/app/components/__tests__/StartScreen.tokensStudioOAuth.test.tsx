@@ -1,18 +1,21 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import {
-  render, screen, fireEvent, createMockStore,
+  render, screen, fireEvent, waitFor, createMockStore,
 } from '../../../../tests/config/setupTest';
 import StartScreen from '../StartScreen';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { Tabs } from '@/constants/Tabs';
 import { SIGN_IN_REQUIRED, VARIABLES_SOURCE_OF_TRUTH } from '@/app/store/providers/tokens-studio/studioAuth';
 
+const mockPullTokens = jest.fn();
+
 jest.mock('@/app/store/remoteTokens', () => ({
   __esModule: true,
   default: () => ({
     restoreStoredProvider: jest.fn(),
     restoreProviderWithAutoPull: jest.fn(),
+    pullTokens: mockPullTokens,
   }),
 }));
 
@@ -62,7 +65,11 @@ describe('StartScreen with Tokens Studio OAuth', () => {
     expect(screen.getByRole('button', { name: /goToSubscription|Go to Subscription/ })).toBeInTheDocument();
   });
 
-  it('shows no button for a project that syncs Figma variables', () => {
+  beforeEach(() => {
+    mockPullTokens.mockReset();
+  });
+
+  it('offers a retry instead of the Subscription tab for a project that syncs Figma variables', () => {
     renderWithError({
       type: 'other',
       header: 'Could not load tokens',
@@ -72,9 +79,39 @@ describe('StartScreen with Tokens Studio OAuth', () => {
 
     expect(screen.getByText('This project syncs Figma variables, it cannot be pulled as tokens.')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /goToSubscription|Go to Subscription|signInAgain|Sign in to Tokens Studio again/ })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /retry/i })).toBeInTheDocument();
   });
 
-  it('shows no button for a connection error', () => {
+  it('retries a connection error and opens the tokens when the pull works', async () => {
+    mockPullTokens.mockResolvedValue({ status: 'success' });
+    const store = renderWithError({
+      type: 'connectivity',
+      header: 'Could not load tokens from Tokens Studio',
+      message: 'Could not renew your Tokens Studio sign-in. Check your connection and try again.',
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: /retry/i }));
+
+    await waitFor(() => expect(store.getState().uiState.activeTab).toBe(Tabs.TOKENS));
+    expect(mockPullTokens).toHaveBeenCalledWith(expect.objectContaining({ updateLocalTokens: true }));
+  });
+
+  it('stays on the start screen when the retry fails again', async () => {
+    mockPullTokens.mockResolvedValue({ status: 'failure', errorMessage: 'still offline' });
+    const store = renderWithError({
+      type: 'connectivity',
+      header: 'Could not load tokens from Tokens Studio',
+      message: 'Could not renew your Tokens Studio sign-in. Check your connection and try again.',
+    });
+    const tabBefore = store.getState().uiState.activeTab;
+
+    fireEvent.click(screen.getByRole('button', { name: /retry/i }));
+
+    await waitFor(() => expect(mockPullTokens).toHaveBeenCalledTimes(1));
+    expect(store.getState().uiState.activeTab).toBe(tabBefore);
+  });
+
+  it('shows no Subscription button for a connection error', () => {
     renderWithError({
       type: 'connectivity',
       header: 'Could not load tokens from Tokens Studio',

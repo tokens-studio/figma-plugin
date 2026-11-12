@@ -38,7 +38,8 @@ export async function getStudioAccessToken(): Promise<string> {
 
 /**
  * Runs a Tokens Studio REST request with a live access token: refreshes first when
- * the stored token is (nearly) expired, and once more if the API still answers 401.
+ * the stored token is (nearly) expired, and once more if the API still answers 401. A 401 after
+ * that signs out.
  * A refused refresh (invalid_grant) logs the user out and surfaces as a RefreshError.
  */
 export async function withStudioAuth<T>(request: (accessToken: string) => Promise<T>): Promise<T> {
@@ -47,7 +48,14 @@ export async function withStudioAuth<T>(request: (accessToken: string) => Promis
     return await request(accessToken);
   } catch (error) {
     if (!(error instanceof StudioApiError) || error.status !== 401) throw error;
-    return request(await refreshedAccessToken(accessToken));
+  }
+  try {
+    return await request(await refreshedAccessToken(accessToken));
+  } catch (error) {
+    // A renewed token refused too means the server ended the sign-in: sign out here as well,
+    // so the Subscription tab offers a fresh sign-in.
+    if (error instanceof StudioApiError && error.status === 401) await useAuthStore.getState().logout();
+    throw error;
   }
 }
 
