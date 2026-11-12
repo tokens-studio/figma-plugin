@@ -24,6 +24,7 @@ import { useGetActiveState } from '@/hooks';
 import { usePropertiesForTokenType } from '../../hooks/usePropertiesForType';
 import { getAliasValue } from '@/utils/alias';
 import { MoreButtonMenuItems } from './MoreButtonMenuItems';
+import { contextMenuContentCss } from '../contextMenuContentCss';
 
 // @TODO typing
 
@@ -136,7 +137,12 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
         <TokenButtonContent type={type} active={active} onClick={handleTokenClick} token={token} />
       </ContextMenu.Trigger>
       <ContextMenu.Portal>
-        <ContextMenu.Content alignOffset={5} collisionPadding={30} onCloseAutoFocus={handleCloseAutoFocus}>
+        <ContextMenu.Content
+          alignOffset={5}
+          collisionPadding={30}
+          onCloseAutoFocus={handleCloseAutoFocus}
+          css={contextMenuContentCss}
+        >
           <MoreButtonMenuItems
             token={token}
             visibleProperties={visibleProperties}
