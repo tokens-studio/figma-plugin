@@ -6,6 +6,7 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { LicenseStatus } from '@/constants/LicenseStatus';
 import * as userStateReducers from './reducers/userState';
+import type { LegacyOnlyLicense } from '@/utils/licenseApi';
 
 export enum AddLicenseSource {
   INITAL_LOAD,
@@ -27,6 +28,9 @@ export interface UserState {
   usedEmail: string | undefined;
   tokensStudioPAT: string | null;
   isFigmaEnterprise: boolean;
+  // MIGRATION: set when the last validation only passed on the legacy license host after Studio rejected the key.
+  // Drives the "Sign in to keep Pro" notice. Remove with the legacy host.
+  legacyOnlyLicense: LegacyOnlyLicense | null;
 }
 
 interface LicenseDetails {
@@ -51,6 +55,7 @@ export const userState = createModel<RootModel>()({
     },
     tokensStudioPAT: null,
     isFigmaEnterprise: false,
+    legacyOnlyLicense: null,
   } as UserState,
   reducers: {
     setUserId(state, payload: string | null) {
@@ -101,6 +106,12 @@ export const userState = createModel<RootModel>()({
         isFigmaEnterprise: payload,
       };
     },
+    setLegacyOnlyLicense(state, payload: LegacyOnlyLicense | null) {
+      return {
+        ...state,
+        legacyOnlyLicense: payload,
+      };
+    },
     ...userStateReducers,
   },
   effects: (dispatch) => ({
@@ -127,6 +138,7 @@ export const userState = createModel<RootModel>()({
       dispatch.userState.setInitialLoad(true);
       dispatch.userState.setLicenseKey(undefined);
       dispatch.userState.setLicenseError(undefined);
+      dispatch.userState.setLegacyOnlyLicense(null);
       dispatch.userState.setLicenseDetails({
         plan: '',
         entitlements: [],

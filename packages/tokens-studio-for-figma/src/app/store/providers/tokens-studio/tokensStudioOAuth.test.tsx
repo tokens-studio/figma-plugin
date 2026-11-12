@@ -13,6 +13,8 @@ import { StudioApiError } from '@/utils/tokensStudio/StudioApiError';
 import { fetchBranches } from '@/utils/tokensStudio/fetchBranchesListRest';
 import { RefreshError } from '@/app/services/RefreshError';
 import { SIGN_IN_REQUIRED, VARIABLES_SOURCE_OF_TRUTH } from './studioAuth';
+import { StorageProviderType } from '@/constants/StorageProviderType';
+import { fetchChangeSetIdForBranch } from '@/utils/tokensStudio/fetchBranchesListRest';
 
 jest.mock('@/utils/tokensStudio/fetchProjectDataRest', () => ({
   fetchProjectDataRest: jest.fn(),
@@ -20,7 +22,7 @@ jest.mock('@/utils/tokensStudio/fetchProjectDataRest', () => ({
 
 jest.mock('@/utils/tokensStudio/fetchBranchesListRest', () => ({
   ...jest.requireActual('@/utils/tokensStudio/fetchBranchesListRest'),
-  fetchBranches: jest.fn(),
+  fetchChangeSetIdForBranch: jest.fn(),
 }));
 
 jest.mock('@/plugin/notifiers', () => ({
@@ -104,6 +106,39 @@ describe('useTokensStudioOAuth loadProjectTokens', () => {
   });
 });
 
+describe('pushToTokensStudioOAuth resolving a missing change set', () => {
+  const branchA = { provider: StorageProviderType.TOKENS_STUDIO_OAUTH, id: 'project-1', branch: 'a' } as any;
+  const branchB = { ...branchA, branch: 'b', changeSetId: 'change-set-b' };
+
+  beforeEach(() => {
+    useAuthStore.setState({
+      oauthTokens: {
+        accessToken: 'token', refreshToken: 'refresh', tokenType: 'Bearer', expiresAt: Date.now() + 60 * 60 * 1000,
+      },
+    });
+    store.dispatch.uiState.setApiData(branchA);
+  });
+
+  it('stores the resolved change set for the branch that is still active', async () => {
+    jest.mocked(fetchChangeSetIdForBranch).mockResolvedValue('change-set-a');
+
+    await pushToTokensStudioOAuth({ context: branchA, action: 'DELETE_THEME', data: {} });
+
+    expect(store.getState().uiState.api).toMatchObject({ branch: 'a', changeSetId: 'change-set-a' });
+  });
+
+  it('does not revert a branch switch that happened while it resolved', async () => {
+    jest.mocked(fetchChangeSetIdForBranch).mockImplementation(async () => {
+      store.dispatch.uiState.setApiData(branchB);
+      return 'change-set-a';
+    });
+
+    await pushToTokensStudioOAuth({ context: branchA, action: 'DELETE_THEME', data: {} });
+
+    expect(store.getState().uiState.api).toMatchObject({ branch: 'b', changeSetId: 'change-set-b' });
+  });
+});
+
 describe('pushToTokensStudioOAuth CREATE_THEME_GROUP', () => {
   const context = { id: 'project-1', branch: 'main', changeSetId: 'change-set-1' } as any;
   const limitRefusal = () => new RestApiError(422, 'Your plan includes 1 theme group. Upgrade to add more.', 'theme_group_limit_reached');
@@ -116,6 +151,16 @@ describe('pushToTokensStudioOAuth CREATE_THEME_GROUP', () => {
         accessToken: 'token', refreshToken: 'refresh', tokenType: 'Bearer', expiresAt: Date.now() + 60 * 60 * 1000,
       },
     });
+  });
+
+  it('reports a saved change unless the caller reports it instead', async () => {
+    jest.mocked(createThemeGroupRest).mockResolvedValue({ data: { id: 'group-1' } } as any);
+
+    await pushToTokensStudioOAuth({ context, action: 'CREATE_THEME_GROUP', data: { name: 'Colors' }, notifyOnSuccess: false });
+    expect(notifyToUI).not.toHaveBeenCalled();
+
+    await pushToTokensStudioOAuth({ context, action: 'CREATE_THEME_GROUP', data: { name: 'Colors' } });
+    expect(notifyToUI).toHaveBeenCalledWith('Created theme group to Tokens Studio');
   });
 
   it('reads a name clash as "already there" and returns null', async () => {

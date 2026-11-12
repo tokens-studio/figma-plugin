@@ -56,6 +56,8 @@ interface PushToTokensStudioOAuth {
   // Throw API failures instead of notifying and returning null, so the caller can report them in its
   // own terms and undo whatever it applied locally.
   rethrowErrors?: boolean;
+  // False when the caller reports the outcome of several writes in one message.
+  notifyOnSuccess?: boolean;
 }
 
 const ACTION_LABELS: Record<string, string> = {
@@ -75,7 +77,7 @@ const ACTION_LABELS: Record<string, string> = {
 };
 
 export const pushToTokensStudioOAuth = async ({
-  context, action, data, successCallback, rethrowErrors,
+  context, action, data, successCallback, rethrowErrors, notifyOnSuccess = true,
 }: PushToTokensStudioOAuth) => {
   const { oauthTokens } = useAuthStore.getState();
   if (!oauthTokens?.accessToken) return null;
@@ -115,7 +117,11 @@ export const pushToTokensStudioOAuth = async ({
       return null;
     }
     changeSetId = resolved;
-    store.dispatch.uiState.setApiData({ ...context, changeSetId });
+    // The user can switch branch during the fetch. Writing `context` back would then undo the switch.
+    const liveApi = store.getState().uiState.api as TokensStudioOAuthCredentials | null;
+    if (liveApi?.id === projectId && liveApi?.branch === branch) {
+      store.dispatch.uiState.setApiData({ ...context, changeSetId });
+    }
   }
   let result: any;
 
@@ -202,7 +208,7 @@ export const pushToTokensStudioOAuth = async ({
         console.warn('Unknown REST action', action);
     }
     // Removing an empty group is housekeeping after another change; it gets no message of its own.
-    if (result && action !== 'DELETE_THEME_GROUP_IF_EMPTY') {
+    if (result && notifyOnSuccess && action !== 'DELETE_THEME_GROUP_IF_EMPTY') {
       const actionLabel = ACTION_LABELS[action] || 'Synced change';
       notifyToUI(`${actionLabel} to Tokens Studio`);
     }
