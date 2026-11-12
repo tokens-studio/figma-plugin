@@ -35,6 +35,16 @@ describe('Footer', () => {
     });
   });
 
+  it('shows Gitea branch and sync controls', async () => {
+    const { getByTestId, getByText } = render(<Footer />, { store });
+    store.dispatch.uiState.setLocalApiState({ provider: StorageProviderType.GITEA, branch: 'gitea-branch', filePath: 'tokens.json' });
+    await waitFor(() => {
+      expect(getByText('gitea-branch')).toBeInTheDocument();
+      expect(getByTestId('footer-pull-button')).toBeInTheDocument();
+      expect(getByTestId('footer-push-button')).toBeInTheDocument();
+    });
+  });
+
   it('disables push button when user is not able to push', async () => {
     const { getByTestId } = render(<Footer />, { store });
     store.dispatch.uiState.setLocalApiState({ provider: StorageProviderType.GITHUB, branch: 'test-branch' });

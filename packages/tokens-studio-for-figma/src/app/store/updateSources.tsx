@@ -109,6 +109,7 @@ async function updateRemoteTokens({
     case StorageProviderType.GITHUB: {
       break;
     }
+    case StorageProviderType.GITEA:
     case StorageProviderType.GITLAB: {
       break;
     }

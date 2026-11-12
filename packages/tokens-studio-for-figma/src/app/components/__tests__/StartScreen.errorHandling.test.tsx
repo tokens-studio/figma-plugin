@@ -1,4 +1,5 @@
 import React from 'react';
+import { fireEvent } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { render, screen, createMockStore } from '../../../../tests/config/setupTest';
 import StartScreen from '../StartScreen';
@@ -164,5 +165,46 @@ describe('StartScreen Error Handling', () => {
 
     // Should show the default error message
     expect(screen.getByText(/unableToFetchRemoteNoCredentials/)).toBeInTheDocument();
+  });
+});
+
+describe('StartScreen credential scopes', () => {
+  const credential = {
+    provider: StorageProviderType.GITEA,
+    internalId: 'same-id',
+    id: 'owner/repo',
+    name: 'Gitea',
+    baseUrl: 'https://git.example.com/gitea',
+    branch: 'main',
+    filePath: 'tokens.json',
+    secret: 'saved-pat',
+  };
+
+  it.each(['https://other.example.com/gitea', 'https://git.example.com/other'])('does not reuse a saved PAT when the document installation changes to %s', (baseUrl) => {
+    const { secret, ...configuration } = credential;
+    const store = createMockStore({
+      uiState: {
+        storageType: { ...configuration, baseUrl }, apiProviders: [credential], lastError: null,
+      },
+    });
+    render(<Provider store={store}><StartScreen /></Provider>);
+    expect(screen.queryByText('retry')).not.toBeInTheDocument();
+    expect(screen.getByText('unableToFetchRemoteNoCredentials')).toBeInTheDocument();
+    fireEvent.click(screen.getByText('enterCredentials'));
+    expect(store.getState().uiState.localApiState).not.toHaveProperty('secret');
+    expect(store.getState().uiState.localApiState).toMatchObject({ baseUrl, new: true });
+  });
+
+  it('allows retry with credentials bound to the document installation', () => {
+    const { secret, ...configuration } = credential;
+    const store = createMockStore({
+      uiState: {
+        storageType: configuration, apiProviders: [credential], lastError: null,
+      },
+    });
+    render(<Provider store={store}><StartScreen /></Provider>);
+    expect(screen.getByText('retry')).toBeInTheDocument();
+    fireEvent.click(screen.getByText('enterCredentials'));
+    expect(store.getState().uiState.localApiState).toMatchObject({ secret });
   });
 });

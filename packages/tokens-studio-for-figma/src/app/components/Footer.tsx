@@ -129,6 +129,7 @@ export default function Footer() {
         )}
         {storageType.provider !== StorageProviderType.LOCAL
           && storageType.provider !== StorageProviderType.GITHUB
+          && storageType.provider !== StorageProviderType.GITEA
           && storageType.provider !== StorageProviderType.GITLAB
           && storageType.provider !== StorageProviderType.ADO
           && storageType.provider !== StorageProviderType.BITBUCKET

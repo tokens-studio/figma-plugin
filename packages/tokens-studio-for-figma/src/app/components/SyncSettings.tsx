@@ -44,6 +44,10 @@ const SyncSettings = () => {
       type: StorageProviderType.GITHUB,
     },
     {
+      text: 'Gitea',
+      type: StorageProviderType.GITEA,
+    },
+    {
       text: 'GitLab',
       type: StorageProviderType.GITLAB,
     },

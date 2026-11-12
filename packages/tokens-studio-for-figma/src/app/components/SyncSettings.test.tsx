@@ -58,6 +58,20 @@ describe('ConfirmDialog', () => {
     expect(result.queryByText('localDocument')).toBeInTheDocument();
   });
 
+  it('offers Gitea with a masked token and administrator setup guidance', async () => {
+    const mockStore = createMockStore(defaultStore);
+    const result = render(<Provider store={mockStore}><SyncSettings /></Provider>);
+    await act(async () => { await userEvent.click(result.getByTestId('add-storage-item-button')); });
+    await act(async () => { await userEvent.click(await result.findByTestId('add-Gitea-credential')); });
+    expect(result.getByLabelText('pat')).toHaveAttribute('type', 'password');
+    expect(result.getByLabelText('providers.gitea.serverUrl')).toBeRequired();
+    expect(result.getByText('providers.gitea.cors')).toBeInTheDocument();
+    expect(result.getByText('providers.gitea.readMore')).toHaveAttribute(
+      'href',
+      'https://docs.tokens.studio/token-storage/remote/sync-git-gitea?ref=addprovider',
+    );
+  });
+
   it('can convert to localStorage', async () => {
     const mockStore = createMockStore(defaultStore);
     mockConfirm.mockImplementationOnce(() => (

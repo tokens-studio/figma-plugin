@@ -1,16 +1,20 @@
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageType, StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
+import { hasSameCredentialScope, matchesCredentialById } from './credentialIdentity';
 
 function isSameCredentials(
   credential: StorageTypeCredentials,
   stored: StorageType | StorageTypeFormValues<false>,
 ): boolean {
+  if (!hasSameCredentialScope(credential, stored)) return false;
+
   // If the internalId is present, we use it to check for equality
   if (stored.provider !== StorageProviderType.LOCAL && credential.internalId && stored.internalId) {
-    return credential.internalId === stored.internalId;
+    return matchesCredentialById(credential, stored);
   }
 
   switch (stored.provider) {
+    case StorageProviderType.GITEA:
     case StorageProviderType.GITHUB:
     case StorageProviderType.GITLAB:
     case StorageProviderType.ADO:
