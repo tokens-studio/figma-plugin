@@ -393,6 +393,55 @@ describe('updateVariables', () => {
     expect(mockSetValueForMode).toHaveBeenCalledWith('1:0', 24);
   });
 
+  it('falls back to the @system.baseFontSize token when the base font size setting is empty', async () => {
+    mockSetValueForMode.mockClear();
+
+    const iconSizeVariable = {
+      name: 'icon/size/small',
+      variableCollectionId: 'VariableCollectionId:1:0',
+      resolvedType: 'FLOAT',
+      setValueForMode: mockSetValueForMode,
+      id: 'VariableID:1:icon',
+      key: 'VariableID:1:icon',
+      description: '',
+      valuesByMode: { '1:0': 0 },
+      remote: false,
+      remove: jest.fn(),
+    };
+
+    figma.variables.createVariable = jest.fn().mockImplementation((name) => (
+      name === 'icon/size/small' ? iconSizeVariable : newVariable
+    ));
+    figma.variables.getLocalVariables = jest.fn().mockReturnValue([]);
+
+    const theme = {
+      id: 'ThemeId:system',
+      name: 'System',
+      group: 'Test group',
+      selectedTokenSets: { core: TokenSetStatus.ENABLED },
+    };
+
+    const tokens = {
+      core: [
+        { name: '@system.baseFontSize', value: '14px', type: TokenTypes.DIMENSION },
+        { name: 'icon.size.small', value: '1rem', type: TokenTypes.SIZING },
+      ],
+    };
+
+    await updateVariables({
+      collection: { id: 'VariableCollectionId:1:0' } as any,
+      mode: '1:0',
+      theme,
+      tokens,
+      settings: { ...settings, baseFontSize: '', aliasBaseFontSize: '' },
+      overallConfig: { core: TokenSetStatus.ENABLED },
+    });
+
+    // 1rem * 14 = 14, not 16
+    expect(iconSizeVariable.setValueForMode).toHaveBeenCalledWith('1:0', 14);
+    expect(mockSetValueForMode).not.toHaveBeenCalledWith('1:0', 16);
+  });
+
   it('should apply different baseFontSize for different modes in the same collection', async () => {
     mockSetValueForMode.mockClear();
     const mockSpacingSetValueForMode = jest.fn();
