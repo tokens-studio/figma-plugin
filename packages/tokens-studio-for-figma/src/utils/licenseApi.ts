@@ -94,6 +94,39 @@ async function attemptHost<T>(
   }
 }
 
+/**
+ * A key that only validates through the legacy host because Studio has no
+ * record of it, as opposed to Studio being unreachable or failing.
+ */
+export type LegacyOnlyLicense = {
+  primaryStatus: 404;
+  primaryReason: 'status';
+};
+
+/**
+ * MIGRATION: true when Studio answered 404 ("No license was found") and the
+ * legacy host then validated the key. Studio's /validate-license only uses
+ * 404 for a key it doesn't hold (never imported, or released when its owner
+ * took a seat with their account). Every other rejection there is a 500, the
+ * same status as a server error, so a 500 (or 429, 502, ...) can't be told
+ * apart from an outage and is excluded. The legacy host still validating the
+ * key is the gate. These users keep Pro only until the legacy host is switched
+ * off; signing in with their Tokens Studio account fixes it.
+ *
+ * Also excludes a Studio timeout or transport error (sending users who can't
+ * reach Studio to a sign-in that also goes to Studio wouldn't help), 'parse'
+ * (a 404 without a readable JSON body, e.g. a proxy page) and 'incomplete'
+ * (a 200). Remove with the legacy host.
+ */
+export function getLegacyOnlyLicense(attempts: LicenseApiAttempt[]): LegacyOnlyLicense | null {
+  if (attempts.length < 2) return null;
+  const primary = attempts[0];
+  const resolved = attempts[attempts.length - 1];
+  if (primary.reason !== 'status' || primary.status !== 404) return null;
+  if (resolved.reason !== null) return null;
+  return { primaryStatus: 404, primaryReason: 'status' };
+}
+
 function reportFallback(endpoint: string, attempts: LicenseApiAttempt[], figmaId?: string | null) {
   const [primary, fallback] = attempts;
   // The cutover signal: the primary could not answer and the legacy host
