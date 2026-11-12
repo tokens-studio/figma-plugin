@@ -17,6 +17,9 @@ import { replay } from '@/app/sentry';
 import { sessionRecordingSelector } from '@/selectors/sessionRecordingSelector';
 import { ExplainerModal } from '../ExplainerModal';
 import { Tabs } from '@/constants/Tabs';
+import { docUrls } from '@/constants/docUrls';
+import { DocsRef } from '@/constants/DocsRef';
+import { withDocsRef } from '@/utils/withDocsRef';
 
 // TODO: expose types from @tokens-studio/ui/checkbox
 type CheckedState = boolean | 'indeterminate';
@@ -27,7 +30,7 @@ function Settings() {
   const onboardingData = {
     title: t('whereTokensStored'),
     text: t('whereTokensStoredOnboarding'),
-    url: 'https://docs.tokens.studio/token-storage/remote?ref=onboarding_explainer_syncproviders',
+    url: withDocsRef(docUrls.remoteStorage, DocsRef.ONBOARDING_EXPLAINER_SYNC_PROVIDERS),
   };
 
   const uiState = useSelector(uiStateSelector);

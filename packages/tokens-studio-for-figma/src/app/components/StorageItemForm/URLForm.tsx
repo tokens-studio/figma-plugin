@@ -6,6 +6,9 @@ import {
 } from '@tokens-studio/ui';
 import { EyeClosedIcon, EyeOpenIcon } from '@radix-ui/react-icons';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import { docUrls } from '@/constants/docUrls';
+import { DocsRef } from '@/constants/DocsRef';
+import { withDocsRef } from '@/utils/withDocsRef';
 import { StorageTypeFormValues } from '@/types/StorageType';
 import { generateId } from '@/utils/generateId';
 import { ChangeEventHandler } from './types';
@@ -61,7 +64,7 @@ export default function URLForm({
       <Stack direction="column" gap={5}>
         <Text muted>{t('providers.url.description')}</Text>
         <Text muted css={{ marginTop: '$2' }}>
-          <Link href="https://docs.tokens.studio/token-storage/remote/sync-server-url?ref=addprovider" target="_blank" rel="noreferrer">
+          <Link href={withDocsRef(docUrls.syncProviders[StorageProviderType.URL], DocsRef.ADD_PROVIDER)} target="_blank" rel="noreferrer">
             {t('providers.url.readMore')}
           </Link>
         </Text>

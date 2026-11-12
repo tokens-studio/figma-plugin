@@ -16,7 +16,9 @@ import OnboardingExplainer from '../OnboardingExplainer';
 import { Dispatch } from '../../store';
 
 import { allTokenSetsSelector, usedTokenSetSelector } from '@/selectors';
-import { docsLinks } from './docsLinks';
+import { docUrls } from '@/constants/docUrls';
+import { DocsRef } from '@/constants/DocsRef';
+import { withDocsRef } from '@/utils/withDocsRef';
 import { RootState } from '@/app/store';
 import { tokenSetListToTree, TreeItem } from '@/utils/tokenset';
 import { TokenSetThemeItem } from '../ManageThemesModal/TokenSetThemeItem';
@@ -171,7 +173,7 @@ export default function ExportSetsTab({ selectedSets, setSelectedSets }: { selec
                 data={{
                   text: t('exportSetsTab.intro'),
                   title: t('exportSetsTab.confirmSets'),
-                  url: docsLinks.stylesAndVariables,
+                  url: withDocsRef(docUrls.exportTokenSets, DocsRef.ONBOARDING_EXPLAINER_EXPORT_SETS),
                 }}
                 closeOnboarding={closeOnboarding}
               />
@@ -180,7 +182,7 @@ export default function ExportSetsTab({ selectedSets, setSelectedSets }: { selec
                 <Heading>{t('exportSetsTab.confirmSets')}</Heading>
                 <ExplainerModal title={t('exportSetsTab.confirmSets')}>
                   {t('exportSetsTab.intro')}
-                  {/* Commenting out until we have those docs ready <Link target="_blank" href={docsLinks.stylesAndVariables}>{`${t('generic.learnMore')} – ${t('docs.stylesAndVariables')}`}</Link> */}
+                  {/* Commenting out until we have those docs ready <Link target="_blank" href={docUrls.exportToFigma}>{`${t('generic.learnMore')} – ${t('docs.stylesAndVariables')}`}</Link> */}
                 </ExplainerModal>
               </Stack>
             )}
@@ -233,7 +235,7 @@ export default function ExportSetsTab({ selectedSets, setSelectedSets }: { selec
             autofocus
           />
         </Stack>
-        {/* Commenting until we have docs <Link target="_blank" href={docsLinks.sets}>{`${t('generic.learnMore')} – ${t('docs.referenceOnlyMode')}`}</Link> */}
+        {/* Commenting until we have docs <Link target="_blank" href={docUrls.exportTokenSets}>{`${t('generic.learnMore')} – ${t('docs.referenceOnlyMode')}`}</Link> */}
         <Stack
           direction="column"
           gap={1}

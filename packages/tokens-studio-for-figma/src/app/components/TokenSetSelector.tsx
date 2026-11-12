@@ -15,6 +15,9 @@ import {
   editProhibitedSelector, tokensSelector, uiStateSelector,
 } from '@/selectors';
 import OnboardingExplainer from './OnboardingExplainer';
+import { docUrls } from '@/constants/docUrls';
+import { DocsRef } from '@/constants/DocsRef';
+import { withDocsRef } from '@/utils/withDocsRef';
 
 export default function TokenSetSelector({ saveScrollPositionSet }: { saveScrollPositionSet: (tokenSet: string) => void }) {
   const { t } = useTranslation(['tokens']);
@@ -22,7 +25,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
   const onboardingData = {
     title: t('sets.title'),
     text: t('sets.description'),
-    url: 'https://docs.tokens.studio/manage-tokens/token-sets?ref=onboarding_explainer_sets',
+    url: withDocsRef(docUrls.tokenSets, DocsRef.ONBOARDING_EXPLAINER_SETS),
   };
 
   const tokens = useSelector(tokensSelector);

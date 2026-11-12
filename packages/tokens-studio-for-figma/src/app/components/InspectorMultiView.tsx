@@ -15,6 +15,9 @@ import { Properties } from '@/constants/Properties';
 import { SelectionGroup } from '@/types';
 import { NodeInfo } from '@/types/NodeInfo';
 import { StyleIdBackupKeys } from '@/constants/StyleIdBackupKeys';
+import { docUrls } from '@/constants/docUrls';
+import { DocsRef } from '@/constants/DocsRef';
+import { withDocsRef } from '@/utils/withDocsRef';
 import OnboardingExplainer from './OnboardingExplainer';
 import BulkRemapModal from './modals/BulkRemapModal';
 
@@ -24,7 +27,7 @@ export default function InspectorMultiView({ resolvedTokens, tokenToSearch }: { 
   const onboardingData = {
     title: t('inspect'),
     text: t('inspectOnboard'),
-    url: 'https://docs.tokens.studio/debug/inspect-tokens?ref=onboarding_explainer_inspect',
+    url: withDocsRef(docUrls.inspectTokens, DocsRef.ONBOARDING_EXPLAINER_INSPECT),
   };
 
   const inspectState = useSelector(inspectStateSelector, isEqual);
