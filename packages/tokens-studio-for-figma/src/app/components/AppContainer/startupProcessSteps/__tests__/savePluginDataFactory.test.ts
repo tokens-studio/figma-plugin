@@ -72,8 +72,41 @@ describe('savePluginDataFactory', () => {
       useAuthStore.setState({
         activeOrganizationId: null,
         fetchUserData: mockFetchUserData,
-        setOAuthTokens: jest.fn(),
+        setOAuthTokens: jest.fn(async (oauthTokens) => useAuthStore.setState({ oauthTokens })),
       });
+    });
+
+    it('refreshes an expired sign-in before handing the new tokens to fetchUserData', async () => {
+      const refreshed = {
+        accessToken: 'new-token', refreshToken: 'new-refresh', tokenType: 'Bearer', expiresAt: Date.now() + 24 * 60 * 60 * 1000,
+      };
+      const refreshTokens = jest.fn(async () => useAuthStore.setState({ oauthTokens: refreshed }));
+      useAuthStore.setState({ refreshTokens });
+      const params = {
+        ...baseParams,
+        oauthTokens: { ...baseParams.oauthTokens, expiresAt: Date.now() - 1000 },
+      } as unknown as StartupMessage;
+
+      await savePluginDataFactory(createMockStore({}).dispatch, params)();
+
+      expect(refreshTokens).toHaveBeenCalledTimes(1);
+      expect(mockFetchUserData).toHaveBeenCalledWith(refreshed, undefined, undefined);
+    });
+
+    it('skips fetchUserData when the startup refresh was refused and signed the user out', async () => {
+      const refreshTokens = jest.fn(async () => {
+        useAuthStore.setState({ oauthTokens: null });
+        throw new Error('invalid_grant');
+      });
+      useAuthStore.setState({ refreshTokens });
+      const params = {
+        ...baseParams,
+        oauthTokens: { ...baseParams.oauthTokens, expiresAt: Date.now() - 1000 },
+      } as unknown as StartupMessage;
+
+      await savePluginDataFactory(createMockStore({}).dispatch, params)();
+
+      expect(mockFetchUserData).not.toHaveBeenCalled();
     });
 
     it('hands fetchUserData the org a Studio-synced file syncs with, keeping the saved org as the fallback', async () => {
