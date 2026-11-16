@@ -186,6 +186,17 @@ describe('BitbucketSecurityNotice', () => {
     expect(screen.queryByRole('button', { name: 'Sync settings' })).not.toBeInTheDocument();
   });
 
+  it('lists the four steps to replace the token', () => {
+    renderNotice();
+
+    expect(screen.getAllByRole('listitem').map((item) => item.querySelector('strong')?.textContent)).toEqual([
+      'Revoke your current token',
+      'Create a new API token',
+      'Find your Bitbucket sync',
+      'Replace the token',
+    ]);
+  });
+
   it('links to the security contact', () => {
     renderNotice();
 

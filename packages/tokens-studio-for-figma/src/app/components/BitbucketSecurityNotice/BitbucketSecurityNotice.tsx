@@ -157,7 +157,7 @@ export default function BitbucketSecurityNotice() {
           <li>
             <strong>Revoke your current token</strong>
             {' '}
-            in your Atlassian account settings, under Security → API tokens.
+            in your Atlassian/Bitbucket account settings, under Security → API tokens.
           </li>
           <li>
             <strong>Create a new API token</strong>
@@ -165,9 +165,14 @@ export default function BitbucketSecurityNotice() {
             with the same permissions.
           </li>
           <li>
-            <strong>Update your Bitbucket sync</strong>
+            <strong>Find your Bitbucket sync</strong>
             {' '}
-            in the plugin: open Sync settings, edit your Bitbucket sync, and paste the new token.
+            in the plugin: open the Settings tab and look under Sync providers.
+          </li>
+          <li>
+            <strong>Replace the token</strong>
+            {' '}
+            by choosing Edit from the ⋮ menu next to your Bitbucket sync, pasting the new token, and saving.
           </li>
         </ol>
         <p>
