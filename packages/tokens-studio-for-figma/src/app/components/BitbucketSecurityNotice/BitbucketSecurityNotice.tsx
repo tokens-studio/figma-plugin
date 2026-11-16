@@ -14,9 +14,9 @@ import { showBitbucketMigrationDialogSelector } from '@/selectors/showBitbucketM
 import type { RootState } from '@/app/store';
 import type { StorageType, StorageTypeCredentials } from '@/types/StorageType';
 
-// TODO: replace with the advisory page once it is published.
-export const BITBUCKET_SECURITY_NOTICE_URL = 'https://tokens.studio/PLACEHOLDER-bitbucket-security-advisory';
+export const BITBUCKET_SECURITY_NOTICE_URL = 'https://tokens.studio/security-advisory';
 export const BITBUCKET_SECURITY_NOTICE_KEY = 'seenBitbucketSecurityNotice2026';
+export const BITBUCKET_SETUP_GUIDE_URL = 'https://docs.tokens.studio/token-storage/remote/sync-git-bitbucket';
 const SECURITY_EMAIL = 'security@tokens.studio';
 
 const Body = styled('div', {
@@ -64,7 +64,7 @@ export function usesBitbucketSync(apiProviders: StorageTypeCredentials[], storag
 
 /**
  * Whether to show the Bitbucket security notice: only to users with a Bitbucket sync, until they open the link.
- * Cancel hides it for this session only, so it comes back the next time the plugin opens.
+ * Closing it hides it for this session only, so it comes back the next time the plugin opens.
  */
 export function shouldShowBitbucketSecurityNotice({
   apiProviders, storageType, seen, dismissed, blocked,
@@ -79,7 +79,7 @@ export default function BitbucketSecurityNotice() {
   const storageType = useSelector(storageTypeSelector);
   const migrationDialogOpen = useSelector(showBitbucketMigrationDialogSelector);
   const seen = useSelector((state: RootState) => state.settings?.[BITBUCKET_SECURITY_NOTICE_KEY] !== false);
-  // Kept in component state on purpose: Cancel only lasts for this session.
+  // Kept in component state on purpose: closing the notice only lasts for this session.
   const [dismissed, setDismissed] = useState(false);
   const isCypress = typeof window !== 'undefined' && !!(window as any).Cypress;
 
@@ -96,7 +96,7 @@ export default function BitbucketSecurityNotice() {
   }, []);
 
   const handleOpenSyncSettings = useCallback(() => {
-    // Like Remind me later, the notice comes back next session until the advisory is opened.
+    // Like closing it, the notice comes back next session until the advisory is opened.
     setDismissed(true);
     dispatch.uiState.setActiveTab(Tabs.SETTINGS);
   }, [dispatch]);
@@ -116,8 +116,10 @@ export default function BitbucketSecurityNotice() {
       showClose={false}
       footer={(
         <ModalFooterRight>
-          <Button variant="secondary" onClick={handleCancel}>
-            Remind me later
+          {/* Opening the guide doesn't count as seen: only the advisory hides the notice for good. */}
+          {/* @ts-ignore Exception for Button to accept target */}
+          <Button as="a" href={BITBUCKET_SETUP_GUIDE_URL} target="_blank" rel="noreferrer" variant="secondary">
+            Setup guide
           </Button>
           <Button variant="secondary" onClick={handleOpenSyncSettings}>
             Sync settings

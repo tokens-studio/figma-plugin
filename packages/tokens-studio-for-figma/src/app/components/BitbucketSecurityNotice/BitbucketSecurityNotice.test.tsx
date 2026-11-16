@@ -9,7 +9,7 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { Tabs } from '@/constants/Tabs';
 import type { StorageType, StorageTypeCredentials } from '@/types/StorageType';
 import BitbucketSecurityNotice, { shouldShowBitbucketSecurityNotice, usesBitbucketSync } from '.';
-import { BITBUCKET_SECURITY_NOTICE_URL } from './BitbucketSecurityNotice';
+import { BITBUCKET_SECURITY_NOTICE_URL, BITBUCKET_SETUP_GUIDE_URL } from './BitbucketSecurityNotice';
 
 const TITLE = 'Action needed: replace your Bitbucket API token';
 const LOCAL: StorageType = { provider: StorageProviderType.LOCAL };
@@ -123,10 +123,10 @@ describe('BitbucketSecurityNotice', () => {
     expect(screen.queryByText(TITLE)).not.toBeInTheDocument();
   });
 
-  it('closes on Remind me later without saving, so it shows again next time', () => {
+  it('closes on Escape without saving, so it shows again next time', () => {
     renderNotice();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Remind me later' }));
+    fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' });
 
     expect(screen.queryByText(TITLE)).not.toBeInTheDocument();
     expect(messageSpy).not.toHaveBeenCalled();
@@ -134,6 +134,23 @@ describe('BitbucketSecurityNotice', () => {
     // A new session starts with the notice again.
     renderNotice();
     expect(screen.getByText(TITLE)).toBeInTheDocument();
+  });
+
+  it('has no Remind me later button', () => {
+    renderNotice();
+
+    expect(screen.queryByRole('button', { name: 'Remind me later' })).not.toBeInTheDocument();
+  });
+
+  it('opens the setup guide without saving, so it shows again next time', () => {
+    renderNotice();
+
+    const guide = screen.getByRole('link', { name: 'Setup guide' });
+    expect(guide).toHaveAttribute('href', BITBUCKET_SETUP_GUIDE_URL);
+    fireEvent.click(guide);
+
+    expect(screen.getByText(TITLE)).toBeInTheDocument();
+    expect(messageSpy).not.toHaveBeenCalled();
   });
 
   it('links to the security contact', () => {
