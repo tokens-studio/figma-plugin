@@ -66,16 +66,16 @@ StorageProviderType.BITBUCKET,
 {
   name: string; // this is only for reference
   id: string; // this should be the repository identifier; eg {workspace}/{repo_slug}
-  username: string; // this is the bitbucket user, required for app password interaction
   branch: string; // this is the base branch
   filePath: string; // this is the path to the token file or files (depends on multifile support)
   baseUrl?: string; // this is the base API url. This is important for self hosted environments
 }
 >;
 
-// The API token is a credential, so it lives on the credential type and never on BitbucketStorageType,
-// which is saved into the file's shared plugin data.
+// The API token and the account it belongs to are credentials, so they live on the credential type and never
+// on BitbucketStorageType, which is saved into the file's shared plugin data.
 export type BitbucketStorageTypeCredential<Required extends boolean = true> = StorageTypeCredential<BitbucketStorageType, Required> & {
+  username: string; // the Atlassian account email (API token) or Bitbucket username (app password)
   apiToken?: string; // the API token for authentication (preferred over app password)
 };
 

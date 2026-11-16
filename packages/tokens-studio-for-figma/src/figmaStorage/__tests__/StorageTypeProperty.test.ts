@@ -101,6 +101,23 @@ describe('StorageTypeProperty', () => {
     expect(read).toEqual(bitbucket);
   });
 
+  it.each([
+    ['unparseable data', '{not json'],
+    ['an empty value', ''],
+  ])('reads %s as no storage type', async (_, raw) => {
+    mockRootGetSharedPluginData.mockReturnValue(raw);
+
+    expect(await StorageTypeProperty.read()).toBeNull();
+  });
+
+  it.each(['constructor', '__proto__', 'toString'])('does not throw on a stored provider named %s', async (provider) => {
+    storeInFile({ provider, id: 'x', apiToken: SECRET });
+
+    await expect(removeCredentialsFromSavedStorageType()).resolves.toBeUndefined();
+    const read = await StorageTypeProperty.read();
+    expect(read).toEqual({ provider, id: 'x' });
+  });
+
   it('reads a legacy provider without resetting it to local', async () => {
     storeInFile({
       provider: 'tokensstudio', internalId: 'i', name: 'Legacy', id: 'project',

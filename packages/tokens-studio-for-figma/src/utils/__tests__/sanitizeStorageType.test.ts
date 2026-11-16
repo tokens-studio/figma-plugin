@@ -58,6 +58,15 @@ describe('sanitizeStorageType', () => {
     });
   });
 
+  it.each(['constructor', 'toString', '__proto__', 'hasOwnProperty', 'valueOf'])(
+    'treats a provider named %s as unknown instead of reading Object.prototype',
+    (provider) => {
+      expect(sanitizeStorageType(asStorageType({
+        provider, id: 'x', secret: 'y',
+      }))).toEqual({ provider, id: 'x' });
+    },
+  );
+
   it('keeps falsy but defined values', () => {
     expect(sanitizeStorageType(asStorageType({
       provider: StorageProviderType.GITHUB, id: 'o/r', baseUrl: '', branch: 'main', filePath: 'tokens.json',

@@ -40,7 +40,10 @@ export function sanitizeStorageType(value: StorageType): StorageType {
     return { provider: StorageProviderType.LOCAL };
   }
 
-  const allowedFields = SAFE_STORAGE_TYPE_FIELDS[value.provider as StorageProviderType] ?? UNKNOWN_PROVIDER_SAFE_FIELDS;
+  // Own-property check, so a stored provider like "constructor" or "__proto__" can't resolve to Object.prototype
+  const allowedFields = Object.prototype.hasOwnProperty.call(SAFE_STORAGE_TYPE_FIELDS, value.provider)
+    ? SAFE_STORAGE_TYPE_FIELDS[value.provider as StorageProviderType]
+    : UNKNOWN_PROVIDER_SAFE_FIELDS;
   const sanitized: Record<string, unknown> = { provider: value.provider };
   allowedFields.forEach((field) => {
     if (value[field] !== undefined) {

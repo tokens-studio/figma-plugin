@@ -125,6 +125,16 @@ describe('startup credential cleanup', () => {
     expect(result.storageType).toEqual(bitbucket);
   });
 
+  it('still starts when the saved provider is named like an Object.prototype key', async () => {
+    mockRootGetSharedPluginData.mockImplementation((namespace: string, key: string) => (
+      namespace === 'tokens' && key === 'storageType' ? JSON.stringify({ provider: 'constructor', id: 'x' }) : ''
+    ));
+
+    await expect(startup()).resolves.toEqual(expect.objectContaining({
+      storageType: { provider: 'constructor', id: 'x' },
+    }));
+  });
+
   it('does not write to a clean file', async () => {
     mockRootGetSharedPluginData.mockImplementation((namespace: string, key: string) => (
       namespace === 'tokens' && key === 'storageType' ? JSON.stringify(bitbucket) : ''
