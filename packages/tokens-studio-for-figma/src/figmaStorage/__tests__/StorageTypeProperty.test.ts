@@ -2,15 +2,18 @@ import { mockRootGetSharedPluginData, mockRootSetSharedPluginData } from '../../
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageType } from '@/types/StorageType';
 import { StorageTypeProperty, removeCredentialsFromSavedStorageType } from '../StorageTypeProperty';
-import { getSavedStorageType } from '@/plugin/node';
+import { setStorageType } from '@/plugin/asyncMessageHandlers/setStorageType';
+import { AsyncMessageTypes } from '@/types/AsyncMessages';
 
 const SECRET = 'super-secret-credential-value';
+const EMAIL = 'jane@example.com';
 
-// Every provider, with every credential-like field the plugin has ever held filled in.
+// Every credential-like field the plugin has ever held, plus a few it might hold one day.
 const withCredentials = (storageType: Record<string, unknown>) => ({
   ...storageType,
   secret: SECRET,
   apiToken: SECRET,
+  username: EMAIL,
   password: SECRET,
   token: SECRET,
   accessToken: SECRET,
@@ -33,7 +36,7 @@ const providers: Record<string, unknown>[] = [
     provider: StorageProviderType.GITLAB, internalId: 'i', name: 'n', id: 'o/r', branch: 'main', filePath: 'tokens',
   },
   {
-    provider: StorageProviderType.BITBUCKET, internalId: 'i', name: 'n', id: 'w/r', username: 'u', branch: 'main', filePath: 'tokens',
+    provider: StorageProviderType.BITBUCKET, internalId: 'i', name: 'n', id: 'w/r', branch: 'main', filePath: 'tokens',
   },
   {
     provider: StorageProviderType.ADO, internalId: 'i', name: 'n', id: 'r', baseUrl: 'https://dev.azure.com/x', branch: 'main', filePath: 'tokens',
@@ -49,48 +52,139 @@ const providers: Record<string, unknown>[] = [
   },
 ];
 
+const bitbucket = providers.find((p) => p.provider === StorageProviderType.BITBUCKET)!;
+
+const storeInFile = (value: unknown) => {
+  mockRootGetSharedPluginData.mockImplementation((namespace: string, key: string) => (
+    namespace === 'tokens' && key === 'storageType' ? JSON.stringify(value) : ''
+  ));
+};
+
+const lastWrittenStorageType = () => {
+  const writes = mockRootSetSharedPluginData.mock.calls.filter(([, key]) => key === 'storageType');
+  return writes[writes.length - 1]?.[2];
+};
+
 describe('StorageTypeProperty', () => {
   beforeEach(() => {
-    mockRootSetSharedPluginData.mockClear();
+    mockRootSetSharedPluginData.mockReset();
     mockRootGetSharedPluginData.mockReset();
   });
 
   it.each(providers.map((p) => [p.provider, p]))('never writes a credential to shared plugin data (%s)', async (_, storageType) => {
     await StorageTypeProperty.write(withCredentials(storageType));
 
-    expect(mockRootSetSharedPluginData).toHaveBeenCalledTimes(1);
-    const [, key, written] = mockRootSetSharedPluginData.mock.calls[0];
-    expect(key).toBe('storageType');
+    const written = lastWrittenStorageType();
     expect(written).not.toContain(SECRET);
+    expect(written).not.toContain(EMAIL);
     expect(JSON.parse(written)).toEqual(storageType);
   });
 
+  it('never saves the Bitbucket token or email sent from the UI through SET_STORAGE_TYPE', async () => {
+    await setStorageType({
+      type: AsyncMessageTypes.SET_STORAGE_TYPE,
+      storageType: { ...bitbucket, username: EMAIL, apiToken: SECRET } as unknown as StorageType,
+    });
+
+    const written = lastWrittenStorageType();
+    expect(written).not.toContain(SECRET);
+    expect(written).not.toContain(EMAIL);
+    expect(JSON.parse(written)).toEqual(bitbucket);
+  });
+
   it('never returns a credential read from shared plugin data', async () => {
-    const bitbucket = providers.find((p) => p.provider === StorageProviderType.BITBUCKET)!;
-    mockRootGetSharedPluginData.mockReturnValue(JSON.stringify(withCredentials(bitbucket)));
+    storeInFile(withCredentials(bitbucket));
 
     const read = await StorageTypeProperty.read();
     expect(JSON.stringify(read)).not.toContain(SECRET);
+    expect(JSON.stringify(read)).not.toContain(EMAIL);
     expect(read).toEqual(bitbucket);
   });
 
-  it('removes a leaked Bitbucket apiToken from an existing file on load', async () => {
-    const bitbucket = providers.find((p) => p.provider === StorageProviderType.BITBUCKET)!;
-    mockRootGetSharedPluginData.mockImplementation((namespace: string, key: string) => (
-      namespace === 'tokens' && key === 'storageType' ? JSON.stringify({ ...bitbucket, apiToken: SECRET }) : ''
-    ));
+  it('reads a legacy provider without resetting it to local', async () => {
+    storeInFile({
+      provider: 'tokensstudio', internalId: 'i', name: 'Legacy', id: 'project',
+    });
 
-    const storageType = await getSavedStorageType();
+    expect(await StorageTypeProperty.read()).toEqual({
+      provider: 'tokensstudio', internalId: 'i', name: 'Legacy', id: 'project',
+    });
+  });
+});
 
-    expect(mockRootSetSharedPluginData).toHaveBeenCalledWith('tokens', 'storageType', JSON.stringify(bitbucket));
-    expect(storageType).toEqual(bitbucket);
+describe('removeCredentialsFromSavedStorageType', () => {
+  beforeEach(() => {
+    mockRootSetSharedPluginData.mockReset();
+    mockRootGetSharedPluginData.mockReset();
   });
 
-  it('does not rewrite a file that holds no credentials', () => {
-    const github = providers.find((p) => p.provider === StorageProviderType.GITHUB)!;
-    mockRootGetSharedPluginData.mockReturnValue(JSON.stringify(github));
+  it('removes a leaked Bitbucket token and email from an existing file', async () => {
+    storeInFile({ ...bitbucket, username: EMAIL, apiToken: SECRET });
 
-    expect(removeCredentialsFromSavedStorageType()).toBe(false);
+    await removeCredentialsFromSavedStorageType();
+
+    const written = lastWrittenStorageType();
+    expect(written).not.toContain(SECRET);
+    expect(written).not.toContain(EMAIL);
+    expect(JSON.parse(written)).toEqual(bitbucket);
+  });
+
+  it('removes an app password, generic storage headers and an email on its own', async () => {
+    storeInFile({ ...bitbucket, secret: SECRET });
+    await removeCredentialsFromSavedStorageType();
+    expect(JSON.parse(lastWrittenStorageType())).toEqual(bitbucket);
+
+    const generic = providers.find((p) => p.provider === StorageProviderType.GENERIC_VERSIONED_STORAGE)!;
+    storeInFile({ ...generic, additionalHeaders: [{ name: 'Authorization', value: SECRET }] });
+    await removeCredentialsFromSavedStorageType();
+    expect(JSON.parse(lastWrittenStorageType())).toEqual(generic);
+
+    storeInFile({ ...bitbucket, username: EMAIL });
+    await removeCredentialsFromSavedStorageType();
+    expect(JSON.parse(lastWrittenStorageType())).toEqual(bitbucket);
+  });
+
+  it('keeps fields this build does not know when cleaning a file', async () => {
+    storeInFile({ ...bitbucket, fieldFromANewerVersion: 'kept', apiToken: SECRET });
+
+    await removeCredentialsFromSavedStorageType();
+
+    expect(JSON.parse(lastWrittenStorageType())).toEqual({ ...bitbucket, fieldFromANewerVersion: 'kept' });
+  });
+
+  it('never resets a legacy or unknown provider to local', async () => {
+    const legacy = {
+      provider: 'tokensstudio', internalId: 'i', name: 'Legacy', id: 'project',
+    };
+    storeInFile(legacy);
+
+    await removeCredentialsFromSavedStorageType();
     expect(mockRootSetSharedPluginData).not.toHaveBeenCalled();
+
+    storeInFile({ ...legacy, secret: SECRET });
+    await removeCredentialsFromSavedStorageType();
+    expect(JSON.parse(lastWrittenStorageType())).toEqual(legacy);
+  });
+
+  it.each([
+    ['a clean file', JSON.stringify(providers.find((p) => p.provider === StorageProviderType.GITHUB))],
+    ['a file without a storage type', ''],
+    ['unparseable data', '{not json'],
+    ['a non-object value', '"github"'],
+  ])('does not write for %s', async (_, raw) => {
+    mockRootGetSharedPluginData.mockReturnValue(raw);
+
+    await removeCredentialsFromSavedStorageType();
+
+    expect(mockRootSetSharedPluginData).not.toHaveBeenCalled();
+  });
+
+  it('does not throw when the file cannot be edited', async () => {
+    storeInFile({ ...bitbucket, apiToken: SECRET });
+    mockRootSetSharedPluginData.mockImplementation(() => {
+      throw new Error('Cannot write to a read-only file');
+    });
+
+    await expect(removeCredentialsFromSavedStorageType()).resolves.toBeUndefined();
   });
 });

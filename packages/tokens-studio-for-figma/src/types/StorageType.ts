@@ -70,9 +70,14 @@ StorageProviderType.BITBUCKET,
   branch: string; // this is the base branch
   filePath: string; // this is the path to the token file or files (depends on multifile support)
   baseUrl?: string; // this is the base API url. This is important for self hosted environments
-  apiToken?: string; // this is the new API Token for authentication (preferred over app password)
 }
 >;
+
+// The API token is a credential, so it lives on the credential type and never on BitbucketStorageType,
+// which is saved into the file's shared plugin data.
+export type BitbucketStorageTypeCredential<Required extends boolean = true> = StorageTypeCredential<BitbucketStorageType, Required> & {
+  apiToken?: string; // the API token for authentication (preferred over app password)
+};
 
 export type TokensStudioOAuthStorageType = GenericStorageType<
 StorageProviderType.TOKENS_STUDIO_OAUTH,
@@ -135,7 +140,7 @@ export type StorageTypeCredentials =
   | StorageTypeCredential<GitHubStorageType>
   | StorageTypeCredential<GitLabStorageType>
   | StorageTypeCredential<GenericVersionedStorageType, false>
-  | StorageTypeCredential<BitbucketStorageType>
+  | BitbucketStorageTypeCredential
   | StorageTypeCredential<ADOStorageType>
   | StorageTypeCredential<SupernovaStorageType>
   | StorageTypeCredential<TokensStudioOAuthStorageType, false>;
@@ -159,7 +164,7 @@ export type StorageTypeFormValues<Incomplete extends boolean = false> =
   >)
   | ({ new?: boolean; migrating?: boolean; provider: StorageProviderType.BITBUCKET } & OptionalPartial<
   Incomplete,
-  Omit<StorageTypeCredential<BitbucketStorageType>, 'provider'>
+  Omit<BitbucketStorageTypeCredential, 'provider'>
   >)
   | ({ new?: boolean; provider: StorageProviderType.SUPERNOVA } & OptionalPartial<
   Incomplete,
