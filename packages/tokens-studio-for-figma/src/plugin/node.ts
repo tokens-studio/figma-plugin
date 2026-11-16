@@ -10,7 +10,7 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageType } from '@/types/StorageType';
 import {
   ActiveThemeProperty, StorageTypeProperty, ThemesProperty, UpdatedAtProperty, ValuesProperty, VersionProperty, OnboardingExplainerSetsProperty, OnboardingExplainerInspectProperty, OnboardingExplainerSyncProvidersProperty, TokenFormatProperty, OnboardingExplainerExportSetsProperty, IsCompressedProperty,
-  CheckForChangesProperty,
+  CheckForChangesProperty, removeCredentialsFromSavedStorageType,
 } from '@/figmaStorage';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { Properties } from '@/constants/Properties';
@@ -112,6 +112,7 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
 export async function getSavedStorageType(): Promise<StorageType> {
   // the saved storage types will never contain credentials
   // as they should not be shared across
+  removeCredentialsFromSavedStorageType(figma.root);
   const storageType = await StorageTypeProperty.read(figma.root);
 
   if (storageType) {

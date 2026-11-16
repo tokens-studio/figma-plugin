@@ -436,7 +436,9 @@ describe('storage type', () => {
 
     saveStorageType(apiContext);
 
-    expect(mockRootSetSharedPluginData).toBeCalledWith('tokens', 'storageType', JSON.stringify(apiContext));
+    expect(mockRootSetSharedPluginData).toBeCalledWith('tokens', 'storageType', expect.any(String));
+    const written = mockRootSetSharedPluginData.mock.calls[mockRootSetSharedPluginData.mock.calls.length - 1][2];
+    expect(JSON.parse(written)).toEqual(apiContext);
   });
 });
 
