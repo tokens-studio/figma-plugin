@@ -1,5 +1,6 @@
 import { isEffectEqual } from '@/utils/isEffectEqual';
 import { TokenBoxshadowValue } from '@/types/values';
+import { normalizeShadowValue } from '@/utils/normalizeShadowValue';
 
 import { convertBoxShadowTypeToFigma } from '../../figmaTransforms/boxShadow';
 import { convertToFigmaColor } from '../../figmaTransforms/colors';
@@ -17,11 +18,11 @@ function convertBoxShadowToFigmaEffect(value: TokenBoxshadowValue, baseFontSize:
       a,
     },
     type: convertBoxShadowTypeToFigma(value.type),
-    spread: convertTypographyNumberToFigma(value.spread.toString(), baseFontSize),
-    radius: convertTypographyNumberToFigma(value.blur.toString(), baseFontSize),
+    spread: convertTypographyNumberToFigma(String(value.spread ?? 0), baseFontSize),
+    radius: convertTypographyNumberToFigma(String(value.blur ?? 0), baseFontSize),
     offset: convertOffsetToFigma(
-      convertTypographyNumberToFigma(value.x.toString(), baseFontSize),
-      convertTypographyNumberToFigma(value.y.toString(), baseFontSize),
+      convertTypographyNumberToFigma(String(value.x ?? 0), baseFontSize),
+      convertTypographyNumberToFigma(String(value.y ?? 0), baseFontSize),
     ),
     blendMode: (value.blendMode || 'NORMAL') as BlendMode,
     visible: true,
@@ -34,7 +35,8 @@ export function effectStyleMatchesBoxShadowToken(
   baseFontSize: string,
 ) {
   if (effectStyle && typeof boxShadowToken !== 'string') {
-    const boxShadowTokenArr = Array.isArray(boxShadowToken) ? boxShadowToken : [boxShadowToken];
+    const normalizedToken = normalizeShadowValue(boxShadowToken);
+    const boxShadowTokenArr = Array.isArray(normalizedToken) ? normalizedToken : [normalizedToken];
     const styleEffects = effectStyle.effects;
     if (styleEffects.length === boxShadowTokenArr.length) {
       return styleEffects.every((styleEffect, idx) => {
