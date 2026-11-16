@@ -142,10 +142,10 @@ describe('BitbucketSecurityNotice', () => {
     expect(screen.queryByRole('button', { name: 'Remind me later' })).not.toBeInTheDocument();
   });
 
-  it('opens the setup guide without saving, so it shows again next time', () => {
+  it('opens the Bitbucket sync guide without saving, so it shows again next time', () => {
     renderNotice();
 
-    const guide = screen.getByRole('link', { name: 'Setup guide' });
+    const guide = screen.getByRole('link', { name: 'Bitbucket sync guide' });
     expect(guide).toHaveAttribute('href', BITBUCKET_SETUP_GUIDE_URL);
     fireEvent.click(guide);
 
@@ -159,18 +159,10 @@ describe('BitbucketSecurityNotice', () => {
     expect(screen.getByRole('link', { name: 'security@tokens.studio' })).toHaveAttribute('href', 'mailto:security@tokens.studio');
   });
 
-  it('opens Sync settings without saving, so it shows again next time', () => {
-    const store = createMockStore({
-      settings: { seenBitbucketSecurityNotice2026: false },
-      uiState: { activeTab: Tabs.START, apiProviders: [BITBUCKET_CREDENTIAL], storageType: LOCAL },
-    });
-    render(<Provider store={store}><BitbucketSecurityNotice /></Provider>);
+  it('has no Sync settings button', () => {
+    renderNotice();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Sync settings' }));
-
-    expect(store.getState().uiState.activeTab).toBe(Tabs.SETTINGS);
-    expect(screen.queryByText(TITLE)).not.toBeInTheDocument();
-    expect(messageSpy).not.toHaveBeenCalledWith(expect.objectContaining({ seenBitbucketSecurityNotice2026: true }));
+    expect(screen.queryByRole('button', { name: 'Sync settings' })).not.toBeInTheDocument();
   });
 
   it('saves that the link was opened and never shows again', () => {

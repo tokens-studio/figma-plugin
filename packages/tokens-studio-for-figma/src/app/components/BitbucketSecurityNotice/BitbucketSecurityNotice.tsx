@@ -95,12 +95,6 @@ export default function BitbucketSecurityNotice() {
     setDismissed(true);
   }, []);
 
-  const handleOpenSyncSettings = useCallback(() => {
-    // Like closing it, the notice comes back next session until the advisory is opened.
-    setDismissed(true);
-    dispatch.uiState.setActiveTab(Tabs.SETTINGS);
-  }, [dispatch]);
-
   const handleOpenLink = useCallback(() => {
     dispatch.settings.setSeenBitbucketSecurityNotice2026(true);
   }, [dispatch]);
@@ -119,10 +113,7 @@ export default function BitbucketSecurityNotice() {
           {/* Opening the guide doesn't count as seen: only the advisory hides the notice for good. */}
           {/* @ts-ignore Exception for Button to accept target */}
           <Button as="a" href={BITBUCKET_SETUP_GUIDE_URL} target="_blank" rel="noreferrer" variant="secondary">
-            Setup guide
-          </Button>
-          <Button variant="secondary" onClick={handleOpenSyncSettings}>
-            Sync settings
+            Bitbucket sync guide
           </Button>
           {/* @ts-ignore Exception for Button to accept target */}
           <Button as="a" href={BITBUCKET_SECURITY_NOTICE_URL} target="_blank" rel="noreferrer" variant="primary" onClick={handleOpenLink}>
