@@ -1,4 +1,6 @@
-import React, { useCallback, useState } from 'react';
+import React, {
+  useCallback, useEffect, useRef, useState,
+} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button } from '@tokens-studio/ui';
 import { WarningTriangleSolid } from 'iconoir-react';
@@ -15,7 +17,9 @@ import type { RootState } from '@/app/store';
 import type { StorageType, StorageTypeCredentials } from '@/types/StorageType';
 
 export const BITBUCKET_SECURITY_NOTICE_URL = 'https://tokens.studio/security-advisory';
-export const BITBUCKET_SECURITY_NOTICE_KEY = 'seenBitbucketSecurityNotice2026';
+export const BITBUCKET_SECURITY_NOTICE_KEY = 'bitbucketSecurityNoticeViews2026';
+// The notice shows on this many plugin launches, or until the advisory is opened, whichever comes first.
+export const BITBUCKET_SECURITY_NOTICE_MAX_VIEWS = 3;
 export const BITBUCKET_SETUP_GUIDE_URL = 'https://docs.tokens.studio/token-storage/remote/sync-git-bitbucket';
 const SECURITY_EMAIL = 'security@tokens.studio';
 
@@ -51,7 +55,10 @@ const WarningIcon = styled(WarningTriangleSolid, {
 type NoticeConditions = {
   apiProviders: StorageTypeCredentials[];
   storageType: StorageType;
-  seen: boolean;
+  // Launches the notice has already been shown on, saved across sessions. Opening the advisory sets it to the max.
+  views: number;
+  // Already shown in this session: keeps the third showing open even though it brought views to the max.
+  shownThisSession: boolean;
   dismissed: boolean;
   // The app is still loading, or another startup dialog is open.
   blocked: boolean;
@@ -63,13 +70,14 @@ export function usesBitbucketSync(apiProviders: StorageTypeCredentials[], storag
 }
 
 /**
- * Whether to show the Bitbucket security notice: only to users with a Bitbucket sync, until they open the link.
- * Closing it hides it for this session only, so it comes back the next time the plugin opens.
+ * Whether to show the Bitbucket security notice: only to users with a Bitbucket sync, on up to three launches or
+ * until they open the advisory. Closing it hides it for this session only.
  */
 export function shouldShowBitbucketSecurityNotice({
-  apiProviders, storageType, seen, dismissed, blocked,
+  apiProviders, storageType, views, shownThisSession, dismissed, blocked,
 }: NoticeConditions): boolean {
-  return !seen && !dismissed && !blocked && usesBitbucketSync(apiProviders, storageType);
+  if (dismissed || blocked || !usesBitbucketSync(apiProviders, storageType)) return false;
+  return shownThisSession || views < BITBUCKET_SECURITY_NOTICE_MAX_VIEWS;
 }
 
 export default function BitbucketSecurityNotice() {
@@ -78,25 +86,39 @@ export default function BitbucketSecurityNotice() {
   const apiProviders = useSelector(apiProvidersSelector);
   const storageType = useSelector(storageTypeSelector);
   const migrationDialogOpen = useSelector(showBitbucketMigrationDialogSelector);
-  const seen = useSelector((state: RootState) => state.settings?.[BITBUCKET_SECURITY_NOTICE_KEY] !== false);
+  const views = useSelector((state: RootState) => state.settings?.[BITBUCKET_SECURITY_NOTICE_KEY] ?? 0);
   // Kept in component state on purpose: closing the notice only lasts for this session.
   const [dismissed, setDismissed] = useState(false);
+  const [shownThisSession, setShownThisSession] = useState(false);
+  // Guards the count synchronously: the store update re-renders before the state update above lands.
+  const countedThisSession = useRef(false);
   const isCypress = typeof window !== 'undefined' && !!(window as any).Cypress;
 
   const open = shouldShowBitbucketSecurityNotice({
     apiProviders,
     storageType,
-    seen,
+    views,
+    shownThisSession,
     dismissed,
     blocked: activeTab === Tabs.LOADING || migrationDialogOpen || isCypress,
   });
+
+  useEffect(() => {
+    // Count each launch once, the first time the notice opens in it.
+    if (open && !countedThisSession.current) {
+      countedThisSession.current = true;
+      setShownThisSession(true);
+      dispatch.settings.setBitbucketSecurityNoticeViews2026(views + 1);
+    }
+  }, [open, views, dispatch]);
 
   const handleCancel = useCallback(() => {
     setDismissed(true);
   }, []);
 
   const handleOpenLink = useCallback(() => {
-    dispatch.settings.setSeenBitbucketSecurityNotice2026(true);
+    dispatch.settings.setBitbucketSecurityNoticeViews2026(BITBUCKET_SECURITY_NOTICE_MAX_VIEWS);
+    setDismissed(true);
   }, [dispatch]);
 
   if (!open) return null;
