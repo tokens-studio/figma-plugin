@@ -98,6 +98,7 @@ export type SavedSettings = {
   seenGenericVersionedHeaderMigrationDialog?: boolean;
   seenTermsUpdate2026?: boolean;
   seenTermsUpdate2026Subprocessors?: boolean;
+  seenBitbucketSecurityNotice2026?: boolean;
 };
 
 export function notifyUISettings(
@@ -138,6 +139,7 @@ export function notifyUISettings(
     seenGenericVersionedHeaderMigrationDialog,
     seenTermsUpdate2026,
     seenTermsUpdate2026Subprocessors,
+    seenBitbucketSecurityNotice2026,
   }: SavedSettings,
 ) {
   postToUI({
@@ -180,6 +182,7 @@ export function notifyUISettings(
       seenGenericVersionedHeaderMigrationDialog,
       seenTermsUpdate2026,
       seenTermsUpdate2026Subprocessors,
+      seenBitbucketSecurityNotice2026,
     },
   });
   postToUI({

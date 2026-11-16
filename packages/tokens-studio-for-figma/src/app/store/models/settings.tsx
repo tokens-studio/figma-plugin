@@ -61,6 +61,7 @@ export interface SettingsState {
   seenGenericVersionedHeaderMigrationDialog?: boolean;
   seenTermsUpdate2026?: boolean;
   seenTermsUpdate2026Subprocessors?: boolean;
+  seenBitbucketSecurityNotice2026?: boolean;
 }
 
 const setUI = (state: SettingsState) => {
@@ -80,6 +81,7 @@ export const settings = createModel<RootModel>()({
     seenGenericVersionedHeaderMigrationDialog: false,
     seenTermsUpdate2026: false,
     seenTermsUpdate2026Subprocessors: false,
+    seenBitbucketSecurityNotice2026: false,
     language: 'en',
     sessionRecording: false,
     updateMode: UpdateMode.SELECTION,
@@ -259,6 +261,12 @@ export const settings = createModel<RootModel>()({
         seenTermsUpdate2026Subprocessors: payload,
       };
     },
+    setSeenBitbucketSecurityNotice2026(state, payload: boolean) {
+      return {
+        ...state,
+        seenBitbucketSecurityNotice2026: payload,
+      };
+    },
     setSeenGenericVersionedHeaderMigrationDialog(state, payload: boolean) {
       return {
         ...state,
@@ -334,6 +342,9 @@ export const settings = createModel<RootModel>()({
       setUI(rootState.settings);
     },
     setSeenTermsUpdate2026Subprocessors: (payload: boolean, rootState) => {
+      setUI(rootState.settings);
+    },
+    setSeenBitbucketSecurityNotice2026: (payload: boolean, rootState) => {
       setUI(rootState.settings);
     },
     ...Object.fromEntries(

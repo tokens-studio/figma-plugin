@@ -77,6 +77,7 @@ export type UiSettingsFromPluginMessage = {
     seenGenericVersionedHeaderMigrationDialog?: boolean;
     seenTermsUpdate2026?: boolean;
     seenTermsUpdate2026Subprocessors?: boolean;
+    seenBitbucketSecurityNotice2026?: boolean;
   };
 };
 
