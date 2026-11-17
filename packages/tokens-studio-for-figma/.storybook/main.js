@@ -9,6 +9,8 @@ module.exports = {
   framework: '@storybook/react',
   webpackFinal: async (config, { configType }) => {
     config.resolve.alias['@'] = path.resolve(__dirname, '../src/');
+    // See the same alias in webpack.config.js. Storybook's webpack 4 does not accept false here.
+    config.resolve.alias['https-proxy-agent'] = path.resolve(__dirname, 'emptyModule.js');
     // Remove the default .css webpack module rule
     // This is necessary because we use both global CSS and CSS modules
     // in the extension and in Storybook
