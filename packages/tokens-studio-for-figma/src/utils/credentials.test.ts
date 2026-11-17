@@ -1,8 +1,88 @@
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import * as generateId from '@/utils/generateId';
 import { removeSingleCredential, updateCredentials } from './credentials';
+import isSameCredentials from './isSameCredentials';
+import { prepareCredentialIdentity } from './credentialIdentity';
 
 describe('updateCredentials', () => {
+  const giteaCredential = {
+    provider: StorageProviderType.GITEA,
+    internalId: 'gitea-id',
+    id: 'design/tokens',
+    name: 'Gitea',
+    baseUrl: 'https://git.example.com/gitea',
+    branch: 'main',
+    filePath: 'tokens.json',
+    secret: 'original-token',
+  };
+
+  it.each([
+    { baseUrl: 'https://other.example.com/gitea' },
+    { baseUrl: 'https://git.example.com/another-installation' },
+    { provider: StorageProviderType.GITHUB },
+  ])('does not replace saved Gitea credentials across an installation boundary: %o', async (changes) => {
+    const changed = { ...giteaCredential, ...changes, secret: 'new-token' };
+    figma.clientStorage.getAsync.mockResolvedValue(JSON.stringify([giteaCredential]));
+    await updateCredentials(changed);
+    expect(figma.clientStorage.setAsync).toHaveBeenCalledWith(
+      'apiProviders',
+      JSON.stringify([giteaCredential, changed]),
+    );
+  });
+
+  it('keeps both installations selectable when the new configuration is prepared before saving', async () => {
+    const prepared = prepareCredentialIdentity({ ...giteaCredential, baseUrl: 'https://other.example.com/gitea', secret: 'new-token' }, [giteaCredential]);
+    expect(prepared.internalId).toBe('idMock');
+    figma.clientStorage.getAsync.mockResolvedValue(JSON.stringify([giteaCredential]));
+    await updateCredentials(prepared);
+    expect(figma.clientStorage.setAsync).toHaveBeenCalledWith('apiProviders', JSON.stringify([giteaCredential, prepared]));
+    expect(isSameCredentials(giteaCredential, giteaCredential)).toBe(true);
+    expect(isSameCredentials(prepared, prepared)).toBe(true);
+    expect(isSameCredentials(giteaCredential, prepared)).toBe(false);
+  });
+
+  it('updates a saved Gitea token within the same normalized installation', async () => {
+    const changed = { ...giteaCredential, baseUrl: 'https://GIT.example.com:443/gitea/', secret: 'new-token' };
+    figma.clientStorage.getAsync.mockResolvedValue(JSON.stringify([giteaCredential]));
+    await updateCredentials(changed);
+    expect(figma.clientStorage.setAsync).toHaveBeenCalledWith('apiProviders', JSON.stringify([changed]));
+  });
+
+  it('updates the same provider across branches without browser URL in the Figma sandbox', async () => {
+    const originalURL = global.URL;
+    const otherProvider = { ...giteaCredential, internalId: 'other-id', name: 'Separate connection' };
+    let saved = JSON.stringify([giteaCredential, otherProvider]);
+    figma.clientStorage.getAsync.mockImplementation(async () => saved);
+    figma.clientStorage.setAsync.mockImplementation(async (_key, value) => { saved = value; });
+    try {
+      // Figma's main sandbox does not provide browser globals.
+      global.URL = undefined as unknown as typeof URL;
+      for (const branch of ['release', 'main', 'release', 'main']) {
+        const changed = { ...giteaCredential, branch };
+        await updateCredentials(changed);
+        expect(JSON.parse(saved)).toEqual([changed, otherProvider]);
+      }
+    } finally {
+      global.URL = originalURL;
+      figma.clientStorage.getAsync.mockReset();
+      figma.clientStorage.setAsync.mockReset();
+    }
+  });
+
+  it('initializes Gitea URL parsing without a browser URL constructor', () => {
+    const originalURL = global.URL;
+    try {
+      global.URL = undefined as unknown as typeof URL;
+      jest.isolateModules(() => {
+        const { normalizeGiteaUrl } = jest.requireActual('../storage/gitea');
+        expect(normalizeGiteaUrl('https://GIT.example.com:443/gitea/')).toBe('https://git.example.com/gitea');
+        expect(() => normalizeGiteaUrl('https://user:secret@git.example.com')).toThrow();
+      });
+    } finally {
+      global.URL = originalURL;
+    }
+  });
+
   afterEach(() => {
     jest.clearAllMocks();
   });

@@ -9,6 +9,7 @@ import usePushDialog from '../hooks/usePushDialog';
 import { getBitbucketCreatePullRequestUrl } from '../store/providers/bitbucket';
 import { getGithubCreatePullRequestUrl } from '../store/providers/github';
 import { getGitlabCreatePullRequestUrl } from '../store/providers/gitlab';
+import { getGiteaCreatePullRequestUrl } from '@/utils/getGiteaCreatePullRequestUrl';
 import { getADOCreatePullRequestUrl } from '../store/providers/ado';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { isGitProvider } from '@/utils/is';
@@ -56,6 +57,15 @@ function PushDialog() {
             branch,
           });
           break;
+        case StorageProviderType.GITEA: {
+          redirectHref = getGiteaCreatePullRequestUrl({
+            baseUrl: localApiState.baseUrl,
+            id: localApiState.id,
+            branch,
+            defaultBranch: localApiState.defaultBranch,
+          });
+          break;
+        }
         case StorageProviderType.GITLAB: {
           redirectHref = getGitlabCreatePullRequestUrl(localApiState.id, localApiState.baseUrl);
           break;
@@ -201,6 +211,7 @@ function PushDialog() {
               {t('pushingTo')}
               {localApiState.provider === StorageProviderType.GITHUB && ' GitHub'}
               {localApiState.provider === StorageProviderType.GITLAB && ' GitLab'}
+              {localApiState.provider === StorageProviderType.GITEA && ' Gitea'}
               {localApiState.provider === StorageProviderType.BITBUCKET && ' Bitbucket'}
               {localApiState.provider === StorageProviderType.ADO && ' ADO'}
               {localApiState.provider === StorageProviderType.SUPERNOVA && ' Supernova.io'}
@@ -221,6 +232,7 @@ function PushDialog() {
                 {t('changesPushedTo')}
                 {localApiState.provider === StorageProviderType.GITHUB && ' GitHub'}
                 {localApiState.provider === StorageProviderType.GITLAB && ' GitLab'}
+                {localApiState.provider === StorageProviderType.GITEA && ' Gitea'}
                 {localApiState.provider === StorageProviderType.BITBUCKET && ' Bitbucket'}
                 {localApiState.provider === StorageProviderType.ADO && ' ADO'}
                 {localApiState.provider === StorageProviderType.SUPERNOVA && ' Supernova.io'}

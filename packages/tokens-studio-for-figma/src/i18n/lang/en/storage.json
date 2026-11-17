@@ -98,6 +98,15 @@
       "calloutDescription": "App Passwords are being deprecated by Atlassian. Migrate to API Tokens for better security and continued access.",
       "switchToMigrationMode": "Migrate",
       "migrationGuide": "Read the migration guide →"
+    },
+    "gitea": {
+      "title": "Gitea",
+      "description": "Connect your self-hosted Gitea repository for version control and two-way token sync. Initialize the repository with a commit before connecting.",
+      "readMore": "View Gitea administrator setup instructions.",
+      "cors": "Self-hosted Gitea requires CORS configuration to connect from Figma.",
+      "tokenHelp": "Use a repository-scoped Personal Access Token with write:repository permission.",
+      "serverUrl": "Gitea installation URL",
+      "serverHelp": "Enter the HTTPS installation URL, including any subpath (for example https://git.example.com/gitea), without /api/v1."
     }
   },
   "selectALayerToSeeAppliedTokens": "Select a layer to see applied tokens",
@@ -123,5 +132,26 @@
   "variablesPlanCantSync": "The Variables plan can't sync with Tokens Studio for Figma.",
   "planCantSync": "This plan can't sync with Tokens Studio for Figma.",
   "planCantSyncConnected": "This plan can't connect new files or switch projects.",
-  "orgHasNoProjects": "This organisation has no projects to sync yet."
+  "orgHasNoProjects": "This organisation has no projects to sync yet.",
+  "giteaAuthenticationError": "Gitea authentication failed. Check your personal access token.",
+  "giteaPermissionError": "Gitea denied access. Check repository permissions and branch protection.",
+  "giteaNotFoundError": "Gitea repository, branch or path was not found. Check the configuration and token access.",
+  "giteaConflict": "Gitea has changed or rejected the changes. Pull the remote tokens before pushing again.",
+  "giteaRateLimitError": "Gitea rate limit reached. Try again later.",
+  "giteaServerError": "Gitea returned a server error. Try again later.",
+  "giteaTransportError": "Cannot connect to Gitea. Check the server URL, network/VPN and TLS certificate. Self-hosted Gitea must allow cross-origin API requests from Figma; ask your administrator to check CORS settings.",
+  "giteaMalformedResponse": "Gitea returned invalid or unsupported content. Check the token path and server configuration.",
+  "giteaUncertainWrite": "The Gitea write may have completed. Keep your local edits and pull to reconcile the remote state before pushing again.",
+  "giteaInvalidUrl": "Enter an HTTPS Gitea installation URL without credentials, query or fragment.",
+  "giteaInstallationUrl": "Enter the Gitea installation URL without /api/v1.",
+  "giteaEmptyRepository": "Initialize the Gitea repository with a first commit and branch before connecting.",
+  "giteaRepositoryFormat": "Gitea repository must be owner/repository",
+  "giteaPullTitle": "Pull from Gitea?",
+  "giteaPullDescription": "Your repo already contains tokens, do you want to pull these now?",
+  "giteaSaveNotConfirmed": "Gitea did not confirm the save.",
+  "giteaPushCancelled": "Push to remote cancelled!",
+  "giteaPullCancelled": "Pull from Gitea cancelled.",
+  "giteaPulled": "Pulled tokens from Gitea",
+  "giteaParseError": "Failed to parse token file - check JSON format",
+  "giteaNoTokens": "No tokens stored on remote"
 }

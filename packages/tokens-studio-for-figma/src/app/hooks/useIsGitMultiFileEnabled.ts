@@ -8,6 +8,7 @@ export function useIsGitMultiFileEnabled() {
 
   return useMemo(
     () => Boolean((api?.provider === StorageProviderType.GITHUB
+            || api?.provider === StorageProviderType.GITEA
             || api?.provider === StorageProviderType.GITLAB
             || api?.provider === StorageProviderType.ADO
             || api?.provider === StorageProviderType.BITBUCKET)

@@ -1,6 +1,11 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
 import compact from 'just-compact';
+import type { BranchLifecycle } from '@/types/BranchLifecycle';
+import { createGiteaBranchLifecycle } from './providers/gitea/branchLifecycle';
+import type { GiteaCredentials } from './providers/gitea';
+import { prepareCredentialIdentity } from '@/utils/credentialIdentity';
+import { getSyncedCredentials } from '@/utils/getSyncedCredentials';
 import { track } from '@/utils/analytics';
 import { useJSONbin } from './providers/jsonbin';
 import useURL from './providers/url';
@@ -8,13 +13,14 @@ import { Dispatch } from '../store';
 import useStorage from './useStorage';
 import { useGitHub } from './providers/github';
 import { useGitLab } from './providers/gitlab';
+import { useGitea } from './providers/gitea';
 import { useSupernova } from './providers/supernova';
 import { useBitbucket } from './providers/bitbucket';
 import { useADO } from './providers/ado';
 import useFile from '@/app/store/providers/file';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import {
-  activeTabSelector, apiSelector, themesListSelector, tokensSelector, activeThemeSelector, usedTokenSetSelector,
+  activeTabSelector, apiSelector, apiProvidersSelector, editProhibitedSelector, themesListSelector, tokensSelector, activeThemeSelector, usedTokenSetSelector,
 } from '@/selectors';
 import { ThemeObject, UsedTokenSetsMap } from '@/types';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
@@ -46,9 +52,19 @@ type PullTokensOptions = {
 
 // @TODO typings and hooks
 
+// A failed restore whose detailed error has already been presented by pullTokens.
+export class ReportedProviderError extends Error {}
+
+type SyncResultHandler = <T extends StorageTypeCredentials | StorageTypeFormValues<false>>(
+  context: T,
+  data: Extract<RemoteResponseData, { status: 'success' }>,
+) => T;
+
 export default function useRemoteTokens() {
   const dispatch = useDispatch<Dispatch>();
   const api = useSelector(apiSelector);
+  const apiProviders = useSelector(apiProvidersSelector);
+  const editProhibited = useSelector(editProhibitedSelector);
   const tokens = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
   const activeTab = useSelector(activeTabSelector);
@@ -78,6 +94,10 @@ export default function useRemoteTokens() {
     checkRemoteChangeForGitLab,
   } = useGitLab();
   const {
+    addNewGiteaCredentials, syncTokensWithGitea, pullTokensFromGitea, pushTokensToGitea,
+    fetchGiteaBranches, createGiteaBranch, checkRemoteChangeForGitea,
+  } = useGitea();
+  const {
     addNewBitbucketCredentials,
     syncTokensWithBitbucket,
     pullTokensFromBitbucket,
@@ -105,6 +125,15 @@ export default function useRemoteTokens() {
   const { pullTokensFromURL } = useURL();
   const { readTokensFromFileOrDirectory } = useFile();
 
+  // Providers may commit revision/access metadata only after an accepted read.
+  // Legacy providers continue managing their own state in their existing hooks.
+  const syncResultHandlers = useMemo<Partial<Record<StorageProviderType, SyncResultHandler>>>(() => ({
+    [StorageProviderType.GITEA]: (context, data) => {
+      if (data.canWrite !== undefined) dispatch.tokenState.setEditProhibited(!data.canWrite);
+      return getSyncedCredentials(context, data);
+    },
+  }), [dispatch]);
+
   const pullTokens = useCallback(
     async ({
       context = api,
@@ -113,7 +142,7 @@ export default function useRemoteTokens() {
       collapsedTokenSets,
       updateLocalTokens = false,
       skipConfirmation = false,
-    }: PullTokensOptions) => {
+    }: PullTokensOptions): Promise<RemoteResponseData | null> => {
       let remoteData: RemoteResponseData<unknown> | null = null;
 
       try {
@@ -132,6 +161,10 @@ export default function useRemoteTokens() {
           }
           case StorageProviderType.BITBUCKET: {
             remoteData = await pullTokensFromBitbucket(context);
+            break;
+          }
+          case StorageProviderType.GITEA: {
+            remoteData = await pullTokensFromGitea(context);
             break;
           }
           case StorageProviderType.GITLAB: {
@@ -189,18 +222,23 @@ export default function useRemoteTokens() {
       }
 
       if (remoteData?.status === 'success') {
-        dispatch.tokenState.setRemoteData({
-          tokens: remoteData.tokens,
-          themes: remoteData.themes,
-          metadata: remoteData.metadata,
-        });
-        dispatch.uiState.setHasRemoteChange(false);
-        const stringifiedRemoteTokens = JSON.stringify(
-          compact([remoteData.tokens, remoteData.themes, TokenFormat.format]),
-          null,
-          2,
-        );
-        dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
+        const handleResult = syncResultHandlers[context.provider];
+        const acceptedData = remoteData;
+        const recordRemoteSnapshot = () => {
+          dispatch.tokenState.setRemoteData({
+            tokens: acceptedData.tokens,
+            themes: acceptedData.themes,
+            metadata: acceptedData.metadata,
+          });
+          dispatch.uiState.setHasRemoteChange(false);
+          const stringifiedRemoteTokens = JSON.stringify(
+            compact([acceptedData.tokens, acceptedData.themes, TokenFormat.format]),
+            null,
+            2,
+          );
+          dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
+        };
+        if (!handleResult) recordRemoteSnapshot();
         if (activeTab !== Tabs.LOADING) {
           if (updateLocalTokens) {
             const format = getFormat();
@@ -215,6 +253,11 @@ export default function useRemoteTokens() {
               themes: remoteData.themes,
             });
             shouldOverride = skipConfirmation ? true : !!(await showPullDialog());
+          }
+          if (handleResult && !shouldOverride && activeTab !== Tabs.LOADING && !skipConfirmation) {
+            dispatch.tokenState.resetChangedState();
+            closePullDialog();
+            return { status: 'failure', errorMessage: 'Pull from remote cancelled!' };
           }
           if (shouldOverride || activeTab === Tabs.LOADING || skipConfirmation) {
             switch (context.provider) {
@@ -294,6 +337,12 @@ export default function useRemoteTokens() {
             });
           }
         }
+        if (handleResult) {
+          recordRemoteSnapshot();
+          const syncedContext = handleResult(context, remoteData);
+          dispatch.uiState.setApiData(syncedContext);
+          dispatch.uiState.setLocalApiState(syncedContext);
+        }
       }
       try {
         if (remoteData?.status === 'success') {
@@ -330,6 +379,8 @@ export default function useRemoteTokens() {
       pullTokensFromGenericVersionedStorage,
       pullTokensFromGitHub,
       pullTokensFromGitLab,
+      pullTokensFromGitea,
+      syncResultHandlers,
       pullTokensFromBitbucket,
       pullTokensFromJSONBin,
       pullTokensFromURL,
@@ -345,14 +396,21 @@ export default function useRemoteTokens() {
   const restoreStoredProvider = useCallback(
     async (context: StorageTypeCredentials) => {
       track('restoreStoredProvider', { provider: context.provider });
-      dispatch.uiState.setLocalApiState(context);
-      dispatch.uiState.setApiData(context);
+      const handleResult = syncResultHandlers[context.provider];
+      if (!handleResult) {
+        dispatch.uiState.setLocalApiState(context);
+        dispatch.uiState.setApiData(context);
+      }
       dispatch.tokenState.setEditProhibited(false);
-      setStorageType({ provider: context, shouldSetInDocument: true });
+      if (!handleResult) setStorageType({ provider: context, shouldSetInDocument: true });
       let content: RemoteResponseData | null = null;
       switch (context.provider) {
         case StorageProviderType.GITHUB: {
           content = await syncTokensWithGitHub(context);
+          break;
+        }
+        case StorageProviderType.GITEA: {
+          content = await syncTokensWithGitea(context);
           break;
         }
         case StorageProviderType.GITLAB: {
@@ -380,16 +438,24 @@ export default function useRemoteTokens() {
           content = await pullTokens({ context });
       }
       if (content?.status === 'failure') {
+        if (handleResult) dispatch.tokenState.setEditProhibited(editProhibited);
         return {
           status: 'failure',
           errorMessage: content?.errorMessage,
         };
       }
       if (content) {
+        if (handleResult) {
+          const syncedContext = handleResult(context, content);
+          dispatch.uiState.setLocalApiState(syncedContext);
+          dispatch.uiState.setApiData(syncedContext);
+          setStorageType({ provider: syncedContext, shouldSetInDocument: true });
+        }
         return {
           status: 'success',
         };
       }
+      if (handleResult) dispatch.tokenState.setEditProhibited(editProhibited);
       return {
         status: 'failure',
         errorMessage: ErrorMessages.GENERAL_CONNECTION_ERROR,
@@ -397,10 +463,13 @@ export default function useRemoteTokens() {
     },
     [
       dispatch,
+      editProhibited,
+      syncResultHandlers,
       setStorageType,
       pullTokens,
       syncTokensWithGitHub,
       syncTokensWithGitLab,
+      syncTokensWithGitea,
       syncTokensWithBitbucket,
       syncTokensWithADO,
       syncTokensWithSupernova,
@@ -415,6 +484,10 @@ export default function useRemoteTokens() {
       switch (context.provider) {
         case StorageProviderType.GITHUB: {
           pushResult = await pushTokensToGitHub(context, overrides);
+          break;
+        }
+        case StorageProviderType.GITEA: {
+          pushResult = await pushTokensToGitea(context, overrides);
           break;
         }
         case StorageProviderType.GITLAB: {
@@ -468,6 +541,7 @@ export default function useRemoteTokens() {
       api,
       pushTokensToGitHub,
       pushTokensToGitLab,
+      pushTokensToGitea,
       pushTokensToBitbucket,
       pushTokensToADO,
       pushTokensToSupernova,
@@ -479,6 +553,7 @@ export default function useRemoteTokens() {
 
   const addNewProviderItem = useCallback(
     async (credentials: StorageTypeFormValues<false>): Promise<RemoteResponseStatus> => {
+      credentials = prepareCredentialIdentity(credentials, apiProviders ?? []);
       let content: RemoteResponseData | null = null;
       switch (credentials.provider) {
         case StorageProviderType.JSONBIN: {
@@ -517,6 +592,10 @@ export default function useRemoteTokens() {
           content = await addNewGitHubCredentials(credentials);
           break;
         }
+        case StorageProviderType.GITEA: {
+          content = await addNewGiteaCredentials(credentials);
+          break;
+        }
         case StorageProviderType.GITLAB: {
           content = await addNewGitLabCredentials(credentials);
           break;
@@ -551,6 +630,8 @@ export default function useRemoteTokens() {
         };
       }
       if (content) {
+        const handleResult = syncResultHandlers[credentials.provider];
+        if (handleResult) credentials = handleResult(credentials, content);
         dispatch.uiState.setLocalApiState(credentials as StorageTypeCredentials); // in JSONBIN the ID can technically be omitted, but this function handles this by creating a new JSONBin and assigning the ID
         dispatch.uiState.setApiData(credentials as StorageTypeCredentials);
         setStorageType({ provider: credentials as StorageTypeCredentials, shouldSetInDocument: true });
@@ -567,7 +648,10 @@ export default function useRemoteTokens() {
       dispatch,
       addJSONBinCredentials,
       addGenericVersionedCredentials,
+      apiProviders,
+      syncResultHandlers,
       addNewGitLabCredentials,
+      addNewGiteaCredentials,
       addNewGitHubCredentials,
       addNewBitbucketCredentials,
       addNewADOCredentials,
@@ -588,6 +672,10 @@ export default function useRemoteTokens() {
           newBranchCreated = await createGithubBranch(context, branch, source);
           break;
         }
+        case StorageProviderType.GITEA: {
+          newBranchCreated = await createGiteaBranch(context, branch, source);
+          break;
+        }
         case StorageProviderType.GITLAB: {
           newBranchCreated = await createGitLabBranch(context, branch, source);
           break;
@@ -605,7 +693,7 @@ export default function useRemoteTokens() {
       }
       return newBranchCreated;
     },
-    [createGithubBranch, createGitLabBranch, createBitbucketBranch, createADOBranch],
+    [createGithubBranch, createGitLabBranch, createGiteaBranch, createBitbucketBranch, createADOBranch],
   );
 
   const fetchBranches = useCallback(
@@ -613,6 +701,8 @@ export default function useRemoteTokens() {
       switch (context.provider) {
         case StorageProviderType.GITHUB:
           return fetchGithubBranches(context);
+        case StorageProviderType.GITEA:
+          return fetchGiteaBranches(context);
         case StorageProviderType.GITLAB:
           return fetchGitLabBranches(context);
         case StorageProviderType.BITBUCKET:
@@ -625,7 +715,7 @@ export default function useRemoteTokens() {
           return null;
       }
     },
-    [fetchGithubBranches, fetchGitLabBranches, fetchBitbucketBranches, fetchADOBranches],
+    [fetchGithubBranches, fetchGitLabBranches, fetchGiteaBranches, fetchBitbucketBranches, fetchADOBranches],
   );
 
   const deleteProvider = useCallback((provider: any) => {
@@ -697,6 +787,10 @@ export default function useRemoteTokens() {
           hasChange = false;
           break;
         }
+        case StorageProviderType.GITEA: {
+          hasChange = await checkRemoteChangeForGitea(context);
+          break;
+        }
         case StorageProviderType.GITLAB: {
           hasChange = await checkRemoteChangeForGitLab(context);
           break;
@@ -716,19 +810,21 @@ export default function useRemoteTokens() {
       dispatch.uiState.setHasRemoteChange(hasChange);
       return hasChange;
     },
-    [api, checkRemoteChangeForGitHub, checkRemoteChangeForGitLab, dispatch.uiState],
+    [api, checkRemoteChangeForGitHub, checkRemoteChangeForGitLab, checkRemoteChangeForGitea, dispatch.uiState],
   );
 
   const restoreProviderWithAutoPull = useCallback(
     async (context: StorageTypeCredentials) => {
       track('restoreProviderWithAutoPull', { provider: context.provider });
-      dispatch.uiState.setLocalApiState(context);
-      dispatch.uiState.setApiData(context);
+      const handleResult = syncResultHandlers[context.provider];
+      if (!handleResult) {
+        dispatch.uiState.setLocalApiState(context);
+        dispatch.uiState.setApiData(context);
+      }
       dispatch.tokenState.setEditProhibited(false);
-      setStorageType({ provider: context, shouldSetInDocument: true });
-
+      if (!handleResult) setStorageType({ provider: context, shouldSetInDocument: true });
       // Pull tokens automatically without user confirmation
-      await pullTokens({
+      const content = await pullTokens({
         context,
         updateLocalTokens: true,
         usedTokenSet: {},
@@ -737,6 +833,17 @@ export default function useRemoteTokens() {
         skipConfirmation: true,
       });
 
+      if (handleResult) {
+        if (content?.status !== 'success') {
+          dispatch.tokenState.setEditProhibited(editProhibited);
+          throw new ReportedProviderError(content?.errorMessage ?? ErrorMessages.GENERAL_CONNECTION_ERROR);
+        }
+        const syncedContext = handleResult(context, content);
+        dispatch.uiState.setLocalApiState(syncedContext);
+        dispatch.uiState.setApiData(syncedContext);
+        setStorageType({ provider: syncedContext, shouldSetInDocument: true });
+      }
+
       // Switch to tokens tab after successful load
       dispatch.uiState.setActiveTab(Tabs.TOKENS);
 
@@ -744,11 +851,21 @@ export default function useRemoteTokens() {
         status: 'success',
       };
     },
-    [dispatch, setStorageType, pullTokens],
+    [dispatch, editProhibited, setStorageType, pullTokens, syncResultHandlers],
   );
+
+  const getBranchLifecycle = useCallback((context: StorageTypeCredentials): BranchLifecycle | undefined => {
+    const lifecycles: Partial<Record<StorageProviderType, () => BranchLifecycle>> = {
+      [StorageProviderType.GITEA]: () => createGiteaBranchLifecycle(context as GiteaCredentials, {
+        pull: pullTokens, push: pushTokensToGitea, create: createGiteaBranch, branches: fetchGiteaBranches,
+      }),
+    };
+    return lifecycles[context.provider]?.();
+  }, [pullTokens, pushTokensToGitea, createGiteaBranch, fetchGiteaBranches]);
 
   return useMemo(
     () => ({
+      getBranchLifecycle,
       restoreStoredProvider,
       restoreProviderWithAutoPull,
       deleteProvider,
@@ -761,6 +878,7 @@ export default function useRemoteTokens() {
       checkRemoteChange,
     }),
     [
+      getBranchLifecycle,
       restoreStoredProvider,
       restoreProviderWithAutoPull,
       deleteProvider,

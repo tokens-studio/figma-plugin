@@ -11,13 +11,14 @@ import { isGitProvider } from '@/utils/is';
 import type { StorageTypeCredentials } from '@/types/StorageType';
 import { ErrorMessage } from '../ErrorMessage';
 import { Dispatch } from '../../store';
+import type { RemoteResponseData } from '@/types/RemoteResponseData';
 
 type Props = {
   isOpen: boolean;
   startBranch: string | null;
   isCurrentChanges: boolean;
   onClose: (arg: boolean) => void;
-  onSuccess: (branch: string, branches: string[]) => void;
+  onSuccess: (branch: string, branches: string[], data?: Extract<RemoteResponseData, { status: 'success' }>) => void;
 };
 
 type FormData = {
@@ -28,7 +29,7 @@ export default function CreateBranchModal({
   isOpen, onClose, onSuccess, startBranch, isCurrentChanges,
 }: Props) {
   const {
-    addNewBranch, pushTokens, fetchBranches, pullTokens,
+    addNewBranch, pushTokens, fetchBranches, pullTokens, getBranchLifecycle,
   } = useRemoteTokens();
 
   const dispatch = useDispatch<Dispatch>();
@@ -38,7 +39,7 @@ export default function CreateBranchModal({
   const usedTokenSet = useSelector(usedTokenSetSelector);
 
   const [formFields, setFormFields] = React.useState<FormData>({} as FormData);
-  const [hasErrored, setHasErrored] = React.useState<boolean>(false);
+  const [hasErrored, setHasErrored] = React.useState<string | boolean>(false);
   const branchInputRef = React.useRef<HTMLInputElement | null>(null);
 
   /* @lifecycle
@@ -67,6 +68,15 @@ export default function CreateBranchModal({
       isGitProvider(localApiState)
       && isGitProvider(apiData)
     ) {
+      const lifecycle = getBranchLifecycle?.(apiData as StorageTypeCredentials);
+      if (lifecycle) {
+        try {
+          const { data, branches } = await lifecycle.createAndSyncBranch(branch, startBranch ?? undefined, isCurrentChanges, { usedTokenSet, activeTheme });
+          if (data?.status === 'success') onSuccess(data.branch ?? branch, branches, data);
+          else setHasErrored(data?.errorMessage || true);
+        } catch (error) { setHasErrored(error instanceof Error ? error.message : true); }
+        return;
+      }
       // type casting because of "name" error - ignoring because not important
       const response = await addNewBranch(localApiState as StorageTypeCredentials, branch, startBranch ?? undefined);
       const branches = await fetchBranches(localApiState as StorageTypeCredentials);
@@ -92,6 +102,7 @@ export default function CreateBranchModal({
     localApiState,
     apiData,
     addNewBranch,
+    getBranchLifecycle,
     isCurrentChanges,
     fetchBranches,
     pushTokens,
@@ -138,7 +149,7 @@ export default function CreateBranchModal({
           </Stack>
           {hasErrored && (
             <ErrorMessage data-testid="provider-modal-error">
-              There was an error connecting. Check your credentials.
+              {typeof hasErrored === 'string' ? hasErrored : 'There was an error connecting. Check your credentials.'}
             </ErrorMessage>
           )}
         </Stack>

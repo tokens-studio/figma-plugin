@@ -1,6 +1,7 @@
 import compact from 'just-compact';
 import { notifyAPIProviders, notifyUI } from '@/plugin/notifiers';
 import isSameCredentials from './isSameCredentials';
+import { matchesCredentialById } from './credentialIdentity';
 import { ApiProvidersProperty } from '@/figmaStorage';
 import { StorageTypeCredentials } from '@/types/StorageType';
 import { StorageProviderType } from '@/constants/StorageProviderType';
@@ -19,7 +20,9 @@ export async function updateCredentials(context: StorageTypeCredentials) {
       let matchingProvider = -1;
 
       if (context.internalId) {
-        matchingProvider = existingProviders.findIndex((i) => i.internalId === context.internalId);
+        matchingProvider = existingProviders.findIndex(
+          (i) => matchesCredentialById(i, context),
+        );
       } else {
         matchingProvider = existingProviders.findIndex((i) => isSameCredentials(i, context));
       }

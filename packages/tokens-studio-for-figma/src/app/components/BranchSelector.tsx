@@ -20,6 +20,8 @@ import { Dispatch } from '../store';
 import { isGitProvider } from '@/utils/is';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
+import { getSyncedCredentials } from '@/utils/getSyncedCredentials';
+import type { RemoteResponseData } from '@/types/RemoteResponseData';
 import { StorageTypeCredentials } from '@/types/StorageType';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { track } from '@/utils/analytics';
@@ -34,6 +36,7 @@ export default function BranchSelector() {
   const {
     pullTokens,
     fetchBranches,
+    getBranchLifecycle,
   } = useRemoteTokens();
   const dispatch = useDispatch<Dispatch>();
   const { setStorageType } = useStorage();
@@ -109,6 +112,14 @@ export default function BranchSelector() {
     async (branch: string) => {
       track('Create new branch from specific branch');
 
+      if (getBranchLifecycle?.(apiData)) {
+        if (hasChanges && !(await askUserIfPushChanges())) return;
+        setIsCurrentChanges(false);
+        setStartBranch(branch);
+        setCreateBranchModalVisible(true);
+        return;
+      }
+
       if (hasChanges && apiData?.provider !== StorageProviderType.TOKENS_STUDIO_OAUTH && (await askUserIfPushChanges())) {
         // User chose to discard changes - clear local token state
         dispatch.tokenState.setEmptyTokens();
@@ -117,8 +128,17 @@ export default function BranchSelector() {
       setStartBranch(branch);
       setCreateBranchModalVisible(true);
     },
-    [hasChanges, askUserIfPushChanges, dispatch, apiData?.provider],
+    [hasChanges, askUserIfPushChanges, dispatch, apiData, getBranchLifecycle],
   );
+
+  const selectSyncedBranch = React.useCallback((branch: string, data: Extract<RemoteResponseData, { status: 'success' }>) => {
+    const context = getSyncedCredentials({ ...apiData, branch } as StorageTypeCredentials, data);
+    setCurrentBranch(branch);
+    dispatch.uiState.setApiData(context);
+    dispatch.uiState.setLocalApiState(context);
+    AsyncMessageChannel.ReactInstance.message({ type: AsyncMessageTypes.CREDENTIALS, credential: context });
+    setStorageType({ provider: context, shouldSetInDocument: true });
+  }, [apiData, dispatch, setStorageType]);
 
   const changeAndPull = React.useCallback(
     async (branch: string) => {
@@ -126,6 +146,12 @@ export default function BranchSelector() {
       if ((isGitProvider(apiData) && isGitProvider(localApiState)) || isTokensStudioProvider) {
         setIsSwitchingBranch(true);
         try {
+          const lifecycle = getBranchLifecycle?.(apiData);
+          if (lifecycle) {
+            const data = await lifecycle.switchBranch(branch, { usedTokenSet, activeTheme });
+            if (data?.status === 'success') selectSyncedBranch(data.branch ?? branch, data);
+            return;
+          }
           // Clear local token state BEFORE pulling to prevent bleed
           dispatch.tokenState.setEmptyTokens();
           // Pull tokens from new branch BEFORE switching UI state
@@ -160,7 +186,7 @@ export default function BranchSelector() {
         }
       }
     },
-    [apiData, localApiState, dispatch, pullTokens, usedTokenSet, activeTheme, setStorageType],
+    [apiData, localApiState, dispatch, pullTokens, usedTokenSet, activeTheme, setStorageType, getBranchLifecycle, selectSyncedBranch],
   );
 
   const onBranchSelected = React.useCallback(
@@ -178,8 +204,13 @@ export default function BranchSelector() {
   );
 
   const onCreateBranchModalSuccess = React.useCallback(
-    (branch: string, branches: string[]) => {
+    (branch: string, branches: string[], data?: Extract<RemoteResponseData, { status: 'success' }>) => {
       setCreateBranchModalVisible(false);
+      if (data) {
+        dispatch.branchState.setBranches(branches.includes(branch) ? branches : [...branches, branch]);
+        selectSyncedBranch(branch, data);
+        return;
+      }
       setCurrentBranch(branch);
       const isTokensStudioProvider = apiData?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH && localApiState?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH;
       if ((isGitProvider(apiData) && isGitProvider(localApiState)) || isTokensStudioProvider) {
@@ -188,7 +219,7 @@ export default function BranchSelector() {
         dispatch.uiState.setLocalApiState({ ...localApiState, branch } as StorageTypeCredentials);
       }
     },
-    [dispatch, apiData, localApiState],
+    [dispatch, apiData, localApiState, selectSyncedBranch],
   );
 
   return currentBranch ? (

@@ -5,19 +5,19 @@ import {
   Button, FormField, IconButton, Label, Link, Stack, Text, TextInput,
 } from '@tokens-studio/ui';
 import { EyeClosedIcon, EyeOpenIcon } from '@radix-ui/react-icons';
-import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeFormValues } from '@/types/StorageType';
 
 import { generateId } from '@/utils/generateId';
 import { ChangeEventHandler } from './types';
 import { ErrorMessage } from '../ErrorMessage';
+import { gitFormConfig, GitFormProvider } from './gitFormConfig';
 
 type ValidatedFormValues = Extract<
 StorageTypeFormValues<false>,
-{ provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB }
+{ provider: GitFormProvider }
 >;
 type Props = {
-  values: Extract<StorageTypeFormValues<true>, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB }>;
+  values: Extract<StorageTypeFormValues<true>, { provider: GitFormProvider }>;
   onChange: ChangeEventHandler;
   onSubmit: (values: ValidatedFormValues) => void;
   onCancel: () => void;
@@ -28,6 +28,7 @@ type Props = {
 export default function GitForm({
   onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
 }: Props) {
+  const config = gitFormConfig[values.provider];
   const [isMasked, setIsMasked] = React.useState(true);
 
   const toggleMask = React.useCallback(() => {
@@ -63,23 +64,20 @@ export default function GitForm({
     [values, onSubmit],
   );
 
-  const baseUrlPlaceholder = `https://${values.provider}.hyma.com`;
-  const gitExplainedText = values.provider === StorageProviderType.GITHUB ? t('gitHubExplained') : t('gitLabExplained');
-  const readMoreText = values.provider === StorageProviderType.GITHUB ? t('readMoreGitHub') : t('readMoreGitLab');
-
   return (
     <form onSubmit={handleSubmit}>
       <Stack direction="column" gap={5}>
-        <Text muted>{gitExplainedText}</Text>
+        <Text muted>{t(config.descriptionKey)}</Text>
         <Text muted css={{ marginTop: '$2' }}>
           <Link
-            href={`https://docs.tokens.studio/sync/${values.provider}?ref=addprovider`}
+            href={config.documentationUrl ?? `https://docs.tokens.studio/sync/${values.provider}?ref=addprovider`}
             target="_blank"
             rel="noreferrer"
           >
-            {readMoreText}
+            {t(config.readMoreKey)}
           </Link>
         </Text>
+        {config.setupNoteKey && <Text muted>{t(config.setupNoteKey)}</Text>}
         <FormField>
           <Label htmlFor="name">{t('name')}</Label>
           <TextInput
@@ -111,6 +109,7 @@ export default function GitForm({
             )}
             required
           />
+          {config.tokenHelpKey && <Text muted>{t(config.tokenHelpKey)}</Text>}
         </FormField>
         <FormField>
           <Label htmlFor="id">{t('repo')}</Label>
@@ -135,16 +134,17 @@ export default function GitForm({
           </Text>
         </FormField>
         <FormField>
-          <Label htmlFor="baseUrl">{t('baseUrl')}</Label>
+          <Label htmlFor="baseUrl">{t(config.baseUrl.labelKey)}</Label>
           <TextInput
             name="baseUrl"
             id="baseUrl"
             value={values.baseUrl || ''}
-            placeholder={baseUrlPlaceholder}
+            required={config.baseUrl.required}
+            placeholder={config.baseUrl.placeholder}
             onChange={onChange}
             type="text"
           />
-          <Text muted>{t('baseUrlHelpText')}</Text>
+          <Text muted>{t(config.baseUrl.helpKey)}</Text>
         </FormField>
         <Stack direction="row" justify="end" gap={4}>
           <Button variant="secondary" onClick={onCancel}>
