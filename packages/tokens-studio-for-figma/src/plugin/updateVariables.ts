@@ -7,6 +7,7 @@ import setValuesOnVariable from './setValuesOnVariable';
 import { mapTokensToVariableInfo } from '@/utils/mapTokensToVariableInfo';
 import { TokenResolver } from '@/utils/TokenResolver';
 import { getAliasValue } from '@/utils/alias';
+import { getBaseFontSizeAlias } from '@/utils/getBaseFontSizeAlias';
 import { resolveCollectionContext } from './extendedCollections/collectionContext';
 import { getVariablesWithoutZombies } from './getVariablesWithoutZombies';
 
@@ -56,8 +57,9 @@ export default async function updateVariables({
 
   // Resolve the base font size for this specific theme using the same resolved tokens
   let themeBaseFontSize = settings.baseFontSize;
-  if (settings.aliasBaseFontSize) {
-    const resolvedBaseFontSize = getAliasValue(settings.aliasBaseFontSize, resolvedTokens);
+  const baseFontSizeAlias = getBaseFontSizeAlias(settings.aliasBaseFontSize, resolvedTokens);
+  if (baseFontSizeAlias) {
+    const resolvedBaseFontSize = getAliasValue(baseFontSizeAlias, resolvedTokens);
     if (
       resolvedBaseFontSize !== undefined
       && resolvedBaseFontSize !== null
