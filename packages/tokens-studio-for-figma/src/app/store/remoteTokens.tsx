@@ -32,7 +32,9 @@ import usePullDialog from '../hooks/usePullDialog';
 import { Tabs } from '@/constants/Tabs';
 import { useTokensStudioOAuth } from './providers/tokens-studio';
 import { notifyToUI } from '@/plugin/notifiers';
-import { BITBUCKET_SECURITY_NOTICE_MAX_VIEWS } from '@/app/components/BitbucketSecurityNotice/BitbucketSecurityNotice';
+import { BITBUCKET_SECURITY_NOTICE_MAX_VIEWS } from '@/constants/BitbucketSecurityNotice';
+import { savesNewBitbucketApiToken } from '@/utils/bitbucketSecurityNotice';
+import { apiProvidersSelector } from '@/selectors/apiProvidersSelector';
 
 export type PushOverrides = { branch: string; commitMessage: string };
 
@@ -53,6 +55,7 @@ export default function useRemoteTokens() {
   const tokens = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
   const activeTab = useSelector(activeTabSelector);
+  const apiProviders = useSelector(apiProvidersSelector);
   const currentActiveTheme = useSelector(activeThemeSelector);
   const currentUsedTokenSet = useSelector(usedTokenSetSelector);
   const { showPullDialog, closePullDialog, showPullDialogError } = usePullDialog();
@@ -480,6 +483,8 @@ export default function useRemoteTokens() {
 
   const addNewProviderItem = useCallback(
     async (credentials: StorageTypeFormValues<false>): Promise<RemoteResponseStatus> => {
+      // Checked before saving, while the saved syncs still hold the old token.
+      const replacesBitbucketApiToken = savesNewBitbucketApiToken(credentials, apiProviders);
       let content: RemoteResponseData | null = null;
       switch (credentials.provider) {
         case StorageProviderType.JSONBIN: {
@@ -555,8 +560,8 @@ export default function useRemoteTokens() {
         dispatch.uiState.setLocalApiState(credentials as StorageTypeCredentials); // in JSONBIN the ID can technically be omitted, but this function handles this by creating a new JSONBin and assigning the ID
         dispatch.uiState.setApiData(credentials as StorageTypeCredentials);
         setStorageType({ provider: credentials as StorageTypeCredentials, shouldSetInDocument: true });
-        if (credentials.provider === StorageProviderType.BITBUCKET) {
-          // A Bitbucket sync saved on this version, new or with a replaced token: the security notice is no longer needed.
+        if (replacesBitbucketApiToken) {
+          // A new or replaced Bitbucket API token was saved on this version: the security notice is no longer needed.
           dispatch.settings.setBitbucketSecurityNoticeViews2026(BITBUCKET_SECURITY_NOTICE_MAX_VIEWS);
         }
         return {
@@ -570,6 +575,7 @@ export default function useRemoteTokens() {
     },
     [
       dispatch,
+      apiProviders,
       addJSONBinCredentials,
       addGenericVersionedCredentials,
       addNewGitLabCredentials,

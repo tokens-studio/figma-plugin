@@ -10,12 +10,15 @@ import { Tabs } from '@/constants/Tabs';
 import { useAuthStore } from '@/app/store/useAuthStore';
 import type { StorageTypeCredentials } from '@/types/StorageType';
 import type { LegacyOnlyLicense } from '@/utils/licenseApi';
-import BitbucketSecurityNotice, { shouldShowBitbucketSecurityNotice, hasBitbucketApiToken } from '.';
+import BitbucketSecurityNotice, { shouldShowBitbucketSecurityNotice } from '.';
 import {
   BITBUCKET_SECURITY_NOTICE_MAX_VIEWS, BITBUCKET_SECURITY_NOTICE_URL, BITBUCKET_SETUP_GUIDE_URL,
-} from './BitbucketSecurityNotice';
+} from '@/constants/BitbucketSecurityNotice';
 
-const TITLE = 'Action needed: replace your Bitbucket API token';
+// Tests run without loaded translations, so the notice renders its i18n keys.
+const TITLE = 'bitbucketSecurityNotice.title';
+const READ_ADVISORY = 'bitbucketSecurityNotice.readAdvisory';
+const SYNC_GUIDE = 'bitbucketSecurityNotice.syncGuide';
 const BITBUCKET_CREDENTIAL = {
   provider: StorageProviderType.BITBUCKET, id: 'workspace/repo', internalId: 'b', name: 'Bitbucket', secret: '', apiToken: 'token',
 } as StorageTypeCredentials;
@@ -25,19 +28,6 @@ const BITBUCKET_APP_PASSWORD = {
 const GITHUB_CREDENTIAL = {
   provider: StorageProviderType.GITHUB, id: 'o/r', internalId: 'g', name: 'GitHub', secret: '',
 } as StorageTypeCredentials;
-
-describe('hasBitbucketApiToken', () => {
-  it('is true for a saved Bitbucket sync with an API token', () => {
-    expect(hasBitbucketApiToken([GITHUB_CREDENTIAL, BITBUCKET_CREDENTIAL])).toBe(true);
-  });
-
-  it('is false for app passwords, blank tokens and other providers', () => {
-    expect(hasBitbucketApiToken([BITBUCKET_APP_PASSWORD])).toBe(false);
-    expect(hasBitbucketApiToken([{ ...BITBUCKET_CREDENTIAL, apiToken: '  ' } as StorageTypeCredentials])).toBe(false);
-    expect(hasBitbucketApiToken([GITHUB_CREDENTIAL])).toBe(false);
-    expect(hasBitbucketApiToken(undefined as unknown as StorageTypeCredentials[])).toBe(false);
-  });
-});
 
 describe('shouldShowBitbucketSecurityNotice', () => {
   const base = {
@@ -78,7 +68,9 @@ describe('BitbucketSecurityNotice', () => {
 
   afterEach(() => {
     messageSpy.mockRestore();
-    useAuthStore.setState({ isAuthenticated: false, isPro: false });
+    act(() => {
+      useAuthStore.setState({ isAuthenticated: false, isPro: false, isLoading: false });
+    });
   });
 
   const renderNotice = ({
@@ -117,7 +109,7 @@ describe('BitbucketSecurityNotice', () => {
     renderNotice();
 
     expect(screen.getByText(TITLE)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Read advisory' })).toHaveAttribute('href', BITBUCKET_SECURITY_NOTICE_URL);
+    expect(screen.getByRole('link', { name: READ_ADVISORY })).toHaveAttribute('href', BITBUCKET_SECURITY_NOTICE_URL);
   });
 
   it.each([
@@ -184,7 +176,7 @@ describe('BitbucketSecurityNotice', () => {
     expect(screen.getByText(TITLE)).toBeInTheDocument();
   });
 
-  it('stays hidden once a Bitbucket sync is saved, before it opens', () => {
+  it('stays hidden once a new Bitbucket API token is saved, before it opens', () => {
     const { store } = renderNotice({ legacyOnlyLicense: { primaryStatus: 404, primaryReason: 'status' } });
 
     act(() => {
@@ -240,7 +232,7 @@ describe('BitbucketSecurityNotice', () => {
   it('opens the Bitbucket sync guide without hiding the notice', () => {
     const { store } = renderNotice();
 
-    const guide = screen.getByRole('link', { name: 'Bitbucket sync guide' });
+    const guide = screen.getByRole('link', { name: SYNC_GUIDE });
     expect(guide).toHaveAttribute('href', BITBUCKET_SETUP_GUIDE_URL);
     fireEvent.click(guide);
 
@@ -248,34 +240,44 @@ describe('BitbucketSecurityNotice', () => {
     expect(savedViews(store)).toBe(1);
   });
 
-  it('only has the guide and advisory buttons', () => {
-    renderNotice();
+  it('has a close button that only closes it for this session', () => {
+    const { store } = renderNotice();
 
-    expect(screen.queryByRole('button', { name: 'Remind me later' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Sync settings' })).not.toBeInTheDocument();
-  });
+    fireEvent.click(screen.getByTestId('close-button'));
 
-  it('lists the four steps to replace the token', () => {
-    renderNotice();
-
-    expect(screen.getAllByRole('listitem').map((item) => item.querySelector('strong')?.textContent)).toEqual([
-      'Revoke your current token',
-      'Create a new API token',
-      'Find your Bitbucket sync',
-      'Replace the token',
-    ]);
+    expect(screen.queryByText(TITLE)).not.toBeInTheDocument();
+    expect(savedViews(store)).toBe(1);
   });
 
   it('links to the security contact', () => {
     renderNotice();
 
-    expect(screen.getByRole('link', { name: 'security@tokens.studio' })).toHaveAttribute('href', 'mailto:security@tokens.studio');
+    expect(document.querySelector('a[href="mailto:security@tokens.studio"]')).toHaveAttribute('target', '_blank');
+  });
+
+  it('lists the four steps to replace the token', () => {
+    renderNotice();
+
+    expect(screen.getAllByRole('listitem')).toHaveLength(4);
+  });
+
+  it('waits while a sign-in runs', () => {
+    useAuthStore.setState({ isLoading: true });
+    const { store } = renderNotice();
+    expect(screen.queryByText(TITLE)).not.toBeInTheDocument();
+    expect(savedViews(store)).toBe(0);
+
+    act(() => {
+      useAuthStore.setState({ isLoading: false });
+    });
+
+    expect(screen.getByText(TITLE)).toBeInTheDocument();
   });
 
   it('hides for good once the advisory is opened, even on the first launch', () => {
     const { store } = renderNotice();
 
-    fireEvent.click(screen.getByRole('link', { name: 'Read advisory' }));
+    fireEvent.click(screen.getByRole('link', { name: READ_ADVISORY }));
 
     expect(screen.queryByText(TITLE)).not.toBeInTheDocument();
     expect(savedViews(store)).toBe(BITBUCKET_SECURITY_NOTICE_MAX_VIEWS);

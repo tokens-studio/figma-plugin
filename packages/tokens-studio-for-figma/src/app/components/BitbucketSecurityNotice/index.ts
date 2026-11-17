@@ -1,4 +1,4 @@
 import BitbucketSecurityNotice from './BitbucketSecurityNotice';
 
-export { shouldShowBitbucketSecurityNotice, hasBitbucketApiToken } from './BitbucketSecurityNotice';
+export { shouldShowBitbucketSecurityNotice } from './BitbucketSecurityNotice';
 export default BitbucketSecurityNotice;
