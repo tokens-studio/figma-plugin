@@ -23,6 +23,7 @@ import RenameTokenGroupModal from '../modals/RenameTokenGroupModal';
 import DuplicateTokenGroupModal from '../modals/DuplicateTokenGroupModal';
 import { useGenerateDocumentation } from '@/app/hooks/useGenerateDocumentation';
 import ProBadge from '../ProBadge';
+import { contextMenuContentCss } from '../contextMenuContentCss';
 
 export type Props = {
   id: string;
@@ -122,7 +123,7 @@ export function TokenGroupHeading({
               </Stack>
             </ContextMenu.Trigger>
             <ContextMenu.Portal>
-              <ContextMenu.Content>
+              <ContextMenu.Content css={contextMenuContentCss}>
                 <ContextMenu.Item disabled={!canEdit} onSelect={handleRename}>
                   {t('rename')}
                 </ContextMenu.Item>

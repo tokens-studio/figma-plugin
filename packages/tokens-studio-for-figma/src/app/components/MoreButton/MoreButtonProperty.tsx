@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { CheckIcon } from '@radix-ui/react-icons';
+import { Check } from 'iconoir-react';
 import {
   ContextMenu,
 } from '@tokens-studio/ui';
@@ -34,7 +34,7 @@ export const MoreButtonProperty: React.FC<React.PropsWithChildren<React.PropsWit
       disabled={disabled}
     >
       <ContextMenu.ItemIndicator>
-        <CheckIcon />
+        <Check />
       </ContextMenu.ItemIndicator>
       {property.label}
     </ContextMenu.CheckboxItem>
