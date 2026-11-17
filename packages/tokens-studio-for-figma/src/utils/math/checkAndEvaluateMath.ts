@@ -2,7 +2,16 @@ import { Parser } from 'expr-eval';
 import calcAstParser from 'postcss-calc-ast-parser';
 import { Root } from 'postcss-calc-ast-parser/dist/types/ast';
 
-const parser = new Parser();
+// Token values come from external sources (synced repositories, URLs, pasted JSON), so expressions
+// are untrusted input. Member access reaches JS builtins from inside an expression, which allows
+// arbitrary code execution. Assignment and function definitions allow unbounded recursion.
+const parser = new Parser({
+  allowMemberAccess: false,
+  operators: {
+    assignment: false,
+    fndef: false,
+  },
+});
 
 /**
  * Clamps the value of x between min and max
