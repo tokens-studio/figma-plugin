@@ -11,10 +11,13 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { Tabs } from '@/constants/Tabs';
 import { activeTabSelector } from '@/selectors/activeTabSelector';
 import { apiProvidersSelector } from '@/selectors/apiProvidersSelector';
-import { storageTypeSelector } from '@/selectors/storageTypeSelector';
 import { showBitbucketMigrationDialogSelector } from '@/selectors/showBitbucketMigrationDialogSelector';
+import { legacyOnlyLicenseSelector } from '@/selectors/legacyOnlyLicenseSelector';
+import { useAuthStore } from '@/app/store/useAuthStore';
+import { useTermsUpdatePending } from '../TermsUpdateModal';
+import { shouldShowLegacyLicenseNotice } from '../LegacyLicenseSignInNotice';
 import type { RootState } from '@/app/store';
-import type { StorageType, StorageTypeCredentials } from '@/types/StorageType';
+import type { StorageTypeCredentials } from '@/types/StorageType';
 
 export const BITBUCKET_SECURITY_NOTICE_URL = 'https://tokens.studio/security-advisory';
 export const BITBUCKET_SECURITY_NOTICE_KEY = 'bitbucketSecurityNoticeViews2026';
@@ -53,30 +56,35 @@ const WarningIcon = styled(WarningTriangleSolid, {
 });
 
 type NoticeConditions = {
-  apiProviders: StorageTypeCredentials[];
-  storageType: StorageType;
+  // The user had a saved Bitbucket API token when the plugin finished loading. Decided once per launch, so adding or
+  // replacing a token later in the session doesn't open the notice.
+  hadApiTokenAtLaunch: boolean;
   // Launches the notice has already been shown on, saved across sessions. Opening the advisory sets it to the max.
   views: number;
   // Already shown in this session: keeps the third showing open even though it brought views to the max.
   shownThisSession: boolean;
   dismissed: boolean;
-  // The app is still loading, or another startup dialog is open.
+  // The app is still loading, or another startup dialog is open or still to come.
   blocked: boolean;
 };
 
-export function usesBitbucketSync(apiProviders: StorageTypeCredentials[], storageType: StorageType): boolean {
-  return storageType?.provider === StorageProviderType.BITBUCKET
-    || (apiProviders ?? []).some((provider) => provider.provider === StorageProviderType.BITBUCKET);
+/**
+ * Whether the user has a saved Bitbucket sync that uses an API token. Only API tokens were saved into files: app
+ * passwords never were, and someone who only opens a file synced with Bitbucket has no token of their own to replace.
+ */
+export function hasBitbucketApiToken(apiProviders: StorageTypeCredentials[]): boolean {
+  return (apiProviders ?? []).some((provider) => provider.provider === StorageProviderType.BITBUCKET
+    && typeof provider.apiToken === 'string' && provider.apiToken.trim() !== '');
 }
 
 /**
- * Whether to show the Bitbucket security notice: only to users with a Bitbucket sync, on up to three launches or
- * until they open the advisory. Closing it hides it for this session only.
+ * Whether to show the Bitbucket security notice: only to users who had a Bitbucket API token saved at launch, on up
+ * to three launches, until they open the advisory or save a Bitbucket sync. Closing it hides it for this session only.
  */
 export function shouldShowBitbucketSecurityNotice({
-  apiProviders, storageType, views, shownThisSession, dismissed, blocked,
+  hadApiTokenAtLaunch, views, shownThisSession, dismissed, blocked,
 }: NoticeConditions): boolean {
-  if (dismissed || blocked || !usesBitbucketSync(apiProviders, storageType)) return false;
+  if (dismissed || blocked || !hadApiTokenAtLaunch) return false;
   return shownThisSession || views < BITBUCKET_SECURITY_NOTICE_MAX_VIEWS;
 }
 
@@ -84,23 +92,38 @@ export default function BitbucketSecurityNotice() {
   const dispatch = useDispatch<Dispatch>();
   const activeTab = useSelector(activeTabSelector);
   const apiProviders = useSelector(apiProvidersSelector);
-  const storageType = useSelector(storageTypeSelector);
   const migrationDialogOpen = useSelector(showBitbucketMigrationDialogSelector);
+  const termsUpdatePending = useTermsUpdatePending();
+  const legacyOnlyLicense = useSelector(legacyOnlyLicenseSelector);
+  const legacyLicenseNoticeDismissed = useSelector((state: RootState) => state.uiState.legacyLicenseNoticeDismissed);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const views = useSelector((state: RootState) => state.settings?.[BITBUCKET_SECURITY_NOTICE_KEY] ?? 0);
   // Kept in component state on purpose: closing the notice only lasts for this session.
   const [dismissed, setDismissed] = useState(false);
   const [shownThisSession, setShownThisSession] = useState(false);
   // Guards the count synchronously: the store update re-renders before the state update above lands.
   const countedThisSession = useRef(false);
+  // Null until loading ends, then fixed for the session.
+  const [hadApiTokenAtLaunch, setHadApiTokenAtLaunch] = useState<boolean | null>(null);
+  const isLoading = activeTab === Tabs.LOADING;
   const isCypress = typeof window !== 'undefined' && !!(window as any).Cypress;
+  // The legacy license notice goes first; this one waits until it is closed.
+  const legacyLicenseNoticePending = shouldShowLegacyLicenseNotice({
+    legacyOnlyLicense, isAuthenticated, dismissed: legacyLicenseNoticeDismissed, blocked: false,
+  });
+
+  useEffect(() => {
+    if (hadApiTokenAtLaunch === null && !isLoading) {
+      setHadApiTokenAtLaunch(hasBitbucketApiToken(apiProviders));
+    }
+  }, [hadApiTokenAtLaunch, isLoading, apiProviders]);
 
   const open = shouldShowBitbucketSecurityNotice({
-    apiProviders,
-    storageType,
+    hadApiTokenAtLaunch: !!hadApiTokenAtLaunch,
     views,
     shownThisSession,
     dismissed,
-    blocked: activeTab === Tabs.LOADING || migrationDialogOpen || isCypress,
+    blocked: isLoading || migrationDialogOpen || termsUpdatePending || legacyLicenseNoticePending || isCypress,
   });
 
   useEffect(() => {

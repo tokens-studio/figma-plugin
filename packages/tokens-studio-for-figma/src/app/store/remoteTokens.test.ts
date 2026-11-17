@@ -11,8 +11,10 @@ import { notifyToUI } from '@/plugin/notifiers';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { JSONBinTokenStorage } from '@/storage';
 import { tokenFormatSelector } from '@/selectors/tokenFormatSelector';
+import { BITBUCKET_SECURITY_NOTICE_MAX_VIEWS } from '@/app/components/BitbucketSecurityNotice/BitbucketSecurityNotice';
 
 const mockStartJob = jest.fn();
+const mockSetBitbucketSecurityNoticeViews = jest.fn();
 const mockRetrieve = jest.fn();
 const mockCanWrite = jest.fn();
 const mockChangePath = jest.fn();
@@ -117,6 +119,9 @@ jest.mock('react-redux', () => ({
     },
     branchState: {
       setBranches: mockSetBranches,
+    },
+    settings: {
+      setBitbucketSecurityNoticeViews2026: mockSetBitbucketSecurityNoticeViews,
     },
   })),
   useSelector: (selector: Selector) => mockSelector(selector),
@@ -742,6 +747,12 @@ describe('remoteTokens', () => {
         expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
           status: 'success',
         });
+        // Saving a Bitbucket sync on this version means the token is new or replaced: the security notice is done.
+        if (context === bitbucketContext) {
+          expect(mockSetBitbucketSecurityNoticeViews).toHaveBeenCalledWith(BITBUCKET_SECURITY_NOTICE_MAX_VIEWS);
+        } else {
+          expect(mockSetBitbucketSecurityNoticeViews).not.toHaveBeenCalled();
+        }
       });
     } else {
       it(`Add newProviderItem to ${context.provider}, should pull tokens and return error message if there is no content`, async () => {

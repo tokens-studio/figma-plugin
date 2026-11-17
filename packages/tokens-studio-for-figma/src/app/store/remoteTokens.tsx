@@ -32,6 +32,7 @@ import usePullDialog from '../hooks/usePullDialog';
 import { Tabs } from '@/constants/Tabs';
 import { useTokensStudioOAuth } from './providers/tokens-studio';
 import { notifyToUI } from '@/plugin/notifiers';
+import { BITBUCKET_SECURITY_NOTICE_MAX_VIEWS } from '@/app/components/BitbucketSecurityNotice/BitbucketSecurityNotice';
 
 export type PushOverrides = { branch: string; commitMessage: string };
 
@@ -554,6 +555,10 @@ export default function useRemoteTokens() {
         dispatch.uiState.setLocalApiState(credentials as StorageTypeCredentials); // in JSONBIN the ID can technically be omitted, but this function handles this by creating a new JSONBin and assigning the ID
         dispatch.uiState.setApiData(credentials as StorageTypeCredentials);
         setStorageType({ provider: credentials as StorageTypeCredentials, shouldSetInDocument: true });
+        if (credentials.provider === StorageProviderType.BITBUCKET) {
+          // A Bitbucket sync saved on this version, new or with a replaced token: the security notice is no longer needed.
+          dispatch.settings.setBitbucketSecurityNoticeViews2026(BITBUCKET_SECURITY_NOTICE_MAX_VIEWS);
+        }
         return {
           status: 'success',
         };

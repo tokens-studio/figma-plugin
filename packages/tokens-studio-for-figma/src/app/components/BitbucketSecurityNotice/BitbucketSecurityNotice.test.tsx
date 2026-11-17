@@ -1,44 +1,47 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import {
-  createMockStore, fireEvent, render, screen,
+  act, createMockStore, fireEvent, render, screen,
 } from '../../../../tests/config/setupTest';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { Tabs } from '@/constants/Tabs';
-import type { StorageType, StorageTypeCredentials } from '@/types/StorageType';
-import BitbucketSecurityNotice, { shouldShowBitbucketSecurityNotice, usesBitbucketSync } from '.';
+import { useAuthStore } from '@/app/store/useAuthStore';
+import type { StorageTypeCredentials } from '@/types/StorageType';
+import type { LegacyOnlyLicense } from '@/utils/licenseApi';
+import BitbucketSecurityNotice, { shouldShowBitbucketSecurityNotice, hasBitbucketApiToken } from '.';
 import {
   BITBUCKET_SECURITY_NOTICE_MAX_VIEWS, BITBUCKET_SECURITY_NOTICE_URL, BITBUCKET_SETUP_GUIDE_URL,
 } from './BitbucketSecurityNotice';
 
 const TITLE = 'Action needed: replace your Bitbucket API token';
-const LOCAL: StorageType = { provider: StorageProviderType.LOCAL };
-const BITBUCKET_FILE = { provider: StorageProviderType.BITBUCKET, id: 'workspace/repo' } as StorageType;
 const BITBUCKET_CREDENTIAL = {
-  provider: StorageProviderType.BITBUCKET, id: 'workspace/repo', internalId: 'b', name: 'Bitbucket', secret: '',
+  provider: StorageProviderType.BITBUCKET, id: 'workspace/repo', internalId: 'b', name: 'Bitbucket', secret: '', apiToken: 'token',
+} as StorageTypeCredentials;
+const BITBUCKET_APP_PASSWORD = {
+  provider: StorageProviderType.BITBUCKET, id: 'workspace/repo', internalId: 'p', name: 'Bitbucket', secret: 'app-password',
 } as StorageTypeCredentials;
 const GITHUB_CREDENTIAL = {
   provider: StorageProviderType.GITHUB, id: 'o/r', internalId: 'g', name: 'GitHub', secret: '',
 } as StorageTypeCredentials;
 
-describe('usesBitbucketSync', () => {
-  it('is true for a saved Bitbucket sync or a file synced with Bitbucket', () => {
-    expect(usesBitbucketSync([BITBUCKET_CREDENTIAL], LOCAL)).toBe(true);
-    expect(usesBitbucketSync([], BITBUCKET_FILE)).toBe(true);
+describe('hasBitbucketApiToken', () => {
+  it('is true for a saved Bitbucket sync with an API token', () => {
+    expect(hasBitbucketApiToken([GITHUB_CREDENTIAL, BITBUCKET_CREDENTIAL])).toBe(true);
   });
 
-  it('is false for users without Bitbucket sync', () => {
-    expect(usesBitbucketSync([GITHUB_CREDENTIAL], LOCAL)).toBe(false);
-    expect(usesBitbucketSync([], LOCAL)).toBe(false);
-    expect(usesBitbucketSync(undefined as unknown as StorageTypeCredentials[], undefined as unknown as StorageType)).toBe(false);
+  it('is false for app passwords, blank tokens and other providers', () => {
+    expect(hasBitbucketApiToken([BITBUCKET_APP_PASSWORD])).toBe(false);
+    expect(hasBitbucketApiToken([{ ...BITBUCKET_CREDENTIAL, apiToken: '  ' } as StorageTypeCredentials])).toBe(false);
+    expect(hasBitbucketApiToken([GITHUB_CREDENTIAL])).toBe(false);
+    expect(hasBitbucketApiToken(undefined as unknown as StorageTypeCredentials[])).toBe(false);
   });
 });
 
 describe('shouldShowBitbucketSecurityNotice', () => {
   const base = {
-    apiProviders: [BITBUCKET_CREDENTIAL], storageType: LOCAL, views: 0, shownThisSession: false, dismissed: false, blocked: false,
+    hadApiTokenAtLaunch: true, views: 0, shownThisSession: false, dismissed: false, blocked: false,
   };
 
   it('shows for a Bitbucket user on the first three launches', () => {
@@ -61,8 +64,8 @@ describe('shouldShowBitbucketSecurityNotice', () => {
     expect(shouldShowBitbucketSecurityNotice({ ...base, blocked: true })).toBe(false);
   });
 
-  it('does not show without Bitbucket sync', () => {
-    expect(shouldShowBitbucketSecurityNotice({ ...base, apiProviders: [GITHUB_CREDENTIAL] })).toBe(false);
+  it('does not show without a Bitbucket API token at launch', () => {
+    expect(shouldShowBitbucketSecurityNotice({ ...base, hadApiTokenAtLaunch: false })).toBe(false);
   });
 });
 
@@ -75,26 +78,30 @@ describe('BitbucketSecurityNotice', () => {
 
   afterEach(() => {
     messageSpy.mockRestore();
+    useAuthStore.setState({ isAuthenticated: false, isPro: false });
   });
 
   const renderNotice = ({
     apiProviders = [BITBUCKET_CREDENTIAL],
-    storageType = LOCAL,
     views = 0,
     activeTab = Tabs.START,
     showBitbucketMigrationDialog = false,
+    licenseKey = '',
+    legacyOnlyLicense = null,
   }: {
     apiProviders?: StorageTypeCredentials[];
-    storageType?: StorageType;
     views?: number;
     activeTab?: Tabs;
     showBitbucketMigrationDialog?: boolean;
+    licenseKey?: string;
+    legacyOnlyLicense?: LegacyOnlyLicense | null;
   } = {}) => {
     const store = createMockStore({
-      settings: { bitbucketSecurityNoticeViews2026: views },
+      settings: { bitbucketSecurityNoticeViews2026: views, seenTermsUpdate2026Subprocessors: false },
       uiState: {
-        activeTab, apiProviders, storageType, showBitbucketMigrationDialog,
+        activeTab, apiProviders, showBitbucketMigrationDialog,
       },
+      userState: { licenseKey, legacyOnlyLicense },
     });
     const result = render(
       <Provider store={store}>
@@ -113,17 +120,79 @@ describe('BitbucketSecurityNotice', () => {
     expect(screen.getByRole('link', { name: 'Read advisory' })).toHaveAttribute('href', BITBUCKET_SECURITY_NOTICE_URL);
   });
 
-  it('shows when the open file syncs with Bitbucket', () => {
-    renderNotice({ apiProviders: [], storageType: BITBUCKET_FILE });
+  it.each([
+    ['without Bitbucket sync', [GITHUB_CREDENTIAL]],
+    ['with only a Bitbucket app password', [BITBUCKET_APP_PASSWORD]],
+    ['without a Bitbucket credential of their own', []],
+  ])('stays hidden for users %s, and counts nothing', (_, apiProviders) => {
+    const { store } = renderNotice({ apiProviders });
+
+    expect(screen.queryByText(TITLE)).not.toBeInTheDocument();
+    expect(savedViews(store)).toBe(0);
+  });
+
+  it('decides at launch: a token added later in the session does not open it', () => {
+    const { store } = renderNotice({ apiProviders: [] });
+
+    act(() => {
+      store.dispatch.uiState.setAPIProviders([BITBUCKET_CREDENTIAL]);
+    });
+
+    expect(screen.queryByText(TITLE)).not.toBeInTheDocument();
+    expect(savedViews(store)).toBe(0);
+  });
+
+  it('decides once loading ends, from the syncs loaded by then', () => {
+    const { store } = renderNotice({ activeTab: Tabs.LOADING, apiProviders: [] });
+
+    act(() => {
+      store.dispatch.uiState.setAPIProviders([BITBUCKET_CREDENTIAL]);
+      store.dispatch.uiState.setActiveTab(Tabs.START);
+    });
 
     expect(screen.getByText(TITLE)).toBeInTheDocument();
   });
 
-  it('stays hidden for users without Bitbucket sync, and counts nothing', () => {
-    const { store } = renderNotice({ apiProviders: [GITHUB_CREDENTIAL] });
-
+  it('waits for the terms update, then shows once it is seen', () => {
+    const { store } = renderNotice({ licenseKey: 'key' });
     expect(screen.queryByText(TITLE)).not.toBeInTheDocument();
     expect(savedViews(store)).toBe(0);
+
+    act(() => {
+      store.dispatch.settings.setSeenTermsUpdate2026Subprocessors(true);
+    });
+
+    expect(screen.getByText(TITLE)).toBeInTheDocument();
+    expect(savedViews(store)).toBe(1);
+  });
+
+  it('is not held back by the terms flag for users who never get the terms update', () => {
+    renderNotice({ licenseKey: '' });
+
+    expect(screen.getByText(TITLE)).toBeInTheDocument();
+  });
+
+  it('waits for the legacy license notice, then shows once it is closed', () => {
+    const { store } = renderNotice({ legacyOnlyLicense: { primaryStatus: 404, primaryReason: 'status' } });
+    expect(screen.queryByText(TITLE)).not.toBeInTheDocument();
+    expect(savedViews(store)).toBe(0);
+
+    act(() => {
+      store.dispatch.uiState.setLegacyLicenseNoticeDismissed(true);
+    });
+
+    expect(screen.getByText(TITLE)).toBeInTheDocument();
+  });
+
+  it('stays hidden once a Bitbucket sync is saved, before it opens', () => {
+    const { store } = renderNotice({ legacyOnlyLicense: { primaryStatus: 404, primaryReason: 'status' } });
+
+    act(() => {
+      store.dispatch.settings.setBitbucketSecurityNoticeViews2026(BITBUCKET_SECURITY_NOTICE_MAX_VIEWS);
+      store.dispatch.uiState.setLegacyLicenseNoticeDismissed(true);
+    });
+
+    expect(screen.queryByText(TITLE)).not.toBeInTheDocument();
   });
 
   it('counts one view per launch and saves it', () => {
