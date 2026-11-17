@@ -1,7 +1,7 @@
 import React, {
-  useCallback, useEffect, useMemo, useRef, useState,
+  useCallback, useEffect, useMemo, useRef,
 } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { Button, Link } from '@tokens-studio/ui';
 import { styled } from '@/stitches.config';
@@ -14,7 +14,7 @@ import { LEGACY_LICENSE_CUTOVER_DATE, LEGACY_LICENSE_SUPPORT_URL } from '@/const
 import { TERMS_UPDATE_MODAL_KEY } from '../TermsUpdateModal';
 import { track } from '@/utils/analytics';
 import type { LegacyOnlyLicense } from '@/utils/licenseApi';
-import type { RootState } from '@/app/store';
+import type { Dispatch, RootState } from '@/app/store';
 
 const ModalFooter = styled('div', {
   display: 'flex',
@@ -57,8 +57,13 @@ export default function LegacyLicenseSignInNotice() {
   const termsUpdatePending = useSelector((state: RootState) => state.settings?.[TERMS_UPDATE_MODAL_KEY] === false);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const loginWithOAuth = useAuthStore((state) => state.loginWithOAuth);
-  // Kept in component state on purpose: dismissing only lasts for this session, and the next start asks again.
-  const [dismissed, setDismissed] = useState(false);
+  const dispatch = useDispatch<Dispatch>();
+  // Not saved: dismissing only lasts for this session, and the next start asks again. Kept in the store so the
+  // Bitbucket security notice can wait until this one is closed.
+  const dismissed = useSelector((state: RootState) => state.uiState.legacyLicenseNoticeDismissed);
+  const setDismissed = useCallback((value: boolean) => {
+    dispatch.uiState.setLegacyLicenseNoticeDismissed(value);
+  }, [dispatch]);
   const trackedShown = useRef(false);
 
   const open = shouldShowLegacyLicenseNotice({
@@ -85,7 +90,7 @@ export default function LegacyLicenseSignInNotice() {
 
   const handleLater = useCallback(() => {
     setDismissed(true);
-  }, []);
+  }, [setDismissed]);
 
   const handleSignIn = useCallback(async () => {
     track('Legacy license sign-in notice sign in clicked', trackingProps);
@@ -97,7 +102,7 @@ export default function LegacyLicenseSignInNotice() {
       // Cancelled or failed: the store holds the error. Bring the notice back so the user can retry or choose Later.
       setDismissed(false);
     }
-  }, [loginWithOAuth, trackingProps]);
+  }, [loginWithOAuth, setDismissed, trackingProps]);
 
   if (!open) return null;
 

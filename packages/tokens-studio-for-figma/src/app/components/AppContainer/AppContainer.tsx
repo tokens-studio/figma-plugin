@@ -26,6 +26,7 @@ import { useFigmaTheme } from '@/hooks/useFigmaTheme';
 import Box from '../Box';
 import { darkThemeMode, lightThemeMode } from '@/stitches.config';
 import BitbucketMigrationDialog from '../BitbucketMigrationDialog';
+import BitbucketSecurityNotice from '../BitbucketSecurityNotice';
 import GenericVersionedHeaderMigrationDialog from '../GenericVersionedHeaderMigrationDialog';
 
 type Props = StartupMessage & {
@@ -110,6 +111,7 @@ export const AppContainer = (params: Props) => {
       <SecondScreenSync />
       <AuthModal />
       <BitbucketMigrationDialog />
+      <BitbucketSecurityNotice />
       <GenericVersionedHeaderMigrationDialog />
     </Box>
   );
