@@ -47,16 +47,40 @@ describe('generateTokensToCreate — references into another theme group', () =>
     expect(reducedValue(getOverallConfig(themes, allIds))).toBe('#2754ac66');
   });
 
-  it('resolves from the active option when every option is exported', () => {
-    expect(reducedValue(getOverallConfigForTheme(themes, allIds, chartsTheme, { brand: 'a', charts: 'charts' }))).toBe('#2143a266');
-    expect(reducedValue(getOverallConfigForTheme(themes, allIds, chartsTheme, { brand: 'b', charts: 'charts' }))).toBe('#2754ac66');
+  it('resolves from the first exported option in theme order, whatever the selection order', () => {
+    expect(reducedValue(getOverallConfigForTheme(themes, allIds, chartsTheme))).toBe('#2143a266');
+    expect(reducedValue(getOverallConfigForTheme(themes, ['charts', 'b', 'a'], chartsTheme))).toBe('#2143a266');
   });
 
-  it('resolves from the exported option when the active one is not exported', () => {
-    expect(reducedValue(getOverallConfigForTheme(themes, ['b', 'charts'], chartsTheme, { brand: 'a' }))).toBe('#2754ac66');
+  it('resolves from the only exported option of the group', () => {
+    expect(reducedValue(getOverallConfigForTheme(themes, ['b', 'charts'], chartsTheme))).toBe('#2754ac66');
   });
 
-  it('resolves from the active option when no option of the group is exported', () => {
-    expect(reducedValue(getOverallConfigForTheme(themes, ['charts'], chartsTheme, { brand: 'a' }))).toBe('#2143a266');
+  it('leaves the reference unresolved when no option of the group is exported, as on main', () => {
+    expect(reducedValue(getOverallConfigForTheme(themes, ['charts'], chartsTheme)))
+      .toBe(reducedValue(getOverallConfig(themes, ['charts'])));
+  });
+
+  // Known limit: the theme's own sets always win over the pool, so when the referenced token
+  // also lives in a SOURCE set of the exported theme (core defaults plus brand overrides),
+  // the export bakes the source value and the brand pick has no effect.
+  it('uses the source set of the exported theme when it also defines the referenced token', () => {
+    const tokensWithCore: Record<string, AnyTokenList> = {
+      core: [{ name: 'brand.accent', value: '#123456', type: TokenTypes.COLOR }],
+      ...tokens,
+    };
+    const chartsWithCore: ThemeObject = {
+      ...chartsTheme,
+      selectedTokenSets: { core: TokenSetStatus.SOURCE, charts: TokenSetStatus.ENABLED },
+    };
+    const themesWithCore = [themes[0], themes[1], chartsWithCore];
+    const value = (selected: string[]) => generateTokensToCreate({
+      theme: chartsWithCore,
+      tokens: tokensWithCore,
+      overallConfig: getOverallConfigForTheme(themesWithCore, selected, chartsWithCore),
+    }).tokensToCreate.find((token) => token.name === 'chart.reduced')?.value;
+
+    expect(value(['a', 'charts'])).toBe('#12345666');
+    expect(value(['b', 'charts'])).toBe('#12345666');
   });
 });

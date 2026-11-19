@@ -21,7 +21,6 @@ import {
   themesListSelector,
   storageTypeSelector,
   isTokensStudioSyncSelector,
-  activeThemeSelector,
 } from '@/selectors';
 import { useAuthStore } from '@/app/store/useAuthStore';
 import { fetchServerResolvedTokensPerTheme } from '@/utils/tokensStudio/fetchServerResolvedTokensPerTheme';
@@ -70,7 +69,6 @@ export default function useTokens() {
   const updateMode = useSelector(updateModeSelector);
   const tokens = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
-  const activeTheme = useSelector(activeThemeSelector);
   const storageType = useSelector(storageTypeSelector);
   const rawSettings = useSelector(settingsStateSelector, isEqual);
   const isTokensStudioSync = useSelector(isTokensStudioSyncSelector);
@@ -483,8 +481,8 @@ export default function useTokens() {
           const enabledTokenSets = getEnabledTokenSets(selectedSets);
 
           if (enabledTokenSets.length > 0) {
-            // Resolve against one option per other group, matching the active combination.
-            const overallConfig = getOverallConfigForTheme(themes, selectedThemes, selectedTheme, activeTheme);
+            // Resolve against one exported option per other group, independent of the active theme.
+            const overallConfig = getOverallConfigForTheme(themes, selectedThemes, selectedTheme);
             const tokensToResolve = mergeTokenGroups(tokens, selectedSets, overallConfig);
             const allTokens = mergeServerResolvedTokens(
               defaultTokenResolver.setTokens(tokensToResolve),
@@ -560,7 +558,7 @@ export default function useTokens() {
 
       dispatch.uiState.completeJob(BackgroundJobs.UI_CREATE_STYLES);
     },
-    [dispatch.tokenState, tokens, settings, themes, activeTheme, dispatch.uiState, serverResolvedTokens],
+    [dispatch.tokenState, tokens, settings, themes, dispatch.uiState, serverResolvedTokens],
   );
 
   const renameStylesFromTokens = useCallback(

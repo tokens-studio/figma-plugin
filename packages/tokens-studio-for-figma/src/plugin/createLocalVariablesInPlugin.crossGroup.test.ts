@@ -1,7 +1,7 @@
 // Guards the wiring in the export loop: every per-theme call to generateTokensToCreate
 // (token count, platform pre-scan and updateVariables) must get a set pool with one
-// option per other group, picked from the active theme, instead of the union of all
-// exported themes.
+// option per other group, the first exported one in theme order, instead of the union of
+// all exported themes. The active theme must not matter.
 
 import { mockCreateVariableCollection, mockGetLocalVariableCollections, mockGetLocalVariableCollectionsAsync } from '../../tests/__mocks__/figmaMock';
 import { AsyncMessageTypes, GetThemeInfoMessageResult } from '@/types/AsyncMessages';
@@ -40,7 +40,7 @@ describe('createLocalVariablesInPlugin — set pool per theme', () => {
 
   const mockGetThemeInfoHandler = async (): Promise<GetThemeInfoMessageResult> => ({
     type: AsyncMessageTypes.GET_THEME_INFO,
-    activeTheme: { brand: 'a', charts: 'charts' },
+    activeTheme: { brand: 'b', charts: 'charts' },
     themes,
   });
 
@@ -84,7 +84,7 @@ describe('createLocalVariablesInPlugin — set pool per theme', () => {
   };
   const settings = { baseFontSize: '16', variablesColor: true } as SettingsState;
 
-  it('resolves the charts theme against the active brand only', async () => {
+  it('resolves the charts theme against the first exported brand, ignoring the active one', async () => {
     await createLocalVariablesInPlugin(tokens, settings, ['a', 'b', 'charts']);
 
     const chartsCalls = mockGenerate.mock.calls.filter(([arg]) => arg.theme.id === 'charts');

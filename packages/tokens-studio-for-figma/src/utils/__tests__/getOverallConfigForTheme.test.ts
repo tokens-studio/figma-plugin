@@ -25,10 +25,10 @@ describe('getOverallConfigForTheme', () => {
   const allIds = themes.map((t) => t.id);
   const charts = themes[4];
 
-  it('takes the active option of every other group when it is exported', () => {
-    expect(getOverallConfigForTheme(themes, allIds, charts, { brand: 'a', mode: 'dark' })).toEqual({
+  it('takes the first exported option of every other group, in theme order', () => {
+    expect(getOverallConfigForTheme(themes, allIds, charts)).toEqual({
       'brand/a': TokenSetStatus.ENABLED,
-      'mode/dark': TokenSetStatus.ENABLED,
+      'mode/light': TokenSetStatus.ENABLED,
       global: TokenSetStatus.SOURCE,
       charts: TokenSetStatus.ENABLED,
       loose1: TokenSetStatus.ENABLED,
@@ -36,26 +36,32 @@ describe('getOverallConfigForTheme', () => {
     });
   });
 
-  it('falls back to the first exported option when the active one is not exported', () => {
-    expect(getOverallConfigForTheme(themes, ['b', 'light', 'dark', 'charts'], charts, { brand: 'a', mode: 'light' })).toEqual({
-      'brand/b': TokenSetStatus.ENABLED,
+  it('follows theme order, not the order of the export selection', () => {
+    expect(getOverallConfigForTheme(themes, ['dark', 'b', 'charts', 'light', 'a'], charts)).toEqual({
+      'brand/a': TokenSetStatus.ENABLED,
       'mode/light': TokenSetStatus.ENABLED,
       global: TokenSetStatus.SOURCE,
       charts: TokenSetStatus.ENABLED,
     });
   });
 
-  it('falls back to the active option when no option of the group is exported', () => {
-    expect(getOverallConfigForTheme(themes, ['charts'], charts, { brand: 'b', mode: 'light' })).toEqual({
+  it('takes the only exported option of a group', () => {
+    expect(getOverallConfigForTheme(themes, ['b', 'dark', 'charts'], charts)).toEqual({
       'brand/b': TokenSetStatus.ENABLED,
-      'mode/light': TokenSetStatus.ENABLED,
+      'mode/dark': TokenSetStatus.ENABLED,
       global: TokenSetStatus.SOURCE,
+      charts: TokenSetStatus.ENABLED,
+    });
+  });
+
+  it('adds nothing for groups with no exported option', () => {
+    expect(getOverallConfigForTheme(themes, ['charts'], charts)).toEqual({
       charts: TokenSetStatus.ENABLED,
     });
   });
 
   it('only includes the theme itself from its own group', () => {
-    expect(getOverallConfigForTheme(themes, allIds, themes[3], { brand: 'a', mode: 'light' })).toEqual({
+    expect(getOverallConfigForTheme(themes, allIds, themes[3])).toEqual({
       'brand/a': TokenSetStatus.ENABLED,
       'mode/dark': TokenSetStatus.ENABLED,
       global: TokenSetStatus.SOURCE,
@@ -69,12 +75,6 @@ describe('getOverallConfigForTheme', () => {
     expect(getOverallConfigForTheme(themes, ['loose1', 'loose2'], themes[5])).toEqual({
       loose1: TokenSetStatus.ENABLED,
       loose2: TokenSetStatus.ENABLED,
-    });
-  });
-
-  it('ignores active themes that no longer exist', () => {
-    expect(getOverallConfigForTheme(themes, ['charts'], charts, { brand: 'deleted' })).toEqual({
-      charts: TokenSetStatus.ENABLED,
     });
   });
 });

@@ -69,12 +69,12 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
       },
     });
 
-    // Each theme resolves against one option per other group, so cross-group references
-    // (baked into flat values such as modified colors) match the active combination.
+    // Each theme resolves against one option per other group (the first exported one in theme order),
+    // so cross-group references baked into flat values such as modified colors depend only on the export selection.
     const overallConfigs: Record<string, UsedTokenSetsMap> = {};
     const overallConfigFor = (theme: ThemeObject) => {
       if (!overallConfigs[theme.id]) {
-        overallConfigs[theme.id] = getOverallConfigForTheme(themeInfo.themes, selectedThemes, theme, themeInfo.activeTheme);
+        overallConfigs[theme.id] = getOverallConfigForTheme(themeInfo.themes, selectedThemes, theme);
       }
       return overallConfigs[theme.id];
     };
@@ -178,7 +178,7 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
       }
 
       if (collection && modeId) {
-        // Use overallConfig to allow cross-theme token references
+        // Resolve against this theme's own sets plus one exported option per other group (see overallConfigFor)
         const allVariableObj = await updateVariables({
           collection,
           mode: modeId,
