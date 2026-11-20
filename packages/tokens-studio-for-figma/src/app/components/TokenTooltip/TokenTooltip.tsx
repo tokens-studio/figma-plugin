@@ -10,13 +10,17 @@ type Props = {
   token: SingleToken;
 };
 
+// Only rendered while the tooltip is open, so the edit-form check costs nothing for the closed ones
+const TokenTooltipLabel: React.FC<Props> = ({ token }) => {
+  // When we open the token edit form we don't want tooltips to show through, which is happening sometimes
+  const showEditForm = useSelector(showEditFormSelector);
+  return showEditForm ? null : <TokenTooltipContent token={token} />;
+};
+
 export const TokenTooltip: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
   children,
   token,
 }) => {
-  // When we open the token edit form we don't want tooltips to show through, which is happening sometimes
-  const showEditForm = useSelector(showEditFormSelector);
-
   if (!children || !React.isValidElement(children)) {
     return null;
   }
@@ -24,15 +28,13 @@ export const TokenTooltip: React.FC<React.PropsWithChildren<React.PropsWithChild
   // Every token gets its own provider. Radix keeps the provider's skip-delay flag in React state and
   // flips it when a tooltip opens and again shortly after it closes. With the single app-wide provider
   // each flip re-rendered every token tooltip, which blocks hovering for hundreds of ms on large sets.
+  // The label must stay truthy: an empty label makes Tooltip render the bare trigger, so toggling it
+  // would remount every token button.
   return (
     <TooltipProvider>
       <Tooltip
         side="bottom"
-        label={showEditForm ? '' : (
-          <TokenTooltipContent
-            token={token}
-          />
-        )}
+        label={<TokenTooltipLabel token={token} />}
       >
         {children}
       </Tooltip>

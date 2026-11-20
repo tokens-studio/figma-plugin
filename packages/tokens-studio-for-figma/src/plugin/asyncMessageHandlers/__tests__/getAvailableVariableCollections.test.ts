@@ -6,6 +6,7 @@ describe('getAvailableVariableCollections', () => {
       {
         id: 'collection1',
         name: 'Collection 1',
+        variableIds: ['VariableID:1:1', 'VariableID:1:2', 'VariableID:1:3'],
         modes: [
           { modeId: 'mode1', name: 'Light' },
           { modeId: 'mode2', name: 'Dark' },
@@ -31,7 +32,9 @@ describe('getAvailableVariableCollections', () => {
     expect(result).toEqual({
       collections: [
         {
-          ...mockCollections[0],
+          id: 'collection1',
+          name: 'Collection 1',
+          variableCount: 3,
           isExtension: false,
           extensionDepth: 0,
           parentCollectionId: undefined,
@@ -42,6 +45,7 @@ describe('getAvailableVariableCollections', () => {
         },
         {
           ...mockCollections[1],
+          variableCount: 0,
           isExtension: false,
           extensionDepth: 0,
           parentCollectionId: undefined,

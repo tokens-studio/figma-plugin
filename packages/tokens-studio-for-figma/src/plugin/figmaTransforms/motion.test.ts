@@ -1,4 +1,6 @@
-import { defaultFigmaEasing, timingToSeconds, toFigmaEasing } from './motion';
+import {
+  defaultFigmaEasing, fromFigmaEasing, secondsToDurationValue, timingToSeconds, toFigmaEasing,
+} from './motion';
 
 describe('timingToSeconds', () => {
   it('parses ms strings', () => {
@@ -121,5 +123,56 @@ describe('defaultFigmaEasing', () => {
         x1: 0, y1: 0, x2: 1, y2: 1,
       },
     });
+  });
+});
+
+describe('secondsToDurationValue', () => {
+  it('converts seconds to an ms duration string', () => {
+    expect(secondsToDurationValue(0.2)).toBe('200ms');
+    expect(secondsToDurationValue(1.5)).toBe('1500ms');
+    expect(secondsToDurationValue(0)).toBe('0ms');
+  });
+
+  it('rounds float noise', () => {
+    expect(secondsToDurationValue(0.30000001192092896)).toBe('300ms');
+    expect(secondsToDurationValue(0.1 + 0.2)).toBe('300ms');
+  });
+
+  it('round-trips with timingToSeconds', () => {
+    expect(timingToSeconds(secondsToDurationValue(0.25))).toBe(0.25);
+  });
+
+  it('rejects non-finite values', () => {
+    expect(secondsToDurationValue(NaN)).toBeNull();
+    expect(secondsToDurationValue(Infinity)).toBeNull();
+  });
+});
+
+describe('fromFigmaEasing', () => {
+  it('converts custom cubic beziers', () => {
+    expect(fromFigmaEasing({
+      type: 'CUSTOM_CUBIC_BEZIER',
+      easingFunctionCubicBezier: {
+        x1: 0.4, y1: 0, x2: 0.2, y2: 1,
+      },
+    })).toBe('0.4, 0, 0.2, 1');
+  });
+
+  it('round-trips with toFigmaEasing', () => {
+    const easing = toFigmaEasing('0.4, 0, 0.2, 1');
+    expect(toFigmaEasing(fromFigmaEasing(easing))).toEqual(easing);
+  });
+
+  it('maps preset easings to their cubic-bezier equivalents', () => {
+    expect(fromFigmaEasing({ type: 'LINEAR' })).toBe('0, 0, 1, 1');
+    expect(fromFigmaEasing({ type: 'EASE_IN_AND_OUT' })).toBe('0.42, 0, 0.58, 1');
+    expect(fromFigmaEasing({ type: 'EASE_OUT_BACK' })).toBe('0.45, 1.45, 0.8, 1');
+  });
+
+  it('returns null for easings without a cubic-bezier form', () => {
+    expect(fromFigmaEasing({ type: 'GENTLE', easingFunctionSpring: { bounce: 0.2 } })).toBeNull();
+    expect(fromFigmaEasing({ type: 'HOLD' })).toBeNull();
+    expect(fromFigmaEasing(null)).toBeNull();
+    expect(fromFigmaEasing('0.4, 0, 0.2, 1')).toBeNull();
   });
 });

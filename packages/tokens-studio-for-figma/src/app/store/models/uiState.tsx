@@ -97,6 +97,8 @@ export interface UIState {
     header?: string;
   } | null;
   showBitbucketMigrationDialog: boolean;
+  // The legacy license notice was closed in this session. Kept in the store so the Bitbucket notice can wait for it.
+  legacyLicenseNoticeDismissed: boolean;
   triggerMigrationEdit?: any;
 }
 
@@ -161,6 +163,7 @@ export const uiState = createModel<RootModel>()({
     selectedExportThemes: [],
     lastError: null,
     showBitbucketMigrationDialog: false,
+    legacyLicenseNoticeDismissed: false,
     triggerMigrationEdit: null,
   } as unknown as UIState,
   reducers: {
@@ -209,17 +212,9 @@ export const uiState = createModel<RootModel>()({
         formId: data.formId,
       },
     }),
-    setSelectedLayers: (state, data: number) => ({
-      ...state,
-      selectedLayers: data,
-    }),
     setHideConfirm: (state) => ({
       ...state,
       confirmState: defaultConfirmState,
-    }),
-    setDisabled: (state, data: boolean) => ({
-      ...state,
-      disabled: data,
     }),
     setEditToken: (state, data: EditTokenObject) => ({
       ...state,
@@ -237,17 +232,16 @@ export const uiState = createModel<RootModel>()({
         displayType: data,
       };
     },
-    setSelectionValues: (state, data: SelectionGroup[]) => ({
+    // Applies a whole selection update in one dispatch. Every dispatch makes each mounted token
+    // re-check its subscriptions, so splitting one update over several dispatches multiplies that cost.
+    setSelection: (state, data: {
+      selectedLayers: number;
+      disabled: boolean;
+      mainNodeSelectionValues: SelectionValue;
+      selectionValues: SelectionGroup[];
+    }) => ({
       ...state,
-      selectionValues: data,
-    }),
-    setMainNodeSelectionValues: (state, data: SelectionValue) => ({
-      ...state,
-      mainNodeSelectionValues: data,
-    }),
-    resetSelectionValues: (state) => ({
-      ...state,
-      selectionValues: [] as SelectionGroup[],
+      ...data,
     }),
     startJob(state, job: BackgroundJob) {
       return {
@@ -443,6 +437,10 @@ export const uiState = createModel<RootModel>()({
     setShowBitbucketMigrationDialog: (state, data: boolean) => ({
       ...state,
       showBitbucketMigrationDialog: data,
+    }),
+    setLegacyLicenseNoticeDismissed: (state, data: boolean) => ({
+      ...state,
+      legacyLicenseNoticeDismissed: data,
     }),
     setTriggerMigrationEdit: (state, data: any) => ({
       ...state,

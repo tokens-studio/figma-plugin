@@ -8,5 +8,13 @@
   "addLicenseKey": "Add license key",
   "keepLicenseSafe": "Make sure you saved a copy of the license key somewhere, as it won’t be stored on this device after you deleted it.",
   "confirmRemove": "Are you sure you want to remove your license key?",
-  "removeLicenseKey": "Remove key"
+  "removeLicenseKey": "Remove key",
+  "legacySignIn": {
+    "title": "Sign in to keep Pro",
+    "body": "Your license key is moving to your Tokens Studio account and will stop working soon. Sign in with the account your team uses to keep your Pro features.",
+    "bodyWithDate": "Your license key is moving to your Tokens Studio account and will stop working on {{date}}. Sign in with the account your team uses to keep your Pro features.",
+    "signIn": "Sign in",
+    "later": "Later",
+    "needHelp": "Need help?"
+  }
 }
