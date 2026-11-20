@@ -225,4 +225,92 @@ describe('applySizingValuesOnNode', () => {
       expect(mockNode.resize).toHaveBeenCalledWith(100, 100); // transformValue('100%', 'sizing', '16') = 100
     });
   });
+
+  describe('auto-layout sizing fix for nested instances', () => {
+    it('should set layoutSizingHorizontal and layoutSizingVertical to FIXED when resizing inside auto-layout parent', async () => {
+      const mockNode = {
+        id: 'I123:456;789:012',
+        resize: jest.fn(),
+        type: 'INSTANCE',
+        layoutSizingHorizontal: 'HUG',
+        layoutSizingVertical: 'HUG',
+        parent: {
+          type: 'FRAME',
+          layoutMode: 'HORIZONTAL',
+        },
+      };
+      const values = { sizing: '12' };
+      const data = { sizing: 'sizing-token' };
+
+      await applySizingValuesOnNode(mockNode as unknown as BaseNode, data, values, baseFontSize);
+
+      expect(mockNode.layoutSizingHorizontal).toBe('FIXED');
+      expect(mockNode.layoutSizingVertical).toBe('FIXED');
+      expect(mockNode.resize).toHaveBeenCalledWith(12, 12);
+    });
+
+    it('should set layoutSizingHorizontal to FIXED for width token inside auto-layout', async () => {
+      const mockNode = {
+        id: 'I123:456;789:012',
+        resize: jest.fn(),
+        type: 'INSTANCE',
+        height: 20,
+        layoutSizingHorizontal: 'FILL',
+        parent: {
+          type: 'FRAME',
+          layoutMode: 'VERTICAL',
+        },
+      };
+      const values = { width: '12' };
+      const data = { width: 'width-token' };
+
+      await applySizingValuesOnNode(mockNode as unknown as BaseNode, data, values, baseFontSize);
+
+      expect(mockNode.layoutSizingHorizontal).toBe('FIXED');
+      expect(mockNode.resize).toHaveBeenCalledWith(12, 20);
+    });
+
+    it('should set layoutSizingVertical to FIXED for height token inside auto-layout', async () => {
+      const mockNode = {
+        id: 'I123:456;789:012',
+        resize: jest.fn(),
+        type: 'INSTANCE',
+        width: 20,
+        layoutSizingVertical: 'FILL',
+        parent: {
+          type: 'FRAME',
+          layoutMode: 'HORIZONTAL',
+        },
+      };
+      const values = { height: '12' };
+      const data = { height: 'height-token' };
+
+      await applySizingValuesOnNode(mockNode as unknown as BaseNode, data, values, baseFontSize);
+
+      expect(mockNode.layoutSizingVertical).toBe('FIXED');
+      expect(mockNode.resize).toHaveBeenCalledWith(20, 12);
+    });
+
+    it('should not change layoutSizing when parent is not auto-layout', async () => {
+      const mockNode = {
+        id: 'node-id',
+        resize: jest.fn(),
+        type: 'INSTANCE',
+        layoutSizingHorizontal: 'HUG',
+        layoutSizingVertical: 'HUG',
+        parent: {
+          type: 'FRAME',
+          // No layoutMode
+        },
+      };
+      const values = { sizing: '12' };
+      const data = { sizing: 'sizing-token' };
+
+      await applySizingValuesOnNode(mockNode as unknown as BaseNode, data, values, baseFontSize);
+
+      expect(mockNode.layoutSizingHorizontal).toBe('HUG');
+      expect(mockNode.layoutSizingVertical).toBe('HUG');
+      expect(mockNode.resize).toHaveBeenCalledWith(12, 12);
+    });
+  });
 });
