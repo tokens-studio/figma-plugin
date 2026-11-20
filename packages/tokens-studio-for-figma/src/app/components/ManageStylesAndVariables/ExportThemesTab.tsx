@@ -11,7 +11,7 @@ import {
   themesListSelector,
   exportExtendedCollectionsSelector,
 } from '@/selectors';
-import { useIsProUser } from '@/app/hooks/useIsProUser';
+import { useCanUseThemes } from '@/app/hooks/useCanUseThemes';
 import { ThemeObject } from '@/types';
 import { LabelledCheckbox } from './LabelledCheckbox';
 import { SearchInputWithToggle } from '../SearchInputWithToggle';
@@ -97,7 +97,7 @@ export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: {
     }
   }, [themes, selectedThemes, setSelectedThemes]);
 
-  const isProUser = useIsProUser();
+  const canUseThemes = useCanUseThemes();
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -224,7 +224,7 @@ export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: {
       {themes.length === 0 ? (
         <StyledCard>
           <Stack direction="column" align="start" gap={4}>
-            {isProUser ? (
+            {canUseThemes ? (
               <>
                 <Heading size="medium">{t('exportThemesTab.headingPro')}</Heading>
                 <p>{t('exportThemesTab.introPro')}</p>

@@ -30,6 +30,7 @@ import {
   exportExtendedCollectionsSelector,
   stylesGradientSelector,
   isFigmaEnterpriseSelector,
+  isTokensStudioSyncSelector,
 } from '@/selectors';
 import ignoreFirstPartImage from '@/app/assets/hints/ignoreFirstPartForStyles.png';
 import prefixStylesImage from '@/app/assets/hints/prefixStyles.png';
@@ -61,6 +62,8 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
   const exportExtendedCollections = useSelector(exportExtendedCollectionsSelector);
   const stylesGradient = useSelector(stylesGradientSelector);
   const isFigmaEnterprise = useSelector(isFigmaEnterpriseSelector);
+  const isTokensStudioSync = useSelector(isTokensStudioSyncSelector);
+  const extendedCollectionsDisabled = !isFigmaEnterprise || isTokensStudioSync;
 
   const dispatch = useDispatch<Dispatch>();
 
@@ -311,11 +314,12 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
                 checked={!!exportExtendedCollections}
                 defaultChecked={exportExtendedCollections}
                 onCheckedChange={handleExportExtendedCollectionsChange}
-                disabled={!isFigmaEnterprise}
+                disabled={extendedCollectionsDisabled}
               />
-              <Label css={{ fontWeight: '$sansRegular', fontSize: '$xsmall', ...(!isFigmaEnterprise ? { color: '$fgDisabled', opacity: 0.5 } : {}) }} htmlFor="exportExtendedCollections">
+              <Label css={{ fontWeight: '$sansRegular', fontSize: '$xsmall', ...(extendedCollectionsDisabled ? { color: '$fgDisabled', opacity: 0.5 } : {}) }} htmlFor="exportExtendedCollections">
                 {t('options.exportExtendedCollections')}
-                {!isFigmaEnterprise && t('options.exportExtendedCollectionsEnterpriseSuffix')}
+                {isTokensStudioSync && t('options.exportExtendedCollectionsStudioSuffix')}
+                {!isTokensStudioSync && !isFigmaEnterprise && t('options.exportExtendedCollectionsEnterpriseSuffix')}
               </Label>
               <ExplainerModal title={t('options.exportExtendedCollections')}>
                 <Box>{t('options.exportExtendedCollectionsExplanation')}</Box>

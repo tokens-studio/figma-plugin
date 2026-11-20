@@ -20,6 +20,7 @@ import {
   updateModeSelector,
   themesListSelector,
   storageTypeSelector,
+  isTokensStudioSyncSelector,
 } from '@/selectors';
 import { useAuthStore } from '@/app/store/useAuthStore';
 import { fetchServerResolvedTokensPerTheme } from '@/utils/tokensStudio/fetchServerResolvedTokensPerTheme';
@@ -69,7 +70,16 @@ export default function useTokens() {
   const tokens = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
   const storageType = useSelector(storageTypeSelector);
-  const settings = useSelector(settingsStateSelector, isEqual);
+  const rawSettings = useSelector(settingsStateSelector, isEqual);
+  const isTokensStudioSync = useSelector(isTokensStudioSyncSelector);
+  // Tokens Studio sync doesn't support extended collections, so the persisted
+  // setting is overridden while Studio is active. Other providers get it as-is.
+  const settings = useMemo(
+    () => (isTokensStudioSync && rawSettings.exportExtendedCollections
+      ? { ...rawSettings, exportExtendedCollections: false }
+      : rawSettings),
+    [rawSettings, isTokensStudioSync],
+  );
   const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
   const { confirm } = useConfirm<ConfirmResult>();
   const store = useStore<RootState>();
@@ -465,56 +475,65 @@ export default function useTokens() {
         return acc;
       }, [] as string[]);
 
-      for (const themeId of selectedThemes) {
-        const selectedTheme = themes.find((theme) => theme.id === themeId);
+      let stylesAssigned = false;
+      try {
+        for (const themeId of selectedThemes) {
+          const selectedTheme = themes.find((theme) => theme.id === themeId);
 
-        if (selectedTheme) {
-          const selectedSets = selectedTheme.selectedTokenSets;
-          const enabledTokenSets = getEnabledTokenSets(selectedSets);
+          if (selectedTheme) {
+            const selectedSets = selectedTheme.selectedTokenSets;
+            const enabledTokenSets = getEnabledTokenSets(selectedSets);
 
-          if (enabledTokenSets.length > 0) {
-            const tokensToResolve = mergeTokenGroups(tokens, selectedSets, overallConfig);
-            const allTokens = mergeServerResolvedTokens(
-              defaultTokenResolver.setTokens(tokensToResolve),
-              serverResolvedTokens,
-            );
+            if (enabledTokenSets.length > 0) {
+              const tokensToResolve = mergeTokenGroups(tokens, selectedSets, overallConfig);
+              const allTokens = mergeServerResolvedTokens(
+                defaultTokenResolver.setTokens(tokensToResolve),
+                serverResolvedTokens,
+              );
 
-            const tokensFromEnabledSets = allTokens.filter(
-              (token) => !token.internal__Parent || enabledTokenSets.includes(token.internal__Parent), // only use enabled sets
-            );
+              const tokensFromEnabledSets = allTokens.filter(
+                (token) => !token.internal__Parent || enabledTokenSets.includes(token.internal__Parent), // only use enabled sets
+              );
 
-            const tokensToCreate = tokensFromEnabledSets.reduce((acc: SingleToken[], curr) => {
-              const isGradient = curr.type === TokenTypes.GRADIENT || (curr.type === TokenTypes.COLOR && isGradientValue(curr.value));
+              const tokensToCreate = tokensFromEnabledSets.reduce((acc: SingleToken[], curr) => {
+                const isGradient = curr.type === TokenTypes.GRADIENT || (curr.type === TokenTypes.COLOR && isGradientValue(curr.value));
 
-              const shouldCreate = [
-                settings.stylesTypography && curr.type === TokenTypes.TYPOGRAPHY,
-                settings.stylesColor && curr.type === TokenTypes.COLOR && !isGradient,
-                settings.stylesGradient && isGradient,
-                settings.stylesEffect && curr.type === TokenTypes.BOX_SHADOW,
-              ].some((isEnabled) => isEnabled);
-              if (shouldCreate && !acc.find((token) => curr.name === token.name)) {
-                acc.push(curr);
-              }
+                const shouldCreate = [
+                  settings.stylesTypography && curr.type === TokenTypes.TYPOGRAPHY,
+                  settings.stylesColor && curr.type === TokenTypes.COLOR && !isGradient,
+                  settings.stylesGradient && isGradient,
+                  settings.stylesEffect && curr.type === TokenTypes.BOX_SHADOW,
+                ].some((isEnabled) => isEnabled);
+                if (shouldCreate && !acc.find((token) => curr.name === token.name)) {
+                  acc.push(curr);
+                }
 
-              return acc;
-            }, []);
+                return acc;
+              }, []);
 
-            totalTokensToCreate += tokensToCreate.length;
+              totalTokensToCreate += tokensToCreate.length;
 
-            const createStylesResult = await wrapTransaction({ name: 'createStyles' }, async () => AsyncMessageChannel.ReactInstance.message({
-              type: AsyncMessageTypes.CREATE_STYLES,
-              tokens: tokensToCreate,
-              sourceTokens: allTokens,
-              settings,
-              selectedTheme,
-            }));
+              const createStylesResult = await wrapTransaction({ name: 'createStyles' }, async () => AsyncMessageChannel.ReactInstance.message({
+                type: AsyncMessageTypes.CREATE_STYLES,
+                tokens: tokensToCreate,
+                sourceTokens: allTokens,
+                settings,
+                selectedTheme,
+              }));
 
-            Object.assign(allStyleIds, createStylesResult.styleIds);
+              Object.assign(allStyleIds, createStylesResult.styleIds);
 
-            dispatch.tokenState.assignStyleIdsToCurrentTheme({ styleIds: createStylesResult.styleIds, tokens: tokensToCreate, selectedThemes });
-          } else {
-            notifyToUI(`No styles created for theme: ${selectedTheme.name}. Make sure some sets are enabled.`, { error: true });
+              dispatch.tokenState.assignStyleIdsToCurrentTheme({ styleIds: createStylesResult.styleIds, tokens: tokensToCreate, selectedThemes });
+              stylesAssigned = true;
+            } else {
+              notifyToUI(`No styles created for theme: ${selectedTheme.name}. Make sure some sets are enabled.`, { error: true });
+            }
           }
+        }
+      } finally {
+        // A theme can receive references from any iteration, so push every selected theme.
+        if (stylesAssigned) {
+          await dispatch.tokenState.pushThemesToStudio(selectedThemes);
         }
       }
 

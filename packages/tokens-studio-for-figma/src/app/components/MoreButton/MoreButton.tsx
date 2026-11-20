@@ -2,40 +2,28 @@
 /* eslint-disable no-console */
 
 import React, { useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { ChevronRightIcon } from '@radix-ui/react-icons';
-import copy from 'copy-to-clipboard';
+import { useDispatch, useStore } from 'react-redux';
 
 import { ContextMenu } from '@tokens-studio/ui';
-import { styled } from '@/stitches.config';
 import {
-  activeTokenSetReadOnlySelector, activeTokenSetSelector, editProhibitedSelector, mainNodeSelectionValuesSelector,
+  activeTokenSetReadOnlySelector, editProhibitedSelector, mainNodeSelectionValuesSelector, showEditFormSelector,
 } from '@/selectors';
 import { PropertyObject } from '@/types/properties';
-import { MoreButtonProperty } from './MoreButtonProperty';
 import { DocumentationProperties } from '@/constants/DocumentationProperties';
 import { SingleToken } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
 import useSetNodeData from '@/hooks/useSetNodeData';
-import { Dispatch } from '@/app/store';
+import { Dispatch, RootState } from '@/app/store';
 import { TokensContext } from '@/context';
 import { SelectionValue, ShowFormOptions } from '@/types';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { track } from '@/utils/analytics';
-import useManageTokens from '@/app/store/useManageTokens';
 import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
 import TokenButtonContent from '../TokenButton/TokenButtonContent';
 import { useGetActiveState } from '@/hooks';
 import { usePropertiesForTokenType } from '../../hooks/usePropertiesForType';
 import { getAliasValue } from '@/utils/alias';
-
-const RightSlot = styled('div', {
-  marginLeft: 'auto',
-  paddingLeft: 16,
-  color: '$contextMenuFg',
-  ':focus > &': { color: 'white' },
-  '[data-disabled] &': { color: '$disabled' },
-});
+import { MoreButtonMenuItems } from './MoreButtonMenuItems';
 
 // @TODO typing
 
@@ -53,13 +41,7 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
   const tokensContext = React.useContext(TokensContext);
   const setNodeData = useSetNodeData();
   const dispatch = useDispatch<Dispatch>();
-  const editProhibited = useSelector(editProhibitedSelector);
-  const activeTokenSetReadOnly = useSelector(activeTokenSetReadOnlySelector);
-  const activeTokenSet = useSelector(activeTokenSetSelector);
-  const mainNodeSelectionValues = useSelector(mainNodeSelectionValuesSelector);
-  const { deleteSingleToken } = useManageTokens();
-
-  const canEdit = !editProhibited && !activeTokenSetReadOnly;
+  const store = useStore<RootState>();
 
   const resolvedValue = useMemo(
     () => getAliasValue(token, tokensContext.resolvedTokens),
@@ -74,23 +56,6 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
   const handleEditClick = React.useCallback(() => {
     showForm({ name: token.name, token, status: EditTokenFormStatus.EDIT });
   }, [token, showForm]);
-
-  const handleCopyTokenName = (props: unknown, text: string) => {
-    copy(text, {});
-  };
-
-  const handleDeleteClick = React.useCallback(() => {
-    deleteSingleToken({
-      parent: activeTokenSet,
-      path: token.name,
-      type: token.type,
-      sourceId: token.$extensions?.['studio.tokens']?.urn,
-    });
-  }, [activeTokenSet, deleteSingleToken, token.$extensions, token.name, token.type]);
-
-  const handleDuplicateClick = React.useCallback(() => {
-    showForm({ name: `${token.name}-copy`, token, status: EditTokenFormStatus.DUPLICATE });
-  }, [showForm, token]);
 
   // TODO: This should probably move to state or a hook
   const setPluginValue = React.useCallback(
@@ -132,9 +97,14 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
   const handleTokenClick = React.useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
       const isMacBrowser = /Mac/.test(navigator.platform);
+      // Read the store at click time: subscribing to it here would make every token re-check (or
+      // re-render) on each store update, which stalls large token lists
+      const state = store.getState();
+      const canEdit = !editProhibitedSelector(state) && !activeTokenSetReadOnlySelector(state);
       if (canEdit && ((isMacBrowser && event.metaKey) || (!isMacBrowser && event.ctrlKey))) {
         handleEditClick();
       } else {
+        const mainNodeSelectionValues = mainNodeSelectionValuesSelector(state);
         // Find the property that currently has this token
         const activeProperty = activeStateProperties.find(
           (prop) => mainNodeSelectionValues[prop.name] === token.name,
@@ -149,8 +119,16 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
         }
       }
     },
-    [canEdit, handleEditClick, handleClick, properties, activeStateProperties, mainNodeSelectionValues, token.name],
+    [handleEditClick, handleClick, properties, activeStateProperties, store, token.name],
   );
+
+  // Closing the menu returns focus to the token. When Edit or Duplicate just opened the edit form,
+  // that focus lands outside the (non-modal) form, which closes it again straight away.
+  const handleCloseAutoFocus = React.useCallback((event: Event) => {
+    if (showEditFormSelector(store.getState())) {
+      event.preventDefault();
+    }
+  }, [store]);
 
   return (
     <ContextMenu>
@@ -158,70 +136,13 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
         <TokenButtonContent type={type} active={active} onClick={handleTokenClick} token={token} />
       </ContextMenu.Trigger>
       <ContextMenu.Portal>
-        <ContextMenu.Content alignOffset={5} collisionPadding={30}>
-          {visibleProperties.map((property) => (property.childProperties ? (
-            <ContextMenu.Sub key={property.label}>
-              <ContextMenu.SubTrigger>
-                {property.label}
-                <RightSlot>
-                  <ChevronRightIcon />
-                </RightSlot>
-              </ContextMenu.SubTrigger>
-              <ContextMenu.Portal>
-                <ContextMenu.SubContent alignOffset={-5} collisionPadding={30}>
-                  {property.childProperties.map((childProperty) => (
-                    <MoreButtonProperty
-                      key={childProperty.name}
-                      value={token.name}
-                      property={childProperty}
-                      onClick={handleClick}
-                    />
-                  ))}
-                </ContextMenu.SubContent>
-              </ContextMenu.Portal>
-            </ContextMenu.Sub>
-          ) : (
-            <MoreButtonProperty
-              key={property.name}
-              value={token.name}
-              property={property}
-              onClick={handleClick}
-              disabled={property.disabled}
-            />
-          )))}
-          <ContextMenu.Sub>
-            <ContextMenu.SubTrigger>
-              Documentation Tokens
-              <RightSlot>
-                <ChevronRightIcon />
-              </RightSlot>
-            </ContextMenu.SubTrigger>
-            <ContextMenu.Portal>
-              <ContextMenu.SubContent alignOffset={-5} collisionPadding={30}>
-                {DocumentationProperties.map((property) => (
-                  <MoreButtonProperty
-                    key={property.name}
-                    value={token.name}
-                    property={property}
-                    onClick={handleClick}
-                  />
-                ))}
-              </ContextMenu.SubContent>
-            </ContextMenu.Portal>
-          </ContextMenu.Sub>
-          <ContextMenu.Separator />
-          <ContextMenu.Item onSelect={handleEditClick} disabled={!canEdit}>
-            Edit Token
-          </ContextMenu.Item>
-          <ContextMenu.Item onSelect={handleDuplicateClick} disabled={!canEdit}>
-            Duplicate Token
-          </ContextMenu.Item>
-          <ContextMenu.Item onSelect={(event) => handleCopyTokenName(event, token.name)}>
-            Copy Token Path
-          </ContextMenu.Item>
-          <ContextMenu.Item onSelect={handleDeleteClick} disabled={!canEdit}>
-            Delete Token
-          </ContextMenu.Item>
+        <ContextMenu.Content alignOffset={5} collisionPadding={30} onCloseAutoFocus={handleCloseAutoFocus}>
+          <MoreButtonMenuItems
+            token={token}
+            visibleProperties={visibleProperties}
+            showForm={showForm}
+            onPropertyClick={handleClick}
+          />
         </ContextMenu.Content>
       </ContextMenu.Portal>
     </ContextMenu>

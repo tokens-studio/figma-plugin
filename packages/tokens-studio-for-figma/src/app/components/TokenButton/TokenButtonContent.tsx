@@ -5,9 +5,8 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { SingleToken } from '@/types/tokens';
 import { TokenTooltip } from '../TokenTooltip';
 import BrokenReferenceIndicator from '../BrokenReferenceIndicator';
-import { displayTypeSelector, uiDisabledSelector } from '@/selectors';
+import { displayTypeSelector } from '@/selectors';
 import { StyledTokenButton, StyledTokenButtonText } from './StyledTokenButton';
-import useTokens from '@/app/store/useTokens';
 import { gradientTokenToCss, isGradientTokenValue } from '@/utils/color';
 import { TokenGradientValue } from '@/types/values';
 import { getAliasValue } from '@/utils/alias';
@@ -23,13 +22,12 @@ export default function TokenButtonContent({
   token, active, type, onClick,
 }: Props) {
   const tokensContext = useContext(TokensContext);
-  const uiDisabled = useSelector(uiDisabledSelector);
   const displayType = useSelector(displayTypeSelector);
-  const { getTokenValue } = useTokens();
 
+  // Avoid useTokens() here: it subscribes to many store slices, and this renders once per token
   const displayValue = useMemo(() => (
-    getTokenValue(token.name, tokensContext.resolvedTokens)?.value
-  ), [token, tokensContext.resolvedTokens, getTokenValue]);
+    tokensContext.resolvedTokens.find((t) => t.name === token.name)?.value
+  ), [token, tokensContext.resolvedTokens]);
 
   const showValue = React.useMemo(() => {
     let show = true;
@@ -101,7 +99,7 @@ export default function TokenButtonContent({
 
   return (
     <TokenTooltip token={token}>
-      <StyledTokenButton tokenType={type as TokenTypes.COLOR} displayType={type === TokenTypes.COLOR || type === TokenTypes.GRADIENT ? displayType : 'GRID'} active={active} disabled={uiDisabled} deprecated={!!token.$deprecated} type="button" onClick={handleButtonClick} css={cssOverrides}>
+      <StyledTokenButton tokenType={type as TokenTypes.COLOR} displayType={type === TokenTypes.COLOR || type === TokenTypes.GRADIENT ? displayType : 'GRID'} active={active} deprecated={!!token.$deprecated} type="button" onClick={handleButtonClick} css={cssOverrides}>
         <BrokenReferenceIndicator token={token} />
         <StyledTokenButtonText>{showValue && <span>{visibleName}</span>}</StyledTokenButtonText>
       </StyledTokenButton>

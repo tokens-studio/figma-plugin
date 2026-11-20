@@ -2,7 +2,7 @@ import { isVariableWithAliasReference } from '@/utils/isAliasReference';
 import { convertToFigmaColor } from './figmaTransforms/colors';
 import { isColorApproximatelyEqual } from '@/utils/isColorApproximatelyEqual';
 import { resolveCollectionContext } from './extendedCollections/collectionContext';
-import { applyChildModeValue } from './extendedCollections/applyChildModeValue';
+import { applyChildModeValue, InheritBehavior } from './extendedCollections/applyChildModeValue';
 import { isVariableComposedColor } from './composedColor';
 
 type RGB = { r: number; g: number; b: number };
@@ -21,7 +21,7 @@ function isFigmaColorObject(obj: VariableValue): obj is RGBOrRGBA {
   );
 }
 
-export default function setColorValuesOnVariable(variable: Variable, mode: string, value: string, collection?: VariableCollection, forceUpdate = false) {
+export default function setColorValuesOnVariable(variable: Variable, mode: string, value: string, collection?: VariableCollection, forceUpdate = false, inheritBehavior: InheritBehavior = 'overwrite') {
   try {
     const { color, opacity } = convertToFigmaColor(value);
     const existingVariableValue = variable.valuesByMode[mode];
@@ -39,7 +39,7 @@ export default function setColorValuesOnVariable(variable: Variable, mode: strin
     // Extended collections: inherit-vs-override decided in one shared place
     const { parentModeId } = resolveCollectionContext(collection, mode);
     if (parentModeId) {
-      applyChildModeValue(variable, mode, parentModeId, newValue);
+      applyChildModeValue(variable, mode, parentModeId, newValue, collection, inheritBehavior);
       return;
     }
 

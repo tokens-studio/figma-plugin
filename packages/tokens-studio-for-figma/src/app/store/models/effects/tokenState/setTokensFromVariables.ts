@@ -2,7 +2,7 @@ import type { RematchDispatch } from '@rematch/core';
 import type { RootModel } from '@/types/RootModel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { pushToTokensStudioOAuth } from '../../../providers/tokens-studio/tokensStudioOAuth';
-import { pushThemeToTokensStudioOAuth } from './utils/pushThemeToTokensStudioOAuth';
+import { notifyThemePushFailures, pushThemeToTokensStudioOAuth, type ThemePushFailure } from './utils/pushThemeToTokensStudioOAuth';
 import {
   resolveSanitizedKey,
   sanitizeNewTokensForStudio,
@@ -19,11 +19,13 @@ export function setTokensFromVariables(dispatch: RematchDispatch<RootModel>) {
 
     const context = currentState.uiState.api;
     const hasChangeSetId = !!(context as any)?.changeSetId;
-    const { importedTokens } = currentState.tokenState;
+    const { importedTokens, tokens: localTokens = {} } = currentState.tokenState;
+    // Changed tokens of a renamed collection are listed as updates, but their set is new in Studio too.
+    const updatedTokensInNewSets = (importedTokens?.updatedTokens || []).filter((token) => token.parent && !localTokens[token.parent]);
     // Sanitize at the studio boundary: strip characters that would corrupt the
     // ledger's reference or token-set parsing. Plugin-only flows still receive
     // the raw names because this effect only runs for TOKENS_STUDIO_OAUTH.
-    const newTokens = sanitizeNewTokensForStudio(importedTokens?.newTokens || []);
+    const newTokens = sanitizeNewTokensForStudio([...(importedTokens?.newTokens || []), ...updatedTokensInNewSets]);
 
     // Only create token sets and tokens if changeSetId is present — the REST API requires it.
     // changeSetId is populated after pulling from the REST API for a specific branch.
@@ -116,10 +118,14 @@ export function setTokensFromVariables(dispatch: RematchDispatch<RootModel>) {
       const updatedThemesToPush = (importedThemes.updatedThemes || []).map((t: any) => sanitizeThemeForStudio(t));
       // Push themes sequentially so that a shared theme group (e.g. "appearances") is only created
       // once — concurrent pushes would both see groupId=null and create duplicate groups.
+      const failures: ThemePushFailure[] = [];
       for (const theme of [...newThemesToPush, ...updatedThemesToPush]) {
         // eslint-disable-next-line no-await-in-loop
-        await pushThemeToTokensStudioOAuth(theme, stateAfterSets, dispatch);
+        const result = await pushThemeToTokensStudioOAuth(theme, stateAfterSets, dispatch, { notifyOnFailure: false });
+        if (!result.ok) failures.push(result.failure);
       }
+      // One message for the whole import rather than one per refused theme.
+      notifyThemePushFailures(failures);
     }
   };
 }

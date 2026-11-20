@@ -329,6 +329,41 @@ describe('destructureTokenForAlias', () => {
       borderWidth: 'borderWidth.10px',
     });
   });
+
+  it('extracts the referenced color token from single-side border tokens', () => {
+    const tokens = new Map<string, any>([
+      ['red', {
+        name: 'red', rawValue: '#f00', type: TokenTypes.COLOR, value: '#f00',
+      }],
+      ['border.top', {
+        name: 'border.top',
+        rawValue: { color: '{red}', style: 'solid', width: '{borderWidth.10px}' },
+        resolvedValueWithReferences: { color: '{red}', style: 'solid', width: '{borderWidth.10px}' },
+        type: TokenTypes.BORDER,
+        value: { color: '#f00', width: 10, style: 'solid' },
+      }],
+    ]);
+    expect(destructureTokenForAlias(tokens, { borderTop: 'border.top' })).toEqual({
+      borderTop: 'border.top',
+      borderColor: 'red',
+    });
+  });
+
+  it('falls back to the side border token name when its color is not a reference', () => {
+    const tokens = new Map<string, any>([
+      ['border.left', {
+        name: 'border.left',
+        rawValue: { color: '#f00', style: 'solid', width: '1' },
+        resolvedValueWithReferences: { color: '#f00', style: 'solid', width: '1' },
+        type: TokenTypes.BORDER,
+        value: { color: '#f00', width: 1, style: 'solid' },
+      }],
+    ]);
+    expect(destructureTokenForAlias(tokens, { borderLeft: 'border.left' })).toEqual({
+      borderLeft: 'border.left',
+      borderColor: 'border.left',
+    });
+  });
 });
 
 describe('returnValueToLookFor', () => {
@@ -401,7 +436,9 @@ describe('storage type', () => {
 
     saveStorageType(apiContext);
 
-    expect(mockRootSetSharedPluginData).toBeCalledWith('tokens', 'storageType', JSON.stringify(apiContext));
+    expect(mockRootSetSharedPluginData).toBeCalledWith('tokens', 'storageType', expect.any(String));
+    const written = mockRootSetSharedPluginData.mock.calls[mockRootSetSharedPluginData.mock.calls.length - 1][2];
+    expect(JSON.parse(written)).toEqual(apiContext);
   });
 });
 

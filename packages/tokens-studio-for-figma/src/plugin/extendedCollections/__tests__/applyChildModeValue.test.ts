@@ -1,145 +1,111 @@
 import { applyChildModeValue } from '../applyChildModeValue';
 
 const CHILD_MODE = 'child-mode';
+const OTHER_CHILD_MODE = 'other-child-mode';
 const PARENT_MODE = 'parent-mode';
 
-function makeVariable(
-  valuesByMode: Record<string, VariableValue>,
-  { withClearApi = true }: { withClearApi?: boolean } = {},
-) {
-  const variable: any = {
+function makeVariable(valuesByMode: Record<string, VariableValue>) {
+  return {
+    id: 'var-1',
     name: 'test-var',
     valuesByMode,
     setValueForMode: jest.fn(),
-  };
-  if (withClearApi) {
-    variable.clearValueForMode = jest.fn();
-  }
-  return variable as Variable & { clearValueForMode?: jest.Mock; setValueForMode: jest.Mock };
+    removeOverrideForMode: jest.fn(),
+  } as unknown as Variable & { setValueForMode: jest.Mock; removeOverrideForMode: jest.Mock };
 }
 
+// Figma keeps extended-collection overrides on the collection, not in valuesByMode
+function makeCollection(overrides: Record<string, VariableValue> = {}) {
+  return {
+    id: 'child-coll',
+    isExtension: true,
+    parentVariableCollectionId: 'parent-coll',
+    variableOverrides: { 'var-1': overrides },
+  } as unknown as VariableCollection;
+}
+
+const alias = (id: string) => ({ type: 'VARIABLE_ALIAS', id } as VariableAlias);
+
 describe('applyChildModeValue', () => {
-  it('leaves an already-inherited child mode untouched when desired matches parent (no explicit child value)', () => {
-    // The common case: the variable only holds the parent mode value, so the
-    // child already inherits. No clear needed — and Figma exposes no clear API.
-    const variable = makeVariable({ [PARENT_MODE]: 16 });
+  describe('desired value equals the parent', () => {
+    it('does nothing when the child has no override', () => {
+      const variable = makeVariable({ [PARENT_MODE]: 16 });
 
-    const result = applyChildModeValue(variable, CHILD_MODE, PARENT_MODE, 16);
-
-    expect(result).toBe('unchanged');
-    expect(variable.clearValueForMode).not.toHaveBeenCalled();
-    expect(variable.setValueForMode).not.toHaveBeenCalled();
-  });
-
-  it('self-heals a stale explicit override matching parent when a clear API is available', () => {
-    // Child holds the same value explicitly (blue) — re-export flips it back to inherited
-    const variable = makeVariable({ [PARENT_MODE]: 16, [CHILD_MODE]: 16 });
-
-    const result = applyChildModeValue(variable, CHILD_MODE, PARENT_MODE, 16);
-
-    expect(result).toBe('cleared');
-    expect(variable.clearValueForMode).toHaveBeenCalledWith(CHILD_MODE);
-  });
-
-  it('reports unchanged (best effort) for a stale override that already matches when no clear API exists', () => {
-    const variable = makeVariable({ [PARENT_MODE]: 16, [CHILD_MODE]: 16 }, { withClearApi: false });
-
-    const result = applyChildModeValue(variable, CHILD_MODE, PARENT_MODE, 16);
-
-    expect(result).toBe('unchanged');
-    expect(variable.setValueForMode).not.toHaveBeenCalled();
-  });
-
-  it('overwrites a stale WRONG override with the desired value when no clear API exists', () => {
-    // Leftover raw value from a previous export that differs from the (now) desired
-    // value. We cannot clear to inherit, so at least make it show the right value.
-    const desiredAlias = { type: 'VARIABLE_ALIAS', id: 'v-target' } as VariableAlias;
-    const variable = makeVariable(
-      { [PARENT_MODE]: desiredAlias, [CHILD_MODE]: { r: 0.5, g: 0.5, b: 0.5, a: 1 } },
-      { withClearApi: false },
-    );
-
-    const result = applyChildModeValue(variable, CHILD_MODE, PARENT_MODE, desiredAlias);
-
-    expect(result).toBe('set');
-    expect(variable.setValueForMode).toHaveBeenCalledWith(CHILD_MODE, desiredAlias);
-  });
-
-  it('sets an explicit override when desired value differs from parent', () => {
-    const variable = makeVariable({ [PARENT_MODE]: 16 });
-
-    const result = applyChildModeValue(variable, CHILD_MODE, PARENT_MODE, 24);
-
-    expect(result).toBe('set');
-    expect(variable.setValueForMode).toHaveBeenCalledWith(CHILD_MODE, 24);
-    expect(variable.clearValueForMode).not.toHaveBeenCalled();
-  });
-
-  it('skips the write when child already holds the desired override', () => {
-    const variable = makeVariable({ [PARENT_MODE]: 16, [CHILD_MODE]: 24 });
-
-    const result = applyChildModeValue(variable, CHILD_MODE, PARENT_MODE, 24);
-
-    expect(result).toBe('unchanged');
-    expect(variable.setValueForMode).not.toHaveBeenCalled();
-    expect(variable.clearValueForMode).not.toHaveBeenCalled();
-  });
-
-  it('sets override when parent mode has no value at all', () => {
-    const variable = makeVariable({});
-
-    const result = applyChildModeValue(variable, CHILD_MODE, PARENT_MODE, 24);
-
-    expect(result).toBe('set');
-    expect(variable.setValueForMode).toHaveBeenCalledWith(CHILD_MODE, 24);
-  });
-
-  describe('aliases', () => {
-    const alias = (id: string) => ({ type: 'VARIABLE_ALIAS', id } as VariableAlias);
-
-    it('leaves child inheriting when parent holds the same alias and there is no explicit child value', () => {
-      const variable = makeVariable({ [PARENT_MODE]: alias('v1') });
-
-      const result = applyChildModeValue(variable, CHILD_MODE, PARENT_MODE, alias('v1'));
+      const result = applyChildModeValue(variable, CHILD_MODE, PARENT_MODE, 16, makeCollection(), 'clear');
 
       expect(result).toBe('unchanged');
-      expect(variable.clearValueForMode).not.toHaveBeenCalled();
+      expect(variable.removeOverrideForMode).not.toHaveBeenCalled();
       expect(variable.setValueForMode).not.toHaveBeenCalled();
     });
 
-    it('sets override when parent aliases a different variable', () => {
-      const variable = makeVariable({ [PARENT_MODE]: alias('v1') });
+    it("'clear' removes only this mode's override", () => {
+      const variable = makeVariable({ [PARENT_MODE]: 16 });
+      const collection = makeCollection({ [CHILD_MODE]: 99, [OTHER_CHILD_MODE]: 42 });
 
-      const result = applyChildModeValue(variable, CHILD_MODE, PARENT_MODE, alias('v2'));
-
-      expect(result).toBe('set');
-      expect(variable.setValueForMode).toHaveBeenCalledWith(CHILD_MODE, alias('v2'));
-    });
-
-    it('sets alias override when parent holds a raw value (type mismatch is never inherit)', () => {
-      const variable = makeVariable({
-        [PARENT_MODE]: {
-          r: 1, g: 1, b: 1, a: 1,
-        },
-      });
-
-      const result = applyChildModeValue(variable, CHILD_MODE, PARENT_MODE, alias('v1'));
-
-      expect(result).toBe('set');
-    });
-
-    it('self-heals a stale explicit alias override matching parent', () => {
-      const variable = makeVariable({ [PARENT_MODE]: alias('v1'), [CHILD_MODE]: alias('v1') });
-
-      const result = applyChildModeValue(variable, CHILD_MODE, PARENT_MODE, alias('v1'));
+      const result = applyChildModeValue(variable, CHILD_MODE, PARENT_MODE, 16, collection, 'clear');
 
       expect(result).toBe('cleared');
-      expect(variable.clearValueForMode).toHaveBeenCalledWith(CHILD_MODE);
+      expect(variable.removeOverrideForMode).toHaveBeenCalledTimes(1);
+      expect(variable.removeOverrideForMode).toHaveBeenCalledWith(CHILD_MODE);
+      expect(variable.setValueForMode).not.toHaveBeenCalled();
     });
-  });
 
-  describe('colors', () => {
-    it('leaves child inheriting when color approximately matches parent (no explicit child value)', () => {
+    it("'clear' self-heals a stale alias override that matches the parent alias", () => {
+      const variable = makeVariable({ [PARENT_MODE]: alias('v1') });
+
+      const result = applyChildModeValue(
+        variable,
+        CHILD_MODE,
+        PARENT_MODE,
+        alias('v1'),
+        makeCollection({ [CHILD_MODE]: alias('v1') }),
+        'clear',
+      );
+
+      expect(result).toBe('cleared');
+      expect(variable.removeOverrideForMode).toHaveBeenCalledWith(CHILD_MODE);
+    });
+
+    it("'overwrite' never clears: it writes a differing override explicitly", () => {
+      const variable = makeVariable({ [PARENT_MODE]: 16 });
+
+      const result = applyChildModeValue(variable, CHILD_MODE, PARENT_MODE, 16, makeCollection({ [CHILD_MODE]: 99 }), 'overwrite');
+
+      expect(result).toBe('set');
+      expect(variable.removeOverrideForMode).not.toHaveBeenCalled();
+      expect(variable.setValueForMode).toHaveBeenCalledWith(CHILD_MODE, 16);
+    });
+
+    it("'overwrite' leaves an override that already holds the desired value", () => {
+      const variable = makeVariable({ [PARENT_MODE]: 16 });
+
+      const result = applyChildModeValue(variable, CHILD_MODE, PARENT_MODE, 16, makeCollection({ [CHILD_MODE]: 16 }), 'overwrite');
+
+      expect(result).toBe('unchanged');
+      expect(variable.removeOverrideForMode).not.toHaveBeenCalled();
+      expect(variable.setValueForMode).not.toHaveBeenCalled();
+    });
+
+    it("'keep' preserves an existing override (e.g. one coming from a brand set)", () => {
+      const variable = makeVariable({ [PARENT_MODE]: 16 });
+
+      const result = applyChildModeValue(variable, CHILD_MODE, PARENT_MODE, 16, makeCollection({ [CHILD_MODE]: 99 }), 'keep');
+
+      expect(result).toBe('unchanged');
+      expect(variable.removeOverrideForMode).not.toHaveBeenCalled();
+      expect(variable.setValueForMode).not.toHaveBeenCalled();
+    });
+
+    it('defaults to overwrite', () => {
+      const variable = makeVariable({ [PARENT_MODE]: 16 });
+
+      const result = applyChildModeValue(variable, CHILD_MODE, PARENT_MODE, 16, makeCollection({ [CHILD_MODE]: 99 }));
+
+      expect(result).toBe('set');
+      expect(variable.removeOverrideForMode).not.toHaveBeenCalled();
+    });
+
+    it('treats approximately equal colors as equal to the parent', () => {
       const variable = makeVariable({
         [PARENT_MODE]: {
           r: 0.5, g: 0.2, b: 0.1, a: 1,
@@ -148,57 +114,69 @@ describe('applyChildModeValue', () => {
 
       const result = applyChildModeValue(variable, CHILD_MODE, PARENT_MODE, {
         r: 0.50000001, g: 0.2, b: 0.1, a: 1,
-      });
+      }, makeCollection(), 'clear');
+
+      expect(result).toBe('unchanged');
+      expect(variable.setValueForMode).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('desired value differs from the parent', () => {
+    it('sets an explicit override', () => {
+      const variable = makeVariable({ [PARENT_MODE]: 16 });
+
+      const result = applyChildModeValue(variable, CHILD_MODE, PARENT_MODE, 24, makeCollection(), 'clear');
+
+      expect(result).toBe('set');
+      expect(variable.setValueForMode).toHaveBeenCalledWith(CHILD_MODE, 24);
+      expect(variable.removeOverrideForMode).not.toHaveBeenCalled();
+    });
+
+    it('skips the write when the override already holds the desired value', () => {
+      const variable = makeVariable({ [PARENT_MODE]: 16 });
+
+      const result = applyChildModeValue(variable, CHILD_MODE, PARENT_MODE, 24, makeCollection({ [CHILD_MODE]: 24 }), 'clear');
 
       expect(result).toBe('unchanged');
       expect(variable.setValueForMode).not.toHaveBeenCalled();
     });
 
-    it('clears an explicit child color override that now matches the parent', () => {
-      const variable = makeVariable({
-        [PARENT_MODE]: {
-          r: 0.5, g: 0.2, b: 0.1, a: 1,
-        },
-        [CHILD_MODE]: {
-          r: 0.5, g: 0.2, b: 0.1, a: 1,
-        },
-      });
+    it('sets an override when the parent mode has no value', () => {
+      const variable = makeVariable({});
+
+      const result = applyChildModeValue(variable, CHILD_MODE, PARENT_MODE, 24, makeCollection());
+
+      expect(result).toBe('set');
+      expect(variable.setValueForMode).toHaveBeenCalledWith(CHILD_MODE, 24);
+    });
+
+    it('sets an override when the parent aliases a different variable', () => {
+      const variable = makeVariable({ [PARENT_MODE]: alias('v1') });
+
+      const result = applyChildModeValue(variable, CHILD_MODE, PARENT_MODE, alias('v2'), makeCollection(), 'clear');
+
+      expect(result).toBe('set');
+      expect(variable.setValueForMode).toHaveBeenCalledWith(CHILD_MODE, alias('v2'));
+    });
+
+    it('never treats a raw color as matching a parent alias', () => {
+      // Inheriting would resolve the alias in the parent's context, not the child's
+      const variable = makeVariable({ [PARENT_MODE]: alias('v1') });
 
       const result = applyChildModeValue(variable, CHILD_MODE, PARENT_MODE, {
         r: 0.5, g: 0.2, b: 0.1, a: 1,
-      });
-
-      expect(result).toBe('cleared');
-      expect(variable.clearValueForMode).toHaveBeenCalledWith(CHILD_MODE);
-    });
-
-    it('sets override for a differing color', () => {
-      const variable = makeVariable({
-        [PARENT_MODE]: {
-          r: 0.5, g: 0.2, b: 0.1, a: 1,
-        },
-      });
-      const newColor = {
-        r: 0.9, g: 0.2, b: 0.1, a: 1,
-      };
-
-      const result = applyChildModeValue(variable, CHILD_MODE, PARENT_MODE, newColor);
-
-      expect(result).toBe('set');
-      expect(variable.setValueForMode).toHaveBeenCalledWith(CHILD_MODE, newColor);
-    });
-
-    it('does NOT clear when parent holds an alias and desired is the resolved raw color', () => {
-      // The classic bug: parent = alias, pass 1 writes resolved color to child.
-      // These must not be treated as matching — inherit would resolve through
-      // the parent's alias chain in parent context, not the child's.
-      const variable = makeVariable({ [PARENT_MODE]: { type: 'VARIABLE_ALIAS', id: 'v1' } as VariableAlias });
-
-      const result = applyChildModeValue(variable, CHILD_MODE, PARENT_MODE, {
-        r: 0.5, g: 0.2, b: 0.1, a: 1,
-      });
+      }, makeCollection(), 'clear');
 
       expect(result).toBe('set');
     });
+  });
+
+  it('falls back to valuesByMode when the collection exposes no overrides', () => {
+    const variable = makeVariable({ [PARENT_MODE]: 16, [CHILD_MODE]: 99 });
+
+    const result = applyChildModeValue(variable, CHILD_MODE, PARENT_MODE, 16, null, 'clear');
+
+    expect(result).toBe('cleared');
+    expect(variable.removeOverrideForMode).toHaveBeenCalledWith(CHILD_MODE);
   });
 });

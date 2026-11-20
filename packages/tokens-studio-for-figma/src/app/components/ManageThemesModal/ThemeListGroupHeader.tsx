@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { IconButton, DropdownMenu } from '@tokens-studio/ui';
 import { Xmark, Check } from 'iconoir-react';
 import { DotsVerticalIcon } from '@radix-ui/react-icons';
-import { editProhibitedSelector, isFigmaEnterpriseSelector } from '@/selectors';
+import { editProhibitedSelector, isFigmaEnterpriseSelector, isTokensStudioSyncSelector } from '@/selectors';
 import { DragControlsContext } from '@/context';
 import { StyledDragButton } from '../StyledDragger/StyledDragButton';
 import { DragGrabber } from '../StyledDragger/DragGrabber';
@@ -38,6 +38,8 @@ export function ThemeListGroupHeader({
   const dragContext = useContext(DragControlsContext);
   const editProhibited = useSelector(editProhibitedSelector);
   const isFigmaEnterprise = useSelector(isFigmaEnterpriseSelector);
+  const isTokensStudioSync = useSelector(isTokensStudioSyncSelector);
+  const extendDisabled = isExtendedGroup || !isFigmaEnterprise || isTokensStudioSync;
   const [currentGroupName, setCurrentGroupName] = useState<string>(groupName === INTERNAL_THEMES_NO_GROUP ? '' : groupName);
   const handleDragStart = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
     dragContext.controls?.start(event);
@@ -133,18 +135,21 @@ export function ThemeListGroupHeader({
                   </DropdownMenu.Item>
                   {groupName !== INTERNAL_THEMES_NO_GROUP && (
                     <DropdownMenu.Item
-                      onSelect={isExtendedGroup || !isFigmaEnterprise ? undefined : handleExtendGroup}
-                      disabled={isExtendedGroup || !isFigmaEnterprise}
+                      onSelect={extendDisabled ? undefined : handleExtendGroup}
+                      disabled={extendDisabled}
                     >
                       <Box css={{
                         display: 'flex',
                         alignItems: 'center',
                         gap: '$2',
-                        ...((isExtendedGroup || !isFigmaEnterprise) ? { color: '$fgDisabled', cursor: 'not-allowed' } : {}),
+                        ...(extendDisabled ? { color: '$fgDisabled', cursor: 'not-allowed' } : {}),
                       }}
                       >
                         <span>{t('extendThemeGroup')}</span>
-                        {!isFigmaEnterprise && (
+                        {isTokensStudioSync && (
+                          <span style={{ fontSize: '10px', opacity: 0.7 }}>{t('notSupportedWithStudioSync')}</span>
+                        )}
+                        {!isTokensStudioSync && !isFigmaEnterprise && (
                           <span style={{ fontSize: '10px', opacity: 0.7 }}>{t('enterpriseOnly')}</span>
                         )}
                       </Box>
