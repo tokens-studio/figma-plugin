@@ -25,6 +25,7 @@ import { useIsProUser } from '@/app/hooks/useIsProUser';
 import { categorizeError } from '@/utils/error/categorizeError';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 import removeIdPropertyFromTokens from '@/utils/removeIdPropertyFromTokens';
+import { buildGitMetadata } from '@/utils/buildGitMetadata';
 
 export type GitlabCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITLAB; }>;
 type GitlabFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITLAB }>;
@@ -75,9 +76,7 @@ export function useGitLab() {
       const { commitMessage, customBranch } = pushSettings;
       try {
         if (customBranch) storage.selectBranch(customBranch);
-        const metadata = {
-          tokenSetOrder: Object.keys(tokens),
-        };
+        const metadata = buildGitMetadata(tokens);
         await storage.save({
           themes,
           tokens,
