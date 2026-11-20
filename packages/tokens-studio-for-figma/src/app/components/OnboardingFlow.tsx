@@ -8,6 +8,9 @@ import Modal from './Modal';
 import { getLastopened } from '@/selectors';
 import Stack from './Stack';
 import { styled } from '@/stitches.config';
+import { docUrls } from '@/constants/docUrls';
+import { DocsRef } from '@/constants/DocsRef';
+import { withDocsRef } from '@/utils/withDocsRef';
 
 const StyledLink = styled('a', {
   display: 'inline-flex',
@@ -47,22 +50,22 @@ export default function OnboardingFlow() {
     {
       title: 'createTokens',
       excerpt: 'createTokensText',
-      read_more_link: 'https://docs.tokens.studio/tokens/creating-tokens',
+      read_more_link: withDocsRef(docUrls.tokenTypes, DocsRef.ONBOARDING),
     },
     {
       title: 'reference',
       excerpt: 'referenceText',
-      read_more_link: 'https://docs.tokens.studio/tokens/aliases',
+      read_more_link: withDocsRef(docUrls.tokenReferences, DocsRef.ONBOARDING),
     },
     {
       title: 'apply',
       excerpt: 'applyText',
-      read_more_link: 'https://docs.tokens.studio/tokens/applying-tokens',
+      read_more_link: withDocsRef(docUrls.variablesOverview, DocsRef.ONBOARDING),
     },
     {
       title: 'knowMore',
       excerpt: 'knowMoreText',
-      read_more_link: 'https://docs.tokens.studio',
+      read_more_link: withDocsRef(docUrls.root, DocsRef.ONBOARDING),
     },
   ];
 

@@ -18,6 +18,9 @@ import Stack from './Stack';
 import { styled } from '@/stitches.config';
 import { Tabs } from '@/constants/Tabs';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import { docUrls } from '@/constants/docUrls';
+import { DocsRef } from '@/constants/DocsRef';
+import { withDocsRef } from '@/utils/withDocsRef';
 import Box from './Box';
 import { transformProviderName } from '@/utils/transformProviderName';
 import { track } from '@/utils/analytics';
@@ -194,11 +197,11 @@ function StartScreen() {
               {t('guides')}
             </Heading>
             <Stack direction="column" gap={3}>
-              <HelpfulLink href="https://docs.tokens.studio/get-started/install-figma-plugin?ref=startscreen" target="_blank">
+              <HelpfulLink href={withDocsRef(docUrls.installPlugin, DocsRef.START_SCREEN)} target="_blank">
                 <BookmarkIcon />
                 {t('gettingStarted')}
               </HelpfulLink>
-              <HelpfulLink href="https://docs.tokens.studio/?ref=startscreen" target="_blank">
+              <HelpfulLink href={withDocsRef(docUrls.root, DocsRef.START_SCREEN)} target="_blank">
                 <ReaderIcon />
                 {t('documentation')}
               </HelpfulLink>
