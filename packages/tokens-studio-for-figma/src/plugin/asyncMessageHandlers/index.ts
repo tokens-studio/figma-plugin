@@ -48,5 +48,6 @@ export * from './removeStylesWithoutConnection';
 export * from './setVariableExportSettings';
 export * from './setSelectedExportThemes';
 export * from './setOAuthTokens';
+export * from './getOAuthTokens';
 export * from './setActiveOrganizationId';
 export * from '../livingDocumentation';

@@ -4,6 +4,8 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { store } from '@/app/store';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { getPlanDisplayName } from '@/utils/tokensStudio/organizationAccess';
+import { TokenRefreshManager } from '@/app/services/TokenRefreshManager';
+import { RefreshError } from '@/app/services/RefreshError';
 
 // Shape of GET /api/v1/organizations (studio-on-rails OrganizationsController#index).
 const orgPayload = (id: string, seat: string, subscription: Record<string, unknown>) => ({
@@ -182,5 +184,105 @@ describe('useAuthStore Pro and plan labels', () => {
     await loadOrganizations();
     const org = useAuthStore.getState().organizations.find((o) => o.id === 'variables');
     expect(org?.subscription?.plan_type).toBe('variables');
+  });
+});
+
+describe('useAuthStore refreshTokens with other files open', () => {
+  const tokens = (name: string, expiresInMs: number) => ({
+    accessToken: `${name}-access`, refreshToken: `${name}-refresh`, tokenType: 'Bearer', expiresAt: Date.now() + expiresInMs,
+  });
+  const HOUR = 60 * 60 * 1000;
+  let stored: ReturnType<typeof tokens> | null | undefined;
+
+  beforeEach(() => {
+    stored = undefined;
+    jest.spyOn(AsyncMessageChannel.ReactInstance, 'message').mockImplementation(async (msg: any) => (
+      msg.type === AsyncMessageTypes.GET_OAUTH_TOKENS ? { oauthTokens: stored } : undefined
+    ) as any);
+    jest.spyOn(TokenRefreshManager, 'refreshTokens').mockImplementation(async (current) => tokens(`${current.refreshToken}-renewed`, 24 * HOUR));
+    useAuthStore.setState({ oauthTokens: tokens('mine', -1000), isAuthenticated: true });
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('uses the pair another file already renewed, instead of renewing a rotated token', async () => {
+    stored = tokens('other-file', HOUR);
+
+    await useAuthStore.getState().refreshTokens();
+
+    expect(TokenRefreshManager.refreshTokens).not.toHaveBeenCalled();
+    expect(useAuthStore.getState().oauthTokens).toEqual(stored);
+  });
+
+  it('renews with the stored refresh token when the stored pair is about to expire too', async () => {
+    stored = tokens('other-file', -1000);
+
+    await useAuthStore.getState().refreshTokens();
+
+    expect(TokenRefreshManager.refreshTokens).toHaveBeenCalledWith(stored, expect.any(String));
+    expect(useAuthStore.getState().oauthTokens?.refreshToken).toBe('other-file-refresh-renewed-refresh');
+  });
+
+  it('renews its own pair when the stored one is the same, and saves the result', async () => {
+    stored = tokens('mine', -1000);
+
+    await useAuthStore.getState().refreshTokens();
+
+    expect(TokenRefreshManager.refreshTokens).toHaveBeenCalledTimes(1);
+    expect(AsyncMessageChannel.ReactInstance.message).toHaveBeenCalledWith(expect.objectContaining({
+      type: AsyncMessageTypes.SET_OAUTH_TOKENS,
+      oauthTokens: expect.objectContaining({ refreshToken: 'mine-refresh-renewed-refresh' }),
+    }));
+  });
+
+  it('renews its own pair when the stored tokens cannot be read', async () => {
+    await useAuthStore.getState().refreshTokens();
+
+    expect(TokenRefreshManager.refreshTokens).toHaveBeenCalledWith(expect.objectContaining({ refreshToken: 'mine-refresh' }), expect.any(String));
+  });
+
+  it('does nothing when this file signed out while the stored tokens were read', async () => {
+    jest.mocked(AsyncMessageChannel.ReactInstance.message).mockImplementation(async (msg: any) => {
+      if (msg.type !== AsyncMessageTypes.GET_OAUTH_TOKENS) return undefined as any;
+      useAuthStore.setState({ oauthTokens: null });
+      return { oauthTokens: tokens('mine', -1000) } as any;
+    });
+
+    await useAuthStore.getState().refreshTokens();
+
+    expect(TokenRefreshManager.refreshTokens).not.toHaveBeenCalled();
+    expect(useAuthStore.getState().oauthTokens).toBeNull();
+  });
+
+  it('does not renew again when this file renewed while the stored tokens were read', async () => {
+    const renewed = tokens('renewed-here', HOUR);
+    jest.mocked(AsyncMessageChannel.ReactInstance.message).mockImplementation(async (msg: any) => {
+      if (msg.type !== AsyncMessageTypes.GET_OAUTH_TOKENS) return undefined as any;
+      useAuthStore.setState({ oauthTokens: renewed });
+      return { oauthTokens: renewed } as any;
+    });
+
+    await useAuthStore.getState().refreshTokens();
+
+    expect(TokenRefreshManager.refreshTokens).not.toHaveBeenCalled();
+    expect(useAuthStore.getState().oauthTokens).toEqual(renewed);
+  });
+
+  it('signs out when another file signed out', async () => {
+    stored = null;
+
+    await expect(useAuthStore.getState().refreshTokens()).rejects.toMatchObject({ kind: 'fatal' });
+    expect(TokenRefreshManager.refreshTokens).not.toHaveBeenCalled();
+    expect(useAuthStore.getState().oauthTokens).toBeNull();
+  });
+
+  it('signs out instead of sending the expired token again when there is no refresh token', async () => {
+    useAuthStore.setState({ oauthTokens: { ...tokens('mine', -1000), refreshToken: '' } });
+
+    await expect(useAuthStore.getState().refreshTokens()).rejects.toBeInstanceOf(RefreshError);
+    expect(TokenRefreshManager.refreshTokens).not.toHaveBeenCalled();
+    expect(useAuthStore.getState().oauthTokens).toBeNull();
   });
 });
