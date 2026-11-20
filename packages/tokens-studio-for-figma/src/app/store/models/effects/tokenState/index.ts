@@ -21,3 +21,5 @@ export * from './setTokensFromStyles';
 export * from './createMultipleTokens';
 export * from './disconnectVariableFromTheme';
 export * from './disconnectStyleFromTheme';
+export * from './disconnectVariablesFromThemes';
+export * from './restoreVariableReferencesToThemes';

@@ -866,6 +866,19 @@ export default function useTokens() {
     [store],
   );
 
+  const removeVariablesByKeys = useCallback(
+    async (variableKeys: string[]) => {
+      if (variableKeys.length === 0) return;
+      track('removeVariables', { count: variableKeys.length });
+
+      await wrapTransaction({ name: 'removeVariables' }, async () => AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.REMOVE_VARIABLES,
+        variableKeys,
+      }));
+    },
+    [],
+  );
+
   const updateVariablesFromToken = useCallback(async (payload: UpdateTokenVariablePayload) => {
     track('updateVariables', payload);
 
@@ -898,6 +911,7 @@ export default function useTokens() {
       createVariablesFromSets,
       renameVariablesFromToken,
       removeVariablesFromToken,
+      removeVariablesByKeys,
       createVariablesFromThemes,
       updateVariablesFromToken,
       filterMultiValueTokens,
@@ -925,6 +939,7 @@ export default function useTokens() {
       createVariablesFromThemes,
       renameVariablesFromToken,
       removeVariablesFromToken,
+      removeVariablesByKeys,
       updateVariablesFromToken,
       filterMultiValueTokens,
     ],

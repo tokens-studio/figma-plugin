@@ -55,6 +55,51 @@ describe('ConfirmDialog', () => {
     });
   });
 
+  it('resolves with secondary when the secondary action is used', async () => {
+    const mockStore = createMockStore({});
+
+    const { result: useConfirmResult } = renderHook(
+      () => useConfirm(),
+      {
+        wrapper: ({ children }: PropsWithChildren<unknown>) => (
+          <Provider store={mockStore}>
+            {children}
+          </Provider>
+        ),
+      },
+    );
+
+    const result = render(
+      <Provider store={mockStore}>
+        <ConfirmDialog />
+      </Provider>,
+    );
+
+    let confirmPromise = new Promise<ResolveCallbackPayload<string[]>>(() => {});
+    await act(async () => {
+      confirmPromise = useConfirmResult.current.confirm({
+        text: 'Delete variables?',
+        confirmAction: 'Delete selected & export',
+        cancelAction: 'Cancel',
+        secondaryAction: 'Skip & export',
+        choices: [{ key: 'a', label: 'a', enabled: true }],
+      });
+    });
+
+    expect(result.queryByText('Skip & export')).toBeInTheDocument();
+
+    await act(async () => {
+      (result.queryByText('Skip & export') as HTMLButtonElement).click();
+    });
+
+    expect(mockStore.getState().uiState.confirmState.show).toBe(false);
+    expect(await confirmPromise).toEqual({
+      data: ['a'],
+      result: true,
+      secondary: true,
+    });
+  });
+
   it('can show options', async () => {
     const mockStore = createMockStore({});
 

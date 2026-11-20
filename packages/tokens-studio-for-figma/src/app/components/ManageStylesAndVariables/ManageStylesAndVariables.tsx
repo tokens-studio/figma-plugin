@@ -16,11 +16,13 @@ import useTokens from '@/app/store/useTokens';
 import useConfirm from '@/app/hooks/useConfirm';
 import ExportSetsTab from './ExportSetsTab';
 import ExportThemesTab from './ExportThemesTab';
-import { allTokenSetsSelector, themesListSelector, tokensSelector } from '@/selectors';
+import {
+  allTokenSetsSelector, removeStylesAndVariablesWithoutConnectionSelector, themesListSelector, tokensSelector,
+} from '@/selectors';
 import { ExportTokenSet } from '@/types/ExportTokenSet';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { Dispatch } from '@/app/store';
-import { TokenTypes } from '@/constants/TokenTypes';
+import { findGradientTokensWithStaleVariables } from '@/utils/findGradientTokensWithStaleVariables';
 
 export default function ManageStylesAndVariables({ showModal, setShowModal }: { showModal: boolean, setShowModal: (show: boolean) => void }) {
   const { t } = useTranslation(['manageStylesAndVariables']);
@@ -55,10 +57,11 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
 
   const {
     createVariablesFromSets, createVariablesFromThemes, createStylesFromSelectedTokenSets, createStylesFromSelectedThemes,
-    removeVariablesFromToken,
+    removeVariablesByKeys,
   } = useTokens();
   const { confirm } = useConfirm<string[]>();
   const allTokens = useSelector(tokensSelector);
+  const removeWithoutConnection = useSelector(removeStylesAndVariablesWithoutConnectionSelector);
 
   // Save selected themes when they change and update redux state
   React.useEffect(() => {
@@ -77,56 +80,61 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
     setShowOptions(false);
   }, []);
 
-  // Color tokens that now hold a gradient value but still have a Figma variable
-  // bound from an earlier export. Figma variables can't store gradients, so a
-  // stale variable will keep overriding the new gradient style on any bound
-  // layer. Offer to delete these variables before we push.
-  const gradientTokensWithStaleVariable = React.useMemo(() => {
-    const isGradient = (v: unknown): v is string => typeof v === 'string'
-      && (v.startsWith('linear-gradient') || v.startsWith('radial-gradient') || v.startsWith('conic-gradient'));
-    // Flatten variable-reference keys across all themes once so the token scan
-    // stays O(tokens + refs) rather than O(tokens × themes).
-    const referencedTokenNames = new Set<string>();
-    themes.forEach((theme) => {
-      Object.keys(theme.$figmaVariableReferences ?? {}).forEach((name) => referencedTokenNames.add(name));
-    });
-    const seen = new Set<string>();
-    const collected: string[] = [];
-    Object.values(allTokens).forEach((tokenList) => {
-      tokenList.forEach((token) => {
-        if (token.type !== TokenTypes.COLOR || !isGradient(token.value) || seen.has(token.name)) return;
-        if (referencedTokenNames.has(token.name)) {
-          seen.add(token.name);
-          collected.push(token.name);
-        }
-      });
-    });
-    return collected;
-  }, [allTokens, themes]);
-
   const handleExportToFigma = React.useCallback(async () => {
-    if (gradientTokensWithStaleVariable.length > 0) {
+    // theme id -> { token name -> variable key } for the references whose key matches
+    const collectReferences = (keys: Set<string>) => Object.fromEntries(themes
+      .map((theme) => [theme.id, Object.fromEntries(Object.entries(theme.$figmaVariableReferences ?? {})
+        .filter(([, key]) => keys.has(key)))] as const)
+      .filter(([, references]) => Object.keys(references).length > 0));
+
+    // With "remove without connection" on, a themes export already deletes variables in the
+    // exported collections that no token created. Only ask about variables that cleanup
+    // won't reach: ones also used by themes outside this export, or extended collections.
+    const removedByExport = (key: string) => removeWithoutConnection && activeTab === 'useThemes'
+      && themes
+        .filter((theme) => Object.values(theme.$figmaVariableReferences ?? {}).includes(key))
+        .every((theme) => selectedThemes.includes(theme.id) && !theme.$figmaIsExtension);
+
+    // Figma variables can't store gradients, so a stale variable from an earlier
+    // export keeps overriding the new gradient style on bound layers. Offer to
+    // delete those before we push. Computed on click as it resolves every theme.
+    const staleGradientTokens = findGradientTokensWithStaleVariables(allTokens, themes)
+      .map((token) => ({ ...token, variableKeys: token.variableKeys.filter((key) => !removedByExport(key)) }))
+      .filter(({ variableKeys }) => variableKeys.length > 0);
+
+    let referencesToRestore: Record<string, Record<string, string>> = {};
+    if (staleGradientTokens.length > 0) {
       const gradientConfirm = await confirm({
         text: t('confirmDeleteGradientVariables.text', { defaultValue: 'Delete Figma variables for gradient tokens?' }),
         description: t('confirmDeleteGradientVariables.description', { defaultValue: "Figma variables can't store gradients. These color tokens are now gradients but still have variables from a previous export — bound layers will keep showing the old color until the variable is removed. Uncheck any you'd rather keep." }),
         confirmAction: t('confirmDeleteGradientVariables.confirmAction', { defaultValue: 'Delete selected & export' }),
         cancelAction: t('confirmDeleteGradientVariables.cancelAction', { defaultValue: 'Cancel' }),
+        secondaryAction: t('confirmDeleteGradientVariables.secondaryAction', { defaultValue: 'Skip & export' }),
         variant: 'danger',
-        choices: gradientTokensWithStaleVariable.map((name) => ({
+        choices: staleGradientTokens.map(({ name }) => ({
           key: name,
           label: name,
           enabled: true,
         })),
       });
       if (!gradientConfirm) return; // user cancelled — abort export entirely
-      const toDelete = gradientConfirm.data ?? [];
-      // Sequential rather than Promise.all — each call posts a REMOVE_VARIABLES
-      // message and the plugin side processes them serially anyway, so this
-      // keeps behavior predictable without a burst of parallel requests.
-      // eslint-disable-next-line no-restricted-syntax
-      for (const name of toDelete) {
-        // eslint-disable-next-line no-await-in-loop
-        await removeVariablesFromToken(name);
+      // Skip keeps every variable and exports as-is
+      const selectedNames = new Set(gradientConfirm.secondary ? [] : gradientConfirm.data ?? []);
+      const keysToDelete = new Set(staleGradientTokens
+        .filter(({ name }) => selectedNames.has(name))
+        .flatMap(({ variableKeys }) => variableKeys));
+      // Kept variables lose their references when the export rewrites them (gradients don't
+      // create variables), which would hide them from this prompt for good. Put them back after.
+      referencesToRestore = collectReferences(new Set(staleGradientTokens
+        .filter(({ name }) => !selectedNames.has(name))
+        .flatMap(({ variableKeys }) => variableKeys)));
+      if (keysToDelete.size > 0) {
+        await removeVariablesByKeys(Array.from(keysToDelete));
+        // Drop the references too, otherwise themes that aren't part of this export
+        // keep pointing at the deleted variable and the prompt shows up again.
+        const referencesToRemove = collectReferences(keysToDelete);
+        dispatch.tokenState.disconnectVariablesFromThemes(Object.fromEntries(Object.entries(referencesToRemove)
+          .map(([themeId, references]) => [themeId, Object.keys(references)])));
       }
     }
 
@@ -137,12 +145,15 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
     } else if (activeTab === 'useThemes') {
       await createVariablesFromThemes(selectedThemes);
       await createStylesFromSelectedThemes(selectedThemes);
+      if (Object.keys(referencesToRestore).length > 0) {
+        dispatch.tokenState.restoreVariableReferencesToThemes(referencesToRestore);
+      }
     }
   }, [
     setShowModal, activeTab, selectedThemes, selectedSets,
     createVariablesFromSets, createStylesFromSelectedTokenSets,
     createVariablesFromThemes, createStylesFromSelectedThemes,
-    gradientTokensWithStaleVariable, confirm, removeVariablesFromToken, t,
+    allTokens, themes, removeWithoutConnection, confirm, removeVariablesByKeys, dispatch, t,
   ]);
   const canExportToFigma = activeTab === 'useSets' ? selectedSets.length > 0 : selectedThemes.length > 0;
 
