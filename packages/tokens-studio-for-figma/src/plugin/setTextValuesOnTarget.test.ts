@@ -90,7 +90,15 @@ const tokenWithStringValue: SingleToken = {
   value: 'large',
 };
 
-const tokens: SingleToken[] = [typographyToken, typographyTokenWithReferences, fontSizeLarge, lineHeightLarge, letterSpacingLarge, numericalWeightToken, tokenWithoutValue, tokenWithStringValue, typographyTokenWithNumericalWeight, typographyTokenWithNumericalWeightReference];
+const typographyTokenWithDescription: SingleToken = {
+  name: 'text.withDescription',
+  type: TokenTypes.TYPOGRAPHY,
+  description: 'A text style with a description',
+  value: { fontFamily: 'Baskerville' },
+  resolvedValueWithReferences: { fontFamily: 'Baskerville' },
+};
+
+const tokens: SingleToken[] = [typographyToken, typographyTokenWithReferences, fontSizeLarge, lineHeightLarge, letterSpacingLarge, numericalWeightToken, tokenWithoutValue, tokenWithStringValue, typographyTokenWithNumericalWeight, typographyTokenWithNumericalWeightReference, typographyTokenWithDescription];
 
 describe('setTextValuesOnTarget', () => {
   let textNodeMock;
@@ -185,5 +193,30 @@ describe('setTextValuesOnTarget', () => {
     expect(textNodeMock).toEqual({
       ...textNodeMock,
     });
+  });
+
+  it('sets the description when it differs from the current one', async () => {
+    await setTextValuesOnTarget(textNodeMock, 'text.withDescription');
+    expect(textNodeMock.description).toEqual('A text style with a description');
+  });
+
+  it('does not rewrite the description on a second call with the same value', async () => {
+    let descriptionSetCount = 0;
+    let storedDescription = '';
+    Object.defineProperty(textNodeMock, 'description', {
+      get: () => storedDescription,
+      set: (v: string) => {
+        storedDescription = v;
+        descriptionSetCount += 1;
+      },
+    });
+
+    await setTextValuesOnTarget(textNodeMock, 'text.withDescription');
+    expect(descriptionSetCount).toBe(1);
+
+    // Re-exporting the identical description must not write it again, otherwise
+    // Figma marks the style as modified even though nothing changed.
+    await setTextValuesOnTarget(textNodeMock, 'text.withDescription');
+    expect(descriptionSetCount).toBe(1);
   });
 });
