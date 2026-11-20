@@ -18,6 +18,25 @@ const STATE_FILE = join(STATE_DIR, "state.json");
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+const JS_UNSAFE_CHAR_MAP = {
+  "<": "\\u003C",
+  ">": "\\u003E",
+  "/": "\\u002F",
+  "\\": "\\\\",
+  "\b": "\\b",
+  "\f": "\\f",
+  "\n": "\\n",
+  "\r": "\\r",
+  "\t": "\\t",
+  "\0": "\\0",
+  "\u2028": "\\u2028",
+  "\u2029": "\\u2029",
+};
+
+function escapeUnsafeJsChars(str) {
+  return str.replace(/[<>/\\\b\f\n\r\t\0\u2028\u2029]/g, (ch) => JS_UNSAFE_CHAR_MAP[ch]);
+}
+
 // `WebSocket` became a stable global in Node 22. Read it off `globalThis` (rather
 // than referencing a bare identifier) so older runtimes fail with a clear,
 // actionable message instead of a bare `ReferenceError` deep inside connection setup.
@@ -238,9 +257,12 @@ class Client {
    * values — Figma node objects have methods and won't serialize.
    */
   async eval(code) {
-    const needsWrap = /\breturn\b/.test(code) || /\bawait\b/.test(code);
-    const expression = needsWrap ? `(async () => { ${code} })()` : code;
-    const result = await this._rawEval(expression, { contextId: this.contextId });
+    const source = String(code);
+    const needsWrap = /\breturn\b/.test(source) || /\bawait\b/.test(source);
+    const expression = needsWrap ? `(async () => { ${source} })()` : source;
+    const serializedExpression = escapeUnsafeJsChars(JSON.stringify(expression));
+    const wrappedExpression = `(() => { const __src = ${serializedExpression}; return (0, eval)(__src); })()`;
+    const result = await this._rawEval(wrappedExpression, { contextId: this.contextId });
     if (result?.exceptionDetails) {
       const ex = result.exceptionDetails;
       const val = ex.exception?.value;
