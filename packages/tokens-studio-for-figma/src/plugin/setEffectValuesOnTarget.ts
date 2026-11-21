@@ -6,6 +6,7 @@ import convertOffsetToFigma from './figmaTransforms/offset';
 import { getShadowBehindNodeFromEffect } from './figmaUtils/getShadowBehindNodeFromEffect';
 import { defaultTokenValueRetriever } from './TokenValueRetriever';
 import { TokenBoxshadowValue } from '@/types/values';
+import { normalizeShadowValue } from '@/utils/normalizeShadowValue';
 
 type ResolvedShadowObject = {
   color: string;
@@ -52,9 +53,10 @@ async function tryApplyCompositeVariable({
       a,
     },
     type: convertBoxShadowTypeToFigma(value.type),
-    spread: convertTypographyNumberToFigma(value.spread.toString(), baseFontSize),
-    radius: convertTypographyNumberToFigma(value.blur.toString(), baseFontSize),
-    offset: convertOffsetToFigma(convertTypographyNumberToFigma(value.x.toString(), baseFontSize), convertTypographyNumberToFigma(value.y.toString(), baseFontSize)),
+    // A missing dimension means 0 in Figma; without the fallback a shadow without x/y threw here and left the style empty
+    spread: convertTypographyNumberToFigma(String(value.spread ?? 0), baseFontSize),
+    radius: convertTypographyNumberToFigma(String(value.blur ?? 0), baseFontSize),
+    offset: convertOffsetToFigma(convertTypographyNumberToFigma(String(value.x ?? 0), baseFontSize), convertTypographyNumberToFigma(String(value.y ?? 0), baseFontSize)),
     blendMode: (value.blendMode || 'NORMAL') as BlendMode,
     visible: true,
     ...value.type === 'dropShadow' && 'effects' in target ? { showShadowBehindNode: getShadowBehindNodeFromEffect(target.effects[0]) } : {},
@@ -98,8 +100,9 @@ export default async function setEffectValuesOnTarget(
   try {
     const resolvedToken = defaultTokenValueRetriever.get(token);
     if (typeof resolvedToken === 'undefined') return;
-    const { description, value } = resolvedToken;
-    const resolvedValue: ResolvedShadowObject = defaultTokenValueRetriever.get(token)?.resolvedValueWithReferences;
+    const { description } = resolvedToken;
+    const value = normalizeShadowValue(resolvedToken.value);
+    const resolvedValue: ResolvedShadowObject = normalizeShadowValue(defaultTokenValueRetriever.get(token)?.resolvedValueWithReferences);
     if (typeof resolvedValue === 'undefined') return;
 
     if (Array.isArray(value)) {
