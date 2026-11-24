@@ -22,7 +22,8 @@ export type ThemePushFailure = {
   groupName?: string;
 };
 
-export type ThemePushResult = { ok: true } | { ok: false; failure: ThemePushFailure };
+// `skipped` means nothing reached Tokens Studio and nothing was refused, so a caller must not report a save.
+export type ThemePushResult = { ok: true; skipped?: true } | { ok: false; failure: ThemePushFailure };
 
 /**
  * Fetch existing theme groups from the REST API to resolve group name → ID.
@@ -92,10 +93,10 @@ export async function pushThemeToTokensStudioOAuth(
   payload: any,
   rootState: any,
   dispatch: any,
-  // A caller pushing several themes collects the failures and reports them in one message instead.
-  { notifyOnFailure = true }: { notifyOnFailure?: boolean } = {},
+  // A caller pushing several themes collects the outcomes and reports them in one message instead.
+  { notifyOnFailure = true, notifyOnSuccess = true }: { notifyOnFailure?: boolean; notifyOnSuccess?: boolean } = {},
 ): Promise<ThemePushResult> {
-  if (rootState?.uiState?.api?.provider !== StorageProviderType.TOKENS_STUDIO_OAUTH) return { ok: true };
+  if (rootState?.uiState?.api?.provider !== StorageProviderType.TOKENS_STUDIO_OAUTH) return { ok: true, skipped: true };
 
   // Read once from the live store — rootState in effects is the pre-dispatch snapshot and
   // may have stale remote metadata / themes that were just written by the reducer.
@@ -176,6 +177,7 @@ export async function pushThemeToTokensStudioOAuth(
         action: 'CREATE_THEME_GROUP',
         data: { name: studioGroupName },
         rethrowErrors: true,
+        notifyOnSuccess,
       });
     } catch (error) {
       createError = error;
@@ -241,6 +243,7 @@ export async function pushThemeToTokensStudioOAuth(
       action: isNewTheme ? 'CREATE_THEME' : 'UPDATE_THEME',
       data: isNewTheme ? themeData : { ...themeData, id: payload.id },
       rethrowErrors: true,
+      notifyOnSuccess,
     });
   } catch (error) {
     if (createdGroupId) {
@@ -263,6 +266,9 @@ export async function pushThemeToTokensStudioOAuth(
       reason: failureDetail(error),
     });
   }
+
+  // The push returns null without a request when it has no access token or finds no change set for the branch.
+  if (!result) return { ok: true, skipped: true };
 
   if (isNewTheme && result?.data?.id) {
     // Re-read after the async create — the reducer has run by now and stored the theme with a local

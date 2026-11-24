@@ -215,7 +215,8 @@ export async function createAnnotation(tokens: SelectionValue, direction: Direct
   };
 
   try {
-    loadFonts().then(() => createAnno(tokens, direction));
+    await loadFonts();
+    createAnno(tokens, direction);
   } catch (err) {
     console.log(err);
     notifyUI('There was an issue creating the annotation. Please try again.');

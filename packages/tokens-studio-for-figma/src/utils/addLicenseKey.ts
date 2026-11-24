@@ -16,12 +16,13 @@ export async function addLicenseKey(dispatch: Dispatch, payload: { key: string; 
   const { key, source } = payload;
 
   const {
-    error, plan, email: clientEmail, entitlements,
+    error, plan, email: clientEmail, entitlements, legacyOnly,
   } = await validateLicense(key, userId, userName);
 
   if (error) {
     dispatch.userState.setLicenseStatus(LicenseStatus.ERROR);
     dispatch.userState.setLicenseError(error);
+    dispatch.userState.setLegacyOnlyLicense(null);
     if (source === AddLicenseSource.INITAL_LOAD) {
       notifyToUI('License key invalid, please check your Settings', { error: true });
     }
@@ -34,6 +35,7 @@ export async function addLicenseKey(dispatch: Dispatch, payload: { key: string; 
       entitlements: [...new Set(entitlements)],
     });
     dispatch.userState.setLicenseStatus(LicenseStatus.VERIFIED);
+    dispatch.userState.setLegacyOnlyLicense(legacyOnly ?? null);
 
     if (source === AddLicenseSource.UI) {
       notifyToUI('License added succesfully!');

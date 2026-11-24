@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/react';
-import { LICENSE_API_TIMEOUT_MS, fetchLicenseApi } from './licenseApi';
+import { LICENSE_API_TIMEOUT_MS, fetchLicenseApi, getLegacyOnlyLicense } from './licenseApi';
 import { LICENSE_API_HOSTS } from './licenseApiUrl';
 import { track } from './analytics';
 
@@ -173,5 +173,80 @@ describe('fetchLicenseApi', () => {
         expect.objectContaining({ level: 'error' }),
       );
     });
+  });
+});
+
+// Decides whether the plugin tells the user to sign in with their account to keep Pro.
+describe('getLegacyOnlyLicense', () => {
+  const validate = () => fetchLicenseApi('/validate-license', { endpoint: 'validate-license' });
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('flags a key Studio has no record of (404) that legacy accepted', async () => {
+    mockFetch(json(404, { message: 'No license was found' }), json(200, { plan: 'pro' }));
+
+    const result = await validate();
+
+    expect(getLegacyOnlyLicense(result.attempts)).toEqual({ primaryStatus: 404, primaryReason: 'status' });
+  });
+
+  // Studio answers 500 both for a key it rejects and for its own errors, so none of these can be told from an outage.
+  it.each([
+    ['a 500 with a rejection message', json(500, { message: 'License key is already used by someone' })],
+    ['a 500 server error', json(500, { status: 500, error: 'Internal Server Error' })],
+    ['a 503', json(503, { message: 'Service Unavailable' })],
+    ['a 429 throttle', json(429, { message: 'Too many requests' })],
+    ['a 400', json(400, { message: 'Missing or invalid request parameters' })],
+  ])('does not flag %s from Studio, even when legacy accepts the key', async (_label, primaryResponse) => {
+    mockFetch(primaryResponse, json(200, { plan: 'pro' }));
+
+    const result = await validate();
+
+    expect(result.attempts[0].reason).toBe('status');
+    expect(getLegacyOnlyLicense(result.attempts)).toBeNull();
+  });
+
+  it('does not flag a Studio timeout, even when legacy accepts the key', async () => {
+    jest.useFakeTimers();
+    mockFetch(hangs(), json(200, { plan: 'pro' }));
+
+    const pending = validate();
+    await Promise.resolve();
+    jest.advanceTimersByTime(LICENSE_API_TIMEOUT_MS);
+    const result = await pending;
+    jest.useRealTimers();
+
+    expect(result.attempts[0].reason).toBe('timeout');
+    expect(getLegacyOnlyLicense(result.attempts)).toBeNull();
+  });
+
+  it.each([
+    ['a transport error', () => Promise.reject(new Error('Network request failed'))],
+    ['an unreadable gateway page', raw(502, '<html>bad gateway</html>')],
+    ['an incomplete 200', json(200, {})],
+  ])('does not flag %s from Studio, even when legacy accepts the key', async (_label, primaryResponse) => {
+    mockFetch(primaryResponse, json(200, { plan: 'pro' }));
+
+    const result = await fetchLicenseApi<{ plan?: string }>('/validate-license', {
+      endpoint: 'validate-license',
+      isComplete: (data) => Boolean(data?.plan),
+    });
+
+    expect(result.ok).toBe(true);
+    expect(getLegacyOnlyLicense(result.attempts)).toBeNull();
+  });
+
+  it('does not flag a key Studio validated', async () => {
+    mockFetch(json(200, { plan: 'pro' }));
+
+    expect(getLegacyOnlyLicense((await validate()).attempts)).toBeNull();
+  });
+
+  it('does not flag a key legacy rejected too', async () => {
+    mockFetch(json(404, { message: 'No license was found' }), json(404, { message: 'No license key found' }));
+
+    expect(getLegacyOnlyLicense((await validate()).attempts)).toBeNull();
   });
 });

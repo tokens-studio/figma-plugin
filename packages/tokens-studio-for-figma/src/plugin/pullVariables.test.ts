@@ -906,6 +906,57 @@ describe('pullStyles', () => {
     );
   });
 
+  it.each([
+    ['a set shared by the theme', { 'core/base': 'source', 'Collection 1/Default': 'enabled' }],
+    ['sets named differently from the collection and mode', { 'core/base': 'source', 'semantic/light': 'enabled' }],
+  ])('does not treat %s as renamed', async (_name, selectedTokenSets) => {
+    notifyRenamedCollectionsSpy.mockClear();
+    (AsyncMessageChannel.PluginInstance.message as jest.Mock).mockResolvedValueOnce({
+      themes: [{
+        id: 'collection-1-default',
+        name: 'Default',
+        group: 'Collection 1',
+        selectedTokenSets,
+        $figmaStyleReferences: {},
+        $figmaModeId: '1:0',
+        $figmaCollectionId: 'VariableID:1:0',
+      }],
+    });
+    global.figma.variables.getVariableCollectionByIdAsync = jest.fn().mockResolvedValue({
+      id: 'VariableID:1:0',
+      name: 'Collection 1',
+      modes: [{ name: 'Default', modeId: '1:0' }],
+    });
+
+    await pullVariables({ useDimensions: false, useRem: false }, [], true);
+
+    expect(notifyRenamedCollectionsSpy).not.toHaveBeenCalled();
+  });
+
+  it('renames only the theme\'s own set when its collection is renamed', async () => {
+    notifyRenamedCollectionsSpy.mockClear();
+    (AsyncMessageChannel.PluginInstance.message as jest.Mock).mockResolvedValueOnce({
+      themes: [{
+        id: 'server-id',
+        name: 'Default',
+        group: 'Old-Collection',
+        selectedTokenSets: { 'core/base': 'source', 'Old Collection/Default': 'enabled' },
+        $figmaStyleReferences: {},
+        $figmaModeId: '1:0',
+        $figmaCollectionId: 'VariableID:1:0',
+      }],
+    });
+    global.figma.variables.getVariableCollectionByIdAsync = jest.fn().mockResolvedValue({
+      id: 'VariableID:1:0',
+      name: 'Collection 1',
+      modes: [{ name: 'Default', modeId: '1:0' }],
+    });
+
+    await pullVariables({ useDimensions: false, useRem: false }, [], true);
+
+    expect(notifyRenamedCollectionsSpy).toHaveBeenCalledWith([['Old Collection/Default', 'Collection 1/Default']]);
+  });
+
   it('sends renamed collections before the variables, so the import can compare them with the old sets', async () => {
     (AsyncMessageChannel.PluginInstance.message as jest.Mock).mockResolvedValueOnce({
       themes: [{
