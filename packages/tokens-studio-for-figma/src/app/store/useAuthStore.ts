@@ -34,6 +34,9 @@ interface AuthState {
   error: string | null;
   isLoading: boolean;
   isPro: boolean;
+  // The fetchUserData started at launch to restore a saved session. Startup steps that depend on the account, like
+  // deciding whether a legacy license key still matters, await it.
+  sessionRestore: Promise<void> | null;
   deviceCode: DeviceCodeState | null; // Device code info for UI display
   deviceCodeAbortController: AbortController | null;
   loginWithOAuth: () => Promise<void>;
@@ -62,6 +65,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   error: null,
   isLoading: false,
   isPro: false,
+  sessionRestore: null,
   deviceCode: null,
   deviceCodeAbortController: null,
   loginWithOAuth: async () => {
