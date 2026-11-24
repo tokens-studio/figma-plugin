@@ -1013,8 +1013,8 @@ export const tokenState = createModel<RootModel>()({
       }
     },
     setServerResolvedTokens() {
-      // Trigger document update whenever server-resolved tokens change
-      dispatch.tokenState.updateDocument({ shouldUpdateNodes: true, updateRemote: false });
+      // Sync stored values only; layers update through explicit Apply actions
+      dispatch.tokenState.updateDocument({ shouldUpdateNodes: false, updateRemote: false });
     },
     toggleUsedTokenSet() {
       dispatch.tokenState.updateDocument({ updateRemote: false });

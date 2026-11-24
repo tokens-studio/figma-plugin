@@ -115,6 +115,7 @@ describe('uiSettings', () => {
       seenTermsUpdate2026Subprocessors: false,
       acceptedStudioConsent: false,
       performanceAnalyticsConsent: false,
+      bitbucketSecurityNoticeViews2026: 0,
     });
   });
 
@@ -188,6 +189,7 @@ describe('uiSettings', () => {
       seenTermsUpdate2026Subprocessors: false,
       acceptedStudioConsent: false,
       performanceAnalyticsConsent: false,
+      bitbucketSecurityNoticeViews2026: 0,
     });
   });
 

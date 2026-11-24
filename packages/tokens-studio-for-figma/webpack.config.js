@@ -26,7 +26,8 @@ const wrapper = (callback) => {
 };
 
 module.exports = wrapper((env, argv) => {
-  const isDevServer = process.env.WEBPACK_DEV_SERVER;
+  const isDevServer = Boolean(env.WEBPACK_SERVE);
+  const previewEnv = env.PREVIEW_ENV;
 
   //Needed to load the process.env variables for sentry
   dotenv.config({
@@ -45,22 +46,20 @@ module.exports = wrapper((env, argv) => {
     },
 
     devServer: {
-      contentBase: path.join(__dirname, 'dist'),
+      static: { directory: path.join(__dirname, 'dist') },
       compress: true,
       open: false,
-      // openPage: '/ui.html',
       hot: true,
-      inline: true,
       historyApiFallback: true,
       port: 9000,
-      overlay: false,
+      client: { overlay: false },
     },
 
     module: {
       rules: [
         // Converts TypeScript code to JavaScript
         // Development fast reload
-        ...(argv.PREVIEW_ENV === 'browser' && isDevServer ? [{
+        ...(previewEnv === 'browser' && isDevServer ? [{
           test: /\.[jt]sx?$/,
           exclude: /node_modules/,
           use: [
@@ -163,11 +162,11 @@ module.exports = wrapper((env, argv) => {
       publicPath: '/',
       filename: '[name].js',
       sourceMapFilename: "[name].js.map",
-      path: path.resolve(__dirname, argv.PREVIEW_ENV === 'browser' && !isDevServer ? 'preview' : 'dist'), // Compile into a folder called "dist"
+      path: path.resolve(__dirname, previewEnv === 'browser' && !isDevServer ? 'preview' : 'dist'), // Compile into a folder called "dist"
     },
     // Tells Webpack to generate "ui.html" and to inline "ui.ts" into it
     plugins: [
-      isDevServer && argv.PREVIEW_ENV === 'browser' && new ReactRefreshPlugin({ overlay: false }),
+      isDevServer && previewEnv === 'browser' && new ReactRefreshPlugin({ overlay: false }),
       new webpack.ProvidePlugin({
         process: 'process/browser',
       }),
@@ -207,11 +206,11 @@ module.exports = wrapper((env, argv) => {
         chunks: ['ui'],
         cache: argv.mode === 'production',
       }),
-      argv.PREVIEW_ENV !== 'browser' && new HtmlInlineScriptPlugin({
+      previewEnv !== 'browser' && new HtmlInlineScriptPlugin({
         assetPreservePattern: [/\.js$/],
       }),
       new webpack.DefinePlugin({
-        'process.env.PREVIEW_ENV': JSON.stringify(argv.PREVIEW_ENV),
+        'process.env.PREVIEW_ENV': JSON.stringify(previewEnv),
       }),
       new ForkTsCheckerWebpackPlugin({
         async: argv.mode === 'development',

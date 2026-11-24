@@ -50,6 +50,7 @@ export async function updateUISettings(uiSettings: Partial<SavedSettings>) {
         uiSettings.seenTermsUpdate2026Subprocessors ?? data?.seenTermsUpdate2026Subprocessors,
       acceptedStudioConsent: uiSettings.acceptedStudioConsent ?? data?.acceptedStudioConsent,
       performanceAnalyticsConsent: uiSettings.performanceAnalyticsConsent ?? data?.performanceAnalyticsConsent,
+      bitbucketSecurityNoticeViews2026: uiSettings.bitbucketSecurityNoticeViews2026 ?? data?.bitbucketSecurityNoticeViews2026,
     });
   } catch (err) {
     notifyUI('There was an issue saving your credentials. Please try again.');
@@ -100,6 +101,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
     let seenTermsUpdate2026Subprocessors: boolean;
     let acceptedStudioConsent: boolean;
     let performanceAnalyticsConsent: boolean;
+    let bitbucketSecurityNoticeViews2026: number;
 
     if (data) {
       width = data.width || 400;
@@ -141,6 +143,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
       seenTermsUpdate2026Subprocessors = typeof data.seenTermsUpdate2026Subprocessors === 'undefined' ? false : data.seenTermsUpdate2026Subprocessors;
       acceptedStudioConsent = data.acceptedStudioConsent ?? false;
       performanceAnalyticsConsent = data.performanceAnalyticsConsent ?? false;
+      bitbucketSecurityNoticeViews2026 = typeof data.bitbucketSecurityNoticeViews2026 === 'number' ? data.bitbucketSecurityNoticeViews2026 : 0;
       settings = {
         language,
         width: Math.max(300, width),
@@ -181,6 +184,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
         seenTermsUpdate2026Subprocessors,
         acceptedStudioConsent,
         performanceAnalyticsConsent,
+        bitbucketSecurityNoticeViews2026,
       };
 
       if (notify) {

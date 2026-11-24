@@ -7,6 +7,7 @@ import { unbindVariableFromTarget } from './unbindVariableFromTarget';
 import { getReferenceTokensFromGradient } from '@/utils/color';
 import { gradientTokenToCss, isGradientTokenValue } from '@/utils/color/gradientTokenToCss';
 import { SingleToken } from '@/types/tokens';
+import { TokenGradientValue } from '@/types/values';
 
 function hasModifier(token: SingleToken) {
   return token.$extensions?.['studio.tokens']?.modify;
@@ -25,6 +26,17 @@ const isGradient = (value: string): boolean => value?.startsWith?.('linear-gradi
   || value?.startsWith?.('radial-gradient')
   || value?.startsWith?.('conic-gradient');
 
+// Raw gradient stops may reference color tokens ("{color.red}"), which can't be
+// parsed as colors. Swap each reference for the referenced token's resolved value.
+const resolveGradientStopReferences = (value: TokenGradientValue): TokenGradientValue => ({
+  ...value,
+  stops: value.stops.map((stop) => {
+    if (typeof stop.color !== 'string' || !stop.color.startsWith('{') || !stop.color.endsWith('}')) return stop;
+    const resolvedColor = defaultTokenValueRetriever.get(stop.color.slice(1, -1))?.value;
+    return typeof resolvedColor === 'string' ? { ...stop, color: resolvedColor } : stop;
+  }),
+});
+
 const getGradientPaint = async (fallbackValue, token) => {
   // If the server-resolved value is a string but not a CSS gradient (e.g. the
   // server returned a non-standard object notation), fall back to rawValue which
@@ -32,6 +44,9 @@ const getGradientPaint = async (fallbackValue, token) => {
   let effectiveValue = fallbackValue;
   if (typeof effectiveValue === 'string' && !isGradient(effectiveValue)) {
     effectiveValue = defaultTokenValueRetriever.get(token)?.rawValue ?? effectiveValue;
+    if (isGradientTokenValue(effectiveValue)) {
+      effectiveValue = resolveGradientStopReferences(effectiveValue);
+    }
   }
 
   let gradientString = typeof effectiveValue === 'object' && effectiveValue != null && effectiveValue.fill

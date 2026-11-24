@@ -44,6 +44,7 @@ export const setUi: AsyncMessageChannelHandlers[AsyncMessageTypes.SET_UI] = asyn
     seenTermsUpdate2026Subprocessors: msg.seenTermsUpdate2026Subprocessors,
     acceptedStudioConsent: msg.acceptedStudioConsent,
     performanceAnalyticsConsent: msg.performanceAnalyticsConsent,
+    bitbucketSecurityNoticeViews2026: msg.bitbucketSecurityNoticeViews2026,
   });
   figma.ui.resize(width, height);
   if (store.inspectDeep !== msg.inspectDeep) {

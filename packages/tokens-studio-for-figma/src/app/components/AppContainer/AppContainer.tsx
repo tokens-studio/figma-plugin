@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import TermsUpdateModal from '../TermsUpdateModal';
+import LegacyLicenseSignInNotice from '../LegacyLicenseSignInNotice';
 import App from '../App';
 import FigmaLoading from '../FigmaLoading';
 import LaunchScreen from '../LaunchScreen/LaunchScreen';
@@ -30,6 +31,7 @@ import { useFigmaTheme } from '@/hooks/useFigmaTheme';
 import Box from '../Box';
 import { darkThemeMode, lightThemeMode } from '@/stitches.config';
 import BitbucketMigrationDialog from '../BitbucketMigrationDialog';
+import BitbucketSecurityNotice from '../BitbucketSecurityNotice';
 import GenericVersionedHeaderMigrationDialog from '../GenericVersionedHeaderMigrationDialog';
 
 type Props = StartupMessage & {
@@ -136,6 +138,7 @@ export const AppContainer = (params: Props) => {
   const appContent = (
     <Box css={{ backgroundColor: '$bgDefault', color: '$fgDefault' }}>
       <TermsUpdateModal />
+      <LegacyLicenseSignInNotice />
       <FigmaLoading
         isLoading={showLoadingScreen}
         label={startupProcess.currentStep ? applicationInitStepLabels[startupProcess.currentStep] : undefined}
@@ -171,6 +174,7 @@ export const AppContainer = (params: Props) => {
       <SecondScreenSync />
       <AuthModal />
       <BitbucketMigrationDialog />
+      <BitbucketSecurityNotice />
       <GenericVersionedHeaderMigrationDialog />
     </Box>
   );

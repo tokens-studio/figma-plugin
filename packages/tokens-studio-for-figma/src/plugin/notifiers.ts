@@ -100,6 +100,7 @@ export type SavedSettings = {
   seenTermsUpdate2026Subprocessors?: boolean;
   acceptedStudioConsent?: boolean;
   performanceAnalyticsConsent?: boolean;
+  bitbucketSecurityNoticeViews2026?: number;
 };
 
 export function notifyUISettings(
@@ -142,6 +143,7 @@ export function notifyUISettings(
     seenTermsUpdate2026Subprocessors,
     acceptedStudioConsent,
     performanceAnalyticsConsent,
+    bitbucketSecurityNoticeViews2026,
   }: SavedSettings,
 ) {
   postToUI({
@@ -186,6 +188,7 @@ export function notifyUISettings(
       seenTermsUpdate2026Subprocessors,
       acceptedStudioConsent,
       performanceAnalyticsConsent,
+      bitbucketSecurityNoticeViews2026,
     },
   });
   postToUI({

@@ -713,6 +713,7 @@ describe('Initiator', () => {
       seenTermsUpdate2026Subprocessors: false,
       acceptedStudioConsent: false,
       performanceAnalyticsConsent: false,
+      bitbucketSecurityNoticeViews2026: 0,
     });
   });
 

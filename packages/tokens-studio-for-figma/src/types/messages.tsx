@@ -79,6 +79,7 @@ export type UiSettingsFromPluginMessage = {
     seenTermsUpdate2026Subprocessors?: boolean;
     acceptedStudioConsent?: boolean;
     performanceAnalyticsConsent?: boolean;
+    bitbucketSecurityNoticeViews2026?: number;
   };
 };
 
