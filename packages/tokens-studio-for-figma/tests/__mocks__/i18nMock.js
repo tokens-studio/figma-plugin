@@ -8,6 +8,16 @@ jest.mock('react-i18next', () => ({
         },
       };
     },
+    // Renders the key, then each component slot (links, bold text) empty, so tests can still find them.
+    Trans: ({ i18nKey, components }) => {
+      const React = jest.requireActual('react');
+      return React.createElement(
+        React.Fragment,
+        null,
+        i18nKey,
+        ...Object.entries(components || {}).map(([name, component]) => React.cloneElement(component, { key: name })),
+      );
+    },
     initReactI18next: {
       type: '3rdParty',
       init: () => {},

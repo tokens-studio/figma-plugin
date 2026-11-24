@@ -5,6 +5,10 @@ name: Node.js CI
 
 on: [pull_request]
 
+# Read-only by default; jobs that comment on the PR raise their own permissions.
+permissions:
+  contents: read
+
 env:
   TOKEN_FLOW_APP_URL: ${{ secrets.TOKEN_FLOW_APP_URL }}
   LICENSE_API_URL: ${{ secrets.LICENSE_API_URL }}
