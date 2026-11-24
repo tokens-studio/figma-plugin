@@ -44,6 +44,10 @@ export const wrapTransaction = async<U>(opts: TransactionOptions<U>, fn: () => U
   }
 
   const transaction = startTransaction({ name: opts.name });
+  // Sentry returns no transaction when tracing isn't set up (e.g. no client yet).
+  if (!transaction) {
+    return fn();
+  }
 
   getCurrentHub().configureScope((scope) => scope.setSpan(transaction));
   const span = transaction.startChild({ op: fn.name, description: opts.description }); // This function returns a Span

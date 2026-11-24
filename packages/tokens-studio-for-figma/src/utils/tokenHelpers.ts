@@ -2,8 +2,8 @@ import { appendTypeToToken } from '@/app/components/createTokenObj';
 import { SingleToken } from '@/types/tokens';
 import { ThemeObject, UsedTokenSetsMap } from '@/types';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import { TokenTypes } from '@/constants/TokenTypes';
 import { getTokenSetsOrder } from './getTokenSetsOrder';
-import { tryParseJson } from './tryParseJson';
 
 export type ResolveTokenValuesResult = SingleToken<
 true,
@@ -91,6 +91,63 @@ export function mergeTokenGroups(
     return mergedTokens;
   }, [] as SingleToken[]);
 }
+// Restores the types JSON would have given: plain numbers, booleans and null. Values with units
+// or other text (`1rem`, `100%`, `Inter`) stay strings.
+function coerceUnquotedPrimitive(value: string): string | number | boolean | null {
+  if (value === 'true') return true;
+  if (value === 'false') return false;
+  if (value === 'null') return null;
+  if (/^-?\d+(\.\d+)?$/.test(value)) return Number(value);
+  return value;
+}
+
+/**
+ * Parses a composite value that is not valid JSON, in the unquoted form the Studio server
+ * returns: `{fontFamily: Inter, fontSize: 1rem, ...}`. A segment without a `key:` prefix
+ * belongs to the previous value, so values containing commas (e.g. font stacks) survive.
+ * Only flat objects are supported: nested values would be split on their inner commas.
+ */
+function parseUnquotedObject(value: string): Record<string, string | number | boolean | null> | null {
+  if (!value.startsWith('{') || !value.endsWith('}')) return null;
+  const body = value.slice(1, -1);
+  if (/[{}[\]]/.test(body)) return null;
+  const result: Record<string, string> = {};
+  let lastKey: string | null = null;
+  body.split(',').forEach((segment) => {
+    const match = segment.match(/^\s*([A-Za-z_$][\w$-]*)\s*:\s*(.*?)\s*$/);
+    if (match) {
+      const [, key, val] = match;
+      lastKey = key;
+      result[key] = val;
+    } else if (lastKey) {
+      result[lastKey] = `${result[lastKey]},${segment}`.trim();
+    }
+  });
+  if (Object.keys(result).length === 0) return null;
+  return Object.fromEntries(Object.entries(result).map(([key, val]) => [key, coerceUnquotedPrimitive(val)]));
+}
+
+/**
+ * Turns a server-resolved composite value back into an object.
+ *
+ * Valid JSON replaces the local value as is: the server is the source of truth, and merging
+ * would stop it from clearing a property by omitting it.
+ *
+ * The unquoted fallback only applies to typography, whose values are flat and which reads
+ * properties straight off the value (e.g. `value.fontFamily`), so a string would silently drop
+ * the apply. It is merged onto the local value because losing a property breaks the apply.
+ * Other types keep the string: their consumers handle it, e.g. gradients fall back to rawValue.
+ */
+function parseServerCompositeValue(serverValue: string, token: ResolveTokenValuesResult): SingleToken['value'] {
+  try {
+    return JSON.parse(serverValue);
+  } catch {
+    if (token.type !== TokenTypes.TYPOGRAPHY) return serverValue;
+    const parsed = parseUnquotedObject(serverValue);
+    return (parsed ? { ...(token.value as Record<string, unknown>), ...parsed } : token.value) as SingleToken['value'];
+  }
+}
+
 /**
  * Merges server-side resolved tokens (gRPC delta) on top of locally-resolved tokens.
  * Only tokens present in the server delta are updated; others retain their local values.
@@ -121,7 +178,7 @@ export function mergeServerResolvedTokens(
         && token.value !== null
         && (serverValue.startsWith('{') || serverValue.startsWith('['))
       ) {
-        nextValue = tryParseJson(serverValue) ?? serverValue;
+        nextValue = parseServerCompositeValue(serverValue, token);
       }
       return {
         ...token,

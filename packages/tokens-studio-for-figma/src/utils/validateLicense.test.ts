@@ -29,13 +29,24 @@ describe('validateLicense', () => {
     expect(urlOf(1)).toEqual(`${PRIMARY}/validate-license?licenseKey=a-key&userId=jan`);
   });
 
-  it('falls back to the legacy host when the primary has no record', async () => {
+  it('falls back to the legacy host when the primary has no record, and marks the key as legacy-only', async () => {
     mockFetch
       .mockImplementationOnce(() => json(404, { message: 'License not found' }))
       .mockImplementationOnce(() => json(200, PRO));
 
-    expect(await validateLicense('a-key', 'jan')).toEqual(PRO);
+    expect(await validateLicense('a-key', 'jan')).toEqual({
+      ...PRO,
+      legacyOnly: { primaryStatus: 404, primaryReason: 'status' },
+    });
     expect(urlOf(2)).toEqual(`${LEGACY}/validate-license?licenseKey=a-key&userId=jan`);
+  });
+
+  it('does not mark the key as legacy-only when the primary could not be reached', async () => {
+    mockFetch
+      .mockImplementationOnce(() => Promise.reject(new Error('Network request failed')))
+      .mockImplementationOnce(() => json(200, PRO));
+
+    expect(await validateLicense('a-key', 'jan')).toEqual(PRO);
   });
 
   // A partially imported record answers 200 with a valid-looking but empty
