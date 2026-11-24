@@ -1,5 +1,11 @@
 # @tokens-studio/figma-plugin
 
+## 2.13.4
+
+### Patch Changes
+
+- de78bf4f6: Bitbucket sync settings saved in a Figma file now only keep the fields needed to find the sync, and no credentials. Files saved by older versions are cleaned when the plugin opens.
+
 ## 2.13.3
 
 ### Patch Changes

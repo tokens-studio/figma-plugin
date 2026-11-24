@@ -711,6 +711,7 @@ describe('Initiator', () => {
       seenGenericVersionedHeaderMigrationDialog: false,
       seenTermsUpdate2026: false,
       seenTermsUpdate2026Subprocessors: false,
+      bitbucketSecurityNoticeViews2026: 0,
     });
   });
 
