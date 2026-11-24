@@ -23,5 +23,18 @@
   "credentialError": "Erreur d'identification",
   "connectivityError": "Erreur de connectivité",
   "genericError": "Une erreur s'est produite",
-  "retry": "Réessayer"
+  "retry": "Réessayer",
+  "bitbucketSecurityNotice": {
+    "title": "Action requise : remplacez votre jeton d'API Bitbucket",
+    "intro": "Nous avons trouvé et corrigé un problème de sécurité qui touche la synchronisation Bitbucket. Les versions précédentes du plugin pouvaient enregistrer votre jeton d'API Bitbucket dans les fichiers Figma que vous synchronisiez, où toute personne ayant accès à ces fichiers pouvait le lire.",
+    "cleanup": "Cette mise à jour retire le jeton de chaque fichier à sa prochaine ouverture. Les copies de fichiers faites avant la mise à jour peuvent encore le contenir, alors remplacez votre jeton :",
+    "step1": "<strong>Révoquez votre jeton actuel</strong> dans les paramètres de votre compte Atlassian/Bitbucket, sous Security → API tokens.",
+    "step2": "<strong>Créez un nouveau jeton d'API</strong> avec les mêmes autorisations.",
+    "step3": "<strong>Trouvez votre synchronisation Bitbucket</strong> dans le plugin : ouvrez l'onglet Paramètres et regardez sous Fournisseurs de synchronisation.",
+    "step4": "<strong>Remplacez le jeton</strong> en choisissant Modifier dans le menu ⋮ à côté de votre synchronisation Bitbucket, en collant le nouveau jeton, puis en enregistrant.",
+    "time": "Cela prend environ deux minutes. Tant que vous n'avez pas révoqué l'ancien jeton, toute personne qui a une copie d'un fichier concerné pourrait l'utiliser pour accéder à vos dépôts Bitbucket.",
+    "questions": "Des questions ? Écrivez à <email>{{email}}</email>",
+    "syncGuide": "Guide de synchronisation Bitbucket",
+    "readAdvisory": "Lire l'avis"
+  }
 }

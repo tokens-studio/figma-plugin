@@ -1,5 +1,5 @@
 import { Entitlements } from '@/app/store/models/userState';
-import { fetchLicenseApi } from './licenseApi';
+import { LegacyOnlyLicense, fetchLicenseApi, getLegacyOnlyLicense } from './licenseApi';
 
 type ValidateLicenseResponse = { plan?: string; entitlements?: Entitlements[]; email?: string };
 
@@ -7,7 +7,13 @@ export default async function validateLicense(
   licenseKey: string,
   userId: string | null,
   userName?: string | null,
-): Promise<{ plan?: string; entitlements?: Entitlements[]; email?: string; error?: string }> {
+): Promise<{
+    plan?: string;
+    entitlements?: Entitlements[];
+    email?: string;
+    error?: string;
+    legacyOnly?: LegacyOnlyLicense;
+  }> {
   const result = await fetchLicenseApi<ValidateLicenseResponse>(
     `/validate-license?licenseKey=${licenseKey}&userId=${userId}${userName ? `&userName=${userName}` : ''}`,
     {
@@ -21,7 +27,10 @@ export default async function validateLicense(
     },
   );
 
-  if (result.ok) return result.data;
+  if (result.ok) {
+    const legacyOnly = getLegacyOnlyLicense(result.attempts);
+    return legacyOnly ? { ...result.data, legacyOnly } : result.data;
+  }
 
   return { error: result.message ?? 'Error validating license' };
 }

@@ -262,6 +262,47 @@ describe('writeVariableImportToTokensStudio', () => {
     ]);
   });
 
+  it('renames a set back in the same session, without creating its changed tokens again', async () => {
+    const state: any = {
+      uiState: { api: { provider: StorageProviderType.TOKENS_STUDIO_OAUTH, id: 'project-1', changeSetId: 'change-set-1' } },
+      tokenState: {
+        renamedCollections: [['Brand/Dark', 'Brand/Night']],
+        tokens: {
+          'Brand/Dark': [{
+            name: 'color.primary', value: '#66b2ff', type: 'color', $extensions: { id: 'token-1' },
+          }],
+        },
+        themes: [],
+        importedTokens: {
+          newTokens: [],
+          updatedTokens: [{
+            name: 'color.primary', value: '#000000', type: 'color', parent: 'Brand/Night',
+          }],
+        },
+        tokenSetMetadata: {},
+        remoteData: { metadata: { tokenSetsData: { 'Brand/Dark': { id: 'set-dark', isDynamic: false } } } },
+        importedThemes: { newThemes: [], updatedThemes: [] },
+      },
+    };
+    mockGetState.mockImplementation(() => state);
+    dispatch.tokenState.setTokenSetMetadata.mockImplementation((metadata: any) => { state.tokenState.tokenSetMetadata = metadata; });
+    dispatch.tokenState.setRemoteMetadata = jest.fn((metadata: any) => { state.tokenState.remoteData = { ...state.tokenState.remoteData, metadata }; });
+    mockPush.mockImplementation(async () => ({ data: {} }));
+    await writeVariableImportToTokensStudio(dispatch)({} as any, {});
+
+    state.tokenState.renamedCollections = [['Brand/Night', 'Brand/Dark']];
+    state.tokenState.tokens = { 'Brand/Night': state.tokenState.tokens['Brand/Dark'] };
+    state.tokenState.importedTokens = { newTokens: [], updatedTokens: [] };
+    await writeVariableImportToTokensStudio(dispatch)({} as any, {});
+
+    expect(mockPush.mock.calls.filter(([args]: any) => args.action === 'UPDATE_TOKEN_SET').map(([args]: any) => args.data)).toEqual([
+      { id: 'set-dark', name: 'Brand/Night' },
+      { id: 'set-dark', name: 'Brand/Dark' },
+    ]);
+    expect(mockPush.mock.calls.map(([args]: any) => args.action)).not.toContain('BATCH_CREATE_TOKENS');
+    expect(state.tokenState.remoteData.metadata.tokenSetsData).toEqual({ 'Brand/Dark': { id: 'set-dark', isDynamic: false } });
+  });
+
   it('keeps the rest of a renamed set\'s metadata', async () => {
     const state: any = {
       uiState: { api: { provider: StorageProviderType.TOKENS_STUDIO_OAUTH, id: 'project-1', changeSetId: 'change-set-1' } },

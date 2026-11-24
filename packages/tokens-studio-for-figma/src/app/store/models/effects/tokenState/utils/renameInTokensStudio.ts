@@ -44,6 +44,16 @@ async function renameTokenSet(context: any, oldName: string, newName: string, di
     ...metadata,
     [newName]: { ...oldEntry, id: oldSet.id, isDynamic: oldSet.isDynamic ?? false },
   } as any);
+
+  // Move it in the last pull's sets too: left under the old name, renaming the set back would find that name taken.
+  const { metadata: remoteMetadata } = store.getState().tokenState.remoteData || {};
+  const remoteSets = { ...remoteMetadata?.tokenSetsData } as Record<string, SetEntry>;
+  const remoteKey = resolveSanitizedKey(remoteSets, sanitizeTokenSetName(oldName), sanitizeTokenSetName);
+  if (remoteKey !== undefined) {
+    const remoteEntry = remoteSets[remoteKey];
+    delete remoteSets[remoteKey];
+    dispatch.tokenState.setRemoteMetadata({ ...remoteMetadata, tokenSetsData: { ...remoteSets, [newName]: remoteEntry } } as any);
+  }
   return true;
 }
 
