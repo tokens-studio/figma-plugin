@@ -255,3 +255,49 @@ describe('updateTokensInTokensStudio', () => {
     });
   });
 });
+
+describe('updateTokensInTokensStudio with many tokens and references', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    setState({ tokenSetMetadata: {}, remoteData: {} });
+    mockPush.mockImplementation(async ({ data }: any) => ({ data: { updated_count: data.length } }));
+  });
+
+  const token = (name: string, value: string) => ({
+    name, value, type: 'color', $extensions: { id: `id-${name}` },
+  });
+
+  it('sends references to a renamed token along with the rename', async () => {
+    await updateTokensInTokensStudio(context, {
+      renames: [{ set: 'Color/Night', oldName: 'accent', newName: 'primary' }],
+      updatedTokens: [{ name: 'imported', value: '{primary}', parent: 'Color/Night' }],
+      newTokens: [],
+      previousTokens: { 'Color/Dark': [token('accent', '#111'), token('imported', '{accent}')], other: [token('link', '{accent}')] },
+      renamedSets: [['Color/Dark', 'Color/Night']],
+    });
+
+    expect(pushed('BATCH_UPDATE_TOKENS')).toEqual([[
+      { token_id: 'id-accent', changes: { name: 'primary' } },
+      { token_id: 'id-imported', changes: { value: '{primary}' } },
+      { token_id: 'id-link', changes: { value: '{primary}' } },
+    ]]);
+  });
+
+  it('splits updates into batches and keeps the ones that went through', async () => {
+    const names = Array.from({ length: 501 }, (_, index) => `token-${index}`);
+    mockPush.mockResolvedValueOnce(null).mockResolvedValueOnce({ data: { updated_count: 1 } });
+
+    const renamed = await updateTokensInTokensStudio(context, {
+      renames: names.map((name) => ({ set: 'Color/Light', oldName: name, newName: `${name}-new` })),
+      updatedTokens: [],
+      newTokens: [],
+      previousTokens: { 'Color/Light': names.map((name) => token(name, '#111')) },
+      renamedSets: [],
+    });
+
+    expect(pushed('BATCH_UPDATE_TOKENS').map((batch) => batch.length)).toEqual([500, 1]);
+    expect([...renamed]).toEqual(['Color/Light\u0000token-500-new']);
+    // The refused request has already been reported.
+    expect(notifyToUI).not.toHaveBeenCalled();
+  });
+});

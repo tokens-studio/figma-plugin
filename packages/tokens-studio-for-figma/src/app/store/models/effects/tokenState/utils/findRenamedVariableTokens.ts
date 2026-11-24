@@ -1,4 +1,5 @@
 import type { ThemeObjectsList } from '@/types';
+import { isThemeOwnTokenSet } from '@/utils/isThemeOwnTokenSet';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 
 export type TokenRename = { set: string; oldName: string; newName: string };
@@ -15,7 +16,8 @@ export function findRenamedVariableTokens(previousThemes: ThemeObjectsList | und
 
     const previousNameByKey = new Map(Object.entries(previousReferences).map(([name, key]) => [key, name]));
     const sets = Object.entries(theme.selectedTokenSets || {})
-      .filter(([, status]) => status === TokenSetStatus.ENABLED)
+      // The theme can use other sets too. Their tokens aren't this mode's variables, even under the same name.
+      .filter(([set, status]) => status === TokenSetStatus.ENABLED && isThemeOwnTokenSet(set, theme))
       .map(([set]) => set);
 
     Object.entries(references).forEach(([newName, key]) => {

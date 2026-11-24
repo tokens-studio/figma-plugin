@@ -34,4 +34,13 @@ describe('findRenamedVariableTokens', () => {
   it('ignores themes it has no previous references for', () => {
     expect(findRenamedVariableTokens([], [theme({ 'color.brand': 'key-1' })])).toEqual([]);
   });
+
+  it('leaves same-named tokens of other sets the theme uses alone', () => {
+    const shared = (references: Record<string, string>) => ({
+      id: 'theme', name: 'Light', group: 'Color', selectedTokenSets: { brand: TokenSetStatus.ENABLED, 'core/base': TokenSetStatus.ENABLED, 'Color/Light': TokenSetStatus.ENABLED }, $figmaVariableReferences: references,
+    });
+
+    expect(findRenamedVariableTokens([shared({ accent: 'key' })], [shared({ primary: 'key' })]))
+      .toEqual([{ set: 'Color/Light', oldName: 'accent', newName: 'primary' }]);
+  });
 });

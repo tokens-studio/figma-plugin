@@ -1,12 +1,14 @@
 import type { RematchDispatch } from '@rematch/core';
 import type { RootModel } from '@/types/RootModel';
 import type { ThemeObjectsList } from '@/types';
+import type { AnyTokenList } from '@/types/tokens';
 import { pushToTokensStudioOAuth } from '../../../../providers/tokens-studio/tokensStudioOAuth';
 import { store } from '@/app/store';
 import { notifyToUI } from '@/plugin/notifiers';
 import {
   lookupBySanitized, resolveSanitizedKey, sanitizeReferencesInValue, sanitizeTokenName, sanitizeTokenSetName, toStudioThemeGroupName,
 } from './sanitizeForStudio';
+import { renameVariableTokens } from './renameVariableTokens';
 import type { TokenRename } from './findRenamedVariableTokens';
 
 type SetEntry = { id?: string; isDynamic?: boolean };
@@ -117,6 +119,29 @@ export const renamedTokenKey = (set: string, name: string) => `${set}\u0000${nam
 
 type ImportedToken = { name: string; value: unknown; parent?: string };
 
+type TokenUpdate = { token_id: string; changes: { name?: string; value?: unknown } };
+
+// Tokens Studio accepts 1500 updates per request, and in Themes Simple view a rename counts once per mode.
+const UPDATE_BATCH_SIZE = 500;
+
+async function pushTokenUpdates(context: any, updates: TokenUpdate[]): Promise<{ confirmed: string[]; refused: boolean; reason?: string }> {
+  // pushToTokensStudioOAuth reports a refused request itself and returns null.
+  const result = await pushToTokensStudioOAuth({ context, action: 'BATCH_UPDATE_TOKENS', data: updates });
+  if (!result) return { confirmed: [], refused: true };
+
+  const response = result.data as { updated_count?: number; warnings?: Array<{ token_id?: string; detail?: string }> } | undefined;
+  const warnings = response?.warnings ?? [];
+  const refusedIds = new Set(warnings.map((warning) => warning.token_id));
+  // Studio names the tokens it skipped in its warnings. When the counts don't add up and it doesn't say which,
+  // none of the updates count as done.
+  const accountedFor = (response?.updated_count ?? 0) + refusedIds.size >= updates.length;
+  return {
+    confirmed: accountedFor ? updates.map((update) => update.token_id).filter((id) => !refusedIds.has(id)) : [],
+    refused: false,
+    reason: warnings.find((warning) => warning.detail)?.detail,
+  };
+}
+
 // Renamed variables and changed values, sent as updates to the existing tokens. Returns the renamed tokens'
 // new names per set, so the import doesn't also create them.
 export async function updateTokensInTokensStudio(
@@ -150,7 +175,7 @@ export async function updateTokensInTokensStudio(
     return studioTokens!.find((token) => token.token_set_id === setId && sanitizeTokenName(token.name) === sanitized)?.id;
   };
 
-  const updates: Array<{ token_id: string; changes: { name?: string; value?: unknown } }> = [];
+  const updates: TokenUpdate[] = [];
   const renameUpdates: Array<{ tokenId: string; key: string }> = [];
   for (const { set, oldName, newName } of renames) {
     // eslint-disable-next-line no-await-in-loop
@@ -171,17 +196,35 @@ export async function updateTokensInTokensStudio(
     if (tokenId) updates.push({ token_id: tokenId, changes: { value: sanitizeReferencesInValue(token.value) } });
   }
 
+  // References to a renamed token. Imported tokens bring their own value, which already has the new name.
+  const importedKeys = new Set([
+    ...[...newTokens, ...updatedTokens].map((token) => renamedTokenKey(sanitizeTokenSetName(token.parent ?? ''), sanitizeTokenName(token.name))),
+    ...renames.map(({ set, oldName }) => renamedTokenKey(sanitizeTokenSetName(set), sanitizeTokenName(oldName))),
+  ]);
+  const newSetNames = new Map(renamedSets);
+  const tokensBySet = Object.fromEntries(Object.entries(previousTokens ?? {}).map(([set, tokens]) => [newSetNames.get(set) ?? set, tokens])) as Record<string, AnyTokenList>;
+  for (const { set, name, value } of renameVariableTokens(tokensBySet, renames).updatedReferences) {
+    if (!importedKeys.has(renamedTokenKey(sanitizeTokenSetName(set), sanitizeTokenName(name)))) {
+      // eslint-disable-next-line no-await-in-loop
+      const tokenId = await findTokenId(set, name);
+      if (tokenId) updates.push({ token_id: tokenId, changes: { value: sanitizeReferencesInValue(value) } });
+    }
+  }
+
   if (updates.length === 0) return renamedTokens;
 
-  // pushToTokensStudioOAuth reports a refused request itself and returns null.
-  const result = await pushToTokensStudioOAuth({ context, action: 'BATCH_UPDATE_TOKENS', data: updates });
-  const response = result?.data as { updated_count?: number; warnings?: Array<{ token_id?: string; detail?: string }> } | undefined;
-  const warnings = response?.warnings ?? [];
-  const refusedIds = new Set(warnings.map((warning) => warning.token_id));
-  // Studio names the tokens it skipped in its warnings. When the counts don't add up and it doesn't say which,
-  // none of the updates count as done.
-  const accountedFor = !!result && (response?.updated_count ?? 0) + refusedIds.size >= updates.length;
-  const confirmed = new Set(accountedFor ? updates.map((update) => update.token_id).filter((id) => !refusedIds.has(id)) : []);
+  const confirmed = new Set<string>();
+  let notApplied = 0;
+  let reason: string | undefined;
+  for (let start = 0; start < updates.length; start += UPDATE_BATCH_SIZE) {
+    const batch = updates.slice(start, start + UPDATE_BATCH_SIZE);
+    // eslint-disable-next-line no-await-in-loop
+    const outcome = await pushTokenUpdates(context, batch);
+    outcome.confirmed.forEach((id) => confirmed.add(id));
+    // pushToTokensStudioOAuth has already reported a refused request.
+    if (!outcome.refused) notApplied += batch.length - outcome.confirmed.length;
+    reason = reason ?? outcome.reason;
+  }
 
   // A rename Studio didn't confirm goes back to the tokens to create, so Studio still gets the token under its new
   // name. If the rename did go through after all, Studio skips the create, since the set has that name already.
@@ -189,9 +232,7 @@ export async function updateTokensInTokensStudio(
     if (!confirmed.has(tokenId)) renamedTokens.delete(key);
   });
 
-  const notApplied = updates.length - confirmed.size;
-  if (result && notApplied > 0) {
-    const reason = warnings.find((warning) => warning.detail)?.detail;
+  if (notApplied > 0) {
     notifyToUI(
       `Tokens Studio didn't apply ${notApplied} of ${updates.length} token updates${reason ? `: ${reason}` : ''}`,
       { error: true },

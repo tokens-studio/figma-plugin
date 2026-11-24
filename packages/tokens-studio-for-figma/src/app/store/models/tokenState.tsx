@@ -9,6 +9,8 @@ import * as tokenStateEffects from './effects/tokenState';
 import { applyVariableImport } from './effects/tokenState/applyVariableImport';
 import { writeVariableImportToTokensStudio } from './effects/tokenState/writeVariableImportToTokensStudio';
 import { pushThemesToStudio } from './effects/tokenState/pushThemesToStudio';
+import { renameVariableTokens } from './effects/tokenState/utils/renameVariableTokens';
+import type { TokenRename } from './effects/tokenState/utils/findRenamedVariableTokens';
 import parseTokenValues from '@/utils/parseTokenValues';
 import { notifyToUI } from '@/plugin/notifiers';
 import parseJson from '@/utils/parseJson';
@@ -419,18 +421,13 @@ export const tokenState = createModel<RootModel>()({
       ...state,
       tokens: withChangedTokens(state.tokens, { edits: data }),
     }),
+    // Renamed Figma variables: rename the token in its set, keeping its Tokens Studio id, and the references to it.
+    renameImportedVariableTokens: (state, renames: TokenRename[]): TokenState => ({
+      ...state,
+      tokens: renameVariableTokens(state.tokens, renames).tokens,
+    }),
     // Applies a variables import as accepting everything in ImportedTokensDialog would, without the
     // createMultipleTokens effect: with Tokens Studio sync, writeVariableImportToTokensStudio already wrote the tokens.
-    // Renamed Figma variables: rename the token in its set, keeping its Tokens Studio id.
-    renameImportedVariableTokens: (state, renames: { set: string; oldName: string; newName: string }[]): TokenState => {
-      const tokens = { ...state.tokens };
-      renames.forEach(({ set, oldName, newName }) => {
-        const setTokens = tokens[set];
-        if (!setTokens || setTokens.some((token) => token.name === newName)) return;
-        tokens[set] = setTokens.map((token) => (token.name === oldName ? { ...token, name: newName } : token));
-      });
-      return { ...state, tokens };
-    },
     applyImportedVariableTokens: (state): TokenState => {
       const { newTokens, updatedTokens } = state.importedTokens;
       const findExisting = (token: { parent?: string; name: string }) => (token.parent ? state.tokens[token.parent]?.find((t) => t.name === token.name) : undefined);
