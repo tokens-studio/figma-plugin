@@ -18,6 +18,7 @@ import { gradientTokenToCss, isGradientTokenValue } from '@/utils/color/gradient
 import { TokenFormatOptions } from './TokenFormatStoreClass';
 import { ClientStorageProperty } from '@/figmaStorage/ClientStorageProperty';
 import { getFileKey } from './helpers';
+import { getReferencedTokenName } from '@/utils/getReferencedTokenName';
 
 // @TODO fix typings
 
@@ -254,17 +255,16 @@ export function destructureTokenForAlias(tokens: Map<string, AnyTokenList[number
     }
     values = { ...values, ...(values.borderColor ? { } : { borderColor: values.border }) };
   }
-  if (values && values.borderTop) {
-    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderTop }) };
-  }
-  if (values && values.borderRight) {
-    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderRight }) };
-  }
-  if (values && values.borderLeft) {
-    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderLeft }) };
-  }
-  if (values && values.borderBottom) {
-    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderBottom }) };
-  }
+  ([Properties.borderTop, Properties.borderRight, Properties.borderLeft, Properties.borderBottom] as const).forEach((side) => {
+    const sideTokenName = values?.[side];
+    if (!sideTokenName || values.borderColor) return;
+    // Use the color token the side border references, so its variable can be bound to the stroke.
+    // Side widths are bound in applyBorderValuesOnNode, as they can't be stored on a shared key.
+    const resolvedValueWithReferences = tokens.get(sideTokenName)?.resolvedValueWithReferences;
+    const colorTokenName = resolvedValueWithReferences && typeof resolvedValueWithReferences === 'object' && 'color' in resolvedValueWithReferences
+      ? getReferencedTokenName(resolvedValueWithReferences.color)
+      : undefined;
+    values = { ...values, borderColor: colorTokenName ?? sideTokenName };
+  });
   return values;
 }

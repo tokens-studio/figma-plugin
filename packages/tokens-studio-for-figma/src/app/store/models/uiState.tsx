@@ -97,6 +97,8 @@ export interface UIState {
     header?: string;
   } | null;
   showBitbucketMigrationDialog: boolean;
+  // The legacy license notice was closed in this session. Kept in the store so the Bitbucket notice can wait for it.
+  legacyLicenseNoticeDismissed: boolean;
   triggerMigrationEdit?: any;
 }
 
@@ -161,6 +163,7 @@ export const uiState = createModel<RootModel>()({
     selectedExportThemes: [],
     lastError: null,
     showBitbucketMigrationDialog: false,
+    legacyLicenseNoticeDismissed: false,
     triggerMigrationEdit: null,
   } as unknown as UIState,
   reducers: {
@@ -438,6 +441,10 @@ export const uiState = createModel<RootModel>()({
     setShowBitbucketMigrationDialog: (state, data: boolean) => ({
       ...state,
       showBitbucketMigrationDialog: data,
+    }),
+    setLegacyLicenseNoticeDismissed: (state, data: boolean) => ({
+      ...state,
+      legacyLicenseNoticeDismissed: data,
     }),
     setTriggerMigrationEdit: (state, data: any) => ({
       ...state,

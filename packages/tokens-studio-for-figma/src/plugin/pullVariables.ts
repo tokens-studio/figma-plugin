@@ -12,6 +12,7 @@ import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { normalizeVariableName } from '@/utils/normalizeVariableName';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
+import { isThemeOwnTokenSet } from '@/utils/isThemeOwnTokenSet';
 import { processExtendedCollectionImport } from './extendedCollections';
 import { composedColorToTokenValue, isVariableComposedColor } from './composedColor';
 import { fromFigmaEasing, secondsToDurationValue } from './figmaTransforms/motion';
@@ -450,7 +451,8 @@ export default async function pullVariables(options: PullVariablesOptions, theme
         if (matchingTheme) {
           Object.keys(matchingTheme.selectedTokenSets || {}).forEach((existingTokenSet) => {
             if (existingTokenSet !== tokenSetName
-              && existingTokenSet.includes('/')
+              // Only the theme's own set can have been renamed along with its collection or mode
+              && isThemeOwnTokenSet(existingTokenSet, matchingTheme)
               && !renamedCollections.has(existingTokenSet)
               && !Array.from(renamedCollections.values()).includes(tokenSetName)) {
               renamedCollections.set(existingTokenSet, tokenSetName);
@@ -502,7 +504,8 @@ export default async function pullVariables(options: PullVariablesOptions, theme
           const hasMatchingCurrentTheme = themesToCreate.some((currentTheme) => currentTheme.$figmaCollectionId === t.$figmaCollectionId
             && currentTheme.$figmaModeId === t.$figmaModeId);
 
-          return hasMatchingCurrentTheme && Object.keys(t.selectedTokenSets || {}).includes(existingSet);
+          return hasMatchingCurrentTheme && Object.keys(t.selectedTokenSets || {}).includes(existingSet)
+            && isThemeOwnTokenSet(existingSet, t);
         });
 
         if (matchingTheme) {
