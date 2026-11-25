@@ -25,6 +25,7 @@
     "typeRoots": ["node_modules/@types", "node_modules/@figma"],
     "paths": {
       "@emotion/core": ["./emotion.d.ts"],
+      "i18next": ["./types-shims/i18next.d.ts"],
       "@/*": ["src/*"]
     }
   },

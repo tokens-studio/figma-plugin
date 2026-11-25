@@ -13697,12 +13697,10 @@ hyperx@^2.5.0:
   dependencies:
     hyperscript-attribute-to-property "^1.0.0"
 
-i18next@^23.2.3:
-  version "23.5.1"
-  resolved "https://registry.npmjs.org/i18next/-/i18next-23.5.1.tgz"
-  integrity sha512-JelYzcaCoFDaa+Ysbfz2JsGAKkrHiMG6S61+HLBUEIPaF40WMwW9hCPymlQGrP+wWawKxKPuSuD71WZscCsWHg==
-  dependencies:
-    "@babel/runtime" "^7.22.5"
+i18next@^26.3.4:
+  version "26.7.2"
+  resolved "https://registry.yarnpkg.com/i18next/-/i18next-26.7.2.tgz#56e7550d479f05d0150479fbb345e6c29b78bbd1"
+  integrity sha512-RsOY3BeaCDdkk52NeJSFAXELQ2rQXBO/tOub6L8ue2ICPfR/FRDWDOfEDg4xMPd1SqO5goVYQ6i72qWEUB/PPw==
 
 iconoir-react@^7.3.0:
   version "7.3.0"
