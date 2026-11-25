@@ -10,9 +10,12 @@ export default async function setBorderValuesOnTarget(
   token: Pick<SingleBorderToken, 'value'>,
   baseFontSize: string,
   side?: 'top' | 'right' | 'bottom' | 'left',
+  widthTokenName?: string,
 ) {
   const { value } = token;
   const { width, style } = value;
+  // Only used for side widths: bind to the referenced width token's variable when there is one, otherwise to the raw value
+  const sideWidthVariableToken = widthTokenName ?? String(width);
   try {
     if (
       'strokeWeight' in target
@@ -28,7 +31,7 @@ export default async function setBorderValuesOnTarget(
       && typeof width !== 'undefined'
       && isPrimitiveValue(width)
       && side === 'top'
-      && !(await tryApplyVariableId(target, 'strokeTopWeight', width))
+      && !(await tryApplyVariableId(target, 'strokeTopWeight', sideWidthVariableToken))
     ) {
       target.strokeTopWeight = transformValue(String(width), 'borderWidth', baseFontSize);
     }
@@ -37,7 +40,7 @@ export default async function setBorderValuesOnTarget(
       && typeof width !== 'undefined'
       && isPrimitiveValue(width)
       && side === 'right'
-      && !(await tryApplyVariableId(target, 'strokeRightWeight', width))
+      && !(await tryApplyVariableId(target, 'strokeRightWeight', sideWidthVariableToken))
     ) {
       target.strokeRightWeight = transformValue(String(width), 'borderWidth', baseFontSize);
     }
@@ -46,7 +49,7 @@ export default async function setBorderValuesOnTarget(
       && typeof width !== 'undefined'
       && isPrimitiveValue(width)
       && side === 'bottom'
-      && !(await tryApplyVariableId(target, 'strokeBottomWeight', width))
+      && !(await tryApplyVariableId(target, 'strokeBottomWeight', sideWidthVariableToken))
     ) {
       target.strokeBottomWeight = transformValue(String(width), 'borderWidth', baseFontSize);
     }
@@ -55,7 +58,7 @@ export default async function setBorderValuesOnTarget(
       && typeof width !== 'undefined'
       && isPrimitiveValue(width)
       && side === 'left'
-      && !(await tryApplyVariableId(target, 'strokeLeftWeight', width))
+      && !(await tryApplyVariableId(target, 'strokeLeftWeight', sideWidthVariableToken))
     ) {
       target.strokeLeftWeight = transformValue(String(width), 'borderWidth', baseFontSize);
     }

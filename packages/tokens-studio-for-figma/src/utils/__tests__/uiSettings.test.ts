@@ -111,6 +111,7 @@ describe('uiSettings', () => {
       seenGenericVersionedHeaderMigrationDialog: false,
       seenTermsUpdate2026: false,
       seenTermsUpdate2026Subprocessors: false,
+      bitbucketSecurityNoticeViews2026: 0,
     });
   });
 
@@ -182,6 +183,7 @@ describe('uiSettings', () => {
       seenGenericVersionedHeaderMigrationDialog: false,
       seenTermsUpdate2026: false,
       seenTermsUpdate2026Subprocessors: false,
+      bitbucketSecurityNoticeViews2026: 0,
     });
   });
 

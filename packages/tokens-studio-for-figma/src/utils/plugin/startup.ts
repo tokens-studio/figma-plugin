@@ -1,5 +1,6 @@
 import {
   ApiProvidersProperty, AuthDataProperty, LicenseKeyProperty, InitialLoadProperty, OAuthTokensProperty, ActiveOrganizationIdProperty,
+  removeCredentialsFromSavedStorageType,
 } from '@/figmaStorage';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { getActiveTheme } from '@/utils/getActiveTheme';
@@ -14,6 +15,9 @@ import { getSavedStorageType, getTokenData } from '../../plugin/node';
 import { UsedEmailProperty } from '@/figmaStorage/UsedEmailProperty';
 
 export async function startup() {
+  // Clean credentials that older versions saved into the file before anything reads the storage type
+  await removeCredentialsFromSavedStorageType(figma.root);
+
   // on startup we need to fetch all the locally available data so we can bootstrap our UI
   const [
     settings,

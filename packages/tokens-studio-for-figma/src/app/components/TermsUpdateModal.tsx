@@ -17,18 +17,27 @@ const ModalFooterRight = styled('div', {
 export const TERMS_UPDATE_MODAL_KEY = 'seenTermsUpdate2026Subprocessors';
 const TERMS_URL = 'https://production.tokens.studio/legal/terms-of-service';
 
-export default function TermsUpdateModal() {
-  const dispatch = useDispatch();
+/**
+ * Whether this user still has the terms update to see. Other startup dialogs that only some users get wait for it.
+ * The seen flag alone isn't enough: it is false for everyone who isn't shown the update.
+ */
+export function useTermsUpdatePending(): boolean {
   const isProUser = useIsProUser();
   const { isPro: hasTokensStudioSubscription } = useAuthStore();
-  const activeTab = useSelector(activeTabSelector);
   const seenFlag = useSelector((state: any) => state.settings?.[TERMS_UPDATE_MODAL_KEY]);
+  return seenFlag === false && isProUser && !hasTokensStudioSubscription;
+}
+
+export default function TermsUpdateModal() {
+  const dispatch = useDispatch();
+  const pending = useTermsUpdatePending();
+  const activeTab = useSelector(activeTabSelector);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
     // Skip showing modal in Cypress tests
     const isCypress = typeof window !== 'undefined' && (window as any).Cypress;
-    if (seenFlag !== false || !isProUser || hasTokensStudioSubscription || activeTab === Tabs.LOADING || isCypress) {
+    if (!pending || activeTab === Tabs.LOADING || isCypress) {
       setOpen(false);
       return undefined;
     }
@@ -36,7 +45,7 @@ export default function TermsUpdateModal() {
     // Let the application settle before showing the announcement.
     const timer = setTimeout(() => setOpen(true), 1000);
     return () => clearTimeout(timer);
-  }, [activeTab, hasTokensStudioSubscription, isProUser, seenFlag]);
+  }, [activeTab, pending]);
 
   const handleClose = useCallback(() => {
     dispatch.settings.setSeenTermsUpdate2026Subprocessors(true);

@@ -11,8 +11,12 @@ import { notifyToUI } from '@/plugin/notifiers';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { JSONBinTokenStorage } from '@/storage';
 import { tokenFormatSelector } from '@/selectors/tokenFormatSelector';
+import { BITBUCKET_SECURITY_NOTICE_MAX_VIEWS } from '@/constants/BitbucketSecurityNotice';
+import { apiProvidersSelector } from '@/selectors/apiProvidersSelector';
 
 const mockStartJob = jest.fn();
+const mockSetBitbucketSecurityNoticeViews = jest.fn();
+let mockApiProviders: unknown[] = [];
 const mockRetrieve = jest.fn();
 const mockCanWrite = jest.fn();
 const mockChangePath = jest.fn();
@@ -86,6 +90,8 @@ const mockSelector = (selector: Selector) => {
       return { provider: 'local' };
     case tokenFormatSelector:
       return 'legacy';
+    case apiProvidersSelector:
+      return mockApiProviders;
     default:
       return {};
   }
@@ -117,6 +123,9 @@ jest.mock('react-redux', () => ({
     },
     branchState: {
       setBranches: mockSetBranches,
+    },
+    settings: {
+      setBitbucketSecurityNoticeViews2026: mockSetBitbucketSecurityNoticeViews,
     },
   })),
   useSelector: (selector: Selector) => mockSelector(selector),
@@ -742,6 +751,8 @@ describe('remoteTokens', () => {
         expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
           status: 'success',
         });
+        // None of these save a Bitbucket API token, so the Bitbucket security notice is left alone.
+        expect(mockSetBitbucketSecurityNoticeViews).not.toHaveBeenCalled();
       });
     } else {
       it(`Add newProviderItem to ${context.provider}, should pull tokens and return error message if there is no content`, async () => {
@@ -761,6 +772,49 @@ describe('remoteTokens', () => {
         }
       });
     }
+  });
+
+  describe('Bitbucket security notice', () => {
+    const withToken = (apiToken: string) => ({
+      ...bitbucketContext, internalId: 'b', username: 'jane@example.test', apiToken,
+    });
+
+    beforeEach(() => {
+      mockFetchBranches.mockImplementation(() => Promise.resolve(['main']));
+      mockRetrieve.mockImplementation(() => Promise.resolve(null));
+      mockPushDialog.mockImplementation(() => Promise.resolve({ customBranch: 'development', commitMessage: 'Initial commit' }));
+    });
+
+    afterEach(() => {
+      mockApiProviders = [];
+    });
+
+    it('marks the notice done when a new or replaced API token is saved', async () => {
+      mockApiProviders = [withToken('old-token')];
+      // The hook reads the saved syncs when it renders.
+      result = renderHook(() => useRemoteTokens()).result;
+
+      expect(await result.current.addNewProviderItem(withToken('new-token') as StorageTypeCredentials)).toEqual({ status: 'success' });
+      expect(mockSetBitbucketSecurityNoticeViews).toHaveBeenCalledWith(BITBUCKET_SECURITY_NOTICE_MAX_VIEWS);
+    });
+
+    it('leaves the notice alone when the sync is saved with the same token', async () => {
+      mockApiProviders = [withToken('old-token')];
+      // The hook reads the saved syncs when it renders.
+      result = renderHook(() => useRemoteTokens()).result;
+
+      expect(await result.current.addNewProviderItem(withToken('old-token') as StorageTypeCredentials)).toEqual({ status: 'success' });
+      expect(mockSetBitbucketSecurityNoticeViews).not.toHaveBeenCalled();
+    });
+
+    it('leaves the notice alone when saving fails', async () => {
+      mockSave.mockImplementation(() => {
+        throw new Error(ErrorMessages.GENERAL_CONNECTION_ERROR);
+      });
+
+      expect((await result.current.addNewProviderItem(withToken('new-token') as StorageTypeCredentials)).status).toBe('failure');
+      expect(mockSetBitbucketSecurityNoticeViews).not.toHaveBeenCalled();
+    });
   });
 
   Object.entries(contextMap).forEach(([contextName, context]) => {
