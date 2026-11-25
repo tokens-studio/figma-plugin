@@ -64,8 +64,11 @@ describe('checkAndEvaluateMath', () => {
     expect(checkAndEvaluateMath('max.name == "max" ? 1 : 0')).toEqual('max.name == "max" ? 1 : 0');
   });
 
-  it('does not evaluate assignments or function definitions in expressions', () => {
+  it('does not evaluate assignments in expressions', () => {
     expect(checkAndEvaluateMath('x = 5')).toEqual('x = 5');
+  });
+
+  it('does not evaluate function definitions in expressions', () => {
     expect(checkAndEvaluateMath('f(x) = x + 1; f(2)')).toEqual('f(x) = x + 1; f(2)');
   });
 });

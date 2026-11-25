@@ -26,7 +26,7 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSa
     // Deconstruct url to WS ID / DS ID
     const parsedURL = new URL(url);
     const fragments = parsedURL.pathname.split('/');
-    const isCloud = parsedURL.hostname.match(/^(cloud|app)\.(dev\.|demo\.|staging\.|)supernova\.io$/)?.[1] === 'cloud';
+    const isCloud = parsedURL.hostname.match(/^(cloud|app)\.(?:(?:dev|demo|staging)\.)?supernova\.io$/)?.[1] === 'cloud';
     if (fragments.length < 5 || (isCloud && (fragments[1] !== 'ws' || fragments[3] !== 'ds'))) {
       throw new Error(
         'Design system URL is not properly formatted. Please copy URL from the cloud without modifying it and try again.',
