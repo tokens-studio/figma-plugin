@@ -15,6 +15,10 @@ describe('normalizeShadowValue', () => {
     expect(normalizeShadowValue({ x: 0, y: 0, inset: false })).toEqual({ x: 0, y: 0, type: BoxShadowTypes.DROP_SHADOW });
   });
 
+  it('defaults a DTCG shadow without type or inset to a drop shadow', () => {
+    expect(normalizeShadowValue({ offsetX: 1, offsetY: 2 })).toEqual({ x: 1, y: 2, type: BoxShadowTypes.DROP_SHADOW });
+  });
+
   it('keeps an explicit type and x/y over the DTCG keys', () => {
     expect(normalizeShadowValue({
       x: 1, y: 2, offsetX: 5, offsetY: 6, type: BoxShadowTypes.DROP_SHADOW, inset: true,
@@ -22,7 +26,7 @@ describe('normalizeShadowValue', () => {
   });
 
   it('normalizes every shadow in an array', () => {
-    expect(normalizeShadowValue([{ offsetX: 1, offsetY: 2 }, { x: 3, y: 4 }])).toEqual([{ x: 1, y: 2 }, { x: 3, y: 4 }]);
+    expect(normalizeShadowValue([{ offsetX: 1, offsetY: 2 }, { x: 3, y: 4 }])).toEqual([{ x: 1, y: 2, type: BoxShadowTypes.DROP_SHADOW }, { x: 3, y: 4 }]);
   });
 
   it('returns references, undefined and plugin-format values unchanged', () => {

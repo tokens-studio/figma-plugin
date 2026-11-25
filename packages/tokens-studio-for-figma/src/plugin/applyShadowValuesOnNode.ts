@@ -2,6 +2,7 @@ import { MapValuesToTokensResult } from '@/types';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import setEffectValuesOnTarget from './setEffectValuesOnTarget';
 import { isSingleBoxShadowValue } from '@/utils/is';
+import { normalizeShadowValue } from '@/utils/normalizeShadowValue';
 import { trySetStyleId } from '@/utils/trySetStyleId';
 import { clearStyleIdBackup, getNonLocalStyle, setStyleIdBackup } from './figmaUtils/styleUtils';
 import { effectStyleMatchesBoxShadowToken } from './figmaUtils/styleMatchers';
@@ -16,15 +17,17 @@ export async function applyShadowValuesOnNode(
   if ('effects' in node && typeof values.boxShadow !== 'undefined' && data.boxShadow) {
     const resolvedToken = defaultTokenValueRetriever.get(data.boxShadow);
     if (!resolvedToken) return;
+    // Normalize first: isSingleBoxShadowValue needs a type, which DTCG shadows express through inset
+    const boxShadow = normalizeShadowValue(values.boxShadow);
     let matchingStyleId = resolvedToken?.styleId;
 
     // Note: We should remove "backup style id" logic from here (this part). This was relevant before we had Themes, where style ids could not be saved to a token yet.
     if (!matchingStyleId) {
-      if (isSingleBoxShadowValue(values.boxShadow)) {
+      if (isSingleBoxShadowValue(boxShadow)) {
         const styleIdBackupKey = 'effectStyleId_original';
         const nonLocalStyle = getNonLocalStyle(node, styleIdBackupKey, 'effects');
         if (nonLocalStyle) {
-          if (effectStyleMatchesBoxShadowToken(nonLocalStyle, values.boxShadow, baseFontSize)) {
+          if (effectStyleMatchesBoxShadowToken(nonLocalStyle, boxShadow, baseFontSize)) {
             // Non-local style matches - use this and clear style id backup:
             matchingStyleId = nonLocalStyle.id;
             clearStyleIdBackup(node, styleIdBackupKey);
@@ -40,7 +43,7 @@ export async function applyShadowValuesOnNode(
     }
 
     if (!matchingStyleId || (matchingStyleId && !(await trySetStyleId(node, 'effect', matchingStyleId)))) {
-      if (isSingleBoxShadowValue(values.boxShadow)) {
+      if (isSingleBoxShadowValue(boxShadow)) {
         setEffectValuesOnTarget(node, data.boxShadow, baseFontSize);
       }
     }

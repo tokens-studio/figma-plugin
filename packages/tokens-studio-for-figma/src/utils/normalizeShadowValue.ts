@@ -17,7 +17,8 @@ function normalizeSingleShadow<T>(shadow: T): T {
   const normalized: Record<string, unknown> = { ...rest };
   if (normalized.x === undefined && offsetX !== undefined) normalized.x = offsetX;
   if (normalized.y === undefined && offsetY !== undefined) normalized.y = offsetY;
-  if (normalized.type === undefined && typeof inset === 'boolean') {
+  // inset is optional in DTCG and defaults to false, so an untyped DTCG shadow is a drop shadow
+  if (normalized.type === undefined && (typeof inset === 'boolean' || inset === undefined)) {
     normalized.type = inset ? BoxShadowTypes.INNER_SHADOW : BoxShadowTypes.DROP_SHADOW;
   }
   return normalized as T;
