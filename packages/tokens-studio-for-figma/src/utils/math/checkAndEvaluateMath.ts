@@ -1,6 +1,5 @@
 import { Parser } from 'expr-eval';
 import calcAstParser from 'postcss-calc-ast-parser';
-import { Root } from 'postcss-calc-ast-parser/dist/types/ast';
 
 // Token values come from external sources (synced repositories, URLs, pasted JSON), so expressions
 // are untrusted input. Member access reaches JS builtins from inside an expression, which allows
@@ -81,15 +80,14 @@ export function checkAndEvaluateMath(expr: string) {
   // Bail out for tuple-shaped inputs — see hasTopLevelComma for why.
   if (typeof expr === 'string' && hasTopLevelComma(expr)) return expr;
 
-  let calcParsed: Root;
+  let calcReduced: ReturnType<typeof calcAstParser.reduceExpression>;
 
   try {
-    calcParsed = calcAstParser.parse(expr);
+    // Reducing is recursive, so a deeply nested expression can overflow the stack here
+    calcReduced = calcAstParser.reduceExpression(calcAstParser.parse(expr));
   } catch (ex) {
     return expr;
   }
-
-  const calcReduced = calcAstParser.reduceExpression(calcParsed);
 
   let unitlessExpr = expr;
   let unit;

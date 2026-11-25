@@ -71,4 +71,9 @@ describe('checkAndEvaluateMath', () => {
   it('does not evaluate function definitions in expressions', () => {
     expect(checkAndEvaluateMath('f(x) = x + 1; f(2)')).toEqual('f(x) = x + 1; f(2)');
   });
+
+  it('returns expressions that are nested too deeply to reduce', () => {
+    const expression = `${'('.repeat(20000)}1${')'.repeat(20000)}`;
+    expect(checkAndEvaluateMath(expression)).toEqual(expression);
+  });
 });
