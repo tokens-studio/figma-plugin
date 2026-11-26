@@ -72,6 +72,10 @@ export type Project = {
   id: string;
   name: string;
   slug?: string;
+  // Studio's `themes_simple_view_active`: the project is in Simple view, where Studio owns its token sets.
+  // Missing means it isn't. Every pull reads it again (`tokenState.studioSimpleView`), which is what the
+  // plugin's Simple view behaviour follows.
+  themesSimpleViewActive?: boolean;
 };
 
 export type Organization = {

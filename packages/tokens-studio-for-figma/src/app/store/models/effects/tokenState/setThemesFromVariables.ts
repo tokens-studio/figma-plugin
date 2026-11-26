@@ -4,6 +4,10 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { notifyThemePushFailures, pushThemeToTokensStudioOAuth, type ThemePushFailure } from './utils/pushThemeToTokensStudioOAuth';
 import { store } from '@/app/store';
 import { ThemeObjectsList } from '@/types';
+import { getStudioSimpleView } from '@/selectors/studioSimpleViewSelector';
+import { notifyToUI } from '@/plugin/notifiers';
+import { simpleViewRuleMessage } from '@/utils/tokensStudio/simpleView';
+import { reloadStudioProject } from '../../../providers/tokens-studio/tokensStudioOAuth';
 
 export function setThemesFromVariables(dispatch: RematchDispatch<RootModel>) {
   return (_payload: ThemeObjectsList, _rootState: any): void => {
@@ -30,8 +34,12 @@ export function setThemesFromVariables(dispatch: RematchDispatch<RootModel>) {
       // newThemes have locally-generated name-based IDs (e.g. "core-primitives") assigned by
       // pullVariables.ts — not server UUIDs. Strip the id so pushThemeToTokensStudioOAuth
       // picks CREATE_THEME (POST) instead of UPDATE_THEME (PATCH → 404).
-      const newThemesToPush = (importedThemes?.newThemes || []).map((t) => ({ ...t, id: undefined }));
+      let newThemesToPush = (importedThemes?.newThemes || []).map((t) => ({ ...t, id: undefined }));
       const updatedThemesToPush = importedThemes?.updatedThemes || [];
+      // Simple view: Studio adds a mode only with its own set, from Manage themes. Existing modes still take the
+      // variable references; new ones are left out and the local copies dropped.
+      const skipNewThemes = !!getStudioSimpleView(currentState) && newThemesToPush.length > 0;
+      if (skipNewThemes) newThemesToPush = [];
 
       // Push sequentially so that a shared theme group is only created once.
       // Concurrent pushes would both see groupId=null and create duplicate groups.
@@ -44,6 +52,10 @@ export function setThemesFromVariables(dispatch: RematchDispatch<RootModel>) {
         }
         // One message for the whole import rather than one per refused theme.
         notifyThemePushFailures(failures);
+        if (skipNewThemes) {
+          notifyToUI(simpleViewRuleMessage('theme_option_create'), { error: true });
+          await reloadStudioProject();
+        }
       })();
     }
   };

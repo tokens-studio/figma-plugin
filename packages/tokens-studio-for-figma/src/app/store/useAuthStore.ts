@@ -12,6 +12,7 @@ import { store } from '@/app/store';
 import { TOKENS_STUDIO_APP_URL } from '@/constants/TokensStudio';
 import { isProOrganization } from '@/utils/tokensStudio/organizationAccess';
 import { isTokensStudioOAuthType } from '@/utils/is';
+import { readThemesSimpleViewActive } from '@/utils/tokensStudio/simpleView';
 
 interface DeviceCodeState {
   userCode: string;
@@ -431,6 +432,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           id: p.id || p.uuid || '',
           name: p.name || (p.attributes?.name) || '',
           slug: p.slug || (p.attributes?.slug) || '',
+          ...(readThemesSimpleViewActive(p) ? { themesSimpleViewActive: true } : {}),
         }));
 
         set((state) => {

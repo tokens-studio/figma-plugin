@@ -43,8 +43,13 @@ import {
   deleteThemeOptionRest,
   listThemeOptionsRest,
   batchCreateTokensRest,
+  createSimpleModeRest,
+  setDefaultModeRest,
+  reorderThemeOptionsRest,
+  copyModeValuesRest,
   isNameConflictError,
 } from '../../../../utils/tokensStudio/restApi';
+import { describeSimpleViewRefusal } from '../../../../utils/tokensStudio/simpleView';
 
 type TokensStudioOAuthCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.TOKENS_STUDIO_OAUTH }>;
 
@@ -204,6 +209,22 @@ export const pushToTokensStudioOAuth = async ({
           result = await deleteThemeOptionRest(accessToken, apiBaseUrl, projectId, data.id, branch, changeSetId);
         }
         break;
+      // Simple view (Studio ADR-182): Studio writes each collection and mode together with its sets.
+      case 'SIMPLE_CREATE_COLLECTION':
+        result = await createThemeGroupRest(accessToken, apiBaseUrl, projectId, { name: data.name }, branch, changeSetId);
+        break;
+      case 'SIMPLE_CREATE_MODE':
+        result = await createSimpleModeRest(accessToken, apiBaseUrl, projectId, { theme_group_id: data.collectionId, name: data.name }, changeSetId);
+        break;
+      case 'SIMPLE_SET_DEFAULT_MODE':
+        result = await setDefaultModeRest(accessToken, apiBaseUrl, projectId, data.collectionId, data.modeId, changeSetId);
+        break;
+      case 'SIMPLE_REORDER_MODES':
+        result = await reorderThemeOptionsRest(accessToken, apiBaseUrl, projectId, data.collectionId, data.orderedIds, changeSetId);
+        break;
+      case 'SIMPLE_COPY_MODE_VALUES':
+        result = await copyModeValuesRest(accessToken, apiBaseUrl, projectId, data.modeId, data.fromModeId, changeSetId);
+        break;
       default:
         console.warn('Unknown REST action', action);
     }
@@ -216,8 +237,16 @@ export const pushToTokensStudioOAuth = async ({
     return result;
   } catch (error) {
     console.error('Failed to push to Tokens Studio OAuth via REST:', error);
+    // A Simple view refusal means the plugin's copy of the project no longer matches what Studio allows:
+    // the project switched view, or a local change was applied that Studio won't keep. Pull it again.
+    const simpleViewRefusal = describeSimpleViewRefusal(error);
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    if (simpleViewRefusal?.reload) reloadStudioProject();
     if (rethrowErrors) throw error;
-    notifyToUI(`Failed to sync: ${error instanceof Error ? error.message : 'Unknown error'}`, { error: true });
+    notifyToUI(
+      simpleViewRefusal ? simpleViewRefusal.message : `Failed to sync: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      { error: true },
+    );
     return null;
   }
 };
@@ -258,6 +287,59 @@ export function alignObjectKeys<T extends Record<string, any>>(obj: T, template:
   return aligned;
 }
 
+let reloadInFlight: Promise<void> | null = null;
+
+/**
+ * Pull the connected Tokens Studio project again and replace the plugin's copy, without asking: Studio
+ * already has every change the plugin made, since OAuth sync writes each one immediately. Used after a
+ * Simple view refusal and after Simple view writes that change sets on the server (a new mode, a renamed
+ * collection). Keeps the active themes that still exist.
+ */
+export function reloadStudioProject(): Promise<void> {
+  if (reloadInFlight) return reloadInFlight;
+  reloadInFlight = (async () => {
+    const api = store.getState().uiState.api as TokensStudioOAuthCredentials | null;
+    if (!useAuthStore.getState().oauthTokens?.accessToken || api?.provider !== StorageProviderType.TOKENS_STUDIO_OAUTH || !api.id) return;
+    const apiBaseUrl = OAuthService.getApiBaseUrl(TOKENS_STUDIO_APP_URL);
+    const projectData = await withStudioAuth((accessToken) => fetchProjectDataRest(accessToken, apiBaseUrl, api.id, api.branch || 'main'));
+    // The user can switch project or branch during the fetch; this data is for the old one then.
+    const liveApi = store.getState().uiState.api as TokensStudioOAuthCredentials | null;
+    if (liveApi?.id !== api.id || liveApi?.branch !== api.branch) return;
+
+    const { themes: localThemes, activeTheme, usedTokenSet } = store.getState().tokenState;
+    const themes = projectData.themes.map((remoteTheme) => {
+      const localTheme = localThemes.find((theme) => theme.id === remoteTheme.id);
+      return localTheme ? alignObjectKeys(remoteTheme, localTheme) : remoteTheme;
+    });
+    const values = applyTokenSetOrder((projectData.tokens || {}) as any, projectData.tokenSetOrder);
+    const metadata = {
+      tokenSetOrder: projectData.tokenSetOrder,
+      tokenSetsData: projectData.tokenSets as any,
+      themeGroupsData: projectData.themeGroups as any,
+      changeSetId: projectData.changeSetId,
+    };
+
+    store.dispatch.tokenState.setStudioSimpleView(projectData.simpleView);
+    store.dispatch.tokenState.setTokenData({
+      values,
+      themes,
+      activeTheme: { ...activeTheme },
+      usedTokenSet,
+      hasChangedRemote: true,
+    });
+    store.dispatch.tokenState.setRemoteData({ tokens: values, themes, metadata });
+    store.dispatch.tokenState.setTokenSetMetadata(projectData.tokenSets ?? {});
+    store.dispatch.tokenState.updateDocument({ shouldUpdateNodes: false, updateRemote: false });
+  })()
+    .catch((error) => {
+      console.error('Failed to reload the Tokens Studio project:', error);
+    })
+    .finally(() => {
+      reloadInFlight = null;
+    });
+  return reloadInFlight;
+}
+
 export function useTokensStudioOAuth() {
   const tokens = useSelector(tokensSelector);
   const activeTheme = useSelector(activeThemeSelector);
@@ -290,6 +372,8 @@ export function useTokensStudioOAuth() {
           errorCode: code,
         };
       }
+      // Read on every pull: Studio can switch a project between Simple and Advanced view on its own.
+      dispatch.tokenState.setStudioSimpleView(projectData.simpleView);
       // OAuth mode intentionally allows editing — write-back is handled via REST actions.
       dispatch.tokenState.setServerResolverContext({
         projectId: context.id,
@@ -458,6 +542,7 @@ export function useTokensStudioOAuth() {
           notifyToUI('Maximum limit of 10,000 tokens reached. Some tokens may be missing.', { error: true });
         }
         const { tokens: newTokens, themes: newThemes, tokenSetOrder } = projectData;
+        dispatch.tokenState.setStudioSimpleView(projectData.simpleView);
 
         const { themes } = store.getState().tokenState;
         const alignedNewThemes = newThemes.map((remoteTheme) => {

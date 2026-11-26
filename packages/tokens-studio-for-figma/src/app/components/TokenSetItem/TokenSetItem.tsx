@@ -27,6 +27,8 @@ export type TokenSetItemProps = {
   canDuplicate?: boolean;
   canDelete: boolean;
   canReorder?: boolean;
+  // False hides Duplicate and Delete: a Tokens Studio project in Simple view keeps exactly one set per mode.
+  canManageSets?: boolean;
   extraBefore?: React.ReactNode;
   onClick: (item: TreeItem) => void;
   onCollapse?: (itemPath: string) => void; // eslint-disable-line react/no-unused-prop-types
@@ -48,6 +50,7 @@ export function TokenSetItem({
   canDuplicate = true,
   canDelete,
   canReorder = false,
+  canManageSets = true,
   extraBefore,
   onRename,
   onDelete,
@@ -182,12 +185,16 @@ export function TokenSetItem({
               </ContextMenu.Item>
               {item.isLeaf && (
                 <>
-                  <ContextMenu.Item disabled={!canEdit || !canDuplicate} onSelect={handleDuplicate}>
-                    {t('duplicate')}
-                  </ContextMenu.Item>
-                  <ContextMenu.Item disabled={!canEdit || !canDelete} onSelect={handleDelete}>
-                    {t('delete')}
-                  </ContextMenu.Item>
+                  {canManageSets && (
+                    <>
+                      <ContextMenu.Item disabled={!canEdit || !canDuplicate} onSelect={handleDuplicate}>
+                        {t('duplicate')}
+                      </ContextMenu.Item>
+                      <ContextMenu.Item disabled={!canEdit || !canDelete} onSelect={handleDelete}>
+                        {t('delete')}
+                      </ContextMenu.Item>
+                    </>
+                  )}
                   <ContextMenu.Separator />
                   <ContextMenu.Item onSelect={handleGenerateDocumentation}>
                     <div

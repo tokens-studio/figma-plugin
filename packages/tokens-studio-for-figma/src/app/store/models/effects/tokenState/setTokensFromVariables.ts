@@ -1,7 +1,7 @@
 import type { RematchDispatch } from '@rematch/core';
 import type { RootModel } from '@/types/RootModel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
-import { pushToTokensStudioOAuth } from '../../../providers/tokens-studio/tokensStudioOAuth';
+import { pushToTokensStudioOAuth, reloadStudioProject } from '../../../providers/tokens-studio/tokensStudioOAuth';
 import { notifyThemePushFailures, pushThemeToTokensStudioOAuth, type ThemePushFailure } from './utils/pushThemeToTokensStudioOAuth';
 import {
   resolveSanitizedKey,
@@ -11,6 +11,9 @@ import {
 } from './utils/sanitizeForStudio';
 import { store } from '@/app/store';
 import type { SetTokensFromVariablesPayload } from '@/types/payloads';
+import { getStudioSimpleView } from '@/selectors/studioSimpleViewSelector';
+import { notifyToUI } from '@/plugin/notifiers';
+import { refusedSetsMessage } from './utils/simpleViewImport';
 
 export function setTokensFromVariables(dispatch: RematchDispatch<RootModel>) {
   return async (_payload: SetTokensFromVariablesPayload, _rootState: any): Promise<void> => {
@@ -18,6 +21,11 @@ export function setTokensFromVariables(dispatch: RematchDispatch<RootModel>) {
     if (currentState?.uiState?.api?.provider !== StorageProviderType.TOKENS_STUDIO_OAUTH) return;
 
     const context = currentState.uiState.api;
+    // Simple view: a Figma collection's modes land in the Studio collection and modes of the same names
+    // (`<Collection>/<Mode>` sets). Studio makes sets only with a collection or mode, so a collection or mode
+    // it doesn't have yet is left out, and the user is told to add it first.
+    const isSimpleView = !!getStudioSimpleView(currentState);
+    const refusedSets: string[] = [];
     const hasChangeSetId = !!(context as any)?.changeSetId;
     const { importedTokens, tokens: localTokens = {} } = currentState.tokenState;
     // Changed tokens of a renamed collection are listed as updates, but their set is new in Studio too.
@@ -61,6 +69,8 @@ export function setTokensFromVariables(dispatch: RematchDispatch<RootModel>) {
               [metaKey]: { ...existingMeta, fromVariableImport: true } as any,
             });
           }
+        } else if (isSimpleView) {
+          refusedSets.push(setName);
         } else {
           // eslint-disable-next-line no-await-in-loop
           const setResult = await pushToTokensStudioOAuth({
@@ -114,7 +124,10 @@ export function setTokensFromVariables(dispatch: RematchDispatch<RootModel>) {
     const stateAfterSets = store.getState();
     const { importedThemes } = stateAfterSets.tokenState;
     if (hasChangeSetId && importedThemes) {
-      const newThemesToPush = (importedThemes.newThemes || []).map((t: any) => sanitizeThemeForStudio({ ...t, id: undefined }));
+      // Simple view: Studio keeps the modes and their sets; only existing modes take the variable references.
+      const newThemesToPush = isSimpleView
+        ? []
+        : (importedThemes.newThemes || []).map((t: any) => sanitizeThemeForStudio({ ...t, id: undefined }));
       const updatedThemesToPush = (importedThemes.updatedThemes || []).map((t: any) => sanitizeThemeForStudio(t));
       // Push themes sequentially so that a shared theme group (e.g. "appearances") is only created
       // once — concurrent pushes would both see groupId=null and create duplicate groups.
@@ -126,6 +139,12 @@ export function setTokensFromVariables(dispatch: RematchDispatch<RootModel>) {
       }
       // One message for the whole import rather than one per refused theme.
       notifyThemePushFailures(failures);
+    }
+
+    if (refusedSets.length > 0) {
+      notifyToUI(refusedSetsMessage(refusedSets), { error: true });
+      // Drop the local copies of what Studio didn't get.
+      await reloadStudioProject();
     }
   };
 }

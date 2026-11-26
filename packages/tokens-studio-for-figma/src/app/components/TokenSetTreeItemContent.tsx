@@ -6,6 +6,7 @@ import { TokenSetItem } from './TokenSetItem';
 import {
   activeTokenSetSelector,
   editProhibitedSelector,
+  isStudioSimpleViewSelector,
   tokenSetMetadataSelector,
 } from '@/selectors';
 import { TreeItem } from '@/utils/tokenset';
@@ -35,6 +36,8 @@ export function TokenSetTreeItemContent({
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const editProhibited = useSelector(editProhibitedSelector);
   const tokenSetMetadata = useSelector(tokenSetMetadataSelector);
+  // A Tokens Studio project in Simple view orders, adds and deletes sets with its collections and modes.
+  const isSimpleView = useSelector(isStudioSimpleViewSelector);
 
   const handleClick = useCallback((set: TreeItem) => {
     if (set.isLeaf) {
@@ -70,7 +73,8 @@ export function TokenSetTreeItemContent({
       onCheck={handleCheckedChange}
       canEdit={!editProhibited}
       canDuplicate={!tokenSetMetadata[item.path]?.isDynamic}
-      canReorder={!editProhibited}
+      canReorder={!editProhibited && !isSimpleView}
+      canManageSets={!isSimpleView}
       canDelete={item.canDelete}
       extraBefore={children}
       onRename={item.onRename}
