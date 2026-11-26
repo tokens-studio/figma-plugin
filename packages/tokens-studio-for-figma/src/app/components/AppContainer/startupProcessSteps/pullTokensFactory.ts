@@ -113,7 +113,11 @@ export function pullTokensFactory(
               const type = remoteData.errorType || 'other';
               const message = remoteData.errorMessage;
               const header = remoteData.errorHeader;
-              dispatch.uiState.setLastError({ type, message, header });
+              // Keep the code: the start screen picks its button from it (sign in again, or none for a variables project).
+              const code = remoteData.errorCode;
+              dispatch.uiState.setLastError({
+                type, message, header, code,
+              });
               notifyToUI(message, { error: true });
               dispatch.uiState.setActiveTab(Tabs.START);
             } else {

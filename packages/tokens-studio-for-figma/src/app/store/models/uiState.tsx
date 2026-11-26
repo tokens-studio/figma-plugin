@@ -95,6 +95,7 @@ export interface UIState {
     type: ErrorCategory;
     message: string;
     header?: string;
+    code?: string;
   } | null;
   showBitbucketMigrationDialog: boolean;
   // The legacy license notice was closed in this session. Kept in the store so the Bitbucket notice can wait for it.
@@ -430,7 +431,9 @@ export const uiState = createModel<RootModel>()({
       ...state,
       selectedExportThemes: data,
     }),
-    setLastError: (state, data: { type: ErrorCategory; message: string; header?: string } | null) => ({
+    setLastError: (state, data: {
+      type: ErrorCategory; message: string; header?: string; code?: string
+    } | null) => ({
       ...state,
       lastError: data,
     }),

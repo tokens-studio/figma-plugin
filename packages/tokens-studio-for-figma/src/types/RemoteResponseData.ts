@@ -16,6 +16,8 @@ type RemoteResponseFailure = {
   errorMessage: string;
   errorType?: 'credential' | 'parsing' | 'connectivity' | 'other';
   errorHeader?: string;
+  // Lets the start screen offer the right next step, e.g. signing in again.
+  errorCode?: string;
 };
 
 export type RemoteResponseData<Metadata = unknown> = RemoteResponseSuccess<Metadata> | RemoteResponseFailure;

@@ -67,6 +67,7 @@ export enum AsyncMessageTypes {
   SET_SELECTED_EXPORT_THEMES = 'async/set-selected-export-themes',
   CREATE_LIVING_DOCUMENTATION = 'async/create-living-documentation',
   SET_OAUTH_TOKENS = 'async/set-oauth-tokens',
+  GET_OAUTH_TOKENS = 'async/get-oauth-tokens',
   SET_ACTIVE_ORGANIZATION_ID = 'async/set-active-organization-id',
   // the below messages are going from plugin to UI
   STARTUP = 'async/startup',
@@ -332,6 +333,11 @@ export type SetOAuthTokensMessage = AsyncMessage<AsyncMessageTypes.SET_OAUTH_TOK
 }>;
 export type SetOAuthTokensMessageResult = AsyncMessage<AsyncMessageTypes.SET_OAUTH_TOKENS>;
 
+export type GetOAuthTokensMessage = AsyncMessage<AsyncMessageTypes.GET_OAUTH_TOKENS>;
+export type GetOAuthTokensMessageResult = AsyncMessage<AsyncMessageTypes.GET_OAUTH_TOKENS, {
+  oauthTokens: OAuthTokens | null;
+}>;
+
 export type SetActiveOrganizationIdMessage = AsyncMessage<AsyncMessageTypes.SET_ACTIVE_ORGANIZATION_ID, {
   activeOrganizationId: string | null;
 }>;
@@ -480,6 +486,7 @@ export type AsyncMessages =
   | SetVariableExportSettingsMessage
   | SetSelectedExportThemesMessage
   | SetOAuthTokensMessage
+  | GetOAuthTokensMessage
   | SetActiveOrganizationIdMessage;
 
 export type AsyncMessageResults =
@@ -537,6 +544,7 @@ export type AsyncMessageResults =
   | SetVariableExportSettingsMessageResult
   | SetSelectedExportThemesMessageResult
   | SetOAuthTokensMessageResult
+  | GetOAuthTokensMessageResult
   | SetActiveOrganizationIdMessageResult;
 
 export type AsyncMessagesMap = {

@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import compact from 'just-compact';
 import { OAuthService } from '../services/OAuthService';
 import { TokenRefreshManager } from '../services/TokenRefreshManager';
 import { RefreshError } from '../services/RefreshError';
@@ -9,10 +8,7 @@ import type {
 } from '@/types/oauth';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
-import { fetchProjectDataRest } from '@/utils/tokensStudio/fetchProjectDataRest';
 import { store } from '@/app/store';
-import { notifyToUI } from '@/plugin/notifiers';
-import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 import { TOKENS_STUDIO_APP_URL } from '@/constants/TokensStudio';
 import { isProOrganization } from '@/utils/tokensStudio/organizationAccess';
 import { isTokensStudioOAuthType } from '@/utils/is';
@@ -47,8 +43,21 @@ interface AuthState {
   // store yet; otherwise it's read from the store.
   fetchUserData: (tokens: OAuthTokens, persistedProjectId?: string, fileOrganizationId?: string) => Promise<void>;
   fetchProjects: (orgId: string, persistedProjectId?: string) => Promise<void>;
-  loadProjectTokens: (projectId: string) => Promise<void>;
   refreshTokens: () => Promise<void>;
+}
+
+/**
+ * The tokens saved in Figma's client storage, which every open file shares: null when no
+ * one is signed in, undefined when they could not be read.
+ */
+async function readStoredOAuthTokens(): Promise<OAuthTokens | null | undefined> {
+  try {
+    const result = await AsyncMessageChannel.ReactInstance.message({ type: AsyncMessageTypes.GET_OAUTH_TOKENS });
+    return result?.oauthTokens;
+  } catch (error) {
+    console.warn('Could not read the stored Tokens Studio sign-in:', error);
+    return undefined;
+  }
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -204,7 +213,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   setOAuthTokens: async (tokens: OAuthTokens | null) => {
     set({ oauthTokens: tokens, isAuthenticated: !!tokens });
-    AsyncMessageChannel.ReactInstance.message({
+    // Wait for the write, so a refresh that reads the stored tokens next sees these.
+    await AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.SET_OAUTH_TOKENS,
       oauthTokens: tokens,
     });
@@ -448,61 +458,33 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
-  loadProjectTokens: async (projectId: string) => {
-    const { oauthTokens, activeOrganization } = get();
-    if (!oauthTokens || !activeOrganization) return;
-
-    set({ isLoading: true });
-
-    const studioUrl = TOKENS_STUDIO_APP_URL;
-    const apiBaseUrl = OAuthService.getApiBaseUrl(studioUrl);
-
-    try {
-      const projectData = await fetchProjectDataRest(
-        oauthTokens.accessToken,
-        apiBaseUrl,
-        projectId,
-      );
-
-      if (projectData && projectData.tokens) {
-        // Apply token set order and dispatch to Redux store
-        const { tokens, themes, tokenSetOrder } = projectData;
-
-        store.dispatch.tokenState.setTokenData({
-          values: tokens as any,
-          themes,
-          activeTheme: {},
-          hasChangedRemote: false,
-        });
-
-        store.dispatch.tokenState.setRemoteData({
-          tokens: tokens as any,
-          themes,
-          metadata: { tokenSetOrder },
-        });
-
-        const stringifiedRemoteTokens = JSON.stringify(compact([tokens, themes, TokenFormat.format]), null, 2);
-        store.dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
-
-        notifyToUI('Successfully loaded project tokens', { error: false });
-      } else {
-        notifyToUI('Project has no tokens or could not load tokens.', { error: true });
-      }
-    } catch (error) {
-      console.error('Failed to load project tokens:', error);
-      notifyToUI('Failed to load project tokens', { error: true });
-    } finally {
-      set({ isLoading: false });
-    }
-  },
-
   refreshTokens: async () => {
     const { oauthTokens } = get();
-    if (!oauthTokens || !oauthTokens.refreshToken) return;
+    if (!oauthTokens) return;
 
     try {
+      // Every open file shares the stored tokens but keeps its own copy in memory. Renewing with
+      // a refresh token another file has already rotated counts as reuse on the server, which
+      // ends the sign-in everywhere, so start from the stored pair.
+      const stored = await readStoredOAuthTokens();
+      // The read is async: this file may have signed out or renewed meanwhile.
+      const current = get().oauthTokens;
+      if (!current) return;
+      if (current !== oauthTokens && !OAuthService.needsRefresh(current)) return;
+      if (stored === null) {
+        throw new RefreshError('fatal', 'Signed out of Tokens Studio in another file');
+      }
+      const latest = stored ?? current;
+      if (latest.refreshToken !== current.refreshToken && !OAuthService.needsRefresh(latest)) {
+        set({ oauthTokens: latest, isAuthenticated: true });
+        return;
+      }
+      if (!latest.refreshToken) {
+        throw new RefreshError('fatal', 'No refresh token stored for Tokens Studio');
+      }
+
       const studioUrl = TOKENS_STUDIO_APP_URL;
-      const newTokens = await TokenRefreshManager.refreshTokens(oauthTokens, studioUrl);
+      const newTokens = await TokenRefreshManager.refreshTokens(latest, studioUrl);
       await get().setOAuthTokens(newTokens);
     } catch (error) {
       console.error('Failed to refresh tokens:', error);
