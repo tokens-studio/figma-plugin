@@ -11,25 +11,31 @@ import {
   sanitizeTokenName,
   sanitizeTokenSetName,
 } from './utils/sanitizeForStudio';
-import { renameThemeGroupsInTokensStudio, renameTokenSetsInTokensStudio } from './utils/renameInTokensStudio';
+import {
+  renamedTokenKey, renameThemeGroupsInTokensStudio, renameTokenSetsInTokensStudio, updateTokensInTokensStudio,
+} from './utils/renameInTokensStudio';
+import { findRenamedVariableTokens } from './utils/findRenamedVariableTokens';
 import { store } from '@/app/store';
-import type { SetTokensFromVariablesPayload } from '@/types/payloads';
 
-export function setTokensFromVariables(dispatch: RematchDispatch<RootModel>) {
-  return async (_payload: SetTokensFromVariablesPayload, _rootState: any): Promise<void> => {
+// Writes a variables import to Tokens Studio. Initiator dispatches it once setTokensFromVariables and
+// setThemesFromVariables have both filled the import, and before applyVariableImport applies it locally:
+// everything it compares against is read from the store before its first await.
+export function writeVariableImportToTokensStudio(dispatch: RematchDispatch<RootModel>) {
+  return async (_payload: void, _rootState: any): Promise<void> => {
     const currentState = store.getState();
     if (currentState?.uiState?.api?.provider !== StorageProviderType.TOKENS_STUDIO_OAUTH) return;
 
     const context = currentState.uiState.api;
     const hasChangeSetId = !!(context as any)?.changeSetId;
-    const { importedTokens, tokens: previousTokens = {} } = currentState.tokenState;
+    const { importedTokens, importedThemes, tokens: previousTokens = {} } = currentState.tokenState;
     // Sanitize at the studio boundary: strip characters that would corrupt the
     // ledger's reference or token-set parsing. Plugin-only flows still receive
     // the raw names because this effect only runs for TOKENS_STUDIO_OAUTH.
     let newTokens = sanitizeNewTokensForStudio(importedTokens?.newTokens || []);
-    // Read before the import is applied locally, which happens right after this effect starts.
     const renamedCollections = currentState.tokenState.renamedCollections ?? [];
     const previousThemes = currentState.tokenState.themes;
+
+    let updatedTokens = importedTokens?.updatedTokens || [];
 
     let renamedSets: [string, string][] = [];
     if (hasChangeSetId && renamedCollections.length > 0) {
@@ -44,9 +50,22 @@ export function setTokensFromVariables(dispatch: RematchDispatch<RootModel>) {
 
     // Changed tokens of a renamed collection are listed as updates. Unless their set was renamed in Studio above,
     // it is new there too, so they are created with it.
-    const updatedTokensInNewSets = (importedTokens?.updatedTokens || []).filter((token) => token.parent && !previousTokens[token.parent]
-      && !renamedSets.some(([, newName]) => newName === token.parent));
-    newTokens = [...newTokens, ...sanitizeNewTokensForStudio(updatedTokensInNewSets)];
+    const isInNewSet = (token: { parent?: string }) => !!token.parent && !previousTokens[token.parent]
+      && !renamedSets.some(([, newName]) => newName === token.parent);
+    newTokens = [...newTokens, ...sanitizeNewTokensForStudio(updatedTokens.filter(isInNewSet))];
+    updatedTokens = updatedTokens.filter((token) => !isInNewSet(token));
+
+    if (hasChangeSetId) {
+      // Renamed variables and changed values update the existing tokens instead of creating new ones.
+      const renamedTokens = await updateTokensInTokensStudio(context, {
+        renames: findRenamedVariableTokens(previousThemes, importedThemes?.updatedThemes),
+        updatedTokens,
+        newTokens,
+        previousTokens,
+        renamedSets,
+      });
+      newTokens = newTokens.filter((token) => !renamedTokens.has(renamedTokenKey(token.parent!, token.name)));
+    }
 
     // Only create token sets and tokens if changeSetId is present — the REST API requires it.
     // changeSetId is populated after pulling from the REST API for a specific branch.
@@ -132,16 +151,8 @@ export function setTokensFromVariables(dispatch: RematchDispatch<RootModel>) {
       }
     }
 
-    // Yield the event loop before reading importedThemes. When hasChangeSetId is false there are
-    // no awaits above, so without this yield the effect runs synchronously and reads importedThemes
-    // before setThemesFromVariables (dispatched next in Initiator.tsx) has populated it.
-    await Promise.resolve();
-
     // Push themes after token sets are created (so selected_token_sets are ready).
-    // setThemesFromVariables skips this when new tokens are present to avoid
-    // sending theme options before token sets exist on the server.
     const stateAfterSets = store.getState();
-    const { importedThemes } = stateAfterSets.tokenState;
     if (hasChangeSetId && importedThemes) {
       await renameThemeGroupsInTokensStudio(context, previousThemes, importedThemes.updatedThemes || [], dispatch);
       const newThemesToPush = (importedThemes.newThemes || []).map((t: any) => sanitizeThemeForStudio({ ...t, id: undefined }));

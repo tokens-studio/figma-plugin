@@ -8,7 +8,7 @@ import type { CreateSingleTokenData } from '@/app/store/useManageTokens';
 // Fires when the user clicks "Import All" in ImportedTokensDialog (via importMultipleTokens).
 // For Tokens Studio OAuth projects this writes the confirmed tokens to the REST API.
 //
-// Variable import tokens are skipped here — setTokensFromVariables already wrote them and
+// Variable import tokens are skipped here — writeVariableImportToTokensStudio already wrote them and
 // recorded their set IDs in tokenSetMetadata. Only sets with no tracked server ID are created.
 export function createMultipleTokens(dispatch: RematchDispatch<RootModel>) {
   return async (payload: CreateSingleTokenData[], _rootState: any): Promise<void> => {
@@ -35,7 +35,7 @@ export function createMultipleTokens(dispatch: RematchDispatch<RootModel>) {
       const setMeta = store.getState().tokenState.tokenSetMetadata[setName] as any;
 
       if (setMeta?.fromVariableImport) {
-        // These tokens were already written by setTokensFromVariables — skip to avoid duplicates.
+        // These tokens were already written by writeVariableImportToTokensStudio — skip to avoid duplicates.
         // Clear the ephemeral flag so future imports into this set are not skipped.
         dispatch.tokenState.setTokenSetMetadata({
           ...store.getState().tokenState.tokenSetMetadata,
