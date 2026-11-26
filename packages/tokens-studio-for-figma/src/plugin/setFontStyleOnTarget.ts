@@ -1,8 +1,9 @@
-import { transformValue } from './helpers';
 import { notifyUI } from './notifiers';
 import { ResolvedTypographyObject } from './ResolvedTypographyObject';
+import { fontWeightStyleCandidates } from './figmaTransforms/fontWeight';
+import { listAvailableFonts } from './listAvailableFonts';
 
-export async function setFontStyleOnTarget({ target, value, baseFontSize }: { target: BaseNode | TextStyle; value: Pick<ResolvedTypographyObject, 'fontFamily' | 'fontWeight'>; baseFontSize: string }) {
+export async function setFontStyleOnTarget({ target, value }: { target: BaseNode | TextStyle; value: Pick<ResolvedTypographyObject, 'fontFamily' | 'fontWeight'>; baseFontSize: string }) {
   if (!('fontName' in target)) return;
   const {
     fontFamily, fontWeight,
@@ -19,52 +20,51 @@ export async function setFontStyleOnTarget({ target, value, baseFontSize }: { ta
         style,
       };
     }
-  } catch (e) {
-    const splitFontFamily = family.split(',');
-    const candidateStyles = transformValue(style, 'fontWeights', baseFontSize);
-    const candidateFonts: { family: string; style: string; }[] = [];
-    splitFontFamily?.forEach((candidateFontFamily) => {
-      const normalizedFontFamily = candidateFontFamily?.replace(/['"]/g, '').trim();
-      if (candidateStyles.length > 0) {
-        candidateStyles.forEach((candidateStyle) => {
-          candidateFonts.push({
-            family: normalizedFontFamily,
-            style: candidateStyle,
-          });
-        });
-      } else {
-        candidateFonts.push({
-          family: normalizedFontFamily,
-          style,
-        });
-      }
+  } catch {
+    const families = family.split(',')
+      .map((candidateFontFamily) => candidateFontFamily.replace(/['"]/g, '').trim())
+      .filter(Boolean);
+    const weightCandidates = fontWeightStyleCandidates(style);
+    const available = await listAvailableFonts();
+
+    const fontsToTry: { family: string; style: string; }[] = [];
+    families.forEach((candidateFamily) => {
+      const familyStyles = available
+        .filter((font) => font.fontName.family === candidateFamily)
+        .map((font) => font.fontName.style);
+      // Keep Figma's canonical style string; match aliases case-insensitively.
+      weightCandidates.forEach((candidate) => {
+        const match = familyStyles.find((familyStyle) => familyStyle.toLowerCase() === candidate.toLowerCase());
+        if (match) {
+          fontsToTry.push({ family: candidateFamily, style: match });
+        }
+      });
     });
 
-    let hasErrored = false;
-
-    for (let i = 0; i < candidateFonts.length; i += 1) {
-      let isApplied = false; // if font is applied then skip other font families
-      await figma
-        .loadFontAsync({ family: candidateFonts[i].family, style: candidateFonts[i].style })
-        .then(() => {
-          if (candidateFonts[i]) {
-            target.fontName = {
-              family: candidateFonts[i].family,
-              style: candidateFonts[i].style,
-            };
-            isApplied = true;
-          }
-        })
-        // eslint-disable-next-line @typescript-eslint/no-loop-func
-        .catch(() => {
-          hasErrored = true;
+    // Installed styles first; candidate loads cover a stale font list.
+    if (fontsToTry.length === 0) {
+      families.forEach((candidateFamily) => {
+        weightCandidates.forEach((candidateStyle) => {
+          fontsToTry.push({ family: candidateFamily, style: candidateStyle });
         });
-      if (isApplied) {
-        hasErrored = false;
+      });
+    }
+
+    let applied = false;
+    for (let i = 0; i < fontsToTry.length; i += 1) {
+      try {
+        await figma.loadFontAsync({ family: fontsToTry[i].family, style: fontsToTry[i].style });
+        target.fontName = {
+          family: fontsToTry[i].family,
+          style: fontsToTry[i].style,
+        };
+        applied = true;
         break;
+      } catch {
+        // Try the next family/style pair.
       }
     }
-    if (hasErrored) {
+    if (!applied) {
       notifyUI(`Error setting font family/weight combination for ${family}/${style}`);
     }
   }

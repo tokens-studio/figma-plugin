@@ -47,6 +47,7 @@ import { ColorModifier } from '@/types/Modifier';
 import { SearchableMultiSelect } from './SearchableMultiSelect';
 import { tokenTypesToCreateVariable } from '@/constants/VariableTypes';
 import { ModalOptions } from '@/constants/ModalOptions';
+import { normalizeShadowValue } from '@/utils/normalizeShadowValue';
 import FigmaVariableForm from './FigmaVariableForm';
 
 let lastUsedRenameOption: UpdateMode = UpdateMode.SELECTION;
@@ -74,7 +75,12 @@ function EditTokenForm({ resolvedTokens }: Props) {
   } = useTokens();
   const dispatch = useDispatch<Dispatch>();
   const [error, setError] = React.useState<string | null>(null);
-  const [internalEditToken, setInternalEditToken] = React.useState<typeof editToken>(editToken);
+  // DTCG shadows use offsetX/offsetY/inset; show them in the x/y/type fields the form edits
+  const [internalEditToken, setInternalEditToken] = React.useState<typeof editToken>(() => (
+    editToken?.type === TokenTypes.BOX_SHADOW
+      ? { ...editToken, value: normalizeShadowValue(editToken.value) } as typeof editToken
+      : editToken
+  ));
   const { confirm } = useConfirm();
   const isValidDimensionToken = React.useMemo(
     () => internalEditToken.type === TokenTypes.DIMENSION

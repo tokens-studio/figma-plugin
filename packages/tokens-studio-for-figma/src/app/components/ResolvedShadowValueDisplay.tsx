@@ -3,6 +3,7 @@ import { useUIDSeed } from 'react-uid';
 import Box from './Box';
 import { styled } from '@/stitches.config';
 import { TokenBoxshadowValue } from '@/types/values';
+import { normalizeShadowValue } from '@/utils/normalizeShadowValue';
 
 type Props = {
   shadows: TokenBoxshadowValue[];
@@ -17,8 +18,9 @@ const StyledValueItem = styled('div', {
   marginBottom: '$2',
 });
 
-export const ResolvedShadowValueDisplay: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({ shadows }) => {
+export const ResolvedShadowValueDisplay: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({ shadows: rawShadows }) => {
   const seed = useUIDSeed();
+  const shadows = normalizeShadowValue(rawShadows);
 
   return (
     <Box css={{

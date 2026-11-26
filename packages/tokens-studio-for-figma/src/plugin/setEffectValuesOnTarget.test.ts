@@ -92,7 +92,48 @@ const mixedShadowToken: SingleToken = {
   resolvedValueWithReferences: mixedShadowTokenValue,
 };
 
-const tokens = [singleShadowToken, multipleShadowToken, mixedShadowToken];
+// DTCG shadows use offsetX/offsetY and inset instead of x/y and type
+const dtcgShadowTokenValue = [
+  {
+    color: '#00000080',
+    offsetX: 2,
+    offsetY: '4px',
+    blur: 8,
+    spread: 0,
+    inset: true,
+  },
+  {
+    type: BoxShadowTypes.DROP_SHADOW,
+    color: '#000000',
+    offsetX: 0,
+    offsetY: 6,
+    blur: 12,
+    spread: 1,
+  },
+];
+
+const dtcgShadowToken = {
+  name: 'shadow.dtcg',
+  type: TokenTypes.BOX_SHADOW,
+  value: dtcgShadowTokenValue,
+  resolvedValueWithReferences: dtcgShadowTokenValue,
+} as unknown as SingleToken;
+
+const missingOffsetShadowTokenValue = {
+  type: BoxShadowTypes.DROP_SHADOW,
+  color: '#000000',
+  blur: 4,
+  spread: 0,
+};
+
+const missingOffsetShadowToken = {
+  name: 'shadow.missingOffset',
+  type: TokenTypes.BOX_SHADOW,
+  value: missingOffsetShadowTokenValue,
+  resolvedValueWithReferences: missingOffsetShadowTokenValue,
+} as unknown as SingleToken;
+
+const tokens = [singleShadowToken, multipleShadowToken, mixedShadowToken, dtcgShadowToken, missingOffsetShadowToken];
 
 describe('setEffectValuesOnTarget', () => {
   let rectangleNodeMock: RectangleNode;
@@ -306,5 +347,26 @@ describe('setEffectValuesOnTarget', () => {
         },
       ],
     });
+  });
+
+  it('reads DTCG offsetX/offsetY and inset', async () => {
+    await setEffectValuesOnTarget(rectangleNodeMock, dtcgShadowToken.name, defaultBaseFontSize);
+    expect(rectangleNodeMock.effects).toEqual([
+      expect.objectContaining({
+        type: 'DROP_SHADOW', offset: { x: 0, y: 6 }, radius: 12, spread: 1,
+      }),
+      expect.objectContaining({
+        type: 'INNER_SHADOW', offset: { x: 2, y: 4 }, radius: 8, spread: 0,
+      }),
+    ]);
+  });
+
+  it('treats missing offsets as 0 instead of leaving the effects empty', async () => {
+    await setEffectValuesOnTarget(rectangleNodeMock, missingOffsetShadowToken.name, defaultBaseFontSize);
+    expect(rectangleNodeMock.effects).toEqual([
+      expect.objectContaining({
+        type: 'DROP_SHADOW', offset: { x: 0, y: 0 }, radius: 4, spread: 0,
+      }),
+    ]);
   });
 });
