@@ -8,6 +8,22 @@ import { SingleTypographyToken } from '@/types/tokens';
 import { ApplyVariablesStylesOrRawValues } from '@/constants/ApplyVariablesStyleOrder';
 import { listAvailableFonts } from './listAvailableFonts';
 
+// Handles both primitive properties (fontSize, textCase, ...) and the {value, unit}
+// shape Figma uses for lineHeight/letterSpacing/paragraphSpacing-like values.
+function isTypographyValueEqual(current: unknown, next: unknown): boolean {
+  if (current === next) return true;
+  if (
+    typeof current === 'object' && current !== null
+    && typeof next === 'object' && next !== null
+    && 'unit' in current && 'unit' in next
+  ) {
+    const a = current as { unit: string; value?: number };
+    const b = next as { unit: string; value?: number };
+    return a.unit === b.unit && a.value === b.value;
+  }
+  return false;
+}
+
 // Cache to track font loading promises to prevent race conditions in Promise.all
 const fontLoadingPromises = new Map<string, Promise<void>>();
 
@@ -89,7 +105,11 @@ export async function tryApplyTypographyCompositeVariable({
           } else {
             if (target.fontName !== figma.mixed) await figma.loadFontAsync(target.fontName);
             const transformedValue = transformValue(normalizedValue[originalKey], originalKey, baseFontSize);
-            if (transformedValue !== null && !(typeof transformedValue === 'number' && Number.isNaN(transformedValue))) {
+            if (
+              transformedValue !== null
+              && !(typeof transformedValue === 'number' && Number.isNaN(transformedValue))
+              && !isTypographyValueEqual(target[originalKey], transformedValue)
+            ) {
               target[originalKey] = transformedValue;
             }
           }
