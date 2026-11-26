@@ -1,5 +1,14 @@
 # @tokens-studio/figma-plugin
 
+## 2.13.5
+
+### Patch Changes
+
+- 8021be5: Creating an annotation now shows an error message when its fonts fail to load, instead of failing silently.
+- eb9bed4: Updated several vulnerable dependencies flagged by Dependabot.
+- efc710e: Shadow tokens that use the DTCG `offsetX`, `offsetY` and `inset` keys now export to Figma effect styles with all their properties, instead of creating an empty style. Their offsets also show in the token tooltip and the edit form.
+- a7e5a40: Fixed Tokens Studio sync failing with "Failed to fetch project data from REST API" a day after signing in. The plugin now renews the sign-in before pulling and retries once when the server rejects an expired token. When the sign-in has really ended, it asks you to sign in again instead of pointing to your subscription, and a project that syncs Figma variables now says it cannot be pulled as tokens.
+
 ## 2.13.4
 
 ### Patch Changes
