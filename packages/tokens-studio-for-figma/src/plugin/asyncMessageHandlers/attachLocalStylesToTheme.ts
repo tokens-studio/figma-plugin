@@ -31,11 +31,12 @@ export const attachLocalStylesToTheme: AsyncMessageChannelHandlers[AsyncMessageT
 
   // step 2 only include the relevant token types
   const enabledTokenTypes = category === 'all'
-    ? [TokenTypes.COLOR, TokenTypes.TYPOGRAPHY, TokenTypes.BOX_SHADOW]
+    ? [TokenTypes.COLOR, TokenTypes.TYPOGRAPHY, TokenTypes.BOX_SHADOW, TokenTypes.GRADIENT]
     : compact([
       category === 'colors' ? TokenTypes.COLOR : null,
       category === 'typography' ? TokenTypes.TYPOGRAPHY : null,
       category === 'effects' ? TokenTypes.BOX_SHADOW : null,
+      category === 'gradients' ? TokenTypes.GRADIENT : null,
     ]);
   tokensToCreateStylesFor = tokensToCreateStylesFor.filter((token) => (
     enabledTokenTypes.includes(token.type)
@@ -46,7 +47,7 @@ export const attachLocalStylesToTheme: AsyncMessageChannelHandlers[AsyncMessageT
   const slice = ignoreFirstPartForStyles ? 1 : 0;
   tokensToCreateStylesFor.forEach((token) => {
     const path = convertTokenNameToPath(token.name, prefix, slice);
-    if (token.type === TokenTypes.COLOR) {
+    if (token.type === TokenTypes.COLOR || token.type === TokenTypes.GRADIENT) {
       const colorStyle = paintToKeyMap.get(path);
       if (colorStyle) {
         figmaStyleReferences[token.name] = colorStyle.id;

@@ -22,10 +22,12 @@ export const setUi: AsyncMessageChannelHandlers[AsyncMessageTypes.SET_UI] = asyn
     prefixStylesWithThemeName: msg.prefixStylesWithThemeName,
     renameExistingStylesAndVariables: msg.renameExistingStylesAndVariables,
     removeStylesAndVariablesWithoutConnection: msg.removeStylesAndVariablesWithoutConnection,
+    exportExtendedCollections: msg.exportExtendedCollections,
     variablesBoolean: msg.variablesBoolean,
     variablesColor: msg.variablesColor,
     variablesNumber: msg.variablesNumber,
     variablesString: msg.variablesString,
+    variablesMotion: msg.variablesMotion,
     stylesColor: msg.stylesColor,
     stylesEffect: msg.stylesEffect,
     stylesTypography: msg.stylesTypography,
@@ -40,6 +42,7 @@ export const setUi: AsyncMessageChannelHandlers[AsyncMessageTypes.SET_UI] = asyn
     seenGenericVersionedHeaderMigrationDialog: msg.seenGenericVersionedHeaderMigrationDialog,
     seenTermsUpdate2026: msg.seenTermsUpdate2026,
     seenTermsUpdate2026Subprocessors: msg.seenTermsUpdate2026Subprocessors,
+    bitbucketSecurityNoticeViews2026: msg.bitbucketSecurityNoticeViews2026,
   });
   figma.ui.resize(width, height);
   if (store.inspectDeep !== msg.inspectDeep) {

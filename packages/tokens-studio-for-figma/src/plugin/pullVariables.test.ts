@@ -112,6 +112,7 @@ global.figma = {
     }),
   },
   variables: {
+    getLocalVariableCollectionsAsync: jest.fn().mockResolvedValue([]),
     // New async version returns a promise that resolves with the expected collection
     getVariableCollectionByIdAsync: jest.fn().mockResolvedValue({
       id: 'VariableID:1:0',
@@ -903,6 +904,30 @@ describe('pullStyles', () => {
         ['Old Collection/Default', 'Collection 1/Default'],
       ]),
     );
+  });
+
+  it('sends renamed collections before the variables, so the import can compare them with the old sets', async () => {
+    (AsyncMessageChannel.PluginInstance.message as jest.Mock).mockResolvedValueOnce({
+      themes: [{
+        id: 'old-collection-default',
+        name: 'Default',
+        group: 'Old Collection',
+        selectedTokenSets: { 'Old Collection/Default': 'enabled' },
+        $figmaStyleReferences: {},
+        $figmaModeId: '1:0',
+        $figmaCollectionId: 'VariableID:1:0',
+      }],
+    });
+    global.figma.variables.getVariableCollectionByIdAsync = jest.fn().mockResolvedValueOnce({
+      id: 'VariableID:1:0',
+      name: 'Collection 1',
+      modes: [{ name: 'Default', modeId: '1:0' }],
+    });
+
+    await pullVariables({ useDimensions: false, useRem: false }, [], true);
+
+    expect(notifyRenamedCollectionsSpy).toHaveBeenCalled();
+    expect(notifyRenamedCollectionsSpy.mock.invocationCallOrder[0]).toBeLessThan(notifyStyleValuesSpy.mock.invocationCallOrder[0]);
   });
 
   it('updates existing themes when mode names change', async () => {

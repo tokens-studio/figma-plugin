@@ -17,6 +17,7 @@ export enum MessageFromPluginTypes {
   API_PROVIDERS = 'apiProviders',
   UI_SETTINGS = 'uiSettings',
   SHOW_EMPTY_GROUPS = 'show_empty_groups',
+  HIDE_DEPRECATED_TOKENS = 'hide_deprecated_tokens',
   START_JOB = 'start_job',
   COMPLETE_JOB = 'complete_job',
   CLEAR_JOBS = 'clear_jobs',
@@ -55,6 +56,7 @@ export type UiSettingsFromPluginMessage = {
     variablesString: boolean;
     variablesNumber: boolean;
     variablesBoolean: boolean;
+    variablesMotion: boolean;
     stylesColor: boolean;
     stylesTypography: boolean;
     stylesEffect: boolean;
@@ -64,6 +66,7 @@ export type UiSettingsFromPluginMessage = {
     prefixStylesWithThemeName: boolean;
     renameExistingStylesAndVariables: boolean;
     removeStylesAndVariablesWithoutConnection: boolean;
+    exportExtendedCollections: boolean;
     inspectDeep: boolean;
     shouldSwapStyles: boolean;
     shouldSwapFigmaModes: boolean;
@@ -74,12 +77,17 @@ export type UiSettingsFromPluginMessage = {
     seenGenericVersionedHeaderMigrationDialog?: boolean;
     seenTermsUpdate2026?: boolean;
     seenTermsUpdate2026Subprocessors?: boolean;
+    bitbucketSecurityNoticeViews2026?: number;
   };
 };
 
 export type ShowEmptyGroupsFromPluginMessage = {
   type: MessageFromPluginTypes.SHOW_EMPTY_GROUPS;
   showEmptyGroups: boolean;
+};
+export type HideDeprecatedTokensFromPluginMessage = {
+  type: MessageFromPluginTypes.HIDE_DEPRECATED_TOKENS;
+  hideDeprecatedTokens: boolean;
 };
 export type ApiProvidersFromPluginMessage = {
   type: MessageFromPluginTypes.API_PROVIDERS;
@@ -152,6 +160,7 @@ export type PostToUIMessage =
   | SelectionFromPluginMessage
   | UiSettingsFromPluginMessage
   | ShowEmptyGroupsFromPluginMessage
+  | HideDeprecatedTokensFromPluginMessage
   | ApiProvidersFromPluginMessage
   | StylesFromPluginMessage
   | VariablesFromPluginMessage

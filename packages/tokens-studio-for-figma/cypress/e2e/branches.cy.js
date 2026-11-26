@@ -83,8 +83,13 @@ describe('Branch switcher', () => {
     // Should now show the create branch modal
     cy.get('input[name=branch]').type('new-branch');
     cy.get('button[type=submit]').click();
-    // Verify the new branch appears in the list
+    // Creating the branch is async; the selector switches to the new branch once it's done
+    cy.get('[data-testid=branch-selector-menu-trigger]').should('contain', 'new-branch');
+    // Opening the selector refetches the branch list, so wait for that before checking the list
+    cy.intercept('GET', '**/repos/122/figma-tokens/branches*').as('refetchBranches');
     cy.get('[data-testid=branch-selector-menu-trigger]').click();
+    cy.wait('@refetchBranches');
+    // Verify the new branch appears in the list
     cy.get('[data-testid=popover-item-new-branch]').should('have.length', 1);
   });
 

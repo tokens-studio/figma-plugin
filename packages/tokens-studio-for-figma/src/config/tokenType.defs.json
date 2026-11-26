@@ -24,6 +24,17 @@
     },
     "help": "If a (local) style is found with the same name it will match to that, if not, will use hex value. Use 'Create Style' to batch-create styles from your tokens (e.g. in your design library). In the future we'll load all 'remote' styles and reference them inside the JSON."
   },
+  "gradient": {
+    "label": "Gradient",
+    "property": "Gradient",
+    "type": "gradient",
+    "schemas": {
+      "value": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  },
   "borderRadius": {
     "label": "Border Radius",
     "property": "Border Radius",
@@ -233,6 +244,40 @@
     "type": "other",
     "schemas": {
       "value": { "type": "string" }
+    }
+  },
+  "duration": {
+    "label": "Duration",
+    "property": "Duration",
+    "type": "duration",
+    "explainer": "e.g. 200ms or 0.2s",
+    "schemas": {
+      "value": { "type": "string" }
+    }
+  },
+  "cubicBezier": {
+    "label": "Cubic Bezier",
+    "property": "Cubic Bezier",
+    "type": "cubicBezier",
+    "explainer": "Four numbers between 0 and 1, e.g. 0.4, 0, 0.2, 1",
+    "schemas": {
+      "value": { "type": "string" }
+    }
+  },
+  "transition": {
+    "label": "Motion",
+    "property": "Motion",
+    "type": "transition",
+    "schemas": {
+      "value": {
+        "type": "object",
+        "properties": {
+          "property": { "type": "string" },
+          "duration": { "type": "string" },
+          "timingFunction": { "type": "string" },
+          "delay": { "type": "string" }
+        }
+      }
     }
   }
 }

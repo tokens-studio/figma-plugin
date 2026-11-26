@@ -23,5 +23,18 @@
   "credentialError": "Credential error",
   "connectivityError": "Connectivity error",
   "genericError": "An error occurred",
-  "retry": "Retry"
+  "retry": "Retry",
+  "bitbucketSecurityNotice": {
+    "title": "Action needed: replace your Bitbucket API token",
+    "intro": "We found and fixed a security issue affecting Bitbucket sync. Earlier versions of the plugin could save your Bitbucket API token inside the Figma files you synced, where anyone with access to those files could read it.",
+    "cleanup": "This update removes the token from each file the next time it's opened. Copies of files made before the update may still contain it, so please replace your token:",
+    "step1": "<strong>Revoke your current token</strong> in your Atlassian/Bitbucket account settings, under Security → API tokens.",
+    "step2": "<strong>Create a new API token</strong> with the same permissions.",
+    "step3": "<strong>Find your Bitbucket sync</strong> in the plugin: open the Settings tab and look under Sync providers.",
+    "step4": "<strong>Replace the token</strong> by choosing Edit from the ⋮ menu next to your Bitbucket sync, pasting the new token, and saving.",
+    "time": "It takes about two minutes. Until you revoke the old token, anyone who has a copy of an affected file could use it to access your Bitbucket repositories.",
+    "questions": "Questions? Contact <email>{{email}}</email>",
+    "syncGuide": "Bitbucket sync guide",
+    "readAdvisory": "Read advisory"
+  }
 }

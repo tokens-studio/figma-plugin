@@ -23,5 +23,18 @@
   "credentialError": "凭据错误",
   "connectivityError": "连接错误",
   "genericError": "发生错误",
-  "retry": "重试"
+  "retry": "重试",
+  "bitbucketSecurityNotice": {
+    "title": "需要操作：更换您的 Bitbucket API 令牌",
+    "intro": "我们发现并修复了一个影响 Bitbucket 同步的安全问题。旧版本插件可能会把您的 Bitbucket API 令牌保存在您同步的 Figma 文件中，任何能访问这些文件的人都可以读取它。",
+    "cleanup": "此更新会在每个文件下次打开时从中删除该令牌。更新前制作的文件副本可能仍包含它，因此请更换您的令牌：",
+    "step1": "<strong>撤销当前令牌</strong>：在您的 Atlassian/Bitbucket 帐户设置中，前往 Security → API tokens。",
+    "step2": "<strong>创建新的 API 令牌</strong>，并授予相同的权限。",
+    "step3": "<strong>找到您的 Bitbucket 同步</strong>：在插件中打开“设置”选项卡，查看“同步提供商”。",
+    "step4": "<strong>更换令牌</strong>：在您的 Bitbucket 同步旁的 ⋮ 菜单中选择“编辑”，粘贴新令牌并保存。",
+    "time": "大约需要两分钟。在您撤销旧令牌之前，任何拥有受影响文件副本的人都可能用它访问您的 Bitbucket 仓库。",
+    "questions": "有疑问？请联系 <email>{{email}}</email>",
+    "syncGuide": "Bitbucket 同步指南",
+    "readAdvisory": "阅读安全公告"
+  }
 }

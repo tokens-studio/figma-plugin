@@ -53,7 +53,25 @@ parser.functions.sample = (func: Function, ...args: any[]) => {
   return func(...args);
 };
 
+// Return true when the input contains a comma at nesting level 0 (outside
+// any parentheses/brackets). expr-eval reads comma as a sequence operator
+// and collapses "a, b, c, d" to just d, which silently corrupts tuple-shaped
+// token values like cubicBezier "0.4, 0, 0.2, 1".
+function hasTopLevelComma(input: string): boolean {
+  let depth = 0;
+  for (let i = 0; i < input.length; i += 1) {
+    const c = input[i];
+    if (c === '(' || c === '[' || c === '{') depth += 1;
+    else if (c === ')' || c === ']' || c === '}') depth = Math.max(0, depth - 1);
+    else if (c === ',' && depth === 0) return true;
+  }
+  return false;
+}
+
 export function checkAndEvaluateMath(expr: string) {
+  // Bail out for tuple-shaped inputs — see hasTopLevelComma for why.
+  if (typeof expr === 'string' && hasTopLevelComma(expr)) return expr;
+
   let calcParsed: Root;
 
   try {

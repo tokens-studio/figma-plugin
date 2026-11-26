@@ -15,4 +15,11 @@ export type ThemeObject = {
   $figmaCollectionId?: string;
   $figmaModeId?: string;
   $figmaVariableReferences?: Record<string, string>;
+  // Extended collection metadata
+  $figmaIsExtension?: boolean;
+  $figmaParentCollectionId?: string;
+  $figmaParentThemeId?: string; // Reference to parent theme for UI hierarchy
+  $figmaMirrorParentSets?: boolean; // If true, automatically mirror parent theme's selectedTokenSets
 };
+
+export type ThemeStyleReferences = Record<string, string>;

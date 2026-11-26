@@ -23,5 +23,18 @@
   "credentialError": "Inloggegevensfout",
   "connectivityError": "Connectiviteitsfout",
   "genericError": "Er is een fout opgetreden",
-  "retry": "Opnieuw proberen"
+  "retry": "Opnieuw proberen",
+  "bitbucketSecurityNotice": {
+    "title": "Actie vereist: vervang je Bitbucket API-token",
+    "intro": "We hebben een beveiligingsprobleem in de Bitbucket-synchronisatie gevonden en opgelost. Eerdere versies van de plugin konden je Bitbucket API-token opslaan in de Figma-bestanden die je synchroniseerde, waar iedereen met toegang tot die bestanden het kon lezen.",
+    "cleanup": "Deze update verwijdert het token uit elk bestand de volgende keer dat het wordt geopend. Kopieën van bestanden die vóór de update zijn gemaakt, kunnen het nog bevatten. Vervang daarom je token:",
+    "step1": "<strong>Trek je huidige token in</strong> in de instellingen van je Atlassian/Bitbucket-account, onder Security → API tokens.",
+    "step2": "<strong>Maak een nieuw API-token</strong> met dezelfde rechten.",
+    "step3": "<strong>Zoek je Bitbucket-synchronisatie</strong> in de plugin: open het tabblad Instellingen en kijk onder Synchronisatieproviders.",
+    "step4": "<strong>Vervang het token</strong> door Bewerking te kiezen in het ⋮-menu naast je Bitbucket-synchronisatie, het nieuwe token te plakken en op te slaan.",
+    "time": "Het duurt ongeveer twee minuten. Totdat je het oude token intrekt, kan iedereen met een kopie van een getroffen bestand het gebruiken om toegang te krijgen tot je Bitbucket-repositories.",
+    "questions": "Vragen? Mail naar <email>{{email}}</email>",
+    "syncGuide": "Handleiding Bitbucket-synchronisatie",
+    "readAdvisory": "Advies lezen"
+  }
 }

@@ -196,16 +196,40 @@ export async function fetchProjectDataRest(
             $extensions['com.figma.codeSyntax'] = token.attributes.syntaxes;
           }
 
-          transformedTokens.push({
+          // Construct $deprecated object from API fields: deprecated_severity indicates deprecation
+          let $deprecated = null;
+          if (token.attributes?.deprecated_severity) {
+            $deprecated = {
+              severity: token.attributes.deprecated_severity,
+              message: token.attributes.deprecated || '',
+              ...(token.attributes.deprecated_metadata?.replacement && {
+                replacementToken: token.attributes.deprecated_metadata.replacement,
+              }),
+              ...(token.attributes.deprecated_metadata?.remove_after && {
+                removeAfter: token.attributes.deprecated_metadata.remove_after,
+              }),
+            };
+          }
+
+          const transformedToken: any = {
             name: tokenName,
             value: transformTokenValue(token),
             type: normalizeTokenType(token.attributes?.type),
-            ...(token.attributes?.description && { description: token.attributes.description }),
             $extensions: {
               ...$extensions,
               id: token.id,
             },
-          });
+          };
+
+          if (token.attributes?.description) {
+            transformedToken.description = token.attributes.description;
+          }
+
+          if ($deprecated) {
+            transformedToken.$deprecated = $deprecated;
+          }
+
+          transformedTokens.push(transformedToken);
         }
       });
       tokens[set.name] = transformedTokens as any;

@@ -136,3 +136,66 @@ last. (Full version in [BEST-PRACTICES.md](./docs/BEST-PRACTICES.md#the-verifica
   and `packages/*` workspaces, so it's not in the turbo build/lint/test graph. Keep it
   zero-dep and standalone. Runtime state + the ~300 MB app copy live in
   `~/.figma-bridge/`, never committed.
+
+## PR proof: attach real screenshots/video, don't just describe them
+
+For any PR with an observable effect (a canvas mutation, a plugin UI change, an
+exported node) — **attach real image/video proof to the PR itself**, not just a
+paragraph claiming it was checked. A reviewer should be able to see the result
+without pulling the branch, cloning the debug build, and re-running the script.
+
+**Use `gh`'s native `--attach` flag** — `gh pr create --attach`, `gh pr edit
+--attach`, `gh pr comment --attach`, and the matching `gh issue` subcommands.
+It uploads the file to GitHub and rewrites the reference in place.
+
+```bash
+# Screenshot, with alt text after "#"
+gh pr comment 123 --attach './after.png#Frame after the fix'
+
+# Multiple files: repeat the flag. Works on create/edit too.
+gh pr create --attach ./before.png --attach ./after.png --title "..." --body "..."
+```
+
+- **Needs `gh` v2.99.0+**. Check with `gh --version` — older Homebrew-pinned
+  builds are common. `brew upgrade gh` fixes it, but has been observed to also
+  remove unrelated formulae as a side effect — run `brew list <tool>` for
+  anything you rely on afterward and reinstall it if it's gone.
+- Formats: PNG/JPEG/GIF/WebP/SVG, MP4/MOV/WebM. Size limits: 10 MB for
+  images/GIFs, 10 MB video on free plans / 100 MB on paid.
+- A local path already referenced in the body/comment markdown
+  (`![alt](./after.png)`) gets rewritten in place, keeping its alt text —
+  attach it and reference it by that same relative filename, no need to
+  hand-paste the resulting `github.com/user-attachments/...` URL yourself.
+- **Prefer capturing directly through the bridge** — `node cli.mjs export
+  <nodeId> file.png` for a specific node, `node cli.mjs shot file.png` for
+  Figma's own chrome — over a hand-drawn mockup or a screenshot taken by
+  hand. See the [verification hierarchy](#the-one-rule-that-matters-most-the-verification-hierarchy)
+  above for which of the two to reach for.
+- **For a visual fix, capture both states** — before and after — so the
+  diff is visible at a glance, not just the end state.
+- **Look at every image before you attach it.** See below — this is the one
+  that gets skipped.
+
+### Validate the capture — a screenshot of an error is still a valid PNG
+
+A capture succeeds whether it photographed the frame you meant or a stale
+build, a crashed plugin dialog, or the wrong file entirely (see "Verify
+*which build*" above). `node cli.mjs export`/`shot` doesn't care, the file is
+a well-formed PNG, and the attachment uploads cleanly. The failure only
+surfaces when a reviewer opens the PR and sees the wrong thing where the
+feature should be — which is worse than having posted nothing, because the
+description claims it was verified.
+
+So treat capture and verification as two steps:
+
+1. **Assert the state with `eval` first** (per the verification hierarchy —
+   read the node/value you expect to see) so you know the capture will show
+   the real thing, not a stale or crashed state. Don't `export`/`shot` on
+   faith.
+2. **Then open the files and actually look at them** — all of them, not the
+   first one. An assertion proves the data is right; only your eyes catch a
+   clipped layout, a blank frame, a plugin dialog stuck mid-transition, or a
+   fallback rendering instead of the case you meant to show.
+- Don't use a third-party "upload image, extract a token from the browser"
+  tool for this. `--attach` uses `gh`'s own existing auth; nothing else
+  should need your GitHub session.

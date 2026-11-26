@@ -46,6 +46,7 @@ export interface SettingsState {
   variablesString: boolean;
   variablesNumber: boolean;
   variablesBoolean: boolean;
+  variablesMotion: boolean;
   stylesColor: boolean;
   stylesTypography: boolean;
   stylesEffect: boolean;
@@ -55,10 +56,12 @@ export interface SettingsState {
   createStylesWithVariableReferences?: boolean;
   renameExistingStylesAndVariables?: boolean;
   removeStylesAndVariablesWithoutConnection?: boolean;
+  exportExtendedCollections?: boolean;
   autoApplyThemeOnDrop?: boolean;
   seenGenericVersionedHeaderMigrationDialog?: boolean;
   seenTermsUpdate2026?: boolean;
   seenTermsUpdate2026Subprocessors?: boolean;
+  bitbucketSecurityNoticeViews2026?: number;
 }
 
 const setUI = (state: SettingsState) => {
@@ -78,6 +81,7 @@ export const settings = createModel<RootModel>()({
     seenGenericVersionedHeaderMigrationDialog: false,
     seenTermsUpdate2026: false,
     seenTermsUpdate2026Subprocessors: false,
+    bitbucketSecurityNoticeViews2026: 0,
     language: 'en',
     sessionRecording: false,
     updateMode: UpdateMode.SELECTION,
@@ -90,6 +94,7 @@ export const settings = createModel<RootModel>()({
     renameExistingStylesAndVariables: false,
     removeStylesAndVariablesWithoutConnection: false,
     createStylesWithVariableReferences: false,
+    exportExtendedCollections: false,
     autoApplyThemeOnDrop: false,
     inspectDeep: false,
     shouldSwapStyles: false,
@@ -102,6 +107,7 @@ export const settings = createModel<RootModel>()({
     variablesString: true,
     variablesNumber: true,
     variablesBoolean: true,
+    variablesMotion: true,
     stylesColor: true,
     stylesTypography: true,
     stylesEffect: true,
@@ -255,6 +261,12 @@ export const settings = createModel<RootModel>()({
         seenTermsUpdate2026Subprocessors: payload,
       };
     },
+    setBitbucketSecurityNoticeViews2026(state, payload: number) {
+      return {
+        ...state,
+        bitbucketSecurityNoticeViews2026: payload,
+      };
+    },
     setSeenGenericVersionedHeaderMigrationDialog(state, payload: boolean) {
       return {
         ...state,
@@ -330,6 +342,9 @@ export const settings = createModel<RootModel>()({
       setUI(rootState.settings);
     },
     setSeenTermsUpdate2026Subprocessors: (payload: boolean, rootState) => {
+      setUI(rootState.settings);
+    },
+    setBitbucketSecurityNoticeViews2026: (payload: number, rootState) => {
       setUI(rootState.settings);
     },
     ...Object.fromEntries(

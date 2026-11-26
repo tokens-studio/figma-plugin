@@ -75,7 +75,11 @@ class TokenResolver {
   private calculateTokenValue(token: SingleToken, resolvedReferences: Set<string> = new Set()): SingleToken['value'] | undefined {
     // Calculations only happen on strings.
     if (typeof token.value === 'string') {
-      const couldBeNumberValue = !this.isExponentialAndZero(token.value) ? checkAndEvaluateMath(token.value) : token.value;
+      // Tuple-shaped values (like a cubicBezier "0.4, 0, 0.2, 1") are now
+      // handled inside checkAndEvaluateMath — no per-type guard needed.
+      const couldBeNumberValue = !this.isExponentialAndZero(token.value)
+        ? checkAndEvaluateMath(token.value)
+        : token.value;
 
       // if it's a number, we don't need to do anything else and can return it
       if (typeof couldBeNumberValue === 'number') {

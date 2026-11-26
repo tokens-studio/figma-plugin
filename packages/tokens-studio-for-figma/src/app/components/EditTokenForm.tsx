@@ -1,8 +1,9 @@
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+import { Check } from 'iconoir-react';
 import {
-  Button, Heading, Textarea, Label, Stack,
+  Button, Heading, Textarea, Label, Stack, Checkbox, DropdownMenu,
 } from '@tokens-studio/ui';
 import { track } from '@/utils/analytics';
 import { Dispatch } from '../store';
@@ -19,7 +20,9 @@ import {
   SingleDimensionToken,
   SingleToken,
   SingleTypographyToken,
+  DeprecatedProperty,
 } from '@/types/tokens';
+import { TokenGradientValue } from '@/types/values';
 import { checkIfAlias, checkIfContainsAlias, getAliasValue } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
 import {
@@ -36,11 +39,12 @@ import BoxShadowInput from './BoxShadowInput';
 import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
 import { StyleOptions } from '@/constants/StyleOptions';
 import BorderTokenForm from './BorderTokenForm';
+import GradientTokenForm from './GradientTokenForm';
 import Box from './Box';
 import ColorTokenForm from './ColorTokenForm';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { ColorModifier } from '@/types/Modifier';
-import { MultiSelectDropdown } from './MultiSelectDropdown';
+import { SearchableMultiSelect } from './SearchableMultiSelect';
 import { tokenTypesToCreateVariable } from '@/constants/VariableTypes';
 import { ModalOptions } from '@/constants/ModalOptions';
 import FigmaVariableForm from './FigmaVariableForm';
@@ -77,7 +81,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
       && (internalEditToken.value?.endsWith('px')
         || internalEditToken.value?.endsWith('rem')
         || checkIfAlias(internalEditToken as SingleDimensionToken, resolvedTokens)),
-    [internalEditToken, resolvedTokens, checkIfAlias],
+    [internalEditToken, resolvedTokens],
   );
   const isValidColorToken = React.useMemo(() => {
     if (internalEditToken?.$extensions?.['studio.tokens']?.modify?.type === ColorModifierTypes.MIX) {
@@ -100,26 +104,39 @@ function EditTokenForm({ resolvedTokens }: Props) {
     if (internalEditToken.type === TokenTypes.COLOR) {
       return isValidColorToken;
     }
+    if (internalEditToken.type === TokenTypes.GRADIENT) {
+      const { value } = internalEditToken;
+      // Alias reference is valid; a structured value needs at least 2 non-empty stops.
+      if (typeof value === 'string') return Boolean(value) && Boolean(internalEditToken.name) && !error;
+      if (!value || typeof value !== 'object') return false;
+      const stops = Array.isArray((value as TokenGradientValue).stops) ? (value as TokenGradientValue).stops : [];
+      if (stops.length < 2) return false;
+      const stopsValid = stops.every((s) => {
+        if (typeof s.color === 'string') return s.color.trim().length > 0;
+        return s.color != null && typeof s.color === 'object';
+      });
+      return stopsValid && Boolean(internalEditToken.name) && !error;
+    }
     return internalEditToken?.value && internalEditToken.name && !error;
-  }, [internalEditToken, error, isValidColorToken, isValidDimensionToken]);
+  }, [internalEditToken, error, isValidColorToken]);
 
   const hasNameThatExistsAlready = React.useMemo(() => {
-    const editToken = resolvedTokens
-      .filter((t) => selectedTokenSets.includes(t.internal__Parent ?? ''))
-      .find((t) => t.name === internalEditToken?.name);
+    const existingToken = resolvedTokens
+      .filter((token) => selectedTokenSets.includes(token.internal__Parent ?? ''))
+      .find((token) => token.name === internalEditToken?.name);
 
-    if (editToken) {
-      editToken.description = internalEditToken.description;
+    if (existingToken) {
+      existingToken.description = internalEditToken.description;
     }
 
-    return editToken;
-  }, [internalEditToken, resolvedTokens, activeTokenSet, selectedTokenSets]);
+    return existingToken;
+  }, [internalEditToken, resolvedTokens, selectedTokenSets]);
 
   const hasAnotherTokenThatStartsWithName = React.useMemo(
     () => resolvedTokens
-      .filter((t) => t.internal__Parent === activeTokenSet)
-      .filter((t) => t.name !== internalEditToken?.initialName)
-      .find((t) => t.name.startsWith(`${internalEditToken?.name}.`)),
+      .filter((token) => token.internal__Parent === activeTokenSet)
+      .filter((token) => token.name !== internalEditToken?.initialName)
+      .find((token) => token.name.startsWith(`${internalEditToken?.name}.`)),
     [internalEditToken, resolvedTokens, activeTokenSet],
   );
 
@@ -214,7 +231,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     if (internalEditToken.type === TokenTypes.DIMENSION && !isValidDimensionToken) {
       setError(t('valueMustIncludePxOrRem', { ns: 'errors' }));
     }
-  }, [internalEditToken, isValidDimensionToken]);
+  }, [internalEditToken, isValidDimensionToken, t]);
 
   const handleBoxShadowValueChange = React.useCallback(
     (shadow: SingleBoxShadowToken['value']) => {
@@ -320,6 +337,16 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken],
   );
 
+  const handleGradientValueChange = React.useCallback(
+    (newGradientValue: TokenGradientValue) => {
+      setError(null);
+      if (internalEditToken?.type === TokenTypes.GRADIENT) {
+        setInternalEditToken({ ...internalEditToken, value: newGradientValue });
+      }
+    },
+    [internalEditToken],
+  );
+
   const removeColorModify = React.useCallback(() => {
     const newValue = { ...internalEditToken.$extensions?.['studio.tokens'] };
     delete newValue?.modify;
@@ -414,6 +441,73 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken],
   );
 
+  const handleDeprecatedToggle = React.useCallback(
+    (isDeprecated: boolean) => {
+      if (internalEditToken) {
+        if (isDeprecated) {
+          setInternalEditToken({
+            ...internalEditToken,
+            $deprecated: {
+              severity: 'warning',
+              message: '',
+            },
+          });
+        } else {
+          setInternalEditToken({
+            ...internalEditToken,
+            $deprecated: undefined,
+          });
+        }
+      }
+    },
+    [internalEditToken],
+  );
+
+  const handleDeprecatedChange = React.useCallback(
+    (property: keyof DeprecatedProperty, value: string) => {
+      if (internalEditToken?.$deprecated) {
+        setInternalEditToken({
+          ...internalEditToken,
+          $deprecated: {
+            ...internalEditToken.$deprecated,
+            [property]: value,
+          },
+        });
+      }
+    },
+    [internalEditToken],
+  );
+
+  const handleSelectSeverityWarning = React.useCallback(
+    () => handleDeprecatedChange('severity', 'warning'),
+    [handleDeprecatedChange],
+  );
+
+  const handleSelectSeverityError = React.useCallback(
+    () => handleDeprecatedChange('severity', 'error'),
+    [handleDeprecatedChange],
+  );
+
+  const handleDeprecatedMessageChange = React.useCallback(
+    (value: string) => handleDeprecatedChange('message', value),
+    [handleDeprecatedChange],
+  );
+
+  const handleDeprecatedCheckboxChange = React.useCallback(
+    (checked: boolean | string) => handleDeprecatedToggle(checked === true),
+    [handleDeprecatedToggle],
+  );
+
+  const handleReplacementTokenInputChange = React.useCallback(
+    (value: string) => handleDeprecatedChange('replacementToken', value),
+    [handleDeprecatedChange],
+  );
+
+  const handleRemoveAfterInputChange = React.useCallback(
+    (value: string) => handleDeprecatedChange('removeAfter', value),
+    [handleDeprecatedChange],
+  );
+
   const resolvedValue = React.useMemo(() => {
     if (internalEditToken) {
       return typeof internalEditToken?.value === 'string'
@@ -423,9 +517,8 @@ function EditTokenForm({ resolvedTokens }: Props) {
     return null;
   }, [internalEditToken, resolvedTokens]);
 
-  // @TODO update to useCallback
-  const submitTokenValue = async ({
-    type, value, name, $extensions,
+  const submitTokenValue = React.useCallback(async ({
+    type, value, name, $extensions, $deprecated,
   }: EditTokenObject) => {
     if (internalEditToken && value && name) {
       let oldName: string | undefined;
@@ -446,6 +539,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
           type,
           value: trimmedValue as SingleToken['value'],
           ...($extensions ? { $extensions } : {}),
+          ...($deprecated ? { $deprecated } : {}),
         });
       } else if (internalEditToken.status === EditTokenFormStatus.EDIT) {
         editSingleToken({
@@ -456,6 +550,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
           type,
           value: trimmedValue as SingleToken['value'],
           ...($extensions ? { $extensions } : {}),
+          ...($deprecated ? { $deprecated } : {}),
         });
         if (themes.length > 0 && tokenTypesToCreateVariable.includes(internalEditToken.type)) {
           updateVariablesFromToken({
@@ -498,7 +593,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
           }
           if (
             themes.length > 0
-            && [TokenTypes.COLOR, TokenTypes.TYPOGRAPHY, TokenTypes.BOX_SHADOW].includes(internalEditToken.type)
+            && [TokenTypes.COLOR, TokenTypes.TYPOGRAPHY, TokenTypes.BOX_SHADOW, TokenTypes.GRADIENT].includes(internalEditToken.type)
           ) {
             choices.push({
               key: StyleOptions.RENAME,
@@ -555,10 +650,27 @@ function EditTokenForm({ resolvedTokens }: Props) {
           value: trimmedValue as SingleToken['value'],
           tokenSets: selectedTokenSets,
           ...($extensions ? { $extensions } : {}),
+          ...($deprecated ? { $deprecated } : {}),
         });
       }
     }
-  };
+  }, [
+    internalEditToken,
+    activeTokenSet,
+    selectedTokenSets,
+    themes,
+    tokens,
+    resolvedValue,
+    createSingleToken,
+    editSingleToken,
+    duplicateSingleToken,
+    updateVariablesFromToken,
+    renameTokensAcrossSets,
+    renameStylesFromTokens,
+    renameVariablesFromToken,
+    remapToken,
+    confirm,
+  ]);
 
   const checkAndSubmitTokenValue = React.useCallback(() => {
     if (internalEditToken.type === TokenTypes.DIMENSION && !isValidDimensionToken) {
@@ -569,7 +681,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
       submitTokenValue(internalEditToken);
       dispatch.uiState.setShowEditForm(false);
     }
-  }, [dispatch, isValid, internalEditToken, submitTokenValue, isValidDimensionToken]);
+  }, [dispatch, isValid, internalEditToken, submitTokenValue, isValidDimensionToken, t]);
 
   const handleFormSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -656,6 +768,18 @@ function EditTokenForm({ resolvedTokens }: Props) {
             handleBorderAliasValueChange={handleChange}
             handleDownShiftInputChange={handleDownShiftInputChange}
             setBorderValue={setBorderValue}
+            onSubmit={checkAndSubmitTokenValue}
+          />
+        );
+      }
+      case TokenTypes.GRADIENT: {
+        return (
+          <GradientTokenForm
+            internalEditToken={internalEditToken}
+            resolvedTokens={resolvedTokens}
+            handleGradientValueChange={handleGradientValueChange}
+            handleGradientAliasValueChange={handleChange}
+            handleDownShiftInputChange={handleDownShiftInputChange}
             onSubmit={checkAndSubmitTokenValue}
           />
         );
@@ -748,20 +872,125 @@ function EditTokenForm({ resolvedTokens }: Props) {
             css={{ fontSize: '$xsmall', padding: '$3' }}
           />
         </Box>
+        <Box>
+          <Stack direction="column" gap={2}>
+            <Stack direction="row" align="center" gap={2}>
+              <Checkbox
+                checked={!!internalEditToken?.$deprecated}
+                onCheckedChange={handleDeprecatedCheckboxChange}
+              />
+              <Label>{t('markAsDeprecated')}</Label>
+            </Stack>
+            {internalEditToken?.$deprecated && (
+              <Box
+                css={{
+                  border: '1px solid $borderDefault',
+                  borderRadius: '$medium',
+                  padding: '$3',
+                  gap: '$2',
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                <Box>
+                  <Label>{t('deprecatedSeverity')}</Label>
+                  <DropdownMenu>
+                    <DropdownMenu.Trigger asChild>
+                      <Button
+                        data-testid="deprecated-severity"
+                        variant="secondary"
+                        asDropdown
+                        size="small"
+                      >
+                        <span>
+                          {internalEditToken.$deprecated.severity === 'error'
+                            ? t('deprecatedSeverityError')
+                            : t('deprecatedSeverityWarning')}
+                        </span>
+                      </Button>
+                    </DropdownMenu.Trigger>
+                    <DropdownMenu.Portal>
+                      <DropdownMenu.Content side="bottom">
+                        <DropdownMenu.RadioGroup value={internalEditToken.$deprecated.severity}>
+                          <DropdownMenu.RadioItem value="warning" onSelect={handleSelectSeverityWarning}>
+                            <DropdownMenu.ItemIndicator>
+                              <Check />
+                            </DropdownMenu.ItemIndicator>
+                            <Box>{t('deprecatedSeverityWarning')}</Box>
+                          </DropdownMenu.RadioItem>
+                          <DropdownMenu.RadioItem value="error" onSelect={handleSelectSeverityError}>
+                            <DropdownMenu.ItemIndicator>
+                              <Check />
+                            </DropdownMenu.ItemIndicator>
+                            <Box>{t('deprecatedSeverityError')}</Box>
+                          </DropdownMenu.RadioItem>
+                        </DropdownMenu.RadioGroup>
+                      </DropdownMenu.Content>
+                    </DropdownMenu.Portal>
+                  </DropdownMenu>
+                </Box>
+                <Box>
+                  <Label>
+                    {t('deprecatedMessage')}
+                    {' '}
+                    {t('optional')}
+                  </Label>
+                  <Textarea
+                    value={internalEditToken.$deprecated.message}
+                    placeholder={t('deprecatedMessagePlaceholder')}
+                    onChange={handleDeprecatedMessageChange}
+                    rows={2}
+                    css={{ fontSize: '$xsmall', padding: '$3' }}
+                  />
+                </Box>
+                <Box>
+                  <Label>
+                    {t('deprecatedReplacementToken')}
+                    {' '}
+                    {t('optional')}
+                  </Label>
+                  <Textarea
+                    value={internalEditToken.$deprecated.replacementToken ?? ''}
+                    placeholder="{color.brand.primary}"
+                    onChange={handleReplacementTokenInputChange}
+                    rows={1}
+                    css={{ fontSize: '$xsmall', padding: '$3' }}
+                  />
+                </Box>
+                <Box>
+                  <Label>
+                    {t('deprecatedRemoveAfter')}
+                    {' '}
+                    {t('optional')}
+                  </Label>
+                  <Textarea
+                    value={internalEditToken.$deprecated.removeAfter ?? ''}
+                    placeholder="v3.0 or 2026-06-01"
+                    onChange={handleRemoveAfterInputChange}
+                    rows={1}
+                    css={{ fontSize: '$xsmall', padding: '$3' }}
+                  />
+                </Box>
+              </Box>
+            )}
+          </Stack>
+        </Box>
         <FigmaVariableForm
           internalEditToken={internalEditToken}
           handleFigmaVariableChange={handleFigmaVariableChange}
           handleRemoveFigmaVariable={removeFigmaVariable}
         />
         {internalEditToken.status === EditTokenFormStatus.DUPLICATE && (
-          <Box>
-            <Label>{t('set', { ns: 'general' })}</Label>
-            <MultiSelectDropdown
+          <Stack direction="column" gap={2}>
+            <Label>{t('selectTokenSets')}</Label>
+            <SearchableMultiSelect
               menuItems={Object.keys(tokens)}
               selectedItems={selectedTokenSets}
               handleSelectedItemChange={handleSelectedItemChange}
+              searchPlaceholder={t('searchSets') as string}
+              data-testid="duplicate-token-sets"
             />
-          </Box>
+          </Stack>
         )}
         <Stack direction="row" justify="end" gap={3}>
           <Button variant="secondary" type="button" onClick={handleReset}>

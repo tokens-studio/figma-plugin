@@ -4,6 +4,8 @@ import setBooleanValuesOnVariable from './setBooleanValuesOnVariable';
 import setColorValuesOnVariable from './setColorValuesOnVariable';
 import setNumberValuesOnVariable from './setNumberValuesOnVariable';
 import setStringValuesOnVariable from './setStringValuesOnVariable';
+import { setEasingValueOnVariable, setTimingValueOnVariable } from './setMotionValuesOnVariable';
+import { toFigmaEasing } from './figmaTransforms/motion';
 import { convertTokenTypeToVariableType } from '@/utils/convertTokenTypeToVariableType';
 import { checkCanReferenceVariable } from '@/utils/alias/checkCanReferenceVariable';
 import { TokenTypes } from '@/constants/TokenTypes';
@@ -11,12 +13,58 @@ import { transformValue } from './helpers';
 import { variableWorker } from './Worker';
 import { ProgressTracker } from './ProgressTracker';
 import { checkVariableAliasEquality } from '@/utils/checkVariableAliasEquality';
+import {
+  canLinkOpacity,
+  ComposedColorCandidate,
+  ComposedColorReference,
+  ComposedColorTokenInfo,
+  getComposedColorCandidates,
+  getComposedColorReferenceNames,
+  isVariableComposedColor,
+  parseComposedColorReference,
+} from './composedColor';
 
 export type ReferenceVariableType = {
   variable: Variable;
   modeId: string;
   referenceVariable: string;
+  collection?: VariableCollection;
+  // Set for rgba({color}, 0.5) / rgba({color}, {opacity}) style values
+  composed?: ComposedColorReference;
+  resolvedValue?: SingleToken['value'];
+  // Colors the composed value may link, in order (see getComposedColorCandidates)
+  colorCandidates?: ComposedColorCandidate[];
+  opacityReferenceValue?: unknown;
+  opacityLinkable?: boolean;
 };
+
+// Figma gates plugin creation of EASING/TIMING variables behind a feature
+// flag. Probe once per run by creating and immediately removing a throwaway
+// variable; cache the result so we don't pay the round-trip per token.
+const motionSupportCache = new WeakMap<VariableCollection, boolean>();
+function motionCapabilityDetected(collection: VariableCollection): boolean {
+  const cached = motionSupportCache.get(collection);
+  if (cached !== undefined) return cached;
+  let supported = false;
+  let probe: Variable | null = null;
+  try {
+    probe = figma.variables.createVariable('__ts_motion_probe__', collection, 'EASING');
+    supported = true;
+  } catch {
+    supported = false;
+  }
+  // Remove in a separate try so a create-success + remove-failure combo
+  // still clears the leaked variable path without flipping supported.
+  if (probe) {
+    try {
+      probe.remove();
+    } catch (e) {
+      console.error('Failed to remove motion capability probe', e);
+    }
+  }
+  motionSupportCache.set(collection, supported);
+  return supported;
+}
 
 export default async function setValuesOnVariable(
   variablesInFigma: Variable[],
@@ -28,6 +76,11 @@ export default async function setValuesOnVariable(
   progressTracker?: ProgressTracker | null,
   metadataUpdateTracker?: Record<string, boolean>,
   providedPlatformsByVariable?: Record<string, Set<string>>,
+  isExtendedCollection = false,
+  // All resolved tokens in the theme, used to check composed colors render correctly
+  resolvedTokensByName?: Map<string, ComposedColorTokenInfo>,
+  // Names of all live local variables, across collections
+  localVariableNames?: Iterable<string>,
 ) {
   const variableKeyMap: Record<string, string> = {};
   const referenceVariableCandidates: ReferenceVariableType[] = [];
@@ -38,6 +91,38 @@ export default async function setValuesOnVariable(
 
   // Use the passed-in metadata tracker or a local one if not provided
   const codeSyntaxUpdateTracker = metadataUpdateTracker || {};
+
+  // Build indexes once so the hot loop can do O(1) lookups instead of scanning
+  // variablesInFigma with `.find()` for every token (mirrors the pattern used in
+  // consumer-plugins/create-variables/operateFromCollections.ts).
+  const variablesByKey = new Map<string, Variable>();
+  // Name index is deliberately collection-scoped: variable names are only unique within
+  // a collection, so we never map a token.path to a variable from a different collection.
+  const variablesByName = new Map<string, Variable>();
+  const variablesById = new Set<string>();
+  variablesInFigma.forEach((v) => {
+    if (!v.remote) variablesByKey.set(v.key, v);
+    if (v.variableCollectionId === collection.id) variablesByName.set(v.name, v);
+    variablesById.add(v.id);
+  });
+
+  // Names an alias can resolve to. Targets often live in another collection (e.g.
+  // primitives), so extended collections get every live local variable name from the
+  // caller, which must exclude zombies to match what the reference pass can link.
+  const allVariableNames = new Set<string>(localVariableNames);
+  variablesInFigma.forEach((v) => allVariableNames.add(v.name));
+
+  const indexVariable = (v: Variable) => {
+    allVariableNames.add(v.name);
+    if (!v.remote && !variablesByKey.has(v.key)) variablesByKey.set(v.key, v);
+    if (v.variableCollectionId === collection.id && !variablesByName.has(v.name)) {
+      variablesByName.set(v.name, v);
+    }
+    if (!variablesById.has(v.id)) {
+      variablesById.add(v.id);
+      variablesInFigma.push(v);
+    }
+  };
 
   // Pre-fetch all variables referenced by variableId to avoid individual async lookups
   // This is much more efficient than fetching one-by-one during token processing
@@ -55,11 +140,15 @@ export default async function setValuesOnVariable(
     Array.from(variableIdsToFetch).map(async (variableId) => {
       try {
         const variable = await figma.variables.getVariableByIdAsync(variableId);
-        if (variable && variable.variableCollectionId === collection.id) {
-          variableIdCache.set(variableId, variable);
-          // Add to local cache if not already present
-          if (!variablesInFigma.some((v) => v.id === variable.id)) {
-            variablesInFigma.push(variable);
+        if (variable) {
+          // For extended collections, skip collection ID check since inherited variables belong to parent
+          const belongsToCollection = isExtendedCollection || variable.variableCollectionId === collection.id;
+          if (belongsToCollection) {
+            variableIdCache.set(variableId, variable);
+            // Add to local cache if not already present
+            if (!variablesInFigma.some((v) => v.id === variable.id)) {
+              variablesInFigma.push(variable);
+            }
           }
         }
       } catch (e) {
@@ -74,14 +163,17 @@ export default async function setValuesOnVariable(
       promises.add(variableWorker.schedule(async () => {
         try {
           const flatScopes = token.$extensions?.['com.figma.scopes'] as VariableScope[] | undefined;
-          const variableType = convertTokenTypeToVariableType(token.type, token.value, flatScopes);
+          let variableType = convertTokenTypeToVariableType(token.type, token.value, flatScopes);
+          if (variableType === 'EASING' || variableType === 'TIMING') {
+            if (!motionCapabilityDetected(collection)) {
+              variableType = variableType === 'EASING' ? 'STRING' : 'FLOAT';
+            }
+          }
           // If id matches the variableId, or name matches the token path, we can use it to update the variable instead of re-creating.
           // Prioritize finding by variableId (key) when present, otherwise fall back to name matching
           // This has the nasty side-effect that if font weight changes from string to number, it will not update the variable given we cannot change type.
           // In that case, we should delete the variable and re-create it.
-          let variable = token.variableId
-            ? variablesInFigma.find((v) => v.key === token.variableId && !v.remote)
-            : variablesInFigma.find((v) => v.name === token.path);
+          let variable = token.variableId ? variablesByKey.get(token.variableId) : variablesByName.get(token.path);
 
           // If not found in local collection, check the pre-fetched cache
           if (!variable && token.variableId) {
@@ -89,15 +181,29 @@ export default async function setValuesOnVariable(
           }
 
           // If still no variable, try one more time to find by name in case it was just created
+          // (variablesByName is already collection-scoped, so no extra check needed).
           if (!variable) {
-            variable = variablesInFigma.find((v) => v.name === token.path && v.variableCollectionId === collection.id);
+            // For extended collections, don't check collection ID since variables belong to parent
+            variable = isExtendedCollection
+              ? variablesInFigma.find((v) => v.name === token.path)
+              : variablesInFigma.find((v) => v.name === token.path && v.variableCollectionId === collection.id);
           }
 
           if (!variable) {
+            // For extended collections, variables should have been found from parent
+            if (isExtendedCollection) {
+              console.warn(
+                `⚠️  Variable "${token.path}" not found in extended collection "${collection.name}". `
+                + 'Extended collections can only update inherited variables from their parent collection. '
+                + 'Skipping this token.',
+              );
+              return; // Skip this token entirely
+            }
+
+            // Regular collection - create new variable
             try {
               variable = figma.variables.createVariable(token.path, collection, variableType);
-              // Add to local cache immediately
-              variablesInFigma.push(variable);
+              indexVariable(variable);
             } catch (e) {
               // If creation fails (e.g., duplicate name), try to find the existing variable by name one more time
               // This can happen if the variable was created in a previous run but the reference wasn't saved
@@ -106,7 +212,7 @@ export default async function setValuesOnVariable(
               );
               if (existingVariable) {
                 variable = existingVariable;
-                variablesInFigma.push(variable);
+                indexVariable(variable);
               } else {
                 throw e; // Re-throw if we still can't find/create the variable
               }
@@ -122,11 +228,57 @@ export default async function setValuesOnVariable(
               variable.name = token.path;
             }
             if (variableType !== variable?.resolvedType) {
-              // TODO: There's an edge case where the user had created a variable based on a numerical weight leading to a float variable,
-              // if they later change it to a string, we cannot update the variable type. Theoretically we should remove and recreate, but that would lead to broken variables?
-              // If we decide to remove, the following would work.
-              // variable.remove();
-              // variable = figma.variables.createVariable(t.path, collection.id, variableType);
+              // Figma disallows changing an existing variable's resolvedType.
+              // For motion types this is a real blocker: a cubicBezier token
+              // that previously resolved to STRING (older builds) will stay
+              // STRING forever unless we recreate the variable. Recreate for
+              // the motion pair only — other types keep the existing "silent
+              // no-op" behavior to avoid breaking references cross-type.
+              if (variableType === 'TIMING' || variableType === 'EASING') {
+                // Snapshot metadata so the fresh variable inherits what the
+                // old one had (Figma cannot preserve these across a
+                // remove+create, and the token doesn't always carry them).
+                const carriedDescription = variable.description;
+                const carriedScopes = variable.scopes;
+                const carriedHiddenFromPublishing = variable.hiddenFromPublishing;
+                const carriedCodeSyntax = { ...(variable.codeSyntax || {}) };
+                const staleKey = variable.key;
+                const idx = variablesInFigma.indexOf(variable);
+                let recreated: Variable | null = null;
+                try {
+                  variable.remove();
+                  if (idx >= 0) variablesInFigma.splice(idx, 1);
+                  recreated = figma.variables.createVariable(token.path, collection, variableType);
+                } catch (e) {
+                  console.error('Failed to recreate variable for type change:', e);
+                }
+                if (recreated) {
+                  // Rehydrate metadata before the switch below runs.
+                  try {
+                    if (carriedDescription) recreated.description = carriedDescription;
+                    if (carriedScopes?.length) recreated.scopes = carriedScopes;
+                    recreated.hiddenFromPublishing = carriedHiddenFromPublishing;
+                    (['WEB', 'ANDROID', 'iOS'] as const).forEach((platform) => {
+                      const syntax = carriedCodeSyntax[platform];
+                      if (syntax) recreated!.setVariableCodeSyntax(platform, syntax);
+                    });
+                  } catch (e) {
+                    console.error('Failed to restore metadata on recreated variable', e);
+                  }
+                  variablesInFigma.push(recreated);
+                  variable = recreated;
+                  variableKeyMap[token.name] = variable.key;
+                } else {
+                  // Recreate failed: the old variable is already gone. Drop
+                  // this token's metadata/value writes rather than operating
+                  // on a dead handle, and remove the stale key mapping so
+                  // downstream reference resolution won't point at a ghost.
+                  delete variableKeyMap[token.name];
+                  const renamedIdx = renamedVariableKeys.indexOf(staleKey);
+                  if (renamedIdx >= 0) renamedVariableKeys.splice(renamedIdx, 1);
+                  return;
+                }
+              }
             }
 
             const currentDescription = variable.description ?? '';
@@ -200,36 +352,107 @@ export default async function setValuesOnVariable(
 
             // Check if the variable already has the correct alias reference before updating
             if (!hasMetadataChanged && checkVariableAliasEquality(existingVariableValue, rawValue)) {
-              // The alias already points to the correct variable, no update needed
               return;
+            }
+
+            // For extended (child) collections a token that will be linked as an
+            // alias in the reference pass must NOT be written as a resolved raw
+            // value here. token.value is often the resolved value (no braces) even
+            // when token.rawValue is a reference, so the brace guards below don't
+            // catch it. Writing raw would create an explicit child override that
+            // the reference pass can no longer convert to inherited — Figma has no
+            // per-mode clear API — leaving a stale raw "blue" override. Skip the
+            // raw write and let the reference pass set the alias (or inherit).
+            // Check if the reference target actually exists as a variable before
+            // skipping the raw write. If the target doesn't exist (e.g. a primitive
+            // token like "colors.black" that isn't exported as a variable), the
+            // reference pass will silently do nothing and we'd lose the value.
+            const composed = variableType === 'COLOR' && !token.$extensions?.['studio.tokens']?.modify
+              ? parseComposedColorReference(token.rawValue)
+              : null;
+            let willBeAliased = isExtendedCollection && checkCanReferenceVariable(token);
+            if (composed) {
+              // Composed colors fall back to resolved values for missing parts, so one
+              // existing target is enough. Outside extended collections only skip the raw
+              // write when the variable is already composed, to avoid rewriting it each run.
+              const refPaths = getComposedColorReferenceNames(composed).map((name) => name.split('.').join('/'));
+              const anyTargetExists = refPaths.some((refPath) => allVariableNames.has(refPath));
+              willBeAliased = anyTargetExists && (isExtendedCollection || isVariableComposedColor(existingVariableValue));
+            } else if (willBeAliased) {
+              let refName = '';
+              if (token.rawValue?.toString().startsWith('{')) {
+                refName = token.rawValue.toString().slice(1, -1);
+              } else if (token.rawValue?.toString().startsWith('$')) {
+                refName = token.rawValue.toString().substring(1);
+              }
+              const refPath = refName.split('.').join('/');
+              if (!allVariableNames.has(refPath)) {
+                willBeAliased = false;
+              }
             }
 
             switch (variableType) {
               case 'BOOLEAN':
-                if (typeof token.value === 'string' && !token.value.includes('{')) {
-                  setBooleanValuesOnVariable(variable, mode, token.value, hasMetadataChanged);
+                if (!willBeAliased && typeof token.value === 'string' && !token.value.includes('{')) {
+                  setBooleanValuesOnVariable(variable, mode, token.value, collection, hasMetadataChanged);
                 }
                 break;
               case 'COLOR':
-                if (typeof token.value === 'string' && !token.value.includes('{')) {
-                  setColorValuesOnVariable(variable, mode, token.value, hasMetadataChanged);
+                if (!willBeAliased && typeof token.value === 'string' && !token.value.includes('{')) {
+                  setColorValuesOnVariable(variable, mode, token.value, collection, hasMetadataChanged);
                 }
                 break;
               case 'FLOAT': {
-                const value = String(token.value);
-                if (typeof value === 'string' && !value.includes('{')) {
+                // Duration fallback path (when Figma has no TIMING support):
+                // an object-form value { value, unit } would stringify to
+                // "[object Object]" and lose the number. Serialize back to the
+                // "<n><unit>" canonical form so transformValue can parse it.
+                let value: string;
+                if (token.type === TokenTypes.DURATION && token.value && typeof token.value === 'object' && !Array.isArray(token.value)) {
+                  const dv = token.value as { value?: unknown; unit?: unknown };
+                  value = `${dv.value}${dv.unit ?? 'ms'}`;
+                } else {
+                  value = String(token.value);
+                }
+                if (!willBeAliased && typeof value === 'string' && !value.includes('{')) {
                   const transformedValue = transformValue(value, token.type, baseFontSize, true);
-                  setNumberValuesOnVariable(variable, mode, Number(transformedValue), hasMetadataChanged);
+                  setNumberValuesOnVariable(variable, mode, Number(transformedValue), collection, hasMetadataChanged);
+                }
+                break;
+              }
+              case 'TIMING': {
+                // Duration accepts "200ms" / "0.2s" / a number / DTCG {value,unit}. Skip raw aliases.
+                const rawStr = typeof token.value === 'string' ? token.value : '';
+                if (!rawStr.includes('{')) {
+                  setTimingValueOnVariable(variable, mode, token.value, hasMetadataChanged);
+                }
+                break;
+              }
+              case 'EASING': {
+                // CubicBezier accepts [x1,y1,x2,y2] / "0.4,0,0.2,1" / MotionEasing. Skip raw aliases.
+                const rawStr = typeof token.value === 'string' ? token.value : '';
+                if (!rawStr.includes('{')) {
+                  setEasingValueOnVariable(variable, mode, token.value, hasMetadataChanged);
                 }
                 break;
               }
               case 'STRING':
-                if (typeof token.value === 'string' && !token.value.includes('{')) {
-                  setStringValuesOnVariable(variable, mode, token.value, hasMetadataChanged);
+                // CubicBezier fallback path (when Figma has no EASING support):
+                // normalize every accepted shape to "x1, y1, x2, y2" so the
+                // STRING variable value matches what the EASING path would
+                // canonicalize, regardless of the input form.
+                if (token.type === TokenTypes.CUBIC_BEZIER) {
+                  const easing = toFigmaEasing(token.value);
+                  const b = easing?.easingFunctionCubicBezier;
+                  if (b) {
+                    setStringValuesOnVariable(variable, mode, `${b.x1}, ${b.y1}, ${b.x2}, ${b.y2}`, collection, hasMetadataChanged);
+                  }
+                } else if (typeof token.value === 'string' && !token.value.includes('{')) {
+                  setStringValuesOnVariable(variable, mode, token.value, collection, hasMetadataChanged);
                   // Given we cannot determine the combined family of a variable, we cannot use fallback weights from our estimates.
                   // This is not an issue because users can set numerical font weights with variables, so we opt-out of the guesswork and just apply the numerical weight.
-                } else if (token.type === TokenTypes.FONT_WEIGHTS && Array.isArray(token.value)) {
-                  setStringValuesOnVariable(variable, mode, token.value[0], hasMetadataChanged);
+                } else if (!willBeAliased && token.type === TokenTypes.FONT_WEIGHTS && Array.isArray(token.value)) {
+                  setStringValuesOnVariable(variable, mode, token.value[0], collection, hasMetadataChanged);
                 }
                 break;
               default:
@@ -354,11 +577,25 @@ export default async function setValuesOnVariable(
               referenceTokenName = token.rawValue!.toString().substring(1);
             }
 
-            if (token && checkCanReferenceVariable(token)) {
+            if (composed) {
+              const lookup = (name: string) => resolvedTokensByName?.get(name);
+              referenceVariableCandidates.push({
+                variable,
+                modeId: mode,
+                referenceVariable: getComposedColorReferenceNames(composed)[0],
+                composed,
+                resolvedValue: token.value,
+                colorCandidates: getComposedColorCandidates(composed, lookup),
+                opacityReferenceValue: composed.opacityReference ? lookup(composed.opacityReference)?.value : undefined,
+                opacityLinkable: canLinkOpacity(composed, lookup),
+                ...(isExtendedCollection ? { collection } : {}),
+              });
+            } else if (token && checkCanReferenceVariable(token)) {
               referenceVariableCandidates.push({
                 variable,
                 modeId: mode,
                 referenceVariable: referenceTokenName,
+                ...(isExtendedCollection ? { collection } : {}),
               });
             }
           }

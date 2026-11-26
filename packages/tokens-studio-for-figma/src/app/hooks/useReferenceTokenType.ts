@@ -22,6 +22,12 @@ export function useReferenceTokenType(type: TokenTypes): TokenTypes[] {
         return [TokenTypes.PARAGRAPH_INDENT, TokenTypes.NUMBER, TokenTypes.DIMENSION];
       case TokenTypes.LETTER_SPACING:
         return [TokenTypes.LETTER_SPACING, TokenTypes.NUMBER, TokenTypes.DIMENSION];
+      case TokenTypes.DURATION:
+        return [TokenTypes.DURATION, TokenTypes.NUMBER];
+      case TokenTypes.CUBIC_BEZIER:
+        return [TokenTypes.CUBIC_BEZIER];
+      case TokenTypes.MOTION:
+        return [TokenTypes.MOTION];
       default:
         return [type];
     }

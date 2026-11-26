@@ -66,6 +66,7 @@ export type SavedSettings = {
   width: number;
   height: number;
   showEmptyGroups: boolean
+  hideDeprecatedTokens: boolean;
   updateMode: UpdateMode;
   updateRemote: boolean;
   updateOnChange: boolean;
@@ -75,6 +76,7 @@ export type SavedSettings = {
   variablesNumber: boolean;
   variablesString: boolean;
   variablesBoolean: boolean;
+  variablesMotion: boolean;
   stylesColor: boolean;
   stylesTypography: boolean;
   stylesEffect: boolean;
@@ -84,6 +86,7 @@ export type SavedSettings = {
   prefixStylesWithThemeName: boolean;
   renameExistingStylesAndVariables: boolean;
   removeStylesAndVariablesWithoutConnection: boolean;
+  exportExtendedCollections: boolean;
   inspectDeep: boolean;
   shouldSwapStyles: boolean;
   shouldSwapFigmaModes: boolean;
@@ -95,6 +98,7 @@ export type SavedSettings = {
   seenGenericVersionedHeaderMigrationDialog?: boolean;
   seenTermsUpdate2026?: boolean;
   seenTermsUpdate2026Subprocessors?: boolean;
+  bitbucketSecurityNoticeViews2026?: number;
 };
 
 export function notifyUISettings(
@@ -108,10 +112,12 @@ export function notifyUISettings(
     applyVariablesStylesOrRawValue,
     shouldUpdateStyles,
     showEmptyGroups,
+    hideDeprecatedTokens,
     variablesColor,
     variablesNumber,
     variablesString,
     variablesBoolean,
+    variablesMotion,
     stylesColor,
     stylesTypography,
     stylesEffect,
@@ -129,9 +135,11 @@ export function notifyUISettings(
     tokenFormat,
     renameExistingStylesAndVariables,
     removeStylesAndVariablesWithoutConnection,
+    exportExtendedCollections,
     seenGenericVersionedHeaderMigrationDialog,
     seenTermsUpdate2026,
     seenTermsUpdate2026Subprocessors,
+    bitbucketSecurityNoticeViews2026,
   }: SavedSettings,
 ) {
   postToUI({
@@ -153,6 +161,7 @@ export function notifyUISettings(
       variablesBoolean,
       variablesNumber,
       variablesString,
+      variablesMotion,
       stylesColor,
       stylesEffect,
       stylesTypography,
@@ -169,14 +178,20 @@ export function notifyUISettings(
       tokenFormat,
       renameExistingStylesAndVariables,
       removeStylesAndVariablesWithoutConnection,
+      exportExtendedCollections,
       seenGenericVersionedHeaderMigrationDialog,
       seenTermsUpdate2026,
       seenTermsUpdate2026Subprocessors,
+      bitbucketSecurityNoticeViews2026,
     },
   });
   postToUI({
     type: MessageFromPluginTypes.SHOW_EMPTY_GROUPS,
     showEmptyGroups,
+  });
+  postToUI({
+    type: MessageFromPluginTypes.HIDE_DEPRECATED_TOKENS,
+    hideDeprecatedTokens,
   });
 }
 

@@ -37,6 +37,6 @@ describe('CreateOrEditThemeForm', () => {
     const stylesTabButton = await result.findByText('stylesAndVariables');
     act(() => stylesTabButton.click());
 
-    expect(result.queryAllByText('attachLocalStyles')).toHaveLength(3);
+    expect(result.queryAllByText('attachLocalStyles')).toHaveLength(4);
   });
 });

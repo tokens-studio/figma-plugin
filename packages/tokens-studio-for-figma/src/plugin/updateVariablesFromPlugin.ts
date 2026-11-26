@@ -11,6 +11,11 @@ import { UpdateTokenVariablePayload } from '@/types/payloads/UpdateTokenVariable
 import { CodeSyntax, VariableScope } from '@/types/tokens';
 import { FIGMA_PLATFORMS, normalizeVariableScopes, getCodeSyntaxValue } from '@/utils/figma';
 import { checkCanReferenceVariable } from '@/utils/alias/checkCanReferenceVariable';
+import { resolveCollectionContext } from './extendedCollections/collectionContext';
+import { applyChildModeValue } from './extendedCollections/applyChildModeValue';
+import {
+  buildComposedColorValue, getComposedColorCandidates, parseComposedColorReference, readVariableValue,
+} from './composedColor';
 
 export default async function updateVariablesFromPlugin(payload: UpdateTokenVariablePayload) {
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
@@ -24,17 +29,16 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
 
   const metadataUpdateTracker: Record<string, boolean> = {};
 
-  themeInfo.themes.forEach((theme) => {
+  for (const theme of themeInfo.themes) {
     if (
       Object.entries(theme.selectedTokenSets).some(
         ([tokenSet, status]) => status === TokenSetStatus.ENABLED && tokenSet === payload.parent,
       )
     ) {
-      // Filter themes which contains this token
       if (theme.$figmaVariableReferences?.[payload.name] && theme.$figmaModeId) {
         const variable = variableMap[theme?.$figmaVariableReferences?.[payload.name]];
-        if (Object.values(themeInfo.activeTheme).includes(theme.id)) {
-          if (variable && !metadataUpdateTracker[variable.id]) {
+        if (variable && Object.values(themeInfo.activeTheme).includes(theme.id)) {
+          if (!metadataUpdateTracker[variable.id]) {
             // Update metadata once per variable
             variable.description = payload.description ?? '';
 
@@ -76,8 +80,40 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
             metadataUpdateTracker[variable.id] = true;
           }
 
-          if (checkCanReferenceVariable(payload)) {
-            // If new token reference to another token, we update the variable to reference to another variable
+          // Fetch collection only when needed for extended-collection parent-mode checks
+          const collection = theme.$figmaCollectionId
+            ? await figma.variables.getVariableCollectionByIdAsync(theme.$figmaCollectionId)
+            : null;
+
+          const composed = payload.type === TokenTypes.COLOR && !payload.$extensions?.['studio.tokens']?.modify
+            ? parseComposedColorReference(payload.rawValue)
+            : null;
+          // No resolved token list here: read the referenced variables' current Figma values
+          const variableForToken = (name: string) => nameToVariableMap[name.split('.').join('/')];
+          const lookup = (name: string) => {
+            const value = readVariableValue(variableForToken(name), theme.$figmaModeId!);
+            return value === undefined ? undefined : { value };
+          };
+          const composedOpacityVariable = composed?.opacityReference ? variableForToken(composed.opacityReference) : undefined;
+          const composedOpacityValue = readVariableValue(composedOpacityVariable, theme.$figmaModeId!);
+          const composedValue = composed && buildComposedColorValue({
+            composed,
+            resolvedValue: payload.value,
+            colorCandidates: getComposedColorCandidates(composed, lookup)
+              .map(({ reference, value }) => ({ variable: variableForToken(reference), value })),
+            opacityVariable: composedOpacityVariable,
+            // Figma stores opacity variables as 0-100
+            opacityReferenceValue: typeof composedOpacityValue === 'number' ? `${composedOpacityValue}%` : undefined,
+          });
+
+          if (composedValue) {
+            const { parentModeId } = resolveCollectionContext(collection, theme.$figmaModeId!, theme);
+            if (parentModeId) {
+              applyChildModeValue(variable, theme.$figmaModeId!, parentModeId, composedValue, collection, 'keep');
+            } else {
+              variable.setValueForMode(theme.$figmaModeId!, composedValue);
+            }
+          } else if (!composed && checkCanReferenceVariable(payload)) {
             let referenceTokenName: string = '';
             if (payload.rawValue && payload.rawValue?.toString().startsWith('{')) {
               referenceTokenName = payload.rawValue?.toString().slice(1, payload.rawValue.toString().length - 1);
@@ -86,26 +122,38 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
             }
             const referenceVariable = nameToVariableMap[referenceTokenName.split('.').join('/')];
             if (referenceVariable) {
-              variable.setValueForMode(theme.$figmaModeId, {
+              const newValue: VariableAlias = {
                 type: 'VARIABLE_ALIAS',
                 id: referenceVariable.id,
-              });
+              };
+
+              // Extended collections: one shared inherit-vs-override decision
+              const { parentModeId } = resolveCollectionContext(collection, theme.$figmaModeId!, theme);
+              if (parentModeId) {
+                applyChildModeValue(variable, theme.$figmaModeId!, parentModeId, newValue, collection, 'keep');
+              } else {
+                variable.setValueForMode(theme.$figmaModeId!, newValue);
+              }
             }
           } else {
+            const modeId = theme.$figmaModeId!;
             switch (payload.type) {
               case TokenTypes.COLOR:
                 if (typeof payload.value === 'string') {
-                  setColorValuesOnVariable(variable, theme.$figmaModeId, payload.value);
+                  if (collection) setColorValuesOnVariable(variable, modeId, payload.value, collection, false, 'keep');
+                  else setColorValuesOnVariable(variable, modeId, payload.value);
                 }
                 break;
               case TokenTypes.BOOLEAN:
                 if (typeof payload.value === 'string') {
-                  setBooleanValuesOnVariable(variable, theme.$figmaModeId, payload.value);
+                  if (collection) setBooleanValuesOnVariable(variable, modeId, payload.value, collection, false, 'keep');
+                  else setBooleanValuesOnVariable(variable, modeId, payload.value);
                 }
                 break;
               case TokenTypes.TEXT:
                 if (typeof payload.value === 'string') {
-                  setStringValuesOnVariable(variable, theme.$figmaModeId, payload.value);
+                  if (collection) setStringValuesOnVariable(variable, modeId, payload.value, collection, false, 'keep');
+                  else setStringValuesOnVariable(variable, modeId, payload.value);
                 }
                 break;
               case TokenTypes.SIZING:
@@ -114,7 +162,8 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
               case TokenTypes.BORDER_WIDTH:
               case TokenTypes.SPACING:
               case TokenTypes.NUMBER:
-                setNumberValuesOnVariable(variable, theme.$figmaModeId, Number(payload.value));
+                if (collection) setNumberValuesOnVariable(variable, modeId, Number(payload.value), collection, false, 'keep');
+                else setNumberValuesOnVariable(variable, modeId, Number(payload.value));
                 break;
               default:
                 break;
@@ -123,5 +172,5 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
         }
       }
     }
-  });
+  }
 }

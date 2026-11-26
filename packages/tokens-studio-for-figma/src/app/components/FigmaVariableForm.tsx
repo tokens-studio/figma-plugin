@@ -9,7 +9,7 @@ import IconMinus from '@/icons/minus.svg';
 import { EditTokenObject, VariableScope, CodeSyntaxPlatform } from '@/types/tokens';
 import Box from './Box';
 import Input from './Input';
-import { tokenTypesToCreateVariable } from '@/constants/VariableTypes';
+import { tokenTypesWithFigmaSection } from '@/constants/VariableTypes';
 
 import {
   VARIABLE_SCOPE_OPTIONS, TOKEN_TYPE_TO_SCOPES_MAP, CODE_SYNTAX_PLATFORM_OPTIONS,
@@ -34,7 +34,7 @@ export default function FigmaVariableForm({
 
   const currentHiddenFromPublishing = useMemo(() => internalEditToken?.$extensions?.['com.figma.hiddenFromPublishing'] as boolean | undefined, [internalEditToken]);
 
-  const shouldShowFigmaVariableSection = useMemo(() => tokenTypesToCreateVariable.includes(internalEditToken.type), [internalEditToken.type]);
+  const shouldShowFigmaVariableSection = useMemo(() => tokenTypesWithFigmaSection.includes(internalEditToken.type), [internalEditToken.type]);
 
   // Filter variable scope options based on token type
   const relevantScopeOptions = useMemo(() => {

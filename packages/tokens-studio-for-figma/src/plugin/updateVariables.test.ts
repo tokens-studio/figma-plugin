@@ -506,4 +506,73 @@ describe('updateVariables', () => {
     expect(mockBaseFontSizeSetValueForMode).toHaveBeenCalledWith('mode-a', 16);
     expect(mockBaseFontSizeSetValueForMode).toHaveBeenCalledWith('mode-b', 20);
   });
+
+  it('writes the resolved value in an extended collection when the alias target only exists as a zombie variable', async () => {
+    const fgSetValueForMode = jest.fn();
+    const fgDefault: any = {
+      id: 'fg-id',
+      key: 'fg-key',
+      name: 'fg/default',
+      resolvedType: 'COLOR',
+      description: '',
+      scopes: [],
+      variableCollectionId: 'parent-coll',
+      valuesByMode: {
+        'parent-mode': {
+          r: 0, g: 0, b: 0, a: 1,
+        },
+      },
+      setValueForMode: fgSetValueForMode,
+      setVariableCodeSyntax: jest.fn(),
+      removeVariableCodeSyntax: jest.fn(),
+    };
+    // Figma can still return variables whose collection was deleted
+    const zombie: any = {
+      id: 'zombie-id',
+      key: 'zombie-key',
+      name: 'colors/red/500',
+      resolvedType: 'COLOR',
+      variableCollectionId: 'deleted-coll',
+      valuesByMode: {},
+    };
+    figma.variables.getLocalVariablesAsync = jest.fn().mockResolvedValue([fgDefault, zombie]);
+    figma.variables.getLocalVariableCollectionsAsync = jest.fn().mockResolvedValue([
+      { id: 'parent-coll' },
+      { id: 'child-coll' },
+    ]);
+
+    const childCollection = {
+      id: 'child-coll',
+      name: 'Brand',
+      isExtension: true,
+      parentVariableCollectionId: 'parent-coll',
+      variableOverrides: {},
+      modes: [{ name: 'Light', modeId: 'child-mode', parentModeId: 'parent-mode' }],
+    } as unknown as VariableCollection;
+
+    await updateVariables({
+      collection: childCollection,
+      mode: 'child-mode',
+      theme: {
+        id: 'brand-light',
+        name: 'Light',
+        group: 'Brand',
+        selectedTokenSets: { brand: TokenSetStatus.ENABLED },
+        $figmaStyleReferences: {},
+        $figmaIsExtension: true,
+      } as ThemeObject,
+      tokens: {
+        brand: [
+          { name: 'colors.red.500', value: '#ff0000', type: TokenTypes.COLOR },
+          { name: 'fg.default', value: '{colors.red.500}', type: TokenTypes.COLOR },
+        ],
+      },
+      settings: { variablesColor: true, baseFontSize: '16' } as any,
+      overallConfig: { brand: TokenSetStatus.ENABLED },
+    });
+
+    expect(fgSetValueForMode).toHaveBeenCalledWith('child-mode', {
+      r: 1, g: 0, b: 0, a: 1,
+    });
+  });
 });

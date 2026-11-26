@@ -48,7 +48,9 @@ const MockEnv = () => {
     ]
   })).as('getContent');
 
-  cy.intercept('GET', '**/repos/122/figma-tokens/branches*', [
+  // Branches on the mocked remote. Creating a ref (see createRef below) adds to this list,
+  // so branch fetches made after a branch is created include it, like the GitHub API does.
+  const branches = [
     {
       name: 'main',
       commit: {
@@ -63,7 +65,11 @@ const MockEnv = () => {
         url: 'http://localhost:58630/six7/api/v3/repos/122/figma-tokens/commits/development-sha'
       }
     },
-  ]).as('getBranches');
+  ];
+
+  cy.intercept('GET', '**/repos/122/figma-tokens/branches*', (req) => {
+    req.reply(branches);
+  }).as('getBranches');
 
   cy.intercept('GET', 'http://localhost:58630/six7/api/v3/repos/122/figma-tokens/git/ref/heads%2Fmain', {
     object: {
@@ -71,8 +77,16 @@ const MockEnv = () => {
     },
   }).as('getMainRef');
 
-  cy.intercept('POST', 'http://localhost:58630/six7/api/v3/repos/122/figma-tokens/git/refs', {
-    ref: 'new-branch',
+  cy.intercept('POST', 'http://localhost:58630/six7/api/v3/repos/122/figma-tokens/git/refs', (req) => {
+    const { ref, sha } = req.body;
+    branches.push({
+      name: ref.replace('refs/heads/', ''),
+      commit: {
+        sha,
+        url: `http://localhost:58630/six7/api/v3/repos/122/figma-tokens/commits/${sha}`
+      }
+    });
+    req.reply({ ref });
   }).as('createRef');
 
   cy.intercept('GET', 'http://localhost:58630/six7/api/v3/repos/122/figma-tokens/contents/tokens.json?ref=new-branch', {}).as(

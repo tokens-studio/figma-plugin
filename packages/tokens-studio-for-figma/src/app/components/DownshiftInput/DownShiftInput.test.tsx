@@ -139,7 +139,7 @@ describe('DownShiftInput', () => {
     });
   });
 
-  it('should return color tokens when type is color', () => {
+  it('should return color tokens when type is color', async () => {
     const result = render(
       <DownshiftInput
         type="color"
@@ -151,11 +151,11 @@ describe('DownShiftInput', () => {
       />,
     );
 
-    waitFor(async () => {
-      result.getByTestId('downshift-input-suffix-button').click();
-      expect(await result.findByText('#e2e8f0')).toBeInTheDocument();
-      expect(await result.getByText('#b91c1c')).toBeInTheDocument();
-      (await result.findByText('#e2e8f0')).click();
+    result.getByTestId('downshift-input-suffix-button').click();
+    expect(await result.findByText('#e2e8f0')).toBeInTheDocument();
+    expect(await result.getByText('#b91c1c')).toBeInTheDocument();
+    (await result.findByText('#e2e8f0')).click();
+    await waitFor(() => {
       expect(result.queryByText('#e2e8f0')).not.toBeInTheDocument();
     });
   });
@@ -171,17 +171,17 @@ describe('DownShiftInput', () => {
         suffix
       />,
     );
-    waitFor(async () => {
-      result.getByTestId('downshift-input-suffix-button').click();
-      const searchInput = await result.findByTestId('downshift-search-input') as HTMLInputElement;
-      fireEvent.change(searchInput, {
-        target: { value: 'slate' },
-      });
+    result.getByTestId('downshift-input-suffix-button').click();
+    const searchInput = await result.findByTestId('downshift-search-input') as HTMLInputElement;
+    fireEvent.change(searchInput, {
+      target: { value: 'slate' },
+    });
+    await waitFor(() => {
       expect(result.getAllByTestId('downshift-input-item')).toHaveLength(2);
     });
   });
 
-  it('should return all tokens when type is documentation type', () => {
+  it('should return all tokens when type is documentation type', async () => {
     const result = render(
       <DownshiftInput
         type="tokenName"
@@ -192,13 +192,13 @@ describe('DownShiftInput', () => {
         suffix
       />,
     );
-    waitFor(() => {
-      result.getByTestId('downshift-input-suffix-button').click();
+    result.getByTestId('downshift-input-suffix-button').click();
+    await waitFor(() => {
       expect(result.getAllByTestId('downshift-input-item')).toHaveLength(10);
     });
   });
 
-  it('should return fontValues when type is fontFamily', () => {
+  it('should return fontValues when type is fontFamily', async () => {
     const mockStore = createMockStore({
       uiState: {
         figmaFonts: [
@@ -230,16 +230,18 @@ describe('DownShiftInput', () => {
       </Provider>,
     );
 
-    waitFor(async () => {
-      result.getByTestId('downshift-input-suffix-button').click();
-      (await result.findByText('Fonts')).click();
+    result.getByTestId('downshift-input-suffix-button').click();
+    (await result.findByText('Fonts')).click();
+    await waitFor(() => {
       expect(result.getAllByTestId('downshift-input-item')).toHaveLength(2);
-      result.getAllByTestId('downshift-input-item')[0].click();
+    });
+    result.getAllByTestId('downshift-input-item')[0].click();
+    await waitFor(() => {
       expect(result.queryByTestId('downshift-input-item')).not.toBeInTheDocument();
     });
   });
 
-  it('should return fontWeights when type is fontWeight', () => {
+  it('should return fontWeights when type is fontWeight', async () => {
     const mockStore = createMockStore({
       uiState: {
         figmaFonts: [
@@ -272,11 +274,13 @@ describe('DownShiftInput', () => {
       </Provider>,
     );
 
-    waitFor(async () => {
-      result.getByTestId('downshift-input-suffix-button').click();
-      (await result.findByText('Weights')).click();
+    result.getByTestId('downshift-input-suffix-button').click();
+    (await result.findByText('Weights')).click();
+    await waitFor(() => {
       expect(result.getAllByTestId('downshift-input-item')).toHaveLength(1);
-      fireEvent.focus(result.getByTestId('mention-input-value'));
+    });
+    fireEvent.focus(result.getByTestId('mention-input-value'));
+    await waitFor(() => {
       expect(result.queryByTestId('downshift-input-item')).not.toBeInTheDocument();
     });
   });
@@ -292,13 +296,11 @@ describe('DownShiftInput', () => {
         suffix
       />,
     );
-    waitFor(async () => {
-      result.getByTestId('downshift-input-suffix-button').click();
-      const searchInput = await result.findByTestId('downshift-search-input') as HTMLInputElement;
-      fireEvent.change(searchInput, {
-        target: { value: 'nonexist' },
-      });
-      expect(await result.findByText('No suggestions found')).toBeInTheDocument();
+    result.getByTestId('downshift-input-suffix-button').click();
+    const searchInput = await result.findByTestId('downshift-search-input') as HTMLInputElement;
+    fireEvent.change(searchInput, {
+      target: { value: 'nonexist' },
     });
+    expect(await result.findByText('No suggestions found')).toBeInTheDocument();
   });
 });

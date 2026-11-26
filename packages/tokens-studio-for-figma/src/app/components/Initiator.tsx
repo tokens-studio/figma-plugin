@@ -14,6 +14,7 @@ import { track } from '@/utils/analytics';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageChannelPreview } from '@/AsyncMessageChannelPreview';
 import { autoApplyThemeOnDropSelector } from '@/selectors';
+import { SelectionGroup, SelectionValue } from '@/types';
 
 // @README this component is not the "Initiator" anymore - as it is named
 // but solely acts as the interface between the plugin and the UI
@@ -49,38 +50,40 @@ export function Initiator() {
         switch (pluginMessage.type) {
           case MessageFromPluginTypes.SELECTION: {
             const { selectionValues, mainNodeSelectionValues, selectedNodes } = pluginMessage;
-            dispatch.uiState.setSelectedLayers(selectedNodes);
-            dispatch.uiState.setDisabled(false);
+            let sortedMainNodeSelectionValues: SelectionValue = {};
             if (mainNodeSelectionValues.length > 1) {
               const allMainNodeSelectionValues = mainNodeSelectionValues.reduce((acc, crr) => (
                 Object.assign(acc, crr)
               ), {});
-              const sortedMainNodeSelectionValues = sortSelectionValueByProperties(allMainNodeSelectionValues);
-              dispatch.uiState.setMainNodeSelectionValues(sortedMainNodeSelectionValues);
+              sortedMainNodeSelectionValues = sortSelectionValueByProperties(allMainNodeSelectionValues);
             } else if (mainNodeSelectionValues.length > 0) {
               // When only one node is selected, we can set the state
-              const sortedMainNodeSelectionValues = sortSelectionValueByProperties(mainNodeSelectionValues[0]);
-              dispatch.uiState.setMainNodeSelectionValues(sortedMainNodeSelectionValues);
-            } else {
-              // When only one is selected and it doesn't contain any tokens, reset.
-              dispatch.uiState.setMainNodeSelectionValues({});
+              sortedMainNodeSelectionValues = sortSelectionValueByProperties(mainNodeSelectionValues[0]);
             }
+            // When only one is selected and it doesn't contain any tokens, the values stay empty.
 
             // Selection values are all tokens across all layers, used in Multi Inspector.
+            let sortedSelectionValues: SelectionGroup[] = [];
             if (selectionValues) {
               const orderObj = convertToOrderObj(Properties);
-              const sortedSelectionValues = selectionValues.sort((a, b) => orderObj[a.type] - orderObj[b.type]);
-              dispatch.uiState.setSelectionValues(sortedSelectionValues);
-            } else {
-              dispatch.uiState.resetSelectionValues();
+              sortedSelectionValues = selectionValues.sort((a, b) => orderObj[a.type] - orderObj[b.type]);
             }
+
+            dispatch.uiState.setSelection({
+              selectedLayers: selectedNodes,
+              disabled: false,
+              mainNodeSelectionValues: sortedMainNodeSelectionValues,
+              selectionValues: sortedSelectionValues,
+            });
             break;
           }
           case MessageFromPluginTypes.NO_SELECTION: {
-            dispatch.uiState.setDisabled(true);
-            dispatch.uiState.setSelectedLayers(0);
-            dispatch.uiState.resetSelectionValues();
-            dispatch.uiState.setMainNodeSelectionValues({});
+            dispatch.uiState.setSelection({
+              selectedLayers: 0,
+              disabled: true,
+              mainNodeSelectionValues: {},
+              selectionValues: [],
+            });
             break;
           }
           case MessageFromPluginTypes.SET_TOKENS: {
@@ -142,6 +145,10 @@ export function Initiator() {
 
           case MessageFromPluginTypes.SHOW_EMPTY_GROUPS: {
             dispatch.uiState.toggleShowEmptyGroups(pluginMessage.showEmptyGroups);
+            break;
+          }
+          case MessageFromPluginTypes.HIDE_DEPRECATED_TOKENS: {
+            dispatch.uiState.toggleHideDeprecatedTokens(pluginMessage.hideDeprecatedTokens);
             break;
           }
           case MessageFromPluginTypes.START_JOB: {

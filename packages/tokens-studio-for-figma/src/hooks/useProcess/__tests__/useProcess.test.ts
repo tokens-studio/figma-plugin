@@ -1,5 +1,4 @@
-import { renderHook, waitFor } from '@testing-library/react';
-import { act } from '@testing-library/react-hooks';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { useState } from 'react';
 import { CanceledError } from '../CanceledError';
 import { ProcessStepStatus } from '../ProcessStepStatus';
@@ -36,24 +35,30 @@ describe('useProcess', () => {
     expect(useProcessResult.current.currentStep).toEqual(null);
     expect(useProcessResult.current.currentStatus).toEqual(ProcessStepStatus.IDLE);
 
-    waitFor(async () => {
-      useProcessResult.current.start();
+    await act(() => useProcessResult.current.start());
+    await waitFor(() => {
       expect(useProcessResult.current.currentStep).toEqual('fetch-user-data');
       expect(useProcessResult.current.currentStatus).toEqual(ProcessStepStatus.DONE);
       expect(useProcessResult.current.isComplete).toEqual(false);
       expect(useStateResult.current[0]).toEqual(mockUser);
+    });
 
-      useProcessResult.current.next();
+    await act(() => useProcessResult.current.next());
+    await waitFor(() => {
       expect(useProcessResult.current.currentStep).toEqual('verify-user-data');
       expect(useProcessResult.current.currentStatus).toEqual(ProcessStepStatus.DONE);
       expect(useProcessResult.current.isComplete).toEqual(false);
+    });
 
-      useProcessResult.current.next();
+    await act(() => useProcessResult.current.next());
+    await waitFor(() => {
       expect(useProcessResult.current.currentStep).toEqual('checkout');
       expect(useProcessResult.current.currentStatus).toEqual(ProcessStepStatus.DONE);
       expect(useProcessResult.current.isComplete).toEqual(true);
+    });
 
-      useProcessResult.current.reset();
+    act(() => useProcessResult.current.reset());
+    await waitFor(() => {
       expect(useProcessResult.current.currentStep).toEqual(null);
       expect(useProcessResult.current.currentStatus).toEqual(ProcessStepStatus.IDLE);
     });
@@ -70,14 +75,19 @@ describe('useProcess', () => {
     ];
 
     const { result: useProcessResult } = renderHook(() => useProcess(steps));
-    try {
-      await act(() => useProcessResult.current.start());
-    } catch (err) {
-      waitFor(() => {
-        expect((err as Error).message).toEqual('network error');
-      });
-    }
-    waitFor(() => {
+    // Catch inside act(): when the act() callback rejects, React doesn't flush the state updates.
+    let error: unknown;
+    await act(async () => {
+      try {
+        await useProcessResult.current.start();
+      } catch (err) {
+        error = err;
+      }
+    });
+    await waitFor(() => {
+      expect((error as Error).message).toEqual('network error');
+    });
+    await waitFor(() => {
       expect(useProcessResult.current.currentStep).toEqual('fetch-user-data');
       expect(useProcessResult.current.currentStatus).toEqual(ProcessStepStatus.FAILED);
       expect(useProcessResult.current.isComplete).toEqual(false);
@@ -97,7 +107,10 @@ describe('useProcess', () => {
     const { result: useProcessResult } = renderHook(() => useProcess(steps));
 
     try {
-      act(() => useProcessResult.current.start()).then(() => {});
+      // Don't wait for the step inside act(): React holds back renders until an async act() settles.
+      act(() => {
+        useProcessResult.current.start();
+      });
 
       await new Promise<void>((resolve) => {
         setTimeout(() => {
@@ -109,13 +122,13 @@ describe('useProcess', () => {
       });
     } catch (err) {
       console.log('errr', err);
-      waitFor(() => {
+      await waitFor(() => {
         expect(err instanceof CanceledError).toBe(true);
       });
     }
 
     // cancel the operation after 5 seconds
-    waitFor(() => {
+    await waitFor(() => {
       expect(useProcessResult.current.currentStatus).toEqual(ProcessStepStatus.CANCELED);
     });
   });

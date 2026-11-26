@@ -17,5 +17,14 @@
   "close": "Dichtbij",
   "secondScreen": "Tweede scherm",
   "and": "En",
-  "more": "meer"
+  "more": "meer",
+  "multiSelect": {
+    "search": "Zoeken",
+    "clearSearch": "Zoekopdracht wissen",
+    "selectAll": "Alles selecteren",
+    "noResults": "Geen items komen overeen met je zoekopdracht",
+    "noneSelected": "Niets geselecteerd",
+    "itemsSelected": "{{number}} geselecteerd",
+    "allSelected": "Alle ({{number}})"
+  }
 }

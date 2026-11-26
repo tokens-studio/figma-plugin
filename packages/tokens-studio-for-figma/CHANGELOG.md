@@ -1,5 +1,73 @@
 # @tokens-studio/figma-plugin
 
+## 2.13.4
+
+### Patch Changes
+
+- de78bf4f6: Bitbucket sync settings saved in a Figma file now only keep the fields needed to find the sync, and no credentials. Files saved by older versions are cleaned when the plugin opens.
+
+## 2.13.3
+
+### Patch Changes
+
+- 210d82c2e: Gradient styles whose colors reference other color tokens are now created when syncing with Tokens Studio, with each color stop bound to its variable. Previously these gradient styles weren't created at all.
+- 5d0c334bc: Fixed border tokens applied to a single side (top, right, bottom or left) setting raw values instead of binding to variables. The side's stroke weight and the stroke color now use the variables of the width and color tokens the border references, as they already did for borders on all sides.
+- 7e3cc255d: Fixed Tokens Studio platform projects updating layers when the plugin opens or a token changes, without Apply being pressed. Server-resolved values are still loaded, but layers now only change when you apply tokens.
+- e6c68721e: Fixed exporting styles from themes to Tokens Studio sending every selected theme once per theme. Each theme is now sent once, after all styles exist, and refused themes are reported in one message.
+- c3e604e5f: Fixed typography tokens not applying with Tokens Studio sync: font family, text case and text decoration were dropped when the server returned a typography value in an unexpected format, so the text layer stayed unchanged.
+
+## 2.13.2
+
+### Patch Changes
+
+- 83a88ba6a: Fixed the token edit form closing right after it opened when choosing Edit Token or Duplicate Token from a token's right-click menu.
+
+## 2.13.1
+
+### Patch Changes
+
+- c271191d2: Importing variables while a file syncs with Tokens Studio now asks for confirmation first. The import creates token sets, tokens and themes in the connected Tokens Studio project straight away, and the confirmation says so, names the branch and shows how many sets, tokens and themes it can add. Cancelling leaves both the plugin and Tokens Studio unchanged. Other sync providers are not affected.
+- ed5c48333: Fixed GitHub sync sometimes failing with "Unable to connect to GitHub" for repositories with many files.
+- 334862f38: Import Figma TIMING and EASING variables as duration and cubicBezier tokens.
+- bbfe20f1c: Importing variables no longer turns existing font weight tokens into `px` dimensions or numbers. They stay unitless `fontWeights` tokens, and only their number is updated. A number variable scoped to font weight alone, or a string variable scoped to font style alone, is always imported as a `fontWeights` token, without `px` or `rem` conversion. The import also skips Figma's default metadata (all scopes, not hidden from publishing) unless a token had other values for it, and tokens no longer show up as updated when nothing changed in Figma.
+- 6b3562288: Fixed documentation layers (value, raw value, name, description) staying empty when the token's value is `none`.
+- 31c2980ae: Fixed the plugin freezing briefly on large token sets whenever the Figma selection changed, after applying a token, when opening or closing the token edit form, or when collaborators edited the file. These freezes made token tooltips show up late or not at all. Each selection update now takes a fraction of the time, and remote edits outside your selection no longer refresh it.
+- 89e49cda6: Fixed several issues when importing variables. Updating or creating a single token in the import dialog now writes to the token's own set instead of the currently active set, and no longer removes same-named rows of other sets from the dialog. Value changes in a collection that was renamed in Figma are now applied on "Import all" instead of being silently dropped. Updated tokens now keep their Tokens Studio id and other plugin metadata instead of losing it on import.
+
+## 2.13.0
+
+### Minor Changes
+
+- 30408a5dc: Add support for exporting extended (child) variable collections for Figma Enterprise users. Extended collections inherit variables from a parent collection and can override specific values per brand or theme, enabling scalable multi-brand design token systems directly in Figma.
+
+### Patch Changes
+
+- 0094104ad: Exporting tokens to Figma variables no longer reshuffles your themes file. New variables are added at the end, existing ones keep their place, and references to deleted tokens are cleaned up.
+- 5b6b0207c: Tokens Studio now has a Free plan, and this adds support for it: organisations on the Free plan can sync their projects with the plugin, and manage themes and export them to Figma variables in those files. Other Pro features still need a paid plan, and organisations on a Variables plan can't sync here.
+- 295866cf6: Color tokens using `rgba`, `combine_alpha` or `set_alpha` with references now export as Figma variables linked to their color and opacity variables.
+- 8469855f9: Fixed token value tooltips appearing late or not at all when hovering tokens in large token sets. Hovering a token no longer re-renders every other token in the list, and neither does changing the selection or applying a token.
+
+## 2.12.1
+
+### Patch Changes
+
+- 8ad16a0e3: Add deprecated token state with visual indicators and bidirectional sync to Tokens Studio, including metadata for severity, replacement tokens, and removal timelines.
+- 5c7fe785f: Add gradient token type support (Tokens Studio users only): create, inspect, and export gradient tokens as Figma paint styles.
+- bbb69632d: Add Prompt to delete stale Figma variables when exporting color tokens that have been converted to gradients. Figma variables can't hold gradient values, so a bound variable from a previous export keeps overriding the new gradient style on any layer that uses it. The export flow now scans for these mismatches and shows a checkbox confirm so you can clean them up in one step.
+- 09b51eff2: Added support for motion, duration, and cubicBezier token types. Duration and cubicBezier tokens can now be exported as native Figma motion variables (Number/Time and Easing) — a new "Motion" checkbox in the variable export options controls the export.
+
+## 2.12.0
+
+### Minor Changes
+
+- da5151c98: Duplicating a token or a token group no longer closes the set picker after every click. The picker is now a proper multi-select panel that stays open while you tick sets, has a search field at the top to filter long set lists, and a select-all toggle that acts on whatever the search currently shows.
+
+### Patch Changes
+
+- 246098691: Fix the default preset's box shadow token using `$type` instead of `type` for the shadow type of its individual layers, a leftover from the DTCG migration. The layer type was unreadable, so every layer was applied as a drop shadow instead of one drop and one inner shadow.
+- a3d0273c0: Optimize variable export process for faster performance on large token sets.
+- e70f7ec5d: Fix legacy↔DTCG token format conversion on GitHub silently committing only $metadata.json without rewriting any token files.
+
 ## 2.11.12
 
 ### Patch Changes

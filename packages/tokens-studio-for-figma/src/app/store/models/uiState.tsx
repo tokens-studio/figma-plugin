@@ -79,6 +79,7 @@ export interface UIState {
   showPushDialog: { state: string | false, overrides?: PushOverrides };
   showPullDialog: string | false;
   showEmptyGroups: boolean;
+  hideDeprecatedTokens: boolean;
   collapsed: boolean;
   selectedLayers: number;
   manageThemesModalOpen: boolean;
@@ -96,6 +97,8 @@ export interface UIState {
     header?: string;
   } | null;
   showBitbucketMigrationDialog: boolean;
+  // The legacy license notice was closed in this session. Kept in the store so the Bitbucket notice can wait for it.
+  legacyLicenseNoticeDismissed: boolean;
   triggerMigrationEdit?: any;
 }
 
@@ -146,6 +149,7 @@ export const uiState = createModel<RootModel>()({
     showPushDialog: { state: false },
     showPullDialog: false,
     showEmptyGroups: true,
+    hideDeprecatedTokens: false,
     collapsed: false,
     selectedLayers: 0,
     manageThemesModalOpen: false,
@@ -159,6 +163,7 @@ export const uiState = createModel<RootModel>()({
     selectedExportThemes: [],
     lastError: null,
     showBitbucketMigrationDialog: false,
+    legacyLicenseNoticeDismissed: false,
     triggerMigrationEdit: null,
   } as unknown as UIState,
   reducers: {
@@ -207,17 +212,9 @@ export const uiState = createModel<RootModel>()({
         formId: data.formId,
       },
     }),
-    setSelectedLayers: (state, data: number) => ({
-      ...state,
-      selectedLayers: data,
-    }),
     setHideConfirm: (state) => ({
       ...state,
       confirmState: defaultConfirmState,
-    }),
-    setDisabled: (state, data: boolean) => ({
-      ...state,
-      disabled: data,
     }),
     setEditToken: (state, data: EditTokenObject) => ({
       ...state,
@@ -235,17 +232,16 @@ export const uiState = createModel<RootModel>()({
         displayType: data,
       };
     },
-    setSelectionValues: (state, data: SelectionGroup[]) => ({
+    // Applies a whole selection update in one dispatch. Every dispatch makes each mounted token
+    // re-check its subscriptions, so splitting one update over several dispatches multiplies that cost.
+    setSelection: (state, data: {
+      selectedLayers: number;
+      disabled: boolean;
+      mainNodeSelectionValues: SelectionValue;
+      selectionValues: SelectionGroup[];
+    }) => ({
       ...state,
-      selectionValues: data,
-    }),
-    setMainNodeSelectionValues: (state, data: SelectionValue) => ({
-      ...state,
-      mainNodeSelectionValues: data,
-    }),
-    resetSelectionValues: (state) => ({
-      ...state,
-      selectionValues: [] as SelectionGroup[],
+      ...data,
     }),
     startJob(state, job: BackgroundJob) {
       return {
@@ -351,6 +347,12 @@ export const uiState = createModel<RootModel>()({
         showEmptyGroups: payload == null ? !state.showEmptyGroups : payload,
       };
     },
+    toggleHideDeprecatedTokens(state, payload: boolean | null) {
+      return {
+        ...state,
+        hideDeprecatedTokens: payload == null ? !state.hideDeprecatedTokens : payload,
+      };
+    },
     toggleCollapsed(state) {
       return {
         ...state,
@@ -436,6 +438,10 @@ export const uiState = createModel<RootModel>()({
       ...state,
       showBitbucketMigrationDialog: data,
     }),
+    setLegacyLicenseNoticeDismissed: (state, data: boolean) => ({
+      ...state,
+      legacyLicenseNoticeDismissed: data,
+    }),
     setTriggerMigrationEdit: (state, data: any) => ({
       ...state,
       triggerMigrationEdit: data,
@@ -478,6 +484,12 @@ export const uiState = createModel<RootModel>()({
       AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.SET_SHOW_EMPTY_GROUPS,
         showEmptyGroups: payload == null ? rootState.uiState.showEmptyGroups : payload,
+      });
+    },
+    toggleHideDeprecatedTokens(payload: null | boolean, rootState) {
+      AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.SET_HIDE_DEPRECATED_TOKENS,
+        hideDeprecatedTokens: payload === null ? rootState.uiState.hideDeprecatedTokens : payload,
       });
     },
     setSelectedExportThemes: (payload: string[]) => {

@@ -3,14 +3,17 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Check, NavArrowRight } from 'iconoir-react';
 import { useTranslation } from 'react-i18next';
 import { DropdownMenu, Button } from '@tokens-studio/ui';
-import { activeThemeSelector, themeOptionsSelector } from '@/selectors';
+import { activeThemeSelector, themeOptionsSelector, themesListSelector } from '@/selectors';
 import Text from '../Text';
 import { Dispatch } from '@/app/store';
 import ProBadge from '../ProBadge';
 import { track } from '@/utils/analytics';
 import { INTERNAL_THEMES_NO_GROUP, INTERNAL_THEMES_NO_GROUP_LABEL } from '@/constants/InternalTokenGroup';
 import Box from '../Box';
-import { useIsProUser } from '@/app/hooks/useIsProUser';
+import { useCanUseThemes } from '@/app/hooks/useCanUseThemes';
+import {
+  buildChildrenMap, buildParentMap, collectAncestors, collectDescendants,
+} from '@/utils/themeHierarchy';
 
 type AvailableTheme = {
   value: string
@@ -19,11 +22,12 @@ type AvailableTheme = {
 };
 
 export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChildren<unknown>>> = () => {
-  const isProUser = useIsProUser();
+  const canUseThemes = useCanUseThemes();
   const dispatch = useDispatch<Dispatch>();
   const { t } = useTranslation(['tokens']);
   const activeTheme = useSelector(activeThemeSelector);
   const availableThemes = useSelector(themeOptionsSelector);
+  const allThemes = useSelector(themesListSelector);
   const groupNames = useMemo(() => ([...new Set(availableThemes.map((theme) => theme.group || INTERNAL_THEMES_NO_GROUP))]), [availableThemes]);
 
   const handleClearTheme = useCallback(() => {
@@ -32,19 +36,41 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
 
   const handleSelectTheme = useCallback((themeId: string) => {
     const groupOfTheme = availableThemes.find((theme) => theme.value === themeId)?.group ?? INTERNAL_THEMES_NO_GROUP;
-    const nextTheme = activeTheme;
-    if (typeof nextTheme[groupOfTheme] !== 'undefined' && nextTheme[groupOfTheme] === themeId) {
+    const nextTheme = { ...activeTheme };
+
+    // Check if we're toggling off the theme
+    const isTogglingOff = typeof nextTheme[groupOfTheme] !== 'undefined' && nextTheme[groupOfTheme] === themeId;
+
+    if (isTogglingOff) {
       delete nextTheme[groupOfTheme];
     } else {
+      // We're activating a theme - enforce mutual exclusion along its lineage.
       nextTheme[groupOfTheme] = themeId;
+
+      // A theme and any of its ancestors/descendants cannot be active together:
+      // an extended (child) collection overrides its parent, so activating one
+      // must deactivate the other. Keyed off $figmaParentThemeId (cycle-safe),
+      // not the display group's slash convention. Siblings are independent
+      // collections and may stay active.
+      const conflicting = new Set([
+        ...collectAncestors(themeId, buildParentMap(allThemes)),
+        ...collectDescendants(themeId, buildChildrenMap(allThemes)),
+      ]);
+
+      for (const [group, activeThemeId] of Object.entries(nextTheme)) {
+        if (conflicting.has(activeThemeId)) {
+          delete nextTheme[group];
+        }
+      }
     }
-    if (nextTheme) {
+
+    if (Object.keys(nextTheme).length > 0) {
       track('Apply theme', { id: nextTheme });
     } else {
       track('Reset theme');
     }
     dispatch.tokenState.setActiveTheme({ newActiveTheme: nextTheme, shouldUpdateNodes: true });
-  }, [dispatch, activeTheme, availableThemes]);
+  }, [dispatch, activeTheme, availableThemes, allThemes]);
 
   const handleManageThemes = useCallback(() => {
     dispatch.uiState.setManageThemesModalOpen(true);
@@ -128,11 +154,11 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
           <DropdownMenu.Item
             data-testid="themeselector-managethemes"
             css={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
-            disabled={!isProUser}
+            disabled={!canUseThemes}
             onSelect={handleManageThemes}
           >
             <span>{t('manageThemes')}</span>
-            {!isProUser && <ProBadge campaign="manage-themes" compact />}
+            {!canUseThemes && <ProBadge campaign="manage-themes" compact />}
             <DropdownMenu.TrailingVisual>
               <NavArrowRight />
             </DropdownMenu.TrailingVisual>

@@ -246,4 +246,75 @@ describe('SetValuesOnVariable - Alias Reference Testing', () => {
       '#FF0000',
     );
   });
+  describe('composed colors', () => {
+    const makeVariables = (existing: VariableValue) => [
+      {
+        id: 'VariableID:overlay', key: 'overlay-key', name: 'colors/overlay', resolvedType: 'COLOR', setValueForMode: mockSetValueForMode, valuesByMode: { 309: existing },
+      },
+      {
+        id: 'VariableID:red', key: 'red-key', name: 'colors/red', resolvedType: 'COLOR', setValueForMode: jest.fn(), valuesByMode: {},
+      },
+    ] as unknown as Variable[];
+    const token = {
+      name: 'colors.overlay',
+      path: 'colors/overlay',
+      rawValue: 'rgba({colors.red}, 0.5)',
+      value: '#ff000080',
+      type: TokenTypes.COLOR,
+      variableId: 'overlay-key',
+    } as SingleToken<true, { path: string; variableId: string }>;
+
+    it('emits a composed reference candidate for rgba({color}, 0.5)', async () => {
+      const result = await setValuesOnVariable(makeVariables({
+        r: 0, g: 0, b: 0, a: 1,
+      }), [token], collection, mode, baseFontSize);
+
+      expect(result.referenceVariableCandidates).toEqual([expect.objectContaining({
+        modeId: mode,
+        referenceVariable: 'colors.red',
+        composed: expect.objectContaining({ mode: 'replace', colorReference: 'colors.red', opacityLiteral: 0.5 }),
+        resolvedValue: '#ff000080',
+      })]);
+      // Brand-new composed values still get the raw color written first as a fallback
+      expect(mockSetValueForMode).toHaveBeenCalledWith(mode, expect.objectContaining({ r: 1, g: 0, b: 0 }));
+    });
+
+    it('attaches the resolved values of the referenced tokens', async () => {
+      const result = await setValuesOnVariable(
+        makeVariables({
+          r: 0, g: 0, b: 0, a: 1,
+        }),
+        [{ ...token, rawValue: 'combine_alpha({colors.red}, {opacity.half}, "source")' } as typeof token],
+        collection,
+        mode,
+        baseFontSize,
+        false,
+        null,
+        undefined,
+        undefined,
+        false,
+        new Map([
+          ['colors.red', { value: '#ff0000', rawValue: '#ff0000', type: 'color' }],
+          ['opacity.half', { value: '0.5', rawValue: '0.5', type: 'opacity' }],
+        ]),
+      );
+
+      expect(result.referenceVariableCandidates).toEqual([expect.objectContaining({
+        composed: expect.objectContaining({ mode: 'source', colorReference: 'colors.red', opacityReference: 'opacity.half' }),
+        colorCandidates: [{ reference: 'colors.red', value: '#ff0000' }],
+        opacityReferenceValue: '0.5',
+        opacityLinkable: true,
+      })]);
+    });
+
+    it('does not overwrite an existing composed value with the raw color', async () => {
+      const result = await setValuesOnVariable(makeVariables({
+        color: { type: 'VARIABLE_ALIAS', id: 'VariableID:red' },
+        opacity: 50,
+      }), [token], collection, mode, baseFontSize);
+
+      expect(result.referenceVariableCandidates).toHaveLength(1);
+      expect(mockSetValueForMode).not.toHaveBeenCalled();
+    });
+  });
 });

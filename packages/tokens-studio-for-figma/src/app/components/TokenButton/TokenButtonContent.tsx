@@ -5,9 +5,11 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { SingleToken } from '@/types/tokens';
 import { TokenTooltip } from '../TokenTooltip';
 import BrokenReferenceIndicator from '../BrokenReferenceIndicator';
-import { displayTypeSelector, uiDisabledSelector } from '@/selectors';
+import { displayTypeSelector } from '@/selectors';
 import { StyledTokenButton, StyledTokenButtonText } from './StyledTokenButton';
-import useTokens from '@/app/store/useTokens';
+import { gradientTokenToCss, isGradientTokenValue } from '@/utils/color';
+import { TokenGradientValue } from '@/types/values';
+import { getAliasValue } from '@/utils/alias';
 
 type Props = {
   active: boolean;
@@ -20,17 +22,16 @@ export default function TokenButtonContent({
   token, active, type, onClick,
 }: Props) {
   const tokensContext = useContext(TokensContext);
-  const uiDisabled = useSelector(uiDisabledSelector);
   const displayType = useSelector(displayTypeSelector);
-  const { getTokenValue } = useTokens();
 
+  // Avoid useTokens() here: it subscribes to many store slices, and this renders once per token
   const displayValue = useMemo(() => (
-    getTokenValue(token.name, tokensContext.resolvedTokens)?.value
-  ), [token, tokensContext.resolvedTokens, getTokenValue]);
+    tokensContext.resolvedTokens.find((t) => t.name === token.name)?.value
+  ), [token, tokensContext.resolvedTokens]);
 
   const showValue = React.useMemo(() => {
     let show = true;
-    if (type === TokenTypes.COLOR) {
+    if (type === TokenTypes.COLOR || type === TokenTypes.GRADIENT) {
       show = false;
       if (displayType === 'LIST') {
         show = true;
@@ -58,6 +59,33 @@ export default function TokenButtonContent({
           '--borderColor': '$colors$borderMuted',
         };
       }
+      case TokenTypes.GRADIENT: {
+        let gradVal: TokenGradientValue | null = null;
+        if (isGradientTokenValue(displayValue)) {
+          gradVal = displayValue;
+        } else if (isGradientTokenValue(token.value)) {
+          gradVal = token.value;
+        }
+        let bg = 'transparent';
+        if (gradVal) {
+          // Resolve any stop colors that are token references (e.g. {color.brand}) so
+          // the swatch renders correctly when displayValue was corrupted by server merge.
+          const resolvedStops = gradVal.stops.map((stop) => {
+            if (typeof stop.color === 'string' && stop.color.startsWith('{')) {
+              const resolved = getAliasValue(stop.color, tokensContext.resolvedTokens as SingleToken[]);
+              return { ...stop, color: typeof resolved === 'string' ? resolved : stop.color };
+            }
+            return stop;
+          });
+          bg = gradientTokenToCss({ ...gradVal, stops: resolvedStops });
+        } else if (typeof displayValue === 'string') {
+          bg = displayValue;
+        }
+        return {
+          '--backgroundColor': bg,
+          '--borderColor': '$colors$borderMuted',
+        };
+      }
       case TokenTypes.BORDER_RADIUS: {
         return {
           borderRadius: `${displayValue}px`,
@@ -67,11 +95,11 @@ export default function TokenButtonContent({
         return {};
       }
     }
-  }, [type, displayValue]);
+  }, [type, displayValue, token.value, tokensContext.resolvedTokens]);
 
   return (
     <TokenTooltip token={token}>
-      <StyledTokenButton tokenType={type as TokenTypes.COLOR} displayType={type === TokenTypes.COLOR ? displayType : 'GRID'} active={active} disabled={uiDisabled} type="button" onClick={handleButtonClick} css={cssOverrides}>
+      <StyledTokenButton tokenType={type as TokenTypes.COLOR} displayType={type === TokenTypes.COLOR || type === TokenTypes.GRADIENT ? displayType : 'GRID'} active={active} deprecated={!!token.$deprecated} type="button" onClick={handleButtonClick} css={cssOverrides}>
         <BrokenReferenceIndicator token={token} />
         <StyledTokenButtonText>{showValue && <span>{visibleName}</span>}</StyledTokenButtonText>
       </StyledTokenButton>

@@ -165,7 +165,7 @@ describe('Add license key', () => {
     expect(removeKeyButton).not.toBeDisabled();
     removeKeyButton.click();
 
-    waitFor(() => {
+    await waitFor(() => {
       expect(screen.getByText('confirmRemove')).toBeInTheDocument();
     });
   });

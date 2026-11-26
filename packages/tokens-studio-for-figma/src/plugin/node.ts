@@ -14,9 +14,11 @@ import {
 } from '@/figmaStorage';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { Properties } from '@/constants/Properties';
+import { gradientTokenToCss, isGradientTokenValue } from '@/utils/color/gradientTokenToCss';
 import { TokenFormatOptions } from './TokenFormatStoreClass';
 import { ClientStorageProperty } from '@/figmaStorage/ClientStorageProperty';
 import { getFileKey } from './helpers';
+import { getReferencedTokenName } from '@/utils/getReferencedTokenName';
 
 // @TODO fix typings
 
@@ -76,6 +78,14 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
       } else if (returnValueToLookFor(key) === 'description') {
         // Not all tokens have a description, so we need to treat it special
         acc[key] = resolvedToken.description ? resolvedToken.description : 'No description';
+      } else if (
+        resolvedToken.type === TokenTypes.GRADIENT
+        && returnValueToLookFor(key) === 'value'
+        && isGradientTokenValue(resolvedToken.value)
+      ) {
+        // Paints are created from CSS gradient strings, so flatten the
+        // gradient object using the resolved stop colors
+        acc[key] = gradientTokenToCss(resolvedToken.value);
       } else if (
         borderPropertyMap.get(key as Properties)
         && resolvedToken.type === TokenTypes.BORDER
@@ -245,17 +255,16 @@ export function destructureTokenForAlias(tokens: Map<string, AnyTokenList[number
     }
     values = { ...values, ...(values.borderColor ? { } : { borderColor: values.border }) };
   }
-  if (values && values.borderTop) {
-    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderTop }) };
-  }
-  if (values && values.borderRight) {
-    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderRight }) };
-  }
-  if (values && values.borderLeft) {
-    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderLeft }) };
-  }
-  if (values && values.borderBottom) {
-    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderBottom }) };
-  }
+  ([Properties.borderTop, Properties.borderRight, Properties.borderLeft, Properties.borderBottom] as const).forEach((side) => {
+    const sideTokenName = values?.[side];
+    if (!sideTokenName || values.borderColor) return;
+    // Use the color token the side border references, so its variable can be bound to the stroke.
+    // Side widths are bound in applyBorderValuesOnNode, as they can't be stored on a shared key.
+    const resolvedValueWithReferences = tokens.get(sideTokenName)?.resolvedValueWithReferences;
+    const colorTokenName = resolvedValueWithReferences && typeof resolvedValueWithReferences === 'object' && 'color' in resolvedValueWithReferences
+      ? getReferencedTokenName(resolvedValueWithReferences.color)
+      : undefined;
+    values = { ...values, borderColor: colorTokenName ?? sideTokenName };
+  });
   return values;
 }

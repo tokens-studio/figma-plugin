@@ -31,7 +31,6 @@ This is a monorepo using Turbo and Yarn workspaces. The main Figma plugin is in 
 - Jest configuration is in `packages/tokens-studio-for-figma/jest.config.ts`
 - Test files follow `.test.ts` or `.test.tsx` naming
 - E2E tests use Cypress and are in `packages/tokens-studio-for-figma/cypress/`
-- Feature flags are enabled during testing via `LAUNCHDARKLY_FLAGS` environment variable
 
 ## Architecture Overview
 
@@ -111,7 +110,6 @@ Multiple storage providers are supported for token synchronization:
 ## Important Notes
 
 - The plugin requires specific Figma API permissions defined in `manifest.json`
-- Feature flags are managed via LaunchDarkly integration
 - Internationalization support with i18next
 - Comprehensive test coverage with both unit and E2E tests
 - Uses Figma Plugin DS for consistent UI components

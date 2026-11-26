@@ -5,7 +5,9 @@ import { defaultTokenValueRetriever } from './TokenValueRetriever';
 import { ColorPaintType, tryApplyColorVariableId } from '@/utils/tryApplyColorVariableId';
 import { unbindVariableFromTarget } from './unbindVariableFromTarget';
 import { getReferenceTokensFromGradient } from '@/utils/color';
+import { gradientTokenToCss, isGradientTokenValue } from '@/utils/color/gradientTokenToCss';
 import { SingleToken } from '@/types/tokens';
+import { TokenGradientValue } from '@/types/values';
 
 function hasModifier(token: SingleToken) {
   return token.$extensions?.['studio.tokens']?.modify;
@@ -24,14 +26,45 @@ const isGradient = (value: string): boolean => value?.startsWith?.('linear-gradi
   || value?.startsWith?.('radial-gradient')
   || value?.startsWith?.('conic-gradient');
 
+// Raw gradient stops may reference color tokens ("{color.red}"), which can't be
+// parsed as colors. Swap each reference for the referenced token's resolved value.
+const resolveGradientStopReferences = (value: TokenGradientValue): TokenGradientValue => ({
+  ...value,
+  stops: value.stops.map((stop) => {
+    if (typeof stop.color !== 'string' || !stop.color.startsWith('{') || !stop.color.endsWith('}')) return stop;
+    const resolvedColor = defaultTokenValueRetriever.get(stop.color.slice(1, -1))?.value;
+    return typeof resolvedColor === 'string' ? { ...stop, color: resolvedColor } : stop;
+  }),
+});
+
 const getGradientPaint = async (fallbackValue, token) => {
-  const gradientString = typeof fallbackValue === 'object' && fallbackValue.fill
-    ? fallbackValue.fill
-    : fallbackValue;
+  // If the server-resolved value is a string but not a CSS gradient (e.g. the
+  // server returned a non-standard object notation), fall back to rawValue which
+  // is always the original structured TokenGradientValue from the token store.
+  let effectiveValue = fallbackValue;
+  if (typeof effectiveValue === 'string' && !isGradient(effectiveValue)) {
+    effectiveValue = defaultTokenValueRetriever.get(token)?.rawValue ?? effectiveValue;
+    if (isGradientTokenValue(effectiveValue)) {
+      effectiveValue = resolveGradientStopReferences(effectiveValue);
+    }
+  }
+
+  let gradientString = typeof effectiveValue === 'object' && effectiveValue != null && effectiveValue.fill
+    ? effectiveValue.fill
+    : effectiveValue;
+  // Gradient-type tokens hold a structured value, flatten it to a CSS string
+  if (isGradientTokenValue(gradientString)) {
+    gradientString = gradientTokenToCss(gradientString);
+  }
   const gradientResult = convertStringToFigmaGradient(gradientString);
   const { gradientStops, gradientTransform, type } = gradientResult;
 
-  const rawValue = defaultTokenValueRetriever.get(token)?.rawValue;
+  let rawValue = defaultTokenValueRetriever.get(token)?.rawValue;
+  // Keep raw stop colors (incl. references) as a string so reference
+  // extraction below works for gradient-type tokens too
+  if (isGradientTokenValue(rawValue)) {
+    rawValue = gradientTokenToCss(rawValue);
+  }
   let gradientStopsWithReferences = gradientStops;
 
   const { createStylesWithVariableReferences } = defaultTokenValueRetriever;
@@ -90,7 +123,7 @@ export default async function setColorValuesOnTarget({
       existingPaint = target.strokes[0] ?? null;
     }
 
-    if (isGradient(resolvedValue)) {
+    if (isGradient(resolvedValue) || isGradientTokenValue(resolvedValue)) {
       const fallbackValue = defaultTokenValueRetriever.get(token)?.value;
       const newPaint = await getGradientPaint(fallbackValue, token);
       applyPaintIfNotEqual(key, existingPaint, newPaint, target);
@@ -117,7 +150,7 @@ export default async function setColorValuesOnTarget({
 
       if (!successfullyAppliedVariable) {
         let newPaint: SolidPaint | GradientPaint;
-        if (isGradient(valueToApply)) {
+        if (isGradient(valueToApply) || isGradientTokenValue(valueToApply)) {
           newPaint = await getGradientPaint(fallbackValue, token);
         } else {
           const { color, opacity } = convertToFigmaColor(typeof valueToApply === 'string' ? valueToApply : valueToApply?.color || givenValue || '');
