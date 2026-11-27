@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { TokensContext } from '@/context';
 import { aliasBaseFontSizeSelector } from '@/selectors';
 import { getAliasValue } from '@/utils/alias';
+import { getBaseFontSizeAlias } from '@/utils/getBaseFontSizeAlias';
 
 /**
  * Custom hook that resolves the current base font size for rem conversion.
@@ -17,8 +18,9 @@ export function useResolvedBaseFontSize(): string {
 
   // Get the current resolved base font size for rem conversion
   const currentBaseFontSize = React.useMemo(() => {
-    if (aliasBaseFontSize) {
-      const resolvedBaseFontSize = getAliasValue(aliasBaseFontSize, tokensContext.resolvedTokens);
+    const baseFontSizeAlias = getBaseFontSizeAlias(aliasBaseFontSize, tokensContext.resolvedTokens);
+    if (baseFontSizeAlias) {
+      const resolvedBaseFontSize = getAliasValue(baseFontSizeAlias, tokensContext.resolvedTokens);
       return resolvedBaseFontSize ? String(resolvedBaseFontSize) : '16px';
     }
     return '16px';

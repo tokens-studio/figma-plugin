@@ -15,6 +15,7 @@ import {
 } from '@/selectors';
 import DownshiftInput from './DownshiftInput';
 import { getAliasValue } from '@/utils/alias';
+import { getBaseFontSizeAlias } from '@/utils/getBaseFontSizeAlias';
 import { defaultTokenResolver } from '@/utils/TokenResolver';
 import Modal from './Modal';
 import { ExplainerModal } from './ExplainerModal';
@@ -43,7 +44,7 @@ const RemConfiguration = () => {
   );
 
   const displayBaseFontValue = React.useMemo(() => {
-    const resolvedAliasBaseFontSize = getAliasValue(aliasBaseFontSize, resolvedTokens);
+    const resolvedAliasBaseFontSize = getAliasValue(getBaseFontSizeAlias(aliasBaseFontSize, resolvedTokens), resolvedTokens);
     let formattedpxValue = 16;
     if (typeof resolvedAliasBaseFontSize === 'string' || typeof resolvedAliasBaseFontSize === 'number') {
       const resolvedAliasBaseFontSizeValue = typeof resolvedAliasBaseFontSize === 'number'
