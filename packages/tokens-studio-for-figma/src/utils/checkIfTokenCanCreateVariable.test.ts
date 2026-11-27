@@ -129,6 +129,43 @@ describe('checkIfTokenCanCreateVariable', () => {
     expect(checkIfTokenCanCreateVariable(lineHeightsToken, settings)).toBe(false);
   });
 
+  it('should return false for AUTO values on other number token types and in any letter case', () => {
+    const autoTokens = [
+      { name: 'spacing.auto', value: 'AUTO', type: TokenTypes.SPACING },
+      { name: 'sizing.auto', value: 'AUTO', type: TokenTypes.SIZING },
+      { name: 'dimension.auto', value: 'AUTO', type: TokenTypes.DIMENSION },
+      { name: 'line-height.auto', value: 'auto', type: TokenTypes.LINE_HEIGHTS },
+      { name: 'spacing.auto-padded', value: ' Auto ', type: TokenTypes.SPACING },
+    ] as ResolveTokenValuesResult[];
+    autoTokens.forEach((token) => {
+      expect(checkIfTokenCanCreateVariable(token, settings)).toBe(false);
+    });
+  });
+
+  it('should still create variables for AUTO values on string token types', () => {
+    const textToken = {
+      name: 'text.auto',
+      value: 'AUTO',
+      type: TokenTypes.TEXT,
+    } as ResolveTokenValuesResult;
+    expect(checkIfTokenCanCreateVariable(textToken, settings)).toBe(true);
+  });
+
+  it('should still create variables for numeric spacing and line heights tokens', () => {
+    const spacingToken = {
+      name: 'spacing.md',
+      value: '16',
+      type: TokenTypes.SPACING,
+    } as ResolveTokenValuesResult;
+    const lineHeightsToken = {
+      name: 'line-height.body',
+      value: '24px',
+      type: TokenTypes.LINE_HEIGHTS,
+    } as ResolveTokenValuesResult;
+    expect(checkIfTokenCanCreateVariable(spacingToken, settings)).toBe(true);
+    expect(checkIfTokenCanCreateVariable(lineHeightsToken, settings)).toBe(true);
+  });
+
   it('should return false for percentage values on non-text tokens', () => {
     const percentageToken = {
       name: 'percentage-token',
