@@ -4,7 +4,7 @@ import React, {
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import {
-  Button, Label, Select, Stack, TextInput,
+  Button, Label, Stack, TextInput,
 } from '@tokens-studio/ui';
 import IconAdd from '@/icons/add.svg';
 import Modal from './Modal';
@@ -20,19 +20,23 @@ type Props = {
   /** A set or folder of the tree to rename, or null. */
   renamePath: string | null;
   onCloseRename: () => void;
+  /** A collection's folder to add a mode to (from its "+" in the tree), or null. */
+  addModePath: string | null;
+  onCloseAddMode: () => void;
 };
 
 /**
  * The set tree's actions for a Tokens Studio project in Simple view, where Studio keeps one set per mode:
- * "Add collection" and "Add mode" instead of "New set", and renaming a set or folder renames its mode or
- * collection.
+ * "Add collection" instead of "New set", a collection folder's "+" adds a mode, and renaming a set or folder
+ * renames its mode or collection.
  */
-export function SimpleViewSetActions({ simpleView, renamePath, onCloseRename }: Props) {
+export function SimpleViewSetActions({
+  simpleView, renamePath, onCloseRename, addModePath, onCloseAddMode,
+}: Props) {
   const { t } = useTranslation(['tokens']);
   const editProhibited = useSelector(editProhibitedSelector);
-  const [adding, setAdding] = useState<'collection' | 'mode' | null>(null);
+  const [addingCollection, setAddingCollection] = useState(false);
   const [name, setName] = useState('');
-  const [collectionId, setCollectionId] = useState<string>('');
 
   const renameTarget = useMemo(() => {
     if (!renamePath) return null;
@@ -43,6 +47,15 @@ export function SimpleViewSetActions({ simpleView, renamePath, onCloseRename }: 
     return null;
   }, [renamePath, simpleView]);
 
+  const addModeCollection = useMemo(
+    () => (addModePath ? findCollectionByFolder(simpleView, addModePath) ?? null : null),
+    [addModePath, simpleView],
+  );
+
+  useEffect(() => {
+    if (addModeCollection) setName('');
+  }, [addModeCollection]);
+
   useEffect(() => {
     if (renameTarget) setName(renameTarget.kind === 'mode' ? renameTarget.mode.name : renameTarget.collection.name);
   }, [renameTarget]);
@@ -50,27 +63,24 @@ export function SimpleViewSetActions({ simpleView, renamePath, onCloseRename }: 
   const handleChangeName = useCallback((event: React.ChangeEvent<HTMLInputElement>) => setName(event.target.value), []);
   const openAddCollection = useCallback(() => {
     setName('');
-    setAdding('collection');
+    setAddingCollection(true);
   }, []);
-  const openAddMode = useCallback(() => {
-    setName('');
-    setCollectionId(simpleView.collections[0]?.id ?? '');
-    setAdding('mode');
-  }, [simpleView.collections]);
-  const closeAdding = useCallback(() => setAdding(null), []);
+  const closeAdding = useCallback(() => {
+    setAddingCollection(false);
+    onCloseAddMode();
+  }, [onCloseAddMode]);
 
   const handleAddSubmit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const trimmed = name.trim();
     if (!trimmed) return;
-    if (adding === 'collection') {
-      addSimpleCollection(trimmed);
+    if (addModeCollection) {
+      addSimpleMode(addModeCollection, trimmed);
     } else {
-      const collection = simpleView.collections.find((c) => c.id === collectionId);
-      if (collection) addSimpleMode(collection, trimmed);
+      addSimpleCollection(trimmed);
     }
-    setAdding(null);
-  }, [adding, collectionId, name, simpleView.collections]);
+    closeAdding();
+  }, [addModeCollection, closeAdding, name]);
 
   const handleRenameSubmit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -101,40 +111,16 @@ export function SimpleViewSetActions({ simpleView, renamePath, onCloseRename }: 
         >
           {t('simpleView.addCollection')}
         </Button>
-        <Button
-          icon={<IconAdd />}
-          size="small"
-          data-testid="button-simple-add-mode"
-          type="button"
-          disabled={editProhibited || simpleView.collections.length === 0}
-          onClick={openAddMode}
-          css={{ justifyContent: 'center' }}
-        >
-          {t('simpleView.addMode')}
-        </Button>
       </Stack>
       <Modal
-        title={adding === 'mode' ? t('simpleView.addMode') : t('simpleView.addCollection')}
-        isOpen={adding !== null}
+        title={addModeCollection ? t('simpleView.addModeTo', { name: addModeCollection.name }) : t('simpleView.addCollection')}
+        isOpen={addingCollection || !!addModeCollection}
         close={closeAdding}
       >
         <form onSubmit={handleAddSubmit}>
           <Stack direction="column" gap={4}>
-            {adding === 'mode' && (
-              <Stack direction="column" gap={2}>
-
-                <Select value={collectionId} onValueChange={setCollectionId}>
-                  <Select.Trigger label={t('simpleView.collection')} value={simpleView.collections.find((c) => c.id === collectionId)?.name ?? ''} />
-                  <Select.Content>
-                    {simpleView.collections.map((collection) => (
-                      <Select.Item key={collection.id} value={collection.id}>{collection.name}</Select.Item>
-                    ))}
-                  </Select.Content>
-                </Select>
-              </Stack>
-            )}
             <Stack direction="column" gap={2}>
-              <Label htmlFor="simple-set-name">{adding === 'mode' ? t('simpleView.modeName') : t('simpleView.collectionName')}</Label>
+              <Label htmlFor="simple-set-name">{addModeCollection ? t('simpleView.modeName') : t('simpleView.collectionName')}</Label>
               <TextInput
                 autoFocus
                 id="simple-set-name"

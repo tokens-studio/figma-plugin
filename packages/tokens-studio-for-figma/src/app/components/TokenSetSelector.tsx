@@ -34,6 +34,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
   // A Tokens Studio project in Simple view keeps one set per mode: sets come and go with collections and modes.
   const simpleView = useSelector(studioSimpleViewSelector);
   const [simpleRenamePath, setSimpleRenamePath] = React.useState<string | null>(null);
+  const [simpleAddModePath, setSimpleAddModePath] = React.useState<string | null>(null);
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
 
@@ -94,6 +95,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
   }, [simpleView]);
 
   const handleCloseSimpleRename = useCallback(() => setSimpleRenamePath(null), []);
+  const handleCloseSimpleAddMode = useCallback(() => setSimpleAddModePath(null), []);
 
   const handleDuplicateTokenSet = React.useCallback((tokenSet: string) => {
     const newTokenSetName = `${tokenSet}_${t('sets.duplicateSetSuffix')}`;
@@ -178,6 +180,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
           onRename={handleRenameTokenSet}
           onDelete={handleDelete}
           onDuplicate={handleDuplicateTokenSet}
+          onAddMode={simpleView ? setSimpleAddModePath : undefined}
           onReorder={handleReorder}
           saveScrollPositionSet={saveScrollPositionSet}
         />
@@ -246,7 +249,13 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
           </form>
         </Modal>
         {simpleView ? (
-          <SimpleViewSetActions simpleView={simpleView} renamePath={simpleRenamePath} onCloseRename={handleCloseSimpleRename} />
+          <SimpleViewSetActions
+            simpleView={simpleView}
+            renamePath={simpleRenamePath}
+            onCloseRename={handleCloseSimpleRename}
+            addModePath={simpleAddModePath}
+            onCloseAddMode={handleCloseSimpleAddMode}
+          />
         ) : (
           <Stack direction="column" css={{ padding: '$3' }} gap={2}>
             <Button

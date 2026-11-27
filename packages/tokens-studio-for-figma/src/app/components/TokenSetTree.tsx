@@ -35,6 +35,7 @@ type ExtendedTreeItem = TreeItem & {
   onRename: (tokenSet: string) => void
   onDelete: (tokenSet: string) => void
   onDuplicate: (tokenSet: string) => void
+  onAddMode?: (folder: string) => void
   saveScrollPositionSet: (tokenSet: string) => void
 };
 
@@ -44,11 +45,13 @@ type TokenSetTreeProps = {
   onRename: (tokenSet: string) => void
   onDelete: (tokenSet: string) => void
   onDuplicate: (tokenSet: string) => void
+  // Only for a Tokens Studio project in Simple view: adds a mode to the collection of this folder.
+  onAddMode?: (folder: string) => void
   saveScrollPositionSet: (tokenSet: string) => void
 };
 
 export default function TokenSetTree({
-  tokenSets, onReorder, onRename, onDelete, onDuplicate, saveScrollPositionSet,
+  tokenSets, onReorder, onRename, onDelete, onDuplicate, onAddMode, saveScrollPositionSet,
 }: TokenSetTreeProps) {
   const tokens = useSelector(tokensSelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
@@ -142,6 +145,7 @@ export default function TokenSetTree({
       onRename,
       onDelete,
       onDuplicate,
+      onAddMode,
       saveScrollPositionSet,
       isActive: activeTokenSet === item.path && item.isLeaf,
       canDelete: !editProhibited || Object.keys(tokenSets).length > 1,
@@ -156,6 +160,7 @@ export default function TokenSetTree({
     onRename,
     onDelete,
     onDuplicate,
+    onAddMode,
     saveScrollPositionSet,
   ]);
 

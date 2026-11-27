@@ -56,12 +56,19 @@ describe('TokenSetSelector for a Tokens Studio project in Simple view', () => {
     jest.clearAllMocks();
   });
 
-  it('offers Add collection and Add mode instead of New set', () => {
+  it('offers Add collection instead of New set, and a "+" on the collection folder', () => {
     const result = renderSelector();
 
     expect(result.getByTestId('button-simple-add-collection')).toBeInTheDocument();
-    expect(result.getByTestId('button-simple-add-mode')).toBeInTheDocument();
+    expect(result.queryByTestId('button-simple-add-mode')).not.toBeInTheDocument();
     expect(result.queryByTestId('button-new-token-set')).not.toBeInTheDocument();
+    expect(result.getByTestId('tokensetitem-Color-mode-add')).toBeInTheDocument();
+  });
+
+  it('offers no "+" on a folder that is no collection', () => {
+    const result = renderSelector({ extraSets: ['Loose/One'] });
+
+    expect(result.queryByTestId('tokensetitem-Loose-add')).not.toBeInTheDocument();
   });
 
   it('adds a collection', async () => {
@@ -75,13 +82,14 @@ describe('TokenSetSelector for a Tokens Studio project in Simple view', () => {
     expect(addSimpleCollection).toHaveBeenCalledWith('Density');
   });
 
-  it('renames a mode set by renaming its mode, and offers no duplicate or delete', async () => {
+  it('renames a mode set by renaming its mode, and offers no duplicate, delete or treat as source', async () => {
     const user = userEvent.setup();
     const result = renderSelector();
 
     await user.pointer({ keys: '[MouseRight]', target: result.getByTestId('tokensetitem-Color-mode/Dark') });
     expect(result.queryByText('duplicate')).not.toBeInTheDocument();
     expect(result.queryByText('delete')).not.toBeInTheDocument();
+    expect(result.queryByText('sets.treatAsSource')).not.toBeInTheDocument();
     await user.click(await result.findByText('rename'));
     const input = result.getByTestId('simple-rename-input');
     expect(input).toHaveValue('Dark');
@@ -141,11 +149,12 @@ describe('TokenSetSelector renames and adds in a Simple project', () => {
     expect(result.queryByTestId('simple-rename-input')).not.toBeInTheDocument();
   });
 
-  it('adds a mode to the chosen collection', async () => {
+  it('adds a mode to the collection whose "+" was clicked', async () => {
     const user = userEvent.setup();
     const result = renderSelector();
 
-    await user.click(result.getByTestId('button-simple-add-mode'));
+    await user.click(result.getByTestId('tokensetitem-Color-mode-add'));
+    expect(result.getByText('simpleView.addModeTo')).toBeInTheDocument();
     await user.type(result.getByTestId('simple-add-name-input'), 'Sepia');
     await user.click(result.getByTestId('simple-add-submit'));
 
@@ -174,12 +183,15 @@ describe('TokenSetSelector for every other project', () => {
     await user.pointer({ keys: '[MouseRight]', target: result.getByTestId('tokensetitem-Color-mode/Dark') });
     expect(await result.findByText('duplicate')).toBeInTheDocument();
     expect(result.getByText('delete')).toBeInTheDocument();
+    expect(result.getByText('sets.treatAsSource')).toBeInTheDocument();
+    expect(result.queryByTestId('tokensetitem-Color-mode-add')).not.toBeInTheDocument();
   });
 
   it('keeps New set for another provider', () => {
     const result = renderSelector({ provider: StorageProviderType.GITHUB });
 
     expect(result.getByTestId('button-new-token-set')).toBeInTheDocument();
-    expect(result.queryByTestId('button-simple-add-mode')).not.toBeInTheDocument();
+    expect(result.queryByTestId('button-simple-add-collection')).not.toBeInTheDocument();
+    expect(result.queryByTestId('tokensetitem-Color-mode-add')).not.toBeInTheDocument();
   });
 });

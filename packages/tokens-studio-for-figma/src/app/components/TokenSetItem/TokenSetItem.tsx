@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { CheckIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
 import {
-  Checkbox, ContextMenu, Tooltip, Box, Text,
+  Checkbox, ContextMenu, Tooltip, Box, Text, IconButton,
 } from '@tokens-studio/ui';
 import { StyledCheckbox } from '../StyledDragger/StyledCheckbox';
 import { StyledWrapper } from './StyledWrapper';
@@ -17,6 +17,7 @@ import { StyledDragButton } from '../StyledDragger/StyledDragButton';
 import { formatCount } from '@/utils/formatCount';
 import { useGenerateDocumentation } from '@/app/hooks/useGenerateDocumentation';
 import ProBadge from '../ProBadge';
+import IconPlus from '@/icons/plus.svg';
 
 export type TokenSetItemProps = {
   item: TreeItem & { tokenCount?: number };
@@ -27,8 +28,12 @@ export type TokenSetItemProps = {
   canDuplicate?: boolean;
   canDelete: boolean;
   canReorder?: boolean;
-  // False hides Duplicate and Delete: a Tokens Studio project in Simple view keeps exactly one set per mode.
+  // False hides Duplicate, Delete and Treat as source: a Tokens Studio project in Simple view keeps exactly
+  // one set per mode and selects the sets for you.
   canManageSets?: boolean;
+  // Shows a trailing "+" on a folder while it is hovered, labelled with `addInFolderLabel`.
+  onAddInFolder?: (folder: string) => void;
+  addInFolderLabel?: string;
   extraBefore?: React.ReactNode;
   onClick: (item: TreeItem) => void;
   onCollapse?: (itemPath: string) => void; // eslint-disable-line react/no-unused-prop-types
@@ -51,6 +56,8 @@ export function TokenSetItem({
   canDelete,
   canReorder = false,
   canManageSets = true,
+  onAddInFolder,
+  addInFolderLabel,
   extraBefore,
   onRename,
   onDelete,
@@ -81,6 +88,10 @@ export function TokenSetItem({
   const handleDuplicate = useCallback(() => {
     onDuplicate(item.path);
   }, [item.path, onDuplicate]);
+
+  const handleAddInFolder = useCallback(() => {
+    onAddInFolder?.(item.path);
+  }, [item.path, onAddInFolder]);
 
   const handleTreatAsSource = useCallback(() => {
     onTreatAsSource(item.path);
@@ -117,9 +128,11 @@ export function TokenSetItem({
     [tokenSetStatus],
   );
 
+  const showAddInFolder = !item.isLeaf && !!onAddInFolder;
+
   return (
     <>
-      <StyledWrapper>
+      <StyledWrapper css={showAddInFolder ? { '&:hover .add-in-folder, &:focus-within .add-in-folder': { opacity: 1 } } : undefined}>
         <ContextMenu>
           {!item.isLeaf ? (
             <ContextMenu.Trigger asChild id={`${item.path}-trigger`}>
@@ -128,7 +141,7 @@ export function TokenSetItem({
                 type="button"
                 data-testid={`tokensetitem-${item.path}`}
                 css={{
-                  padding: '$3 $7 $3 $1',
+                  padding: showAddInFolder ? '$3 $9 $3 $1' : '$3 $7 $3 $1',
                   paddingLeft: `${5 * item.level}px`,
                 }}
                 isActive={isActive}
@@ -209,21 +222,37 @@ export function TokenSetItem({
                       <ProBadge compact campaign="tokenset-context-menu" />
                     </div>
                   </ContextMenu.Item>
-                  <ContextMenu.Separator />
-                  <ContextMenu.CheckboxItem
-                    checked={tokenSetStatus === TokenSetStatus.SOURCE}
-                    onSelect={handleTreatAsSource}
-                  >
-                    <ContextMenu.ItemIndicator>
-                      <CheckIcon />
-                    </ContextMenu.ItemIndicator>
-                    {t('sets.treatAsSource')}
-                  </ContextMenu.CheckboxItem>
+                  {canManageSets && (
+                    <>
+                      <ContextMenu.Separator />
+                      <ContextMenu.CheckboxItem
+                        checked={tokenSetStatus === TokenSetStatus.SOURCE}
+                        onSelect={handleTreatAsSource}
+                      >
+                        <ContextMenu.ItemIndicator>
+                          <CheckIcon />
+                        </ContextMenu.ItemIndicator>
+                        {t('sets.treatAsSource')}
+                      </ContextMenu.CheckboxItem>
+                    </>
+                  )}
                 </>
               )}
             </ContextMenu.Content>
           </ContextMenu.Portal>
         </ContextMenu>
+        {showAddInFolder && (
+          <Box className="add-in-folder" css={{ position: 'absolute', right: '$7', opacity: 0 }}>
+            <IconButton
+              icon={<IconPlus />}
+              size="small"
+              variant="invisible"
+              tooltip={addInFolderLabel}
+              onClick={handleAddInFolder}
+              data-testid={`tokensetitem-${item.path}-add`}
+            />
+          </Box>
+        )}
         <StyledCheckbox checked={isChecked}>
           {item.isLeaf ? (
             <Tooltip label={getCheckboxTooltip()} side="right">
