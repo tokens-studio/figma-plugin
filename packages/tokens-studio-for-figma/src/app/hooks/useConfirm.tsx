@@ -9,6 +9,8 @@ import { confirmStateSelector } from '@/selectors';
 export type ResolveCallbackPayload<C = any> = false | {
   result: true;
   data: C;
+  // Set when the dialog's secondaryAction button was used
+  secondary?: boolean;
 };
 
 let resolveCallback: (payload: ResolveCallbackPayload<any>) => void = () => {};
@@ -23,6 +25,7 @@ function useConfirm<C = any>() {
       description,
       confirmAction,
       cancelAction,
+      secondaryAction,
       choices,
       input,
       variant,
@@ -34,6 +37,7 @@ function useConfirm<C = any>() {
       description,
       confirmAction,
       cancelAction,
+      secondaryAction,
       text: text ?? '',
       choices: choices ?? [],
       variant,
@@ -59,9 +63,14 @@ function useConfirm<C = any>() {
     closeConfirm();
   }, [closeConfirm]);
 
+  const onSecondary = useCallback((data: C) => {
+    resolveCallback({ result: true, data, secondary: true });
+    closeConfirm();
+  }, [closeConfirm]);
+
   return useMemo(() => ({
-    confirm, onConfirm, onCancel, confirmState,
-  }), [confirm, onConfirm, onCancel, confirmState]);
+    confirm, onConfirm, onCancel, onSecondary, confirmState,
+  }), [confirm, onConfirm, onCancel, onSecondary, confirmState]);
 }
 
 export default useConfirm;

@@ -22,3 +22,5 @@ export * from './disconnectVariableFromTheme';
 export * from './renameVariableIdsToTheme';
 export * from './renameVariableNamesToThemes';
 export * from './removeVariableNamesFromThemes';
+export * from './disconnectVariablesFromThemes';
+export * from './restoreVariableReferencesToThemes';
