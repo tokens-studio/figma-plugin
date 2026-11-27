@@ -1,7 +1,18 @@
 import { globalCss } from '@/stitches.config';
 import '@/app/assets/fonts/fonts.css';
 
+const checkableMenuItems = ['menuitemcheckbox', 'menuitemradio'].map((role) => `[data-radix-menu-content] [role="${role}"]`);
+
 export const globalStyles = globalCss({
+  // Dropdown and context menus place their check mark differently, and in dropdowns it touches
+  // the label. Radix renders the indicator as a span[data-state] inside checkable items, so pin
+  // it to the same spot in every menu, leaving a gap before the label.
+  [checkableMenuItems.join(', ')]: {
+    position: 'relative',
+  },
+  [checkableMenuItems.map((item) => `${item} > span[data-state]`).join(', ')]: {
+    left: '$2',
+  },
   body: {
     fontFamily: '$sans',
     fontSize: '$xsmall',
