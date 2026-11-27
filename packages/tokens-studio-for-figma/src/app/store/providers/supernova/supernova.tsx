@@ -43,7 +43,16 @@ export function useSupernova() {
 
   const pushTokensToSupernova = useCallback(
     async (context: SupernovaCredentials, overrides?: PushOverrides): Promise<RemoteResponseData> => {
-      const storage = await storageClientFactory(context);
+      let storage: SupernovaTokenStorage;
+      try {
+        storage = storageClientFactory(context);
+      } catch (e: any) {
+        // The design system URL is invalid or not a supported Supernova host
+        return {
+          status: 'failure',
+          errorMessage: e.message,
+        };
+      }
 
       dispatch.uiState.setLocalApiState({ ...context });
       const pushSettings = await pushDialog({ state: 'initial', overrides });
@@ -151,7 +160,11 @@ export function useSupernova() {
   const syncTokensWithSupernova = useCallback(
     async (context: SupernovaCredentials): Promise<RemoteResponseData> => {
       try {
-        return (await pushTokensToSupernova(context)) as any;
+        const result = await pushTokensToSupernova(context);
+        if (result.status === 'failure') {
+          notifyToUI(result.errorMessage, { error: true });
+        }
+        return result;
       } catch (e) {
         notifyToUI('Error syncing with Supernova, check credentials', { error: true });
         return {
