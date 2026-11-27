@@ -1,0 +1,28 @@
+import { Meta, Story, Canvas } from '@storybook/addon-docs';
+
+import LaunchScreen from '@/app/components/LaunchScreen/LaunchScreen';
+import ConsentDialog from '@/app/components/LaunchScreen/ConsentDialog';
+import FigmaLoading from '@/app/components/FigmaLoading';
+
+<Meta title='LaunchScreen' component={LaunchScreen}/>
+
+<Canvas>
+  <Story name='Loading'>
+    <FigmaLoading isLoading label="Verifying license" />
+  </Story>
+</Canvas>
+
+<Canvas>
+  <Story name='Launch'>
+    <LaunchScreen />
+  </Story>
+</Canvas>
+
+<Canvas>
+  <Story name='Consent'>
+    <>
+      <LaunchScreen />
+      <ConsentDialog isOpen />
+    </>
+  </Story>
+</Canvas>

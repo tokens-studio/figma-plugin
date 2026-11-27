@@ -61,6 +61,8 @@ export interface SettingsState {
   seenGenericVersionedHeaderMigrationDialog?: boolean;
   seenTermsUpdate2026?: boolean;
   seenTermsUpdate2026Subprocessors?: boolean;
+  acceptedStudioConsent?: boolean;
+  performanceAnalyticsConsent?: boolean;
   bitbucketSecurityNoticeViews2026?: number;
 }
 
@@ -81,6 +83,8 @@ export const settings = createModel<RootModel>()({
     seenGenericVersionedHeaderMigrationDialog: false,
     seenTermsUpdate2026: false,
     seenTermsUpdate2026Subprocessors: false,
+    acceptedStudioConsent: false,
+    performanceAnalyticsConsent: false,
     bitbucketSecurityNoticeViews2026: 0,
     language: 'en',
     sessionRecording: false,
@@ -261,6 +265,13 @@ export const settings = createModel<RootModel>()({
         seenTermsUpdate2026Subprocessors: payload,
       };
     },
+    setStudioConsent(state, payload: { accepted: boolean; performanceAnalytics: boolean }) {
+      return {
+        ...state,
+        acceptedStudioConsent: payload.accepted,
+        performanceAnalyticsConsent: payload.performanceAnalytics,
+      };
+    },
     setBitbucketSecurityNoticeViews2026(state, payload: number) {
       return {
         ...state,
@@ -342,6 +353,9 @@ export const settings = createModel<RootModel>()({
       setUI(rootState.settings);
     },
     setSeenTermsUpdate2026Subprocessors: (payload: boolean, rootState) => {
+      setUI(rootState.settings);
+    },
+    setStudioConsent: (payload: { accepted: boolean; performanceAnalytics: boolean }, rootState) => {
       setUI(rootState.settings);
     },
     setBitbucketSecurityNoticeViews2026: (payload: number, rootState) => {

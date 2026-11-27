@@ -19,5 +19,17 @@
   "loadFromProvider": "सिंक प्रदाता से लोड करें",
   "selectProvider": "एक प्रदाता चुनें",
   "chooseProvider": "एक प्रदाता चुनें...",
-  "loadingTokens": "सिंक प्रदाता से टोकन लोड हो रहा है..."
+  "loadingTokens": "सिंक प्रदाता से टोकन लोड हो रहा है...",
+  "createAccount": "खाता बनाएँ",
+  "logIn": "लॉग इन करें",
+  "continueWithoutAccount": "बिना खाते के जारी रखें",
+  "joinSlackShort": "Slack से जुड़ें",
+  "docs": "दस्तावेज़",
+  "reportIssue": "समस्या की रिपोर्ट करें",
+  "termsAndConditions": "नियम और शर्तें",
+  "consentDescription": "Figma के लिए Tokens Studio प्लगइन का उपयोग जारी रखने के लिए बॉक्स चुनकर अपनी सहमति दें। कुछ सहमतियाँ आवश्यक हैं और इन्हें वापस लिया जा सकता है।",
+  "termsOfService": "सेवा की शर्तें",
+  "performanceAnalytics": "प्रदर्शन विश्लेषण",
+  "optional": "(वैकल्पिक)",
+  "agreeAndContinue": "सहमत हों और जारी रखें"
 }

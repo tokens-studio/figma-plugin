@@ -98,6 +98,8 @@ export type SavedSettings = {
   seenGenericVersionedHeaderMigrationDialog?: boolean;
   seenTermsUpdate2026?: boolean;
   seenTermsUpdate2026Subprocessors?: boolean;
+  acceptedStudioConsent?: boolean;
+  performanceAnalyticsConsent?: boolean;
   bitbucketSecurityNoticeViews2026?: number;
 };
 
@@ -139,6 +141,8 @@ export function notifyUISettings(
     seenGenericVersionedHeaderMigrationDialog,
     seenTermsUpdate2026,
     seenTermsUpdate2026Subprocessors,
+    acceptedStudioConsent,
+    performanceAnalyticsConsent,
     bitbucketSecurityNoticeViews2026,
   }: SavedSettings,
 ) {
@@ -182,6 +186,8 @@ export function notifyUISettings(
       seenGenericVersionedHeaderMigrationDialog,
       seenTermsUpdate2026,
       seenTermsUpdate2026Subprocessors,
+      acceptedStudioConsent,
+      performanceAnalyticsConsent,
       bitbucketSecurityNoticeViews2026,
     },
   });

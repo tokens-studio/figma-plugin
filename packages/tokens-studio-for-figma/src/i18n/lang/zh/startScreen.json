@@ -19,5 +19,17 @@
   "loadFromProvider": "从同步提供程序加载",
   "selectProvider": "选择提供商",
   "chooseProvider": "选择提供商...",
-  "loadingTokens": "正在从同步提供商加载令牌..."
+  "loadingTokens": "正在从同步提供商加载令牌...",
+  "createAccount": "创建账户",
+  "logIn": "登录",
+  "continueWithoutAccount": "不登录继续使用",
+  "joinSlackShort": "加入 Slack",
+  "docs": "文档",
+  "reportIssue": "报告问题",
+  "termsAndConditions": "条款和条件",
+  "consentDescription": "请勾选下方选项表示同意，以继续使用 Tokens Studio for Figma 插件。部分同意项为必选，且可随时撤回。",
+  "termsOfService": "服务条款",
+  "performanceAnalytics": "性能分析",
+  "optional": "（可选）",
+  "agreeAndContinue": "同意并继续"
 }

@@ -48,6 +48,8 @@ export async function updateUISettings(uiSettings: Partial<SavedSettings>) {
       seenTermsUpdate2026: uiSettings.seenTermsUpdate2026 ?? data?.seenTermsUpdate2026,
       seenTermsUpdate2026Subprocessors:
         uiSettings.seenTermsUpdate2026Subprocessors ?? data?.seenTermsUpdate2026Subprocessors,
+      acceptedStudioConsent: uiSettings.acceptedStudioConsent ?? data?.acceptedStudioConsent,
+      performanceAnalyticsConsent: uiSettings.performanceAnalyticsConsent ?? data?.performanceAnalyticsConsent,
       bitbucketSecurityNoticeViews2026: uiSettings.bitbucketSecurityNoticeViews2026 ?? data?.bitbucketSecurityNoticeViews2026,
     });
   } catch (err) {
@@ -97,6 +99,8 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
     let seenGenericVersionedHeaderMigrationDialog: boolean;
     let seenTermsUpdate2026: boolean;
     let seenTermsUpdate2026Subprocessors: boolean;
+    let acceptedStudioConsent: boolean;
+    let performanceAnalyticsConsent: boolean;
     let bitbucketSecurityNoticeViews2026: number;
 
     if (data) {
@@ -137,6 +141,8 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
       seenGenericVersionedHeaderMigrationDialog = typeof data.seenGenericVersionedHeaderMigrationDialog === 'undefined' ? false : data.seenGenericVersionedHeaderMigrationDialog;
       seenTermsUpdate2026 = typeof data.seenTermsUpdate2026 === 'undefined' ? false : data.seenTermsUpdate2026;
       seenTermsUpdate2026Subprocessors = typeof data.seenTermsUpdate2026Subprocessors === 'undefined' ? false : data.seenTermsUpdate2026Subprocessors;
+      acceptedStudioConsent = data.acceptedStudioConsent ?? false;
+      performanceAnalyticsConsent = data.performanceAnalyticsConsent ?? false;
       bitbucketSecurityNoticeViews2026 = typeof data.bitbucketSecurityNoticeViews2026 === 'number' ? data.bitbucketSecurityNoticeViews2026 : 0;
       settings = {
         language,
@@ -176,6 +182,8 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
         seenGenericVersionedHeaderMigrationDialog,
         seenTermsUpdate2026,
         seenTermsUpdate2026Subprocessors,
+        acceptedStudioConsent,
+        performanceAnalyticsConsent,
         bitbucketSecurityNoticeViews2026,
       };
 
