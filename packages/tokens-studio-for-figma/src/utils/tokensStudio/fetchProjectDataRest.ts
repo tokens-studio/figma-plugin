@@ -3,6 +3,8 @@ import { AnyTokenSet } from '@/types/tokens';
 import { ThemeObjectsList, ThemeObject } from '@/types';
 import { parseBranchesFromResponse } from './fetchBranchesListRest';
 import { studioApiErrorFromResponse } from './StudioApiError';
+import { buildSimpleCollections, readThemesSimpleViewActive } from './simpleView';
+import type { StudioSimpleView } from '@/types/StudioSimpleView';
 
 // Types derived from REST endpoints
 
@@ -35,7 +37,22 @@ export type ProjectData = {
   hasExceededPaginationLimit?: boolean;
   /** The change_set_id for the resolved branch — used for server-side token resolution */
   changeSetId: string;
+  /** Whether the project is in Studio's Simple view, read again on every pull, with its collections and modes. */
+  simpleView: StudioSimpleView;
 };
+
+// The project itself, for `themes_simple_view_active`. A failed read keeps the pull going as a project
+// that isn't in Simple view: the plugin then behaves as it always has, and Studio still refuses what
+// Simple view doesn't allow.
+async function fetchThemesSimpleViewActive(apiBaseUrl: string, projectId: string, headers: HeadersInit): Promise<boolean> {
+  try {
+    const res = await fetch(`${apiBaseUrl}/api/v1/projects/${projectId}`, { headers });
+    if (!res.ok) return false;
+    return readThemesSimpleViewActive(await res.json());
+  } catch (e) {
+    return false;
+  }
+}
 
 function transformTokenValue(token: any): unknown {
   const value = token.attributes?.value;
@@ -101,11 +118,12 @@ export async function fetchProjectDataRest(
   const branchQuery = `change_set_id=${encodeURIComponent(changeSetId)}`;
 
   // 2. Fetch all required data concurrently
-  const [tokensRes, tokenSetsData, themeGroupsData, themeOptionsData] = await Promise.all([
+  const [tokensRes, tokenSetsData, themeGroupsData, themeOptionsData, themesSimpleViewActive] = await Promise.all([
     fetch(`${apiBaseUrl}/api/v1/projects/${projectId}/tokens?${branchQuery}&per_page=10000`, { headers }),
     fetchAllPages(`${apiBaseUrl}/api/v1/projects/${projectId}/token_sets?${branchQuery}&per_page=100`, headers, 'token sets'),
     fetchAllPages(`${apiBaseUrl}/api/v1/projects/${projectId}/theme_groups?${branchQuery}&per_page=100`, headers, 'theme groups'),
     fetchAllPages(`${apiBaseUrl}/api/v1/projects/${projectId}/theme_options?${branchQuery}&per_page=1000`, headers, 'theme options'),
+    fetchThemesSimpleViewActive(apiBaseUrl, projectId, headers),
   ]);
 
   const handleFetchResponse = async (res: Response, resourceName: string) => {
@@ -337,6 +355,14 @@ export async function fetchProjectDataRest(
     });
   }
 
+  const simpleView: StudioSimpleView = {
+    projectId,
+    active: themesSimpleViewActive,
+    collections: themesSimpleViewActive
+      ? buildSimpleCollections(themeGroupsData.data || [], themeOptionsData.data || [], tokenSetIdToName)
+      : [],
+  };
+
   return {
     tokens,
     themes,
@@ -345,5 +371,6 @@ export async function fetchProjectDataRest(
     tokenSetOrder,
     changeSetId,
     hasExceededPaginationLimit,
+    simpleView,
   };
 }

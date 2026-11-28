@@ -1,3 +1,4 @@
+import omit from 'just-omit';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { pushToTokensStudioOAuth } from '../../../../providers/tokens-studio/tokensStudioOAuth';
 import { store } from '@/app/store';
@@ -6,6 +7,8 @@ import { TOKENS_STUDIO_APP_URL } from '@/constants/TokensStudio';
 import { useAuthStore } from '@/app/store/useAuthStore';
 import { notifyToUI } from '@/plugin/notifiers';
 import { RestApiError } from '@/utils/tokensStudio/restApi';
+import { describeSimpleViewRefusal, simpleViewRuleMessage } from '@/utils/tokensStudio/simpleView';
+import { getStudioSimpleView } from '@/selectors/studioSimpleViewSelector';
 import {
   lookupBySanitized,
   resolveSanitizedKey,
@@ -60,6 +63,9 @@ async function fetchThemeGroupId(projectId: string, groupName: string, changeSet
  * reads "Your plan includes 1 theme group. Upgrade to add more."
  */
 function failureDetail(error: unknown): string {
+  // Simple view refusals get the plugin's own wording rather than Studio's, which names API calls.
+  const simpleViewRefusal = describeSimpleViewRefusal(error);
+  if (simpleViewRefusal) return simpleViewRefusal.message;
   if (error instanceof RestApiError && error.detail) return error.detail;
   return error instanceof Error ? error.message : 'Unknown error';
 }
@@ -137,6 +143,16 @@ export async function pushThemeToTokensStudioOAuth(
     return { ok: false, failure };
   };
 
+  // Simple view: a mode is added with its own set, from Manage themes. A theme made here would need a set
+  // selection Studio refuses, and could leave a new collection behind.
+  if (isNewTheme && getStudioSimpleView(liveState)) {
+    return fail({
+      themeName: payload?.name,
+      action: 'create',
+      reason: simpleViewRuleMessage('theme_option_create'),
+    });
+  }
+
   // Tokens Studio keeps every theme in a group and refuses one without; say so instead of sending it.
   if (isNewTheme && !groupName) {
     return fail({
@@ -152,6 +168,9 @@ export async function pushThemeToTokensStudioOAuth(
     : null;
   // Set when this push created the group, so a refused theme doesn't leave it behind empty.
   let createdGroupId: string | null = null;
+  // A project in Simple view creates a collection with a "Default" mode of its own (the response names it in
+  // `meta.theme_option_id`), so the group is never empty: undoing it means deleting it outright.
+  let createdGroupHasOwnMode = false;
 
   if (groupName && !themeGroupId) {
     const { id: projectId, changeSetId } = rootState.uiState.api;
@@ -172,6 +191,7 @@ export async function pushThemeToTokensStudioOAuth(
     if (createResult?.data?.id) {
       themeGroupId = createResult.data.id;
       createdGroupId = themeGroupId;
+      createdGroupHasOwnMode = !!createResult?.meta?.theme_option_id;
     } else {
       // The group may already exist: Studio reports a plan's group limit or a name it would no longer accept
       // before it checks for a name clash, so look the group up before treating the refusal as final.
@@ -222,12 +242,17 @@ export async function pushThemeToTokensStudioOAuth(
     figma_mode_id: payload?.$figmaModeId || null,
   };
 
+  // In Simple view Studio derives every mode's selection and refuses any that differs from what it stored. The
+  // plugin's copy is lossy (disabled entries and sets without a name are dropped), so an update sends none:
+  // a variable or style export then only changes the references.
+  const updateData = getStudioSimpleView(liveState) ? omit(themeData, 'selected_token_sets') : themeData;
+
   let result: any;
   try {
     result = await pushToTokensStudioOAuth({
       context: rootState.uiState.api,
       action: isNewTheme ? 'CREATE_THEME' : 'UPDATE_THEME',
-      data: isNewTheme ? themeData : { ...themeData, id: payload.id },
+      data: isNewTheme ? themeData : { ...updateData, id: payload.id },
       rethrowErrors: true,
       notifyOnSuccess,
     });
@@ -236,8 +261,9 @@ export async function pushThemeToTokensStudioOAuth(
       // The group was made for this theme only; don't leave it empty, where it still counts toward a plan's limit.
       await pushToTokensStudioOAuth({
         context: rootState.uiState.api,
-        action: 'DELETE_THEME_GROUP_IF_EMPTY',
+        action: createdGroupHasOwnMode ? 'DELETE_THEME_GROUP' : 'DELETE_THEME_GROUP_IF_EMPTY',
         data: { id: createdGroupId },
+        notifyOnSuccess: false,
       });
       const { metadata: currentMetadata } = store.getState().tokenState.remoteData || {};
       const remainingGroups = { ...(currentMetadata?.themeGroupsData || {}) };

@@ -2,14 +2,17 @@ import React, {
   useCallback, useContext,
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { TokenSetItem } from './TokenSetItem';
 import {
   activeTokenSetSelector,
   editProhibitedSelector,
+  studioSimpleViewSelector,
   tokenSetMetadataSelector,
 } from '@/selectors';
 import { TreeItem } from '@/utils/tokenset';
 import { DragControlsContext } from '@/context';
+import { findCollectionByFolder } from '@/utils/tokensStudio/simpleView';
 
 type ExtendedTreeItem = TreeItem & {
   tokenSets: string[];
@@ -20,6 +23,7 @@ type ExtendedTreeItem = TreeItem & {
   onRename: (tokenSet: string) => void
   onDelete: (tokenSet: string) => void
   onDuplicate: (tokenSet: string) => void
+  onAddMode?: (folder: string) => void
   saveScrollPositionSet: (tokenSet: string) => void
 };
 
@@ -35,6 +39,12 @@ export function TokenSetTreeItemContent({
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const editProhibited = useSelector(editProhibitedSelector);
   const tokenSetMetadata = useSelector(tokenSetMetadataSelector);
+  // A Tokens Studio project in Simple view orders, adds and deletes sets with its collections and modes.
+  const simpleView = useSelector(studioSimpleViewSelector);
+  const isSimpleView = !!simpleView;
+  const { t } = useTranslation(['tokens']);
+  // A collection's folder offers a "+" that adds a mode to that collection.
+  const isCollectionFolder = !item.isLeaf && !!simpleView && !!findCollectionByFolder(simpleView, item.path);
 
   const handleClick = useCallback((set: TreeItem) => {
     if (set.isLeaf) {
@@ -70,7 +80,10 @@ export function TokenSetTreeItemContent({
       onCheck={handleCheckedChange}
       canEdit={!editProhibited}
       canDuplicate={!tokenSetMetadata[item.path]?.isDynamic}
-      canReorder={!editProhibited}
+      canReorder={!editProhibited && !isSimpleView}
+      canManageSets={!isSimpleView}
+      onAddInFolder={isCollectionFolder && !editProhibited ? item.onAddMode : undefined}
+      addInFolderLabel={t('simpleView.addMode')}
       canDelete={item.canDelete}
       extraBefore={children}
       onRename={item.onRename}

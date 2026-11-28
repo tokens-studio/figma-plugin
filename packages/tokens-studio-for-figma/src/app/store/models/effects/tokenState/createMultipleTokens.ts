@@ -1,9 +1,12 @@
 import type { RematchDispatch } from '@rematch/core';
 import type { RootModel } from '@/types/RootModel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
-import { pushToTokensStudioOAuth } from '../../../providers/tokens-studio/tokensStudioOAuth';
+import { pushToTokensStudioOAuth, reloadStudioProject } from '../../../providers/tokens-studio/tokensStudioOAuth';
 import { store } from '@/app/store';
 import type { CreateSingleTokenData } from '@/app/store/useManageTokens';
+import { getStudioSimpleView } from '@/selectors/studioSimpleViewSelector';
+import { notifyToUI } from '@/plugin/notifiers';
+import { refusedSetsMessage } from './utils/simpleViewImport';
 
 // Fires when the user clicks "Import All" in ImportedTokensDialog (via importMultipleTokens).
 // For Tokens Studio OAuth projects this writes the confirmed tokens to the REST API.
@@ -30,6 +33,9 @@ export function createMultipleTokens(dispatch: RematchDispatch<RootModel>) {
     });
 
     const allTokensToCreate: Array<{ name: string; value: any; type: string; description?: string; token_set_id: string }> = [];
+    // Simple view: Studio makes sets only with a collection or mode, so tokens for a set it doesn't have stay out.
+    const isSimpleView = !!getStudioSimpleView(currentState);
+    const refusedSets: string[] = [];
 
     for (const [setName, tokens] of Object.entries(tokensBySet)) {
       const setMeta = store.getState().tokenState.tokenSetMetadata[setName] as any;
@@ -45,7 +51,9 @@ export function createMultipleTokens(dispatch: RematchDispatch<RootModel>) {
         // Resolve or create the server ID for this token set.
         let tokenSetId: string | undefined = setMeta?.id;
 
-        if (!tokenSetId) {
+        if (!tokenSetId && isSimpleView) {
+          refusedSets.push(setName);
+        } else if (!tokenSetId) {
           // eslint-disable-next-line no-await-in-loop
           const setResult = await pushToTokensStudioOAuth({
             context: context as any,
@@ -83,6 +91,12 @@ export function createMultipleTokens(dispatch: RematchDispatch<RootModel>) {
         action: 'BATCH_CREATE_TOKENS',
         data: allTokensToCreate,
       });
+    }
+
+    if (refusedSets.length > 0) {
+      notifyToUI(refusedSetsMessage(refusedSets), { error: true });
+      // Drop the local copies of the tokens Studio didn't get.
+      await reloadStudioProject();
     }
   };
 }

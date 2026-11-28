@@ -12,9 +12,12 @@ import IconAdd from '@/icons/add.svg';
 import Modal from './Modal';
 import TokenSetTree from './TokenSetTree';
 import {
-  editProhibitedSelector, tokensSelector, uiStateSelector,
+  editProhibitedSelector, studioSimpleViewSelector, tokensSelector, uiStateSelector,
 } from '@/selectors';
 import OnboardingExplainer from './OnboardingExplainer';
+import { SimpleViewSetActions } from './SimpleViewSetActions';
+import { notifyToUI } from '@/plugin/notifiers';
+import { findCollectionByFolder, findModeBySetName, simpleViewRuleMessage } from '@/utils/tokensStudio/simpleView';
 
 export default function TokenSetSelector({ saveScrollPositionSet }: { saveScrollPositionSet: (tokenSet: string) => void }) {
   const { t } = useTranslation(['tokens']);
@@ -28,6 +31,10 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
   const tokens = useSelector(tokensSelector);
   const editProhibited = useSelector(editProhibitedSelector);
   const uiState = useSelector(uiStateSelector);
+  // A Tokens Studio project in Simple view keeps one set per mode: sets come and go with collections and modes.
+  const simpleView = useSelector(studioSimpleViewSelector);
+  const [simpleRenamePath, setSimpleRenamePath] = React.useState<string | null>(null);
+  const [simpleAddModePath, setSimpleAddModePath] = React.useState<string | null>(null);
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
 
@@ -72,11 +79,23 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
 
   const handleRenameTokenSet = React.useCallback((tokenSet: string) => {
     track('Renamed token set');
+    if (simpleView) {
+      // Only a mode's set or a collection's folder has a name of its own to change.
+      if (findModeBySetName(simpleView, tokenSet) || findCollectionByFolder(simpleView, tokenSet)) {
+        setSimpleRenamePath(tokenSet);
+      } else {
+        notifyToUI(simpleViewRuleMessage('token_set_rename'), { error: true });
+      }
+      return;
+    }
     handleNewTokenSetNameChange(tokenSet);
     setOldTokenSetName(tokenSet);
     setIsDuplicate(false);
     setShowRenameTokenSetFields(true);
-  }, []);
+  }, [simpleView]);
+
+  const handleCloseSimpleRename = useCallback(() => setSimpleRenamePath(null), []);
+  const handleCloseSimpleAddMode = useCallback(() => setSimpleAddModePath(null), []);
 
   const handleDuplicateTokenSet = React.useCallback((tokenSet: string) => {
     const newTokenSetName = `${tokenSet}_${t('sets.duplicateSetSuffix')}`;
@@ -161,6 +180,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
           onRename={handleRenameTokenSet}
           onDelete={handleDelete}
           onDuplicate={handleDuplicateTokenSet}
+          onAddMode={simpleView ? setSimpleAddModePath : undefined}
           onReorder={handleReorder}
           saveScrollPositionSet={saveScrollPositionSet}
         />
@@ -228,19 +248,29 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
             </Stack>
           </form>
         </Modal>
-        <Stack direction="column" css={{ padding: '$3' }} gap={2}>
-          <Button
-            icon={<IconAdd />}
-            size="small"
-            data-testid="button-new-token-set"
-            type="button"
-            disabled={editProhibited}
-            onClick={handleOpenNewTokenSetModal}
-            css={{ justifyContent: 'center' }}
-          >
-            {t('sets.new')}
-          </Button>
-        </Stack>
+        {simpleView ? (
+          <SimpleViewSetActions
+            simpleView={simpleView}
+            renamePath={simpleRenamePath}
+            onCloseRename={handleCloseSimpleRename}
+            addModePath={simpleAddModePath}
+            onCloseAddMode={handleCloseSimpleAddMode}
+          />
+        ) : (
+          <Stack direction="column" css={{ padding: '$3' }} gap={2}>
+            <Button
+              icon={<IconAdd />}
+              size="small"
+              data-testid="button-new-token-set"
+              type="button"
+              disabled={editProhibited}
+              onClick={handleOpenNewTokenSetModal}
+              css={{ justifyContent: 'center' }}
+            >
+              {t('sets.new')}
+            </Button>
+          </Stack>
+        )}
         {uiState.onboardingExplainerSets && (
         <OnboardingExplainer data={onboardingData} closeOnboarding={closeOnboarding} />
         )}

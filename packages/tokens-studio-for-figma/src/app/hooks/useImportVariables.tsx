@@ -7,7 +7,7 @@ import { VariableCollectionInfo, SelectedCollections } from '@/types/VariableCol
 import { ThemeObjectsList } from '@/types/ThemeObjectsList';
 import { track } from '@/utils/analytics';
 import { StorageProviderType } from '@/constants/StorageProviderType';
-import { apiSelector, isTokensStudioSyncSelector } from '@/selectors';
+import { apiSelector, isStudioSimpleViewSelector, isTokensStudioSyncSelector } from '@/selectors';
 import useConfirm from './useConfirm';
 
 export function useImportVariables() {
@@ -16,6 +16,7 @@ export function useImportVariables() {
   const [isLoading, setIsLoading] = useState(false);
   const isTokensStudioSync = useSelector(isTokensStudioSyncSelector);
   const api = useSelector(apiSelector);
+  const isStudioSimpleView = useSelector(isStudioSimpleViewSelector);
   const { confirm } = useConfirm();
   const { t } = useTranslation(['tokens']);
   // setTokensFromVariables and setThemesFromVariables decide on `api.provider` whether to write to Tokens Studio.
@@ -66,16 +67,19 @@ export function useImportVariables() {
         ), 0);
         const confirmResult = await confirm({
           text: t('importVariablesStudioConfirmTitle') as string,
-          description: [
-            branch
-              ? t('importVariablesStudioConfirmDescriptionBranch', { branch })
-              : t('importVariablesStudioConfirmDescription'),
-            t('importVariablesStudioConfirmCounts', {
-              sets: totalSelectedModes,
-              tokens: totalTokens,
-              themes: proUser ? totalSelectedModes : 0,
-            }),
-          ].join(' '),
+          // Simple view: Studio keeps the collections and modes, so the import fills the ones that exist.
+          description: isStudioSimpleView
+            ? t('importVariablesStudioSimpleViewDescription')
+            : [
+              branch
+                ? t('importVariablesStudioConfirmDescriptionBranch', { branch })
+                : t('importVariablesStudioConfirmDescription'),
+              t('importVariablesStudioConfirmCounts', {
+                sets: totalSelectedModes,
+                tokens: totalTokens,
+                themes: proUser ? totalSelectedModes : 0,
+              }),
+            ].join(' '),
           confirmAction: t('importVariablesStudioConfirmAction') as string,
           cancelAction: t('cancel') as string,
         });
@@ -106,7 +110,7 @@ export function useImportVariables() {
     } catch (error) {
       console.error('Error importing variables:', error);
     }
-  }, [closeDialog, collections, writesToTokensStudio, branch, confirm, t]);
+  }, [closeDialog, collections, writesToTokensStudio, isStudioSimpleView, branch, confirm, t]);
 
   return {
     isDialogOpen,

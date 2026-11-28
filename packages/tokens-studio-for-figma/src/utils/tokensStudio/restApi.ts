@@ -12,12 +12,16 @@ export class RestApiError extends Error {
 
   detail?: string;
 
-  constructor(status: number, detail?: string, code?: string) {
+  // Simple view refusals name the rule they apply in `meta.rule`.
+  meta?: Record<string, any>;
+
+  constructor(status: number, detail?: string, code?: string, meta?: Record<string, any>) {
     super(`API error: ${status} ${detail || ''}`);
     this.name = 'RestApiError';
     this.status = status;
     this.detail = detail;
     this.code = code;
+    this.meta = meta;
   }
 }
 
@@ -91,7 +95,7 @@ async function restRequest(
       const errorData = await response.json().catch(() => ({}));
       console.error(`REST API Request failed [${method} ${url.toString()}]:`, response.status, errorData);
       const apiError = errorData.errors?.[0];
-      throw new RestApiError(response.status, apiError?.detail, apiError?.code);
+      throw new RestApiError(response.status, apiError?.detail, apiError?.code, apiError?.meta);
     }
 
     const result = await response.json().catch(() => ({}));
@@ -406,6 +410,70 @@ export async function deleteThemeOptionRest(
 ) {
   return restRequest(authToken, apiBaseUrl, `/api/v1/projects/${projectId}/theme_options/${themeOptionId}`, {
     method: 'DELETE',
+    query: changeSetId ? { change_set_id: changeSetId } : undefined,
+  });
+}
+
+// Simple view (Studio ADR-182). Studio owns a Simple project's token sets: each of these calls writes the
+// collection or mode together with its sets.
+
+// A new mode in a Simple view collection, with its own (empty) set `<Collection>/<Mode>`.
+export async function createSimpleModeRest(
+  authToken: string,
+  apiBaseUrl: string,
+  projectId: string,
+  data: { theme_group_id: string; name: string },
+  changeSetId?: string,
+) {
+  return restRequest(authToken, apiBaseUrl, `/api/v1/projects/${projectId}/theme_options`, {
+    method: 'POST',
+    body: { theme_option: { theme_group_id: data.theme_group_id, name: data.name, create_set: true } },
+    query: changeSetId ? { change_set_id: changeSetId } : undefined,
+  });
+}
+
+export async function setDefaultModeRest(
+  authToken: string,
+  apiBaseUrl: string,
+  projectId: string,
+  themeGroupId: string,
+  themeOptionId: string,
+  changeSetId?: string,
+) {
+  return restRequest(authToken, apiBaseUrl, `/api/v1/projects/${projectId}/theme_groups/${themeGroupId}`, {
+    method: 'PATCH',
+    body: { theme_group: { default_theme_option_id: themeOptionId } },
+    query: changeSetId ? { change_set_id: changeSetId } : undefined,
+  });
+}
+
+export async function reorderThemeOptionsRest(
+  authToken: string,
+  apiBaseUrl: string,
+  projectId: string,
+  themeGroupId: string,
+  orderedIds: string[],
+  changeSetId?: string,
+) {
+  return restRequest(authToken, apiBaseUrl, `/api/v1/projects/${projectId}/theme_options/reorder`, {
+    method: 'PATCH',
+    body: { theme_group_id: themeGroupId, ordered_ids: orderedIds },
+    query: changeSetId ? { change_set_id: changeSetId } : undefined,
+  });
+}
+
+// "Copy values from mode X": afterwards the mode shows exactly what `fromOptionId` shows.
+export async function copyModeValuesRest(
+  authToken: string,
+  apiBaseUrl: string,
+  projectId: string,
+  themeOptionId: string,
+  fromOptionId: string,
+  changeSetId?: string,
+) {
+  return restRequest(authToken, apiBaseUrl, `/api/v1/projects/${projectId}/theme_options/${themeOptionId}/copy_values`, {
+    method: 'POST',
+    body: { from_option_id: fromOptionId },
     query: changeSetId ? { change_set_id: changeSetId } : undefined,
   });
 }

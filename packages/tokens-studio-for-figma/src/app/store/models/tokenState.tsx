@@ -45,6 +45,11 @@ import { wrapTransaction } from '@/profiling/transaction';
 import addIdPropertyToTokens from '@/utils/addIdPropertyToTokens';
 import { TokenFormat, TokenFormatOptions, setFormat } from '@/plugin/TokenFormatStoreClass';
 import { pushToTokensStudioOAuth } from '../providers/tokens-studio';
+import type { StudioSimpleView } from '@/types/StudioSimpleView';
+import { getStudioSimpleView } from '@/selectors/studioSimpleViewSelector';
+import { findModeBySetName, simpleViewRuleMessage } from '@/utils/tokensStudio/simpleView';
+import { reloadStudioProject } from '../providers/tokens-studio/tokensStudioOAuth';
+import { renameSimpleMode } from '../providers/tokens-studio/simpleViewActions';
 import { StorageTypeCredential, TokensStudioOAuthStorageType } from '@/types/StorageType';
 import { updateAliasesInState } from '../utils/updateAliasesInState';
 import { CreateSingleTokenData, EditSingleTokenData } from '../useManageTokens';
@@ -99,6 +104,13 @@ export interface TokenState {
    * null = server hasn't responded yet or is unavailable → use local resolver only.
    */
   serverResolvedTokens: Record<string, string> | null;
+  /**
+   * Whether the connected Tokens Studio project is in Simple view, with its collections and modes, as the
+   * last pull read it. Read it through `studioSimpleViewSelector`, which also checks the provider and project.
+   */
+  studioSimpleView: StudioSimpleView | null;
+  /** True while a Simple view write and the pull after it run: its actions wait, so they act on fresh data. */
+  studioSimpleWritePending: boolean;
 }
 
 // Figma has no font weight variable type, so a numeric font weight comes back from the import as a number
@@ -209,6 +221,8 @@ export const tokenState = createModel<RootModel>()({
     renamedCollections: null,
     serverResolverContext: null,
     serverResolvedTokens: null,
+    studioSimpleView: null,
+    studioSimpleWritePending: false,
   } as unknown as TokenState,
   reducers: {
     setTokensSize: (state, size: number) => ({
@@ -854,6 +868,14 @@ export const tokenState = createModel<RootModel>()({
       // Clear cached server results whenever the context changes (e.g. branch switch)
       serverResolvedTokens: null,
     }),
+    setStudioSimpleView: (state, payload: StudioSimpleView | null): TokenState => ({
+      ...state,
+      studioSimpleView: payload,
+    }),
+    setStudioSimpleWritePending: (state, payload: boolean): TokenState => ({
+      ...state,
+      studioSimpleWritePending: payload,
+    }),
     setServerResolvedTokens: (state, payload: Record<string, string> | null): TokenState => {
       if (isEqual(state.serverResolvedTokens, payload)) {
         return state;
@@ -925,6 +947,13 @@ export const tokenState = createModel<RootModel>()({
     addTokenSet(name: string, rootState) {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
 
+      // Simple view: Studio makes sets only with a collection or a mode. Undo the local set.
+      if (getStudioSimpleView(rootState)) {
+        notifyToUI(simpleViewRuleMessage('token_set_create'), { error: true });
+        reloadStudioProject();
+        return;
+      }
+
       if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
         pushToTokensStudioOAuth({
           context: rootState.uiState.api as StorageTypeCredential<TokensStudioOAuthStorageType, false>,
@@ -955,6 +984,22 @@ export const tokenState = createModel<RootModel>()({
     renameTokenSet(data: { oldName: string; newName: string }, rootState) {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
 
+      // Simple view: a set is named `<Collection>/<Mode>`, so renaming its last part renames the mode, and
+      // Studio renames the set with it. Any other rename is refused and undone.
+      const simpleView = getStudioSimpleView(rootState);
+      if (simpleView) {
+        const match = findModeBySetName(simpleView, data.oldName);
+        const folder = data.oldName.split('/').slice(0, -1).join('/');
+        const newModeName = data.newName.startsWith(`${folder}/`) ? data.newName.slice(folder.length + 1) : '';
+        if (match && folder && newModeName && !newModeName.includes('/')) {
+          renameSimpleMode(match.mode, newModeName);
+        } else {
+          notifyToUI(simpleViewRuleMessage('token_set_rename'), { error: true });
+          reloadStudioProject();
+        }
+        return;
+      }
+
       if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
         const tokenSetId = (rootState.tokenState.tokenSetMetadata[data.oldName] as any)?.id;
         if (tokenSetId) {
@@ -972,6 +1017,13 @@ export const tokenState = createModel<RootModel>()({
     deleteTokenSet(name: string, rootState) {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
 
+      // Simple view: a set goes only with its mode or collection. Undo the local delete.
+      if (getStudioSimpleView(rootState)) {
+        notifyToUI(simpleViewRuleMessage('token_set_delete'), { error: true });
+        reloadStudioProject();
+        return;
+      }
+
       if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
         const tokenSetId = (rootState.tokenState.tokenSetMetadata[name] as any)?.id;
         if (tokenSetId) {
@@ -987,6 +1039,9 @@ export const tokenState = createModel<RootModel>()({
     },
     setTokenSetOrder(data: string[], rootState) {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
+
+      // Simple view: sets follow the order of their collections, which Studio keeps. Nothing to send.
+      if (getStudioSimpleView(rootState)) return;
 
       if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO_OAUTH) {
         data.forEach((name, index) => {

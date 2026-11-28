@@ -7,7 +7,9 @@ import debounce from 'lodash.debounce';
 import { Button, EmptyState } from '@tokens-studio/ui';
 import { styled } from '@stitches/react';
 import { useTranslation } from 'react-i18next';
-import { activeThemeSelector, isTokensStudioSyncSelector, themesListSelector } from '@/selectors';
+import {
+  activeThemeSelector, isTokensStudioSyncSelector, studioSimpleViewSelector, themesListSelector,
+} from '@/selectors';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
@@ -35,6 +37,7 @@ import {
 import { ItemData } from '@/context';
 import { checkReorder } from '@/utils/motion';
 import { ensureFolderIsTogether, findOrderableTargetIndexesInThemeList } from '@/utils/dragDropOrder';
+import { SimpleViewThemesModal } from './SimpleViewThemesModal';
 
 type Props = unknown;
 
@@ -49,7 +52,7 @@ const StyledReorderGroup = styled(ReorderGroup, {
   },
 });
 
-export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = () => {
+const AdvancedManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = () => {
   const dispatch = useDispatch<Dispatch>();
   const themes = useSelector(themesListSelector);
   const activeTheme = useSelector(activeThemeSelector);
@@ -542,4 +545,14 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
       )}
     </Modal>
   );
+};
+
+/**
+ * A Tokens Studio project in Simple view manages collections and modes, and Studio picks every mode's sets.
+ * Every other project, synced or not, gets the full theme editor.
+ */
+export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = () => {
+  const simpleView = useSelector(studioSimpleViewSelector);
+  if (simpleView) return <SimpleViewThemesModal simpleView={simpleView} />;
+  return <AdvancedManageThemesModal />;
 };
