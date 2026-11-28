@@ -65,12 +65,15 @@ export function findModeBySetName(view: StudioSimpleView | null | undefined, tok
   return null;
 }
 
-/** The collection a folder of the set tree stands for: its sets are that collection's mode sets. */
+/**
+ * The collection a folder of the set tree stands for: each of that collection's modes has its set directly in
+ * the folder, as `<folder>/<mode>`. A parent folder (`Brand` above `Brand/Colors`) stands for no collection.
+ */
 export function findCollectionByFolder(view: StudioSimpleView | null | undefined, folderPath: string) {
   if (!view) return null;
   return view.collections.find((collection) => (
     collection.modes.length > 0
-    && collection.modes.every((mode) => mode.tokenSetName?.startsWith(`${folderPath}/`))
+    && collection.modes.every((mode) => mode.tokenSetName === `${folderPath}/${mode.name}`)
   )) ?? null;
 }
 

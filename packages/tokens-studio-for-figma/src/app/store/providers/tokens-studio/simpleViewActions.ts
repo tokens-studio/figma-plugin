@@ -17,14 +17,11 @@ function failureReason(error: unknown): string {
   return error instanceof Error ? error.message : 'Unknown error';
 }
 
-async function runSimpleWrite(
+async function runSteps(
   steps: Array<{ action: string; data: Record<string, unknown> }>,
   { success, failure }: { success: string | ((results: any[]) => string); failure: string },
+  context: any,
 ): Promise<boolean> {
-  const state = store.getState();
-  // Only for a project in Simple view: every other project keeps the plugin's usual flows.
-  if (!getStudioSimpleView(state)) return false;
-  const context = state.uiState.api as any;
   const results: any[] = [];
   try {
     for (const step of steps) {
@@ -49,6 +46,27 @@ async function runSimpleWrite(
   notifyToUI(typeof success === 'function' ? success(results) : success);
   await reloadStudioProject();
   return true;
+}
+
+// Writes still running, with the pull after each. The UI disables Simple view actions until it is 0.
+let pendingWrites = 0;
+
+async function runSimpleWrite(
+  steps: Array<{ action: string; data: Record<string, unknown> }>,
+  { success, failure }: { success: string | ((results: any[]) => string); failure: string },
+): Promise<boolean> {
+  const state = store.getState();
+  // Only for a project in Simple view: every other project keeps the plugin's usual flows.
+  if (!getStudioSimpleView(state)) return false;
+  const context = state.uiState.api as any;
+  pendingWrites += 1;
+  store.dispatch.tokenState.setStudioSimpleWritePending(true);
+  try {
+    return await runSteps(steps, { success, failure }, context);
+  } finally {
+    pendingWrites -= 1;
+    if (pendingWrites === 0) store.dispatch.tokenState.setStudioSimpleWritePending(false);
+  }
 }
 
 export function addSimpleCollection(name: string) {

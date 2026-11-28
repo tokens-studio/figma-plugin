@@ -109,6 +109,8 @@ export interface TokenState {
    * last pull read it. Read it through `studioSimpleViewSelector`, which also checks the provider and project.
    */
   studioSimpleView: StudioSimpleView | null;
+  /** True while a Simple view write and the pull after it run: its actions wait, so they act on fresh data. */
+  studioSimpleWritePending: boolean;
 }
 
 // Figma has no font weight variable type, so a numeric font weight comes back from the import as a number
@@ -220,6 +222,7 @@ export const tokenState = createModel<RootModel>()({
     serverResolverContext: null,
     serverResolvedTokens: null,
     studioSimpleView: null,
+    studioSimpleWritePending: false,
   } as unknown as TokenState,
   reducers: {
     setTokensSize: (state, size: number) => ({
@@ -868,6 +871,10 @@ export const tokenState = createModel<RootModel>()({
     setStudioSimpleView: (state, payload: StudioSimpleView | null): TokenState => ({
       ...state,
       studioSimpleView: payload,
+    }),
+    setStudioSimpleWritePending: (state, payload: boolean): TokenState => ({
+      ...state,
+      studioSimpleWritePending: payload,
     }),
     setServerResolvedTokens: (state, payload: Record<string, string> | null): TokenState => {
       if (isEqual(state.serverResolvedTokens, payload)) {

@@ -43,7 +43,7 @@ const themes = [
   },
 ];
 
-const renderModal = ({ provider = StorageProviderType.TOKENS_STUDIO_OAUTH, active = true } = {}) => {
+const renderModal = ({ provider = StorageProviderType.TOKENS_STUDIO_OAUTH, active = true, writePending = false } = {}) => {
   const api = {
     provider, id: 'p1', orgId: 'o1', name: 'Northwind',
   };
@@ -53,6 +53,7 @@ const renderModal = ({ provider = StorageProviderType.TOKENS_STUDIO_OAUTH, activ
       tokens: { 'Color-mode/Light': [], 'Color-mode/Dark': [] },
       themes,
       studioSimpleView: { projectId: 'p1', active, collections: active ? [collection] : [] },
+      studioSimpleWritePending: writePending,
     } as any,
   });
   return render(
@@ -122,6 +123,17 @@ describe('ManageThemesModal for a Tokens Studio project in Simple view', () => {
     await user.click(result.getByTestId('simple-rename-collection-submit'));
 
     expect(renameSimpleCollection).toHaveBeenCalledWith(collection, 'Appearance');
+  });
+
+  it('disables every action while a write and the pull after it run', () => {
+    const result = renderModal({ writePending: true });
+
+    expect(result.getByTestId('button-simple-new-collection')).toBeDisabled();
+    expect(result.getByTestId('simple-collection-Color-mode-add-mode')).toBeDisabled();
+    expect(result.getByTestId('simple-collection-Color-mode-menu')).toBeDisabled();
+    expect(result.getByTestId('simple-mode-Light-down')).toBeDisabled();
+    expect(result.getByTestId('simple-mode-Dark-up')).toBeDisabled();
+    expect(result.getByTestId('simple-mode-Dark-menu')).toBeDisabled();
   });
 });
 

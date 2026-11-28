@@ -87,6 +87,24 @@ describe('Simple view theme management', () => {
     expect(notifyToUI).toHaveBeenCalledWith('Added collection "Density" to Tokens Studio');
   });
 
+  it('marks a write pending until the pull after it is done, also when Studio refuses it', async () => {
+    let pendingDuringPull: boolean | undefined;
+    jest.mocked(fetchProjectDataRest).mockImplementation(async () => {
+      pendingDuringPull = store.getState().tokenState.studioSimpleWritePending;
+      return null as any;
+    });
+
+    const write = addSimpleMode(collection, 'Sepia');
+    expect(store.getState().tokenState.studioSimpleWritePending).toBe(true);
+    await write;
+    expect(pendingDuringPull).toBe(true);
+    expect(store.getState().tokenState.studioSimpleWritePending).toBe(false);
+
+    respond = () => ({ status: 422, body: { errors: [{ code: 'taken', detail: 'Name is taken' }] } });
+    await addSimpleMode(collection, 'Sepia');
+    expect(store.getState().tokenState.studioSimpleWritePending).toBe(false);
+  });
+
   it('adds a mode with its own set, never seeded from another mode', async () => {
     await addSimpleMode(collection, 'High contrast');
 

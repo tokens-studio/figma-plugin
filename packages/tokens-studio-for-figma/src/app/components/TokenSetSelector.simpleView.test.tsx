@@ -30,7 +30,7 @@ const collection = {
 const noop = () => {};
 
 const renderSelector = ({
-  provider = StorageProviderType.TOKENS_STUDIO_OAUTH, active = true, extraSets = [] as string[],
+  provider = StorageProviderType.TOKENS_STUDIO_OAUTH, active = true, extraSets = [] as string[], writePending = false,
 } = {}) => {
   const api = {
     provider, id: 'p1', orgId: 'o1', name: 'Northwind',
@@ -42,6 +42,7 @@ const renderSelector = ({
       usedTokenSet: {},
       activeTokenSet: 'Color-mode/Light',
       studioSimpleView: { projectId: 'p1', active, collections: active ? [collection] : [] },
+      studioSimpleWritePending: writePending,
     } as any,
   });
   return render(
@@ -159,6 +160,19 @@ describe('TokenSetSelector renames and adds in a Simple project', () => {
     await user.click(result.getByTestId('simple-add-submit'));
 
     expect(addSimpleMode).toHaveBeenCalledWith(collection, 'Sepia');
+  });
+
+  it('waits for a pending write before it adds or renames', async () => {
+    const user = userEvent.setup();
+    const result = renderSelector({ writePending: true });
+
+    expect(result.getByTestId('button-simple-add-collection')).toBeDisabled();
+    await user.click(result.getByTestId('tokensetitem-Color-mode-add'));
+    await user.type(result.getByTestId('simple-add-name-input'), 'Sepia');
+    expect(result.getByTestId('simple-add-submit')).toBeDisabled();
+    await user.type(result.getByTestId('simple-add-name-input'), '{Enter}');
+
+    expect(addSimpleMode).not.toHaveBeenCalled();
   });
 
   it('cancels adding without a call', async () => {

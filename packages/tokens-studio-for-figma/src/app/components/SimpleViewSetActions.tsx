@@ -8,7 +8,7 @@ import {
 } from '@tokens-studio/ui';
 import IconAdd from '@/icons/add.svg';
 import Modal from './Modal';
-import { editProhibitedSelector } from '@/selectors';
+import { editProhibitedSelector, studioSimpleWritePendingSelector } from '@/selectors';
 import type { StudioSimpleView } from '@/types/StudioSimpleView';
 import { findCollectionByFolder, findModeBySetName } from '@/utils/tokensStudio/simpleView';
 import {
@@ -35,6 +35,8 @@ export function SimpleViewSetActions({
 }: Props) {
   const { t } = useTranslation(['tokens']);
   const editProhibited = useSelector(editProhibitedSelector);
+  // While a write and the pull after it run, adds and renames wait: they would act on the sets before it.
+  const writePending = useSelector(studioSimpleWritePendingSelector);
   const [addingCollection, setAddingCollection] = useState(false);
   const [name, setName] = useState('');
 
@@ -73,25 +75,26 @@ export function SimpleViewSetActions({
   const handleAddSubmit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const trimmed = name.trim();
-    if (!trimmed) return;
+    if (!trimmed || writePending) return;
     if (addModeCollection) {
       addSimpleMode(addModeCollection, trimmed);
     } else {
       addSimpleCollection(trimmed);
     }
     closeAdding();
-  }, [addModeCollection, closeAdding, name]);
+  }, [addModeCollection, closeAdding, name, writePending]);
 
   const handleRenameSubmit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const trimmed = name.trim();
+    if (writePending) return;
     if (renameTarget?.kind === 'mode' && trimmed && trimmed !== renameTarget.mode.name) {
       renameSimpleMode(renameTarget.mode, trimmed);
     } else if (renameTarget?.kind === 'collection' && trimmed && trimmed !== renameTarget.collection.name) {
       renameSimpleCollection(renameTarget.collection, trimmed);
     }
     onCloseRename();
-  }, [name, onCloseRename, renameTarget]);
+  }, [name, onCloseRename, renameTarget, writePending]);
 
   let renameTitle = '';
   if (renameTarget?.kind === 'mode') renameTitle = t('simpleView.renameModeTitle', { name: renameTarget.mode.name });
@@ -105,7 +108,7 @@ export function SimpleViewSetActions({
           size="small"
           data-testid="button-simple-add-collection"
           type="button"
-          disabled={editProhibited}
+          disabled={editProhibited || writePending}
           onClick={openAddCollection}
           css={{ justifyContent: 'center' }}
         >
@@ -133,7 +136,7 @@ export function SimpleViewSetActions({
             </Stack>
             <Stack direction="row" gap={4} justify="end">
               <Button variant="secondary" onClick={closeAdding}>{t('cancel')}</Button>
-              <Button data-testid="simple-add-submit" type="submit" variant="primary" disabled={!name.trim()}>{t('create')}</Button>
+              <Button data-testid="simple-add-submit" type="submit" variant="primary" disabled={!name.trim() || writePending}>{t('create')}</Button>
             </Stack>
           </Stack>
         </form>
@@ -155,7 +158,7 @@ export function SimpleViewSetActions({
             </Stack>
             <Stack direction="row" gap={4} justify="end">
               <Button variant="secondary" onClick={onCloseRename}>{t('cancel')}</Button>
-              <Button type="submit" variant="primary" disabled={!name.trim()} data-testid="simple-rename-submit">{t('change')}</Button>
+              <Button type="submit" variant="primary" disabled={!name.trim() || writePending} data-testid="simple-rename-submit">{t('change')}</Button>
             </Stack>
           </Stack>
         </form>

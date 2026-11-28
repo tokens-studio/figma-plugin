@@ -25,3 +25,6 @@ export const studioSimpleViewSelector = createSelector(
 );
 
 export const isStudioSimpleViewSelector = createSelector(studioSimpleViewSelector, (view) => view !== null);
+
+/** True while a Simple view write and the pull after it run. */
+export const studioSimpleWritePendingSelector = (state: RootState) => state.tokenState.studioSimpleWritePending === true;

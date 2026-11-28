@@ -288,6 +288,8 @@ export function alignObjectKeys<T extends Record<string, any>>(obj: T, template:
 }
 
 let reloadInFlight: Promise<void> | null = null;
+// A reload asked for while one runs: that one's fetch may predate the write that asked, so one more follows it.
+let reloadQueued: Promise<void> | null = null;
 
 /**
  * Pull the connected Tokens Studio project again and replace the plugin's copy, without asking: Studio
@@ -296,7 +298,15 @@ let reloadInFlight: Promise<void> | null = null;
  * collection). Keeps the active themes that still exist.
  */
 export function reloadStudioProject(): Promise<void> {
-  if (reloadInFlight) return reloadInFlight;
+  if (reloadInFlight) {
+    if (!reloadQueued) {
+      reloadQueued = reloadInFlight.then(() => {
+        reloadQueued = null;
+        return reloadStudioProject();
+      });
+    }
+    return reloadQueued;
+  }
   reloadInFlight = (async () => {
     const api = store.getState().uiState.api as TokensStudioOAuthCredentials | null;
     if (!useAuthStore.getState().oauthTokens?.accessToken || api?.provider !== StorageProviderType.TOKENS_STUDIO_OAUTH || !api.id) return;

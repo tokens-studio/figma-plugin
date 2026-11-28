@@ -11,7 +11,7 @@ import Text from '../Text';
 import IconPlus from '@/icons/plus.svg';
 import { Dispatch } from '@/app/store';
 import useConfirm from '@/app/hooks/useConfirm';
-import { editProhibitedSelector } from '@/selectors';
+import { editProhibitedSelector, studioSimpleWritePendingSelector } from '@/selectors';
 import type { StudioSimpleCollection, StudioSimpleMode, StudioSimpleView } from '@/types/StudioSimpleView';
 import {
   addSimpleCollection,
@@ -45,12 +45,14 @@ function NameForm({
 }: NameFormProps) {
   const { t } = useTranslation(['tokens']);
   const [value, setValue] = useState(initialValue);
+  // Waits for the write before it, so it acts on the collections and modes that write left.
+  const writePending = useSelector(studioSimpleWritePendingSelector);
   const handleChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => setValue(event.target.value), []);
   const handleSubmit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const name = value.trim();
-    if (name) onSubmit(name);
-  }, [onSubmit, value]);
+    if (name && !writePending) onSubmit(name);
+  }, [onSubmit, value, writePending]);
   const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Escape') {
       // Close the form, not the modal.
@@ -72,7 +74,7 @@ function NameForm({
           data-testid={`${testId}-input`}
         />
         <Button size="small" variant="secondary" onClick={onCancel}>{t('cancel')}</Button>
-        <Button size="small" variant="primary" type="submit" disabled={!value.trim()} data-testid={`${testId}-submit`}>
+        <Button size="small" variant="primary" type="submit" disabled={!value.trim() || writePending} data-testid={`${testId}-submit`}>
           {submitLabel}
         </Button>
       </Stack>
@@ -291,6 +293,9 @@ export function SimpleViewThemesModal({ simpleView }: { simpleView: StudioSimple
   const dispatch = useDispatch<Dispatch>();
   const { t } = useTranslation(['tokens']);
   const editProhibited = useSelector(editProhibitedSelector);
+  // While a write and the pull after it run, every action waits: it would act on the collections before it.
+  const writePending = useSelector(studioSimpleWritePendingSelector);
+  const disabled = editProhibited || writePending;
   const [editing, setEditing] = useState<Editing | null>(null);
 
   const handleClose = useCallback(() => dispatch.uiState.setManageThemesModalOpen(false), [dispatch]);
@@ -323,7 +328,7 @@ export function SimpleViewThemesModal({ simpleView }: { simpleView: StudioSimple
             data-testid="button-simple-new-collection"
             variant="secondary"
             icon={<IconPlus />}
-            disabled={editProhibited}
+            disabled={disabled}
             onClick={handleNewCollection}
           >
             {t('simpleView.newCollection')}
@@ -344,7 +349,7 @@ export function SimpleViewThemesModal({ simpleView }: { simpleView: StudioSimple
           <CollectionSection
             key={collection.id}
             collection={collection}
-            disabled={editProhibited}
+            disabled={disabled}
             editing={editing}
             setEditing={setEditing}
           />

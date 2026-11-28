@@ -75,9 +75,43 @@ describe('pushThemeToTokensStudioOAuth and Simple view', () => {
     expect(mockPush.mock.calls[0][0].data).toEqual(expect.objectContaining({
       id: 'o-dark',
       theme_group_id: 'g1',
-      // The selection Studio derived, sent back as it is: Studio accepts an unchanged selection.
-      selected_token_sets: { 's-dark': 'enabled' },
       figma_variable_references: { bg: 'VariableID:1' },
+    }));
+    // Studio derives the selection in Simple view: the plugin sends none.
+    expect(mockPush.mock.calls[0][0].data).not.toHaveProperty('selected_token_sets');
+  });
+
+  it('saves references for a mode whose stored selection the plugin only has a lossy copy of', async () => {
+    // Studio stores { s-dark: enabled, s-light: disabled, s-gone: enabled }. The plugin's copy drops the disabled
+    // entry and the deleted set, so sending it back would differ, which Studio refuses in Simple view.
+    setState(true, { themeGroupsData: { Colors: { id: 'g1' } }, tokenSetsData: { 'Colors/Dark': { id: 's-dark' } } });
+    mockPush.mockResolvedValueOnce({ data: { id: 'o-dark' } });
+
+    const result = await pushThemeToTokensStudioOAuth(
+      { ...newTheme, id: 'o-dark', $figmaStyleReferences: { bg: 'S:abc,' } },
+      rootState,
+      dispatch,
+    );
+
+    expect(result.ok).toBe(true);
+    const { data } = mockPush.mock.calls[0][0];
+    expect(data).not.toHaveProperty('selected_token_sets');
+    expect(data.figma_style_references).toEqual({ bg: 'S:abc,' });
+  });
+
+  it('still sends the selection with an update in an Advanced project', async () => {
+    setState(false, { themeGroupsData: { Colors: { id: 'g1' } }, tokenSetsData: { 'Colors/Dark': { id: 's-dark' } } });
+    mockPush.mockResolvedValueOnce({ data: { id: 'o-dark' } });
+
+    await pushThemeToTokensStudioOAuth(
+      { ...newTheme, id: 'o-dark', $figmaVariableReferences: { bg: 'VariableID:1' } },
+      rootState,
+      dispatch,
+    );
+
+    expect(mockPush.mock.calls[0][0].data).toEqual(expect.objectContaining({
+      id: 'o-dark',
+      selected_token_sets: { 's-dark': 'enabled' },
     }));
   });
 

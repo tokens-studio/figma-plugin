@@ -1,3 +1,4 @@
+import omit from 'just-omit';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { pushToTokensStudioOAuth } from '../../../../providers/tokens-studio/tokensStudioOAuth';
 import { store } from '@/app/store';
@@ -241,12 +242,17 @@ export async function pushThemeToTokensStudioOAuth(
     figma_mode_id: payload?.$figmaModeId || null,
   };
 
+  // In Simple view Studio derives every mode's selection and refuses any that differs from what it stored. The
+  // plugin's copy is lossy (disabled entries and sets without a name are dropped), so an update sends none:
+  // a variable or style export then only changes the references.
+  const updateData = getStudioSimpleView(liveState) ? omit(themeData, 'selected_token_sets') : themeData;
+
   let result: any;
   try {
     result = await pushToTokensStudioOAuth({
       context: rootState.uiState.api,
       action: isNewTheme ? 'CREATE_THEME' : 'UPDATE_THEME',
-      data: isNewTheme ? themeData : { ...themeData, id: payload.id },
+      data: isNewTheme ? themeData : { ...updateData, id: payload.id },
       rethrowErrors: true,
       notifyOnSuccess,
     });

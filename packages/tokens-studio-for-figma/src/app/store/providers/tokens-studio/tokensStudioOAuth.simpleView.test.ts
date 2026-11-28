@@ -127,4 +127,33 @@ describe('Tokens Studio pushes and Simple view refusals', () => {
 
     expect(store.getState().tokenState.studioSimpleView).toBeNull();
   });
+
+  it('pulls once more when a reload is asked for while one runs, so a later write is not missed', async () => {
+    let finishFirst: (value: any) => void = () => {};
+    const withSepia = {
+      ...simpleProject,
+      tokens: { ...simpleProject.tokens, 'Color-mode/Sepia': [] },
+    };
+    jest.mocked(fetchProjectDataRest)
+      .mockImplementationOnce(() => new Promise((resolve) => { finishFirst = resolve; }))
+      .mockResolvedValueOnce(withSepia as any);
+
+    const first = reloadStudioProject();
+    // Two writes land while the first pull runs: one more pull covers both.
+    const second = reloadStudioProject();
+    const third = reloadStudioProject();
+    expect(third).toBe(second);
+    await Promise.resolve();
+    finishFirst(simpleProject);
+    await Promise.all([first, second, third]);
+
+    expect(fetchProjectDataRest).toHaveBeenCalledTimes(2);
+    expect(Object.keys(store.getState().tokenState.tokens)).toContain('Color-mode/Sepia');
+  });
+
+  it('pulls once when nothing else asks for a reload meanwhile', async () => {
+    await reloadStudioProject();
+
+    expect(fetchProjectDataRest).toHaveBeenCalledTimes(1);
+  });
 });

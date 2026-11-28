@@ -90,6 +90,20 @@ describe('set tree lookups', () => {
     expect(findCollectionByFolder(view, 'Color')).toBeNull();
     expect(findModeBySetName(null, 'Color-mode/Dark')).toBeNull();
   });
+
+  it('matches a nested collection by its own folder only, not by a parent folder', () => {
+    const nested: StudioSimpleView = {
+      projectId: 'p',
+      active: true,
+      collections: [
+        { id: 'colors', name: 'Brand/Colors', modes: [{ id: 'c1', name: 'Light', tokenSetName: 'Brand/Colors/Light' }] },
+        { id: 'type', name: 'Brand/Type', modes: [{ id: 't1', name: 'Default', tokenSetName: 'Brand/Type/Default' }] },
+      ],
+    };
+    expect(findCollectionByFolder(nested, 'Brand')).toBeNull();
+    expect(findCollectionByFolder(nested, 'Brand/Colors')?.id).toBe('colors');
+    expect(findCollectionByFolder(nested, 'Brand/Type')?.id).toBe('type');
+  });
 });
 
 describe('describeSimpleViewRefusal', () => {
